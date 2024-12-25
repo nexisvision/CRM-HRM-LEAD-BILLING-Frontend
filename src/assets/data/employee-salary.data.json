@@ -1,0 +1,18 @@
+[
+    {
+      "id": 1,
+      "employeeId": "EMP001",
+      "name": "John Doe",
+      "payslipType": "Hourly",
+      "salary": "15000",
+      "account": "ROUND BANK"
+    },
+    {
+      "id": 2,
+      "employeeId": "EMP002",
+      "name": "Jane Smith",
+      "payslipType": "Monthly",
+      "salary": "60000",
+      "account": "CITY BANK"
+    }
+  ]
