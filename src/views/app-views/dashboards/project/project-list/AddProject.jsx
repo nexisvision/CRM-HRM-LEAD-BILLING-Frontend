@@ -66,13 +66,23 @@ const AddProject = ({ onClose }) => {
   });
 
   const onSubmit = (values, { resetForm }) => {
-    dispatch(AddPro(values));
-    resetForm();
-    onClose();
-    dispatch(GetProject());
-    console.log("Submitted values:", values);
-    message.success("Project added successfully!");
-    navigate("/app/dashboards/project/list");
+    dispatch(AddPro(values))
+      .then(() => {
+        dispatch(GetProject())
+          .then(() => {
+            message.success("Project added successfully!");
+            resetForm();
+            onClose();
+          })
+          .catch((error) => {
+            message.error("Failed to fetch the latest meeting data.");
+            console.error("MeetData API error:", error);
+          });
+      })
+      .catch((error) => {
+        message.error("Failed to add meeting.");
+        console.error("AddMeet API error:", error);
+      });
   };
 
   return (

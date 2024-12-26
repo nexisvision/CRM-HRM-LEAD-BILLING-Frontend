@@ -54,7 +54,6 @@ const EditProject = ({ id, onClose }) => {
         dispatch(GetProject());
         message.success("Project updated successfully!");
         onClose();
-        // navigate("app/dashboards/project/list");
       })
       .catch((error) => {
         message.error("Failed to update employee.");
@@ -89,7 +88,7 @@ const EditProject = ({ id, onClose }) => {
     <div className="add-job-form">
       <Formik
         initialValues={singleEmp || initialValues}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         enableReinitialize
         onSubmit={onSubmit}
       >

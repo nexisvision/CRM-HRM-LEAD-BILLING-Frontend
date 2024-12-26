@@ -12,6 +12,7 @@ import Plan from "../views/app-views/plan/PlanReducers/PlanSlice"
 import Meeting from "../views/app-views/hrm/Meeting/MeetingReducer/MeetingSlice"
 import Announce from "../views/app-views/hrm/Announcement/AnnouncementReducer/AnnouncementSlice"
 import Project from "../views/app-views/dashboards/project/project-list/projectReducer/ProjectSlice"
+import TaskCalander from "../views/app-views/dashboards/taskcalendar/TaskCalendarReducer/TaskCalendarSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -28,6 +29,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
         Meeting,
         Announce,
         Project,
+        TaskCalander,
         // employee,
         // department,
         ...asyncReducers,

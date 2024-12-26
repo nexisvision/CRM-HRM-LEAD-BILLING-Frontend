@@ -10,14 +10,11 @@ import axios from "axios";
 const GetDes = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(
-      "http://localhost:5353/api/v1/designations/get-all-designations",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const res = await axios.get("http://localhost:5353/api/v1/designations/", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -30,7 +27,7 @@ const AddDesignation = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/designations/create-designation",
+      "http://localhost:5353/api/v1/designations/",
       payload,
       {
         headers: {
@@ -51,7 +48,7 @@ const DeleteDes = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/designations/delete-designation/${id}`,
+      `http://localhost:5353/api/v1/designations/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -71,7 +68,7 @@ const EditDesignation = async (id, values) => {
   console.log("idinapi", id);
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/designations/update-designation/${id}`,
+      `http://localhost:5353/api/v1/designations/${id}`,
       values,
       {
         headers: {
