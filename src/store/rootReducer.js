@@ -9,6 +9,9 @@ import Department from "../views/app-views/hrm/Department/DepartmentReducers/Dep
 import Designation from "../views/app-views/hrm/Designation/DesignationReducers/DesignationSlice"
 import Leave from "../views/app-views/hrm/Leaves/LeaveReducer/LeaveSlice"
 import Plan from "../views/app-views/plan/PlanReducers/PlanSlice"
+import Meeting from "../views/app-views/hrm/Meeting/MeetingReducer/MeetingSlice"
+import Announce from "../views/app-views/hrm/Announcement/AnnouncementReducer/AnnouncementSlice"
+import Project from "../views/app-views/dashboards/project/project-list/projectReducer/ProjectSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -22,6 +25,9 @@ const rootReducer = (asyncReducers) => (state, action) => {
         Designation,
         Leave,
         Plan,
+        Meeting,
+        Announce,
+        Project,
         // employee,
         // department,
         ...asyncReducers,

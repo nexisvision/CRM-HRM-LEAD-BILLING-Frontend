@@ -3,21 +3,38 @@ import { Formik, Form as FormikForm, Field } from 'formik';
 import { Input, Button, message, Row, Col } from 'antd';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
+import { addAnnounce, GetAnn } from './AnnouncementReducer/AnnouncementSlice';
+import { useDispatch } from 'react-redux';
 
 // Validation Schema using Yup
 const validationSchema = Yup.object().shape({
-  Title: Yup.string().required('Title is required'),
-  Description: Yup.string().required('Description is required'),
+  title: Yup.string().required('title is required'),
+  description: Yup.string().required('description is required'),
 });
 
-const AddAnnouncement = () => {
+const AddAnnouncement = ({onClose}) => {
   const navigate = useNavigate();
+  
+  const dispatch = useDispatch();
 
-  const handleSubmit = (values) => {
-    console.log('Submitted values:', values);
-    message.success('Announcement added successfully!');
-    // Add logic to save data
-    navigate('/app/hrm/attendance');
+  const handleSubmit = (values,{resetForm}) => {
+    // dispatch(addAnnounce(values));
+    // console.log('Submitted values:', values);
+    // message.success('Announcement added successfully!');
+    // navigate('/app/hrm/announcement');
+
+    dispatch(addAnnounce(values))
+          .then(() => {
+            dispatch(GetAnn());
+            message.success('Announcement added successfully!');
+            resetForm();
+            onClose();
+            navigate('/app/hrm/announcement');
+          })
+          .catch((error) => {
+            message.error('Failed to add Announcement.');
+            console.error('Add API error:', error);
+          });
   };
 
   return (
@@ -27,41 +44,41 @@ const AddAnnouncement = () => {
 
       <Formik
         initialValues={{
-          Title: '',
-          Description: '',
+          title: '',
+          description: '',
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ errors, touched, handleSubmit }) => (
+        {({ errors, touched, handleSubmit ,resetForm}) => (
           <FormikForm onSubmit={handleSubmit}>
             <Row gutter={16}>
               <Col span={12}>
-                {/* Title Field */}
+                {/* title Field */}
                 <div style={{ marginBottom: '16px' }}>
-                  <label>Title*</label>
+                  <label>title*</label>
                   <Field
                     as={Input}
-                    name="Title"
-                    placeholder="Enter Title"
+                    name="title"
+                    placeholder="Enter title"
                   />
-                  {errors.Title && touched.Title && (
-                    <div style={{ color: 'red', fontSize: '12px' }}>{errors.Title}</div>
+                  {errors.title && touched.title && (
+                    <div style={{ color: 'red', fontSize: '12px' }}>{errors.title}</div>
                   )}
                 </div>
               </Col>
 
               <Col span={12}>
-                {/* Description Field */}
+                {/* description Field */}
                 <div style={{ marginBottom: '16px' }}>
-                  <label>Description*</label>
+                  <label>description*</label>
                   <Field
                     as={Input}
-                    name="Description"
-                    placeholder="Enter Description"
+                    name="description"
+                    placeholder="Enter description"
                   />
-                  {errors.Description && touched.Description && (
-                    <div style={{ color: 'red', fontSize: '12px' }}>{errors.Description}</div>
+                  {errors.description && touched.description && (
+                    <div style={{ color: 'red', fontSize: '12px' }}>{errors.description}</div>
                   )}
                 </div>
               </Col>
@@ -71,7 +88,7 @@ const AddAnnouncement = () => {
               <Button
                 type="default"
                 className="mr-2"
-                onClick={() => navigate('/app/hrm/desigantion')}
+                onClick={onClose}
               >
                 Cancel
               </Button>
@@ -87,17 +104,6 @@ const AddAnnouncement = () => {
 };
 
 export default AddAnnouncement;
-
-
-
-
-
-
-
-
-
-
-
 
 
 // import React from 'react';
@@ -137,20 +143,20 @@ export default AddAnnouncement;
 //         <Row gutter={16}>
 //           <Col span={12}>
 //             <Form.Item
-//               name="Title"
+//               name="title"
 //               label="title"
-//               rules={[{ required: true, message: 'Title is required' }]}
+//               rules={[{ required: true, message: 'title is required' }]}
 //             >
 //               <Input placeholder="" />
 //             </Form.Item>
 //           </Col>
 //           <Col span={12}>
 //             <Form.Item
-//               name="Description"
+//               name="description"
 //               label="description"
-//               rules={[{ required: true, message: 'Description is required' }]}
+//               rules={[{ required: true, message: 'description is required' }]}
 //             >
-//               <Input placeholder="Description" />
+//               <Input placeholder="description" />
 //             </Form.Item>
 //           </Col>
 //         </Row>

@@ -20,7 +20,7 @@ export const AddDept = createAsyncThunk(
 
 
 export const getDept = createAsyncThunk(
-    "emp/getEmp",
+    "emp/getDept",
     async (thunkAPI) => {
         try {
             const response = await UserService.GetDept();

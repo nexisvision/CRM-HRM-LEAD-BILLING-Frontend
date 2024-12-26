@@ -8,11 +8,11 @@ import axios from "axios";
     //     return res
     // };
 
-    const fetchEmpData = async () => {
+    const getMeet = async () => {
         const token = localStorage.getItem("auth_token");
         try {
           const res = await axios.get(
-            "http://localhost:5353/api/v1/employees/",
+            "http://localhost:5353/api/v1/meetings/",
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -32,7 +32,7 @@ import axios from "axios";
       
         try {
           const res = await axios.post(
-            "http://localhost:5353/api/v1/employees/",
+            "http://localhost:5353/api/v1/meetings/",
             payload, 
             {
               headers: {
@@ -48,12 +48,12 @@ import axios from "axios";
         }
       };
 
-      const Empdelete = async (id) => {
+      const DeleteMeet = async (id) => {
         const token = localStorage.getItem("auth_token");
       
         try {
           const res = await axios.delete(
-            `http://localhost:5353/api/v1/employees/${id}`, 
+            `http://localhost:5353/api/v1/meetings/${id}`, 
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -69,11 +69,11 @@ import axios from "axios";
       };
 
 
-      const EditEmp = async (employeeIdd, values) => {
+      const EditMeet = async (meetid, values) => {
         const token = localStorage.getItem("auth_token");
         try {
           const res = await axios.put(
-            `http://localhost:5353/api/v1/employees/${employeeIdd}`,
+            `http://localhost:5353/api/v1/meetings/${meetid}`,
             values,
             {
               headers: {
@@ -115,10 +115,10 @@ import axios from "axios";
 
 const UserService = {
     // addUser,
-    fetchEmpData,
+    getMeet,
     CreateMeet,
-    Empdelete,
-    EditEmp,
+    DeleteMeet,
+    EditMeet,
     // getAllUsers,    
     // getUserById,
     // deleteUser,

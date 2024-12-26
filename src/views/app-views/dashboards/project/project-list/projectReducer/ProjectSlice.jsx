@@ -1,14 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./MeetingService";
+import UserService from "./ProjectService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
-export const AddMeet = createAsyncThunk(
-  "users/addUser",
+export const AddPro = createAsyncThunk(
+  "users/AddPro",
   async (userData, thunkAPI) => {
     try {
-      const response = await UserService.CreateMeet(userData);
+      const response = await UserService.AddProject(userData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -18,11 +18,11 @@ export const AddMeet = createAsyncThunk(
 
 // Async thunk for user login
 
-export const MeetData = createAsyncThunk(
-  "emp/getmeet",
-  async (loginData, thunkAPI) => {
+export const GetProject = createAsyncThunk(
+  "emp/GetProject",
+  async (thunkAPI) => {
     try {
-      const response = await UserService.getMeet(loginData);
+      const response = await UserService.GetProject();
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -57,22 +57,23 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const deleteM = createAsyncThunk(
-  "users/deleteMeet",
+export const DeletePro = createAsyncThunk(
+  "users/DeletePro",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.DeleteMeet(userId);
+      const response = await UserService.DeletePro(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const EditMeet = createAsyncThunk(
-  "users/EditMeet",
-  async ({ meetid, values }, thunkAPI) => {
+export const Editpro = createAsyncThunk(
+  "users/Editpro",
+  async ({ id, values }, thunkAPI) => {
     try {
-      const response = await UserService.EditMeet(meetid, values);
+      console.log("idinslice", id);
+      const response = await UserService.EditPro(id, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -95,9 +96,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "Meeting",
+  name: "Project",
   initialState: {
-    Meeting: [],
+    Project: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -134,27 +135,27 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(AddMeet.pending, (state) => {
+      .addCase(AddPro.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(AddMeet.fulfilled, (state, action) => {
+      .addCase(AddPro.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(AddMeet.rejected, (state, action) => {
+      .addCase(AddPro.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(MeetData.pending, (state) => {
+      .addCase(GetProject.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(MeetData.fulfilled, (state, action) => {
+      .addCase(GetProject.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.Meeting = action?.payload;
+        state.Project = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(MeetData.rejected, (state, action) => {
+      .addCase(GetProject.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
@@ -187,27 +188,27 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
       //delete
-      .addCase(deleteM.pending, (state) => {
+      .addCase(DeletePro.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(deleteM.fulfilled, (state, action) => {
+      .addCase(DeletePro.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload.message);
       })
-      .addCase(deleteM.rejected, (state, action) => {
+      .addCase(DeletePro.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(EditMeet.pending, (state) => {
+      .addCase(Editpro.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(EditMeet.fulfilled, (state, action) => {
+      .addCase(Editpro.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; // Update the state with the updated employee data
+        state.editItem = action.payload;
       })
-      .addCase(EditMeet.rejected, (state, action) => {
+      .addCase(Editpro.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
       });

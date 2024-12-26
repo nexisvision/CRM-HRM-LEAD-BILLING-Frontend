@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined,EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -13,6 +13,8 @@ import userData from 'assets/data/user-list.data.json';
 import OrderListData from 'assets/data/order-list.data.json';
 import utils from 'utils';
 import EditMeeting from './EditMeeting';
+import { deleteM, MeetData } from './MeetingReducer/MeetingSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const MeetingList = () => {
   const [users, setUsers] = useState(userData);
@@ -22,6 +24,14 @@ const MeetingList = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddMeetingModalVisible, setIsAddMeetingModalVisible] = useState(false);
   const [isEditMeetingModalVisible, setIsEditMeetingModalVisible] = useState(false);
+
+  const [meetid,setMeetid] = useState("");
+
+  const dispatch = useDispatch();
+
+
+     const tabledata = useSelector((state) => state.Meeting);
+
 
 //   const [dealStatisticData] = useState(DealStatisticData);
 
@@ -56,11 +66,21 @@ const MeetingList = () => {
     setSelectedRowKeys([]);
   };
 
-  // Delete user
-  const deleteUser = (userId) => {
-    setUsers(users.filter((item) => item.id !== userId));
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
-  };
+
+    const deleteUser = async (userId) => {
+      try {
+        await dispatch(deleteM(userId)); 
+    
+        const updatedData = await dispatch(MeetData());
+    
+        setUsers(users.filter((item) => item.id !== userId));
+    
+        message.success({ content: 'Deleted user successfully.', duration: 2 });
+      } catch (error) {
+        // message.error({ content: 'Failed to delete user', duration: 2 });
+        console.error('Error deleting user:', error);
+      }
+    };
 
   // Show user profile
   const showUserProfile = (userInfo) => {
@@ -74,6 +94,21 @@ const MeetingList = () => {
     setUserProfileVisible(false);
   };
 
+  useEffect(() => {
+    dispatch(MeetData());
+  }, [dispatch]);
+  
+  useEffect(() => {
+    if (tabledata && tabledata.Meeting) {
+      setUsers(tabledata.Meeting.data);
+    }
+  }, [tabledata]);
+
+  const EditMeet = (id) =>{
+    openEditMeetingModal();
+    setMeetid(id)
+  }
+
   const dropdownMenu = (elm) => (
     <Menu>
       <Menu.Item>
@@ -82,7 +117,7 @@ const MeetingList = () => {
             type=""
             className=""
             icon={<EditOutlined />}
-            onClick={openEditMeetingModal}
+            onClick={() => EditMeet(elm.id)}
             size="small"
           >
             <span className="">Edit</span>
@@ -107,8 +142,8 @@ const MeetingList = () => {
 
   const tableColumns = [
     {
-      title: 'Meeting title',
-      dataIndex: 'meeting title',
+      title: 'Meeting title ',
+      dataIndex: 'title',
       sorter: {
         compare: (a, b) => a.branch.length - b.branch.length,
       },
@@ -116,13 +151,13 @@ const MeetingList = () => {
 
     {
       title: 'Meeting Date',
-      dataIndex: 'meeting date',
+      dataIndex: 'date',
       sorter: (a, b) => dayjs(a.startdate).unix() - dayjs(b.startdate).unix(),
     },
     
     {
         title: 'Meeting Time',
-        dataIndex: 'meeting time',
+        dataIndex: 'startTime',
         sorter: (a, b) => utils.antdTableSorter(a, b, 'name')
     },
     {
@@ -138,18 +173,7 @@ const MeetingList = () => {
 
   return (
     <Card bodyStyle={{ padding: '-3px' }}>
-      {/* <Row gutter={16}>
-        {dealStatisticData.map((elm, i) => (
-          <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-            <StatisticWidget
-              title={elm.title}
-              value={elm.value}
-              status={elm.status}
-              subtitle={elm.subtitle}
-            />
-          </Col>
-        ))}
-      </Row> */}
+    
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
@@ -193,7 +217,7 @@ const MeetingList = () => {
         footer={null}
         width={1000}
       >
-        <EditMeeting onClose={closeEditMeetingModal} />
+        <EditMeeting onClose={closeEditMeetingModal} meetid={meetid}/>
       </Modal>
     </Card>
   );

@@ -7,17 +7,14 @@ import axios from "axios";
 //     return res
 // };
 
-const GetDes = async () => {
+const GetProject = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(
-      "http://localhost:5353/api/v1/designations/get-all-designations",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const res = await axios.get("http://localhost:5353/api/v1/projects/", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -25,12 +22,12 @@ const GetDes = async () => {
   }
 };
 
-const AddDesignation = async (payload) => {
+const AddProject = async (payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/designations/create-designation",
+      "http://localhost:5353/api/v1/projects/",
       payload,
       {
         headers: {
@@ -46,12 +43,12 @@ const AddDesignation = async (payload) => {
   }
 };
 
-const DeleteDes = async (id) => {
+const DeletePro = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/designations/delete-designation/${id}`,
+      `http://localhost:5353/api/v1/projects/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -66,12 +63,11 @@ const DeleteDes = async (id) => {
   }
 };
 
-const EditDesignation = async (id, values) => {
+const EditPro = async (id, values) => {
   const token = localStorage.getItem("auth_token");
-  console.log("idinapi", id);
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/designations/update-designation/${id}`,
+      `http://localhost:5353/api/v1/projects/${id}`,
       values,
       {
         headers: {
@@ -108,10 +104,10 @@ const EditDesignation = async (id, values) => {
 
 const UserService = {
   // addUser,
-  GetDes,
-  AddDesignation,
-  DeleteDes,
-  EditDesignation,
+  GetProject,
+  AddProject,
+  DeletePro,
+  EditPro,
   // getAllUsers,
   // getUserById,
   // deleteUser,

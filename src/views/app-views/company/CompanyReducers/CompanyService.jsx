@@ -12,7 +12,7 @@ import axios from "axios";
         const token = localStorage.getItem("auth_token");
         try {
           const res = await axios.get(
-            "http://localhost:5353/api/v1/client/get-all",
+            "http://localhost:5353/api/v1/clients/",
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -32,7 +32,7 @@ import axios from "axios";
       
         try {
           const res = await axios.post(
-            "http://localhost:5353/api/v1/client/create",
+            "http://localhost:5353/api/v1/clients/",
             payload, 
             {
               headers: {
@@ -53,7 +53,7 @@ import axios from "axios";
       
         try {
           const res = await axios.delete(
-            `http://localhost:5353/api/v1/client/${id}`, 
+            `http://localhost:5353/api/v1/clients/${id}`, 
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -73,7 +73,7 @@ import axios from "axios";
         const token = localStorage.getItem("auth_token");
         try {
           const res = await axios.put(
-            `http://localhost:5353/api/v1/client/${comnyid}`,
+            `http://localhost:5353/api/v1/clients/${comnyid}`,
             values,
             {
               headers: {
