@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Button, DatePicker, Select, Upload, message, Row, Col } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  DatePicker,
+  Select,
+  Upload,
+  message,
+  Row,
+  Col,
+} from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { UploadOutlined } from "@ant-design/icons";
 import moment from "moment";
@@ -11,7 +21,7 @@ import { empdata, updateEmp } from "./EmployeeReducers/EmployeeSlice";
 
 const { Option } = Select;
 
-const EditEmployee = ({ employeeIdd,onClose }) => {
+const EditEmployee = ({ employeeIdd, onClose }) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -29,12 +39,13 @@ const EditEmployee = ({ employeeIdd,onClose }) => {
     if (singleEmp) {
       form.setFieldsValue({
         ...singleEmp,
-        joiningDate: singleEmp.joiningDate ? moment(singleEmp.joiningDate) : null,
+        joiningDate: singleEmp.joiningDate
+          ? moment(singleEmp.joiningDate)
+          : null,
         leaveDate: singleEmp.leaveDate ? moment(singleEmp.leaveDate) : null,
       });
     }
   }, [singleEmp, form]);
-
 
   const onFinish = async (values) => {
     // try {
@@ -47,17 +58,17 @@ const EditEmployee = ({ employeeIdd,onClose }) => {
     //   message.error(error || "Failed to update employee details. Please try again.");
     // }
 
-     dispatch(updateEmp({ employeeIdd, values }))
-          .then(() => {
-            dispatch(empdata());
-            message.success("Employee details updated successfully!");
-            onClose();
-            navigate('/app/hrm/employee');
-          })
-          .catch((error) => {
-            message.error('Failed to update Employee.');
-            console.error('Edit API error:', error);
-          });
+    dispatch(updateEmp({ employeeIdd, values }))
+      .then(() => {
+        dispatch(empdata());
+        message.success("Employee details updated successfully!");
+        onClose();
+        navigate("/app/hrm/employee");
+      })
+      .catch((error) => {
+        message.error("Failed to update Employee.");
+        console.error("Edit API error:", error);
+      });
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -126,7 +137,11 @@ const EditEmployee = ({ employeeIdd,onClose }) => {
               label="Email"
               rules={[
                 { required: true, message: "Email is required" },
-                { type: "email", message: "Please enter a valid email (e.g., example@example.com)" },
+                {
+                  type: "email",
+                  message:
+                    "Please enter a valid email (e.g., example@example.com)",
+                },
               ]}
             >
               <Input placeholder="johndoe@example.com" />
@@ -234,7 +249,9 @@ const EditEmployee = ({ employeeIdd,onClose }) => {
             <Form.Item
               name="accountholder"
               label="Account Holder Name"
-              rules={[{ required: true, message: "Account Holder Name is required" }]}
+              rules={[
+                { required: true, message: "Account Holder Name is required" },
+              ]}
             >
               <Input placeholder="John Doe" />
             </Form.Item>
@@ -243,7 +260,9 @@ const EditEmployee = ({ employeeIdd,onClose }) => {
             <Form.Item
               name="accountnumber"
               label="Account Number"
-              rules={[{ required: true, message: "Account Number is required" }]}
+              rules={[
+                { required: true, message: "Account Number is required" },
+              ]}
             >
               <Input placeholder="123456789" />
             </Form.Item>
@@ -284,15 +303,12 @@ const EditEmployee = ({ employeeIdd,onClose }) => {
 
 export default EditEmployee;
 
+{
+  /* <h1 className="text-lg font-bold mb-3">Document</h1> */
+}
 
-
-
-
-
-
-{/* <h1 className="text-lg font-bold mb-3">Document</h1> */}
-
-{/* <Row gutter={16}>
+{
+  /* <Row gutter={16}>
 <Col span={12}>
   <Form.Item
     name="cv"
@@ -315,11 +331,8 @@ export default EditEmployee;
     </Upload>
   </Form.Item>
 </Col>
-</Row> */}
-
-
-
-
+</Row> */
+}
 
 // import React, { useEffect, useState } from 'react';
 // import { Form, Input, Button, DatePicker, Select, message, Row, Col } from 'antd';
@@ -598,15 +611,6 @@ export default EditEmployee;
 // };
 
 // export default EditEmployee;
-
-
-
-
-
-
-
-
-
 
 // import React, { useEffect, useState } from 'react';
 // import { Form, Input, Button, DatePicker, Select, message, Row, Col } from 'antd';

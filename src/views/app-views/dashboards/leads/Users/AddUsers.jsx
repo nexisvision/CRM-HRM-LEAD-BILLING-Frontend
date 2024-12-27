@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { Modal, Button, Select, Form, message } from 'antd';
-import { useNavigate } from 'react-router-dom';
-
+import React, { useState } from "react";
+import { Modal, Button, Select, Form, message } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 
@@ -29,7 +28,7 @@ const AddUsers = () => {
         form.resetFields();
       })
       .catch((error) => {
-        console.error('Validation failed:', error);
+        console.error("Validation failed:", error);
       });
   };
 
@@ -57,28 +56,26 @@ const AddUsers = () => {
           </Button>,
         ]}
       > */}
-        <Form form={form} layout="vertical" name="add_user_form">
-        <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+      <Form form={form} layout="vertical" name="add_user_form">
+        <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
 
-          <Form.Item
-            name="user"
-            label="User"
-            rules={[{ required: true, message: 'Please select a user!' }]}
-          >
-            <Select placeholder="Select Users">
-              <Option value="User 1">User 1</Option>
-              <Option value="User 2">User 2</Option>
-              <Option value="User 3">User 3</Option>
-            </Select>
-
-            
-          </Form.Item>
-          <Form.Item>
+        <Form.Item
+          name="user"
+          label="User"
+          rules={[{ required: true, message: "Please select a user!" }]}
+        >
+          <Select placeholder="Select Users">
+            <Option value="User 1">User 1</Option>
+            <Option value="User 2">User 2</Option>
+            <Option value="User 3">User 3</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item>
           <div className="form-buttons text-right">
             <Button
               type="default"
               className="mr-2"
-              onClick={() => navigate('/deals')}
+              onClick={() => navigate("/deals")}
             >
               Cancel
             </Button>
@@ -87,7 +84,7 @@ const AddUsers = () => {
             </Button>
           </div>
         </Form.Item>
-        </Form>
+      </Form>
       {/* </Modal> */}
     </div>
   );

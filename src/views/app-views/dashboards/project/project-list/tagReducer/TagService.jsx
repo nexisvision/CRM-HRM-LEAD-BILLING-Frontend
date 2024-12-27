@@ -7,10 +7,10 @@ import axios from "axios";
 //     return res
 // };
 
-const GetLeads = async () => {
+const GetTags = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/leads/", {
+    const res = await axios.get("http://localhost:5353/api/v1/tags/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -22,12 +22,12 @@ const GetLeads = async () => {
   }
 };
 
-const AddLeads = async (payload) => {
+const AddTagP = async (payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/leads/",
+      "http://localhost:5353/api/v1/tags/",
       payload,
       {
         headers: {
@@ -43,15 +43,18 @@ const AddLeads = async (payload) => {
   }
 };
 
-const DeleteLeads = async (id) => {
+const DeletePro = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
-    const res = await axios.delete(`http://localhost:5353/api/v1/leads/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await axios.delete(
+      `http://localhost:5353/api/v1/projects/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     //   dispatch(empdata());
     return res.data;
   } catch (error) {
@@ -60,11 +63,11 @@ const DeleteLeads = async (id) => {
   }
 };
 
-const EditLeads = async (id, values) => {
+const EditPro = async (id, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/leads/${id}`,
+      `http://localhost:5353/api/v1/projects/${id}`,
       values,
       {
         headers: {
@@ -101,10 +104,10 @@ const EditLeads = async (id, values) => {
 
 const UserService = {
   // addUser,
-  GetLeads,
-  AddLeads,
-  DeleteLeads,
-  EditLeads,
+  GetTags,
+  AddTagP,
+  DeletePro,
+  EditPro,
   // getAllUsers,
   // getUserById,
   // deleteUser,

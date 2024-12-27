@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, DatePicker, Select, message, Row, Col } from "antd";
+import { Input, Button, DatePicker, Select, message, Row, Col, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -9,6 +9,8 @@ import { Editpro, GetProject } from "./projectReducer/ProjectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+import { GetTagspro, AddTags } from "./tagReducer/TagSlice";
+import { PlusOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -83,6 +85,34 @@ const EditProject = ({ id, onClose }) => {
       }
     }
   }, [id, projectdata]);
+
+  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
+  const [newTag, setNewTag] = useState("");
+
+  useEffect(() => {
+    dispatch(GetTagspro());
+  }, [dispatch]);
+
+  const Tagsdetail = useSelector((state) => state.Tags);
+  const AllTags = Tagsdetail?.Tags?.data;
+
+  const handleAddNewTag = async () => {
+    if (!newTag.trim()) {
+      message.error("Please enter a tag name");
+      return;
+    }
+
+    try {
+      await dispatch(AddTags({ name: newTag }));
+      message.success("Tag added successfully");
+      setNewTag("");
+      setIsTagModalVisible(false);
+      dispatch(GetTagspro());
+    } catch (error) {
+      console.error("Failed to add tag:", error);
+      message.error("Failed to add tag");
+    }
+  };
 
   return (
     <div className="add-job-form">
@@ -242,11 +272,46 @@ const EditProject = ({ id, onClose }) => {
               <Col span={24} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Tag</label>
-                  <Field
-                    name="tag"
-                    as={Input}
-                    placeholder="Enter Project Tag"
-                  />
+                  <div className="flex gap-2">
+                    <Field name="tag">
+                      {({ field, form }) => (
+                        <Select
+                          {...field}
+                          className="w-full"
+                          placeholder="Select or add new tag"
+                          onChange={(value) => form.setFieldValue("tag", value)}
+                          onBlur={() => form.setFieldTouched("tag", true)}
+                          value={values.tag}
+                          dropdownRender={(menu) => (
+                            <div>
+                              {menu}
+                              <div
+                                style={{
+                                  padding: '8px',
+                                  borderTop: '1px solid #e8e8e8',
+                                }}
+                              >
+                                <Button
+                                  type="link"
+                                  icon={<PlusOutlined />}
+                                  onClick={() => setIsTagModalVisible(true)}
+                                  block
+                                >
+                                  Add New Tag
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        >
+                          {AllTags && AllTags.map((tag) => (
+                            <Option key={tag.id} value={tag.name}>
+                              {tag.name}
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
+                  </div>
                   <ErrorMessage
                     name="tag"
                     component="div"
@@ -294,6 +359,21 @@ const EditProject = ({ id, onClose }) => {
           </Form>
         )}
       </Formik>
+
+      {/* Add Tag Modal */}
+      <Modal
+        title="Add New Tag"
+        visible={isTagModalVisible}
+        onCancel={() => setIsTagModalVisible(false)}
+        onOk={handleAddNewTag}
+        okText="Add Tag"
+      >
+        <Input
+          placeholder="Enter new tag name"
+          value={newTag}
+          onChange={(e) => setNewTag(e.target.value)}
+        />
+      </Modal>
     </div>
   );
 };

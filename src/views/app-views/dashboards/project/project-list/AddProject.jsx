@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, DatePicker, Select, message, Row, Col } from "antd";
+import {
+  Input,
+  Button,
+  DatePicker,
+  Select,
+  message,
+  Row,
+  Col,
+  Modal,
+} from "antd";
 import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -11,6 +20,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { AddPro, GetProject } from "./projectReducer/ProjectSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { ClientData } from "views/app-views/company/CompanyReducers/CompanySlice";
+import { PlusOutlined } from "@ant-design/icons";
+import { GetTagspro, AddTags } from "./tagReducer/TagSlice";
 
 const { Option } = Select;
 
@@ -18,6 +29,9 @@ const AddProject = ({ onClose }) => {
   const navigate = useNavigate();
   const [list, setList] = useState();
   const dispatch = useDispatch();
+  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
+  const [newTag, setNewTag] = useState("");
+  const [tags, setTags] = useState([]);
 
   useEffect(() => {
     dispatch(empdata());
@@ -27,6 +41,13 @@ const AddProject = ({ onClose }) => {
     dispatch(ClientData());
   }, [dispatch]);
 
+  useEffect(() => {
+    dispatch(GetTagspro());
+  }, [dispatch]);
+
+  const Tagsdetail = useSelector((state) => state.Tags);
+  const AllTags = Tagsdetail?.Tags?.data;
+
   const Allclient = useSelector((state) => state.ClientData);
   const clientdata = Allclient.ClientData.data;
 
@@ -35,6 +56,7 @@ const AddProject = ({ onClose }) => {
 
   const initialValues = {
     project_name: "",
+    category: "",
     startdate: null,
     enddate: null,
     // projectimage: "",
@@ -42,6 +64,7 @@ const AddProject = ({ onClose }) => {
     user: "",
     budget: "",
     estimatedmonths: "",
+    estimatedhours: "",
     description: "",
     tag: "",
     status: "",
@@ -49,6 +72,7 @@ const AddProject = ({ onClose }) => {
 
   const validationSchema = Yup.object({
     project_name: Yup.string().required("Please enter a Project Name."),
+    category: Yup.string().required("Please enter a Category."),
     startdate: Yup.date().nullable().required("Start date is required."),
     enddate: Yup.date().nullable().required("End date is required."),
     // projectimage: Yup.mixed().required("Please upload a Project Image."),
@@ -58,8 +82,13 @@ const AddProject = ({ onClose }) => {
       .required("Please enter a Project Budget.")
       .positive("Budget must be positive."),
     estimatedmonths: Yup.number()
+      .required("Please enter Estimated Months.")
+      .positive("Months must be positive.")
+      .integer("Months must be a whole number"),
+    estimatedhours: Yup.number()
       .required("Please enter Estimated Hours.")
-      .positive("Hours must be positive."),
+      .positive("Hours must be positive.")
+      .integer("Hours must be a whole number"),
     description: Yup.string().required("Please enter a Project Description."),
     tag: Yup.string().required("Please enter a Tag."),
     status: Yup.string().required("Please select Status."),
@@ -83,6 +112,45 @@ const AddProject = ({ onClose }) => {
         message.error("Failed to add meeting.");
         console.error("AddMeet API error:", error);
       });
+  };
+
+  useEffect(() => {
+    fetchTags();
+  }, []);
+
+  const fetchTags = async () => {
+    try {
+      const response = await dispatch(GetProject());
+      // Assuming the API returns projects with tags
+      // Extract unique tags from all projects
+      const uniqueTags = [
+        ...new Set(response.payload.data.map((project) => project.tag)),
+      ];
+      setTags(uniqueTags.filter((tag) => tag)); // Filter out null/undefined values
+    } catch (error) {
+      console.error("Failed to fetch tags:", error);
+      message.error("Failed to load tags");
+    }
+  };
+
+  const handleAddNewTag = async () => {
+    if (!newTag.trim()) {
+      message.error("Please enter a tag name");
+      return;
+    }
+
+    try {
+      await dispatch(AddTags({ name: newTag }));
+
+      message.success("Tag added successfully");
+      setNewTag("");
+      setIsTagModalVisible(false);
+      // Refresh tags list
+      dispatch(GetTagspro());
+    } catch (error) {
+      console.error("Failed to add tag:", error);
+      message.error("Failed to add tag");
+    }
   };
 
   return (
@@ -114,6 +182,23 @@ const AddProject = ({ onClose }) => {
                   />
                   <ErrorMessage
                     name="project_name"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={24} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">Category</label>
+                  <Field
+                    name="category"
+                    as={Input}
+                    placeholder="Enter Project Category"
+                    rules={[{ required: true }]}
+                  />
+                  <ErrorMessage
+                    name="category"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -241,7 +326,7 @@ const AddProject = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              <Col span={8} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Budget</label>
                   <Field
@@ -258,17 +343,34 @@ const AddProject = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              <Col span={8} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">Estimated Months</label>
+                  <Field
+                    name="estimatedmonths"
+                    as={Input}
+                    type="number"
+                    placeholder="Enter Estimated Months"
+                  />
+                  <ErrorMessage
+                    name="estimatedmonths"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={8} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Estimated Hours</label>
                   <Field
-                    name="estimatedmonths"
+                    name="estimatedhours"
                     as={Input}
                     type="number"
                     placeholder="Enter Estimated Hours"
                   />
                   <ErrorMessage
-                    name="estimatedmonths"
+                    name="estimatedhours"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -295,11 +397,46 @@ const AddProject = ({ onClose }) => {
               <Col span={24} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Tag</label>
-                  <Field
-                    name="tag"
-                    as={Input}
-                    placeholder="Enter Project Tag"
-                  />
+                  <div className="flex gap-2">
+                    <Field name="tag">
+                      {({ field, form }) => (
+                        <Select
+                          {...field}
+                          className="w-full"
+                          placeholder="Select or add new tag"
+                          onChange={(value) => form.setFieldValue("tag", value)}
+                          onBlur={() => form.setFieldTouched("tag", true)}
+                          dropdownRender={(menu) => (
+                            <div>
+                              {menu}
+                              <div
+                                style={{
+                                  padding: "8px",
+                                  borderTop: "1px solid #e8e8e8",
+                                }}
+                              >
+                                <Button
+                                  type="link"
+                                  icon={<PlusOutlined />}
+                                  onClick={() => setIsTagModalVisible(true)}
+                                  block
+                                >
+                                  Add New Tag
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        >
+                          {AllTags &&
+                            AllTags.map((tag) => (
+                              <Option key={tag.id} value={tag.name}>
+                                {tag.name}
+                              </Option>
+                            ))}
+                        </Select>
+                      )}
+                    </Field>
+                  </div>
                   <ErrorMessage
                     name="tag"
                     component="div"
@@ -347,6 +484,21 @@ const AddProject = ({ onClose }) => {
           </Form>
         )}
       </Formik>
+
+      {/* Add Tag Modal */}
+      <Modal
+        title="Add New Tag"
+        visible={isTagModalVisible}
+        onCancel={() => setIsTagModalVisible(false)}
+        onOk={handleAddNewTag}
+        okText="Add Tag"
+      >
+        <Input
+          placeholder="Enter new tag name"
+          value={newTag}
+          onChange={(e) => setNewTag(e.target.value)}
+        />
+      </Modal>
     </div>
   );
 };

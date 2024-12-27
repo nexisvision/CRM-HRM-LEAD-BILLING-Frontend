@@ -23,7 +23,7 @@ const ProjectList = () => {
 	const [isAddProjectModalVisible, setIsAddProjectModalVisible] = useState(false);
 	const [isEditProjectModalVisible, setIsEditProjectModalVisible] = useState(false);
 
-	const [idd,setIdd]= useState("")
+	const [idd,setIdd]= useState("");
 
 	  const AllProject = useSelector((state) => state.Project);
 	  const properdata = AllProject.Project.data;
@@ -51,18 +51,38 @@ const ProjectList = () => {
 	useEffect(() => {
 		if (properdata) {
 			const datac = dataclient?.find((item) => item.id === item?.member || item?.client )		
-			const formattedData = properdata?.map(item => ({
-				id: item.id,
-				name: item.project_name || item.name,
-				category: item?.budget || item.category,
-				attachmentCount: datac || item.attachmentCount,
-				totalTask: item?.enddate || item.totalTask,
-				completedTask: item?.estimatedmonths || item.completedTask,
-				progression: item?.startdate || item.progression,
-				dayleft: item?.tag || item.dayleft,
-				statusColor: item?.status || item.statusColor,
-				member: datac || item.member,
-			}));
+			const formattedData = properdata?.map(item => {
+				// Calculate days left
+				const currentDate = new Date();
+				const endDate = new Date(item.enddate);
+				const startDate = new Date(item.startdate);
+
+				// Calculate total project days
+				const totalDays = Math.ceil((endDate - startDate) / (1000 * 3600 * 24));
+				
+				// Calculate completed days
+				const completedDays = Math.ceil((currentDate - startDate) / (1000 * 3600 * 24));
+				
+				// Ensure completedDays doesn't exceed totalDays
+				const adjustedCompletedDays = Math.min(Math.max(0, completedDays), totalDays);
+
+				console.log("opopoop",properdata)
+				return {
+					id: item.id,
+					name: item.project_name || item.name,
+					category: item?.category || item.category,
+					attachmentCount: datac || item.attachmentCount,
+					totalTask: item?.budget || item.budget,
+					// Update completedTask to show days progress
+					completedTask: `${adjustedCompletedDays}/${totalDays}`,
+					
+					progression: item?.startdate || item.progression,
+					dayleft: Math.max(0, Math.ceil((endDate - currentDate) / (1000 * 3600 * 24))),
+					statusColor: item?.status || item.statusColor,
+					member: datac || item.member,
+					tag: item?.tag || item.tag_name || item.tag,
+				};
+			});
 			setList(formattedData);
 		}
 	}, [properdata]);
@@ -108,9 +128,9 @@ const ProjectList = () => {
 
 	const tableColumns = [
 		{
-			title: 'PROJECT',
-			dataIndex: 'project_name',
-			key: 'project_name',
+			title: 'Project',
+			dataIndex: 'name',
+			key: 'name',
 			render: (name, record) => (
 				<div>
 					<h4 className="mb-0">{name}</h4>
@@ -119,74 +139,72 @@ const ProjectList = () => {
 			),
 		},
 		{
-			title: 'Info',
-			dataIndex: 'Info',
-			key: 'Info',
-			render: (_, record) => (
+			title: 'Budget',
+			dataIndex: 'totalTask',
+			key: 'totalTask',
+			render: (totalTask) => (
 				<div>
-					<Tooltip title="Attachment">
-						<span className="mr-3">
-							<PaperClipOutlined /> {record.attachmentCount}
-						</span>
-					</Tooltip>
-					<Tooltip title="Task Completed">
-						<span className="mr-3">
-							<CheckCircleOutlined /> {record.completedTask}/{record.totalTask}
-						</span>
-					</Tooltip>
-					<Tag color={record.statusColor}>
-						<ClockCircleOutlined /> {record.dayleft} days left
-					</Tag>
+					<span>{totalTask}</span>
 				</div>
 			),
 		},
 		{
-			title: 'COMPLETION',
-			dataIndex: 'progression',
-			key: 'progression',
-			render: (progression) => (
-				<Progress
-					percent={progression}
-					strokeColor={
-						progression >= 80
-							? 'green'
-							: progression >= 60
-								? 'orange'
-								: 'red'
-					}
-					size="small"
-				/>
+			title: 'Progress',
+			dataIndex: 'completedTask',
+			key: 'completedTask',
+			render: (completedTask) => (
+				<div>
+					<span>
+						<CheckCircleOutlined className="mr-2" />
+						{completedTask}
+					</span>
+				</div>
 			),
 		},
 		{
-			title: 'USERS',
-			dataIndex: 'user',
-			key: 'user',
+			title: 'Days Left',
+			dataIndex: 'dayleft',
+			key: 'dayleft',
+			render: (dayleft) => {
+				let statusColor = '';
+				if (dayleft > 10) {
+					statusColor = 'green';
+				} else if (dayleft > 5) {
+					statusColor = 'orange';
+				} else {
+					statusColor = 'red';
+				}
+
+				return (
+					<Tag color={statusColor}>
+						<ClockCircleOutlined className="mr-2" />
+						{dayleft} days left
+					</Tag>
+				);
+			},
+		},
+		{
+			title: 'Client',
+			dataIndex: 'member',
+			key: 'member',
 			render: (member) => (
 				<div>
-					{member.slice(0, 3).map((m, index) => (
-						<Tooltip title={m.name} key={index}>
-							<Avatar src={m.img}>
-								{!m.img && utils.getNameInitial(m.name)}
-							</Avatar>
-						</Tooltip>
-					))}
-					{member.length > 3 && (
-						<Tooltip title={`${member.length - 3} More`}>
-							<Avatar size="small" className="text-black font-medium">
-								+{member.length - 3}
-							</Avatar>
-						</Tooltip>
-					)}
+					<span>{member}</span>
 				</div>
 			),
 		},
 		{
 			title: 'Action',
 			key: 'action',
-			render: (_, elm) => (
-				<div className='text-center'>
-					 <EllipsisDropdown menu={dropdownMenu(elm)} />
+			render: (_, record) => (
+				<div className="text-right">
+					<Dropdown 
+						overlay={dropdownMenu(record.id)} 
+						trigger={['click']}
+						placement="bottomRight"
+					>
+						<Button type="text" icon={<EllipsisDropdown />} />
+					</Dropdown>
 				</div>
 			),
 		},
@@ -219,16 +237,16 @@ const ProjectList = () => {
 			<div className="my-4 container-fluid">
 				{view === VIEW_LIST ? (
 					<Table
-						// columns={tableColumns}
+						columns={tableColumns}
 						dataSource={list}
 						rowKey="id"
-						scroll={1200}
+						scroll={{ x: 1000 }}
 					/>
 				) : (
 					<Row gutter={16}>
 						{list?.map((item) => {
 							// Determine the color dynamically based on the days left
-							let statusColor = '';
+							let statusColor = '';				
 							if (item.dayleft > 10) {
 								statusColor = 'green'; // Safe status
 							} else if (item.dayleft > 5) {
@@ -239,40 +257,40 @@ const ProjectList = () => {
 
 							return (
 								<Col xs={24} sm={24} lg={8} xl={8} xxl={6} key={item.id}>
-									<Card
-
-									><div className='flex items-center justify-between'>
+									<Card>
+										<div className='flex items-center justify-between'>
 											<div className=''>
 												<p className='font-medium'>{item.name}</p>
 												<p>{item.category}</p>
-
 											</div>
-											<div>
-												<p>
-													<Dropdown
+											<div className="flex items-center gap-2">
+												{item.tag && (
+													<Tag 
+														color="blue" 
+														className="m-0"
+													>
+														{item.tag}
+													</Tag>
+												)}
+												<Dropdown
 													overlay={dropdownMenu(item.id)}
 													trigger={['click']}
 													placement="bottomRight"
 													key="dropdown"
 												>
-													<Button type="text" icon={<EllipsisDropdown />}>
-													</Button>
-												</Dropdown></p>
+													<Button type="text" icon={<EllipsisDropdown />} />
+												</Dropdown>
 											</div>
-
 										</div>
 
 										<p className="flex gap-4 mt-1">
-											<span>
-												{/* <PaperClipOutlined /> */}
-												{item.member}
-											</span>
-											
+											<span>{item.member}</span>
 										</p>
+
 										<p className="flex gap-4 mt-1">
 											<span>
 												<PaperClipOutlined />
-												{item.completedTask}
+												{item.totalTask}
 											</span>
 											<span>
 												<CheckCircleOutlined />
@@ -292,33 +310,17 @@ const ProjectList = () => {
 										</p>
 										<p>
 											<Progress
-												percent={item.progression}
+												percent={item.dayleft}
 												strokeColor={
-													item.progression >= 80
+													item.dayleft >= 80
 														? 'green'
-														: item.progression >= 60
+														: item.dayleft >= 60
 															? 'orange'
 															: 'red'
 												}
 												size="small"
 											/>
 										</p>
-										{/* <div>
-											{item?.member?.slice(0, 3)?.map((m, index) => (
-												<Tooltip title={m?.name} key={index}>
-													<Avatar src={m?.img}>
-														{!m?.img && utils?.getNameInitial(m?.name)}
-													</Avatar>
-												</Tooltip>
-											))}
-											{item?.member?.length > 3 && (
-												<Tooltip title={`${item?.member?.length - 3} More`}>
-													<Avatar size="small" className="text-black font-medium">
-														+{item?.member?.length - 3}
-													</Avatar>
-												</Tooltip>
-											)}
-										</div> */}
 									</Card>
 								</Col>
 							);
@@ -355,285 +357,3 @@ const ProjectList = () => {
 };
 
 export default ProjectList;
-
-
-
-
-
-
-
-// import React, { useState } from 'react';
-// import { Table, Button, Tooltip, Tag, Progress, Avatar, Modal, Card, Radio, Row, Col, Dropdown, Menu } from 'antd';
-// import { PlusOutlined, EditOutlined, DeleteOutlined, AppstoreOutlined, UnorderedListOutlined, PaperClipOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
-// import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-// import ProjectListData from './ProjectListData';
-// import AddProject from './AddProject';
-// import EditProject from './EditProject';
-// import utils from 'utils';
-// import PageHeaderAlt from 'components/layout-components/PageHeaderAlt';
-// import Flex from 'components/shared-components/Flex';
-// const VIEW_LIST = 'LIST';
-// const VIEW_GRID = 'GRID';
-// const ProjectList = () => {
-//     const [view, setView] = useState(VIEW_GRID);
-//     const [list, setList] = useState(ProjectListData);
-//     const [isAddProjectModalVisible, setIsAddProjectModalVisible] = useState(false);
-//     const [isEditProjectModalVisible, setIsEditProjectModalVisible] = useState(false);
-//     // Open Add Project Modal
-//     const openAddProjectModal = () => setIsAddProjectModalVisible(true);
-//     const closeAddProjectModal = () => setIsAddProjectModalVisible(false);
-//     // Open Edit Project Modal
-//     const openEditProjectModal = () => setIsEditProjectModalVisible(true);
-//     const closeEditProjectModal = () => setIsEditProjectModalVisible(false);
-//     // Delete Project
-//     const deleteItem = (id) => {
-//         const updatedList = list.filter((item) => item.id !== id);
-//         setList(updatedList);
-//     };
-//     // Change Project View
-//     const onChangeProjectView = (e) => {
-//         setView(e.target.value);
-//     };
-//     // Generate Action Menu for Dropdown
-//     const dropdownMenu = (id) => (
-//         <Menu>
-//             <Menu.Item key="edit" onClick={() => openEditProjectModal(id)}>
-//                 <EditOutlined /> Edit
-//             </Menu.Item>
-//             <Menu.Item key="delete" onClick={() => deleteItem(id)}>
-//                 <DeleteOutlined /> Delete
-//             </Menu.Item>
-//         </Menu>
-//     );
-//     // Table columns for list view
-//     const tableColumns = [
-//         {
-//             title: 'PROJECT',
-//             dataIndex: 'name',
-//             key: 'name',
-//             render: (name, record) => (
-//                 <div>
-//                     <h4 className="mb-0">{name}</h4>
-//                     <span className="text-muted">{record.category}</span>
-//                 </div>
-//             ),
-//         },
-//         {
-//             title: 'Info',
-//             dataIndex: 'info',
-//             key: 'info',
-//             render: (_, record) => (
-//                 <div>
-//                     <Tooltip title="Attachment">
-//                         <span className="mr-3">
-//                             <PaperClipOutlined /> {record.attachmentCount}
-//                         </span>
-//                     </Tooltip>
-//                     <Tooltip title="Task Completed">
-//                         <span className="mr-3">
-//                             <CheckCircleOutlined /> {record.completedTask}/{record.totalTask}
-//                         </span>
-//                     </Tooltip>
-//                     <Tag color={record.statusColor}>
-//                         <ClockCircleOutlined /> {record.dayleft} days left
-//                     </Tag>
-//                 </div>
-//             ),
-//         },
-//         {
-//             title: 'COMPLETION',
-//             dataIndex: 'progression',
-//             key: 'progression',
-//             render: (progression) => (
-//                 <Progress
-//                     percent={progression}
-//                     strokeColor={
-//                         progression >= 80
-//                             ? 'green'
-//                             : progression >= 60
-//                                 ? 'orange'
-//                                 : 'red'
-//                     }
-//                     size="small"
-//                 />
-//             ),
-//         },
-//         {
-//             title: 'USERS',
-//             dataIndex: 'member',
-//             key: 'member',
-//             render: (member) => (
-//                 <div>
-//                     {member.slice(0, 3).map((m, index) => (
-//                         <Tooltip title={m.name} key={index}>
-//                             <Avatar src={m.img}>
-//                                 {!m.img && utils.getNameInitial(m.name)}
-//                             </Avatar>
-//                         </Tooltip>
-//                     ))}
-//                     {member.length > 3 && (
-//                         <Tooltip title={`${member.length - 3} More`}>
-//                             <Avatar size="small" className="text-black font-medium">
-//                                 +{member.length - 3}
-//                             </Avatar>
-//                         </Tooltip>
-//                     )}
-//                 </div>
-//             ),
-//         },
-//         {
-//             title: 'Action',
-//             key: 'action',
-//             render: (_, elm) => (
-//                 <div className='text-center'>
-//                      <EllipsisDropdown menu={dropdownMenu(elm)} />
-//                 </div>
-//             ),
-//         },
-//     ];
-//     return (
-//         <div>
-//             <PageHeaderAlt className="border-bottom">
-//                 <div className="container-fluid">
-//                     <Flex justifyContent="space-between" alignItems="center" className="py-4">
-//                         <h2 className='text-xl font-medium'>Projects</h2>
-//                         <div className='flex gap-3'>
-//                             <Radio.Group defaultValue={VIEW_GRID} onChange={onChangeProjectView}>
-//                                 <Radio.Button value={VIEW_GRID}>
-//                                     <AppstoreOutlined />
-//                                 </Radio.Button>
-//                                 <Radio.Button value={VIEW_LIST}>
-//                                     <UnorderedListOutlined />
-//                                 </Radio.Button>
-//                             </Radio.Group>
-//                             <Button type="primary" icon={<PlusOutlined />} onClick={openAddProjectModal} className='flex items-center'>
-//                                 New Project
-//                             </Button>
-//                         </div>
-//                     </Flex>
-//                 </div>
-//             </PageHeaderAlt>
-//             <div className="my-4 container-fluid">
-//                 {view === VIEW_LIST ? (
-//                     <Table
-//                         columns={tableColumns}
-//                         dataSource={list}
-//                         rowKey="id"
-//                         scroll={1200}
-//                     />
-//                 ) : (
-//                     <Row gutter={16}>
-//                         {list.map((item) => {
-//                             // Determine the color dynamically based on the days left
-//                             let statusColor = '';
-//                             if (item.dayleft > 10) {
-//                                 statusColor = 'green'; // Safe status
-//                             } else if (item.dayleft > 5) {
-//                                 statusColor = 'orange'; // Warning status
-//                             } else {
-//                                 statusColor = 'red'; // Critical status
-//                             }
-//                             return (
-//                                 <Col xs={24} sm={24} lg={8} xl={8} xxl={6} key={item.id}>
-//                                     <Card
-//                                     ><div className='flex items-center justify-between'>
-//                                             <div className=''>
-//                                                 <p className='font-medium'>{item.name}</p>
-//                                                 <p>{item.category}</p>
-//                                             </div>
-//                                             <div>
-//                                                 <p>
-//                                                     <Dropdown
-//                                                     overlay={dropdownMenu(item.id)}
-//                                                     trigger={['click']}
-//                                                     placement="bottomRight"
-//                                                     key="dropdown"
-//                                                 >
-//                                                     <Button type="text" icon={<EllipsisDropdown />}>
-//                                                     </Button>
-//                                                 </Dropdown></p>
-//                                             </div>
-//                                         </div>
-//                                         <p className="flex gap-4 mt-1">
-//                                             <span>
-//                                                 <PaperClipOutlined />
-//                                                 {item.attachmentCount}
-//                                             </span>
-//                                             <span>
-//                                                 <CheckCircleOutlined />
-//                                                 {item.completedTask}/{item.totalTask}
-//                                             </span>
-//                                             <span
-//                                                 style={{
-//                                                     color: statusColor,
-//                                                     display: 'flex',
-//                                                     alignItems: 'center',
-//                                                     gap: '4px',
-//                                                 }}
-//                                             >
-//                                                 <ClockCircleOutlined />
-//                                                 {item.dayleft} days left
-//                                             </span>
-//                                         </p>
-//                                         <p>
-//                                             <Progress
-//                                                 percent={item.progression}
-//                                                 strokeColor={
-//                                                     item.progression >= 80
-//                                                         ? 'green'
-//                                                         : item.progression >= 60
-//                                                             ? 'orange'
-//                                                             : 'red'
-//                                                 }
-//                                                 size="small"
-//                                             />
-//                                         </p>
-//                                         <div>
-//                                             {item.member.slice(0, 3).map((m, index) => (
-//                                                 <Tooltip title={m.name} key={index}>
-//                                                     <Avatar src={m.img}>
-//                                                         {!m.img && utils.getNameInitial(m.name)}
-//                                                     </Avatar>
-//                                                 </Tooltip>
-//                                             ))}
-//                                             {item.member.length > 3 && (
-//                                                 <Tooltip title={`${item.member.length - 3} More`}>
-//                                                     <Avatar size="small" className="text-black font-medium">
-//                                                         +{item.member.length - 3}
-//                                                     </Avatar>
-//                                                 </Tooltip>
-//                                             )}
-//                                         </div>
-//                                     </Card>
-//                                 </Col>
-//                             );
-//                         })}
-//                     </Row>
-//                 )}
-//             </div>
-//             {/* Add Project Modal */}
-//             <Modal
-//                 title="Add Project"
-//                 visible={isAddProjectModalVisible}
-//                 onCancel={closeAddProjectModal}
-//                 footer={null}
-//                 width={800}
-//                 className='mt-[-70px]'
-//             >
-//                 <AddProject onClose={closeAddProjectModal} />
-//             </Modal>
-//             {/* Edit Project Modal */}
-//             <Modal
-//                 title="Edit Project"
-//                 visible={isEditProjectModalVisible}
-//                 onCancel={closeEditProjectModal}
-//                 footer={null}
-//                 width={800}
-//                 className='mt-[-70px]'
-//             >
-//                 <EditProject onClose={closeEditProjectModal} />
-//             </Modal>
-//         </div>
-//     );
-// };
-// export default ProjectList;

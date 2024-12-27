@@ -1,46 +1,104 @@
-import React, { useState } from "react";
-import { Card, Table, Input, Tag, Menu, Button,Select,Modal, message } from "antd";
-import { EyeOutlined, DeleteOutlined, MailOutlined, PushpinOutlined,SearchOutlined,EditOutlined,PlusOutlined,FileExcelOutlined } from "@ant-design/icons";
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Input,
+  Tag,
+  Menu,
+  Button,
+  Select,
+  Modal,
+  message,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  MailOutlined,
+  RocketOutlined,
+  PushpinOutlined,
+  SearchOutlined,
+  EditOutlined,
+  PlusOutlined,
+  FileExcelOutlined,
+} from "@ant-design/icons";
 import dayjs from "dayjs";
 
-import UserView from "./UserView";
+import UserView from "../client-list/UserView";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-import OrderListData from 'assets/data/order-list.data.json';
-import utils from 'utils';
-
+import OrderListData from "assets/data/order-list.data.json";
+import utils from "utils";
 
 import userData from "assets/data/user-list.data.json";
+
+import ResetPassword from "./ResetPassword";
+import { useDispatch, useSelector } from "react-redux";
+import { ClientData, deleteClient } from "./CompanyReducers/CompanySlice";
 import AddClient from "./AddClient";
 import EditClient from "./EditClient";
-import ResetPassword from "../user-list/ResetPassword";
+
+const { Option } = Select;
 
 const ClientList = () => {
   const [users, setUsers] = useState(userData);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [list, setList] = useState(OrderListData);
-  const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
-  const [isEditClientModalVisible, setIsEditClientModalVisible] = useState(false);
-  const [isResetPasswordModalVisible, setIsResetPasswordModalVisible] = useState(false);
+  const [isAddCompanyModalVisible, setIsAddCompanyModalVisible] =
+    useState(false);
+  const [isEditCompanyModalVisible, setIsEditCompanyModalVisible] =
+    useState(false);
+  const [isResetPasswordModalVisible, setIsResetPasswordModalVisible] =
+    useState(false);
+  const [isUpgradePlanModalVisible, setIsUpgradePlanModalVisible] =
+    useState(false);
+  const [comnyid, setCompnyid] = useState("");
+
+  const tabledata = useSelector((state) => state.ClientData);
+  console.log("ooooo", tabledata);
+
+  const dispatch = useDispatch();
 
   const deleteUser = (userId) => {
+    dispatch(deleteClient(userId));
     setUsers(users.filter((user) => user.id !== userId));
+    dispatch(ClientData());
     message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
 
+  const getCompanyStatus = (status) => {
+    if (status === "active") {
+      return "blue";
+    }
+    if (status === "blocked") {
+      return "cyan";
+    }
+    return "";
+  };
+  const comId = (id) => {
+    setCompnyid(id);
+  };
 
+  useEffect(() => {
+    dispatch(ClientData());
+  }, [dispatch]);
 
-  const paymentStatusList = ['active', 'blocked'];
+  useEffect(() => {
+    if (tabledata && tabledata.ClientData && tabledata.ClientData.data) {
+      setUsers(tabledata.ClientData.data);
+    }
+  }, [tabledata]);
+
+  const companyStatusList = ["active", "blocked"];
 
   const handleShowStatus = (value) => {
-    if (value !== 'All') {
-      const key = 'status';
-      const data = utils.filterArray(OrderListData, key, value);
-      setList(data);
+    if (value !== "All") {
+      const key = "status";
+      const data = utils.filterArray(userData, key, value);
+      setUsers(data);
     } else {
-      setList(OrderListData);
+      setUsers(userData);
     }
   };
 
@@ -51,25 +109,20 @@ const ClientList = () => {
     setList(data);
   };
 
-//   const deleteUser = (userId) => {
-//     setUsers(users.filter((user) => user.id !== userId));
-//     message.success({ content: `Deleted user ${userId}`, duration: 2 });
-//   };
-
-const openAddClientModal = () => {
-    setIsAddClientModalVisible(true);
+  const openAddCompanyModal = () => {
+    setIsAddCompanyModalVisible(true);
   };
 
-  const closeAddClientModal = () => {
-    setIsAddClientModalVisible(false);
+  const closeAddCompanyModal = () => {
+    setIsAddCompanyModalVisible(false);
   };
 
-  const openEditClientModal = () => {
-    setIsEditClientModalVisible(true);
+  const openEditCompanyModal = () => {
+    setIsEditCompanyModalVisible(true);
   };
 
-  const closeEditClientModal = () => {
-    setIsEditClientModalVisible(false);
+  const closeEditCompanyModal = () => {
+    setIsEditCompanyModalVisible(false);
   };
 
   const openResetPasswordModal = () => {
@@ -80,6 +133,13 @@ const openAddClientModal = () => {
     setIsResetPasswordModalVisible(false);
   };
 
+  const openUpgradePlanModal = () => {
+    setIsUpgradePlanModalVisible(true);
+  };
+
+  const closeUpgradePlanModal = () => {
+    setIsUpgradePlanModalVisible(false);
+  };
 
   const showUserProfile = (userInfo) => {
     setUserProfileVisible(true);
@@ -95,56 +155,72 @@ const openAddClientModal = () => {
     <Menu>
       <Menu.Item>
         <Flex alignItems="center">
-      <Button
-        type=""
-        icon={<EyeOutlined />}
-        onClick={() => showUserProfile(user)}
-        size="small"
-        style={{ display: "block", marginBottom: "8px" }}
-      >
-        View Details
-      </Button>
-      </Flex>
+          <Button
+            type=""
+            icon={<EyeOutlined />}
+            onClick={() => showUserProfile(user)}
+            size="small"
+            style={{ display: "block", marginBottom: "8px" }}
+          >
+            View Details
+          </Button>
+        </Flex>
       </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-      <Button
-        type=""
-        icon={<EditOutlined />}
-        onClick={openEditClientModal}
-        size="small"
-        style={{ display: "block", marginBottom: "8px" }}
-      >
-        Edit
-      </Button>
-      </Flex>
+          <Button
+            type=""
+            icon={<EditOutlined />}
+            onClick={() => {
+              openEditCompanyModal();
+              comId(user.id); // Call the delete user function
+            }}
+            size="small"
+            style={{ display: "block", marginBottom: "8px" }}
+          >
+            Edit
+          </Button>
+        </Flex>
       </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-      <Button
-        type=""
-        icon={<PushpinOutlined />}
-        onClick={openResetPasswordModal}
-        size="small"
-        style={{ display: "block", marginBottom: "8px" }}
-      >
-        Reset Password
-      </Button>
-      </Flex>
+          <Button
+            type=""
+            icon={<PushpinOutlined />}
+            onClick={openResetPasswordModal}
+            size="small"
+            style={{ display: "block", marginBottom: "8px" }}
+          >
+            Reset Password
+          </Button>
+        </Flex>
       </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-      <Button
-        type=""
-        icon={<DeleteOutlined />}
-        onClick={() => deleteUser(user.id)}
-        size="small"
-      >
-        Delete
-      </Button>
-      </Flex>
+          <Button
+            type=""
+            icon={<RocketOutlined />}
+            onClick={openUpgradePlanModal}
+            size="small"
+            style={{ display: "block", marginBottom: "8px" }}
+          >
+            UpgradePlan
+          </Button>
+        </Flex>
       </Menu.Item>
-</Menu>
+      <Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            icon={<DeleteOutlined />}
+            onClick={() => deleteUser(user.id)}
+            size="small"
+          >
+            Delete
+          </Button>
+        </Flex>
+      </Menu.Item>
+    </Menu>
   );
 
   const tableColumns = [
@@ -158,7 +234,11 @@ const openAddClientModal = () => {
       dataIndex: "name",
       render: (_, record) => (
         <div className="d-flex">
-          <AvatarStatus src={record.img} name={record.name} subTitle={record.email} />
+          <AvatarStatus
+            src={record.img}
+            name={record.name}
+            subTitle={record.email}
+          />
         </div>
       ),
       sorter: (a, b) => a.name.localeCompare(b.name),
@@ -191,12 +271,12 @@ const openAddClientModal = () => {
     {
       title: "Status",
       dataIndex: "status",
-      render: (status) => (
-        <Tag className="text-capitalize" color={status === "active" ? "cyan" : "red"}>
-          {status}
-        </Tag>
+      render: (_, record) => (
+        <>
+          <Tag color={getCompanyStatus(record.status)}>{record.status}</Tag>
+        </>
       ),
-      sorter: (a, b) => a.status.localeCompare(b.status),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
     },
     {
       title: "Action",
@@ -211,7 +291,11 @@ const openAddClientModal = () => {
 
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
-        <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+      >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
@@ -228,8 +312,8 @@ const openAddClientModal = () => {
               onChange={handleShowStatus}
               placeholder="Status"
             >
-              <Select.Option value="All">Status</Select.Option>
-              {paymentStatusList.map((elm) => (
+              <Select.Option value="All">All Status</Select.Option>
+              {companyStatusList.map((elm) => (
                 <Select.Option key={elm} value={elm}>
                   {elm}
                 </Select.Option>
@@ -238,7 +322,7 @@ const openAddClientModal = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-          <Button type="primary" className="ml-2" onClick={openAddClientModal}>
+          <Button type="primary" className="ml-2" onClick={openAddCompanyModal}>
             <PlusOutlined />
             New
           </Button>
@@ -257,24 +341,24 @@ const openAddClientModal = () => {
           close={closeUserProfile}
         />
       )}
-       <Modal
-        title="Create Client"
-        visible={isAddClientModalVisible}
-        onCancel={closeAddClientModal}
+      <Modal
+        title="Create Company"
+        visible={isAddCompanyModalVisible}
+        onCancel={closeAddCompanyModal}
         footer={null}
         width={1100}
         // className="mt-[-70px]"
       >
-        <AddClient onClose={closeAddClientModal} />
+        <AddClient onClose={closeAddCompanyModal} />
       </Modal>
       <Modal
-        title="Edit Client"
-        visible={isEditClientModalVisible}
-        onCancel={closeEditClientModal}
+        title="Edit Company"
+        visible={isEditCompanyModalVisible}
+        onCancel={closeEditCompanyModal}
         footer={null}
         width={1000}
       >
-        <EditClient onClose={closeEditClientModal} />
+        <EditClient onClose={closeEditCompanyModal} comnyid={comnyid} />
       </Modal>
 
       <Modal
@@ -285,6 +369,15 @@ const openAddClientModal = () => {
         width={1000}
       >
         <ResetPassword onClose={closeResetPasswordModal} />
+      </Modal>
+      <Modal
+        title="Upgrade Plan"
+        visible={isUpgradePlanModalVisible}
+        onCancel={closeUpgradePlanModal}
+        footer={null}
+        width={1000}
+      >
+        {/* <PlanUpgrade onClose={closeUpgradePlanModal} /> */}
       </Modal>
     </Card>
   );

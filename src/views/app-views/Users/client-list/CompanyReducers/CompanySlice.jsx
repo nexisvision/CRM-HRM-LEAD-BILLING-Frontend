@@ -1,31 +1,33 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./LeadService";
+import UserService from "./CompanyService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
-export const LeadsAdd = createAsyncThunk(
-  "users/LeadsAdd",
+export const addClient = createAsyncThunk(
+  "users/addUser",
   async (userData, thunkAPI) => {
     try {
-      const response = await UserService.AddLeads(userData);
+      const response = await UserService.createClient(userData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-
 // Async thunk for user login
 
-export const GetLeads = createAsyncThunk("emp/GetLeads", async (thunkAPI) => {
-  try {
-    const response = await UserService.GetLeads();
-    return response;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.response.data);
+export const ClientData = createAsyncThunk(
+  "emp/getClient",
+  async (thunkAPI) => {
+    try {
+      const response = await UserService.ClientData();
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
 // Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
@@ -54,23 +56,22 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const LeadsDelete = createAsyncThunk(
-  "users/LeadsDelete",
+export const deleteClient = createAsyncThunk(
+  "users/deleteUser",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.DeleteLeads(userId);
+      const response = await UserService.DeleteClient(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const LeadsEdit = createAsyncThunk(
-  "users/LeadsEdit",
-  async ({ id, values }, thunkAPI) => {
+export const Editclient = createAsyncThunk(
+  "users/updateEmployee",
+  async ({ comnyid, values }, thunkAPI) => {
     try {
-      console.log("idinslice", id);
-      const response = await UserService.EditLeads(id, values);
+      const response = await UserService.EditClient(comnyid, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -93,9 +94,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "Leads",
+  name: "ClientData",
   initialState: {
-    Leads: [],
+    ClientData: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -132,27 +133,27 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(LeadsAdd.pending, (state) => {
+      .addCase(addClient.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(LeadsAdd.fulfilled, (state, action) => {
+      .addCase(addClient.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(LeadsAdd.rejected, (state, action) => {
+      .addCase(addClient.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(GetLeads.pending, (state) => {
+      .addCase(ClientData.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(GetLeads.fulfilled, (state, action) => {
+      .addCase(ClientData.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.Leads = action?.payload;
+        state.ClientData = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(GetLeads.rejected, (state, action) => {
+      .addCase(ClientData.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
@@ -185,27 +186,27 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
       //delete
-      .addCase(LeadsDelete.pending, (state) => {
+      .addCase(deleteClient.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(LeadsDelete.fulfilled, (state, action) => {
+      .addCase(deleteClient.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload.message);
       })
-      .addCase(LeadsDelete.rejected, (state, action) => {
+      .addCase(deleteClient.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(LeadsEdit.pending, (state) => {
+      .addCase(Editclient.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(LeadsEdit.fulfilled, (state, action) => {
+      .addCase(Editclient.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload;
       })
-      .addCase(LeadsEdit.rejected, (state, action) => {
+      .addCase(Editclient.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
       });
