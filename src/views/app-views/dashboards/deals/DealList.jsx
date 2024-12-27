@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, EditOutlined,FileAddOutlined, FileExcelOutlined } from '@ant-design/icons';
+import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, EditOutlined, FileAddOutlined, FileExcelOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from '../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
@@ -12,6 +12,7 @@ import AddDeal from './AddDeal';
 import userData from 'assets/data/user-list.data.json';
 import OrderListData from 'assets/data/order-list.data.json';
 import utils from 'utils';
+import { useNavigate } from 'react-router-dom';
 import EditDeal from './EditDeal';
 import ViewDeal from './ViewDeal';
 
@@ -19,6 +20,7 @@ const DealList = () => {
   const [users, setUsers] = useState(userData);
   const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const navigate = useNavigate();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   // const [viewDealVisible, setViewDealVisible] = useState(false);
 
@@ -29,6 +31,8 @@ const DealList = () => {
   const [isEditDealModalVisible, setIsEditDealModalVisible] = useState(false);
 
   const [dealStatisticData] = useState(DealStatisticData);
+
+
 
   // Open Add Job Modal
   const openAddDealModal = () => {
@@ -50,11 +54,13 @@ const DealList = () => {
     setIsEditDealModalVisible(false);
   };
 
-
-
   const openViewDealModal = () => {
-    setIsViewDealModalVisible(true);
+    navigate('/app/dashboards/project/deal/viewDeal', { state: { user: selectedUser } }); // Pass user data as state if needed
   };
+
+  // const openViewDealModal = () => {
+  //   setIsViewDealModalVisible(true);
+  // };
 
   // Close Add Job Modal
   const closeViewDealModal = () => {
@@ -91,8 +97,8 @@ const DealList = () => {
     setUserProfileVisible(false);
   };
 
-   
-  
+
+
 
   const dropdownMenu = (elm) => (
     <Menu>
@@ -184,14 +190,14 @@ const DealList = () => {
       },
     },
     {
-        title: 'User',
-        dataIndex: 'name',
-        render: (_, record) => (
-            <div className="d-flex">
-                <AvatarStatus size={30} src={record.image} name={record.name}/>
-            </div>
-        ),
-        sorter: (a, b) => utils.antdTableSorter(a, b, 'name')
+      title: 'User',
+      dataIndex: 'name',
+      render: (_, record) => (
+        <div className="d-flex">
+          <AvatarStatus size={30} src={record.image} name={record.name} />
+        </div>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, 'name')
     },
     {
       title: 'Action',
@@ -271,16 +277,16 @@ const DealList = () => {
       </Modal>
 
       <Modal
-      className='mt-[-70px]'
+        className='mt-[-70px]'
         title="Deal"
         visible={isViewDealModalVisible}
         onCancel={closeViewDealModal}
         footer={null}
         width={1800}
 
->
+      >
         <ViewDeal onClose={closeViewDealModal} />
-    
+
       </Modal>
     </Card>
   );

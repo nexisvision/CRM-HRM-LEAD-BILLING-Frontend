@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input, Button, Select, Switch, Row, Col, message } from 'antd';
+import { Form, Input, Button, Select, Switch, Row, Col, message, Menu, Dropdown } from 'antd';
 import { useDispatch } from 'react-redux';
 import { CreatePlan, GetPlan } from './PlanReducers/PlanSlice';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +21,85 @@ const AddPlan = ({ onClose }) => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const [durationType, setDurationType] = useState(null);
+const [selectedMonth, setSelectedMonth] = useState(null);
+const [selectedYear, setSelectedYear] = useState(null);
+
+
+  const handleMenuClick = (e) => {
+    console.log('Selected:', e.key);
+  };
+
+
+  // Nested menus for Yearly and Monthly options
+  // Update handlers
+const handleMonthlySelect = ({ key }) => {
+  setDurationType('Monthly');
+  setSelectedMonth(key);
+  form.setFieldsValue({ 
+    durationType: 'Monthly',
+    monthCount: key 
+  });
+};
+
+const handleYearlyInputChange = ({ key }) => {
+  setDurationType('Yearly');
+  setSelectedYear(key);
+  form.setFieldsValue({ 
+    durationType: 'Yearly',
+    monthCount: key 
+  });
+  // setYearlyValue(e.target.value);
+  // form.setFieldsValue({ 
+  //   durationType: 'Yearly',
+  //   yearCount: e.target.value 
+  // });
+};
+
+// Update the menus
+const yearlyMenu = (
+  <Menu onClick={handleYearlyInputChange}>
+    <Menu.Item className='w-full'>
+      <Input 
+        placeholder="Enter years"
+        type="number"
+        // min={1}
+        // max={10}
+        onChange={(e) => {
+          const value = e.target.value;
+          setSelectedYear(value);
+          form.setFieldsValue({ 
+            durationType: 'Yearly',
+            yearCount: value 
+          });
+        }}
+        // onClick={(e) => e.stopPropagation()}
+      />
+    </Menu.Item>
+  </Menu>
+);
+
+const monthlyMenu = (
+  <Menu onClick={handleMonthlySelect} >
+    {Array.from({ length: 12 }, (_, i) => (
+      <Menu.Item key={i + 1}>{`${i + 1} Month${i + 1 > 1 ? 's' : ''}`}</Menu.Item>
+    ))}
+  </Menu>
+);
+
+  // Main menu
+  const mainMenu = (
+    <Menu>
+      <Menu.Item key="Lifetime">Lifetime</Menu.Item>
+      <Menu.SubMenu key="Yearly" title="Yearly">
+        {yearlyMenu}
+      </Menu.SubMenu>
+      <Menu.SubMenu key="Monthly" title="Monthly">
+        {monthlyMenu}
+      </Menu.SubMenu>
+    </Menu>
+  );
 
   const handleSubmit = (values) => {
     // Include the featureStates as part of the payload
@@ -97,13 +176,32 @@ const AddPlan = ({ onClose }) => {
               label="Duration"
               rules={[{ required: true, message: 'Please select a duration!' }]}
             >
+              <Dropdown overlay={mainMenu} trigger={['click']} className='w-full'>
+                <Button>
+                  {durationType === 'Monthly' && selectedMonth
+                    ? `${selectedMonth} Month${selectedMonth > 1 ? 's' : ''}`
+                    : durationType === 'Yearly' && selectedYear
+                      ? `${selectedYear} Year${selectedYear > 1 ? 's' : ''}`
+                      : 'Select Duration'}
+                </Button>
+              </Dropdown>
+            </Form.Item>
+          </Col>
+          
+
+          {/* <Col span={12}>
+            <Form.Item
+              name="duration"
+              label="Duration"
+              rules={[{ required: true, message: 'Please select a duration!' }]}
+            >
               <Select>
                 <Option value="Lifetime">Lifetime</Option>
                 <Option value="Yearly">Yearly</Option>
                 <Option value="Monthly">Monthly</Option>
               </Select>
             </Form.Item>
-          </Col>
+          </Col> */}
 
           <Col span={12}>
             <Form.Item
@@ -179,7 +277,7 @@ const AddPlan = ({ onClose }) => {
         )}
 
         {/* <Form.Item label="Features"> */}
-          {/* <Row gutter={16}>
+        {/* <Row gutter={16}>
             {Object.keys(featureStates).map((feature) => (
               <Col span={4} key={feature}>
                 <Switch

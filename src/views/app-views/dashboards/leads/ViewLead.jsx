@@ -34,7 +34,7 @@ const ViewLead = () => {
 
   return (
     <>
-  
+    <h1 className="text-lg font-bold ml-3">Lead</h1>
     <div className="flex flex-col lg:flex-row ml-[-24px] mb-[-24px] rounded-b-lg mt-[-51px] rounded-t-lg mr-[-24px] bg-gray-100">
       {/* <hr style={{ marginTop:"20px",border: '10px solid #e8e8e8' }} /> */}
       {/* Sidebar */}
@@ -42,7 +42,7 @@ const ViewLead = () => {
         className="md:w-1/4 sm:w-full h-auto md:h-full fixed md:relative bg-white shadow-md"
         style={{ minWidth: "300px" }}
       > */}
-        <div className="sm:w-full md:w-[95%] md:mr-[30px] lg:w-[240px] md:ml-[23px] h-full mt-16">
+        <div className="sm:w-full md:w-[95%] md:mr-[30px] lg:w-[240px] md:ml-[23px] h-full mt-16 px-[30px] md:p-0 lg:p-0">
           <ul className="">
             <li
               onClick={() => scrollToSection(generalRef)}

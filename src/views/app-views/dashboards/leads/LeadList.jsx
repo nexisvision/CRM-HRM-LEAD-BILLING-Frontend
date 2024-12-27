@@ -46,6 +46,7 @@ const LeadList = () => {
   const [isViewLeadModalVisible, setIsViewLeadModalVisible] = useState(false);
   const [isEditLeadModalVisible, setIsEditLeadModalVisible] = useState(false);
   const [dealStatisticData] = useState(DealStatisticData);
+  const navigate = useNavigate();
 
   const [id, setId] = useState("null");
 
@@ -63,6 +64,10 @@ const LeadList = () => {
     }
   };
 
+  const openViewLeadModal = () => {
+    navigate('/app/dashboards/project/lead/viewLead', { state: { user: selectedUser } }); // Pass user data as state if needed
+  };    
+
   // Open file manager
   const openFileManager = () => {
     fileInputRef.current.click();
@@ -72,7 +77,7 @@ const LeadList = () => {
   const closeAddLeadModal = () => setIsAddLeadModalVisible(false);
   const openEditLeadModal = () => setIsEditLeadModalVisible(true);
   const closeEditLeadModal = () => setIsEditLeadModalVisible(false);
-  const openViewLeadModal = () => setIsViewLeadModalVisible(true);
+  // const openViewLeadModal = () => setIsViewLeadModalVisible(true);
   const closeViewLeadModal = () => setIsViewLeadModalVisible(false);
 
   const tabledata = useSelector((state) => state.Leads);

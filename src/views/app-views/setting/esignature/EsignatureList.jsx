@@ -168,6 +168,25 @@ const ESignaturePage = () => {
     setHasDrawing(false);
   };
 
+  const saveSignature = async (name, signatureFile) => {
+    try {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('signature', signatureFile); // This should be a File/Blob object
+
+        const response = await fetch('/api/signature/save', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error saving signature:', error);
+        throw error;
+    }
+};
+
   const handleSave = () => {
     if (sigPadRef.current.isEmpty()) {
       notification.error({
@@ -340,11 +359,13 @@ const ESignaturePage = () => {
         }}
         okText={isEditMode ? "Update" : "Save"}
       >
+        <div className="border-b border-gray-200 my-3"></div>
+        <label htmlFor="" className="text-sm font-semibold mb-2">Enter Signature Name</label>
         <Input
           placeholder="Enter signature name"
           value={signatureName}
           onChange={(e) => setSignatureName(e.target.value)}
-          className="mb-4"
+          className="my-2"
         />
         {tempSignature && (
           <div className="border p-4 rounded">

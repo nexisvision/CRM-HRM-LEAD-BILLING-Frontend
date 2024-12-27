@@ -542,6 +542,14 @@ const extraNavvvTree = [
         submenu: []
       },
       {
+        key: 'superadmin-subscribeduserplans',
+        path: `${APP_PREFIX_PATH}/superadmin/subscribeduserplans`,
+        title: 'Subscribed User Plans',
+        icon: BlockOutlined,
+        breadcrumb: true,
+        submenu: []
+      },
+      {
         key: 'superadmin-coupon',
         path: `${APP_PREFIX_PATH}/superadmin/coupon`,
         title: 'Coupon',
@@ -557,7 +565,43 @@ const extraNavvvTree = [
         breadcrumb: true,
         submenu: []
       },
-    ]
+
+          {
+            key: 'setting',
+            path: `${APP_PREFIX_PATH}/setting`,
+            title: 'Setting',
+            icon:  CalendarOutlined,
+            breadcrumb: true,
+            submenu: [
+              {
+                key: 'extra-superadmin-setting-countries',
+                path: `${APP_PREFIX_PATH}/setting/countries`,
+                title: 'Countries',
+                icon: ControlOutlined,
+                breadcrumb: true,
+                submenu: []
+              },
+              {
+                key: 'extra-superadmin-setting-currencies',
+                path: `${APP_PREFIX_PATH}/setting/currencies`,
+                title: 'Currencies',
+                icon: UsergroupAddOutlined,
+                breadcrumb: true,
+                submenu: []
+              },
+              {
+                key: 'extra-superadmin-setting-esignature',
+                path: `${APP_PREFIX_PATH}/setting/esignature`,
+                title: 'ESignature',
+                icon: FileDoneOutlined,
+                breadcrumb: true,
+                submenu: []
+              },
+             
+            ]
+            
+          },
+        ]
   }
 ]
 
@@ -658,14 +702,14 @@ const dashBoardNavTree = [{
                 breadcrumb: false,
                 submenu: []
               },
-              {
-                key: 'dashboards-project-Bug',
-                path: `${APP_PREFIX_PATH}/dashboards/project/bug`,
-                title: 'Bug',
-                icon: BugOutlined,
-                breadcrumb: false,
-                submenu: []
-              },
+              // {
+              //   key: 'dashboards-project-Bug',
+              //   path: `${APP_PREFIX_PATH}/dashboards/project/bug`,
+              //   title: 'Bug',
+              //   icon: BugOutlined,
+              //   breadcrumb: false,
+              //   submenu: []
+              // },
               {
                 key: 'dashboards-project-Task',
                 path: `${APP_PREFIX_PATH}/dashboards/project/task`,
@@ -687,6 +731,14 @@ const dashBoardNavTree = [{
                 path: `${APP_PREFIX_PATH}/dashboards/project/projectreport`,
                 title: 'Project Report',
                 icon: FundProjectionScreenOutlined,
+                breadcrumb: false,
+                submenu: []
+              },
+              {
+                key: 'dashboards-project-systemsetup',
+                path: `${APP_PREFIX_PATH}/dashboards/project/systemsetup`,
+                title: 'System Setup',
+                icon: BugOutlined,
                 breadcrumb: false,
                 submenu: []
               },
@@ -800,47 +852,47 @@ const dashBoardNavTree = [{
             submenu: []
           },
       
-          {
-            key: 'dashboards-ecommerce',
-            path: `${APP_PREFIX_PATH}/dashboards/ecommerce`,
-            title: 'ecommerce',
-            icon: ShoppingCartOutlined,
-            breadcrumb: true,
-            submenu: [
-              {
-                key: 'dashboards-ecommerce-productList',
-                path: `${APP_PREFIX_PATH}/dashboards/ecommerce/product-list`,
-                title: 'productList',
-                icon: '',
-                breadcrumb: true,
-                submenu: []
-              },
-              {
-                key: 'dashboards-ecommerce-addProduct',
-                path: `${APP_PREFIX_PATH}/dashboards/ecommerce/add-product`,
-                title: 'addProduct',
-                icon: AppstoreAddOutlined,
-                breadcrumb: false,
-                submenu: []
-              },
-              {
-                key: 'dashboards-ecommerce-editProduct',
-                path: `${APP_PREFIX_PATH}/dashboards/ecommerce/edit-product/12`,
-                title: 'editProduct',
-                icon: EditOutlined,
-                breadcrumb: false,
-                submenu: []
-              },
-              {
-                key: 'dashboards-ecommerce-orders',
-                path: `${APP_PREFIX_PATH}/dashboards/ecommerce/orders`,
-                title: 'orders',
-                icon: '',
-                breadcrumb: false,
-                submenu: []
-              }
-            ]
-          },
+          // {
+          //   key: 'dashboards-ecommerce',
+          //   path: `${APP_PREFIX_PATH}/dashboards/ecommerce`,
+          //   title: 'ecommerce',
+          //   icon: ShoppingCartOutlined,
+          //   breadcrumb: true,
+          //   submenu: [
+          //     {
+          //       key: 'dashboards-ecommerce-productList',
+          //       path: `${APP_PREFIX_PATH}/dashboards/ecommerce/product-list`,
+          //       title: 'productList',
+          //       icon: '',
+          //       breadcrumb: true,
+          //       submenu: []
+          //     },
+          //     {
+          //       key: 'dashboards-ecommerce-addProduct',
+          //       path: `${APP_PREFIX_PATH}/dashboards/ecommerce/add-product`,
+          //       title: 'addProduct',
+          //       icon: AppstoreAddOutlined,
+          //       breadcrumb: false,
+          //       submenu: []
+          //     },
+          //     {
+          //       key: 'dashboards-ecommerce-editProduct',
+          //       path: `${APP_PREFIX_PATH}/dashboards/ecommerce/edit-product/12`,
+          //       title: 'editProduct',
+          //       icon: EditOutlined,
+          //       breadcrumb: false,
+          //       submenu: []
+          //     },
+          //     {
+          //       key: 'dashboards-ecommerce-orders',
+          //       path: `${APP_PREFIX_PATH}/dashboards/ecommerce/orders`,
+          //       title: 'orders',
+          //       icon: '',
+          //       breadcrumb: false,
+          //       submenu: []
+          //     }
+          //   ]
+          // },
           {
             key: 'extra-pages',
             path: `${APP_PREFIX_PATH}/pages`,
@@ -865,14 +917,14 @@ const dashBoardNavTree = [{
                 submenu: []
               },
              
-              {
-                key: 'extra-pages-esignature',
-                path: `${APP_PREFIX_PATH}/pages/esignature`,
-                title: 'esignature',
-                icon: FileDoneOutlined,
-                breadcrumb: true,
-                submenu: []
-              },
+              // {
+              //   key: 'extra-pages-esignature',
+              //   path: `${APP_PREFIX_PATH}/pages/esignature`,
+              //   title: 'esignature',
+              //   icon: FileDoneOutlined,
+              //   breadcrumb: true,
+              //   submenu: []
+              // },
               // {
               //   key: 'extra-pages-pricing',
               //   path: `${APP_PREFIX_PATH}/pages/pricing`,

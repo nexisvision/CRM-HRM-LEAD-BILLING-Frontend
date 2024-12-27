@@ -16,6 +16,7 @@ import userData from '../../../../assets/data/user-list.data.json';
 import OrderListData from 'assets/data/order-list.data.json';
 import { IoCopyOutline } from "react-icons/io5";
 import utils from 'utils';
+import { useNavigate } from 'react-router-dom';
 
 const ContractList = () => {
   const [users, setUsers] = useState(userData);
@@ -26,7 +27,7 @@ const ContractList = () => {
   const [isAddContractModalVisible, setIsAddContractModalVisible] = useState(false);
   const [isViewContractModalVisible, setIsViewContractModalVisible] = useState(false);
   const [isEditContractModalVisible, setIsEditContractModalVisible] = useState(false);
-
+  const navigate = useNavigate();
 //   const [dealStatisticData] = useState(DealStatisticData);
 
   // Open Add Job Modal
@@ -39,9 +40,9 @@ const ContractList = () => {
     setIsAddContractModalVisible(false);
   };
 
-  const openViewContractModal = () => {
-    setIsViewContractModalVisible(true);
-  };
+  // const openViewContractModal = () => {
+  //   setIsViewContractModalVisible(true);
+  // };
 
   // Close Add Job Modal
   const closeViewContractModal = () => {
@@ -56,6 +57,10 @@ const ContractList = () => {
   const closeEditContractModal = () => {
     setIsEditContractModalVisible(false);
   };
+
+  const openViewContractModal = () => {
+    navigate('/app/dashboards/project/contract/viewContract', { state: { user: selectedUser } }); // Pass user data as state if needed
+  }; 
 
   // Search functionality
   const onSearch = (e) => {

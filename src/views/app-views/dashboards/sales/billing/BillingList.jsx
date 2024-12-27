@@ -183,7 +183,8 @@ export const BillingList = () => {
             title: 'status',
             dataIndex: 'paymentStatus',
             render: (_, record) => (
-                <><Badge status={getPaymentStatus(record.paymentStatus)} /><span>{record.paymentStatus}</span></>
+                <><Tag color={getPaymentStatus(record.paymentStatus)}>{record.paymentStatus}</Tag></>
+                // <><Badge status={getPaymentStatus(record.paymentStatus)} /><span>{record.paymentStatus}</span></>
             ),
             sorter: (a, b) => utils.antdTableSorter(a, b, 'paymentStatus')
         },

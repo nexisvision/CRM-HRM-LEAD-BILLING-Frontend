@@ -120,9 +120,19 @@ export const protectedRoutes = [
         component: React.lazy(() => import('views/app-views/dashboards/leads')),
     },
     {
+        key: 'dashboard.project.lead',
+        path: `${APP_PREFIX_PATH}/dashboards/project/lead/viewLead`,
+        component: React.lazy(() => import('views/app-views/dashboards/leads/ViewLead')),
+    },
+    {
         key: 'dashboard.project.deal',
         path: `${APP_PREFIX_PATH}/dashboards/project/deal`,
         component: React.lazy(() => import('views/app-views/dashboards/deals')),
+    },
+    {
+        key: 'dashboard.project.deal',
+        path: `${APP_PREFIX_PATH}/dashboards/project/deal/viewDeal`,
+        component: React.lazy(() => import('views/app-views/dashboards/deals/ViewDeal')),
     },
     {
         key: 'dashboard.project.contract',
@@ -130,9 +140,19 @@ export const protectedRoutes = [
         component: React.lazy(() => import('views/app-views/dashboards/contract')),
     },
     {
+        key: 'dashboard.project.contract',
+        path: `${APP_PREFIX_PATH}/dashboards/project/contract/viewContract`,
+        component: React.lazy(() => import('views/app-views/dashboards/contract/ViewContract')),
+    },
+    {
         key: 'dashboard.project.bug',
         path: `${APP_PREFIX_PATH}/dashboards/project/bug`,
         component: React.lazy(() => import('views/app-views/dashboards/bug')),
+    },
+    {
+        key: 'dashboard.project.systemsetup',
+        path: `${APP_PREFIX_PATH}/dashboards/project/systemsetup`,
+        component: React.lazy(() => import('views/app-views/dashboards/systemsetup')),
     },
     {
         key: 'dashboard.project.task',
@@ -922,7 +942,7 @@ export const protectedRoutes = [
 
     {
         key: 'hrm.eventsetup',
-        path: `${APP_PREFIX_PATH}/hrm/EventSetup`,
+        path: `${APP_PREFIX_PATH}/hrm/eventsetup`,
         component: React.lazy(() => import('views/app-views/hrm/EventSetup')),
     },
 
@@ -1034,15 +1054,43 @@ export const protectedRoutes = [
         component: React.lazy(() => import('views/app-views/plan')),
     },
     {
+        key: 'subscribeduserplans',
+        path: `${APP_PREFIX_PATH}/superadmin/subscribeduserplans`,
+        component: React.lazy(() => import('views/app-views/subscribeduserplans')),
+    },
+
+    {
+        key: 'setting',
+        path: `${APP_PREFIX_PATH}/setting`,
+        component: React.lazy(() => import('views/app-views/setting')),
+    },
+    {
+        key: 'setting.countries',
+        path: `${APP_PREFIX_PATH}/setting/countries`,
+        component: React.lazy(() => import('views/app-views/setting/countries')),
+    },
+    {
+        key: 'setting.currencies',
+        path: `${APP_PREFIX_PATH}/setting/currencies`,
+        component: React.lazy(() => import('views/app-views/setting/currencies')),
+    },
+    {
+        key: 'setting.esignature',
+        path: `${APP_PREFIX_PATH}/setting/esignature`,
+        component: React.lazy(() => import('views/app-views/setting/esignature')),
+    },
+    
+
+    {
         key: 'pages.invoice',
         path: `${APP_PREFIX_PATH}/pages/invoice`,
         component: React.lazy(() => import('views/app-views/pages/invoice')),
     },
-    {
-        key: 'pages.esignature',
-        path: `${APP_PREFIX_PATH}/pages/esignature`,
-        component: React.lazy(() => import('views/app-views/pages/esignature')),
-    },
+    // {
+    //     key: 'pages.esignature',
+    //     path: `${APP_PREFIX_PATH}/pages/esignature`,
+    //     component: React.lazy(() => import('views/app-views/pages/esignature')),
+    // },
     {
         key: 'pages.pricing',
         path: `${APP_PREFIX_PATH}/pages/pricing`,

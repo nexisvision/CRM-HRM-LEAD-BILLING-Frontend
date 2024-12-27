@@ -29,12 +29,13 @@ const ViewContract = () => {
 
   return (
     <>
+    <h1 className="text-lg font-bold ml-3">Contract</h1>
     <div className="flex flex-col lg:flex-row ml-[-24px] rounded-t-lg mb-[-24px] mt-[-51px] rounded-b-lg mr-[-24px] bg-gray-100">
 
 
       {/* Sidebar */}
       {/* <Card className=" lg:w-[240px] lg:h-full ml-[20px] mr-[20px] lg:mr-0 mt-[10px] top-[10px] lg:sticky p-[-20px]"> */}
-      <div className="sm:w-full md:w-[95%] md:mr-[30px] lg:w-[240px] md:ml-[23px] h-full mt-16">
+      <div className="sm:w-full md:w-[95%] md:mr-[30px] lg:w-[240px] md:ml-[23px] h-full mt-16 px-[30px] md:p-0 lg:p-0">
         
         <ul className="">
           <li

@@ -67,7 +67,7 @@ const AddInvoice = () => {
     const onSubmit = (values) => {
         console.log('Submitted values:', values);
         message.success('Job added successfully!');
-        navigate('/apps/sales/estimates/');
+        navigate('/apps/sales/invoice/');
     };
 
     const initialValues = {

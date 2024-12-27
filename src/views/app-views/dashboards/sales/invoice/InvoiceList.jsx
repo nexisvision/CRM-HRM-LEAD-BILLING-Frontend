@@ -188,7 +188,8 @@ export const InvoiceList = () => {
 			title: 'status',
 			dataIndex: 'paymentStatus',
 			render: (_, record) => (
-				<><Badge status={getPaymentStatus(record.paymentStatus)} /><span>{record.paymentStatus}</span></>
+				<><Tag color={getPaymentStatus(record.paymentStatus)}>{record.paymentStatus}</Tag></>
+				// <><Badge status={getPaymentStatus(record.paymentStatus)}  className='me-2'/><span>{record.paymentStatus}</span></>
 			),
 			sorter: (a, b) => utils.antdTableSorter(a, b, 'paymentStatus')
 		},
@@ -204,84 +205,7 @@ export const InvoiceList = () => {
 		}
 	];
 
-	// const tableColumns = [
-	// 	{
-	// 		title: 'ID',
-	// 		dataIndex: 'id'
-	// 	},
-	// 	{
-	// 		title: 'Product',
-	// 		dataIndex: 'name',
-	// 		render: (_, record) => (
-	// 			<div className="d-flex">
-	// 				<AvatarStatus size={30} src={record.image} name={record.name}/>
-	// 			</div>
-	// 		),
-	// 		sorter: (a, b) => utils.antdTableSorter(a, b, 'name')
-	// 	},
-	// 	{
-	// 		title: 'Company Name',
-	// 		dataIndex: 'company',
-	// 		sorter: {
-	// 			compare: (a, b) => a.company.length - b.company.length,
-	// 		},
-	// 	},
-	// 	{
-	// 		title: 'Project List',
-	// 		dataIndex: 'project',
-	// 		sorter: {
-	// 			compare: (a, b) => a.project.length - b.project.length,
-	// 		},
-	// 	},
-	// 	{
-	// 		title: 'Date',
-	// 		dataIndex: 'date',
-	// 		render: (_, record) => (
-	// 			<span>{dayjs.unix(record.date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
-	// 		),
-	// 		sorter: (a, b) => utils.antdTableSorter(a, b, 'date')
-	// 	},
-	// 	{
-	// 		title: 'Order status',
-	// 		dataIndex: 'orderStatus',
-	// 		render: (_, record) => (
-	// 			<><Tag color={getShippingStatus(record.orderStatus)}>{record.orderStatus}</Tag></>
-	// 		),
-	// 		sorter: (a, b) => utils.antdTableSorter(a, b, 'orderStatus')
-	// 	},
-	// 	{
-	// 		title: 'Payment status',
-	// 		dataIndex: 'paymentStatus',
-	// 		render: (_, record) => (
-	// 			<><Badge status={getPaymentStatus(record.paymentStatus)} /><span>{record.paymentStatus}</span></>
-	// 		),
-	// 		sorter: (a, b) => utils.antdTableSorter(a, b, 'paymentStatus')
-	// 	},
-	// 	{
-	// 		title: 'Total',
-	// 		dataIndex: 'amount',
-	// 		render: (_, record) => (
-	// 			<span className="font-weight-semibold">
-	// 				<NumberFormat
-	// 					displayType={'text'} 
-	// 					value={(Math.round(record.amount * 100) / 100).toFixed(2)} 
-	// 					prefix={'$'} 
-	// 					thousandSeparator={true} 
-	// 				/>
-	// 			</span>
-	// 		),
-	// 		sorter: (a, b) => utils.antdTableSorter(a, b, 'amount')
-	// 	},
-	// 	{
-	// 		title: 'Action',
-	// 		dataIndex: 'actions',
-	// 		render: (_, elm) => (
-	// 			<div className="text-center">
-	// 				<EllipsisDropdown menu={dropdownMenu(elm)}/>
-	// 			</div>
-	// 		)
-	// 	}
-	// ];
+	
 
 	const rowSelection = {
 		onChange: (key, rows) => {

@@ -11,9 +11,6 @@ import NumberFormat from 'react-number-format';
 import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils'
-import AddPayment from "./AddPayment"
-import EditPayment from './EditPayment';
-import ViewPayment from './ViewPayment';
 import { PaymentStatisticData } from '../../../dashboards/default/DefaultDashboardData';
 
 // import { PaymentStatisticData } from '../../../dashboards/default/DefaultDashboardData';
@@ -21,22 +18,9 @@ import StatisticWidget from 'components/shared-components/StatisticWidget';
 
 const { Option } = Select
 
-const getPaymentStatus = method => {
-	if (method === 'paypal') {
-		return 'success'
-	}
-	if (method === 'Pending') {
-		return 'warning'
-	}
-	if (method === 'Expired') {
-		return 'error'
-	}
-	return ''
-}
-
 const paymentStatusList = ['paypal']
 
-const PaymentList = () => {
+const SourcesList = () => {
 
 	const [list, setList] = useState(OrderListData)
 	const [selectedRows, setSelectedRows] = useState([])
@@ -52,7 +36,7 @@ const PaymentList = () => {
 	};
 
 	// Close Add Job Modal
-	const closeAddPaymentModal = () => {
+	const closeAddEstimatesModal = () => {
 		setIsAddPaymentModalVisible(false);
 	};
 
@@ -89,19 +73,6 @@ const PaymentList = () => {
 	const dropdownMenu = row => (
 		<Menu>
 			<Menu.Item>
-				<Flex alignItems="center" onClick={openViewPaymentModal}>
-					<EyeOutlined />
-					<span className="ml-2">View Details</span>
-				</Flex>
-			</Menu.Item>
-			<Menu.Item>
-				<Flex alignItems="center">
-					<PlusCircleOutlined />
-					<span className="ml-2">Add to remark</span>
-				</Flex>
-			</Menu.Item>
-
-			<Menu.Item>
 				<Flex alignItems="center">
 					<Button
 						type=""
@@ -116,12 +87,6 @@ const PaymentList = () => {
 			</Menu.Item>
 			<Menu.Item>
 				<Flex alignItems="center">
-					<TiPinOutline />
-					<span className="ml-2">Pin</span>
-				</Flex>
-			</Menu.Item>
-			<Menu.Item>
-				<Flex alignItems="center">
 					<DeleteOutlined />
 					<span className="ml-2">Delete</span>
 				</Flex>
@@ -131,46 +96,11 @@ const PaymentList = () => {
 
 	const tableColumns = [
 		{
-			title: 'ID',
-			dataIndex: 'id'
+			title: 'Source',
+			dataIndex: 'source',
+			sorter: (a, b) => utils.antdTableSorter(a, b, 'source')
 		},
-		{
-			title: 'Date',
-			dataIndex: 'date',
-			render: (_, record) => (
-				<span>{dayjs.unix(record.date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
-			),
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'date')
-		},
-		{
-			title: 'Invoice',
-			dataIndex: 'invoice'
-		},
-		{
-			title: 'Amount',
-			dataIndex: 'amount',
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'amount')
-		},
-		{
-			title: 'Client',
-			dataIndex: 'client',
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'amount')
-		},
-		{
-			title: 'Project',
-			dataIndex: 'project',
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'amount')
-		},
-		{
-			title: 'Method',
-			dataIndex: 'method',
-			render: (_, record) => (
-					<><Tag color={getPaymentStatus(record.method)}>{record.method}</Tag></>
-				  ),
-			sorter: {
-				compare: (a, b) => a.method.length - b.method.length,
-			},
-		},
+		
 		{
 			title: 'Action',
 			dataIndex: 'actions',
@@ -182,12 +112,6 @@ const PaymentList = () => {
 		}
 	];
 
-	const rowSelection = {
-		onChange: (key, rows) => {
-			setSelectedRows(rows)
-			setSelectedRowKeys(key)
-		}
-	};
 
 	const onSearch = e => {
 		const value = e.currentTarget.value
@@ -200,41 +124,17 @@ const PaymentList = () => {
 	return (
 		<>
 			<Card>
-				<Row gutter={16}>
-					{paymentStatisticData.map((elm, i) => (
-						<Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-							<StatisticWidget
-								value={elm.value}
-								subtitle={elm.subtitle}
-							/>
-						</Col>
-					))}
-				</Row>
 				<Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
 					<Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
 						<div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
 							<Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)} />
 						</div>
-						<div className="w-full md:w-48">
-							<Select
-								defaultValue="All"
-								className="w-full"
-								style={{ minWidth: 180 }}
-								onChange={handleShowStatus}
-								placeholder="method"
-							>
-								<Option value="All">All method </Option>
-								{paymentStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
-							</Select>
-						</div>
+						
 					</Flex>
 					<Flex gap="7px" className="flex">
 						<Button type="primary" className="ml-2" onClick={openAddPaymentModal}>
 							<PlusOutlined />
 							<span className="ml-2">New</span>
-						</Button>
-						<Button type="primary" icon={<FileExcelOutlined />} block>
-							Export All
 						</Button>
 					</Flex>
 				</Flex>
@@ -243,54 +143,19 @@ const PaymentList = () => {
 						columns={tableColumns}
 						dataSource={list}
 						rowKey='id'
-						scroll={{x:1200}}
-						rowSelection={{
-							selectedRowKeys: selectedRowKeys,
-							type: 'checkbox',
-							preserveSelectedRowKeys: false,
-							...rowSelection,
-						}}
+						// scroll={{x:1000}}
+						// rowSelection={{
+						// 	selectedRowKeys: selectedRowKeys,
+						// 	type: 'checkbox',
+						// 	preserveSelectedRowKeys: false,
+						// 	...rowSelection,
+						// }}
 					/>
 				</div>
 			</Card>
-			<Card>
-				<Modal
-					title="Add Payment"
-					visible={isAddPaymentModalVisible}
-					onCancel={closeAddPaymentModal}
-					footer={null}
-					width={800}
-					className='mt-[-70px]'
-
-				>
-					<AddPayment onClose={closeAddPaymentModal} />
-				</Modal>
-
-				<Modal
-					title="Edit Payment"
-					visible={isEditPaymentModalVisible}
-					onCancel={closeEditPaymentModal}
-					footer={null}
-					width={800}
-					className='mt-[-70px]'
-
-				>
-					<EditPayment onClose={closeEditPaymentModal} />
-				</Modal>
-
-				<Modal
-					title="Payment"
-					visible={isViewPaymentModalVisible}
-					onCancel={closeViewPaymentModal}
-					footer={null}
-					width={600}
-					className='mt-[-70px]'
-				>
-					<ViewPayment onClose={closeViewPaymentModal} />
-				</Modal>
-			</Card>
+		
 		</>
 	)
 }
 
-export default PaymentList
+export default SourcesList

@@ -26,6 +26,9 @@
     "client":"jk",
     "phoneNumber": "+12-123-1234",
     "clientemail":"jk@gmail.com",
+    "currenciename":"USD US Dollar",
+    "currencyicon":"$",
+    "currencycode":"USD",
     "personalInfo": {
       "location": "New York, US",
       "title": "Product Manager",
@@ -45,6 +48,9 @@
     "role": "User",
     "lastOnline": 1572393600,
     "status": "active",
+    "currenciename":"EUR Euro",
+    "currencyicon":"€",
+    "currencycode":"EUR",
     "personalInfo": {
       "location": "New York, US",
       "title": "Software Engineer",
@@ -62,6 +68,9 @@
     "email": "ronnie_vergas@infotech.io",
     "img": "/img/avatars/thumb-3.jpg",
     "role": "User",
+    "currenciename":"USD US Dollar",
+    "currencyicon":"$",
+    "currencycode":"USD",
     "lastOnline": 1572393600,
     "status": "blocked",
     "personalInfo": {
@@ -81,6 +90,9 @@
     "email": "cookie_lukie@hotmail.com",
     "img": "/img/avatars/thumb-4.jpg",
     "role": "Admin",
+    "currenciename":"AUD Australian Dollar",
+    "currencyicon":"$",
+    "currencycode":"AUD",
     "lastOnline": 1579132800,
     "status": "active",
     "personalInfo": {
@@ -100,6 +112,9 @@
     "email": "joyce991@infotech.io",
     "img": "/img/avatars/thumb-5.jpg",
     "role": "User",
+    "currenciename":"INR Indian Rupee",
+    "currencyicon":"₹",
+    "currencycode":"INR",
     "lastOnline": 1582416000,
     "status": "active",
     "personalInfo": {
@@ -121,6 +136,9 @@
     "role": "User",
     "lastOnline": 1583107200,
     "status": "active",
+    "currenciename":"AUD Australian Dollar",
+    "currencyicon":"$",
+    "currencycode":"AUD",
     "personalInfo": {
       "location": "London, UK",
       "title": "Compliance Manager",
@@ -139,6 +157,9 @@
     "img": "/img/avatars/thumb-7.jpg",
     "role": "User",
     "lastOnline": 1582761600,
+    "currenciename":"INR Indian Rupee",
+    "currencyicon":"₹",
+    "currencycode":"INR",
     "status": "active",
     "personalInfo": {
       "location": "London, UK",
@@ -157,6 +178,9 @@
     "email": "iamfred@imaze.infotech.io",
     "img": "/img/avatars/thumb-8.jpg",
     "role": "User",
+    "currenciename":"AUD Australian Dollar",
+    "currencyicon":"$",
+    "currencycode":"AUD",
     "lastOnline": 1579219200,
     "status": "blocked",
     "personalInfo": {
@@ -176,6 +200,9 @@
     "email": "carolyn_h@gmail.com",
     "img": "/img/avatars/thumb-9.jpg",
     "role": "User",
+    "currenciename":"AUD Australian Dollar",
+    "currencyicon":"$",
+    "currencycode":"AUD",
     "lastOnline": 1584489600,
     "status": "blocked",
     "personalInfo": {
@@ -194,6 +221,9 @@
     "name": "Brittany Hale",
     "email": "brittany1134@gmail.com",
     "img": "/img/avatars/thumb-10.jpg",
+    "currenciename":"AUD Australian Dollar",
+    "currencyicon":"$",
+    "currencycode":"AUD",
     "role": "User",
     "lastOnline": 1583452800,
     "status": "active",
@@ -214,6 +244,9 @@
     "email": "handsome-obrien@hotmail.com",
     "img": "/img/avatars/thumb-11.jpg",
     "role": "User",
+    "currenciename":"AUD Australian Dollar",
+    "currencyicon":"$",
+    "currencycode":"AUD",
     "lastOnline": 1584576000,
     "status": "active",
     "personalInfo": {
@@ -233,6 +266,9 @@
     "email": "maymaymay12@infotech.io",
     "img": "/img/avatars/thumb-12.jpg",
     "role": "User",
+    "currenciename":"INR Indian Rupee",
+    "currencyicon":"₹",
+    "currencycode":"INR",
     "lastOnline": 1574208000,
     "status": "blocked",
     "personalInfo": {
@@ -252,7 +288,11 @@
     "email": "",
     "img": "/img/avatars/thumb-13.jpg",
     "role": "User",
+    "currenciename":"AUD Australian Dollar",
+    "currencyicon":"$",
+    "currencycode":"AUD",
     "lastOnline": 1586649600,
+    
     "status": "active",
     "personalInfo": {
       "location": "London, UK",
@@ -272,6 +312,9 @@
     "img": "/img/avatars/thumb-14.jpg",
     "role": "User",
     "lastOnline": 1583020800,
+    "currenciename":"INR Indian Rupee",
+    "currencyicon":"₹",
+    "currencycode":"INR",
     "status": "active",
     "personalInfo": {
       "location": "London, UK",
@@ -291,6 +334,9 @@
     "img": "/img/avatars/thumb-15.jpg",
     "role": "User",
     "lastOnline": 1586217600,
+    "currenciename":"AUD Australian Dollar",
+    "currencyicon":"$",
+    "currencycode":"AUD",
     "status": "active",
     "personalInfo": {
       "location": "London, UK",

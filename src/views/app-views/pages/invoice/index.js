@@ -4,11 +4,96 @@ import { Card, Table, Button, Select } from 'antd';
 import { invoiceData } from './invoiceData';
 import Qr from '../../../../assets/svg/Qr.png';
 import NumberFormat from 'react-number-format';
+import html2pdf from 'html2pdf.js';  // Add this import at the top
+
 
 const { Column } = Table;
 const { Option } = Select;
 
 export class Invoice extends Component {
+
+	handlePrint = () => {
+		const printContent = document.getElementById('printable-content');
+		const printWindow = window.open('', '_blank');
+		
+		printWindow.document.write(`
+			<html>
+				<head>
+					<title>Print Invoice</title>
+					<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.13/antd.min.css">
+					<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+					<style>
+						body {
+							padding: 20px;
+							background: white !important;
+						}
+						@media print {
+							body {
+								padding: 0;
+							}
+							.ant-table {
+								font-size: 12px;
+							}
+							/* Preserve background colors and gradients */
+							* {
+								-webkit-print-color-adjust: exact !important;
+								print-color-adjust: exact !important;
+							}
+							/* Hide print button and select */
+							.d-print-none {
+								display: none !important;
+							}
+						}
+						/* Copy all your custom styles here */
+						.bg-gradient-to-r {
+							background-image: linear-gradient(to right, var(--tw-gradient-stops));
+						}
+						.from-blue-50 {
+							--tw-gradient-from: #eff6ff;
+							--tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgb(239 246 255 / 0));
+						}
+						.to-purple-50 {
+							--tw-gradient-to: #f5f3ff;
+						}
+					</style>
+				</head>
+				<body>
+					${printContent.innerHTML}
+				</body>
+			</html>
+		`);
+	
+		printWindow.document.close();
+		printWindow.focus();
+	
+		// Wait for resources to load
+		setTimeout(() => {
+			printWindow.print();
+			printWindow.close();
+		}, 500);
+	};
+
+	handleDownload = () => {
+        const element = document.getElementById('printable-content');
+        const opt = {
+            margin: 1,
+            filename: 'invoice.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+                scale: 2,
+                useCORS: true,
+                logging: false
+            },
+            jsPDF: { 
+                unit: 'mm', 
+                format: 'a4', 
+                orientation: 'portrait' 
+            }
+        };
+
+        html2pdf().set(opt).from(element).save();
+    };
+
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -484,25 +569,9 @@ export class Invoice extends Component {
 	render() {
 		const { template } = this.state;
 
-		const renderTemplate = () => {
-			switch (template) {
-				case 'rendertemplate':
-					return this.renderTemplate();
-				case 'modern':
-					return this.renderModernTemplate();
-				case 'classic':
-					return this.renderClassicTemplate();
-				case 'minimal':
-					return this.renderMinimalTemplate();
-				default:
-					return this.renderModernTemplate();
-			}
-		};
-
 		return (
 			<div className="container">
-
-				<div className="text-left d-print-none">
+				<div className="text-left">
 					<div className="max-w-6xl mx-auto mb-6 flex justify-between items-center">
 						<Select
 							defaultValue={this.state.template}
@@ -516,20 +585,22 @@ export class Invoice extends Component {
 						</Select>
 
 						<div className="space-x-4">
-							<Button type="primary" onClick={() => window.print()}>
+							<Button type="primary" onClick={this.handlePrint}>
 								<PrinterOutlined />
 								<span className="ml-1">Print</span>
 							</Button>
-							<Button type="primary" onClick={() => {/* Add download logic */ }}>
+							<Button type="primary" onClick={this.handleDownload}>
 								<DownloadOutlined />
 								<span className="ml-1">Download</span>
 							</Button>
 						</div>
 					</div>
 
-					{/* Invoice Content */}
-					<div className="max-w-6xl mx-auto">
-						{renderTemplate()}
+					<div id="printable-content" className="max-w-6xl mx-auto" >
+						{this.state.template === 'rendertemplate' && this.renderTemplate()}
+						{this.state.template === 'modern' && this.renderModernTemplate()}
+						{this.state.template === 'classic' && this.renderClassicTemplate()}
+						{this.state.template === 'minimal' && this.renderMinimalTemplate()}
 					</div>
 				</div>
 			</div>

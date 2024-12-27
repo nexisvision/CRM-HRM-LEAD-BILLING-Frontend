@@ -4,45 +4,81 @@ import moment from 'moment';
 import ReactQuill from 'react-quill';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { useDispatch } from 'react-redux';
+import { createEventData } from './EventSetupService/EventSetupSlice'; // Make sure the path is correct
+
 
 const { Option } = Select;
 
-const AddEventSetUp = ({ onAddEvent }) => {
+const AddEventSetUp = ({ onSuccess }) => {
+  const dispatch = useDispatch();
   // const [form] = Form.useForm();
 
-  const onSubmit = (values) => {
-    const formattedData = {
-      id: Date.now(),
-      branch: values.branch,
-      department: values.department,
-      employee: values.employee,
-      title: values.title,
-      date: values.eventsetupDate.format('YYYY-MM-DD'),
-      description: values.description
-    };
+  // const onSubmit = async (values) => {
+  //   const formattedData = {
+  //     id: Date.now(),
+  //     branch: values.branch,
+  //     title: values.title,
+  //     department: values.department,
+  //     employee: values.employee,
+  //     startDate: values.eventstartdate.format('YYYY-MM-DD'),
+  //     endDate: values.eventenddate.format('YYYY-MM-DD'),
+  //     description: values.description
+  //   };
 
-    onAddEvent(formattedData);
-    message.success('Event scheduled successfully!');
+  //   try {
+  //     await dispatch(addNewEvent(formattedData)).unwrap();
+  //     message.success('Event scheduled successfully!');
+  //   } catch (error) {
+  //     message.error('Failed to schedule event');
+  //   }
+  // };
+
+  const onSubmit = async (values, { resetForm }) => {
+    try {
+      const payload = {
+        EventTitle: values.EventTitle,
+        EventManager: values.EventManager,
+        EventDate: moment(values.EventDate).format('YYYY-MM-DD'),
+        EventTime: moment(values.EventTime).format('HH:mm:ss')
+      };
+
+      await dispatch(createEventData(payload)).unwrap();
+      message.success('Event created successfully');
+      resetForm();
+      onSuccess(); // Close modal
+    } catch (error) {
+      message.error(error?.message || 'Failed to create event');
+    }
   };
 
+
+
   const initialValues = {
-    branch: '',
-    department: '',
-    employee: '',
-    title: '',
-    eventstartdate: null,
-    eventenddate: null,
-    description: '',
+    EventTitle: '',
+    EventManager: '',
+    EventDate: '',
+    EventTime: '',
+    // eventstartdate: null,
+    // eventenddate: null,
+    // description: '',
   }
 
   const validationSchema = Yup.object({
-    branch: Yup.string().required('Please Select a branch.'),
-    department: Yup.string().required('Please Select a department.'),
-    employee: Yup.string().required('Please select a employee.'),
-    title: Yup.string().required('Please enter a title.'),
-    eventstartdate: Yup.date().nullable().required(' Event Start Date is required.'),
-    eventenddate: Yup.date().nullable().required('End Date is required.'),
-    description: Yup.string().required('Please enter a description.'),
+    EventTitle: Yup.string().required('Please enter event title.'),
+    EventManager: Yup.string().required('Please enter a manager name.'),
+    EventDate: Yup.date().nullable().required('Event Date is required.'),
+    EventTime: Yup.date().nullable().required('End Time is required.')
+    .test('is-greater', 'End time should be after start time', function(value) {
+      const { StartTime } = this.parent;
+      if (!StartTime || !value) return true;
+      return moment(value).isAfter(moment(StartTime));
+    })
+    // employee: Yup.string().required('Please select a employee.'),
+    // title: Yup.string().required('Please enter a title.'),
+    // eventstartdate: Yup.date().nullable().required(' Event Start Date is required.'),
+    // eventenddate: Yup.date().nullable().required('End Date is required.'),
+    // description: Yup.string().required('Please enter a description.'),
   });
 
   return (
@@ -58,27 +94,7 @@ const AddEventSetUp = ({ onAddEvent }) => {
           <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
           <Row gutter={16}>
 
-            <Col span={8} className='mt-2'>
-              <div className="form-item">
-                <label className='font-semibold'>Branch</label>
-                <Field name="branch">
-                  {({ field }) => (
-                    <Select
-                      {...field}
-                      className="w-full"
-                      placeholder="Select Branch"
-                      onChange={(value) => setFieldValue('branch', value)}
-                      value={values.branch}
-                      onBlur={() => setFieldTouched("branch", true)}
-                    >
-                      <Option value="branch1">Branch 1</Option>
-                      <Option value="branch2">Branch 2</Option>
-                    </Select>
-                  )}
-                </Field>
-                <ErrorMessage name="branch" component="div" className="error-message text-red-500 my-1" />
-              </div>
-            </Col>
+
             {/* <Col span={8}>
             <Form.Item
               name="branch"
@@ -92,26 +108,7 @@ const AddEventSetUp = ({ onAddEvent }) => {
               </Select>
             </Form.Item>
           </Col> */}
-            <Col span={8} className='mt-2'>
-              <div className="form-item">
-                <label className='font-semibold'>Department</label>
-                <Field name="department">
-                  {({ field }) => (
-                    <Select
-                      {...field}
-                      className="w-full"
-                      placeholder="Select Department"
-                      onChange={(value) => setFieldValue('department', value)}
-                      value={values.department}
-                      onBlur={() => setFieldTouched("department", true)}
-                    >
-                      <Option value="Select department">Select department</Option>
-                    </Select>
-                  )}
-                </Field>
-                <ErrorMessage name="department" component="div" className="error-message text-red-500 my-1" />
-              </div>
-            </Col>
+
             {/* <Col span={8}>
               <Form.Item
                 name="department"
@@ -123,27 +120,7 @@ const AddEventSetUp = ({ onAddEvent }) => {
                 </Select>
               </Form.Item>
             </Col> */}
-            <Col span={8} className='mt-2'>
-              <div className="form-item">
-                <label className='font-semibold'>Employee</label>
-                <Field name="employee">
-                  {({ field }) => (
-                    <Select
-                      {...field}
-                      className="w-full"
-                      placeholder="Select Employee"
-                      onChange={(value) => setFieldValue('employee', value)}
-                      value={values.employee}
-                      onBlur={() => setFieldTouched("employee", true)}
-                    >
-                      <Option value="employee1">Employee 1</Option>
-                      <Option value="employee2">Employee 2</Option>
-                    </Select>
-                  )}
-                </Field>
-                <ErrorMessage name="employee" component="div" className="error-message text-red-500 my-1" />
-              </div>
-            </Col>
+
             {/* <Col span={8}>
               <Form.Item
                 name="employee"
@@ -155,13 +132,44 @@ const AddEventSetUp = ({ onAddEvent }) => {
                 </Select>
               </Form.Item>
             </Col> */}
-            <Col span={24} className='mt-2'>
+            <Col span={12} className='mt-2'>
               <div className="form-item">
                 <label className='font-semibold'>Event Title"</label>
-                <Field name="title" as={Input} placeholder="Event Title" />
-                <ErrorMessage name="title" component="div" className="error-message text-red-500 my-1" />
+                <Field name="EventTitle" as={Input} placeholder="Event Title" />
+                <ErrorMessage name="EventTitle" component="div" className="error-message text-red-500 my-1" />
               </div>
             </Col>
+
+            <Col span={12} className='mt-2'>
+              <div className="form-item">
+                <label className='font-semibold'>Event Manager</label>
+                <Field name="EventManager">
+                  {({ field }) => (
+                    <Select
+                      {...field}
+                      className="w-full"
+                      placeholder="Select Event Manager"
+                      onChange={(value) => setFieldValue('EventManager', value)}
+                      value={values.EventManager}
+                      onBlur={() => setFieldTouched("EventManager", true)}
+                    >
+                      <Option value="Manager 1">Manager 1</Option>
+                      <Option value="Manager 2">Manager 2</Option>
+                      <Option value="Manager 3">Manager 3</Option>
+                    </Select>
+                  )}
+                </Field>
+                <ErrorMessage name="EventManager" component="div" className="error-message text-red-500 my-1" />
+              </div>
+            </Col>
+
+            {/* <Col span={12} className='mt-2'>
+              <div className="form-item">
+                <label className='font-semibold'>Event Manager"</label>
+                <Field name="EventManager" as={Input} placeholder="Event Title" />
+                <ErrorMessage name="EventManager" component="div" className="error-message text-red-500 my-1" />
+              </div>
+            </Col> */}
 
             {/* <Col span={24}>
               <Form.Item
@@ -187,30 +195,30 @@ const AddEventSetUp = ({ onAddEvent }) => {
           </Col> */}
             <Col span={12} className='mt-2'>
               <div className="form-item">
-                <label className='font-semibold'>Event Start Date</label>
+                <label className='font-semibold'>Event Date</label>
                 <DatePicker
                   className="w-full"
                   format="DD-MM-YYYY"
-                  value={values.eventstartdate}
-                  onChange={(eventstartdate) => setFieldValue('eventstartdate', eventstartdate)}
-                  onBlur={() => setFieldTouched("eventstartdate", true)}
+                  value={values.EventDate}
+                  onChange={(EventDate) => setFieldValue('EventDate', EventDate)}
+                  onBlur={() => setFieldTouched("EventDate", true)}
                 />
-                <ErrorMessage name="eventstartdate" component="div" className="error-message text-red-500 my-1" />
+                <ErrorMessage name="EventDate" component="div" className="error-message text-red-500 my-1" />
               </div>
             </Col>
 
 
             <Col span={12} className='mt-2'>
               <div className="form-item">
-                <label className='font-semibold'>Event End Date</label>
-                <DatePicker
+                <label className='font-semibold'>Event Time</label>
+                <TimePicker
                   className="w-full"
-                  format="DD-MM-YYYY"
-                  value={values.eventenddate}
-                  onChange={(eventenddate) => setFieldValue('eventenddate', eventenddate)}
-                  onBlur={() => setFieldTouched("eventenddate", true)}
+                  format="HH:mm:ss"
+                  value={values.EventTime}
+                  onChange={(EventTime) => setFieldValue('EventTime', EventTime)}
+                  onBlur={() => setFieldTouched("EventTime", true)}
                 />
-                <ErrorMessage name="eventenddate" component="div" className="error-message text-red-500 my-1" />
+                <ErrorMessage name="EventTime" component="div" className="error-message text-red-500 my-1" />
               </div>
             </Col>
             {/* <Col span={12}>
@@ -231,9 +239,9 @@ const AddEventSetUp = ({ onAddEvent }) => {
                 <DatePicker style={{ width: '100%' }} />
               </Form.Item>
             </Col> */}
-            <Col span={24} className='mt-2'>
+            {/* <Col span={24} className='mt-2'>
               <label className='font-semibold'>Event Select Color</label>
-              {/* <Input placeholder="Event Title" /> */}
+            
               <div>
                 <Button htmlType="" className='me-1 bg-cyan-500'></Button>
                 <Button htmlType="" className='me-1 bg-orange-400'></Button>
@@ -242,9 +250,9 @@ const AddEventSetUp = ({ onAddEvent }) => {
                 <Button htmlType="" className='bg-blue-800'></Button>
               </div>
 
-            </Col>
+            </Col> */}
 
-            <Col span={24} className='mt-2'>
+            {/* <Col span={24} className='mt-2'>
               <div className="form-item">
                 <label className="font-semibold">Event Description</label>
                 <Field name="description">
@@ -260,7 +268,7 @@ const AddEventSetUp = ({ onAddEvent }) => {
                 </Field>
                 <ErrorMessage name="description" component="div" className="error-message text-red-500 my-1" />
               </div>
-            </Col>
+            </Col> */}
 
             {/* <Col span={24}>
               <Form.Item name="description" label="Event Description" rules={[{ required: true }]}>
@@ -270,12 +278,12 @@ const AddEventSetUp = ({ onAddEvent }) => {
           </Row>
           <div className="form-buttons text-right mt-2">
 
-          <Button type="default" htmlType="submit" className='me-2'>
-            Cancel Event
-          </Button>
-          <Button type="primary" htmlType="submit">
-            Add Event
-          </Button>
+            <Button type="default" htmlType="submit" className='me-2'>
+              Cancel Event
+            </Button>
+            <Button type="primary" htmlType="submit">
+              Add Event
+            </Button>
           </div>
 
         </Form>
