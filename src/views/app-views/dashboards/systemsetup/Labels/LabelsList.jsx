@@ -1,10 +1,37 @@
 import React, { useState } from 'react';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { TiArrowMove } from "react-icons/ti";
+import Flex from 'components/shared-components/Flex'
+import { Button, Modal } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import AddLabels from './AddLabels';
+import EditLabels from './EditLabels';
 // import { DragHandle } from '@mui/icons-material';
 
 const LabelsList = () => {
   const [selectedTab, setSelectedTab] = useState('sales');
+  const [isEditLabelsModalVisible, setIsEditLabelsModalVisible] = useState(false);
+  const [isAddLabelsModalVisible, setIsAddLabelsModalVisible] = useState(false);
+
+  // Open Add Job Modal
+  const openAddLabelsModal = () => {
+    setIsAddLabelsModalVisible(true);
+  };
+
+  // Close Add Job Modal
+  const closeAddLabelsModal = () => {
+    setIsAddLabelsModalVisible(false);
+  };
+
+  // Open Add Job Modal
+  const openEditLabelsModal = () => {
+    setIsEditLabelsModalVisible(true);
+  };
+
+  // Close Add Job Modal
+  const closeEditLabelsModal = () => {
+      setIsEditLabelsModalVisible(false);
+  };
+
 
   // Sample data for Sales and Marketing
   const salesData = [
@@ -21,10 +48,24 @@ const LabelsList = () => {
   ];
 
   return (
+    <>
+
+    <div className='flex justify-between items-center mb-4'>
+        <div className='flex items-center'>
+              <h1 className='text-lg font-bold'>Manage Labels</h1>
+        </div>
+        <Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap mt-2 gap-4'>
+          <div className='flex justify-end'>
+            <Button type="primary"  onClick={openAddLabelsModal}>
+              <PlusOutlined />
+            </Button>
+          </div>
+        </Flex>
+      </div>
     <div className="flex min-h-screen bg-gray-100">
 
       {/* Main Content */}
-      <div className="flex-1 p-6">
+      <div className="flex-1">
         {/* Tabs */}
         <div className="flex space-x-4 mb-6 ">
           <button
@@ -67,7 +108,7 @@ const LabelsList = () => {
               </div>
               <div className="flex space-x-2">
                 <button className="p-2 text-teal-500 hover:bg-teal-50 rounded-md transition-colors duration-200">
-                  <EditOutlined className=' text-xl'/>
+                  <EditOutlined className=' text-xl' onClick={openEditLabelsModal}/>
                 </button>
                 <button className="p-2 text-pink-500 hover:bg-pink-50 rounded-md transition-colors duration-200">
                   <DeleteOutlined className='text-xl'/>
@@ -83,6 +124,28 @@ const LabelsList = () => {
 
       </div>
     </div>
+    <Modal
+            title="Add Labels"
+            visible={isAddLabelsModalVisible}
+            onCancel={closeAddLabelsModal}
+            footer={null}
+            width={700}
+            className='mt-[-70px]'
+          >
+            <AddLabels onClose={closeAddLabelsModal} />
+          </Modal>
+
+          <Modal
+            title="Edit Labels"
+              visible={isEditLabelsModalVisible}
+            onCancel={closeEditLabelsModal}
+            footer={null}
+            width={700}
+            className='mt-[-70px]'
+          >
+              <EditLabels onClose={closeEditLabelsModal} />
+          </Modal>
+    </>
   );
 };
 

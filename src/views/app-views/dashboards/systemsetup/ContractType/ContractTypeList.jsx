@@ -3,18 +3,13 @@ import React, { useState } from 'react'
 import { Card, Table, Select, Input, Button, Badge, Menu, Tag, Modal ,Row,Col} from 'antd';
 import OrderListData from "../../../../../assets/data/order-list.data.json"
 import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import { TiPinOutline } from "react-icons/ti";
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import Flex from 'components/shared-components/Flex'
-import NumberFormat from 'react-number-format';
-import dayjs from 'dayjs';
-import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils'
 import { PaymentStatisticData } from '../../../dashboards/default/DefaultDashboardData';
+import EditContractType from './EditContractType';
+import AddContractType from './AddContractType';
 
-// import { PaymentStatisticData } from '../../../dashboards/default/DefaultDashboardData';
-import StatisticWidget from 'components/shared-components/StatisticWidget';
 
 const { Option } = Select
 
@@ -25,74 +20,45 @@ const ContractTypeList = () => {
 	const [list, setList] = useState(OrderListData)
 	const [selectedRows, setSelectedRows] = useState([])
 	const [selectedRowKeys, setSelectedRowKeys] = useState([])
-	const [isAddPaymentModalVisible, setIsAddPaymentModalVisible] = useState(false);
-	const [isEditPaymentModalVisible, setIsEditPaymentModalVisible] = useState(false);
-	const [isViewPaymentModalVisible, setIsViewPaymentModalVisible] = useState(false);
-	const [paymentStatisticData] = useState(PaymentStatisticData);
-
+	const [isAddContractTypeModalVisible, setIsAddContractTypeModalVisible] = useState(false);
+	const [isEditContractTypeModalVisible, setIsEditContractTypeModalVisible] = useState(false);
 	// Open Add Job Modal
-	const openAddPaymentModal = () => {
-		setIsAddPaymentModalVisible(true);
+	const openAddContractTypeModal = () => {
+		setIsAddContractTypeModalVisible(true);
 	};
 
 	// Close Add Job Modal
-	const closeAddEstimatesModal = () => {
-		setIsAddPaymentModalVisible(false);
+	const closeAddContractTypeModal = () => {
+		setIsAddContractTypeModalVisible(false);
 	};
 
 	// Open Add Job Modal
-	const openEditPaymentModal = () => {
-		setIsEditPaymentModalVisible(true);
+	const openEditContractTypeModal = () => {
+		setIsEditContractTypeModalVisible(true);
 	};
 
 	// Close Add Job Modal
-	const closeEditPaymentModal = () => {
-		setIsEditPaymentModalVisible(false);
+	const closeEditContractTypeModal = () => {
+		setIsEditContractTypeModalVisible(false);
 	};
 
-	// Open Add Job Modal
-	const openViewPaymentModal = () => {
-		setIsViewPaymentModalVisible(true);
-	};
 
-	// Close Add Job Modal
-	const closeViewPaymentModal = () => {
-		setIsViewPaymentModalVisible(false);
-	};
-
-	const handleShowStatus = value => {
-		if (value !== 'All') {
-			const key = 'method'
-			const data = utils.filterArray(OrderListData, key, value)
-			setList(data)
-		} else {
-			setList(OrderListData)
-		}
-	}
-
-	const dropdownMenu = row => (
-		<Menu>
-			<Menu.Item>
-				<Flex alignItems="center">
-					<Button
-						type=""
-						className=""
-						icon={<EditOutlined />}
-						onClick={openEditPaymentModal}
-						size="small"
-					>
-						<span className="">Edit</span>
-					</Button>
-				</Flex>
-			</Menu.Item>
-			<Menu.Item>
-				<Flex alignItems="center">
-					<DeleteOutlined />
-					<span className="ml-2">Delete</span>
-				</Flex>
-			</Menu.Item>
-		</Menu>
-	);
+	// const dropdownMenu = row => (
+	// 	<Menu>
+	// 		<Menu.Item>
+	// 			<Flex alignItems="center" onClick={openEditContractTypeModal}>
+	// 				<EditOutlined />
+	// 				<span className="ml-2">Edit</span>
+	// 			</Flex>
+	// 		</Menu.Item>
+	// 		<Menu.Item>
+	// 			<Flex alignItems="center">
+	// 				<DeleteOutlined />
+	// 				<span className="ml-2">Delete</span>
+	// 			</Flex>
+	// 		</Menu.Item>
+	// 	</Menu>
+	// );
 
 	const tableColumns = [
 		{
@@ -105,19 +71,20 @@ const ContractTypeList = () => {
 			title: 'Action',
 			dataIndex: 'actions',
 			render: (_, elm) => (
-				<div className="text-center">
-					<EllipsisDropdown menu={dropdownMenu(elm)} />
-				</div>
+				<div className="flex space-x-2">
+                  <button className="p-2 text-teal-500 hover:bg-teal-50 rounded-md transition-colors duration-200" onClick={openEditContractTypeModal}>
+                    <EditOutlined className=' text-xl' />
+                  </button>
+                  <button className="p-2 text-pink-500 hover:bg-pink-50 rounded-md transition-colors duration-200">
+                    <DeleteOutlined className='text-xl' />
+                  </button>
+                </div>
+				// <div className="text-center">
+				// 	<EllipsisDropdown menu={dropdownMenu(elm)} />
+				// </div>
 			)
 		}
 	];
-
-	const rowSelection = {
-		onChange: (key, rows) => {
-			setSelectedRows(rows)
-			setSelectedRowKeys(key)
-		}
-	};
 
 	const onSearch = e => {
 		const value = e.currentTarget.value
@@ -129,6 +96,18 @@ const ContractTypeList = () => {
 
 	return (
 		<>
+		<div className='flex justify-between items-center mb-4'>
+        <div className='flex items-center'>
+          <h1 className='text-lg font-bold'>Manage Contract Type</h1>
+        </div>
+        <Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap mt-2 gap-4'>
+          <div className='flex justify-end'>
+            <Button type="primary"  onClick={openAddContractTypeModal}>
+              <PlusOutlined />
+            </Button>
+          </div>
+        </Flex>
+      </div>
 			<Card>
 				<Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
 					<Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
@@ -137,12 +116,7 @@ const ContractTypeList = () => {
 						</div>
 						
 					</Flex>
-					<Flex gap="7px" className="flex">
-						<Button type="primary" className="ml-2" onClick={openAddPaymentModal}>
-							<PlusOutlined />
-							<span className="ml-2">New</span>
-						</Button>
-					</Flex>
+					
 				</Flex>
 				<div className="table-responsive">
 					<Table
@@ -159,6 +133,27 @@ const ContractTypeList = () => {
 					/>
 				</div>
 			</Card>
+
+			<Modal
+				title="Add Contract Type"
+				visible={isAddContractTypeModalVisible}
+					onCancel={closeAddContractTypeModal}
+				footer={null}
+				width={700}
+			// className='mt-[-70px]'
+			>
+				<AddContractType onClose={closeAddContractTypeModal} />
+			</Modal>
+			<Modal
+				title="Edit Contract Type"
+				visible={isEditContractTypeModalVisible}
+				onCancel={closeEditContractTypeModal}
+				footer={null}
+				width={700}
+			// className='mt-[-70px]'
+			>
+				<EditContractType onClose={closeEditContractTypeModal} />
+			</Modal>
 		
 		</>
 	)

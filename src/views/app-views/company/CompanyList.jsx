@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Input, Tag, Menu, Button,Select,Modal, message } from "antd";
-import { EyeOutlined, DeleteOutlined, MailOutlined,RocketOutlined, PushpinOutlined,SearchOutlined,EditOutlined,PlusOutlined,FileExcelOutlined } from "@ant-design/icons";
+import { Card, Table, Input, Tag, Menu, Button, Select, Modal, message,Switch } from "antd";
+import { EyeOutlined, DeleteOutlined, MailOutlined, RocketOutlined, PushpinOutlined, SearchOutlined, EditOutlined, PlusOutlined, FileExcelOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 
 import UserView from "../Users/user-list/UserView";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-import OrderListData from 'assets/data/order-list.data.json';
+import OrderListData from '../../../assets/data/order-list.data.json';
 import utils from 'utils';
 
 
-import userData from "assets/data/user-list.data.json";
+import userData from "../../../assets/data/user-list.data.json";
 import AddCompany from "./AddCompany";
 import EditCompany from "./EditCompany";
 import ResetPassword from "./ResetPassword";
@@ -30,10 +30,10 @@ const CompanyList = () => {
   const [isEditCompanyModalVisible, setIsEditCompanyModalVisible] = useState(false);
   const [isResetPasswordModalVisible, setIsResetPasswordModalVisible] = useState(false);
   const [isUpgradePlanModalVisible, setIsUpgradePlanModalVisible] = useState(false);
-  const [comnyid,setCompnyid] = useState("");
+  const [comnyid, setCompnyid] = useState("");
 
   const tabledata = useSelector((state) => state.ClientData);
-  console.log("ooooo",tabledata)
+  console.log("ooooo", tabledata)
 
   const dispatch = useDispatch();
 
@@ -54,23 +54,22 @@ const CompanyList = () => {
     }
     return ''
   }
-  const comId = (id) =>{
+
+  const comId = (id) => {
     setCompnyid(id);
   }
 
 
-    useEffect(() => {
-      dispatch(ClientData());
-    }, [dispatch]);
-  
-    useEffect(() => {
-       if (tabledata && tabledata.ClientData && tabledata.ClientData.data) {
-         setUsers(tabledata.ClientData.data);
-       }
-     }, [tabledata]);
+  useEffect(() => {
+    dispatch(ClientData());
+  }, [dispatch]);
 
+  useEffect(() => {
+    if (tabledata && tabledata.ClientData && tabledata.ClientData.data) {
+      setUsers(tabledata.ClientData.data);
+    }
+  }, [tabledata]);
 
-  const companyStatusList = ['active', 'blocked'];
 
   const handleShowStatus = (value) => {
     if (value !== 'All') {
@@ -82,6 +81,21 @@ const CompanyList = () => {
     }
   };
 
+  const companyStatusList = ['active', 'blocked'];
+
+  const getCompanyPlanStatus = status => {
+    if (status === 'free') {
+      return 'blue'
+    }
+    if (status === 'premium') {
+      return 'cyan'
+    }
+    if (status === 'standard') {
+      return 'orange'
+    }
+    return ''
+  }
+
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     const searchArray = value ? list : OrderListData;
@@ -89,7 +103,7 @@ const CompanyList = () => {
     setList(data);
   };
 
-const openAddCompanyModal = () => {
+  const openAddCompanyModal = () => {
     setIsAddCompanyModalVisible(true);
   };
 
@@ -133,77 +147,83 @@ const openAddCompanyModal = () => {
     setSelectedUser(null);
   };
 
+  const handleStatusChange = (checked, userId) => {
+    const newStatus = checked ? 'active' : 'inactive';
+    // Update your data/API here
+    console.log(`User ${userId} status changed to ${newStatus}`);
+  };
+
   const dropdownMenu = (user) => (
     <Menu>
       <Menu.Item>
         <Flex alignItems="center">
-      <Button
-        type=""
-        icon={<EyeOutlined />}
-        onClick={() => showUserProfile(user)}
-        size="small"
-        style={{ display: "block", marginBottom: "8px" }}
-      >
-        View Details
-      </Button>
-      </Flex>
+          <Button
+            type=""
+            icon={<EyeOutlined />}
+            onClick={() => showUserProfile(user)}
+            size="small"
+            style={{ display: "block", marginBottom: "8px" }}
+          >
+            View Details
+          </Button>
+        </Flex>
       </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-        <Button
-  type=""
-  icon={<EditOutlined />}
-  onClick={() => {
-    openEditCompanyModal();
-    comId(user.id); // Call the delete user function
-  }}
-  size="small"
-  style={{ display: "block", marginBottom: "8px" }}
->
-  Edit
-</Button>
+          <Button
+            type=""
+            icon={<EditOutlined />}
+            onClick={() => {
+              openEditCompanyModal();
+              comId(user.id); // Call the delete user function
+            }}
+            size="small"
+            style={{ display: "block", marginBottom: "8px" }}
+          >
+            Edit
+          </Button>
 
-      </Flex>
+        </Flex>
       </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-      <Button
-        type=""
-        icon={<PushpinOutlined />}
-        onClick={openResetPasswordModal}
-        size="small"
-        style={{ display: "block", marginBottom: "8px" }}
-      >
-        Reset Password
-      </Button>
-      </Flex>
+          <Button
+            type=""
+            icon={<PushpinOutlined />}
+            onClick={openResetPasswordModal}
+            size="small"
+            style={{ display: "block", marginBottom: "8px" }}
+          >
+            Reset Password
+          </Button>
+        </Flex>
       </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-      <Button
-        type=""
-        icon={<RocketOutlined />}
-        onClick={openUpgradePlanModal}
-        size="small"
-        style={{ display: "block", marginBottom: "8px" }}
-      >
-        UpgradePlan
-      </Button>
-      </Flex>
+          <Button
+            type=""
+            icon={<RocketOutlined />}
+            onClick={openUpgradePlanModal}
+            size="small"
+            style={{ display: "block", marginBottom: "8px" }}
+          >
+            UpgradePlan
+          </Button>
+        </Flex>
       </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-      <Button
-        type=""
-        icon={<DeleteOutlined />}
-        onClick={() => deleteUser(user.id)}
-        size="small"
-      >
-        Delete
-      </Button>
-      </Flex>
+          <Button
+            type=""
+            icon={<DeleteOutlined />}
+            onClick={() => deleteUser(user.id)}
+            size="small"
+          >
+            Delete
+          </Button>
+        </Flex>
       </Menu.Item>
-</Menu>
+    </Menu>
   );
 
   const tableColumns = [
@@ -221,6 +241,14 @@ const openAddCompanyModal = () => {
         </div>
       ),
       sorter: (a, b) => a.name.localeCompare(b.name),
+    },
+    {
+      title: "Current Plan",
+      dataIndex: "currentplan",
+      render: (_, record) => (
+        <><Tag color={getCompanyPlanStatus(record.currentplan)}>{record.currentplan}</Tag></>
+      ),
+      sorter: (a, b) => a.currentplan.length - b.currentplan.length,
     },
     {
       title: "Pending Project",
@@ -248,12 +276,23 @@ const openAddCompanyModal = () => {
       sorter: (a, b) => dayjs(a.lastOnline).unix() - dayjs(b.lastOnline).unix(),
     },
     {
+      title: 'Is Active	',
+      dataIndex: 'isactive',
+      render: (_, record) => (
+          <Switch
+              defaultChecked={record.isactive === 'active'}
+              onChange={(checked) => handleStatusChange(checked, record.id)}
+              size="small"
+          />
+      ),
+  },
+    {
       title: "Status",
       dataIndex: "status",
       render: (_, record) => (
-				<><Tag color={getCompanyStatus(record.status)}>{record.status}</Tag></>
-			),
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'status')
+        <><Tag color={getCompanyStatus(record.status)}>{record.status}</Tag></>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, 'status')
     },
     {
       title: "Action",
@@ -268,7 +307,7 @@ const openAddCompanyModal = () => {
 
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
-        <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
@@ -314,13 +353,13 @@ const openAddCompanyModal = () => {
           close={closeUserProfile}
         />
       )}
-       <Modal
+      <Modal
         title="Create Company"
         visible={isAddCompanyModalVisible}
         onCancel={closeAddCompanyModal}
         footer={null}
         width={1100}
-        // className="mt-[-70px]"
+      // className="mt-[-70px]"
       >
         <AddCompany onClose={closeAddCompanyModal} />
       </Modal>

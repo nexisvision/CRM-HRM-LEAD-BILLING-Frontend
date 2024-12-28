@@ -11,6 +11,7 @@
     "pendingprojects":"10",
     "invoices":"65531",
     "permission":"adduser",
+    "currentplan":"free",
     "leavetype":"casual",
     "tags":"dfssdfdfs,ewrdssd",
     "appliedon":"10/10/1992",
@@ -49,6 +50,7 @@
     "lastOnline": 1572393600,
     "status": "active",
     "currenciename":"EUR Euro",
+    "currentplan":"premium",
     "currencyicon":"€",
     "currencycode":"EUR",
     "personalInfo": {
@@ -71,6 +73,7 @@
     "currenciename":"USD US Dollar",
     "currencyicon":"$",
     "currencycode":"USD",
+    "currentplan":"free",
     "lastOnline": 1572393600,
     "status": "blocked",
     "personalInfo": {
@@ -93,8 +96,10 @@
     "currenciename":"AUD Australian Dollar",
     "currencyicon":"$",
     "currencycode":"AUD",
+    "currentplan":"premium",
     "lastOnline": 1579132800,
     "status": "active",
+    "isactive":"active",
     "personalInfo": {
       "location": "New York, US",
       "title": "HR Executive",
@@ -117,6 +122,7 @@
     "currencycode":"INR",
     "lastOnline": 1582416000,
     "status": "active",
+    "isactive":"active",
     "personalInfo": {
       "location": "New York, US",
       "title": "Frontend Developer",
@@ -136,9 +142,11 @@
     "role": "User",
     "lastOnline": 1583107200,
     "status": "active",
+    "isactive":"inactive",
     "currenciename":"AUD Australian Dollar",
     "currencyicon":"$",
     "currencycode":"AUD",
+    "currentplan":"standard",
     "personalInfo": {
       "location": "London, UK",
       "title": "Compliance Manager",

@@ -35,6 +35,7 @@ import EditLead from "./EditLead";
 import ViewLead from "./ViewLead";
 import { useDispatch, useSelector } from "react-redux";
 import { GetLeads, LeadsDelete } from "./LeadReducers/LeadSlice";
+import { useNavigate } from "react-router-dom";
 
 const LeadList = () => {
   const [users, setUsers] = useState(userData);

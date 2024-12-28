@@ -51,7 +51,7 @@ const SystemSetupList = () => {
 
     return (
         <>
-            <h1 className="text-lg font-bold ml-3">System Setup</h1>
+            {/* <h1 className="text-lg font-bold ml-3">System Setup</h1> */}
             <div className="flex flex-col lg:flex-row ml-[-24px] mb-[-24px] rounded-b-lg mt-[-51px] rounded-t-lg mr-[-24px] bg-gray-100">
                 {/* Sidebar */}
                 <div className="sm:w-full md:w-[95%] md:mr-[30px] lg:w-[240px] md:ml-[23px] h-full mt-16 px-[30px] md:p-0 lg:p-0">

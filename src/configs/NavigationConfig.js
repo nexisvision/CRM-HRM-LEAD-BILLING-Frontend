@@ -574,6 +574,14 @@ const extraNavvvTree = [
             breadcrumb: true,
             submenu: [
               {
+                key: 'extra-superadmin-setting-general',
+                path: `${APP_PREFIX_PATH}/setting/general`,
+                title: 'General',
+                icon: ControlOutlined,
+                breadcrumb: true,
+                submenu: []
+              },
+              {
                 key: 'extra-superadmin-setting-countries',
                 path: `${APP_PREFIX_PATH}/setting/countries`,
                 title: 'Countries',
