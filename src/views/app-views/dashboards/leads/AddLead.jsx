@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {
   Input,
   Button,
@@ -19,8 +19,10 @@ import utils from "utils";
 import OrderListData from "assets/data/order-list.data.json";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
+import { useDispatch ,useSelector} from "react-redux";
 import { GetLeads, LeadsAdd } from "./LeadReducers/LeadSlice";
+import { getallcurrencies } from "../../setting/currencies/currenciesreducer/currenciesSlice";
+
 
 const { Option } = Select;
 
@@ -29,6 +31,12 @@ const AddLead = ({ onClose }) => {
   const [details, setDetails] = useState(false);
   const [info, setInfo] = useState(false);
   const [organisation, setorganisation] = useState(false);
+  
+  const { currencies } = useSelector((state) => state.currencies);
+  
+  // Add state for lead value and currency
+  const [selectedCurrency, setSelectedCurrency] = useState(null);
+
 
   const dispatch = useDispatch();
 
@@ -39,6 +47,7 @@ const AddLead = ({ onClose }) => {
     telephone: "",
     email: "",
     leadValue: "",
+    currencyIcon: "", 
     assigned: "",
     status: "",
     notes: "",
@@ -49,14 +58,11 @@ const AddLead = ({ onClose }) => {
     targetDate: null,
     contentType: "",
     brandName: "",
-    companyName: "",
-    street: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    country: "",
-    website: "",
   };
+
+  useEffect(() => {
+    dispatch(getallcurrencies());
+  }, [dispatch]);
 
   const validationSchema = Yup.object({
     leadTitle: Yup.string().required("Lead Title is required"),
@@ -66,7 +72,10 @@ const AddLead = ({ onClose }) => {
       .matches(/^\d{10}$/, "telephone number must be exactly 10 digits")
       .nullable(),
     email: Yup.string().email("Please enter a valid email address").nullable(),
-    leadValue: Yup.string().nullable(),
+    leadValue: Yup.number()
+    .typeError('Lead Value must be a number')
+    .nullable(),
+  currencyIcon: Yup.string().nullable(),
     assigned: Yup.string().nullable(),
     status: Yup.string().required("Status is required"),
 
@@ -100,39 +109,16 @@ const AddLead = ({ onClose }) => {
       then: Yup.string().required("Brand name is required"),
     }),
 
-    // Organisation section
-    companyName: Yup.string().when("organisation", {
-      is: true,
-      then: Yup.string().required("Company name is required"),
-    }),
-    street: Yup.string().when("organisation", {
-      is: true,
-      then: Yup.string().required("Street is required"),
-    }),
-    city: Yup.string().when("organisation", {
-      is: true,
-      then: Yup.string().required("City is required"),
-    }),
-    state: Yup.string().when("organisation", {
-      is: true,
-      then: Yup.string().required("State is required"),
-    }),
-    zipCode: Yup.string().when("organisation", {
-      is: true,
-      then: Yup.string().required("Zip Code is required"),
-    }),
-    country: Yup.string().when("organisation", {
-      is: true,
-      then: Yup.string().required("Country is required"),
-    }),
-    website: Yup.string().when("organisation", {
-      is: true,
-      then: Yup.string().required("Website is required"),
-    }),
+   
   });
 
   const onSubmit = (values, { resetForm }) => {
-    dispatch(LeadsAdd(values))
+    const formData = {
+      ...values,
+      leadValue: values.leadValue ? String(values.leadValue) : null,
+      currencyIcon: values.currencyIcon || null,
+    };
+    dispatch(LeadsAdd(formData))
       .then(() => {
         dispatch(GetLeads()); // Refresh leave data
         message.success("Leads added successfully!");
@@ -143,10 +129,92 @@ const AddLead = ({ onClose }) => {
         message.error("Failed to add Leads.");
         console.error("Add API error:", error);
       });
-    dispatch(LeadsAdd(values));
-    console.log("Submitted values:", values);
-    message.success("Project added successfully!");
   };
+
+  const LeadValueField = () => (
+    <Col span={12} className="mt-2">
+      <div className="form-item">
+        <label className="font-semibold">Lead Value</label>
+        <div className="flex gap-2">
+          <Field
+            name="leadValue"
+            type="number"
+            as={Input}
+            placeholder="Enter Lead Value"
+            className="w-2/3"
+          />
+          <Field name="currencyIcon">
+            {({ field, form }) => (
+              <Select
+                {...field}
+                className="w-1/3"
+                placeholder="Select Currency"
+                onChange={(value) => {
+                  const selectedCurrency = currencies.find(c => c.id === value);
+                  form.setFieldValue("currencyIcon", selectedCurrency?.currencyIcon || '');
+                }}
+              >
+                {currencies?.map((currency) => (
+                  <Option 
+                    key={currency.id} 
+                    value={currency.id}
+                  >
+                    {currency.currencyCode} ({currency.currencyIcon})
+                  </Option>
+                ))}
+              </Select>
+            )}
+          </Field>
+        </div>
+        <ErrorMessage
+          name="leadValue"
+          component="div"
+          className="error-message text-red-500 my-1"
+        />
+      </div>
+    </Col>
+  );
+
+   // Custom component for lead value with currency
+  //  const LeadValueField = ({ field, form }) => (
+  //   <Col span={24} className="mt-2">
+  //     <div className="form-item">
+  //       <div className="flex gap-2">
+  //         <Field
+  //           name="leadValue"
+  //           // type="number"
+  //           as={Input}
+  //           placeholder="Enter Lead Value"
+  //           className="w-full"
+  //         />
+  //         <Field name="currencyId">
+  //           {({ field, form }) => (
+  //             <Select
+  //               {...field}
+  //               className="w-full"
+  //               placeholder="Currency"
+  //               onChange={(value) => form.setFieldValue("currencyId", value)}
+  //             >
+  //               {currencies?.map((currency) => (
+  //                 <Option 
+  //                   key={currency.id} 
+  //                   value={currency.id}
+  //                 >
+  //                   {currency.currencyCode} ({currency.currencyIcon})
+  //                 </Option>
+  //               ))}
+  //             </Select>
+  //           )}
+  //         </Field>
+  //       </div>
+  //       <ErrorMessage
+  //         name="leadValue"
+  //         component="div"
+  //         className="error-message text-red-500 my-1"
+  //       />
+  //     </div>
+  //   </Col>
+  // );
 
   return (
     <div className="add-job-form">
@@ -249,7 +317,25 @@ const AddLead = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+
+              <Col span={12} className="">
+              <div className="form-item">
+                <label className="font-semibold">Lead Value</label>
+                <Field name="leadValue" component={LeadValueField} />
+                <ErrorMessage
+                  name="leadValue.amount"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
+                <ErrorMessage
+                  name="leadValue.currencyId"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
+              </div>
+            </Col>
+
+              {/* <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Lead Value($)</label>
                   <Field
@@ -263,7 +349,7 @@ const AddLead = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
@@ -599,168 +685,7 @@ const AddLead = ({ onClose }) => {
                 )}
               </Col>
 
-              <Col span={24} className="mt-4 ">
-                <div className="flex justify-between items-center">
-                  <label className="font-semibold">
-                    Address & Organisation Details
-                  </label>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={organisation}
-                      onChange={(e) => setorganisation(e.target.checked)}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                  </label>
-                </div>
-
-                {/* Conditionally show Upload field */}
-                {organisation && (
-                  <>
-                    <div className="mt-2">
-                      <Col span={24} className="mt-2">
-                        <div className="form-item">
-                          <label className="font-semibold">Company Name</label>
-                          <Field
-                            name="companyName"
-                            as={Input}
-                            placeholder="Enter Company Name"
-                            className="w-full "
-                          />
-                          <ErrorMessage
-                            name="companyName"
-                            component="div"
-                            className="error-message text-red-500 my-1"
-                          />
-                        </div>
-                      </Col>
-                    </div>
-                    <div className="mt-2">
-                      <Col span={24} className="mt-2">
-                        <div className="form-item">
-                          <label className="font-semibold">Street</label>
-                          <Field
-                            name="street"
-                            as={Input}
-                            placeholder="Enter Street"
-                            className="w-full"
-                          />
-                          <ErrorMessage
-                            name="street"
-                            component="div"
-                            className="error-message text-red-500 my-1"
-                          />
-                        </div>
-                      </Col>
-                    </div>
-                    <div className="mt-2">
-                      <Col span={24} className="mt-2">
-                        <div className="form-item">
-                          <label className="font-semibold">City</label>
-                          <Field
-                            name="city"
-                            as={Input}
-                            placeholder="Enter City Name"
-                            className="w-full"
-                          />
-                          <ErrorMessage
-                            name="city"
-                            component="div"
-                            className="error-message text-red-500 my-1"
-                          />
-                        </div>
-                      </Col>
-                    </div>
-                    <div className="mt-2">
-                      <Col span={24} className="mt-2">
-                        <div className="form-item mt-2">
-                          <label className="font-semibold">State</label>
-                          <Field
-                            name="state"
-                            as={Input}
-                            placeholder="Enter State Name"
-                            className="w-full"
-                          />
-                          <ErrorMessage
-                            name="state"
-                            component="div"
-                            className="error-message text-red-500 my-1"
-                          />
-                        </div>
-                      </Col>
-                    </div>
-                    <div>
-                      <Col span={24} className="mt-2">
-                        <div className="form-item mt-2">
-                          <label className="font-semibold">Zip Code</label>
-                          <Field
-                            name="zipCode"
-                            as={Input}
-                            placeholder="Enter zip code"
-                            className="w-full"
-                          />
-                          <ErrorMessage
-                            name="zipCode"
-                            component="div"
-                            className="error-message text-red-500 my-1"
-                          />
-                        </div>
-                      </Col>
-                    </div>
-
-                    <div>
-                      <Col span={24} className="mt-2">
-                        <div className="form-item  mt-2">
-                          <label className="font-semibold">Country</label>
-                          <Field name="contentType">
-                            {({ field }) => (
-                              <Select
-                                {...field}
-                                className="w-full"
-                                placeholder="Select Country"
-                                onChange={(value) =>
-                                  setFieldValue("country", value)
-                                }
-                                value={values.country}
-                                onBlur={() => setFieldTouched("country", true)}
-                              >
-                                <Option value="India">India</Option>
-                                <Option value="arubs">Aruba</Option>
-                                <Option value="bhutan">Bhutan</Option>
-                              </Select>
-                            )}
-                          </Field>
-                          <ErrorMessage
-                            name="country"
-                            component="div"
-                            className="error-message text-red-500 my-1"
-                          />
-                        </div>
-                      </Col>
-                    </div>
-                    <div className="mt-2">
-                      <Col span={24} className="mt-2 border-b pb-3">
-                        <div className="form-item">
-                          <label className="font-semibold">Website</label>
-                          <Field
-                            name="website"
-                            as={Input}
-                            placeholder="Enter Website"
-                            className="w-full"
-                            onBlur={() => setFieldTouched("website", true)}
-                          />
-                          <ErrorMessage
-                            name="Website"
-                            component="div"
-                            className="error-message text-red-500 my-1"
-                          />
-                        </div>
-                      </Col>
-                    </div>
-                  </>
-                )}
-              </Col>
+             
 
               <Col className="mt-2">
                 <h5 className="flex">

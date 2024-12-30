@@ -19,6 +19,8 @@ import EventSetup from "../views/app-views/hrm/EventSetup/EventSetupService/Even
 import Deals from "../views/app-views/dashboards/deals/DealReducers/DealSlice"
 import SubClient from "../views/app-views/Users/client-list/CompanyReducers/CompanySlice"
 import Contract from "../views/app-views/dashboards/contract/ContractReducers/ContractSlice"
+import countries from "../views/app-views/setting/countries/countriesreducer/countriesSlice"
+import currencies from "../views/app-views/setting/currencies/currenciesreducer/currenciesSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -42,6 +44,8 @@ const rootReducer = (asyncReducers) => (state, action) => {
         Deals,
         SubClient,
         Contract,
+        countries,
+        currencies,
         // employee,
         // department,
         ...asyncReducers,

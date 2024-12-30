@@ -83,12 +83,6 @@ const RevenueList = () => {
 		<Menu>
 			<Menu.Item>
 				<Flex alignItems="center">
-					<EyeOutlined />
-					<span className="ml-2">View Details</span>
-				</Flex>
-			</Menu.Item>
-			<Menu.Item>
-				<Flex alignItems="center">
 					<PlusCircleOutlined />
 					<span className="ml-2">Add to remark</span>
 				</Flex>

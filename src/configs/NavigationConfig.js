@@ -2,8 +2,8 @@ import {
   DashboardOutlined, 
   AppstoreOutlined,
   FileTextOutlined,
-  PieChartOutlined,
-  EnvironmentOutlined,
+  // SettingOutlined,
+  // DollarOutlined,
   AntDesignOutlined,
   BugOutlined,
   SafetyOutlined,
@@ -22,6 +22,7 @@ import {
   EuroCircleOutlined,
   ScheduleOutlined,
   CheckSquareOutlined,
+  GlobalOutlined ,
   // SolutionOutlined,
   BankOutlined,
   DeploymentUnitOutlined,
@@ -570,7 +571,7 @@ const extraNavvvTree = [
             key: 'setting',
             path: `${APP_PREFIX_PATH}/setting`,
             title: 'Setting',
-            icon:  CalendarOutlined,
+            icon:  SettingOutlined ,
             breadcrumb: true,
             submenu: [
               {
@@ -585,7 +586,7 @@ const extraNavvvTree = [
                 key: 'extra-superadmin-setting-countries',
                 path: `${APP_PREFIX_PATH}/setting/countries`,
                 title: 'Countries',
-                icon: ControlOutlined,
+                icon: GlobalOutlined ,
                 breadcrumb: true,
                 submenu: []
               },
@@ -593,7 +594,7 @@ const extraNavvvTree = [
                 key: 'extra-superadmin-setting-currencies',
                 path: `${APP_PREFIX_PATH}/setting/currencies`,
                 title: 'Currencies',
-                icon: UsergroupAddOutlined,
+                icon: DollarOutlined ,
                 breadcrumb: true,
                 submenu: []
               },

@@ -22,7 +22,7 @@ const EditContract = () => {
         startdate: null,
         enddate: null,
         // skills: '',
-        jobDescription: '',
+        description: '',
     };
 
     const validationSchema = Yup.object({
@@ -34,7 +34,7 @@ const EditContract = () => {
       startdate: Yup.date().nullable().required('Start date is required.'),
       enddate: Yup.date().nullable().required('End date is required.'),
     //   skills: Yup.number().required('Please enter a Skills.'),
-      jobDescription: Yup.string().required('Please enter a Job Description.'),
+    description: Yup.string().required('Please enter a Description.'),
     });
 
 
@@ -172,13 +172,13 @@ const EditContract = () => {
 
                             <Col span={24} className='mt-4'>
                                 <div className="form-item">
-                                    <label className='font-semibold'>Job Description</label>
+                                    <label className='font-semibold'>Description</label>
                                     <ReactQuill
-                                        value={values.jobDescription}
-                                        onChange={(value) => setFieldValue('jobDescription', value)}
-                                        placeholder="Enter Job Description"
+                                        value={values.description}
+                                        onChange={(value) => setFieldValue('description', value)}
+                                        placeholder="Enter Description"
                                     />
-                                    <ErrorMessage name="jobDescription" component="div" className="error-message text-red-500 my-1" />
+                                    <ErrorMessage name="description" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
 

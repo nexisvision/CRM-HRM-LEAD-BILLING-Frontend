@@ -19,6 +19,7 @@ import moment from "moment";
 import { useSelector } from "react-redux";
 import { GetLeads, LeadsEdit } from "./LeadReducers/LeadSlice";
 import { useDispatch } from "react-redux";
+import { getallcurrencies } from "../../setting/currencies/currenciesreducer/currenciesSlice";
 
 const { Option } = Select;
 
@@ -34,6 +35,11 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
   const datleads = allempdata.Leads.data;
 
   const project = datleads.find((item) => item.id === id);
+  const { currencies } = useSelector((state) => state.currencies);
+  
+  // Add state for lead value and currency
+  const [selectedCurrency, setSelectedCurrency] = useState(null);
+
 
   useEffect(() => {
     if (project) {
@@ -78,19 +84,19 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
     targetDate: project?.targetDate ? moment(project.targetDate) : null,
     contentType: project?.contentType || "",
     brandName: project?.brandName || "",
-    companyName: project?.companyName || "",
-    street: project?.street || "",
-    city: project?.city || "",
-    state: project?.state || "",
-    zipCode: project?.zipCode || "",
-    country: project?.country || "",
-    website: project?.website || "",
-    users: project?.users || [],
-    pipeline: project?.pipeline || "",
-    stage: project?.stage || "",
-    sources: project?.sources || [],
-    products: project?.products || [],
-    tags: project?.tags || [],
+    // companyName: project?.companyName || "",
+    // street: project?.street || "",
+    // city: project?.city || "",
+    // state: project?.state || "",
+    // zipCode: project?.zipCode || "",
+    // country: project?.country || "",
+    // website: project?.website || "",
+    // users: project?.users || [],
+    // pipeline: project?.pipeline || "",
+    // stage: project?.stage || "",
+    // sources: project?.sources || [],
+    // products: project?.products || [],
+    // tags: project?.tags || [],
   };
 
   const validationSchema = Yup.object({
@@ -136,37 +142,46 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
     }),
 
     // Organisation section
-    companyName: Yup.string().when("organisation", {
-      is: true,
-      then: Yup.string().required("Company name is required"),
-    }),
-    street: Yup.string().when("organisation", {
-      is: true,
-      then: Yup.string().required("Street is required"),
-    }),
-    city: Yup.string().when("organisation", {
-      is: true,
-      then: Yup.string().required("City is required"),
-    }),
-    state: Yup.string().when("organisation", {
-      is: true,
-      then: Yup.string().required("State is required"),
-    }),
-    zipCode: Yup.string().when("organisation", {
-      is: true,
-      then: Yup.string().required("Zip Code is required"),
-    }),
-    country: Yup.string().when("organisation", {
-      is: true,
-      then: Yup.string().required("Country is required"),
-    }),
-    website: Yup.string().when("organisation", {
-      is: true,
-      then: Yup.string().required("Website is required"),
-    }),
+    // companyName: Yup.string().when("organisation", {
+    //   is: true,
+    //   then: Yup.string().required("Company name is required"),
+    // }),
+    // street: Yup.string().when("organisation", {
+    //   is: true,
+    //   then: Yup.string().required("Street is required"),
+    // }),
+    // city: Yup.string().when("organisation", {
+    //   is: true,
+    //   then: Yup.string().required("City is required"),
+    // }),
+    // state: Yup.string().when("organisation", {
+    //   is: true,
+    //   then: Yup.string().required("State is required"),
+    // }),
+    // zipCode: Yup.string().when("organisation", {
+    //   is: true,
+    //   then: Yup.string().required("Zip Code is required"),
+    // }),
+    // country: Yup.string().when("organisation", {
+    //   is: true,
+    //   then: Yup.string().required("Country is required"),
+    // }),
+    // website: Yup.string().when("organisation", {
+    //   is: true,
+    //   then: Yup.string().required("Website is required"),
+    // }),
   });
 
+  useEffect(() => {
+    dispatch(getallcurrencies());
+  }, [dispatch]);
+
   const onSubmit = (values) => {
+    const formData = {
+      ...values,
+      leadValue: values.leadValue ? String(values.leadValue) : null,
+      currencyIcon: values.currencyIcon || null,
+    };
     dispatch(LeadsEdit({ id, values }))
       .then(() => {
         dispatch(GetLeads());
@@ -184,6 +199,46 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
     onUpdateLead(updatedLead);
   };
 
+  const LeadValueField = ({ field, form }) => (
+    <Col span={24} className="mt-2">
+      <div className="form-item">
+        <div className="flex gap-2">
+          <Field
+            name="leadValue"
+            type="number"
+            as={Input}
+            placeholder="Enter Lead Value"
+            className="w-full"
+          />
+          <Field name="currencyId">
+            {({ field, form }) => (
+              <Select
+                {...field}
+                className="w-full"
+                placeholder="Currency"
+                onChange={(value) => form.setFieldValue("currencyId", value)}
+              >
+                {currencies?.map((currency) => (
+                  <Option 
+                    key={currency.id} 
+                    value={currency.id}
+                  >
+                    {currency.currencyCode} ({currency.currencyIcon})
+                  </Option>
+                ))}
+              </Select>
+            )}
+          </Field>
+        </div>
+        <ErrorMessage
+          name="leadValue"
+          component="div"
+          className="error-message text-red-500 my-1"
+        />
+      </div>
+    </Col>
+  );
+
   return (
     <div className="edit-lead-form">
       <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
@@ -195,7 +250,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
       >
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
-            <h2 className="mb-4 border-b pb-2 font-medium"></h2>
+            {/* <h2 className="mb-4 border-b pb-2 font-medium"></h2> */}
 
             <Row gutter={16}>
               <Col span={24}>
@@ -281,7 +336,24 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="">
+              <div className="form-item">
+                <label className="font-semibold">Lead Value</label>
+                <Field name="leadValue" component={LeadValueField} />
+                <ErrorMessage
+                  name="leadValue.amount"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
+                <ErrorMessage
+                  name="leadValue.currencyId"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
+              </div>
+            </Col>
+
+              {/* <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Lead Value($)</label>
                   <Field
@@ -295,7 +367,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
@@ -621,169 +693,6 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                           />
                           <ErrorMessage
                             name="brandName"
-                            component="div"
-                            className="error-message text-red-500 my-1"
-                          />
-                        </div>
-                      </Col>
-                    </div>
-                  </>
-                )}
-              </Col>
-
-              <Col span={24} className="mt-4 ">
-                <div className="flex justify-between items-center">
-                  <label className="font-semibold">
-                    Address & Organisation Details
-                  </label>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={organisation}
-                      onChange={(e) => setorganisation(e.target.checked)}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                  </label>
-                </div>
-
-                {/* Conditionally show Upload field */}
-                {organisation && (
-                  <>
-                    <div className="mt-2">
-                      <Col span={24} className="mt-2">
-                        <div className="form-item">
-                          <label className="font-semibold">Company Name</label>
-                          <Field
-                            name="companyName"
-                            as={Input}
-                            placeholder="Enter Company Name"
-                            className="w-full "
-                          />
-                          <ErrorMessage
-                            name="companyName"
-                            component="div"
-                            className="error-message text-red-500 my-1"
-                          />
-                        </div>
-                      </Col>
-                    </div>
-                    <div className="mt-2">
-                      <Col span={24} className="mt-2">
-                        <div className="form-item">
-                          <label className="font-semibold">Street</label>
-                          <Field
-                            name="street"
-                            as={Input}
-                            placeholder="Enter Street"
-                            className="w-full"
-                          />
-                          <ErrorMessage
-                            name="street"
-                            component="div"
-                            className="error-message text-red-500 my-1"
-                          />
-                        </div>
-                      </Col>
-                    </div>
-                    <div className="mt-2">
-                      <Col span={24} className="mt-2">
-                        <div className="form-item">
-                          <label className="font-semibold">City</label>
-                          <Field
-                            name="city"
-                            as={Input}
-                            placeholder="Enter City Name"
-                            className="w-full"
-                          />
-                          <ErrorMessage
-                            name="city"
-                            component="div"
-                            className="error-message text-red-500 my-1"
-                          />
-                        </div>
-                      </Col>
-                    </div>
-                    <div className="mt-2">
-                      <Col span={24} className="mt-2">
-                        <div className="form-item mt-2">
-                          <label className="font-semibold">State</label>
-                          <Field
-                            name="state"
-                            as={Input}
-                            placeholder="Enter State Name"
-                            className="w-full"
-                          />
-                          <ErrorMessage
-                            name="state"
-                            component="div"
-                            className="error-message text-red-500 my-1"
-                          />
-                        </div>
-                      </Col>
-                    </div>
-                    <div>
-                      <Col span={24} className="mt-2">
-                        <div className="form-item mt-2">
-                          <label className="font-semibold">Zip Code</label>
-                          <Field
-                            name="zipCode"
-                            as={Input}
-                            placeholder="Enter zip code"
-                            className="w-full"
-                          />
-                          <ErrorMessage
-                            name="zipCode"
-                            component="div"
-                            className="error-message text-red-500 my-1"
-                          />
-                        </div>
-                      </Col>
-                    </div>
-
-                    <div>
-                      <Col span={24} className="mt-2">
-                        <div className="form-item  mt-2">
-                          <label className="font-semibold">Country</label>
-                          <Field name="contentType">
-                            {({ field }) => (
-                              <Select
-                                {...field}
-                                className="w-full"
-                                placeholder="Select Country"
-                                onChange={(value) =>
-                                  setFieldValue("country", value)
-                                }
-                                value={values.country}
-                                onBlur={() => setFieldTouched("country", true)}
-                              >
-                                <Option value="India">India</Option>
-                                <Option value="arubs">Aruba</Option>
-                                <Option value="bhutan">Bhutan</Option>
-                              </Select>
-                            )}
-                          </Field>
-                          <ErrorMessage
-                            name="country"
-                            component="div"
-                            className="error-message text-red-500 my-1"
-                          />
-                        </div>
-                      </Col>
-                    </div>
-                    <div className="mt-2">
-                      <Col span={24} className="mt-2 border-b pb-3">
-                        <div className="form-item">
-                          <label className="font-semibold">Website</label>
-                          <Field
-                            name="website"
-                            as={Input}
-                            placeholder="Enter Website"
-                            className="w-full"
-                            onBlur={() => setFieldTouched("website", true)}
-                          />
-                          <ErrorMessage
-                            name="Website"
                             component="div"
                             className="error-message text-red-500 my-1"
                           />
