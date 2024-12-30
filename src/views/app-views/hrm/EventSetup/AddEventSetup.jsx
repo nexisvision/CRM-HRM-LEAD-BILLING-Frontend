@@ -1,12 +1,23 @@
-import React from 'react';
-import { Input, Button, DatePicker, Select, TimePicker, message, Row, Col } from 'antd';
-import moment from 'moment';
-import ReactQuill from 'react-quill';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import { useDispatch } from 'react-redux';
-import { createEventData } from './EventSetupService/EventSetupSlice'; // Make sure the path is correct
-
+import React from "react";
+import {
+  Input,
+  Button,
+  DatePicker,
+  Select,
+  TimePicker,
+  message,
+  Row,
+  Col,
+} from "antd";
+import moment from "moment";
+import ReactQuill from "react-quill";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import {
+  createEventData,
+  fetchEventsData,
+} from "./EventSetupService/EventSetupSlice"; // Make sure the path is correct
 
 const { Option } = Select;
 
@@ -39,41 +50,53 @@ const AddEventSetUp = ({ onSuccess }) => {
       const payload = {
         EventTitle: values.EventTitle,
         EventManager: values.EventManager,
-        EventDate: moment(values.EventDate).format('YYYY-MM-DD'),
-        EventTime: moment(values.EventTime).format('HH:mm:ss')
+        EventDate: moment(values.EventDate).format("YYYY-MM-DD"),
+        EventTime: values.EventTime,
       };
 
-      await dispatch(createEventData(payload)).unwrap();
-      message.success('Event created successfully');
-      resetForm();
-      onSuccess(); // Close modal
+      dispatch(createEventData(payload)).then(() => {
+        dispatch(fetchEventsData())
+          .then(() => {
+            message.success("event added successfully!");
+            resetForm();
+            onSuccess();
+          })
+          .catch((error) => {
+            message.error("Failed to fetch the latest event data.");
+            console.error("MeetData API error:", error);
+          });
+      });
     } catch (error) {
-      message.error(error?.message || 'Failed to create event');
+      message.error(error?.message || "Failed to create event");
     }
   };
 
-
-
   const initialValues = {
-    EventTitle: '',
-    EventManager: '',
-    EventDate: '',
-    EventTime: '',
+    EventTitle: "",
+    EventManager: "",
+    EventDate: "",
+    EventTime: "",
     // eventstartdate: null,
     // eventenddate: null,
     // description: '',
-  }
+  };
 
   const validationSchema = Yup.object({
-    EventTitle: Yup.string().required('Please enter event title.'),
-    EventManager: Yup.string().required('Please enter a manager name.'),
-    EventDate: Yup.date().nullable().required('Event Date is required.'),
-    EventTime: Yup.date().nullable().required('End Time is required.')
-    .test('is-greater', 'End time should be after start time', function(value) {
-      const { StartTime } = this.parent;
-      if (!StartTime || !value) return true;
-      return moment(value).isAfter(moment(StartTime));
-    })
+    EventTitle: Yup.string().required("Please enter event title."),
+    EventManager: Yup.string().required("Please enter a manager name."),
+    EventDate: Yup.date().nullable().required("Event Date is required."),
+    EventTime: Yup.date()
+      .nullable()
+      .required("End Time is required.")
+      .test(
+        "is-greater",
+        "End time should be after start time",
+        function (value) {
+          const { StartTime } = this.parent;
+          if (!StartTime || !value) return true;
+          return moment(value).isAfter(moment(StartTime));
+        }
+      ),
     // employee: Yup.string().required('Please select a employee.'),
     // title: Yup.string().required('Please enter a title.'),
     // eventstartdate: Yup.date().nullable().required(' Event Start Date is required.'),
@@ -88,13 +111,9 @@ const AddEventSetUp = ({ onSuccess }) => {
       onSubmit={onSubmit}
     >
       {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
-        <Form
-          className="formik-form" onSubmit={handleSubmit}
-        >
-          <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+        <Form className="formik-form" onSubmit={handleSubmit}>
+          <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
           <Row gutter={16}>
-
-
             {/* <Col span={8}>
             <Form.Item
               name="branch"
@@ -132,24 +151,28 @@ const AddEventSetUp = ({ onSuccess }) => {
                 </Select>
               </Form.Item>
             </Col> */}
-            <Col span={12} className='mt-2'>
+            <Col span={12} className="mt-2">
               <div className="form-item">
-                <label className='font-semibold'>Event Title"</label>
+                <label className="font-semibold">Event Title"</label>
                 <Field name="EventTitle" as={Input} placeholder="Event Title" />
-                <ErrorMessage name="EventTitle" component="div" className="error-message text-red-500 my-1" />
+                <ErrorMessage
+                  name="EventTitle"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
               </div>
             </Col>
 
-            <Col span={12} className='mt-2'>
+            <Col span={12} className="mt-2">
               <div className="form-item">
-                <label className='font-semibold'>Event Manager</label>
+                <label className="font-semibold">Event Manager</label>
                 <Field name="EventManager">
                   {({ field }) => (
                     <Select
                       {...field}
                       className="w-full"
                       placeholder="Select Event Manager"
-                      onChange={(value) => setFieldValue('EventManager', value)}
+                      onChange={(value) => setFieldValue("EventManager", value)}
                       value={values.EventManager}
                       onBlur={() => setFieldTouched("EventManager", true)}
                     >
@@ -159,7 +182,11 @@ const AddEventSetUp = ({ onSuccess }) => {
                     </Select>
                   )}
                 </Field>
-                <ErrorMessage name="EventManager" component="div" className="error-message text-red-500 my-1" />
+                <ErrorMessage
+                  name="EventManager"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
               </div>
             </Col>
 
@@ -193,32 +220,43 @@ const AddEventSetUp = ({ onSuccess }) => {
               </Select>
             </Form.Item>
           </Col> */}
-            <Col span={12} className='mt-2'>
+            <Col span={12} className="mt-2">
               <div className="form-item">
-                <label className='font-semibold'>Event Date</label>
+                <label className="font-semibold">Event Date</label>
                 <DatePicker
                   className="w-full"
                   format="DD-MM-YYYY"
                   value={values.EventDate}
-                  onChange={(EventDate) => setFieldValue('EventDate', EventDate)}
+                  onChange={(EventDate) =>
+                    setFieldValue("EventDate", EventDate)
+                  }
                   onBlur={() => setFieldTouched("EventDate", true)}
                 />
-                <ErrorMessage name="EventDate" component="div" className="error-message text-red-500 my-1" />
+                <ErrorMessage
+                  name="EventDate"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
               </div>
             </Col>
 
-
-            <Col span={12} className='mt-2'>
+            <Col span={12} className="mt-2">
               <div className="form-item">
-                <label className='font-semibold'>Event Time</label>
+                <label className="font-semibold">Event Time</label>
                 <TimePicker
                   className="w-full"
                   format="HH:mm:ss"
                   value={values.EventTime}
-                  onChange={(EventTime) => setFieldValue('EventTime', EventTime)}
+                  onChange={(EventTime) =>
+                    setFieldValue("EventTime", EventTime)
+                  }
                   onBlur={() => setFieldTouched("EventTime", true)}
                 />
-                <ErrorMessage name="EventTime" component="div" className="error-message text-red-500 my-1" />
+                <ErrorMessage
+                  name="EventTime"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
               </div>
             </Col>
             {/* <Col span={12}>
@@ -277,15 +315,13 @@ const AddEventSetUp = ({ onSuccess }) => {
             </Col> */}
           </Row>
           <div className="form-buttons text-right mt-2">
-
-            <Button type="default" htmlType="submit" className='me-2'>
+            <Button type="default" htmlType="submit" className="me-2">
               Cancel Event
             </Button>
             <Button type="primary" htmlType="submit">
               Add Event
             </Button>
           </div>
-
         </Form>
       )}
     </Formik>
@@ -293,6 +329,3 @@ const AddEventSetUp = ({ onSuccess }) => {
 };
 
 export default AddEventSetUp;
-
-
-

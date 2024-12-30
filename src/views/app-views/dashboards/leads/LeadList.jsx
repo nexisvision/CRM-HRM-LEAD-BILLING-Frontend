@@ -83,8 +83,6 @@ const LeadList = () => {
 
   const tabledata = useSelector((state) => state.Leads);
 
-  console.log("dvfnkjdvn", tabledata);
-
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     const searchArray = value ? list : OrderListData;

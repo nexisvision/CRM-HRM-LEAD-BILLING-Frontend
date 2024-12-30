@@ -1,50 +1,68 @@
-import React, { useState } from 'react';
-import { Input, Button, DatePicker, Select, message, Row, Col ,Checkbox} from 'antd';
-import { useNavigate } from 'react-router-dom';
-import 'react-quill/dist/quill.snow.css';
-import ReactQuill from 'react-quill';
-import utils from 'utils';
-import OrderListData from "assets/data/order-list.data.json"
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+import React, { useState } from "react";
+import {
+  Input,
+  Button,
+  DatePicker,
+  Select,
+  message,
+  Row,
+  Col,
+  Checkbox,
+} from "antd";
+import { useNavigate } from "react-router-dom";
+import "react-quill/dist/quill.snow.css";
+import ReactQuill from "react-quill";
+import utils from "utils";
+import OrderListData from "assets/data/order-list.data.json";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import { AddCon } from "./ContractReducers/ContractSlice";
 
 const { Option } = Select;
 // const CheckboxGroup = Checkbox.Group;
 const AddContract = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const initialValues = {
-    subject: '',
-    client: '',
-    Projects: '',
-    contracttype: '',
+    subject: "",
+    client: "",
+    Projects: "",
+    contracttype: "",
     startdate: null,
     enddate: null,
-    contractvalue: '',
-    description: '',
+    contractvalue: "",
+    description: "",
     // options: [],
   };
 
   const validationSchema = Yup.object({
-    subject: Yup.string().required('Please enter a Subject Name.'),
-    client: Yup.string().required('Please select Client.'),
-    projects: Yup.mixed().required('Please select Projects.'),
-    contracttype: Yup.number().required('Please enter Contract Value .'),
-    startdate: Yup.date().nullable().required('Start date is required.'),
-    enddate: Yup.date().nullable().required('End date is required.'),
-    contractvalue: Yup.number().required('Please Select a contractvalue.').positive('Contract Value must be positive.'),
-    description: Yup.string().required('Please enter a Description.'),
+    subject: Yup.string().optional("Please enter a Subject Name."),
+    client: Yup.string().optional("Please select Client."),
+    projects: Yup.mixed().optional("Please select Projects."),
+    contracttype: Yup.string().optional("Please enter Contract Value ."),
+    startdate: Yup.date().nullable().optional("Start date is required."),
+    enddate: Yup.date().nullable().optional("End date is required."),
+    contractvalue: Yup.number()
+      .optional("Please Select a contractvalue.")
+      .positive("Contract Value must be positive."),
+    description: Yup.string().optional("Please enter a Description."),
     // options: Yup.array().min(1, 'Please select at least one option.'),
-    
   });
 
-
   const onSubmit = (values) => {
-    console.log('Submitted values:', values);
-    message.success('Project added successfully!');
-    navigate('/app/apps/project');
+    dispatch(AddCon(values));
+    console.log("Submitted values:", values);
+    message.success("Project added successfully!");
   };
   // console.log("object",Option)
+
+  const Clientdata = useSelector((state) => state.SubClient);
+  const filtersubclient = Clientdata.SubClient.data;
+
+  const Projectdtaa = useSelector((state) => state.Project);
+  const filterprojectdata = Projectdtaa.Project.data;
 
   return (
     <div className="add-job-form">
@@ -53,29 +71,38 @@ const AddContract = () => {
         validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
-        {({ values, setFieldValue, handleSubmit, handleChange, }) => (
+        {({ values, setFieldValue, handleSubmit, handleChange }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
             <h2 className="mb-4 border-b pb-2 font-medium"></h2>
 
             <Row gutter={16}>
               <Col span={24}>
                 <div className="form-item">
-                  <label className='font-semibold'>Subject</label>
-                  <Field name="subject" as={Input} placeholder="Enter Subject Name" rules={[{ required: true }]} />
-                  <ErrorMessage name="subject" component="div" className="error-message text-red-500 my-1" />
+                  <label className="font-semibold">Subject</label>
+                  <Field
+                    name="subject"
+                    as={Input}
+                    placeholder="Enter Subject Name"
+                    rules={[{ required: true }]}
+                  />
+                  <ErrorMessage
+                    name="subject"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 
-              <Col span={12} className='mt-4'>
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className='font-semibold'>Client</label>
+                  <label className="font-semibold">Client</label>
                   <Field name="client">
                     {({ field }) => (
                       <Select
                         {...field}
                         className="w-full"
                         placeholder="Select Client"
-                        onChange={(value) => setFieldValue('client', value)}
+                        onChange={(value) => setFieldValue("client", value)}
                         value={values.client}
                       >
                         <Option value="xyz">XYZ</Option>
@@ -84,20 +111,24 @@ const AddContract = () => {
                     )}
                   </Field>
 
-                  <ErrorMessage name="client" component="div" className="error-message text-red-500 my-1" />
+                  <ErrorMessage
+                    name="client"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 
-              <Col span={12} className='mt-4'>
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className='font-semibold'>Projects</label>
+                  <label className="font-semibold">Projects</label>
                   <Field name="projects">
                     {({ field }) => (
                       <Select
                         {...field}
                         className="w-full"
                         placeholder="Select Projects"
-                        onChange={(value) => setFieldValue('projects', value)}
+                        onChange={(value) => setFieldValue("projects", value)}
                         value={values.projects}
                       >
                         <Option value="Projects1">Projects1</Option>
@@ -105,20 +136,26 @@ const AddContract = () => {
                       </Select>
                     )}
                   </Field>
-                  <ErrorMessage name="client" component="div" className="error-message text-red-500 my-1" />
+                  <ErrorMessage
+                    name="client"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 
-              <Col span={12} className='mt-4'>
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className='font-semibold'>Contract Type</label>
+                  <label className="font-semibold">Contract Type</label>
                   <Field name="contracttype">
                     {({ field }) => (
                       <Select
                         {...field}
                         className="w-full"
                         placeholder="Select Contract Type"
-                        onChange={(value) => setFieldValue('contracttype', value)}
+                        onChange={(value) =>
+                          setFieldValue("contracttype", value)
+                        }
                         value={values.contracttype}
                       >
                         <Option value="Marketing">Marketing</Option>
@@ -126,41 +163,62 @@ const AddContract = () => {
                       </Select>
                     )}
                   </Field>
-                  <ErrorMessage name="contracttype" component="div" className="error-message text-red-500 my-1" />
+                  <ErrorMessage
+                    name="contracttype"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 
-              <Col span={12} className='mt-4'>
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className='font-semibold'>Contract Value</label>
-                  <Field name="contractValue" as={Input} placeholder="Enter Contract Value " type='number' />
-                  <ErrorMessage name="contractValue" component="div" className="error-message text-red-500 my-1" />
+                  <label className="font-semibold">Contract Value</label>
+                  <Field
+                    name="contractValue"
+                    as={Input}
+                    placeholder="Enter Contract Value "
+                    type="number"
+                  />
+                  <ErrorMessage
+                    name="contractValue"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 
-              <Col span={12} className='mt-4'>
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className='font-semibold'>Start Date</label>
+                  <label className="font-semibold">Start Date</label>
                   <DatePicker
                     className="w-full"
                     format="DD-MM-YYYY"
                     value={values.startdate}
-                    onChange={(date) => setFieldValue('startdate', date)}
+                    onChange={(date) => setFieldValue("startdate", date)}
                   />
-                  <ErrorMessage name="startdate" component="div" className="error-message text-red-500 my-1" />
+                  <ErrorMessage
+                    name="startdate"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 
-              <Col span={12} className='mt-4'>
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className='font-semibold'>End Date</label>
+                  <label className="font-semibold">End Date</label>
                   <DatePicker
                     className="w-full"
                     format="DD-MM-YYYY"
                     value={values.enddate}
-                    onChange={(date) => setFieldValue('enddate', date)}
+                    onChange={(date) => setFieldValue("enddate", date)}
                   />
-                  <ErrorMessage name="enddate" component="div" className="error-message text-red-500 my-1" />
+                  <ErrorMessage
+                    name="enddate"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 
@@ -172,15 +230,19 @@ const AddContract = () => {
                 </div>
               </Col> */}
 
-              <Col span={24} className='mt-4'>
+              <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className='font-semibold'>Description</label>
+                  <label className="font-semibold">Description</label>
                   <ReactQuill
-                    value={values.jobDescription}
-                    onChange={(value) => setFieldValue('description', value)}
+                    value={values.description}
+                    onChange={(value) => setFieldValue("description", value)}
                     placeholder="Enter description"
                   />
-                  <ErrorMessage name="description" component="div" className="error-message text-red-500 my-1" />
+                  <ErrorMessage
+                    name="description"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 
@@ -209,12 +271,19 @@ const AddContract = () => {
                   <ErrorMessage name="options" component="div" className="error-message text-red-500 my-1" />
                 </div>
               </Col> */}
-
             </Row>
 
             <div className="form-buttons text-right mt-4">
-              <Button type="default" className="mr-2" onClick={() => navigate('/app/apps/project')}>Cancel</Button>
-              <Button type="primary" htmlType="submit">Create</Button>
+              <Button
+                type="default"
+                className="mr-2"
+                onClick={() => navigate("/app/apps/project")}
+              >
+                Cancel
+              </Button>
+              <Button type="primary" htmlType="submit">
+                Create
+              </Button>
             </div>
           </Form>
         )}
@@ -338,6 +407,3 @@ export default AddContract;
 // };
 
 // export default AddContract;
-
-
-

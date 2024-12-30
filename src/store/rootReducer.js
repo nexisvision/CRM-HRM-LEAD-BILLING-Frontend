@@ -16,6 +16,9 @@ import TaskCalander from "../views/app-views/dashboards/taskcalendar/TaskCalenda
 import Tags from "../views/app-views/dashboards/project/project-list/tagReducer/TagSlice"
 import Leads from "../views/app-views/dashboards/leads/LeadReducers/LeadSlice"
 import EventSetup from "../views/app-views/hrm/EventSetup/EventSetupService/EventSetupSlice"
+import Deals from "../views/app-views/dashboards/deals/DealReducers/DealSlice"
+import SubClient from "../views/app-views/Users/client-list/CompanyReducers/CompanySlice"
+import Contract from "../views/app-views/dashboards/contract/ContractReducers/ContractSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -36,6 +39,9 @@ const rootReducer = (asyncReducers) => (state, action) => {
         Tags,
         Leads,
         EventSetup,
+        Deals,
+        SubClient,
+        Contract,
         // employee,
         // department,
         ...asyncReducers,

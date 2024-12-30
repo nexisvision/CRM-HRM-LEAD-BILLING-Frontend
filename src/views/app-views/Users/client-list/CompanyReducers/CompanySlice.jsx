@@ -94,9 +94,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "ClientData",
+  name: "SubClient",
   initialState: {
-    ClientData: [],
+    SubClient: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -150,7 +150,7 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(ClientData.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.ClientData = action?.payload;
+        state.SubClient = action?.payload;
         toast.success(action.payload?.data?.message);
       })
       .addCase(ClientData.rejected, (state, action) => {
