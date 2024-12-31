@@ -7,6 +7,7 @@ import ProjectListData from './ProjectListData';
 import AddProject from './AddProject';
 import EditProject from './EditProject';
 import utils from 'utils';
+import { useNavigate,useParams } from 'react-router-dom';
 import PageHeaderAlt from 'components/layout-components/PageHeaderAlt';
 import Flex from 'components/shared-components/Flex';
 import { empdata } from 'views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice';
@@ -33,6 +34,13 @@ const ProjectList = () => {
 	const Allclientdata = useSelector((state) => state.ClientData);
 
 	const dataclient = Allclientdata.ClientData.data;
+
+	const navigate = useNavigate();
+	const { projectId } = useParams();
+
+	const handleProjectClick = () => {
+        navigate(`/app/dashboards/project/view/${projectId}`);
+    };
 
 	
 	  useEffect(() => {
@@ -127,17 +135,31 @@ const ProjectList = () => {
 	);
 
 	const tableColumns = [
+		// {
+		// 	title: 'Project',
+		// 	dataIndex: 'name',
+		// 	key: 'name',
+		// 	render: (name, record) => (
+		// 		<div>
+		// 			<h4 className="mb-0">{name}</h4>
+		// 			<span className="text-muted">{record.category}</span>
+		// 		</div>
+		// 	),
+		// },
 		{
-			title: 'Project',
-			dataIndex: 'name',
-			key: 'name',
-			render: (name, record) => (
-				<div>
-					<h4 className="mb-0">{name}</h4>
-					<span className="text-muted">{record.category}</span>
-				</div>
-			),
-		},
+            title: 'Project',
+            dataIndex: 'name',
+            key: 'name',
+            render: (name, record) => (
+                <div 
+                    onClick={() => handleProjectClick(record.id)}
+                    className="cursor-pointer hover:text-blue-600"
+                >
+                    <h4 className="mb-0">{name}</h4>
+                    <span className="text-muted">{record.category}</span>
+                </div>
+            ),
+        },
 		{
 			title: 'Budget',
 			dataIndex: 'totalTask',
@@ -257,7 +279,7 @@ const ProjectList = () => {
 
 							return (
 								<Col xs={24} sm={24} lg={8} xl={8} xxl={6} key={item.id}>
-									<Card>
+									<Card  onClick={() => handleProjectClick(item.id)}>
 										<div className='flex items-center justify-between'>
 											<div className=''>
 												<p className='font-medium'>{item.name}</p>

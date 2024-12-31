@@ -32,6 +32,7 @@ import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddContract from "./AddContract";
 import ViewContract from "./ViewContract";
 import EditContract from "./EditContract";
+import { useNavigate } from "react-router-dom";
 import userData from "../../../../assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
 import { IoCopyOutline } from "react-icons/io5";
@@ -48,6 +49,7 @@ const ContractList = () => {
     useState(false);
   const [isEditContractModalVisible, setIsEditContractModalVisible] =
     useState(false);
+    const navigate = useNavigate();
   //   const [dealStatisticData] = useState(DealStatisticData);
   // Open Add Job Modal
   const openAddContractModal = () => {
@@ -57,9 +59,15 @@ const ContractList = () => {
   const closeAddContractModal = () => {
     setIsAddContractModalVisible(false);
   };
+
   const openViewContractModal = () => {
-    setIsViewContractModalVisible(true);
+    navigate("/app/dashboards/project/contract/viewContract", {
+      state: { user: selectedUser },
+    }); // Pass user data as state if needed
   };
+  // const openViewContractModal = () => {
+  //   setIsViewContractModalVisible(true);
+  // };
   // Close Add Job Modal
   const closeViewContractModal = () => {
     setIsViewContractModalVisible(false);

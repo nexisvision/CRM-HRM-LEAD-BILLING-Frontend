@@ -159,7 +159,7 @@ const handleCancel = () => {
             <Button
               type="default"
               className="mr-2"
-              onClick={navigate("/app/superadmin/countries")}
+              onClick={navigate("/app/setting/countries")}
             >
               Cancel
             </Button>

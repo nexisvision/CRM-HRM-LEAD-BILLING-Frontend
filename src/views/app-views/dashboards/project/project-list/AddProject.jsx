@@ -267,7 +267,6 @@ const AddProject = ({ onClose }) => {
                   <label className="font-semibold">Client</label>
                   <Select
                     style={{ width: "100%" }}
-                    mode='multiple'
                     placeholder="Select Client"
                     loading={!clientdata}
                     value={values.client} // Bind value to Formik's field
@@ -301,7 +300,6 @@ const AddProject = ({ onClose }) => {
                   <label className="font-semibold">User</label>
                   <Select
                     style={{ width: "100%" }}
-                      mode='multiple'
                     placeholder="Select User"
                     loading={!employeedata}
                     value={values.user} // Bind value to Formik's field
@@ -405,7 +403,6 @@ const AddProject = ({ onClose }) => {
                         <Select
                           {...field}
                           className="w-full"
-                          mode='multiple'
                           placeholder="Select or add new tag"
                           onChange={(value) => form.setFieldValue("tag", value)}
                           onBlur={() => form.setFieldTouched("tag", true)}
@@ -456,14 +453,15 @@ const AddProject = ({ onClose }) => {
                       <Select
                         {...field}
                         className="w-full"
-                        mode='multiple'
                         placeholder="Select Status"
                         onChange={(value) => setFieldValue("status", value)}
                         value={values.status}
                         onBlur={() => setFieldTouched("status", true)}
                       >
-                        <Option value="active">Active</Option>
-                        <Option value="inactive">Inactive</Option>
+                        <Option value="pending">pending</Option>
+                        <Option value="in_progress">in_progress</Option>
+                        <Option value="completed">completed</Option>
+                        <Option value="onhold">On Hold</Option>
                       </Select>
                     )}
                   </Field>
