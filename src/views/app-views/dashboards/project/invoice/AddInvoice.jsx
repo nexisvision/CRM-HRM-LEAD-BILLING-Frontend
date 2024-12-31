@@ -76,7 +76,7 @@ const AddInvoice = () => {
         duedate: null,
         currency: '',
         exchangerate: '',
-        refnumber: '',
+        client: '',
     };
 
     const validationSchema = Yup.object({
@@ -85,7 +85,7 @@ const AddInvoice = () => {
         duedate: Yup.date().nullable().required('Due Date is required.'),
         currency: Yup.string().required('Please select currency.'),
         exchangerate: Yup.string().required('Please enter exchange rate.'),
-        refnumber: Yup.string().required('Please enter a ref number.'),
+        client: Yup.string().required('Please enter client name.'),
     });
 
 
@@ -182,28 +182,28 @@ const AddInvoice = () => {
                                                         <ErrorMessage name="exchangerate" component="div" className="error-message text-red-500 my-1" />
                                                     </div>
                                                 </Col>
-
-                                                {/* <Col span={8} className='mt-2'>
+                                                <Col span={8} className='mt-2'>
                                                     <div className="form-item">
-                                                        <label className='font-semibold'>Category</label>
-                                                        <Field name="category">
-                                                            {({ field }) => (
-                                                                <Select
-                                                                    {...field}
-                                                                    className="w-full"
-                                                                    placeholder="Select Category"
-                                                                    onChange={(value) => setFieldValue('category', value)}
-                                                                    value={values.category}
-                                                                    onBlur={() => setFieldTouched("category", true)}
-                                                                >
-                                                                    <Option value="xyz">XYZ</Option>
-                                                                    <Option value="abc">ABC</Option>
-                                                                </Select>
-                                                            )}
-                                                        </Field>
-                                                        <ErrorMessage name="category" component="div" className="error-message text-red-500 my-1" />
+                                                        <label className='font-semibold mb-2'>Client</label>
+                                                        <Field name="client" as={Input} placeholder="Enter Client Name" />
+                                                        <ErrorMessage name="client" component="div" className="error-message text-red-500 my-1" />
                                                     </div>
-                                                </Col> */}
+                                                </Col>
+                                                <Col span={8} className='mt-2'>
+                                                    <div className="form-item">
+                                                        <label className='font-semibold mb-2'>Project</label>
+                                                        <Field name="project" as={Input} placeholder="Website Copier Project" />
+                                                        <ErrorMessage name="project" component="div" className="error-message text-red-500 my-1" />
+                                                    </div>
+                                                </Col>
+                                                <Col span={8} className='mt-2'>
+                                                    <div className="form-item">
+                                                        <label className='font-semibold mb-2'>Client</label>
+                                                        <Field name="client" as={Input} placeholder="Enter Client Name" />
+                                                        <ErrorMessage name="client" component="div" className="error-message text-red-500 my-1" />
+                                                    </div>
+                                                </Col>
+                                              
                                             </Row>
                                         </Form>
                                     )}

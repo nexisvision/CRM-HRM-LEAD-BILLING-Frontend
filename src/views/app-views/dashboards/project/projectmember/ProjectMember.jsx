@@ -21,29 +21,11 @@ import Flex from 'components/shared-components/Flex'
 import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils'
+import AddProjectMember from './AddProjectMember'
+
 const { Column } = Table;
 const { Option } = Select
-// const getPaymentStatus = status => {
-//  if (status === 'Paid') {
-//      return 'success'
-//  }
-//  if (status === 'Pending') {
-//      return 'warning'
-//  }
-//  if (status === 'Expired') {
-//      return 'error'
-//  }
-//  return ''
-// }
-// const getShippingStatus = status => {
-//  if (status === 'Ready') {
-//      return 'blue'
-//  }
-//  if (status === 'Shipped') {
-//      return 'cyan'
-//  }
-//  return ''
-// }
+
 const paymentStatusList = ['Paid', 'Pending', 'Expired']
 export const ProjectMember = () => {
     const [annualStatisticData] = useState(AnnualStatisticData);
@@ -247,7 +229,7 @@ export const ProjectMember = () => {
                     // }}
                     />
                 </div>
-                {/* <Modal
+                 <Modal
                     title="Project Member Create"
                     visible={isAddProjectMemberModalVisible}
                     onCancel={closeAddProjectMemberModal}
@@ -255,9 +237,9 @@ export const ProjectMember = () => {
                     width={1000}
                     className='mt-[-70px]'
                 >
-                <AddProjectMember onClose={closeAddProjectMemberModal} />
-                </Modal>
-                <Modal
+                <AddProjectMember  onClose={closeAddProjectMemberModal} />
+                </Modal> 
+              {/*  <Modal
                     title="Edit Project Member"
                     visible={isEditProjectMemberModalVisible}
                     onCancel={closeEditProjectMemberModal}
