@@ -20,10 +20,11 @@ import Flex from 'components/shared-components/Flex'
 // import NumberFormat from 'react-number-format';
 import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
-import utils from 'utils'
-import AddInvoice from './AddInvoice';
-import EditInvoice from './EditInvoice';
-import ViewInvoice from './ViewInvoice';
+import utils from 'utils';
+import AddInvoice from "./AddInvoice"
+// import AddInvoice from './AddInvoice';
+// import EditInvoice from './EditInvoice';
+// import ViewInvoice from './ViewInvoice';
 
 
 
@@ -38,11 +39,23 @@ const getPaymentStatus = status => {
 	if (status === 'Pending') {
 		return 'warning'
 	}
+	if (status === 'Expired') {
+		return 'error'
+	}
 	return ''
 }
 
+const getShippingStatus = status => {
+	if (status === 'Ready') {
+		return 'blue'
+	}
+	if (status === 'Shipped') {
+		return 'cyan'
+	}
+	return ''
+}
 
-const paymentStatusList = ['paid','pending']
+const paymentStatusList = ['Paid', 'Pending', 'Expired']
 
 export const InvoiceList = () => {
 
@@ -108,23 +121,10 @@ export const InvoiceList = () => {
 				</Flex>
 			</Menu.Item>
 			<Menu.Item>
-				<Flex alignItems="center">
-					<PlusCircleOutlined />
-					<span className="ml-2">Add to remark</span>
-				</Flex>
-			</Menu.Item>
-
-			<Menu.Item>
 				<Flex alignItems="center" onClick={openEditInvoiceModal}>
 					<EditOutlined />
 					{/* <EditOutlined /> */}
 					<span className="ml-2">Edit</span>
-				</Flex>
-			</Menu.Item>
-			<Menu.Item>
-				<Flex alignItems="center">
-					<TiPinOutline />
-					<span className="ml-2">Pin</span>
 				</Flex>
 			</Menu.Item>
 			<Menu.Item>
@@ -141,36 +141,34 @@ export const InvoiceList = () => {
 			title: 'Invoice',
 			dataIndex: 'id'
 		},
+        {
+            title: 'Project',
+            dataIndex: 'project',
+            sorter: {
+                compare: (a, b) => a.project.length - b.project.length,
+            },
+        },
+        {
+            title: 'Client',
+            dataIndex: 'client',
+            sorter: {
+                compare: (a, b) => a.client.length - b.client.length,
+            },
+        },
+        {
+            title: 'Total',
+            dataIndex: 'total',
+            sorter: {
+                compare: (a, b) => a.total.length - b.total.length,
+            },
+        },
 		{
-			title: 'Issue  Date',
-			dataIndex: 'issuedate',
+			title: 'Invoice Date',
+			dataIndex: 'invoiceDate',
 			render: (_, record) => (
-				<span>{dayjs.unix(record.date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
+				<span>{dayjs.unix(record.invoiceDate).format(DATE_FORMAT_DD_MM_YYYY)}</span>
 			),
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'issuedate')
-		},
-		{
-			title: 'Due Date',
-			dataIndex: 'duedate',
-			render: (_, record) => (
-				<span>{dayjs.unix(record.date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
-			),
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'duedate')
-		},
-		{
-			title: 'Due Amount',
-			dataIndex: 'dueamount',
-			render: (_, record) => (
-				<span className="font-weight-semibold">
-					<NumberFormat
-						displayType={'text'}
-						value={(Math.round(record.amount * 100) / 100).toFixed(2)}
-						prefix={'$'}
-						thousandSeparator={true}
-					/>
-				</span>
-			),
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'dueamount')
+			sorter: (a, b) => utils.antdTableSorter(a, b, 'invoiceDate')
 		},
 		{
 			title: 'status',
@@ -210,38 +208,13 @@ export const InvoiceList = () => {
 		setSelectedRowKeys([])
 	}
 
-	// total() {
-	// 	let total = 0;
-	// 	invoiceData.forEach((elm) => {
-	// 		total += elm.price;
-	// 	})
-	// 	return total
-	// }
-
-	// render() {
 
 
 	return (
 		<div className="container">
 
-
-			<Row gutter={16}>
-				{
-					annualStatisticData.map((elm, i) => (
-						<Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-
-							<StatisticWidget
-								title={elm.title}
-								value={elm.value}
-								status={elm.status}
-								subtitle={elm.subtitle}
-							/>
-						</Col>
-					))
-				}
-			</Row>
-			<Card>
-				<Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
+            <div>
+            <Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
 					<Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
 						<div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
 							<Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)} />
@@ -258,17 +231,23 @@ export const InvoiceList = () => {
 								{paymentStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
 							</Select>
 						</div>
-					</Flex>
-					<Flex gap="7px" className="flex">
-						<Button type="primary" className="flex items-center" onClick={openAddInvoiceModal}>
+                        <div className='flex gap-4'>
+                        <Button type="primary" className="flex items-center" onClick={openAddInvoiceModal}>
 							<PlusOutlined />
-							<span className="ml-2">New</span>
+							<span className="ml-2">Create Invoice</span>
 						</Button>
 						<Button type="primary" icon={<FileExcelOutlined />} block>
 							Export All
 						</Button>
+                        </div>
+					</Flex>
+					<Flex gap="7px" className="flex">
+						
 					</Flex>
 				</Flex>
+            </div>
+			<Card>
+				
 				<div className="table-responsive">
 					<Table
 						columns={tableColumns}
@@ -294,7 +273,7 @@ export const InvoiceList = () => {
 				>
 					<AddInvoice onClose={closeAddInvoiceModal} />
 				</Modal>
-				<Modal
+				{/* <Modal
 					title="Edit Invoice"
 					visible={isEditInvoiceModalVisible}
 					onCancel={closeEditInvoiceModal}
@@ -303,8 +282,8 @@ export const InvoiceList = () => {
 					className='mt-[-70px]'
 				>
 					<EditInvoice onClose={closeEditInvoiceModal} />
-				</Modal>
-				<Modal
+				</Modal> */}
+				{/* <Modal
 					title="Invoice"
 					visible={isViewInvoiceModalVisible}
 					onCancel={closeViewInvoiceModal}
@@ -313,7 +292,7 @@ export const InvoiceList = () => {
 					className='mt-[-70px]'
 				>
 					<ViewInvoice onClose={closeViewInvoiceModal} />
-				</Modal>
+				</Modal> */}
 			</Card>
 		</div>
 	);

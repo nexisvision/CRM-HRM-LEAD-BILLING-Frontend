@@ -108,8 +108,8 @@ const OverViewList = () => {
                                 />
                                 {/* Scale markers */}
                                 <div className="relative mt-2">
-                                    <span className="absolute left-2 text-xs text-gray-500">0</span>
-                                    <span className="absolute right-2 text-xs text-gray-500">100</span>
+                                    <span className="absolute left-0 bottom-[50px] text-xs text-gray-500">0</span>
+                                    <span className="absolute right-0 bottom-[50px] text-xs text-gray-500">100</span>
                                 </div>
                             </div>
 

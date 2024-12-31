@@ -36,10 +36,9 @@ const ProjectList = () => {
 	const dataclient = Allclientdata.ClientData.data;
 
 	const navigate = useNavigate();
-	const { projectId } = useParams();
 
-	const handleProjectClick = () => {
-        navigate(`/app/dashboards/project/view/${projectId}`);
+	const handleProjectClick = (id) => {
+        navigate(`/app/dashboards/project/view/${id}`);
     };
 
 	
@@ -279,10 +278,12 @@ const ProjectList = () => {
 
 							return (
 								<Col xs={24} sm={24} lg={8} xl={8} xxl={6} key={item.id}>
-									<Card  onClick={() => handleProjectClick(item.id)}>
+									<Card>
 										<div className='flex items-center justify-between'>
-											<div className=''>
+											<div className='' onClick={() => handleProjectClick(item.id)}>
 												<p className='font-medium'>{item.name}</p>
+											</div>
+											<div>
 												<p>{item.category}</p>
 											</div>
 											<div className="flex items-center gap-2">

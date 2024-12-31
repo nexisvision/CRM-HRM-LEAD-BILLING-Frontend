@@ -11,9 +11,9 @@ import NumberFormat from 'react-number-format';
 import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils'
-import AddPayment from "./AddPayment"
-import EditPayment from './EditPayment';
-import ViewPayment from './ViewPayment';
+// import AddPayment from "./AddPayment"
+// import EditPayment from './EditPayment';
+// import ViewPayment from './ViewPayment';
 import { PaymentStatisticData } from '../../../dashboards/default/DefaultDashboardData';
 
 // import { PaymentStatisticData } from '../../../dashboards/default/DefaultDashboardData';
@@ -75,7 +75,7 @@ const PaymentList = () => {
 
 	const handleShowStatus = value => {
 		if (value !== 'All') {
-			const key = 'method'
+			const key = 'status'
 			const data = utils.filterArray(OrderListData, key, value)
 			setList(data)
 		} else {
@@ -93,13 +93,6 @@ const PaymentList = () => {
 			</Menu.Item>
 			<Menu.Item>
 				<Flex alignItems="center">
-					<PlusCircleOutlined />
-					<span className="ml-2">Add to remark</span>
-				</Flex>
-			</Menu.Item>
-
-			<Menu.Item>
-				<Flex alignItems="center">
 					<Button
 						type=""
 						className=""
@@ -109,12 +102,6 @@ const PaymentList = () => {
 					>
 						<span className="">Edit</span>
 					</Button>
-				</Flex>
-			</Menu.Item>
-			<Menu.Item>
-				<Flex alignItems="center">
-					<TiPinOutline />
-					<span className="ml-2">Pin</span>
 				</Flex>
 			</Menu.Item>
 			<Menu.Item>
@@ -131,41 +118,63 @@ const PaymentList = () => {
 			title: 'ID',
 			dataIndex: 'id'
 		},
-		{
-			title: 'Date',
-			dataIndex: 'date',
-			render: (_, record) => (
-				<span>{dayjs.unix(record.date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
-			),
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'date')
-		},
-		{
-			title: 'Invoice',
-			dataIndex: 'invoice'
-		},
-		{
-			title: 'Amount',
-			dataIndex: 'amount',
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'amount')
-		},
-		{
-			title: 'Client',
-			dataIndex: 'client',
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'client')
-		},
-		{
+        {
 			title: 'Project',
 			dataIndex: 'project',
 			sorter: (a, b) => utils.antdTableSorter(a, b, 'project')
 		},
 		{
-			title: 'Method',
-			dataIndex: 'method',
+            title: 'Invoice',
+			dataIndex: 'invoice',
+			sorter: (a, b) => utils.antdTableSorter(a, b, 'invoice')
+		},
+        
+		{
+			title: 'Client',
+			dataIndex: 'client',
+			sorter: (a, b) => utils.antdTableSorter(a, b, 'client')
+		},
+        {
+			title: 'Order',
+			dataIndex: 'order',
+			sorter: (a, b) => utils.antdTableSorter(a, b, 'order')
+		},
+		{
+			title: 'Amount',
+			dataIndex: 'amount',
 			render: (_, record) => (
-					<><Tag color={getPaymentStatus(record.method)}>{record.method}</Tag></>
+				<span className="font-weight-semibold">
+					<NumberFormat
+						displayType={'text'}
+						value={(Math.round(record.amount * 100) / 100).toFixed(2)}
+						prefix={'$'}
+						thousandSeparator={true}
+					/>
+				</span>
+			),
+			sorter: (a, b) => utils.antdTableSorter(a, b, 'amount')
+		},
+        {
+            title: 'Paid On',
+            dataIndex: 'paidOn',
+            render: (_, record) => (
+                <span>{dayjs.unix(record.paidOn).format(DATE_FORMAT_DD_MM_YYYY)}</span>
+            ),
+            sorter: (a, b) => utils.antdTableSorter(a, b, 'paidOn')
+        },
+        {
+			title: 'Payment Gateway',
+			dataIndex: 'paymentGateway',
+			sorter: (a, b) => utils.antdTableSorter(a, b, 'paymentGateway')
+		},
+        {
+			title: 'Status',
+			dataIndex: 'status',
+			render: (_, record) => (
+					<><Tag color={getPaymentStatus(record.status)}>{record.status}</Tag></>
 				  ),
 			sorter: {
-				compare: (a, b) => a.method.length - b.method.length,
+				compare: (a, b) => a.status.length - b.status.length,
 			},
 		},
 		{
@@ -196,17 +205,6 @@ const PaymentList = () => {
 
 	return (
 		<>
-			<Card>
-				<Row gutter={16}>
-					{paymentStatisticData.map((elm, i) => (
-						<Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-							<StatisticWidget
-								value={elm.value}
-								subtitle={elm.subtitle}
-							/>
-						</Col>
-					))}
-				</Row>
 				<Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
 					<Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
 						<div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
@@ -235,6 +233,7 @@ const PaymentList = () => {
 						</Button>
 					</Flex>
 				</Flex>
+			<Card>
 				<div className="table-responsive">
 					<Table
 						columns={tableColumns}
@@ -251,7 +250,7 @@ const PaymentList = () => {
 				</div>
 			</Card>
 			<Card>
-				<Modal
+				{/* <Modal
 					title="Add Payment"
 					visible={isAddPaymentModalVisible}
 					onCancel={closeAddPaymentModal}
@@ -261,9 +260,9 @@ const PaymentList = () => {
 
 				>
 					<AddPayment onClose={closeAddPaymentModal} />
-				</Modal>
+				</Modal> */}
 
-				<Modal
+				{/* <Modal
 					title="Edit Payment"
 					visible={isEditPaymentModalVisible}
 					onCancel={closeEditPaymentModal}
@@ -273,9 +272,9 @@ const PaymentList = () => {
 
 				>
 					<EditPayment onClose={closeEditPaymentModal} />
-				</Modal>
+				</Modal> */}
 
-				<Modal
+				{/* <Modal
 					title="Payment"
 					visible={isViewPaymentModalVisible}
 					onCancel={closeViewPaymentModal}
@@ -284,7 +283,7 @@ const PaymentList = () => {
 					className='mt-[-70px]'
 				>
 					<ViewPayment onClose={closeViewPaymentModal} />
-				</Modal>
+				</Modal> */}
 			</Card>
 		</>
 	)
