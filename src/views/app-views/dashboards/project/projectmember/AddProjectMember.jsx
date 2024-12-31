@@ -12,10 +12,10 @@ const AddProjectMember = () => {
     const [showReceiptUpload, setShowReceiptUpload] = useState(false);
     // const [uploadModalVisible, setUploadModalVisible] = useState(false);
     const initialValues = {
-       AddProjectMember :''
+        AddProjectMember: ''
     };
     const validationSchema = Yup.object({
-     AddProjectMember :Yup.string().required('Please enter AddProjectMember name.')
+        AddProjectMember: Yup.string().required('Please enter AddProjectMember name.')
     });
     const onSubmit = (values, { resetForm }) => {
         console.log('Submitted values:', values);
@@ -31,45 +31,31 @@ const AddProjectMember = () => {
                 validationSchema={validationSchema}
                 onSubmit={onSubmit}
             >
-                {({ values, setFieldValue, handleSubmit,setFieldTouched }) => (
+                {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
                     <Form className="formik-form" onSubmit={handleSubmit}>
                         <Row gutter={16}>
-                        <Col span={24} className='mt-2'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold text-[12] text-dark-gray-500 '>AddProjectMember</label>
-                                                        <Field name="AddProjectMember">
-                                                            {({ field }) => (
-                                                                <Select
-                                                                    {...field}
-                                                                    className="w-full mt-2"
-                                                                    mode="multiple"
-                                                                    placeholder="Select AddProjectMember"
-                                                                    onChange={(value) => setFieldValue('AddProjectMember', value)}
-                                                                    value={values.AddProjectMember}
-                                                                    onBlur={() => setFieldTouched("AddProjectMember", true)}
-                                                                >
-                                                                    <Option value="xyz">XYZ</Option>
-                                                                    <Option value="abc">ABC</Option>
-                                                                </Select>
-                                                            )}
-                                                        </Field>
-                                                        <ErrorMessage name="AddProjectMember" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
-                                                </Col>
-                            {showReceiptUpload && (
-                                <Col span={12} className='mt-4'>
-                                     <Upload beforeUpload={() => false}>
-                                <Button icon={<UploadOutlined />}>Upload Receipt</Button>
-                            </Upload>
-                                    {/* <Button
-                                        type="dashed"
-                                        icon={<UploadOutlined />}
-                                        onClick={() => setShowReceiptUpload(false)}
-                                    >
-                                        Upload Receipt
-                                    </Button> */}
-                                </Col>
-                            )}
+                            <Col span={24} className='mt-2'>
+                                <div className="form-item">
+                                    <label className='font-semibold text-[12] text-dark-gray-500 '>AddProjectMember</label>
+                                    <Field name="AddProjectMember">
+                                        {({ field }) => (
+                                            <Select
+                                                {...field}
+                                                className="w-full mt-2"
+                                                mode="multiple"
+                                                placeholder="Select AddProjectMember"
+                                                onChange={(value) => setFieldValue('AddProjectMember', value)}
+                                                value={values.AddProjectMember}
+                                                onBlur={() => setFieldTouched("AddProjectMember", true)}
+                                            >
+                                                <Option value="xyz">XYZ</Option>
+                                                <Option value="abc">ABC</Option>
+                                            </Select>
+                                        )}
+                                    </Field>
+                                    <ErrorMessage name="AddProjectMember" component="div" className="error-message text-red-500 my-1" />
+                                </div>
+                            </Col>
                         </Row>
                         <div className="form-buttons text-right mt-4">
                             <Button type="default" className="mr-2" onClick={() => navigate('/apps/sales/expenses')}>Cancel</Button>
