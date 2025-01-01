@@ -176,7 +176,7 @@ export const MilestoneList = () => {
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                     </select>
-                    {/* <><Tag color={getMilestoneStatus(record.milestoneStatus)}>{record.milestoneStatus}</Tag></> */}
+
                 </>
             ),
             sorter: (a, b) => utils.antdTableSorter(a, b, 'milestoneStatus')

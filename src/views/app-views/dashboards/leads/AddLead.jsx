@@ -132,9 +132,9 @@ const AddLead = ({ onClose }) => {
   };
 
   const LeadValueField = () => (
-    <Col span={12} className="mt-2">
+    <Col span={12} className="">
       <div className="form-item">
-        <label className="font-semibold">Lead Value</label>
+        {/* <label className="font-semibold">Lead Value</label> */}
         <div className="flex gap-2">
           <Field
             name="leadValue"
@@ -234,7 +234,7 @@ const AddLead = ({ onClose }) => {
             <h2 className="mb-4 border-b pb-2 font-medium"></h2>
 
             <Row gutter={16}>
-              <Col span={24}>
+              <Col span={24} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold flex">
                     Lead Title <h1 className="text-rose-500">*</h1>

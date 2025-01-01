@@ -1,27 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, DatePicker } from 'antd';
 import { EyeOutlined, DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
 // import { Card, Table,  Badge, Menu, Tag,Modal } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
-import { UploadOutlined } from "@ant-design/icons";
 import ReactQuill from 'react-quill';
-import OrderListData from 'assets/data/order-list.data.json';
-import Flex from 'components/shared-components/Flex'
-import utils from 'utils';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import userData from 'assets/data/user-list.data.json';
-import dayjs from 'dayjs';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
+import { useSelector, useDispatch } from 'react-redux';
+import {getallcurrencies} from "../../../setting/currencies/currenciesreducer/currenciesSlice"
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
 const { Option } = Select;
 
 const EditMilestone = ({onClose}) => {
-
-
     const navigate = useNavigate();
+    const { currencies } = useSelector((state) => state.currencies);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(getallcurrencies());
+    }, [dispatch]);
+
 
     const onSubmit = (values) => {
         console.log('Submitted values:', values);
@@ -48,6 +47,42 @@ const EditMilestone = ({onClose}) => {
         endDate: Yup.date().nullable().required('End Date is required.'),
 
     });
+
+    const CurrencyField = () => (
+        <Col span={12} className="">
+            <div className="form-item">
+                <div className="flex gap-2">
+                    <Field name="currency">
+                        {({ field, form }) => (
+                            <Select
+                                {...field}
+                                className="w-full"
+                                placeholder="Select Currency"
+                                onChange={(value) => {
+                                    const selectedCurrency = currencies.find(c => c.id === value);
+                                    form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
+                                }}
+                            >
+                                {currencies?.map((currency) => (
+                                    <Option
+                                        key={currency.id}
+                                        value={currency.id}
+                                    >
+                                        {currency.currencyCode}
+                                    </Option>
+                                ))}
+                            </Select>
+                        )}
+                    </Field>
+                </div>
+                <ErrorMessage
+                    name="currency"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                />
+            </div>
+        </Col>
+    );
 
 
 
@@ -106,6 +141,18 @@ const EditMilestone = ({onClose}) => {
                                                         <ErrorMessage name="status" component="div" className="error-message text-red-500 my-1" />
                                                     </div>
                                                 </Col>
+                                                <Col span={24} className="mt-2">
+                                                <div className="form-item">
+                                                    <label className="font-semibold">Currency</label>
+                                                    <Field name="currency" component={CurrencyField} />
+                                                    <ErrorMessage
+                                                        name="currency"
+                                                        component="div"
+                                                        className="error-message text-red-500 my-1"
+                                                    />
+                                                </div>
+                                            </Col>
+                                                
                                                 
                                                 <Col span={24} className='mt-2'>
                                                     <div className="form-item">

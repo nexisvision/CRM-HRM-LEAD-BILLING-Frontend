@@ -31,7 +31,7 @@ const AddProjectReport = () => {
       contractValue: Yup.number().required('Please enter Contract Value .').positive('Contract Value must be positive.'),
       startdate: Yup.date().nullable().required('Start date is required.'),
       enddate: Yup.date().nullable().required('End date is required.'),
-      skills: Yup.number().required('Please enter a Skills.'),
+      skills: Yup.string().required('Please enter a Skills.'),
       jobDescription: Yup.string().required('Please enter a Job Description.'),
     });
 

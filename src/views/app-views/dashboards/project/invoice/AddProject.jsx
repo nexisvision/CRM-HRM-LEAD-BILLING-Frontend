@@ -18,7 +18,7 @@ import * as Yup from 'yup';
 
 const { Option } = Select;
 
-const AddInvoice = () => {
+const AddProject = () => {
     const [users, setUsers] = useState(userData);
     // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     // const [list, setList] = useState(OrderListData);
@@ -326,78 +326,7 @@ const AddInvoice = () => {
                     <Card>
                         <div>
                             <div className="overflow-x-auto">
-                                <Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex mb-4'>
-                                    <Flex className="flex " mobileFlex={false}>
-                                        <div className="w-full flex gap-4">
-                                            <div>
-                                                <Select
-                                                    value={selectedProduct}
-                                                    onChange={handleProductChange}
-                                                    className="w-full !rounded-none"
-                                                    placeholder="Select Product"
-                                                    rootClassName="!rounded-none"
-                                                >
-                                                    <Option value="smart_speakers">Smart Speakers</Option>
-                                                    <Option value="electric_kettle">Electric Kettle</Option>
-                                                    <Option value="headphones">Headphones</Option>
-                                                </Select>
-                                            </div>
-
-                                            <div className='flex mb-4'>
-                                                <Button
-                                                    className='rounded-none'
-                                                    onClick={toggleFilter}
-                                                    type={hasActiveFilters ? 'primary' : 'default'}
-                                                >
-                                                    <FilterOutlined />
-                                                    {hasActiveFilters && (
-                                                        <span className="ml-1">
-                                                            {Object.values(filters).filter(v => v !== null).length}
-                                                        </span>
-                                                    )}
-                                                </Button>
-                                                <Button
-                                                    type="primary"
-                                                    className='rounded-none ml-2'
-                                                    onClick={openAddInvoiceModal}
-                                                >
-                                                    <span>Add</span>
-                                                </Button>
-                                            </div>
-
-                                            {/* Filter Selectors */}
-                                            {showFilter && (
-                                                <div className="space-y-2 mb-4">
-                                                    {/* Status Filter */}
-                                                    <Select
-                                                        value={filters.status}
-                                                        onChange={(value) => handleFilterChange('status', value)}
-                                                        className="w-full rounded-none"
-                                                        placeholder="Select Product Category"
-                                                        allowClear
-                                                    >
-                                                        <Option value="select">Select Product Category</Option>
-
-                                                    </Select>
-                                                </div>
-                                            )}
-
-
-                                            {/* <div className='flex'>
-                                                <Button  className='rounded-none' onClick={e => onSearch(e)}>
-                                                    <FilterOutlined />
-                                                </Button>
-                                               
-                                                <Button type="primary" className='rounded-none' onClick={openAddInvoiceModal}>
-                                                    <span>Add</span>
-                                                </Button>
-                                            </div> */}
-                                        </div>
-
-                                    </Flex>
-                                    <Flex gap="7px" className="flex">
-                                    </Flex>
-                                </Flex>
+                          
 
                                 <table className="w-full border border-gray-200 bg-white">
                                     <thead className="bg-gray-100">
@@ -624,5 +553,5 @@ const AddInvoice = () => {
     );
 };
 
-export default AddInvoice;
+export default AddProject;              
 

@@ -21,7 +21,8 @@ import Flex from 'components/shared-components/Flex'
 import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils';
-import AddInvoice from "./AddInvoice"
+import AddInvoice from "./AddInvoice";
+import AddProject from "./AddProject";
 // import AddInvoice from './AddInvoice';
 // import EditInvoice from './EditInvoice';
 // import ViewInvoice from './ViewInvoice';
@@ -63,6 +64,7 @@ export const InvoiceList = () => {
 	const [list, setList] = useState(OrderListData)
 	const [selectedRows, setSelectedRows] = useState([])
 	const [isAddInvoiceModalVisible, setIsAddInvoiceModalVisible] = useState(false);
+	const [isAddProjectModalVisible, setIsAddProjectModalVisible] = useState(false);
 	const [isEditInvoiceModalVisible, setIsEditInvoiceModalVisible] = useState(false);
 	const [isViewInvoiceModalVisible, setIsViewInvoiceModalVisible] = useState(false);
 
@@ -88,6 +90,16 @@ export const InvoiceList = () => {
 	// Close Add Job Modal
 	const closeAddInvoiceModal = () => {
 		setIsAddInvoiceModalVisible(false);
+	};
+
+	// Open Add Job Modal
+	const openAddProjectModal = () => {
+		setIsAddProjectModalVisible(true);
+	};
+
+	// Close Add Job Modal
+	const closeAddProjectModal = () => {
+		setIsAddProjectModalVisible(false);
 	};
 
 	// Open Add Job Modal
@@ -237,6 +249,10 @@ export const InvoiceList = () => {
 							<PlusOutlined />
 							<span className="ml-2">Create Invoice</span>
 						</Button>
+						<Button type="primary" className="flex items-center" onClick={openAddProjectModal}>
+							<PlusOutlined />
+							<span className="ml-2">Create Project</span>
+						</Button>
 						<Button type="primary" icon={<FileExcelOutlined />} block>
 							Export All
 						</Button>
@@ -274,6 +290,16 @@ export const InvoiceList = () => {
 				>
 					<AddInvoice onClose={closeAddInvoiceModal} />
 				</Modal>
+				<Modal
+					title="Project Create"
+					visible={isAddProjectModalVisible}
+					onCancel={closeAddProjectModal}
+					footer={null}
+					width={1000}
+					className='mt-[-70px]'
+				>
+					<AddProject onClose={closeAddProjectModal} />
+				</Modal>	
 				{/* <Modal
 					title="Edit Invoice"
 					visible={isEditInvoiceModalVisible}
