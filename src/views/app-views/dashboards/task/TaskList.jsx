@@ -70,7 +70,7 @@ const TaskList = () => {
 	};
 
 	const openviewTaskModal = () => {
-		navigate('/app/apps/project/task/viewtask')
+		navigate('/app/dashboards/project/task/viewtask')
 	};
 
 

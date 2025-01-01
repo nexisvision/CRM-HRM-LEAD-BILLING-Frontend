@@ -211,8 +211,7 @@ export const InvoiceList = () => {
 
 
 	return (
-		<div className="container">
-
+		<>
             <div>
             <Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
 					<Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
@@ -231,6 +230,8 @@ export const InvoiceList = () => {
 								{paymentStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
 							</Select>
 						</div>
+					</Flex>
+					<Flex gap="7px" className="flex">
                         <div className='flex gap-4'>
                         <Button type="primary" className="flex items-center" onClick={openAddInvoiceModal}>
 							<PlusOutlined />
@@ -240,12 +241,12 @@ export const InvoiceList = () => {
 							Export All
 						</Button>
                         </div>
-					</Flex>
-					<Flex gap="7px" className="flex">
 						
 					</Flex>
 				</Flex>
             </div>
+		<div className="container">
+
 			<Card>
 				
 				<div className="table-responsive">
@@ -295,6 +296,7 @@ export const InvoiceList = () => {
 				</Modal> */}
 			</Card>
 		</div>
+		</>
 	);
 }
 

@@ -6,6 +6,7 @@ import InvoiceList from './invoice/InvoiceList';
 import PaymentList from './payment/PaymentList';
 import ProjectMember from './projectmember/ProjectMember';
 import ExpensesList from './expenses/ExpensesList';
+import MilestoneList from './milestone/MilestoneList';
 // import Members from './tabs/Members';
 // import Files from './tabs/Files';
 // import Milestones from './tabs/Milestones';
@@ -20,12 +21,12 @@ const ViewProject = () => {
     { id: 'overview', label: 'Overview' },
     { id: 'projectmember', label: 'Project Member' },
     { id: 'files', label: 'Files' },
+    { id: 'milestones', label: 'Milestones' },
     { id: 'tasks', label: 'Tasks' },
     { id: 'invoices', label: 'Invoices' },
     { id: 'expenses', label: 'Expenses' },
     { id: 'payments', label: 'Payments' },
     // { id: 'members', label: 'Members' },
-    // { id: 'milestones', label: 'Milestones' },
     // { id: 'taskboard', label: 'Task Board' },
     // { id: 'ganttchart', label: 'Gantt Chart' },
     // { id: 'more', label: 'More↓' },
@@ -37,6 +38,8 @@ const ViewProject = () => {
         return <OverViewList />;
       case 'projectmember':
         return <ProjectMember />;
+      case 'milestones':
+        return <MilestoneList />;
       case 'files':
         return <FileList />;
       case 'tasks':
@@ -47,6 +50,7 @@ const ViewProject = () => {
         return <ExpensesList />;
       case 'payments':
         return <PaymentList />;
+
       //   case 'members':
       //     return <Members />;
       //   case 'milestones':

@@ -58,12 +58,9 @@ const AddProjectMember = () => {
                             </Col>
                         </Row>
                         <div className="form-buttons text-right mt-4">
-                            <Button type="default" className="mr-2" onClick={() => navigate('/apps/sales/expenses')}>Cancel</Button>
+                            <Button type="default" className="mr-2" onClick={() => navigate('/apps/project/projectmember')}>Cancel</Button>
                             <Button type="primary" htmlType="submit">Create</Button>
                         </div>
-                        {/* <Modal
-                          
-                        </Modal> */}
                     </Form>
                 )}
             </Formik>

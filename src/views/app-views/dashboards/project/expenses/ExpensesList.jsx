@@ -13,7 +13,9 @@ import Flex from 'components/shared-components/Flex'
 import NumberFormat from 'react-number-format';
 import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
-import utils from 'utils'
+import utils from 'utils';
+import AddExpenses from "./AddExpenss";
+import EditExpenses from "./EditExpenss";
 // import AddExpenses from "./AddExpenses";
 // import EditExpenses from "./EditExpenses"
 // import ViewExpenses from './ViewExpenses';
@@ -188,37 +190,36 @@ const ExpensesList = () => {
     }
     return (
         <>
+        <Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
+					<Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
+						<div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
+							<Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)} />
+						</div>
+						<div className="w-full md:w-48">
+							<Select
+								defaultValue="All"
+								className="w-full"
+								style={{ minWidth: 180 }}
+								onChange={handleShowStatus}
+								placeholder="Status"
+							>
+								<Option value="All">All Status </Option>
+								{expenseStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
+							</Select>
+						</div>
+					</Flex>
+					<Flex gap="7px" className="flex">
+						<Button type="primary" className="ml-2" onClick={openAddExpensesModal}>
+							<PlusOutlined />
+							<span className="ml-2">Add Expenses</span>
+						</Button>
+						<Button type="primary" icon={<FileExcelOutlined />} block>
+							Export All
+						</Button>
+					</Flex>
+				</Flex>
             <Card>
-                <div className='flex justify-between'>
-                <Flex gap="7px" className="flex">
-                    <Button type="primary" className="flex items-center mb-3" onClick={openAddExpensesModal}>
-                        <PlusOutlined />
-                        <span className="ml-2">Add Expenses</span>
-                    </Button>
-                    <Button type="primary" className='bg-blue-500 items-center ' icon={<FileExcelOutlined  className='align-middle'/>} block>
-                        Export
-                    </Button>
-                </Flex>
-                </div>
-                <Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
-                    <Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false} >
-                        <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
-                            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)} />
-                        </div>
-                        <div className="w-full md:w-48">
-                            <Select
-                                defaultValue="All"
-                                className="w-full"
-                                style={{ minWidth: 180 }}
-                                onChange={handleShowStatus}
-                                placeholder="Status"
-                            >
-                                <Option value="All">All Expenss </Option>
-                                {expenseStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
-                            </Select>
-                        </div>
-                    </Flex>
-                </Flex>
+               
                 <div className="table-responsive">
                     <Table
                         columns={tableColumns}
@@ -235,7 +236,7 @@ const ExpensesList = () => {
                 </div>
             </Card>
             <Card>
-                {/* <Modal
+                 <Modal
                     title="Add Expenses"
                     visible={isAddExpensesModalVisible}
                     onCancel={closeAddExpensesModal}
@@ -255,7 +256,7 @@ const ExpensesList = () => {
                 >
                     <EditExpenses onClose={closeEditExpensesModal} />
                 </Modal>
-                <Modal
+              {/*  <Modal
                     title="Expenses"
                     visible={isViewExpensesModalVisible}
                     onCancel={closeViewExpensesModal}
