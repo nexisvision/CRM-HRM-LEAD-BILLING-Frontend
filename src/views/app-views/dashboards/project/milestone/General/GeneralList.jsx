@@ -1,86 +1,57 @@
 import React, { useState } from "react";
-import FileList from "../File/FileList";
-import SubTaskList from "../SubTask/SubTaskList";
-import CommentList from "../Comment/CommentList";
-import TimeSheetList from "../TimeSheet/TimeSheetList";
-import NotesList from "../Notes/NotesList";
+// import FileList from "../File/FileList";
+// import SubTaskList from "../SubTask/SubTaskList";
+// import CommentList from "../Comment/CommentList";
+// import TimeSheetList from "../TimeSheet/TimeSheetList";
+// import NotesList from "../Notes/NotesList";
 
 const GeneralList = () => {
-  const [selectedSection, setSelectedSection] = useState("File");
 
-  // Function to handle section selection
-  const handleSectionClick = (section) => {
-    setSelectedSection(section);
-  };
 
   return (
-    <div className="bg-white">
-      {/* Sidebar */}
-      <div className="mt-3 border-b">
-        <ul className="flex">
-          <li
-            onClick={() => handleSectionClick("File")}
-            className={`cursor-pointer p-3 flex justify-between rounded-t-lg ${
-              selectedSection === "File" ? "border-b-rose-500 text-white bg-rose-500" : "border-0"
-            }`}
-          >
-            File
-          </li>
-          <li
-            onClick={() => handleSectionClick("SubTask")}
-            className={`cursor-pointer p-3 flex justify-between rounded-t-lg ${
-              selectedSection === "SubTask" ? "border-b-rose-500 text-white bg-rose-500" : "border-0"
-            }`}
-          >
-            Sub Task
-          </li>
-          <li
-            onClick={() => handleSectionClick("Comment")}
-            className={`cursor-pointer p-3 flex justify-between rounded-t-lg ${
-              selectedSection === "Comment" ? "border-b-rose-500 text-white bg-rose-500" : "border-0"
-            }`}
-          >
-            Comment
-          </li>
-          <li
-            onClick={() => handleSectionClick("Timesheet")}
-            className={`cursor-pointer p-3 flex justify-between rounded-t-lg ${
-              selectedSection === "Timesheet" ? "border-b-rose-500 text-white bg-rose-500" : "border-0"
-            }`}
-          >
-            Timesheet
-          </li>
-          <li
-            onClick={() => handleSectionClick("Notes")}
-            className={`cursor-pointer p-3 flex justify-between rounded-t-lg ${
-              selectedSection === "Notes" ? "border-b-rose-500 text-white bg-rose-500" : "border-0"
-            }`}
-          >
-            Notes
-          </li>
-        </ul>
-      </div>
+    <div className="bg-white shadow rounded-lg p-6 space-y-4 w-full">
+      {/* Table Header */}
+      <h2 className="text-lg font-semibold mb-4">Tasks</h2>
 
-      {/* Content Section */}
-      <div className="flex-1 lg:ml-[-23px] p-4 overflow-y-auto mt-0 lg:mt-[10px]">
-        {selectedSection === "File" && (
-          <div className="m-2">
-            <FileList />
-          </div>
-        )}
-        {selectedSection === "SubTask" && (
-          <div className="m-2">
-            <SubTaskList />
-          </div>
-        )}
-        {selectedSection === "Comment" && (
-          <div className="m-2">
-            <CommentList />
-          </div>
-        )}
-        {/* Add components for other sections as needed */}
-        {selectedSection === "Timesheet" && <div className="m-2"><TimeSheetList/></div>}
-        {selectedSection === "Notes" && <div className="m-2"><NotesList/></div>}
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full border">
+          <thead>
+            <tr className="text-left text-sm font-medium text-gray-600">
+              <th className="px-4 py-2">#</th>
+              <th className="px-4 py-2">Task</th>
+              <th className="px-4 py-2">Assigned To</th>
+              <th className="px-4 py-2">Assigned By</th>
+              <th className="px-4 py-2 ">Due Date</th>
+              <th className="px-4 py-2 ">Total Hours</th>
+              <th className="px-4 py-2 ">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {/* No Records Found Row */}
+            <tr className="text-center text-gray-500">
+              <td colSpan="7" className="px-4 py-8">
+                <div className="flex flex-col items-center">
+                  <svg
+                    className="w-10 h-10 text-gray-400 mb-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                    />
+                  </svg>
+                  <span className="text-sm">- No record found. -</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );

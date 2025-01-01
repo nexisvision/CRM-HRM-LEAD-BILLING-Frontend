@@ -23,6 +23,7 @@ import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils';
 import AddMilestone from './AddMilestone';
 import EditMilestone from './EditMilestone';
+import ViewMilestone from './ViewMilestone';
 // import AddInvoice from './AddInvoice';
 // import EditInvoice from './EditInvoice';
 // import ViewInvoice from './ViewInvoice';
@@ -120,6 +121,13 @@ export const MilestoneList = () => {
                     {/* <EditOutlined /> */}
                     <span className="ml-2">Edit</span>
                 </Flex>
+            </Menu.Item>    
+            <Menu.Item>
+                <Flex alignItems="center" onClick={openViewMilestoneModal}>
+                    <EyeOutlined />
+                    {/* <EditOutlined /> */}
+                    <span className="ml-2">View</span>
+                </Flex>
             </Menu.Item>
             <Menu.Item>
                 <Flex alignItems="center">
@@ -168,7 +176,7 @@ export const MilestoneList = () => {
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                     </select>
-                    <><Tag color={getMilestoneStatus(record.milestoneStatus)}>{record.milestoneStatus}</Tag></>
+                    {/* <><Tag color={getMilestoneStatus(record.milestoneStatus)}>{record.milestoneStatus}</Tag></> */}
                 </>
             ),
             sorter: (a, b) => utils.antdTableSorter(a, b, 'milestoneStatus')
@@ -185,14 +193,6 @@ export const MilestoneList = () => {
         }
     ];
 
-
-
-    const rowSelection = {
-        onChange: (key, rows) => {
-            setSelectedRows(rows)
-            setSelectedRowKeys(key)
-        }
-    };
 
     const onSearch = e => {
         const value = e.currentTarget.value
@@ -267,6 +267,16 @@ export const MilestoneList = () => {
                     className='mt-[-70px]'
                 >
                     <EditMilestone onClose={closeEditMilestoneModal} />
+                </Modal>
+                <Modal
+                    title="Milestone Details"
+                    visible={isViewMilestoneModalVisible}
+                    onCancel={closeViewMilestoneModal}
+                    footer={null}
+                    width={1000}
+                    className='mt-[-70px]'
+                >
+                    <ViewMilestone onClose={closeViewMilestoneModal} />
                 </Modal>
             </Card>
         </div>
