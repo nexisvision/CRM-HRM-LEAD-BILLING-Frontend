@@ -80,7 +80,7 @@ const AddMilestone = ({ onClose }) => {
                         {({ field, form }) => (
                             <Select
                                 {...field}
-                                className="w-full"
+                                className="w-full mt-2"
                                 placeholder="Select Currency"
                                 onChange={(value) => {
                                     const selectedCurrency = currencies.find(c => c.id === value);
@@ -125,26 +125,26 @@ const AddMilestone = ({ onClose }) => {
                                 {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
                                     <Form className="formik-form" onSubmit={handleSubmit}>
                                         <Row gutter={16}>
-                                            <Col span={12}>
+                                            <Col span={12} className="mt-4">
                                                 <div className="form-item">
                                                     <label className='font-semibold mb-2'>Milestone Title </label>
                                                     <div className='flex'>
-                                                        <Field name="milestoneTitle" as={Input} placeholder="Enter Milestone Title" onBlur={() => setFieldTouched("milestoneTitle", true)} className=' rounded-e-lg rounded-s-none' />
+                                                        <Field name="milestoneTitle" as={Input} placeholder="Enter Milestone Title" onBlur={() => setFieldTouched("milestoneTitle", true)} className=' rounded-e-lg rounded-s-none mt-2' />
                                                     </div>
                                                     <ErrorMessage name="milestoneTitle" component="div" className="error-message text-red-500 my-1" />
                                                 </div>
                                             </Col>
-                                            <Col span={12}>
+                                            <Col span={12} className="mt-4">
                                                 <div className="form-item">
                                                     <label className='font-semibold mb-2'>Milestone Cost </label>
                                                     <div className='flex'>
-                                                        <Field name="milestoneCost" as={Input} placeholder="Enter Milestone Cost" onBlur={() => setFieldTouched("milestoneCost", true)} className=' rounded-e-lg rounded-s-none' />
+                                                        <Field name="milestoneCost" as={Input} placeholder="Enter Milestone Cost" onBlur={() => setFieldTouched("milestoneCost", true)} className=' rounded-e-lg rounded-s-none mt-2' />
                                                     </div>
                                                     <ErrorMessage name="milestoneCost" component="div" className="error-message text-red-500 my-1" />
                                                 </div>
                                             </Col>
 
-                                            <Col span={24} className="mt-2">
+                                            <Col span={24} className="mt-4">
                                                 <div className="form-item">
                                                     <label className="font-semibold">Currency</label>
                                                     <Field name="currency" component={CurrencyField} />
@@ -155,14 +155,14 @@ const AddMilestone = ({ onClose }) => {
                                                     />
                                                 </div>
                                             </Col>
-                                            <Col span={12} className='mt-2'>
+                                            <Col span={12} className='mt-4'>
                                                 <div className="form-item">
                                                     <label className='font-semibold mb-2'>Status</label>
-                                                    <Field name="currency">
+                                                    <Field name="status">
                                                         {({ field }) => (
                                                             <Select
                                                                 {...field}
-                                                                className="w-full"
+                                                                className="w-full mt-2"
                                                                 placeholder="Select Status"
                                                                 onChange={(value) => setFieldValue('status', value)}
                                                                 value={values.status}
@@ -176,15 +176,15 @@ const AddMilestone = ({ onClose }) => {
                                                     <ErrorMessage name="status" component="div" className="error-message text-red-500 my-1" />
                                                 </div>
                                             </Col>
-                                            <Col span={12} className='mt-2'>
+                                            <Col span={12} className='mt-4'>
                                                 <div className="form-item">
                                                     <label className='font-semibold mb-2'>Add Cost To Project Budget</label>
                                                     <Field name="addCostToProjectBudget">
                                                         {({ field }) => (
                                                             <Select
                                                                 {...field}
-                                                                className="w-full"
-                                                                placeholder="Select Status"
+                                                                className="w-full mt-2"
+                                                                placeholder="Select Add Cost To Project Budget"
                                                                 onChange={(value) => setFieldValue('addCostToProjectBudget', value)}
                                                                 value={values.addCostToProjectBudget}
                                                                 onBlur={() => setFieldTouched("addCostToProjectBudget", true)}
@@ -197,23 +197,24 @@ const AddMilestone = ({ onClose }) => {
                                                     <ErrorMessage name="addCostToProjectBudget" component="div" className="error-message text-red-500 my-1" />
                                                 </div>
                                             </Col>
-                                            <Col span={24} className='mt-2'>
+                                            <Col span={24} className='mt-4'>
                                                 <div className="form-item">
-                                                    <label className='font-semibold'>Milestone Summary</label>
+                                                    <label className='font-semibold mb-2'>Milestone Summary</label>
                                                     <ReactQuill
                                                         value={values.milestoneSummary}
                                                         onChange={(value) => setFieldValue('milestoneSummary', value)}
                                                         placeholder="Enter Milestone Summary"
+                                                        className='mt-2'
                                                     />
                                                     <ErrorMessage name="milestoneSummary" component="div" className="error-message text-red-500 my-1" />
                                                 </div>
                                             </Col>
 
-                                            <Col span={12} className='mt-2'>
+                                            <Col span={12} className='mt-4'>
                                                 <div className="form-item">
                                                     <label className='font-semibold mb-2'>Start Date</label>
                                                     <DatePicker
-                                                        className="w-full"
+                                                        className="w-full mt-2"
                                                         format="DD-MM-YYYY"
                                                         value={values.startDate}
                                                         onChange={(startDate) => setFieldValue('startDate', startDate)}
@@ -222,11 +223,11 @@ const AddMilestone = ({ onClose }) => {
                                                     <ErrorMessage name="startDate" component="div" className="error-message text-red-500 my-1" />
                                                 </div>
                                             </Col>
-                                            <Col span={12} className='mt-2'>
+                                            <Col span={12} className='mt-4'>
                                                 <div className="form-item">
                                                     <label className='font-semibold mb-2'>End Date</label>
                                                     <DatePicker
-                                                        className="w-full"
+                                                        className="w-full mt-2"
                                                         format="DD-MM-YYYY"
                                                         value={values.endDate}
                                                         onChange={(endDate) => setFieldValue('endDate', endDate)}

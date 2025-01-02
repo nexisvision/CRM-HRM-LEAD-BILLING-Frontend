@@ -11,13 +11,11 @@ import NumberFormat from 'react-number-format';
 import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils'
-// import AddPayment from "./AddPayment"
+import AddPayment from "./AddPayment"
 // import EditPayment from './EditPayment';
-// import ViewPayment from './ViewPayment';
+import ViewPayment from './ViewPayment';
 import { PaymentStatisticData } from '../../../dashboards/default/DefaultDashboardData';
 
-// import { PaymentStatisticData } from '../../../dashboards/default/DefaultDashboardData';
-import StatisticWidget from 'components/shared-components/StatisticWidget';
 
 const { Option } = Select
 
@@ -91,19 +89,7 @@ const PaymentList = () => {
 					<span className="ml-2">View Details</span>
 				</Flex>
 			</Menu.Item>
-			<Menu.Item>
-				<Flex alignItems="center">
-					<Button
-						type=""
-						className=""
-						icon={<EditOutlined />}
-						onClick={openEditPaymentModal}
-						size="small"
-					>
-						<span className="">Edit</span>
-					</Button>
-				</Flex>
-			</Menu.Item>
+			
 			<Menu.Item>
 				<Flex alignItems="center">
 					<DeleteOutlined />
@@ -250,7 +236,7 @@ const PaymentList = () => {
 				</div>
 			</Card>
 			<Card>
-				{/* <Modal
+				<Modal
 					title="Add Payment"
 					visible={isAddPaymentModalVisible}
 					onCancel={closeAddPaymentModal}
@@ -260,7 +246,7 @@ const PaymentList = () => {
 
 				>
 					<AddPayment onClose={closeAddPaymentModal} />
-				</Modal> */}
+				</Modal>
 
 				{/* <Modal
 					title="Edit Payment"
@@ -274,16 +260,16 @@ const PaymentList = () => {
 					<EditPayment onClose={closeEditPaymentModal} />
 				</Modal> */}
 
-				{/* <Modal
-					title="Payment"
+				<Modal
+					title="Payment Details"
 					visible={isViewPaymentModalVisible}
 					onCancel={closeViewPaymentModal}
 					footer={null}
-					width={600}
+					width={800}
 					className='mt-[-70px]'
 				>
 					<ViewPayment onClose={closeViewPaymentModal} />
-				</Modal> */}
+				</Modal>
 			</Card>
 		</>
 	)

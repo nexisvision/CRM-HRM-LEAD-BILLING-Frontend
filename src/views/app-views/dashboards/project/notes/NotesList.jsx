@@ -21,9 +21,9 @@ import Flex from 'components/shared-components/Flex'
 import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils';
-import AddMilestone from './AddMilestone';
-import EditMilestone from './EditMilestone';
-import ViewMilestone from './ViewMilestone';
+// import AddNotes from './AddNotes';
+// import EditNotes from './EditNotes';
+// import ViewNotes from './ViewNotes';
 // import AddInvoice from './AddInvoice';
 // import EditInvoice from './EditInvoice';
 // import ViewInvoice from './ViewInvoice';
@@ -57,16 +57,16 @@ const getShippingStatus = status => {
     return ''
 }
 
-const milestoneStatusList = ['Paid', 'Pending', 'Expired']
+const notesStatusList = ['Paid', 'Pending', 'Expired']
 
-export const MilestoneList = () => {
+export const NotesList = () => {
 
     const [annualStatisticData] = useState(AnnualStatisticData);
     const [list, setList] = useState(OrderListData)
     const [selectedRows, setSelectedRows] = useState([])
-    const [isAddMilestoneModalVisible, setIsAddMilestoneModalVisible] = useState(false);
-    const [isEditMilestoneModalVisible, setIsEditMilestoneModalVisible] = useState(false);
-    const [isViewMilestoneModalVisible, setIsViewMilestoneModalVisible] = useState(false);
+    const [isAddNotesModalVisible, setIsAddNotesModalVisible] = useState(false);
+    const [isEditNotesModalVisible, setIsEditNotesModalVisible] = useState(false);
+    const [isViewNotesModalVisible, setIsViewNotesModalVisible] = useState(false);
 
 
 
@@ -83,47 +83,47 @@ export const MilestoneList = () => {
     }
 
     // Open Add Job Modal
-    const openAddMilestoneModal = () => {
-        setIsAddMilestoneModalVisible(true);
+    const openAddNotesModal = () => {
+        setIsAddNotesModalVisible(true);
     };
 
     // Close Add Job Modal
-    const closeAddMilestoneModal = () => {
-        setIsAddMilestoneModalVisible(false);
+    const closeAddNotesModal = () => {
+        setIsAddNotesModalVisible(false);
     };
 
     // Open Add Job Modal
-    const openEditMilestoneModal = () => {
-        setIsEditMilestoneModalVisible(true);
+    const openEditNotesModal = () => {
+        setIsEditNotesModalVisible(true);
     };
 
     // Close Add Job Modal
-    const closeEditMilestoneModal = () => {
-        setIsEditMilestoneModalVisible(false);
+    const closeEditNotesModal = () => {
+        setIsEditNotesModalVisible(false);
     };
 
 
     // Open Add Job Modal
-    const openViewMilestoneModal = () => {
-        setIsViewMilestoneModalVisible(true);
+    const openViewNotesModal = () => {
+        setIsViewNotesModalVisible(true);
     };
 
     // Close Add Job Modal
-    const closeViewMilestoneModal = () => {
-        setIsViewMilestoneModalVisible(false);
+    const closeViewNotesModal = () => {
+        setIsViewNotesModalVisible(false);
     };
 
     const dropdownMenu = row => (
         <Menu>
             <Menu.Item>
-                <Flex alignItems="center" onClick={openEditMilestoneModal}>
+                <Flex alignItems="center" onClick={openEditNotesModal}>
                     <EditOutlined />
                     {/* <EditOutlined /> */}
                     <span className="ml-2">Edit</span>
                 </Flex>
             </Menu.Item>    
             <Menu.Item>
-                <Flex alignItems="center" onClick={openViewMilestoneModal}>
+                <Flex alignItems="center" onClick={openViewNotesModal}>
                     <EyeOutlined />
                     {/* <EditOutlined /> */}
                     <span className="ml-2">View</span>
@@ -144,36 +144,19 @@ export const MilestoneList = () => {
             dataIndex: 'id'
         },
         {
-            title: 'Milestone Title',
-            dataIndex: 'milestoneTitle',
+            title: 'Note Title',
+            dataIndex: 'noteTitle',
             sorter: {
-                compare: (a, b) => a.milestoneTitle.length - b.milestoneTitle.length,
+                compare: (a, b) => a.noteTitle.length - b.noteTitle.length,
             },
         },
         {
-            title: 'Milestone Cost',
-            dataIndex: 'milestoneCost',
+            title: 'Note Type',
+            dataIndex: 'noteType',
             sorter: {
-                compare: (a, b) => a.milestoneCost.length - b.milestoneCost.length,
+                compare: (a, b) => a.noteType.length - b.noteType.length,
             },
         },
-        {
-            title: 'Task Count',
-            dataIndex: 'taskCount',
-            sorter: {
-                compare: (a, b) => a.taskCount.length - b.taskCount.length,
-            },
-        },
-        {
-            title: 'Status',
-            dataIndex: 'status',
-            render: (_, record) => (
-				<><Tag color={getMilestoneStatus(record.status)}>{record.status}</Tag></>
-				// <><Badge status={getPaymentStatus(record.paymentStatus)}  className='me-2'/><span>{record.paymentStatus}</span></>
-			),
-            sorter: (a, b) => utils.antdTableSorter(a, b, 'milestoneStatus')
-        },
-
         {
             title: 'Action',
             dataIndex: 'actions',
@@ -185,6 +168,12 @@ export const MilestoneList = () => {
         }
     ];
 
+    const rowSelection = {
+		onChange: (key, rows) => {
+			setSelectedRows(rows)
+			setSelectedRowKeys(key)
+		}
+	};
 
     const onSearch = e => {
         const value = e.currentTarget.value
@@ -220,7 +209,7 @@ export const MilestoneList = () => {
                     </Flex>
                     <Flex gap="7px" className="flex">
                         <div className='flex gap-4'>
-                            <Button type="primary" className="flex items-center" onClick={openAddMilestoneModal}>
+                            <Button type="primary" className="flex items-center" onClick={openAddNotesModal}>
                                 <PlusOutlined />
                                 <span className="ml-2">Create Milestone</span>
                             </Button>
@@ -237,43 +226,49 @@ export const MilestoneList = () => {
                         dataSource={list}
                         rowKey='id'
                         scroll={{ x: 1200 }}
+                        rowSelection={{
+							selectedRowKeys: selectedRowKeys,
+							type: 'checkbox',
+							preserveSelectedRowKeys: false,
+							...rowSelection,
+						}}
                     />
                 </div>
 
-                <Modal
+                {/* <Modal
                     title="Milestone Create"
-                    visible={isAddMilestoneModalVisible}
-                    onCancel={closeAddMilestoneModal}
+                    visible={isAddNotesModalVisible}
+                    onCancel={closeAddNotesModal}
                     footer={null}
                     width={1000}
                     className='mt-[-70px]'
                 >
-                    <AddMilestone onClose={closeAddMilestoneModal} />
-                </Modal>
-                <Modal
+                    <AddNotes onClose={closeAddNotesModal} />
+                </Modal> */}
+                {/* <Modal
                     title="Milestone Edit"
-                    visible={isEditMilestoneModalVisible}
-                    onCancel={closeEditMilestoneModal}
+                    visible={isEditNotesModalVisible}
+                    onCancel={closeEditNotesModal}
                     footer={null}
                     width={1000}
                     className='mt-[-70px]'
                 >
-                    <EditMilestone onClose={closeEditMilestoneModal} />
-                </Modal>
-                <Modal
+                    <EditNotes onClose={closeEditNotesModal} />
+                </Modal> */}
+                {/* <Modal
                     title="Milestone Details"
-                    visible={isViewMilestoneModalVisible}
-                    onCancel={closeViewMilestoneModal}
+                    visible={isViewNotesModalVisible}
+                    onCancel={closeViewNotesModal}
                     footer={null}
                     width={1000}
                     className='mt-[-70px]'
                 >
-                    <ViewMilestone onClose={closeViewMilestoneModal} />
-                </Modal>
+                    <ViewNotes onClose={closeViewNotesModal} />
+                </Modal> */}
             </Card>
         </div>
     );
 }
 
 
-export default MilestoneList;
+export default NotesList;

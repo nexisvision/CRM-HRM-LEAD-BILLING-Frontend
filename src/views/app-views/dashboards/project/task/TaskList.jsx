@@ -17,13 +17,14 @@ import { TiPinOutline } from "react-icons/ti";
 import AvatarStatus from 'components/shared-components/AvatarStatus';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import Flex from 'components/shared-components/Flex'
+import { useNavigate } from 'react-router-dom';
 // import NumberFormat from 'react-number-format';
 import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils'
-// import AddInvoice from './AddInvoice';
-// import EditInvoice from './EditInvoice';
-// import ViewInvoice from './ViewInvoice';
+import AddTask from './AddTask';
+import EditTask from './EditTask';
+import TaskView from './TaskView';
 
 
 
@@ -64,9 +65,9 @@ export const TaskList = () => {
     const [isAddTaskModalVisible, setIsAddTaskModalVisible] = useState(false);
     const [isEditTaskModalVisible, setIsEditTaskModalVisible] = useState(false);
     const [isViewTaskModalVisible, setIsViewTaskModalVisible] = useState(false);
+    const navigate = useNavigate();
 
-
-
+    const [selectedUser, setSelectedUser] = useState(null);
     const [selectedRowKeys, setSelectedRowKeys] = useState([])
 
     const handleShowStatus = value => {
@@ -101,10 +102,14 @@ export const TaskList = () => {
 
 
     // Open Add Job Modal
+    // const openViewTaskModal = () => {
+    //     setIsViewTaskModalVisible(true);
+    // };
     const openViewTaskModal = () => {
-        setIsViewTaskModalVisible(true);
-    };
-
+        navigate("/app/dashboards/project/task/TaskView", {
+          state: { user: selectedUser },
+        }); // Pass user data as state if needed
+      };
     // Close Add Job Modal
     const closeViewTaskModal = () => {
         setIsViewTaskModalVisible(false);
@@ -319,17 +324,17 @@ export const TaskList = () => {
                     />
                 </div>
 
-                {/* <Modal
-					title="Invoice Create"
-					visible={isAddInvoiceModalVisible}
-					onCancel={closeAddInvoiceModal}
+                <Modal
+					title="Task Create"
+					visible={isAddTaskModalVisible}
+					onCancel={closeAddTaskModal}
 					footer={null}
 					width={1000}
 					className='mt-[-70px]'
 				>
-					<AddInvoice onClose={closeAddInvoiceModal} />
-				</Modal> */}
-                {/* <Modal
+					<AddTask onClose={closeAddTaskModal} />
+				</Modal>
+                <Modal
 					title="Edit Task"
 					visible={isEditTaskModalVisible}
 					onCancel={closeEditTaskModal}
@@ -338,17 +343,17 @@ export const TaskList = () => {
 					className='mt-[-70px]'
 				>
 					<EditTask onClose={closeEditTaskModal} />
-				</Modal> */}
-                {/* <Modal
-					title="Task"
+				</Modal>
+                <Modal
+					title="Task Details"
 					visible={isViewTaskModalVisible}
-					    onCancel={closeViewTaskModal}
+					onCancel={closeViewTaskModal}
 					footer={null}
 					width={1000}
 					className='mt-[-70px]'
 				>
-					<ViewTask onClose={closeViewTaskModal} />
-				</Modal> */}
+					<TaskView onClose={closeViewTaskModal} />
+				</Modal>
             </Card>
         </div>
     );

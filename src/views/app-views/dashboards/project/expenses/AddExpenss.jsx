@@ -12,39 +12,32 @@ const AddExpenses = () => {
     const [showReceiptUpload, setShowReceiptUpload] = useState(false);
     // const [uploadModalVisible, setUploadModalVisible] = useState(false);
     const initialValues = {
-        ItemName: '',
-        Currency: '',
-        ExchangeRate: '',
-        Price: '',
-        PurchaseDate: '',
-        Employee: '',
-        Project: '',
-        ExpenseCategory: '',
-        PurchasedFrom: '',
-        BankAccount: '',
-        Description: '',
-        Bill: ""
+        itemName: '',
+        currency: '',
+        price: '',
+        employee: '',
+        project: '',
+        purchasedFrom: '',
+        purchaseDate: '',
+        // bill: "",
+        description: '',
     };
     const validationSchema = Yup.object({
-        ItemName: Yup.string().required('Please enter ItemName.'),
-        Currency: Yup.string().required('Please enter Currency.'),
-        ExchangeRate: Yup.string().required('Please enter ExchangeRate.'),
-        Price: Yup.string().required('Please enter Price.'),
-        PurchaseDate: Yup.date().nullable().required('Date is required.'),
-        Employee: Yup.string().required('Please enter Employee.'),
-        Project: Yup.string().required('Please enter Project.'),
-        ExpenseCategory: Yup.string().required('Please enter ExpenseCategory.'),
-        PurchasedFrom: Yup.string().required('Please enter PurchasedFrom.'),
-        BankAccount: Yup.string().required('Please enter BankAccount.'),
-        Description: Yup.string().required('Please enter a Description.'),
-        Bill: Yup.string().required('Please enter Bill.'),
+        itemName: Yup.string().required('Please enter ItemName.'),
+        currency: Yup.string().required('Please enter Currency.'),
+        price: Yup.number().required('Please enter Price.'),
+        purchaseDate: Yup.date().required('Please enter PurchaseDate.'),
+        employee: Yup.string().required('Please enter Employee.'),
+        project: Yup.string().required('Please enter Project.'),
+        purchasedFrom: Yup.string().required('Please enter PurchasedFrom.'),
         description: Yup.string().required('Please enter a description.'),
+        // bill: Yup.string().required('Please enter Bill.'),
     });
     const onSubmit = (values, { resetForm }) => {
         console.log('Submitted values:', values);
         message.success('Expenses added successfully!');
         resetForm();
-        navigate('/apps/sales/expenses');
+        navigate('/app/dashboards/project/expenses');
     };
     return (
         <div className="add-expenses-form">
@@ -60,15 +53,15 @@ const AddExpenses = () => {
                             <Col span={8}>
                                 <div className="form-item">
                                     <label className='font-semibold'>ItemName</label>
-                                    <Field name="ItemName" as={Input} placeholder="Enter ItemName" />
-                                    <ErrorMessage name="ItemName" component="div" className="error-message text-red-500 my-1" />
+                                    <Field name="itemName" as={Input} placeholder="Enter ItemName" />
+                                    <ErrorMessage name="itemName" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
                             <Col span={8}>
                                 <div className="form-item">
                                     <label className='font-semibold'>Currency</label>
-                                    <Field name="Currency" as={Input} placeholder="Enter Currency" />
-                                    <ErrorMessage name="Currency" component="div" className="error-message text-red-500 my-1" />
+                                    <Field name="currency" as={Input} placeholder="Enter Currency" />
+                                    <ErrorMessage name="currency" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
                             {/* <Col span={6} >
@@ -81,59 +74,58 @@ const AddExpenses = () => {
                             <Col span={8} >
                                 <div className="form-item">
                                     <label className='font-semibold'>Price</label>
-                                    <Field name="Price" type='number' as={Input} placeholder="Enter Price" />
-                                    <ErrorMessage name="Price" component="div" className="error-message text-red-500 my-1" />
+                                    <Field name="price" type='number' as={Input} placeholder="Enter Price" />
+                                    <ErrorMessage name="price" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
-                            {/* <Col span={8} className='mt-2'>
+                            <Col span={8} className='mt-2'>
                                 <div className="form-item">
                                     <label className='font-semibold'>PurchaseDate</label>
                                     <DatePicker
                                         className="w-full"
                                         format="DD-MM-YYYY"
-                                        value={values.PurchaseDate}
-                                        onChange={(date) => setFieldValue('PurchaseDate', date)}
-                                        onBlur={() => setFieldTouched("PurchaseDate", true)}
+                                        value={values.purchaseDate}
+                                        onChange={(date) => setFieldValue('purchaseDate', date)}
+                                        onBlur={() => setFieldTouched("purchaseDate", true)}
                                     />
-                                    <ErrorMessage name="PurchaseDate" component="div" className="error-message text-red-500 my-1" />
+                                    <ErrorMessage name="purchaseDate" component="div" className="error-message text-red-500 my-1" />
                                 </div>
-                            </Col> */}
+                            </Col>
                             <Col span={8} className='mt-2'>
                                 <div className="form-item">
                                     <label className='font-semibold'>Employee</label>
-                                    <Field name="AddExpenseEmployee">
-                            {({ field }) => (
-                              <Select
-                                {...field}
-                                mode="multiple"
-                                placeholder="Select AddExpenseEmployee"
-                                className="w-full"
-                                onChange={(value) => setFieldValue('AddExpenseEmployee', value)}
-                                value={values.AddExpenseEmployee}
-                                onBlur={() => setFieldTouched('AddExpenseEmployee', true)}
-                                allowClear={false}
-                              >
-                                <Option value="xyz">XYZ</Option>
-                                <Option value="abc">ABC</Option>
-                              </Select>
-                            )}
-                            </Field>
-                                    <ErrorMessage name="Employee" component="div" className="error-message text-red-500 my-1" />
+                                    <Field name="employee">
+                                        {({ field }) => (
+                                            <Select
+                                                {...field}
+                                                placeholder="Select Employee"
+                                                className="w-full"
+                                                onChange={(value) => setFieldValue('employee', value)}
+                                                value={values.employee}
+                                                onBlur={() => setFieldTouched('employee', true)}
+                                                allowClear={false}
+                                            >
+                                                <Option value="xyz">XYZ</Option>
+                                                <Option value="abc">ABC</Option>
+                                            </Select>
+                                        )}
+                                    </Field>
+                                    <ErrorMessage name="employee" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
                             <Col span={8} className='mt-2'>
                                 <div className="form-item">
                                     <label className='font-semibold'>Project</label>
-                                    <Field name="Project" as={Input} placeholder="Enter Project" />
-                                    <ErrorMessage name="Project" component="div" className="error-message text-red-500 my-1" />
+                                    <Field name="project" as={Input} placeholder="Enter Project" />
+                                    <ErrorMessage name="project" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
 
                             <Col span={8} className='mt-2'>
                                 <div className="form-item">
                                     <label className='font-semibold'>PurchasedFrom</label>
-                                    <Field name="PurchasedFrom" as={Input} placeholder="Enter PurchasedFrom" />
-                                    <ErrorMessage name="PurchasedFrom" component="div" className="error-message text-red-500 my-1" />
+                                    <Field name="purchasedFrom" as={Input} placeholder="Enter PurchasedFrom" />
+                                    <ErrorMessage name="purchasedFrom" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
                             <Col span={24} className='mt-2'>

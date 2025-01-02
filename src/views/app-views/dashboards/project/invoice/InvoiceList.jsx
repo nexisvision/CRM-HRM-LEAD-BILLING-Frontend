@@ -22,9 +22,8 @@ import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils';
 import AddInvoice from "./AddInvoice";
-import AddProject from "./AddProject";
+import EditInvoice from './EditInvoice';
 // import AddInvoice from './AddInvoice';
-// import EditInvoice from './EditInvoice';
 // import ViewInvoice from './ViewInvoice';
 
 
@@ -249,10 +248,6 @@ export const InvoiceList = () => {
 							<PlusOutlined />
 							<span className="ml-2">Create Invoice</span>
 						</Button>
-						<Button type="primary" className="flex items-center" onClick={openAddProjectModal}>
-							<PlusOutlined />
-							<span className="ml-2">Create Project</span>
-						</Button>
 						<Button type="primary" icon={<FileExcelOutlined />} block>
 							Export All
 						</Button>
@@ -289,18 +284,8 @@ export const InvoiceList = () => {
 					className='mt-[-70px]'
 				>
 					<AddInvoice onClose={closeAddInvoiceModal} />
-				</Modal>
-				<Modal
-					title="Project Create"
-					visible={isAddProjectModalVisible}
-					onCancel={closeAddProjectModal}
-					footer={null}
-					width={1000}
-					className='mt-[-70px]'
-				>
-					<AddProject onClose={closeAddProjectModal} />
 				</Modal>	
-				{/* <Modal
+				<Modal
 					title="Edit Invoice"
 					visible={isEditInvoiceModalVisible}
 					onCancel={closeEditInvoiceModal}
@@ -309,7 +294,7 @@ export const InvoiceList = () => {
 					className='mt-[-70px]'
 				>
 					<EditInvoice onClose={closeEditInvoiceModal} />
-				</Modal> */}
+				</Modal>
 				{/* <Modal
 					title="Invoice"
 					visible={isViewInvoiceModalVisible}

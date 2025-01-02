@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Card, Checkbox, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, DatePicker } from 'antd';
+import React, { useState,useEffect } from 'react';
+import { Card, Checkbox, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, DatePicker, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
 // import { Card, Table,  Badge, Menu, Tag,Modal } from 'antd';
 import { useNavigate } from 'react-router-dom';
@@ -11,14 +11,14 @@ import Flex from 'components/shared-components/Flex'
 import utils from 'utils';
 import AvatarStatus from 'components/shared-components/AvatarStatus';
 import userData from 'assets/data/user-list.data.json';
-import dayjs from 'dayjs';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
+import { useSelector, useDispatch } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { getallcurrencies } from '../../../setting/currencies/currenciesreducer/currenciesSlice';
 import * as Yup from 'yup';
 
 const { Option } = Select;
 
-const AddProject = () => {
+const EditInvoice = () => {
     const [users, setUsers] = useState(userData);
     // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     // const [list, setList] = useState(OrderListData);
@@ -26,59 +26,36 @@ const AddProject = () => {
 
     const [discountType, setDiscountType] = useState("%");
     const [discountValue, setDiscountValue] = useState(0);
-    const [isAddInvoiceModalVisible, setIsAddInvoiceModalVisible] = useState(false);
+    const [isAddProductModalVisible, setIsAddProductModalVisible] = useState(false);
     const [list, setList] = useState(OrderListData)
+    const [selectedMilestone, setSelectedMilestone] = useState(null);
     const [selectedRows, setSelectedRows] = useState([])
     const [selectedRowKeys, setSelectedRowKeys] = useState([])
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [showFields, setShowFields] = useState(false);
+    const { currencies } = useSelector((state) => state.currencies);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(getallcurrencies());
+    }, [dispatch]);
 
     const handleCheckboxChange = (e) => {
         setShowFields(e.target.checked);
     };
 
-    const [showFilter, setShowFilter] = useState(false);
-    const [filters, setFilters] = useState({
-        status: null,
-        date: null,
-        amount: null
-    });
 
-    const toggleFilter = () => {
-        setShowFilter(!showFilter);
-        // Reset all filters when hiding
-        if (showFilter) {
-            setFilters({
-                status: null,
-                date: null,
-                amount: null
-            });
-        }
-    };
-
-    const handleFilterChange = (type, value) => {
-        setFilters(prev => ({
-            ...prev,
-            [type]: value
-        }));
-    };
-
-
-    const hasActiveFilters = Object.values(filters).some(value => value !== null);
 
     const handleProductChange = (value) => {
         setSelectedProduct(value);
         console.log('Selected product:', value);
     };
-    // Open Add Job Modal
-    const openAddInvoiceModal = () => {
-        setIsAddInvoiceModalVisible(true);
+
+    const handleMilestoneChange = (value) => {
+        setSelectedMilestone(value);
+        console.log('Selected Milestone:', value);
     };
-    // Close Add Job Modal
-    const closeAddInvoiceModal = () => {
-        setIsAddInvoiceModalVisible(false);
-    };
-    // 
+ 
 
     const [rows, setRows] = useState([
         {
@@ -123,38 +100,26 @@ const AddProject = () => {
 
     const onSubmit = (values) => {
         console.log('Submitted values:', values);
-        message.success('Job added successfully!');
-        navigate('/app/dashboards/project/invoice');
+        message.success('Invoice added successfully!');
+        navigate('/app/dashboards/project/list');
     };
 
     const initialValues = {
-        invoiceNumber: '',
         invoiceDate: null,
         duedate: null,
         currency: '',
-        exchangerate: '',
         client: '',
         project: '',
         tax: '',
-        bankaccount: '',
-        paymentdetails: '',
-        shippingAddress: '',
-        generatedBy: '',
     };
 
     const validationSchema = Yup.object({
-        invoiceNumber: Yup.string().required('Please enter invoice number.'),
         invoiceDate: Yup.date().nullable().required('Invoice Date is required.'),
         duedate: Yup.date().nullable().required('Due Date is required.'),
         currency: Yup.string().required('Please select currency.'),
-        exchangerate: Yup.string().required('Please enter exchange rate.'),
         client: Yup.string().required('Please enter client name.'),
         project: Yup.string().required('Please enter project name.'),
         tax: Yup.string().required('Please select tax.'),
-        bankaccount: Yup.string().required('Please select bank account.'),
-        paymentdetails: Yup.string().required('Please select payment details.'),
-        shippingAddress: Yup.string().required('Please enter shipping address.'),
-        generatedBy: Yup.string().required('Please select generated by.'),
     });
 
     const handleShowStatus = value => {
@@ -185,15 +150,42 @@ const AddProject = () => {
         setList(data)
         setSelectedRowKeys([])
     }
-    // Search functionality
-    // const onSearch = (e) => {
-    //     const value = e.currentTarget.value;
-    //     const searchArray = value ? list : OrderListData;
-    //     const data = utils.wildCardSearch(searchArray, value);
-    //     setList(data);
-    //     setSelectedRowKeys([]);
-    // };
 
+    const CurrencyField = () => (
+        <Col span={8} className="">
+            <div className="form-item">
+                <div className="flex gap-2">
+                    <Field name="currency">
+                        {({ field, form }) => (
+                            <Select
+                                {...field}
+                                className="w-full mt-2"
+                                placeholder="Select Currency"
+                                onChange={(value) => {
+                                    const selectedCurrency = currencies.find(c => c.id === value);
+                                    form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
+                                }}
+                            >
+                                {currencies?.map((currency) => (
+                                    <Option
+                                        key={currency.id}
+                                        value={currency.id}
+                                    >
+                                        {currency.currencyCode}
+                                    </Option>
+                                ))}
+                            </Select>
+                        )}
+                    </Field>
+                </div>
+                <ErrorMessage
+                    name="currency"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                />
+            </div>
+        </Col>
+    );
 
 
     return (
@@ -212,7 +204,7 @@ const AddProject = () => {
                                     {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
                                         <Form className="formik-form" onSubmit={handleSubmit}>
                                             <Row gutter={16}>
-                                                <Col span={7}>
+                                                {/* <Col span={7}>
                                                     <div className="form-item">
                                                         <label className='font-semibold mb-2'>Invoice Number</label>
                                                         <div className='flex'>
@@ -221,8 +213,8 @@ const AddProject = () => {
                                                         </div>
                                                         <ErrorMessage name="invoiceNumber" component="div" className="error-message text-red-500 my-1" />
                                                     </div>
-                                                </Col>
-                                                <Col span={4} className='mt-2'>
+                                                </Col> */}
+                                                <Col span={12} className='mt-2'>
                                                     <div className="form-item">
                                                         <label className='font-semibold mb-2'>Invoice Date</label>
                                                         <DatePicker
@@ -235,7 +227,7 @@ const AddProject = () => {
                                                         <ErrorMessage name="invoiceDate" component="div" className="error-message text-red-500 my-1" />
                                                     </div>
                                                 </Col>
-                                                <Col span={4} className='mt-2'>
+                                                <Col span={12} className='mt-2'>
                                                     <div className="form-item">
                                                         <label className='font-semibold mb-2'>Due Date</label>
                                                         <DatePicker
@@ -248,51 +240,41 @@ const AddProject = () => {
                                                         <ErrorMessage name="duedate" component="div" className="error-message text-red-500 my-1" />
                                                     </div>
                                                 </Col>
-                                                <Col span={5} className='mt-2'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold mb-2'>Currency</label>
-                                                        <Field name="currency">
-                                                            {({ field }) => (
-                                                                <Select
-                                                                    {...field}
-                                                                    className="w-full"
-                                                                    placeholder="Select Currency"
-                                                                    onChange={(value) => setFieldValue('currency', value)}
-                                                                    value={values.currency}
-                                                                    onBlur={() => setFieldTouched("currency", true)}
-                                                                >
-                                                                    <Option value="usd$">USD($)</Option>
-                                                                    <Option value="inr">INR(₹)</Option>
-                                                                </Select>
-                                                            )}
-                                                        </Field>
-                                                        <ErrorMessage name="currency" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
+                                                <Col span={24} className="mt-4">
+                                                <div className="form-item">
+                                                    <label className="font-semibold">Currency</label>
+                                                    <Field name="currency" component={CurrencyField} />
+                                                    <ErrorMessage
+                                                        name="currency"
+                                                        component="div"
+                                                        className="error-message text-red-500 my-1"
+                                                    />
+                                                </div>
                                                 </Col>
 
-                                                <Col span={4} className='mt-2'>
+                                                {/* <Col span={4} className='mt-2'>
                                                     <div className="form-item">
                                                         <label className='font-semibold mb-2'>Exchange Rate</label>
                                                         <Field name="exchangerate" as={Input} placeholder="Enter Exchange Rate" />
                                                         <h6>( GBP To USD )</h6>
                                                         <ErrorMessage name="exchangerate" component="div" className="error-message text-red-500 my-1" />
                                                     </div>
-                                                </Col>
-                                                <Col span={8} className='mt-2'>
+                                                </Col> */}
+                                                <Col span={12} className='mt-2'>
                                                     <div className="form-item">
                                                         <label className='font-semibold mb-2'>Client</label>
                                                         <Field name="client" as={Input} placeholder="Enter Client Name" />
                                                         <ErrorMessage name="client" component="div" className="error-message text-red-500 my-1" />
                                                     </div>
                                                 </Col>
-                                                <Col span={8} className='mt-2'>
+                                                <Col span={12} className='mt-2'>
                                                     <div className="form-item">
                                                         <label className='font-semibold mb-2'>Project</label>
                                                         <Field name="project" as={Input} placeholder="Website Copier Project" />
                                                         <ErrorMessage name="project" component="div" className="error-message text-red-500 my-1" />
                                                     </div>
                                                 </Col>
-                                                <Col span={8} className='mt-2'>
+                                                <Col span={12} className='mt-2'>
                                                     <div className="form-item">
                                                         <label className='font-semibold mb-2'>Calculate Tax</label>
                                                         <Field name="tax">
@@ -326,7 +308,46 @@ const AddProject = () => {
                     <Card>
                         <div>
                             <div className="overflow-x-auto">
-                          
+                                <Flex alignItems="center"  mobileFlex={false} className='flex mb-4 gap-4'>
+                                    <Flex className="flex " mobileFlex={false}>
+                                        <div className="w-full flex gap-4">
+                                            <div>
+                                                <Select
+                                                    value={selectedProduct}
+                                                    onChange={handleProductChange}
+                                                    className="w-full !rounded-none"
+                                                    placeholder="Select Milestone"
+                                                    rootClassName="!rounded-none"
+                                                >
+                                                    <Option value="smart_speakers">Smart Speakers</Option>
+                                                    <Option value="electric_kettle">Electric Kettle</Option>
+                                                    <Option value="headphones">Headphones</Option>
+                                                </Select>
+                                            </div>
+
+
+                                        </div>
+
+                                    </Flex>
+                                    <Flex gap="7px" className="flex">
+                                        <div className="w-full flex gap-4">
+                                            <div>
+                                                <Select
+                                                    value={selectedMilestone}
+                                                    onChange={handleMilestoneChange}
+                                                    className="w-full !rounded-none"
+                                                    placeholder="Select Milestone"
+                                                    rootClassName="!rounded-none"
+                                                >
+                                                    <Option value="smart_speakers">Milestone 1</Option>
+                                                    <Option value="electric_kettle">Milestone 2</Option>
+                                                    <Option value="headphones">Milestone 3</Option>
+                                                </Select>
+                                            </div>
+
+                                        </div>
+                                    </Flex>
+                                </Flex>
 
                                 <table className="w-full border border-gray-200 bg-white">
                                     <thead className="bg-gray-100">
@@ -409,28 +430,14 @@ const AddProject = () => {
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td colSpan={3} className="px-4 py-2 border-b">
+                                                    <td colSpan={4} className="px-4 py-2 border-b">
                                                         <textarea
-                                                            rows={1}
+                                                            rows={2}
                                                             placeholder="Description"
-                                                            className="w-[70%] p-2 border rounded"
+                                                            className="w-[70%] p-2 border"
                                                         ></textarea>
                                                     </td>
-                                                    <td colSpan={1} className="px-4 py-2 border-2 text-gray-300 text-center">
-                                                        <Upload
-                                                            action="http://localhost:5500/api/users/upload-cv"
-                                                            listType="picture"
-                                                            accept=".pdf"
-                                                            maxCount={1}
-                                                            showUploadList={{ showRemoveIcon: true }}
-                                                        >
-                                                            <div className="flex flex-col items-center">
-                                                                <CloudUploadOutlined className='text-4xl text-blue-500' />
-                                                                <span className="text-gray-600">Choose File</span>
-                                                            </div>
-
-                                                        </Upload>
-                                                    </td>
+                                                    
                                                     <td className='hidden'>
                                                         <span>0</span>
                                                     </td>
@@ -447,10 +454,10 @@ const AddProject = () => {
                             </div>
 
                             {/* Summary Section */}
-                            <div className="mt-3 flex flex-col justify-end items-end space-y-2">
+                            <div className="mt-3 flex flex-col justify-end items-end space-y-2 border-t-2">
                                 <table className='w-full lg:w-[50%] p-2'>
                                     {/* Sub Total */}
-                                    <tr className="flex justify-between px-2  py-2 border-2">
+                                    <tr className="flex justify-between px-2  py-2 border-b-2 border-x-2">
                                         <td className="font-medium ">Sub Total</td>
                                         <td className="font-medium px-4 py-2">0.00</td>
                                     </tr>
@@ -515,43 +522,20 @@ const AddProject = () => {
                             </div>
                         </div>
 
-                        <div className='mt-4'>
-                            <Checkbox onChange={handleCheckboxChange}>
-                                I Have Received Payment
-                            </Checkbox>
 
-                            {showFields && (
-                                <div style={{ marginTop: '20px' }}>
-                                    <Row gutter={16}>
-                                    <Col span={12}>
-                                            <label>Payment Gateway</label>
-                                            <Select placeholder="Select an option" className="w-full">
-                                                <Option value="--">--</Option>
-                                                <Option value="offline">Offline Payment</Option>
-                                                <Option value="online">Online Payment</Option>
-                                            </Select>
-                                        </Col>
-                                        <Col span={12}>
-                                                <label>Transaction ID</label>
-                                            <Input placeholder="Enter Transaction ID" />
-                                        </Col>
-                                        
-                                    </Row>
-                                </div>
-                            )}
-                        </div>
 
                     </Card>
 
                     <div className="form-buttons text-right">
-                        <Button type="default" className="mr-2" onClick={() => navigate('/apps/sales/estimates')}>Cancel</Button>
-                        <Button type="primary" htmlType="submit">Create</Button>
+                        <Button type="default" className="mr-2" onClick={() => navigate('/app/dashboards/project/list')}>Cancel</Button>
+                        <Button type="primary" htmlType="submit">Update</Button>
                     </div>
                 </div>
             </div>
+
         </>
     );
 };
 
-export default AddProject;              
+export default EditInvoice;
 

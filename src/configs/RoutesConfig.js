@@ -166,6 +166,11 @@ export const protectedRoutes = [
     },
     {
         key: 'dashboard.project.task',
+        path: `${APP_PREFIX_PATH}/dashboards/project/task/TaskView`,
+        component: React.lazy(() => import('views/app-views/dashboards/project/task/TaskView')),
+    },
+    {
+        key: 'dashboard.project.task',
         path: `${APP_PREFIX_PATH}/dashboards/project/task/viewtask`,
         component: React.lazy(() => import('views/app-views/dashboards/task/ViewTask')),
     },

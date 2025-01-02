@@ -12,10 +12,10 @@ const AddProjectMember = () => {
     const [showReceiptUpload, setShowReceiptUpload] = useState(false);
     // const [uploadModalVisible, setUploadModalVisible] = useState(false);
     const initialValues = {
-        AddProjectMember: ''
+        AddProjectMember: []
     };
     const validationSchema = Yup.object({
-        AddProjectMember: Yup.string().required('Please enter AddProjectMember name.')
+        AddProjectMember: Yup.array().min(1, 'Please select at least one member.')
     });
     const onSubmit = (values, { resetForm }) => {
         console.log('Submitted values:', values);
