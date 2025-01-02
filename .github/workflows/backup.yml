@@ -1,0 +1,22 @@
+name: Auto Backup
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Runs daily at midnight (UTC)
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source repository
+        uses: actions/checkout@v3
+        with:
+          # Main repository to be checked out
+          repository: nexisvision/CRM-HRM-LEAD-BILLING-Frontend
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push to backup repository
+        run: |
+          git remote add backup https://github.com/nexisvision/CRM-HRM-LEAD-BILLING-Frontend-Backup.git
+          git push --mirror backup
