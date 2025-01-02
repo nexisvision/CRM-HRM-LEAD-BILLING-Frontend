@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import OverViewList from './overView/OverViewList';
-import FileList from './File/FileList';
-import TaskList from './task/TaskList';
-import InvoiceList from './invoice/InvoiceList';
-import PaymentList from './payment/PaymentList';
-import ProjectMember from './projectmember/ProjectMember';
-import ExpensesList from './expenses/ExpensesList';
-import MilestoneList from './milestone/MilestoneList';
-import NotesList from './notes/NotesList';
+import React, { useState } from "react";
+import OverViewList from "./overView/OverViewList";
+import FileList from "./File/FileList";
+import TaskList from "./task/TaskList";
+import InvoiceList from "./invoice/InvoiceList";
+import PaymentList from "./payment/PaymentList";
+import ProjectMember from "./projectmember/ProjectMember";
+import ExpensesList from "./expenses/ExpensesList";
+import MilestoneList from "./milestone/MilestoneList";
+import NotesList from "./notes/NotesList";
 // import Members from './tabs/Members';
 // import Files from './tabs/Files';
 // import Milestones from './tabs/Milestones';
@@ -16,18 +16,18 @@ import NotesList from './notes/NotesList';
 // import GanttChart from './tabs/GanttChart';
 
 const ViewProject = () => {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   const tabs = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'projectmember', label: 'Project Member' },
-    { id: 'files', label: 'Files' },
-    { id: 'milestones', label: 'Milestones' },
-    { id: 'tasks', label: 'Tasks' },
-    { id: 'invoices', label: 'Invoices' },
-    { id: 'expenses', label: 'Expenses' },
-    { id: 'payments', label: 'Payments' },
-    { id: 'notes', label: 'Notes' },
+    { id: "overview", label: "Overview" },
+    { id: "projectmember", label: "Project Member" },
+    { id: "files", label: "Files" },
+    { id: "milestones", label: "Milestones" },
+    { id: "tasks", label: "Tasks" },
+    { id: "invoices", label: "Invoices" },
+    { id: "expenses", label: "Expenses" },
+    { id: "payments", label: "Payments" },
+    { id: "notes", label: "Notes" },
     // { id: 'members', label: 'Members' },
     // { id: 'taskboard', label: 'Task Board' },
     // { id: 'ganttchart', label: 'Gantt Chart' },
@@ -36,23 +36,23 @@ const ViewProject = () => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'overview':
+      case "overview":
         return <OverViewList />;
-      case 'projectmember':
+      case "projectmember":
         return <ProjectMember />;
-      case 'milestones':
+      case "milestones":
         return <MilestoneList />;
-      case 'files':
+      case "files":
         return <FileList />;
-      case 'tasks':
+      case "tasks":
         return <TaskList />;
-      case 'invoices':
+      case "invoices":
         return <InvoiceList />;
-      case 'expenses':
+      case "expenses":
         return <ExpensesList />;
-      case 'payments':
+      case "payments":
         return <PaymentList />;
-      case 'notes':
+      case "notes":
         return <NotesList />;
 
       //   case 'members':
@@ -78,9 +78,10 @@ const ViewProject = () => {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`py-4 px-1 inline-flex items-center border-b-2 font-medium text-sm
-                ${activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ${
+                  activeTab === tab.id
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }
               `}
             >
@@ -91,9 +92,7 @@ const ViewProject = () => {
       </div>
 
       {/* Content Area */}
-      <div className="mt-6">
-        {renderContent()}
-      </div>
+      <div className="mt-6">{renderContent()}</div>
     </div>
   );
 };

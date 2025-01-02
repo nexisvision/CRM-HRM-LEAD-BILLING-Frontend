@@ -249,8 +249,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
         enableReinitialize
       >
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
-          <Form className="formik-form" onSubmit={handleSubmit}>
-            {/* <h2 className="mb-4 border-b pb-2 font-medium"></h2> */}
+          <Form onSubmit={handleSubmit}>
 
             <Row gutter={16}>
               <Col span={24}>
@@ -713,14 +712,17 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
             <div className="form-buttons text-right mt-4">
               <Button
                 type="default"
-                htmlType="submit"
                 className="mr-2"
-                onClick={() => navigate("/app/apps/project/lead")}
+                onClick={() => navigate("/leads")}
               >
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit">
-                Create
+              <Button 
+                type="primary" 
+                htmlType="submit"
+                onClick={handleSubmit}
+              >
+                Update
               </Button>
             </div>
           </Form>

@@ -1,33 +1,32 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./ContractService";
+import UserService from "./minstoneService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
-export const AddCon = createAsyncThunk(
-  "users/AddCon",
-  async (userData, thunkAPI) => {
+
+export const AddMins = createAsyncThunk(
+  "users/AddMins",
+  async ({ id, values }, thunkAPI) => {
     try {
-      const response = await UserService.CreateCon(userData);
+      const response = await UserService.AddMin(id, values);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
+
 // Async thunk for user login
 
-export const ContaractData = createAsyncThunk(
-  "emp/ContaractData",
-  async (thunkAPI) => {
-    try {
-      const response = await UserService.ContaractData();
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
+export const Getmins = createAsyncThunk("emp/Getmins", async (id, thunkAPI) => {
+  try {
+    const response = await UserService.GetMin(id);
+    return response;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response.data);
   }
-);
+});
 
 // Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
@@ -56,23 +55,23 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const DeleteCon = createAsyncThunk(
-  "users/DeleteCon",
+export const Deletemins = createAsyncThunk(
+  "users/Deletemins",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.DeleteCon(userId);
+      const response = await UserService.Deletemin(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const Editcon = createAsyncThunk(
-  "users/Editcon",
-  async ({ id, values }, thunkAPI) => {
+export const Editmins = createAsyncThunk(
+  "users/Editmins",
+  async ({ id, data }, thunkAPI) => {
     try {
-      console.log("jkjkjkjkjjkj", id);
-      const response = await UserService.Editcon(id, values);
+      console.log("idinslice", id);
+      const response = await UserService.EditMin(id, data);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -95,9 +94,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "Contract",
+  name: "Milestone",
   initialState: {
-    Contract: [],
+    Milestone: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -134,27 +133,27 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(AddCon.pending, (state) => {
+      .addCase(AddMins.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(AddCon.fulfilled, (state, action) => {
+      .addCase(AddMins.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(AddCon.rejected, (state, action) => {
+      .addCase(AddMins.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(ContaractData.pending, (state) => {
+      .addCase(Getmins.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(ContaractData.fulfilled, (state, action) => {
+      .addCase(Getmins.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.Contract = action?.payload;
+        state.Milestone = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(ContaractData.rejected, (state, action) => {
+      .addCase(Getmins.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
@@ -187,27 +186,27 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
       //delete
-      .addCase(DeleteCon.pending, (state) => {
+      .addCase(Deletemins.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(DeleteCon.fulfilled, (state, action) => {
+      .addCase(Deletemins.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload.message);
       })
-      .addCase(DeleteCon.rejected, (state, action) => {
+      .addCase(Deletemins.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(Editcon.pending, (state) => {
+      .addCase(Editmins.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(Editcon.fulfilled, (state, action) => {
+      .addCase(Editmins.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload;
       })
-      .addCase(Editcon.rejected, (state, action) => {
+      .addCase(Editmins.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
       });

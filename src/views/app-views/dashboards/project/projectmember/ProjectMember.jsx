@@ -1,275 +1,162 @@
-import React, { Component } from 'react'
-import { useState } from 'react'
-// import { PrinterOutlined } from '@ant-design/icons';
-import StatisticWidget from 'components/shared-components/StatisticWidget';
-import {
-    AnnualStatisticData,
-} from '../../../dashboards/default/DefaultDashboardData';
-import { Row, Card, Col, Table, Select, Input, Button, Badge, Menu, Modal, Tag } from 'antd';
-// import { invoiceData } from '../../../pages/invoice/invoiceData';
-// import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
-import NumberFormat from 'react-number-format';
-// import React, {useState} from 'react'
-// import { Card, Table, Select, Input, Button, Badge, Menu, Tag } from 'antd';
-import OrderListData from "../../../../../assets/data/order-list.data.json"
-import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, EditOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import { TiPinOutline } from "react-icons/ti";
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import Flex from 'components/shared-components/Flex'
-// import NumberFormat from 'react-number-format';
-import dayjs from 'dayjs';
-import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
-import utils from 'utils'
-import AddProjectMember from './AddProjectMember'
+import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Row, Card, Table, Button, Modal, message } from "antd";
+import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import AddProjectMember from "./AddProjectMember";
+import { GetProject } from "../project-list/projectReducer/ProjectSlice";
+import Flex from "components/shared-components/Flex";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 
-const { Column } = Table;
-const { Option } = Select
+const ProjectMember = () => {
+  const dispatch = useDispatch();
+  const [isAddProjectMemberModalVisible, setIsAddProjectMemberModalVisible] =
+    useState(false);
 
-const paymentStatusList = ['Paid', 'Pending', 'Expired']
-export const ProjectMember = () => {
-    const [annualStatisticData] = useState(AnnualStatisticData);
-    const [list, setList] = useState(OrderListData)
-    const [selectedRows, setSelectedRows] = useState([])
-    const [isAddProjectMemberModalVisible, setIsAddProjectMemberModalVisible] = useState(false);
-    const [isEditProjectMemberModalVisible, setIsEditProjectMemberModalVisible] = useState(false);
-    const [isViewProjectMemberModalVisible, setIsViewProjectMemberModalVisible] = useState(false);
-    const [selectedRowKeys, setSelectedRowKeys] = useState([])
-    const handleShowStatus = value => {
-        if (value !== 'All') {
-            const key = 'paymentStatus'
-            const data = utils.filterArray(OrderListData, key, value)
-            setList(data)
-        } else {
-            setList(OrderListData)
+  const AllProject = useSelector((state) => state.Project);
+  const AllEmployee = useSelector((state) => state.employee);
+
+  const projectData = AllProject?.Project?.data || [];
+  const employeeData = AllEmployee?.employee?.data || [];
+
+  const { id } = useParams();
+
+  const DeletePro2 = async (payload) => {
+    const token = localStorage.getItem("auth_token");
+
+    const payload2 = {
+      project_members: [payload],
+    };
+
+    try {
+      const res = await axios.post(
+        `http://localhost:5353/api/v1/projects/membersdelete/${id}`,
+        { project_members: payload2 },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
+      // dispatch(empdata());
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      throw error;
     }
-    // Open Add Job Modal
-    const openAddProjectMemberModal = () => {
-        setIsAddProjectMemberModalVisible(true);
-    };
-    // Close Add Job Modal
-    const closeAddProjectMemberModal = () => {
-        setIsAddProjectMemberModalVisible(false);
-    };
-    // Open Add Job Modal
-    const openEditProjectMemberModal = () => {
-        setIsEditProjectMemberModalVisible(true);
-    };
-    // Close Add Job Modal
-    const closeEditProjectMemberModal = () => {
-        setIsEditProjectMemberModalVisible(false);
-    };
-    // Open Add Job Modal
-    const openViewProjectMemberModal = () => {
-        setIsViewProjectMemberModalVisible(true);
-    };
-    // Close Add Job Modal
-    const closeViewProjectMemberModal = () => {
-        setIsViewProjectMemberModalVisible(false);
-    };
-    const dropdownMenu = row => (
-        <Menu>
-            <Menu.Item>
-                <Flex alignItems="center" onClick={openViewProjectMemberModal}>
-                    <EyeOutlined />
-                    {/* <EyeOutlined /> */}
-                    <span className="ml-2">View Details</span>
-                </Flex>
-            </Menu.Item>
-            <Menu.Item>
-                <Flex alignItems="center">
-                    <PlusCircleOutlined />
-                    <span className="ml-2">Add to remark</span>
-                </Flex>
-            </Menu.Item>
-            <Menu.Item>
-                <Flex alignItems="center" onClick={openEditProjectMemberModal}>
-                    <EditOutlined />
-                    {/* <EditOutlined /> */}
-                    <span className="ml-2">Edit</span>
-                </Flex>
-            </Menu.Item>
-            <Menu.Item>
-                <Flex alignItems="center">
-                    <TiPinOutline />
-                    <span className="ml-2">Pin</span>
-                </Flex>
-            </Menu.Item>
-            <Menu.Item>
-                <Flex alignItems="center">
-                    <DeleteOutlined />
-                    <span className="ml-2">Delete</span>
-                </Flex>
-            </Menu.Item>
-        </Menu>
-    );
-    const tableColumns = [
-        {
-            title: '#',
-            dataIndex: 'id'
-        },
-        // {
-        //  title: 'Name',
-        //  dataIndex: 'name',
-        //  render: (_, record) => (
-        //      <span>{record.name}</span>
-        //  ),
-        //  sorter: (a, b) => utils.antdTableSorter(a, b, 'name')
-        // },
-        {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
-            render: (text) => (
-                <div>
-                    <span>{text}</span>
-                    <br />
-                    <span className="text-xs text-gray-500"></span>
-                </div>
-            ),
-        },
-        {
-            title: 'Hourly Rate ',
-            dataIndex: 'hourlyrate',
-            render: (_, record) => (
-                <input className='border border-gray-300 rounded-md p-2' value={record.hourlyrate} />
-            ),
-            sorter: (a, b) => utils.antdTableSorter(a, b, 'hourlyrate')
-        },
-        {
-            title: 'User Role ',
-            dataIndex: 'userrole',
-            render: (_, record) => (
-                <label htmlFor="Project Admin">
-                    <input type='radio' className='border border-gray-300 rounded-md p-2' value={record.userrole} />
-                    <span className='ml-2 items-center p-2' >Project Admin</span>
-                </label>
-            ),
-            sorter: (a, b) => utils.antdTableSorter(a, b, 'userrole')
-        },
-        {
-            title: 'Action',
-            dataIndex: 'actions',
-            render: (_, elm) => (
-                <div className="text-center">
-                    <DeleteOutlined menu={dropdownMenu(elm)} />
-                </div>
-            )
-        }
-        // {
-        //  title: 'status',
-        //  dataIndex: 'paymentStatus',
-        //  // render: (_, record) => (
-        //  //  <><Tag color={getPaymentStatus(record.paymentStatus)}>{record.paymentStatus}</Tag></>
-        //  //  // <><Badge status={getPaymentStatus(record.paymentStatus)}  className='me-2'/><span>{record.paymentStatus}</span></>
-        //  // ),
-        //  sorter: (a, b) => utils.antdTableSorter(a, b, 'paymentStatus')
-        // },
-        // {
-        //  title: 'Action',
-        //  dataIndex: 'actions',
-        //  render: (_, elm) => (
-        //      <div className="text-center">
-        //          <EllipsisDropdown menu={dropdownMenu(elm)} />
-        //      </div>
-        //  )
-        // }
-    ];
-    const rowSelection = {
-        onChange: (key, rows) => {
-            setSelectedRows(rows)
-            setSelectedRowKeys(key)
-        }
-    };
-    // const onSearch = e => {
-    //  const value = e.currentTarget.value
-    //  const searchArray = e.currentTarget.value ? list : OrderListData
-    //  const data = utils.wildCardSearch(searchArray, value)
-    //  setList(data)
-    //  setSelectedRowKeys([])
-    // }
-    // total() {
-    //  let total = 0;
-    //  invoiceData.forEach((elm) => {
-    //      total += elm.price;
-    //  })
-    //  return total
-    // }
-    // render() {
-    return (
-        <div className="container">
-            <Flex gap="7px" className="flex">
-                <Button type="primary" className="flex items-center bg-blue-500 text-white rounded-md p-2 mb-3" onClick={openAddProjectMemberModal}>
-                    <PlusOutlined />
-                    <span className="ml-2">Add Project Member</span>
-                </Button>
-            </Flex>
-            <Card>
-                <Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
-                    <Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
-                        <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
-                            {/* <Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)} /> */}
-                        </div>
-                        <div className="mb-3">
-                        </div>
-                    </Flex>
-                </Flex>
-                <div className="table-responsive">
-                    <Table
-                        columns={tableColumns}
-                        dataSource={list}
-                        rowKey='id'
-                    // scroll={{ x: 1200 }}
-                    // rowSelection={{
-                    //  selectedRowKeys: selectedRowKeys,
-                    //  type: 'checkbox',
-                    //  preserveSelectedRowKeys: false,
-                    //  ...rowSelection,
-                    // }}
-                    />
-                </div>
-                 <Modal
-                    title="Project Member Create"
-                    visible={isAddProjectMemberModalVisible}
-                    onCancel={closeAddProjectMemberModal}
-                    footer={null}
-                    width={1000}
-                    className='mt-[-70px]'
-                >
-                <AddProjectMember  onClose={closeAddProjectMemberModal} />
-                </Modal> 
-              {/*  <Modal
-                    title="Edit Project Member"
-                    visible={isEditProjectMemberModalVisible}
-                    onCancel={closeEditProjectMemberModal}
-                    footer={null}
-                    width={1000}
-                    className='mt-[-70px]'
-                >
-                        <EditProjectMember onClose={closeEditProjectMemberModal} />
-                </Modal>
-                <Modal
-                    title="Project Member"
-                    visible={isViewProjectMemberModalVisible}
-                    onCancel={closeViewProjectMemberModal}
-                    footer={null}
-                    width={1000}
-                    className='mt-[-70px]'
-                >
-                    <ViewProjectMember onClose={closeViewProjectMemberModal} />
-                </Modal> */}
-            </Card>
+  };
+
+  console.log("tt", projectData);
+
+  const project = projectData[0]; // Accessing the first project as an example
+
+  const userField = project?.project_members; // The 'user' field in the project
+  let userArray = [];
+  console.log("popopop", userField);
+
+  try {
+    const parsedUserField = JSON.parse(userField); // Parse the JSON string
+    userArray = parsedUserField?.project_members; // Extract the array of user IDs
+  } catch (error) {
+    console.error("Error parsing user field:", error);
+  }
+
+  const userEmployeeData = userArray
+    ?.map((userId) => {
+      const employee = employeeData?.find((emp) => emp?.id === userId);
+      if (!employee) {
+        console.warn(`No employee found for userId: ${userId}`);
+      }
+      return employee || null; // Return the employee if found, otherwise null
+    })
+    .filter((employee) => employee !== null); // Remove null values
+
+  console.log("Filtered Employee Data:", userEmployeeData);
+
+  const tableColumns = [
+    {
+      title: "Name",
+      dataIndex: "firstName",
+      key: "firstName",
+      render: (text, record) => <span>{record?.firstName || "N/A"}</span>,
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      render: (text, record) => <span>{record?.email || "N/A"}</span>,
+    },
+    {
+      title: "Action",
+      dataIndex: "actions",
+      render: (_, record) => (
+        <Button
+          danger
+          icon={<DeleteOutlined />}
+          onClick={() => handleDelete(record.id)}
+        >
+          Delete
+        </Button>
+      ),
+    },
+  ];
+
+  const openAddProjectMemberModal = () => {
+    setIsAddProjectMemberModalVisible(true);
+  };
+
+  const closeAddProjectMemberModal = () => {
+    setIsAddProjectMemberModalVisible(false);
+  };
+
+  const handleDelete = async (userId) => {
+    try {
+      console.log("yyyyy", userId);
+      await dispatch(DeletePro2(userId));
+      const updatedData = await dispatch(GetProject());
+      // setUsers(users.filter((item) => item.id !== userId));
+      message.success({ content: "Deleted user successfully", duration: 2 });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
+  };
+
+  useEffect(() => {
+    dispatch(GetProject());
+  }, [dispatch]);
+
+  return (
+    <div className="container">
+      <Flex gap="7px" className="flex">
+        <Button
+          type="primary"
+          className="flex items-center bg-blue-500 text-white rounded-md p-2 mb-3"
+          onClick={openAddProjectMemberModal}
+        >
+          <PlusOutlined />
+          <span className="ml-2">Add Project Member</span>
+        </Button>
+      </Flex>
+      <Card>
+        <div className="table-responsive">
+          <Table
+            columns={tableColumns}
+            dataSource={userEmployeeData}
+            rowKey="id"
+          />
         </div>
-    );
-}
+        <Modal
+          title="Add Project Member"
+          visible={isAddProjectMemberModalVisible}
+          onCancel={closeAddProjectMemberModal}
+          footer={null}
+          width={1000}
+        >
+          <AddProjectMember onClose={closeAddProjectMemberModal} />
+        </Modal>
+      </Card>
+    </div>
+  );
+};
+
 export default ProjectMember;
-
-
-
-
-
-
-
-
-

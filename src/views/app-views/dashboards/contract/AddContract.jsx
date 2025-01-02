@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Input,
   Button,
@@ -17,22 +17,24 @@ import OrderListData from "assets/data/order-list.data.json";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { AddCon } from "./ContractReducers/ContractSlice";
+import { AddCon, ContaractData } from "./ContractReducers/ContractSlice";
+import { GetProject } from "../project/project-list/projectReducer/ProjectSlice";
+import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 
 const { Option } = Select;
 // const CheckboxGroup = Checkbox.Group;
-const AddContract = () => {
+const AddContract = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const initialValues = {
     subject: "",
     client: "",
-    Projects: "",
-    contracttype: "",
+    project: "",
+    type: "",
     startdate: null,
-    enddate: null,
-    contractvalue: "",
+    endDate: null,
+    value: "",
     description: "",
     // options: [],
   };
@@ -40,21 +42,32 @@ const AddContract = () => {
   const validationSchema = Yup.object({
     subject: Yup.string().optional("Please enter a Subject Name."),
     client: Yup.string().optional("Please select Client."),
-    projects: Yup.mixed().optional("Please select Projects."),
-    contracttype: Yup.string().optional("Please enter Contract Value ."),
-    startdate: Yup.date().nullable().optional("Start date is required."),
-    enddate: Yup.date().nullable().optional("End date is required."),
-    contractvalue: Yup.number()
+    project: Yup.mixed().optional("Please select Projects."),
+    type: Yup.string().optional("Please enter Contract Value ."),
+    startDate: Yup.date().nullable().optional("Start date is required."),
+    endDate: Yup.date().nullable().optional("End date is required."),
+    value: Yup.number()
       .optional("Please Select a contractvalue.")
       .positive("Contract Value must be positive."),
     description: Yup.string().optional("Please enter a Description."),
     // options: Yup.array().min(1, 'Please select at least one option.'),
   });
 
-  const onSubmit = (values) => {
-    dispatch(AddCon(values));
-    console.log("Submitted values:", values);
-    message.success("Project added successfully!");
+  const onSubmit = (values, { resetForm }) => {
+    // dispatch(AddCon(values));
+    // onClose();
+    // console.log("Submitted values:", values);
+    dispatch(AddCon(values))
+      .then(() => {
+        dispatch(ContaractData()); // Refresh leave data
+        message.success("Project added successfully!");
+        resetForm();
+        onClose(); // Close modal
+      })
+      .catch((error) => {
+        message.error("Failed to add Leads.");
+        console.error("Add API error:", error);
+      });
   };
   // console.log("object",Option)
 
@@ -64,6 +77,11 @@ const AddContract = () => {
   const Projectdtaa = useSelector((state) => state.Project);
   const filterprojectdata = Projectdtaa.Project.data;
 
+  useEffect(() => {
+    dispatch(GetProject());
+    dispatch(ClientData());
+  }, []);
+
   return (
     <div className="add-job-form">
       <Formik
@@ -71,7 +89,7 @@ const AddContract = () => {
         validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
-        {({ values, setFieldValue, handleSubmit, handleChange }) => (
+        {({ values, setFieldValue, handleSubmit, handleChange, resetForm }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
             <h2 className="mb-4 border-b pb-2 font-medium"></h2>
 
@@ -105,8 +123,19 @@ const AddContract = () => {
                         onChange={(value) => setFieldValue("client", value)}
                         value={values.client}
                       >
-                        <Option value="xyz">XYZ</Option>
-                        <Option value="abc">ABC</Option>
+                        {filtersubclient && filtersubclient.length > 0 ? (
+                          filtersubclient.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.username ||
+                                client?.username ||
+                                "Unnamed Client"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Client Available
+                          </Option>
+                        )}
                       </Select>
                     )}
                   </Field>
@@ -119,7 +148,7 @@ const AddContract = () => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              {/* <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Projects</label>
                   <Field name="projects">
@@ -142,21 +171,59 @@ const AddContract = () => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
+              </Col> */}
+
+              <Col span={12} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">Projects</label>
+                  <Field name="project">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full"
+                        placeholder="Select Projects"
+                        onChange={(value) => setFieldValue("project", value)}
+                        value={values.project}
+                      >
+                        {filterprojectdata && filterprojectdata.length > 0 ? (
+                          filterprojectdata.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.project_name ||
+                                client?.username ||
+                                "Unnamed Client"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Projects Available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  {/* <Field name="user" as={Select} className='w-full' placeholder="Select User">
+                                                      <Option value="xyz">xyz</Option>
+                                                      <Option value="abc">abc</Option>
+                                                  </Field> */}
+                  <ErrorMessage
+                    name="user"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
               </Col>
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Contract Type</label>
-                  <Field name="contracttype">
+                  <Field name="type">
                     {({ field }) => (
                       <Select
                         {...field}
                         className="w-full"
                         placeholder="Select Contract Type"
-                        onChange={(value) =>
-                          setFieldValue("contracttype", value)
-                        }
-                        value={values.contracttype}
+                        onChange={(value) => setFieldValue("type", value)}
+                        value={values.type}
                       >
                         <Option value="Marketing">Marketing</Option>
                         <Option value="Planning">Planning</Option>
@@ -164,7 +231,7 @@ const AddContract = () => {
                     )}
                   </Field>
                   <ErrorMessage
-                    name="contracttype"
+                    name="type"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -175,13 +242,13 @@ const AddContract = () => {
                 <div className="form-item">
                   <label className="font-semibold">Contract Value</label>
                   <Field
-                    name="contractValue"
+                    name="value"
                     as={Input}
                     placeholder="Enter Contract Value "
-                    type="number"
+                    type="text"
                   />
                   <ErrorMessage
-                    name="contractValue"
+                    name="value"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -194,11 +261,11 @@ const AddContract = () => {
                   <DatePicker
                     className="w-full"
                     format="DD-MM-YYYY"
-                    value={values.startdate}
-                    onChange={(date) => setFieldValue("startdate", date)}
+                    value={values.startDate}
+                    onChange={(date) => setFieldValue("startDate", date)}
                   />
                   <ErrorMessage
-                    name="startdate"
+                    name="startDate"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -211,11 +278,11 @@ const AddContract = () => {
                   <DatePicker
                     className="w-full"
                     format="DD-MM-YYYY"
-                    value={values.enddate}
-                    onChange={(date) => setFieldValue("enddate", date)}
+                    value={values.endDate}
+                    onChange={(date) => setFieldValue("endDate", date)}
                   />
                   <ErrorMessage
-                    name="enddate"
+                    name="endDate"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -274,11 +341,7 @@ const AddContract = () => {
             </Row>
 
             <div className="form-buttons text-right mt-4">
-              <Button
-                type="default"
-                className="mr-2"
-                onClick={() => navigate("/app/apps/project")}
-              >
+              <Button type="default" className="mr-2" onClick={onClose}>
                 Cancel
               </Button>
               <Button type="primary" htmlType="submit">
