@@ -2,8 +2,8 @@ name: Auto Backup
 
 on:
   schedule:
-    - cron: "0 19 * * *" # Runs daily at midnight (UTC)
-  workflow_dispatch: # Allows manual trigger
+    - cron: "0 19 * * *"  # Runs daily at 19:00 UTC (7:00 PM UTC)
+  workflow_dispatch:  # Allows manual trigger
 
 jobs:
   backup:
@@ -26,4 +26,4 @@ jobs:
           git push --mirror backup
         env:
           GIT_USER: ${{ secrets.GITHUB_ACTOR }}
-          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_TOKEN: ${{ secrets.BACKUP_TOKEN }}  # Use the PAT here
