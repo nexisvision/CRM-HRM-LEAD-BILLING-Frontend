@@ -30,38 +30,6 @@ const AddInvoice = () => {
         dispatch(getallcurrencies());
     }, [dispatch]);
 
-    const handleCheckboxChange = (e) => {
-        setShowFields(e.target.checked);
-    };
-
-    const [showFilter, setShowFilter] = useState(false);
-    const [filters, setFilters] = useState({
-        status: null,
-        date: null,
-        amount: null
-    });
-
-    const toggleFilter = () => {
-        setShowFilter(!showFilter);
-        // Reset all filters when hiding
-        if (showFilter) {
-            setFilters({
-                status: null,
-                date: null,
-                amount: null
-            });
-        }
-    };
-
-    const handleFilterChange = (type, value) => {
-        setFilters(prev => ({
-            ...prev,
-            [type]: value
-        }));
-    };
-
-
-    const hasActiveFilters = Object.values(filters).some(value => value !== null);
 
     const handleProductChange = (value) => {
         setSelectedProduct(value);
@@ -148,42 +116,6 @@ const AddInvoice = () => {
         tax: Yup.string().required('Please select tax.'),
     });
 
-    const CurrencyField = () => (
-        <Col span={8} className="">
-            <div className="form-item">
-                <div className="flex gap-2">
-                    <Field name="currency">
-                        {({ field, form }) => (
-                            <Select
-                                {...field}
-                                className="w-full mt-2"
-                                placeholder="Select Currency"
-                                onChange={(value) => {
-                                    const selectedCurrency = currencies.find(c => c.id === value);
-                                    form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
-                                }}
-                            >
-                                {currencies?.map((currency) => (
-                                    <Option
-                                        key={currency.id}
-                                        value={currency.id}
-                                    >
-                                        {currency.currencyCode}
-                                    </Option>
-                                ))}
-                            </Select>
-                        )}
-                    </Field>
-                </div>
-                <ErrorMessage
-                    name="currency"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                />
-            </div>
-        </Col>
-    );
-
 
     return (
         <>
@@ -230,33 +162,56 @@ const AddInvoice = () => {
                                                         <ErrorMessage name="duedate" component="div" className="error-message text-red-500 my-1" />
                                                     </div>
                                                 </Col>
-                                                <Col span={24} className="mt-4">
+                                                <Col span={12} className="mt-4">
                                                 <div className="form-item">
-                                                    <label className="font-semibold">Currency</label>
-                                                    <Field name="currency" component={CurrencyField} />
+                                                    <label className='font-semibold mb-2'>Currency</label>
+                                                    <div className="flex gap-2">
+                                                        <Field name="currency">
+                                                            {({ field, form }) => (
+                                                                <Select
+                                                                    {...field}
+                                                                    className="w-full"
+                                                                    placeholder="Select Currency"
+                                                                    onChange={(value) => {
+                                                                        const selectedCurrency = currencies.find(c => c.id === value);
+                                                                        form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
+                                                                    }}
+                                                                >
+                                                                    {currencies?.map((currency) => (
+                                                                        <Option
+                                                                            key={currency.id}
+                                                                            value={currency.id}
+                                                                        >
+                                                                            {currency.currencyCode}
+                                                                        </Option>
+                                                                    ))}
+                                                                </Select>
+                                                            )}
+                                                        </Field>
+                                                    </div>
                                                     <ErrorMessage
                                                         name="currency"
                                                         component="div"
                                                         className="error-message text-red-500 my-1"
                                                     />
                                                 </div>
-                                                </Col>
+                                            </Col>
 
-                                                <Col span={12} className='mt-2'>
+                                                <Col span={12} className='mt-4'>
                                                     <div className="form-item">
                                                         <label className='font-semibold mb-2'>Client</label>
                                                         <Field name="client" as={Input} placeholder="Enter Client Name" />
                                                         <ErrorMessage name="client" component="div" className="error-message text-red-500 my-1" />
                                                     </div>
                                                 </Col>
-                                                <Col span={12} className='mt-2'>
+                                                <Col span={12} className='mt-4'>
                                                     <div className="form-item">
                                                         <label className='font-semibold mb-2'>Project</label>
                                                         <Field name="project" as={Input} placeholder="Website Copier Project" />
                                                         <ErrorMessage name="project" component="div" className="error-message text-red-500 my-1" />
                                                     </div>
                                                 </Col>
-                                                <Col span={12} className='mt-2'>
+                                                <Col span={12} className='mt-4'>
                                                     <div className="form-item">
                                                         <label className='font-semibold mb-2'>Calculate Tax</label>
                                                         <Field name="tax">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Input, Button, DatePicker, Select, message, Row, Col, Switch, Upload, Modal } from 'antd';
 import { CloudUploadOutlined,QuestionCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -6,10 +6,25 @@ import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { useSelector, useDispatch } from 'react-redux';
+import { getallcurrencies } from '../../../setting/currencies/currenciesreducer/currenciesSlice';
+
 const { Option } = Select;
+
 const AddPayment = () => {
+
     const navigate = useNavigate();
     const [showReceiptUpload, setShowReceiptUpload] = useState(false);
+
+
+    
+    const { currencies } = useSelector((state) => state.currencies);
+    const dispatch = useDispatch();
+
+    
+    useEffect(() => {
+        dispatch(getallcurrencies());
+    }, [dispatch]);
     // const [uploadModalVisible, setUploadModalVisible] = useState(false);
     const initialValues = {
         project: '',
@@ -17,11 +32,11 @@ const AddPayment = () => {
         paidon: '',
         amount: '',
         currency: '',
-        exchangeRate: '',
+        // exchangeRate: '',
         transactionId: '',
         paymentGateway: '',
         bankAccount: '',
-        receipt: '',
+        // receipt: '',
         remark: '',
     };
     const validationSchema = Yup.object({
@@ -30,11 +45,11 @@ const AddPayment = () => {
         paidon: Yup.string().required('Please enter Paid On.'),
         amount: Yup.string().required('Please enter Amount.'),
         currency: Yup.string().required('Please enter Currency.'),
-        exchangeRate: Yup.string().required('Please enter Exchange Rate.'),
+        // exchangeRate: Yup.string().required('Please enter Exchange Rate.'),
         transactionId: Yup.string().required('Please enter Transaction Id.'),
         paymentGateway: Yup.string().required('Please enter Payment Gateway.'),
         bankAccount: Yup.string().required('Please enter Bank Account.'),
-        receipt: Yup.string().required('Please enter Receipt.'),
+        // receipt: Yup.string().required('Please enter Receipt.'),
         remark: Yup.string().required('Please enter Remark.'),
     });
     const onSubmit = (values, { resetForm }) => {
@@ -54,14 +69,14 @@ const AddPayment = () => {
                 {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
                     <Form className="formik-form" onSubmit={handleSubmit}>
                         <Row gutter={16}>
-                            <Col span={6}>
+                            <Col span={8}>
                                 <div className="form-item">
                                     <label className='font-semibold'>Project</label>
-                                    <Field name="project" as={Input} placeholder="Enter Project" />
+                                    <Field className='mt-2' name="project" as={Input} placeholder="Enter Project" />
                                     <ErrorMessage name="project" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
-                            <Col span={6} >
+                            <Col span={8} >
                                 <div className="form-item">
                                     <label className='font-semibold'>Invoice</label>
                                     <Field name="invoice">
@@ -69,7 +84,7 @@ const AddPayment = () => {
                                             <Select
                                                 {...field}
                                                 placeholder="Select Invoice"
-                                                className="w-full"
+                                                className="w-full mt-2"
                                                 onChange={(value) => setFieldValue('invoice', value)}
                                                 value={values.invoice}
                                                 onBlur={() => setFieldTouched('invoice', true)}
@@ -83,11 +98,11 @@ const AddPayment = () => {
                                     <ErrorMessage name="invoice" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
-                            <Col span={6} >
+                            <Col span={8} >
                                 <div className="form-item">
                                     <label className='font-semibold'>Paid On</label>
                                     <DatePicker
-                                        className="w-full"
+                                        className="w-full mt-2"
                                         format="DD-MM-YYYY"
                                         value={values.paidon}
                                         onChange={(date) => setFieldValue('paidon', date)}
@@ -96,50 +111,62 @@ const AddPayment = () => {
                                     <ErrorMessage name="paidon" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
-                            <Col span={6}>
+                            <Col span={8} className='mt-4'>
                                 <div className="form-item">
                                     <label className='font-semibold'>Amount </label>
-                                    <Field name="amount" as={Input} placeholder="Enter Amount" />
+                                    <Field className='mt-2' name="amount" as={Input} placeholder="Enter Amount" />
                                     <ErrorMessage name="amount" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
-                            <Col span={6} className='mt-2'>
+                            <Col span={8} className="mt-4">
                                 <div className="form-item">
-                                    <label className='font-semibold'>Currency</label>
-                                    <Field name="currency">
-                                        {({ field }) => (
-                                            <Select
-                                                {...field}
-                                                placeholder="Select Currency"
-                                                className="w-full"
-                                                onChange={(value) => setFieldValue('currency', value)}
-                                                value={values.currency}
-                                                onBlur={() => setFieldTouched('currency', true)}
-                                                allowClear={false}
-                                            >
-                                                <Option value="INR">INR</Option>
-                                                <Option value="USD">USD</Option>
-                                            </Select>
-                                        )}
-                                    </Field>
-                                    <ErrorMessage name="currency" component="div" className="error-message text-red-500 my-1" />
+                                    <label className="font-semibold">Currency</label>
+                                    <div className="flex gap-2">
+                                        <Field name="currency">
+                                            {({ field, form }) => (
+                                                <Select
+                                                    {...field}
+                                                    className="w-full mt-2"
+                                                    placeholder="Select Currency"
+                                                    onChange={(value) => {
+                                                        const selectedCurrency = currencies.find(c => c.id === value);
+                                                        form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
+                                                    }}
+                                                >
+                                                    {currencies?.map((currency) => (
+                                                        <Option
+                                                            key={currency.id}
+                                                            value={currency.id}
+                                                        >
+                                                            {currency.currencyCode}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                            )}
+                                        </Field>
+                                    </div>
+                                    <ErrorMessage
+                                        name="currency"
+                                        component="div"
+                                        className="error-message text-red-500 my-1"
+                                    />
                                 </div>
                             </Col>
-                            <Col span={6}>
+                            {/* <Col span={6}>
                                 <div className="form-item">
                                     <label className='font-semibold'>Exchange Rate  </label>
                                     <Field name="exchangeRate" as={Input} placeholder="Enter Exchange Rate" />
                                     <ErrorMessage name="exchangeRate" component="div" className="error-message text-red-500 my-1" />
                                 </div>
-                            </Col>
-                            <Col span={6} >
+                            </Col> */}
+                            <Col span={8} className="mt-4">
                                 <div className="form-item">
                                     <label className='font-semibold'>Transaction Id</label>
-                                    <Field name="transactionId" type='number' as={Input} placeholder="Enter Transaction Id" />
+                                    <Field name="transactionId" type='number' as={Input} placeholder="Enter Transaction Id" className='mt-2'/>
                                     <ErrorMessage name="transactionId" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
-                            <Col span={6} className='mt-2'>
+                            <Col span={8} className='mt-4'>
                                 <div className="form-item">
                                     <label className='font-semibold'>Payment Gateway</label>
                                     <Field name="paymentGateway">
@@ -147,7 +174,7 @@ const AddPayment = () => {
                                             <Select
                                                 {...field}
                                                 placeholder="Select Payment Gateway"
-                                                className="w-full"
+                                                className="w-full mt-2"
                                                 onChange={(value) => setFieldValue('paymentGateway', value)}
                                                 value={values.paymentGateway}
                                                 onBlur={() => setFieldTouched('paymentGateway', true)}
@@ -161,7 +188,7 @@ const AddPayment = () => {
                                     <ErrorMessage name="paymentGateway" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
-                            <Col span={6} className='mt-2'>
+                            <Col span={8} className='mt-4'>
                                 <div className="form-item">
                                     <label className='font-semibold'>Bank Account</label>
                                     <Field name="bankAccount">
@@ -169,7 +196,7 @@ const AddPayment = () => {
                                             <Select
                                                 {...field}
                                                 placeholder="Select Bank Account"
-                                                className="w-full"
+                                                className="w-full mt-2"
                                                 onChange={(value) => setFieldValue('bankAccount', value)}
                                                 value={values.bankAccount}
                                                 onBlur={() => setFieldTouched('bankAccount', true)}
@@ -186,7 +213,7 @@ const AddPayment = () => {
 
                             <div className='mt-4 w-full'>
                                 <span className='block  font-semibold p-2'>Receipt <QuestionCircleOutlined /></span>
-                                <Col span={24} >
+                                <Col span={24} className='mt-2'>
                                     <Upload
                                         action="http://localhost:5500/api/users/upload-cv"
                                         listType="picture"
@@ -200,7 +227,7 @@ const AddPayment = () => {
                                     </Upload>
                                 </Col>
                             </div>
-                            <Col span={24} className='mt-2'>
+                            <Col span={24} className='mt-4'>
                                 <div className="form-item">
                                     <label className='font-semibold'>Remark</label>
                                     <ReactQuill
@@ -208,6 +235,7 @@ const AddPayment = () => {
                                         onChange={(value) => setFieldValue('remark', value)}
                                         placeholder="Enter Remark"
                                         onBlur={() => setFieldTouched("remark", true)}
+                                        className='mt-2'
                                     />
                                     <ErrorMessage name="remark" component="div" className="error-message text-red-500 my-1" />
                                 </div>

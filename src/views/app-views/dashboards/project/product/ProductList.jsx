@@ -3,17 +3,15 @@ import React, { useState } from 'react'
 import { Card, Table, Select, Input, Button, Badge, Menu, Tag, Modal ,Row,Col} from 'antd';
 import OrderListData from "../../../../../assets/data/order-list.data.json"
 import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import { TiPinOutline } from "react-icons/ti";
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import Flex from 'components/shared-components/Flex'
 import NumberFormat from 'react-number-format';
 import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils'
-import AddPayment from "./AddPayment"
-// import EditPayment from './EditPayment';
-import ViewPayment from './ViewPayment';
+import AddProduct  from "./AddProduct"
+import EditProduct from './EditProduct';
+import ViewProduct from './ViewProduct';
 import { PaymentStatisticData } from '../../../dashboards/default/DefaultDashboardData';
 
 
@@ -31,44 +29,44 @@ const getPaymentStatus = method => {
 
 const paymentStatusList = ['Normal','Expired']
 
-const PaymentList = () => {
+const ProductList = () => {
 
 	const [list, setList] = useState(OrderListData)
 	const [selectedRows, setSelectedRows] = useState([])
 	const [selectedRowKeys, setSelectedRowKeys] = useState([])
-	const [isAddPaymentModalVisible, setIsAddPaymentModalVisible] = useState(false);
-	const [isEditPaymentModalVisible, setIsEditPaymentModalVisible] = useState(false);
-	const [isViewPaymentModalVisible, setIsViewPaymentModalVisible] = useState(false);
+	const [isAddProductModalVisible, setIsAddProductModalVisible] = useState(false);
+	const [isEditProductModalVisible, setIsEditProductModalVisible] = useState(false);
+	const [isViewProductModalVisible, setIsViewProductModalVisible] = useState(false);
 	const [paymentStatisticData] = useState(PaymentStatisticData);
 
 	// Open Add Job Modal
-	const openAddPaymentModal = () => {
-		setIsAddPaymentModalVisible(true);
+	const openAddProductModal = () => {
+		setIsAddProductModalVisible(true);
 	};
 
 	// Close Add Job Modal
-	const closeAddPaymentModal = () => {
-		setIsAddPaymentModalVisible(false);
+	const closeAddProductModal = () => {
+		setIsAddProductModalVisible(false);
 	};
 
 	// Open Add Job Modal
-	const openEditPaymentModal = () => {
-		setIsEditPaymentModalVisible(true);
+	const openEditProductModal = () => {
+		setIsEditProductModalVisible(true);
 	};
 
 	// Close Add Job Modal
-	const closeEditPaymentModal = () => {
-		setIsEditPaymentModalVisible(false);
+	const closeEditProductModal = () => {
+		setIsEditProductModalVisible(false);
 	};
 
 	// Open Add Job Modal
-	const openViewPaymentModal = () => {
-		setIsViewPaymentModalVisible(true);
+	const openViewProductModal = () => {
+		setIsViewProductModalVisible(true);
 	};
 
 	// Close Add Job Modal
-	const closeViewPaymentModal = () => {
-		setIsViewPaymentModalVisible(false);
+	const closeViewProductModal = () => {
+		setIsViewProductModalVisible(false);
 	};
 
 	const handleShowStatus = value => {
@@ -84,9 +82,17 @@ const PaymentList = () => {
 	const dropdownMenu = row => (
 		<Menu>
 			<Menu.Item>
-				<Flex alignItems="center" onClick={openViewPaymentModal}>
+				<Flex alignItems="center" onClick={openViewProductModal}>
 					<EyeOutlined />
 					<span className="ml-2">View Details</span>
+				</Flex>
+			</Menu.Item>
+
+            <Menu.Item>
+				<Flex alignItems="center" onClick={openEditProductModal}>
+					<EditOutlined />
+					{/* <EditOutlined /> */}
+					<span className="ml-2">Edit</span>
 				</Flex>
 			</Menu.Item>
 			
@@ -105,64 +111,41 @@ const PaymentList = () => {
 		// 	dataIndex: 'id'
 		// },
         {
-			title: 'Project',
-			dataIndex: 'project',
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'project')
+			title: 'Name',
+			dataIndex: 'name',
+			sorter: (a, b) => utils.antdTableSorter(a, b, 'name')
 		},
 		{
-            title: 'Invoice',
-			dataIndex: 'invoice',
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'invoice')
+            title: 'Price',
+			dataIndex: 'price',
+			sorter: (a, b) => utils.antdTableSorter(a, b, 'price')
 		},
         
 		{
-			title: 'Client',
-			dataIndex: 'client',
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'client')
+			title: 'Category',
+			dataIndex: 'category',
+			sorter: (a, b) => utils.antdTableSorter(a, b, 'category')
 		},
         {
-			title: 'Order',
-			dataIndex: 'order',
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'order')
-		},
-		{
-			title: 'Amount',
-			dataIndex: 'amount',
-			render: (_, record) => (
-				<span className="font-weight-semibold">
-					<NumberFormat
-						displayType={'text'}
-						value={(Math.round(record.amount * 100) / 100).toFixed(2)}
-						prefix={'$'}
-						thousandSeparator={true}
-					/>
-				</span>
-			),
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'amount')
+			title: 'Sku',
+			dataIndex: 'sku',
+			sorter: (a, b) => utils.antdTableSorter(a, b, 'sku')
 		},
         {
-            title: 'Paid On',
-            dataIndex: 'paidOn',
-            render: (_, record) => (
-                <span>{dayjs.unix(record.paidOn).format(DATE_FORMAT_DD_MM_YYYY)}</span>
-            ),
-            sorter: (a, b) => utils.antdTableSorter(a, b, 'paidOn')
-        },
-        {
-			title: 'Payment Gateway',
-			dataIndex: 'paymentGateway',
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'paymentGateway')
+			title: 'Description',
+			dataIndex: 'description',
+			sorter: (a, b) => utils.antdTableSorter(a, b, 'description')
 		},
-        {
-			title: 'Status',
-			dataIndex: 'status',
-			render: (_, record) => (
-					<><Tag color={getPaymentStatus(record.status)}>{record.status}</Tag></>
-				  ),
-			sorter: {
-				compare: (a, b) => a.status.length - b.status.length,
-			},
-		},
+        // {
+		// 	title: 'Status',
+		// 	dataIndex: 'status',
+		// 	render: (_, record) => (
+		// 			<><Tag color={getPaymentStatus(record.status)}>{record.status}</Tag></>
+		// 		  ),
+		// 	sorter: {
+		// 		compare: (a, b) => a.status.length - b.status.length,
+		// 	},
+		// },
 		{
 			title: 'Action',
 			dataIndex: 'actions',
@@ -196,7 +179,7 @@ const PaymentList = () => {
 						<div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
 							<Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)} />
 						</div>
-						<div className="w-full md:w-48">
+						{/* <div className="w-full md:w-48">
 							<Select
 								defaultValue="All"
 								className="w-full"
@@ -207,12 +190,12 @@ const PaymentList = () => {
 								<Option value="All">All method </Option>
 								{paymentStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
 							</Select>
-						</div>
+						</div> */}
 					</Flex>
 					<Flex gap="7px" className="flex">
-						<Button type="primary" className="ml-2" onClick={openAddPaymentModal}>
+						<Button type="primary" className="ml-2" onClick={openAddProductModal}>
 							<PlusOutlined />
-							<span className="ml-2">Create Payment</span>
+							<span className="ml-2">Create Product</span>
 						</Button>
 						<Button type="primary" icon={<FileExcelOutlined />} block>
 							Export All
@@ -237,42 +220,43 @@ const PaymentList = () => {
 			</Card>
 			<Card>
 				<Modal
-					title="Add Payment"
-					visible={isAddPaymentModalVisible}
-					onCancel={closeAddPaymentModal}
+					    title="Add Product"
+					visible={isAddProductModalVisible}
+					onCancel={closeAddProductModal}
 					footer={null}
 					width={800}
 					className='mt-[-70px]'
 
 				>
-					<AddPayment onClose={closeAddPaymentModal} />
+					<AddProduct onClose={closeAddProductModal} />
 				</Modal>
 
-				{/* <Modal
-					title="Edit Payment"
-					visible={isEditPaymentModalVisible}
-					onCancel={closeEditPaymentModal}
+				<Modal
+					title="Edit Product"
+					visible={isEditProductModalVisible}
+					onCancel={closeEditProductModal}
 					footer={null}
 					width={800}
 					className='mt-[-70px]'
 
 				>
-					<EditPayment onClose={closeEditPaymentModal} />
-				</Modal> */}
+					<EditProduct onClose={closeEditProductModal} />
+				</Modal>
 
 				<Modal
-					title="Payment Details"
-					visible={isViewPaymentModalVisible}
-					onCancel={closeViewPaymentModal}
+					title="Product Details"
+					visible={isViewProductModalVisible}
+					onCancel={closeViewProductModal}
 					footer={null}
 					width={800}
 					className='mt-[-70px]'
 				>
-					<ViewPayment onClose={closeViewPaymentModal} />
+					<ViewProduct onClose={closeViewProductModal} />
 				</Modal>
 			</Card>
 		</>
 	)
 }
 
-export default PaymentList
+export default ProductList
+    

@@ -16,7 +16,7 @@ const AddMilestone = ({ onClose }) => {
     const { currencies } = useSelector((state) => state.currencies);
     const dispatch = useDispatch();
 
-    
+
     useEffect(() => {
         dispatch(getallcurrencies());
     }, [dispatch]);
@@ -72,43 +72,6 @@ const AddMilestone = ({ onClose }) => {
     });
 
 
-    const CurrencyField = () => (
-        <Col span={12} className="">
-            <div className="form-item">
-                <div className="flex gap-2">
-                    <Field name="currency">
-                        {({ field, form }) => (
-                            <Select
-                                {...field}
-                                className="w-full mt-2"
-                                placeholder="Select Currency"
-                                onChange={(value) => {
-                                    const selectedCurrency = currencies.find(c => c.id === value);
-                                    form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
-                                }}
-                            >
-                                {currencies?.map((currency) => (
-                                    <Option
-                                        key={currency.id}
-                                        value={currency.id}
-                                    >
-                                        {currency.currencyCode}
-                                    </Option>
-                                ))}
-                            </Select>
-                        )}
-                    </Field>
-                </div>
-                <ErrorMessage
-                    name="currency"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                />
-            </div>
-        </Col>
-    );
-
-
     return (
         <>
             <div>
@@ -144,10 +107,33 @@ const AddMilestone = ({ onClose }) => {
                                                 </div>
                                             </Col>
 
-                                            <Col span={24} className="mt-4">
+                                            <Col span={12} className="mt-4">
                                                 <div className="form-item">
-                                                    <label className="font-semibold">Currency</label>
-                                                    <Field name="currency" component={CurrencyField} />
+                                                    <label className='font-semibold mb-2'>Currency</label>
+                                                    <div className="flex gap-2">
+                                                        <Field name="currency">
+                                                            {({ field, form }) => (
+                                                                <Select
+                                                                    {...field}
+                                                                    className="w-full mt-2"
+                                                                    placeholder="Select Currency"
+                                                                    onChange={(value) => {
+                                                                        const selectedCurrency = currencies.find(c => c.id === value);
+                                                                        form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
+                                                                    }}
+                                                                >
+                                                                    {currencies?.map((currency) => (
+                                                                        <Option
+                                                                            key={currency.id}
+                                                                            value={currency.id}
+                                                                        >
+                                                                            {currency.currencyCode}
+                                                                        </Option>
+                                                                    ))}
+                                                                </Select>
+                                                            )}
+                                                        </Field>
+                                                    </div>
                                                     <ErrorMessage
                                                         name="currency"
                                                         component="div"

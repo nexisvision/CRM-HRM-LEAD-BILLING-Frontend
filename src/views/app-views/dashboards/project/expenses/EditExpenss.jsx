@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input, Button, DatePicker, Select, message, Row, Col, Switch, Upload, Modal } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -6,10 +6,23 @@ import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { useDispatch, useSelector } from 'react-redux';
+import { getallcurrencies } from '../../../setting/currencies/currenciesreducer/currenciesSlice';
+
 const { Option } = Select;
+
 const EditExpenses = () => {
+
     const navigate = useNavigate();
     const [showReceiptUpload, setShowReceiptUpload] = useState(false);
+    const { currencies } = useSelector((state) => state.currencies);
+    const dispatch = useDispatch();
+
+    
+    useEffect(() => {
+        dispatch(getallcurrencies());
+    }, [dispatch]);
+
     // const [uploadModalVisible, setUploadModalVisible] = useState(false);
     const initialValues = {
         itemName: '',
@@ -61,26 +74,38 @@ const EditExpenses = () => {
                                     <ErrorMessage name="itemName" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
-                            <Col span={8} className='mt-2'>
+                            <Col span={8} className="">
                                 <div className="form-item">
-                                    <label className='font-semibold'>Currency</label>
-                                    <Field name="currency">
-                                        {({ field }) => (
-                                            <Select
-                                                {...field}
-                                                placeholder="Select Currency"
-                                                className="w-full"
-                                                onChange={(value) => setFieldValue('currency', value)}
-                                                value={values.currency}
-                                                onBlur={() => setFieldTouched('currency', true)}
-                                                allowClear={false}
-                                            >
-                                                <Option value="INR">INR</Option>
-                                                <Option value="USD">USD</Option>
-                                            </Select>
-                                        )}
-                                    </Field>
-                                    <ErrorMessage name="currency" component="div" className="error-message text-red-500 my-1" />
+                                    <label className="font-semibold">Currency</label>
+                                    <div className="flex gap-2">
+                                        <Field name="currency">
+                                            {({ field, form }) => (
+                                                <Select
+                                                    {...field}
+                                                    className="w-full"
+                                                    placeholder="Select Currency"
+                                                    onChange={(value) => {
+                                                        const selectedCurrency = currencies.find(c => c.id === value);
+                                                        form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
+                                                    }}
+                                                >
+                                                    {currencies?.map((currency) => (
+                                                        <Option
+                                                            key={currency.id}
+                                                            value={currency.id}
+                                                        >
+                                                            {currency.currencyCode}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                            )}
+                                        </Field>
+                                    </div>
+                                    <ErrorMessage
+                                        name="currency"
+                                        component="div"
+                                        className="error-message text-red-500 my-1"
+                                    />
                                 </div>
                             </Col>
                             {/* <Col span={6} >

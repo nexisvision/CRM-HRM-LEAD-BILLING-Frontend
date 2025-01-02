@@ -6,13 +6,13 @@ import { useNavigate } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
 import { useSelector, useDispatch } from 'react-redux';
-import {getallcurrencies} from "../../../setting/currencies/currenciesreducer/currenciesSlice"
+import { getallcurrencies } from "../../../setting/currencies/currenciesreducer/currenciesSlice"
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
 const { Option } = Select;
 
-const EditMilestone = ({onClose}) => {
+const EditMilestone = ({ onClose }) => {
     const navigate = useNavigate();
     const { currencies } = useSelector((state) => state.currencies);
     const dispatch = useDispatch();
@@ -48,103 +48,89 @@ const EditMilestone = ({onClose}) => {
 
     });
 
-    const CurrencyField = () => (
-        <Col span={12} className="">
-            <div className="form-item">
-                <div className="flex gap-2">
-                    <Field name="currency">
-                        {({ field, form }) => (
-                            <Select
-                                {...field}
-                                className="w-full mt-2"
-                                placeholder="Select Currency"
-                                onChange={(value) => {
-                                    const selectedCurrency = currencies.find(c => c.id === value);
-                                    form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
-                                }}
-                            >
-                                {currencies?.map((currency) => (
-                                    <Option
-                                        key={currency.id}
-                                        value={currency.id}
-                                    >
-                                        {currency.currencyCode}
-                                    </Option>
-                                ))}
-                            </Select>
-                        )}
-                    </Field>
-                </div>
-                <ErrorMessage
-                    name="currency"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                />
-            </div>
-        </Col>
-    );
-
-
 
     return (
         <>
             <div>
                 <div className=' ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4'>
                     <h2 className=" border-b pb-[30px] font-medium"></h2>
-                   
-                        <div className="">
-                            <div className=" p-2">
-                                <Formik
-                                    initialValues={initialValues}
-                                    validationSchema={validationSchema}
-                                    onSubmit={onSubmit}
-                                >
-                                    {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
-                                        <Form className="formik-form" onSubmit={handleSubmit}>
-                                            <Row gutter={16}>
-                                                <Col span={8} className="mt-4">
-                                                    <div className="form-item">
-                                                        <label className='font-semibold mb-2'>Milestone Title </label>
-                                                        <div className='flex'>
-                                                            <Field name="milestoneTitle" as={Input} placeholder="Enter Milestone Title" onBlur={() => setFieldTouched("milestoneTitle", true)} className=' rounded-e-lg rounded-s-none mt-2' />
-                                                        </div>
-                                                        <ErrorMessage name="milestoneTitle" component="div" className="error-message text-red-500 my-1" />
+
+                    <div className="">
+                        <div className=" p-2">
+                            <Formik
+                                initialValues={initialValues}
+                                validationSchema={validationSchema}
+                                onSubmit={onSubmit}
+                            >
+                                {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
+                                    <Form className="formik-form" onSubmit={handleSubmit}>
+                                        <Row gutter={16}>
+                                            <Col span={12} className="mt-4">
+                                                <div className="form-item">
+                                                    <label className='font-semibold mb-2'>Milestone Title </label>
+                                                    <div className='flex'>
+                                                        <Field name="milestoneTitle" as={Input} placeholder="Enter Milestone Title" onBlur={() => setFieldTouched("milestoneTitle", true)} className=' rounded-e-lg rounded-s-none mt-2' />
                                                     </div>
-                                                </Col>
-                                                <Col span={8} className="mt-4">
-                                                    <div className="form-item">
-                                                        <label className='font-semibold mb-2'>Milestone Cost </label>
-                                                        <div className='flex'>
-                                                            <Field name="milestoneCost" as={Input} placeholder="Enter Milestone Cost" onBlur={() => setFieldTouched("milestoneCost", true)} className=' rounded-e-lg rounded-s-none mt-2' />
-                                                        </div>
-                                                        <ErrorMessage name="milestoneCost" component="div" className="error-message text-red-500 my-1" />
+                                                    <ErrorMessage name="milestoneTitle" component="div" className="error-message text-red-500 my-1" />
+                                                </div>
+                                            </Col>
+                                            <Col span={12} className="mt-4">
+                                                <div className="form-item">
+                                                    <label className='font-semibold mb-2'>Milestone Cost </label>
+                                                    <div className='flex'>
+                                                        <Field name="milestoneCost" as={Input} placeholder="Enter Milestone Cost" onBlur={() => setFieldTouched("milestoneCost", true)} className=' rounded-e-lg rounded-s-none mt-2' />
                                                     </div>
-                                                </Col>
-                                                <Col span={8} className='mt-4'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold mb-2'>Status</label>
+                                                    <ErrorMessage name="milestoneCost" component="div" className="error-message text-red-500 my-1" />
+                                                </div>
+                                            </Col>
+                                            <Col span={12} className='mt-4'>
+                                                <div className="form-item">
+                                                    <label className='font-semibold mb-2'>Status</label>
+                                                    <Field name="currency">
+                                                        {({ field }) => (
+                                                            <Select
+                                                                {...field}
+                                                                className="w-full mt-2"
+                                                                placeholder="Select Status"
+                                                                onChange={(value) => setFieldValue('status', value)}
+                                                                value={values.status}
+                                                                onBlur={() => setFieldTouched("status", true)}
+                                                            >
+                                                                <Option value="active">Active</Option>
+                                                                <Option value="inactive">Inactive</Option>
+                                                            </Select>
+                                                        )}
+                                                    </Field>
+                                                    <ErrorMessage name="status" component="div" className="error-message text-red-500 my-1" />
+                                                </div>
+                                            </Col>
+                                            <Col span={12} className="mt-4">
+                                                <div className="form-item">
+                                                    <label className='font-semibold mb-2'>Currency</label>
+                                                    <div className="flex gap-2">
                                                         <Field name="currency">
-                                                            {({ field }) => (
+                                                            {({ field, form }) => (
                                                                 <Select
                                                                     {...field}
                                                                     className="w-full mt-2"
-                                                                    placeholder="Select Status"
-                                                                    onChange={(value) => setFieldValue('status', value)}
-                                                                    value={values.status}
-                                                                    onBlur={() => setFieldTouched("status", true)}
+                                                                    placeholder="Select Currency"
+                                                                    onChange={(value) => {
+                                                                        const selectedCurrency = currencies.find(c => c.id === value);
+                                                                        form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
+                                                                    }}
                                                                 >
-                                                                    <Option value="active">Active</Option>
-                                                                    <Option value="inactive">Inactive</Option>
+                                                                    {currencies?.map((currency) => (
+                                                                        <Option
+                                                                            key={currency.id}
+                                                                            value={currency.id}
+                                                                        >
+                                                                            {currency.currencyCode}
+                                                                        </Option>
+                                                                    ))}
                                                                 </Select>
                                                             )}
                                                         </Field>
-                                                        <ErrorMessage name="status" component="div" className="error-message text-red-500 my-1" />
                                                     </div>
-                                                </Col>
-                                                <Col span={24} className="mt-4">
-                                                <div className="form-item">
-                                                    <label className="font-semibold">Currency</label>
-                                                    <Field name="currency" component={CurrencyField}  className="mt-2"/>
                                                     <ErrorMessage
                                                         name="currency"
                                                         component="div"
@@ -152,54 +138,54 @@ const EditMilestone = ({onClose}) => {
                                                     />
                                                 </div>
                                             </Col>
-                                                
-                                                
-                                                <Col span={24} className='mt-4'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold'>Milestone Summary</label>
-                                                        <ReactQuill
-                                                            value={values.milestoneSummary}
-                                                            className='mt-2'
-                                                            onChange={(value) => setFieldValue('milestoneSummary', value)}
-                                                            placeholder="Enter Milestone Summary"
-                                                        />
-                                                        <ErrorMessage name="milestoneSummary" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
-                                                </Col>
 
-                                                <Col span={12} className='mt-4'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold mb-2'>Start Date</label>
-                                                        <DatePicker
-                                                            className="w-full mt-2"
-                                                            format="DD-MM-YYYY"
 
-                                                            value={values.startDate}
-                                                            onChange={(startDate) => setFieldValue('startDate', startDate)}
-                                                            onBlur={() => setFieldTouched("startDate", true)}
-                                                        />
-                                                        <ErrorMessage name="startDate" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
-                                                </Col>
-                                                <Col span={12} className='mt-4'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold mb-2'>End Date</label>
-                                                        <DatePicker
-                                                            className="w-full mt-2"
-                                                            format="DD-MM-YYYY"
-                                                            value={values.endDate}
-                                                            onChange={(endDate) => setFieldValue('endDate', endDate)}
-                                                            onBlur={() => setFieldTouched("endDate", true)}
-                                                        />
-                                                        <ErrorMessage name="endDate" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
-                                                </Col>
-                                            </Row>
-                                        </Form>
-                                    )}
-                                </Formik>
-                            </div>
+                                            <Col span={24} className='mt-4'>
+                                                <div className="form-item">
+                                                    <label className='font-semibold'>Milestone Summary</label>
+                                                    <ReactQuill
+                                                        value={values.milestoneSummary}
+                                                        className='mt-2'
+                                                        onChange={(value) => setFieldValue('milestoneSummary', value)}
+                                                        placeholder="Enter Milestone Summary"
+                                                    />
+                                                    <ErrorMessage name="milestoneSummary" component="div" className="error-message text-red-500 my-1" />
+                                                </div>
+                                            </Col>
+
+                                            <Col span={12} className='mt-4'>
+                                                <div className="form-item">
+                                                    <label className='font-semibold mb-2'>Start Date</label>
+                                                    <DatePicker
+                                                        className="w-full mt-2"
+                                                        format="DD-MM-YYYY"
+
+                                                        value={values.startDate}
+                                                        onChange={(startDate) => setFieldValue('startDate', startDate)}
+                                                        onBlur={() => setFieldTouched("startDate", true)}
+                                                    />
+                                                    <ErrorMessage name="startDate" component="div" className="error-message text-red-500 my-1" />
+                                                </div>
+                                            </Col>
+                                            <Col span={12} className='mt-4'>
+                                                <div className="form-item">
+                                                    <label className='font-semibold mb-2'>End Date</label>
+                                                    <DatePicker
+                                                        className="w-full mt-2"
+                                                        format="DD-MM-YYYY"
+                                                        value={values.endDate}
+                                                        onChange={(endDate) => setFieldValue('endDate', endDate)}
+                                                        onBlur={() => setFieldTouched("endDate", true)}
+                                                    />
+                                                    <ErrorMessage name="endDate" component="div" className="error-message text-red-500 my-1" />
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                    </Form>
+                                )}
+                            </Formik>
                         </div>
+                    </div>
 
 
                     <div className="form-buttons text-right py-2">

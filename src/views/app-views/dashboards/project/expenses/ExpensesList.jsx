@@ -18,7 +18,7 @@ import AddExpenses from "./AddExpenss";
 import EditExpenses from "./EditExpenss";
 // import AddExpenses from "./AddExpenses";
 // import EditExpenses from "./EditExpenses"
-// import ViewExpenses from './ViewExpenses';
+import ViewExpenss from './ViewExpenss';
 const { Option } = Select
 const getShippingStatus = orderStatus => {
     if (orderStatus === 'Ready') {
@@ -79,21 +79,9 @@ const ExpensesList = () => {
                 </Flex>
             </Menu.Item>
             <Menu.Item>
-                <Flex alignItems="center">
-                    <PlusCircleOutlined />
-                    <span className="ml-2">Add to remark</span>
-                </Flex>
-            </Menu.Item>
-            <Menu.Item>
                 <Flex alignItems="center" onClick={openEditExpensesModal}>
                     <EditOutlined />
                     <span className="ml-2">Edit</span>
-                </Flex>
-            </Menu.Item>
-            <Menu.Item>
-                <Flex alignItems="center">
-                    <TiPinOutline />
-                    <span className="ml-2">Pin</span>
                 </Flex>
             </Menu.Item>
             <Menu.Item>
@@ -105,10 +93,10 @@ const ExpensesList = () => {
         </Menu>
     );
     const tableColumns = [
-        {
-            title: 'ID',
-            dataIndex: 'id'
-        },
+        // {
+        //     title: 'ID',
+        //     dataIndex: 'id'
+        // },
         {
             title: 'ItemName',
             dataIndex: 'itemName',
@@ -226,12 +214,12 @@ const ExpensesList = () => {
                         dataSource={list}
                         rowKey='id'
                         scroll={{ x: 1200 }}
-                        rowSelection={{
-                            selectedRowKeys: selectedRowKeys,
-                            type: 'checkbox',
-                            preserveSelectedRowKeys: false,
-                            ...rowSelection,
-                        }}
+                        // rowSelection={{
+                        //     selectedRowKeys: selectedRowKeys,
+                        //     type: 'checkbox',
+                        //     preserveSelectedRowKeys: false,
+                        //     ...rowSelection,
+                        // }}
                     />
                 </div>
             </Card>
@@ -256,16 +244,16 @@ const ExpensesList = () => {
                 >
                     <EditExpenses onClose={closeEditExpensesModal} />
                 </Modal>
-              {/*  <Modal
-                    title="Expenses"
+               <Modal
+                    title="Expenses Details"
                     visible={isViewExpensesModalVisible}
                     onCancel={closeViewExpensesModal}
                     footer={null}
                     width={1000}
-                    className='mt-[-70px]'
+                    className='mt-[-70px]'      
                 >
-                    <ViewExpenses onClose={closeViewExpensesModal} />
-                </Modal> */}
+                    <ViewExpenss onClose={closeViewExpensesModal} />
+                </Modal>
             </Card>
         </>
     )
