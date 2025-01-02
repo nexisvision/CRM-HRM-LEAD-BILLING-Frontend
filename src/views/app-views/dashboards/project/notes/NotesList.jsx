@@ -21,12 +21,10 @@ import Flex from 'components/shared-components/Flex'
 import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils';
-// import AddNotes from './AddNotes';
-// import EditNotes from './EditNotes';
-// import ViewNotes from './ViewNotes';
-// import AddInvoice from './AddInvoice';
-// import EditInvoice from './EditInvoice';
-// import ViewInvoice from './ViewInvoice';
+import AddNotes from './AddNotes';
+import EditNotes from './EditNotes';
+import ViewNotes from './ViewNotes';
+
 
 
 
@@ -64,9 +62,9 @@ export const NotesList = () => {
     const [annualStatisticData] = useState(AnnualStatisticData);
     const [list, setList] = useState(OrderListData)
     const [selectedRows, setSelectedRows] = useState([])
-    const [isAddNotesModalVisible, setIsAddNotesModalVisible] = useState(false);
-    const [isEditNotesModalVisible, setIsEditNotesModalVisible] = useState(false);
-    const [isViewNotesModalVisible, setIsViewNotesModalVisible] = useState(false);
+    const [AddNotesModalVisible, setAddNotesModalVisible] = useState(false);
+    const [EditNotesModalVisible, setEditNotesModalVisible] = useState(false);
+    const [ViewNotesModalVisible, setViewNotesModalVisible] = useState(false);
 
 
 
@@ -84,33 +82,33 @@ export const NotesList = () => {
 
     // Open Add Job Modal
     const openAddNotesModal = () => {
-        setIsAddNotesModalVisible(true);
+        setAddNotesModalVisible(true);
     };
 
     // Close Add Job Modal
     const closeAddNotesModal = () => {
-        setIsAddNotesModalVisible(false);
+        setAddNotesModalVisible(false);
     };
 
     // Open Add Job Modal
     const openEditNotesModal = () => {
-        setIsEditNotesModalVisible(true);
+        setEditNotesModalVisible(true);
     };
 
     // Close Add Job Modal
     const closeEditNotesModal = () => {
-        setIsEditNotesModalVisible(false);
+        setEditNotesModalVisible(false);
     };
 
 
     // Open Add Job Modal
     const openViewNotesModal = () => {
-        setIsViewNotesModalVisible(true);
+        setViewNotesModalVisible(true);
     };
 
     // Close Add Job Modal
     const closeViewNotesModal = () => {
-        setIsViewNotesModalVisible(false);
+        setViewNotesModalVisible(false);
     };
 
     const dropdownMenu = row => (
@@ -235,40 +233,40 @@ export const NotesList = () => {
                     />
                 </div>
 
-                {/* <Modal
-                    title="Milestone Create"
-                    visible={isAddNotesModalVisible}
-                    onCancel={closeAddNotesModal}
-                    footer={null}
-                    width={1000}
-                    className='mt-[-70px]'
-                >
-                    <AddNotes onClose={closeAddNotesModal} />
-                </Modal> */}
-                {/* <Modal
-                    title="Milestone Edit"
-                    visible={isEditNotesModalVisible}
+        <Modal
+        title="Add Project Notes"
+        visible={AddNotesModalVisible}
+        onCancel={closeAddNotesModal}
+        footer={null}
+        width={1000}
+        className='mt-[-70px]'
+        >
+            <AddNotes onClose={closeAddNotesModal} />
+        </Modal>
+                <Modal
+                    title="Edit Project Notes"
+                    visible={EditNotesModalVisible}
                     onCancel={closeEditNotesModal}
                     footer={null}
                     width={1000}
                     className='mt-[-70px]'
                 >
                     <EditNotes onClose={closeEditNotesModal} />
-                </Modal> */}
-                {/* <Modal
-                    title="Milestone Details"
-                    visible={isViewNotesModalVisible}
+                </Modal>
+                <Modal
+                    title="Project Note Details"
+                    visible={ViewNotesModalVisible}
                     onCancel={closeViewNotesModal}
                     footer={null}
                     width={1000}
                     className='mt-[-70px]'
                 >
                     <ViewNotes onClose={closeViewNotesModal} />
-                </Modal> */}
+                </Modal>
             </Card>
         </div>
     );
 }
 
 
-export default NotesList;
+export default NotesList

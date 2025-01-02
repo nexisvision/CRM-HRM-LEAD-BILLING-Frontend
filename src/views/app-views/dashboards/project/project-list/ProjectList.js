@@ -11,9 +11,9 @@ import { useNavigate,useParams } from 'react-router-dom';
 import PageHeaderAlt from 'components/layout-components/PageHeaderAlt';
 import Flex from 'components/shared-components/Flex';
 import { empdata } from 'views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice';
-import { ClientData } from 'views/app-views/company/CompanyReducers/CompanySlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { DeletePro, GetProject } from './projectReducer/ProjectSlice';
+import { ClientData } from 'views/app-views/Users/client-list/CompanyReducers/CompanySlice';
 
 const VIEW_LIST = 'LIST';
 const VIEW_GRID = 'GRID';

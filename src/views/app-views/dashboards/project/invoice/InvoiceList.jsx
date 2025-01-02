@@ -23,6 +23,7 @@ import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils';
 import AddInvoice from "./AddInvoice";
 import EditInvoice from './EditInvoice';
+import InvoiceView from './InvoiceView';
 // import AddInvoice from './AddInvoice';
 // import ViewInvoice from './ViewInvoice';
 
@@ -65,7 +66,7 @@ export const InvoiceList = () => {
 	const [isAddInvoiceModalVisible, setIsAddInvoiceModalVisible] = useState(false);
 	const [isAddProjectModalVisible, setIsAddProjectModalVisible] = useState(false);
 	const [isEditInvoiceModalVisible, setIsEditInvoiceModalVisible] = useState(false);
-	const [isViewInvoiceModalVisible, setIsViewInvoiceModalVisible] = useState(false);
+	const [ViewInvoiceModalVisible, setViewInvoiceModalVisible] = useState(false);
 
 
 
@@ -114,12 +115,12 @@ export const InvoiceList = () => {
 
 	// Open Add Job Modal
 	const openViewInvoiceModal = () => {
-		setIsViewInvoiceModalVisible(true);
+		setViewInvoiceModalVisible(true);
 	};
 
 	// Close Add Job Modal
 	const closeViewInvoiceModal = () => {
-		setIsViewInvoiceModalVisible(false);
+		setViewInvoiceModalVisible(false);
 	};
 
 	const dropdownMenu = row => (
@@ -295,16 +296,16 @@ export const InvoiceList = () => {
 				>
 					<EditInvoice onClose={closeEditInvoiceModal} />
 				</Modal>
-				{/* <Modal
+				<Modal
 					title="Invoice"
-					visible={isViewInvoiceModalVisible}
+					visible={ViewInvoiceModalVisible}
 					onCancel={closeViewInvoiceModal}
 					footer={null}
 					width={1000}
 					className='mt-[-70px]'
 				>
-					<ViewInvoice onClose={closeViewInvoiceModal} />
-				</Modal> */}
+					<InvoiceView onClose={closeViewInvoiceModal} />
+				</Modal>
 			</Card>
 		</div>
 		</>
