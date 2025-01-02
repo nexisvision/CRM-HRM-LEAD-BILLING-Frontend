@@ -19,22 +19,22 @@ const AddTask = () => {
     // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
     const initialValues = {
-        TaskName: '',
-        TaskCategory: '',
-        Project: '',
-        StartDate: null,
+        taskName: '',
+        taskCategory: '',
+        project: '',
+        startDate: null,
         dueDate: null,
-        AssignTo: [],
+        assignTo: [],
         description: '',
     };
 
     const validationSchema = Yup.object({
-        TaskName: Yup.string().required('Please enter TaskName.'),
-        TaskCategory: Yup.string().required('Please enter TaskCategory.'),
-        Project: Yup.string().required('Please enter Project.'),
-        StartDate: Yup.date().nullable().required('Date is required.'),
+        taskName: Yup.string().required('Please enter TaskName.'),
+        taskCategory: Yup.string().required('Please enter TaskCategory.'),
+        project: Yup.string().required('Please enter Project.'),
+        startDate: Yup.date().nullable().required('Date is required.'),
         dueDate: Yup.date().nullable().required('Date is required.'),
-        AssignTo: Yup.array().min(1, 'Please select at least one AssignTo.'),
+        assignTo: Yup.array().min(1, 'Please select at least one AssignTo.'),
         description: Yup.string().required('Please enter a Description.'),
 
     });
@@ -66,26 +66,26 @@ const AddTask = () => {
                 {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
                     <Form className="formik-form" onSubmit={handleSubmit}>
                         <Row gutter={16}>
-                            <Col span={12} >
+                            <Col span={8} >
                                 <div className="form-item">
                                     <label className='font-semibold'>Task Name</label>
-                                    <Field name="TaskName" as={Input} placeholder="Enter TaskName" className='mt-2' />
-                                    <ErrorMessage name="TaskName" component="div" className="error-message text-red-500 my-1" />
+                                    <Field name="taskName" as={Input} placeholder="Enter TaskName" className='mt-2' />
+                                        <ErrorMessage name="taskName" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
 
-                            <Col span={12}>
+                            <Col span={8}>
                                 <div className="form-item">
                                     <label className='font-semibold'>Task Category</label>
-                                    <Field name="TaskCategory">
+                                    <Field name="taskCategory">
                                         {({ field }) => (
                                             <Select
                                                 {...field}
                                                 placeholder="Select TaskCategory"
                                                 className="w-full mt-2"
-                                                onChange={(value) => setFieldValue('TaskCategory', value)}
-                                                value={values.TaskCategory}
-                                                onBlur={() => setFieldTouched('TaskCategory', true)}
+                                                onChange={(value) => setFieldValue('taskCategory', value)}
+                                                value={values.taskCategory}
+                                                onBlur={() => setFieldTouched('taskCategory', true)}
                                                 allowClear={false}
                                             >
                                                 <Option value="Task Category">Task Category</Option>
@@ -93,15 +93,15 @@ const AddTask = () => {
                                             </Select>
                                         )}
                                     </Field>
-                                    <ErrorMessage name="TaskCategory" component="div" className="error-message text-red-500 my-1" />
+                                        <ErrorMessage name="taskCategory" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
 
-                            <Col span={24} className="mt-4">
+                            <Col span={8}>
                                 <div className="form-item">
                                     <label className='font-semibold'>Project</label>
-                                    <Field name="Project" as={Input} placeholder="Enter Project" className='mt-2' />
-                                    <ErrorMessage name="Project" component="div" className="error-message text-red-500 my-1" />
+                                    <Field name="project" as={Input} placeholder="Enter Project" className='mt-2' />
+                                    <ErrorMessage name="project" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
 
@@ -109,14 +109,14 @@ const AddTask = () => {
                                 <div className="form-item">
                                     <label className='font-semibold '>StartDate</label>
                                     <DatePicker
-                                        name="StartDate"
+                                        name="startDate"
                                         className='w-full mt-2'
                                         placeholder="Select StartDate"
-                                        onChange={(value) => setFieldValue('StartDate', value)}
-                                        value={values.StartDate}
-                                        onBlur={() => setFieldTouched('StartDate', true)}
+                                        onChange={(value) => setFieldValue('startDate', value)}
+                                        value={values.startDate}
+                                        onBlur={() => setFieldTouched('startDate', true)}
                                     />
-                                    <ErrorMessage name="StartDate" component="div" className="error-message text-red-500 my-1" />
+                                    <ErrorMessage name="startDate" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
 
@@ -135,19 +135,19 @@ const AddTask = () => {
                                 </div>
                             </Col>
 
-                            <Col span={24} className='mt-4'>
+                            <Col span={8} className='mt-4'>
                                 <div className="form-item">
                                     <label className='font-semibold'>AssignTo</label>
                                     <Field name="AssignTo">
                                         {({ field }) => (
                                             <Select
                                                 {...field}
-                                                mode='multiple'
+                                                mode='multiple' 
                                                 placeholder="Select AssignTo"
                                                 className="w-full mt-2"
-                                                onChange={(value) => setFieldValue('AssignTo', value)}
-                                                value={values.AssignTo}
-                                                onBlur={() => setFieldTouched('AssignTo', true)}
+                                                onChange={(value) => setFieldValue('assignTo', value)}
+                                                value={values.assignTo}
+                                                onBlur={() => setFieldTouched('assignTo', true)}
                                                 allowClear={false}
                                             >
                                                 <Option value="xyz">XYZ</Option>
@@ -156,7 +156,7 @@ const AddTask = () => {
                                         )}
                                     </Field>
                                     <ErrorMessage
-                                        name="AssignTo"
+                                        name="assignTo"
                                         component="div"
                                         className="error-message text-red-500 my-1" />
                                 </div>

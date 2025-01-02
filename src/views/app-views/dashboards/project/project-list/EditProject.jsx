@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, DatePicker, Select, message, Row, Col, Modal } from "antd";
+import {
+  Input,
+  Button,
+  DatePicker,
+  Select,
+  message,
+  Row,
+  Col,
+  Modal,
+} from "antd";
 import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -287,8 +296,8 @@ const EditProject = ({ id, onClose }) => {
                               {menu}
                               <div
                                 style={{
-                                  padding: '8px',
-                                  borderTop: '1px solid #e8e8e8',
+                                  padding: "8px",
+                                  borderTop: "1px solid #e8e8e8",
                                 }}
                               >
                                 <Button
@@ -303,11 +312,12 @@ const EditProject = ({ id, onClose }) => {
                             </div>
                           )}
                         >
-                          {AllTags && AllTags.map((tag) => (
-                            <Option key={tag.id} value={tag.name}>
-                              {tag.name}
-                            </Option>
-                          ))}
+                          {AllTags &&
+                            AllTags.map((tag) => (
+                              <Option key={tag.id} value={tag.name}>
+                                {tag.name}
+                              </Option>
+                            ))}
                         </Select>
                       )}
                     </Field>

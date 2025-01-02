@@ -8,7 +8,6 @@ import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import Title from 'antd/es/skeleton/Title';
 
 const { Option } = Select;
 
@@ -20,22 +19,22 @@ const EditTask = () => {
     // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
     const initialValues = {
-        Title: '',
-        TaskCategory: '',
-        Project: '',
-        StartDate: '',
-        dueDate: '',
-        AssignTo: [],
+        taskName: '',
+        taskCategory: '',
+        project: '',
+        startDate: null,
+        dueDate: null,
+        assignTo: [],
         description: '',
     };
 
     const validationSchema = Yup.object({
-        Title: Yup.string().required('Please enter Title.'),
-        TaskCategory: Yup.string().required('Please enter TaskCategory.'),
-        Project: Yup.string().required('Please enter Project.'),
-        StartDate: Yup.date().nullable().required('Date is required.'),
+        taskName: Yup.string().required('Please enter TaskName.'),
+        taskCategory: Yup.string().required('Please enter TaskCategory.'),
+        project: Yup.string().required('Please enter Project.'),
+        startDate: Yup.date().nullable().required('Date is required.'),
         dueDate: Yup.date().nullable().required('Date is required.'),
-        AssignTo: Yup.array().min(1, 'Please select at least one AssignTo.'),
+        assignTo: Yup.array().min(1, 'Please select at least one AssignTo.'),
         description: Yup.string().required('Please enter a Description.'),
 
     });
@@ -44,7 +43,7 @@ const EditTask = () => {
         console.log('Submitted values:', values);
         message.success('Expenses added successfully!');
         resetForm();
-        navigate('/apps/sales/expenses');
+        navigate('/app/dashboards/project/list');
     };
 
 
@@ -67,66 +66,66 @@ const EditTask = () => {
                 {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
                     <Form className="formik-form" onSubmit={handleSubmit}>
                         <Row gutter={16}>
-                            <Col span={12}>
+                            <Col span={8} >
                                 <div className="form-item">
-                                    <label className='font-semibold'>Title</label>
-                                    <Field name="Title" as={Input} placeholder="Enter Title" />
-                                    <ErrorMessage name="Title" component="div" className="error-message text-red-500 my-1" />
+                                    <label className='font-semibold'>Task Name</label>
+                                    <Field name="taskName" as={Input} placeholder="Enter TaskName" className='mt-2' />
+                                        <ErrorMessage name="taskName" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
 
-                            <Col span={12}>
+                            <Col span={8}>
                                 <div className="form-item">
-                                    <label className='font-semibold'>TaskCategory</label>
-                                    <Field name="TaskCategory">
+                                    <label className='font-semibold'>Task Category</label>
+                                    <Field name="taskCategory">
                                         {({ field }) => (
                                             <Select
                                                 {...field}
                                                 placeholder="Select TaskCategory"
-                                                className="w-full"
-                                                onChange={(value) => setFieldValue('TaskCategory', value)}
-                                                value={values.TaskCategory}
-                                                onBlur={() => setFieldTouched('TaskCategory', true)}
+                                                className="w-full mt-2"
+                                                onChange={(value) => setFieldValue('taskCategory', value)}
+                                                value={values.taskCategory}
+                                                onBlur={() => setFieldTouched('taskCategory', true)}
                                                 allowClear={false}
                                             >
-                                                <Option value="TaskCategory">TaskCategory</Option>
-                                                <Option value="TaskCategory">TaskCategory</Option>
+                                                <Option value="Task Category">Task Category</Option>
+                                                <Option value="Task Category">Task Category</Option>
                                             </Select>
                                         )}
                                     </Field>
-                                    <ErrorMessage name="TaskCategory" component="div" className="error-message text-red-500 my-1" />
+                                        <ErrorMessage name="taskCategory" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
 
-                            <Col span={24}>
+                            <Col span={8} className="mt-4">
                                 <div className="form-item">
                                     <label className='font-semibold'>Project</label>
-                                    <Field name="Project" as={Input} placeholder="Enter Project" />
-                                    <ErrorMessage name="Project" component="div" className="error-message text-red-500 my-1" />
+                                    <Field name="project" as={Input} placeholder="Enter Project" className='mt-2' />
+                                    <ErrorMessage name="project" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
 
-                            <Col span={8}  >
+                            <Col span={8} className="mt-4">
                                 <div className="form-item">
                                     <label className='font-semibold '>StartDate</label>
                                     <DatePicker
-                                        name="StartDate"
-                                        className='w-full '
+                                        name="startDate"
+                                        className='w-full mt-2'
                                         placeholder="Select StartDate"
-                                        onChange={(value) => setFieldValue('StartDate', value)}
-                                        value={values.StartDate}
-                                        onBlur={() => setFieldTouched('StartDate', true)}
+                                        onChange={(value) => setFieldValue('startDate', value)}
+                                        value={values.startDate}
+                                        onBlur={() => setFieldTouched('startDate', true)}
                                     />
-                                    <ErrorMessage name="StartDate" component="div" className="error-message text-red-500 my-1" />
+                                    <ErrorMessage name="startDate" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
 
-                            <Col span={8}  >
+                            <Col span={8} className='mt-4' >
                                 <div className="form-item">
                                     <label className='font-semibold '>DueDate</label>
                                     <DatePicker
                                         name="dueDate"
-                                        className='w-full '
+                                        className='w-full mt-2'
                                         placeholder="Select DueDate"
                                         onChange={(value) => setFieldValue('dueDate', value)}
                                         value={values.dueDate}
@@ -136,19 +135,19 @@ const EditTask = () => {
                                 </div>
                             </Col>
 
-                            <Col span={24} className='mt-2'>
+                            <Col span={8} className='mt-4'>
                                 <div className="form-item">
                                     <label className='font-semibold'>AssignTo</label>
                                     <Field name="AssignTo">
                                         {({ field }) => (
                                             <Select
                                                 {...field}
-                                                mode='multiple'
+                                                mode='multiple' 
                                                 placeholder="Select AssignTo"
-                                                className="w-full"
-                                                onChange={(value) => setFieldValue('AssignTo', value)}
-                                                value={values.AssignTo}
-                                                onBlur={() => setFieldTouched('AssignTo', true)}
+                                                className="w-full mt-2"
+                                                onChange={(value) => setFieldValue('assignTo', value)}
+                                                value={values.assignTo}
+                                                onBlur={() => setFieldTouched('assignTo', true)}
                                                 allowClear={false}
                                             >
                                                 <Option value="xyz">XYZ</Option>
@@ -157,7 +156,7 @@ const EditTask = () => {
                                         )}
                                     </Field>
                                     <ErrorMessage
-                                        name="AssignTo"
+                                        name="assignTo"
                                         component="div"
                                         className="error-message text-red-500 my-1" />
                                 </div>
@@ -175,11 +174,6 @@ const EditTask = () => {
                                     <ErrorMessage name="description" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col>
-
-
-
-
-
 
                             <div className="mt-4">
                                 <button
@@ -202,69 +196,65 @@ const EditTask = () => {
                                 </button>
 
                                 {isOtherDetailsVisible && (
-                                    <div className="mt-4">
-                                        <div className=" grid grid-cols-3 gap-4">
-                                            <Col span={24}>
+                                    <div className="mt-6">
+                                        <Row gutter={[16, 16]}>
+                                            <Col span={9}>
                                                 <div className="form-item">
-                                                    <label className='font-semibold'>Label</label>
+                                                    <label className="font-semibold">Label</label>
                                                     <Field name="Label">
                                                         {({ field }) => (
                                                             <Select
                                                                 {...field}
-                                                                placeholder="Select Label"
-                                                                className="w-full"
+                                                                placeholder="Nothing selected"
+                                                                className="w-full mt-2"
                                                                 onChange={(value) => setFieldValue('Label', value)}
                                                                 value={values.Label}
-                                                                onBlur={() => setFieldTouched('Label', true)}
-                                                                allowClear={false}
                                                             >
-                                                                <Option value="Label">Label</Option>
-                                                                <Option value="Label">Label</Option>
+                                                                <Option value="label1">Label 1</Option>
+                                                                <Option value="label2">Label 2</Option>
                                                             </Select>
                                                         )}
                                                     </Field>
-                                                    <ErrorMessage name="Label" component="div" className="error-message text-red-500 my-1" />
                                                 </div>
                                             </Col>
 
-                                            <Col span={24}>
+                                            <Col span={9}>
                                                 <div className="form-item">
-                                                    <label className='font-semibold'>Milestones</label>
+                                                    <label className="font-semibold">Milestones</label>
                                                     <Field name="Milestones">
                                                         {({ field }) => (
                                                             <Select
                                                                 {...field}
-                                                                placeholder="Select Milestones"
-                                                                className="w-full"
+                                                                placeholder="--"
+                                                                className="w-full mt-2"
                                                                 onChange={(value) => setFieldValue('Milestones', value)}
                                                                 value={values.Milestones}
-                                                                onBlur={() => setFieldTouched('Milestones', true)}
-                                                                allowClear={false}
                                                             >
-                                                                <Option value="Milestones">Milestones</Option>
-                                                                <Option value="Milestones">Milestones</Option>
+                                                                <Option value="milestone1">Milestone 1</Option>
+                                                                <Option value="milestone2">Milestone 2</Option>
                                                             </Select>
                                                         )}
                                                     </Field>
-                                                    <ErrorMessage name="Milestones" component="div" className="error-message text-red-500 my-1" />
                                                 </div>
                                             </Col>
 
-                                            <Col span={24}>
+                                            <Col span={9}>
                                                 <div className="form-item">
-                                                    <label className='font-semibold'>Status</label>
+                                                    <label className="font-semibold mb-2">Status</label>
                                                     <Field name="Status">
                                                         {({ field }) => (
                                                             <Select
                                                                 {...field}
-                                                                placeholder="Select Status"
-                                                                className="w-full"
+                                                                className="w-full mt-2"
                                                                 onChange={(value) => setFieldValue('Status', value)}
                                                                 value={values.Status}
-                                                                onBlur={() => setFieldTouched('Status', true)}
-                                                                allowClear={false}
                                                             >
-                                                                <Option value="Incomplete">Incomplete</Option>
+                                                                <Option value="Incomplete">
+                                                                    <div className="flex items-center">
+                                                                        <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+                                                                        Incomplete
+                                                                    </div>
+                                                                </Option>
                                                                 <Option value="To Do">To Do</Option>
                                                                 <Option value="In Progress">Doing</Option>
                                                                 <Option value="Completed">Completed</Option>
@@ -272,34 +262,35 @@ const EditTask = () => {
                                                             </Select>
                                                         )}
                                                     </Field>
-                                                    <ErrorMessage name="Status" component="div" className="error-message text-red-500 my-1" />
                                                 </div>
                                             </Col>
 
-                                            <Col span={24}>
+                                            <Col span={10}>
                                                 <div className="form-item">
-                                                    <label className='font-semibold'>Priority</label>
+                                                    <label className="font-semibold">Priority</label>
                                                     <Field name="Priority">
                                                         {({ field }) => (
                                                             <Select
                                                                 {...field}
-                                                                placeholder="Select Priority"
-                                                                className="w-full"
+                                                                className="w-full mt-2"
                                                                 onChange={(value) => setFieldValue('Priority', value)}
                                                                 value={values.Priority}
-                                                                onBlur={() => setFieldTouched('Priority', true)}
-                                                                allowClear={false}
                                                             >
+                                                                <Option value="Medium">
+                                                                    <div className="flex items-center">
+                                                                        <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
+                                                                        Medium
+                                                                    </div>
+                                                                </Option>
                                                                 <Option value="High">High</Option>
-                                                                <Option value="Medium">Medium</Option>
                                                                 <Option value="Low">Low</Option>
                                                             </Select>
                                                         )}
                                                     </Field>
-                                                    <ErrorMessage name="Priority" component="div" className="error-message text-red-500 my-1" />
                                                 </div>
-                                            
+                                            </Col>
 
+                                            <Col span={24}>
                                                 <div className="mt-6 ">
                                                     <span className="block font-semibold text-gray-700 mb-2">Add File</span>
                                                     <Upload
@@ -308,25 +299,23 @@ const EditTask = () => {
                                                         accept=".pdf"
                                                         maxCount={1}
                                                         showUploadList={{ showRemoveIcon: true }}
-                                                        className="border-2 flex justify-center items-center p-10 w-[100%] border-gray-300 rounded-md"
+                                                        className="border-2 flex justify-center items-center p-10 w-full border-gray-300 rounded-md"
                                                     >
-                                                        <span className="text-xl text-blue-500">Choose File</span>
+                                                        <span className="text-xl text-blue-500 cursor-pointer hover:text-blue-700 w-full">Choose File</span>
                                                     </Upload>
                                                 </div>
                                             </Col>
-                                            
-                                        </div>
+
+                                        </Row>
                                     </div>
+                                    // </div>
                                 )}
                             </div>
                         </Row>
 
-
-
-
                         <div className="form-buttons text-right mt-4">
                             <Button type="default" className="mr-2" onClick={() => navigate('/apps/sales/expenses')}>Cancel</Button>
-                            <Button type="primary" htmlType="submit">Update</Button>
+                            <Button type="primary" htmlType="submit">Create</Button>
                         </div>
 
                     </Form>

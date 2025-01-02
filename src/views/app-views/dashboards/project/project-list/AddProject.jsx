@@ -56,7 +56,8 @@ const AddProject = ({ onClose }) => {
 
   const initialValues = {
     project_name: "",
-    category: "",
+   
+    project_category: "",
     startDate: null,
     endDate: null,
     // projectimage: "",
@@ -65,14 +66,15 @@ const AddProject = ({ onClose }) => {
     budget: "",
     estimatedmonths: "",
     estimatedhours: "",
-    description: "",
+    project_description: "",
     tag: "",
     status: "",
   };
 
   const validationSchema = Yup.object({
     project_name: Yup.string().required("Please enter a Project Name."),
-    category: Yup.string().required("Please enter a Category."),
+  
+    project_category: Yup.string().required("Please enter a Category."),
     startDate: Yup.date().nullable().required("Start date is required."),
     endDate: Yup.date().nullable().required("End date is required."),
     // projectimage: Yup.mixed().required("Please upload a Project Image."),
@@ -89,7 +91,9 @@ const AddProject = ({ onClose }) => {
       .required("Please enter Estimated Hours.")
       .positive("Hours must be positive.")
       .integer("Hours must be a whole number"),
-    description: Yup.string().required("Please enter a Project Description."),
+    project_description: Yup.string().required(
+      "Please enter a Project Description."
+    ),
     tag: Yup.string().required("Please enter a Tag."),
     status: Yup.string().required("Please select Status."),
   });
@@ -192,13 +196,13 @@ const AddProject = ({ onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Category</label>
                   <Field
-                    name="category"
+                    name="project_category"
                     as={Input}
-                    placeholder="Enter Project Category"
+                    placeholder="Enter Project project_category"
                     rules={[{ required: true }]}
                   />
                   <ErrorMessage
-                    name="category"
+                    name="project_category"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -381,13 +385,15 @@ const AddProject = ({ onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Description</label>
                   <ReactQuill
-                    value={values.description}
-                    onChange={(value) => setFieldValue("description", value)}
-                    placeholder="Enter Description"
-                    onBlur={() => setFieldTouched("description", true)}
+                    value={values.project_description}
+                    onChange={(value) =>
+                      setFieldValue("project_description", value)
+                    }
+                    placeholder="Enter project_description"
+                    onBlur={() => setFieldTouched("project_description", true)}
                   />
                   <ErrorMessage
-                    name="description"
+                    name="project_description"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
