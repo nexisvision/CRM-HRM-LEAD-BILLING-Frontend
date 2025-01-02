@@ -7,10 +7,10 @@ import axios from "axios";
 //     return res
 // };
 
-const fetchEmpData = async () => {
+const Getex = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/employees/", {
+    const res = await axios.get(`http://localhost:5353/api/v1/expenses/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -22,13 +22,15 @@ const fetchEmpData = async () => {
   }
 };
 
-const createEmp = async (payload) => {
+const AddExpence = async (id, values) => {
   const token = localStorage.getItem("auth_token");
+
+  console.log("wewwew", values);
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/employees/",
-      payload,
+      `http://localhost:5353/api/v1/expenses/${id}`,
+      values,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -43,12 +45,12 @@ const createEmp = async (payload) => {
   }
 };
 
-const Empdelete = async (id) => {
+const DeleteEx = async (exid) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/employees/${id}`,
+      `http://localhost:5353/api/v1/expenses/${exid}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -63,11 +65,11 @@ const Empdelete = async (id) => {
   }
 };
 
-const EditEmp = async (employeeIdd, values) => {
+const EditEx = async (id, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/employees/${employeeIdd}`,
+      `http://localhost:5353/api/v1/expenses/${id}`,
       values,
       {
         headers: {
@@ -104,10 +106,10 @@ const EditEmp = async (employeeIdd, values) => {
 
 const UserService = {
   // addUser,
-  fetchEmpData,
-  createEmp,
-  Empdelete,
-  EditEmp,
+  Getex,
+  AddExpence,
+  DeleteEx,
+  EditEx,
   // getAllUsers,
   // getUserById,
   // deleteUser,

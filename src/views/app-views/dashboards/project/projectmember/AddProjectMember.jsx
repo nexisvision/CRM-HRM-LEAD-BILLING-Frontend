@@ -1,70 +1,182 @@
-import React, { useState } from 'react';
-import { Input, Button, DatePicker, Select, message, Row, Col, Switch, Upload, Modal } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import 'react-quill/dist/quill.snow.css';
-import ReactQuill from 'react-quill';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+import React, { useEffect, useState } from "react";
+import {
+  Input,
+  Button,
+  DatePicker,
+  Select,
+  message,
+  Row,
+  Col,
+  Switch,
+  Upload,
+  Modal,
+} from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+import { useNavigate, useParams } from "react-router-dom";
+import "react-quill/dist/quill.snow.css";
+import ReactQuill from "react-quill";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { useSelector } from "react-redux";
+import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+
+import { useDispatch } from "react-redux";
+import {
+  Editpro,
+  GetProject,
+} from "../project-list/projectReducer/ProjectSlice";
+import axios from "axios";
 const { Option } = Select;
 const AddProjectMember = () => {
-    const navigate = useNavigate();
-    const [showReceiptUpload, setShowReceiptUpload] = useState(false);
-    // const [uploadModalVisible, setUploadModalVisible] = useState(false);
-    const initialValues = {
-        AddProjectMember: []
+  const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+  const [showReceiptUpload, setShowReceiptUpload] = useState(false);
+  // const [uploadModalVisible, setUploadModalVisible] = useState(false);
+  const initialValues = {
+    project_members: "",
+  };
+  const validationSchema = Yup.object({
+    project_members: Yup.string().required(
+      "Please enter AddProjectMember name."
+    ),
+  });
+
+  const { id } = useParams();
+
+  const Addmember = async (payload) => {
+    const token = localStorage.getItem("auth_token");
+
+    try {
+      const res = await axios.post(
+        `http://localhost:5353/api/v1/projects/membersadd/${id}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      //    dispatch(empdata());
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      throw error;
+    }
+  };
+
+  const onSubmit = (values, { resetForm }) => {
+    // Assuming values is an array like ["sdhbsdhbhsd", "sdbfhjsdf"]
+    const payload = {
+      project_members: values,
     };
-    const validationSchema = Yup.object({
-        AddProjectMember: Yup.array().min(1, 'Please select at least one member.')
-    });
-    const onSubmit = (values, { resetForm }) => {
-        console.log('Submitted values:', values);
-        message.success('Expenses added successfully!');
-        resetForm();
-        navigate('/apps/project/projectmember');
-    };
-    return (
-        <div className="add-project-member-form">
-            <hr style={{ marginBottom: '20px', border: '1px solid #E8E8E8' }} />
-            <Formik
-                initialValues={initialValues}
-                validationSchema={validationSchema}
-                onSubmit={onSubmit}
-            >
-                {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
-                    <Form className="formik-form" onSubmit={handleSubmit}>
-                        <Row gutter={16}>
-                            <Col span={24} className='mt-2'>
-                                <div className="form-item">
-                                    <label className='font-semibold text-[12] text-dark-gray-500 '>AddProjectMember</label>
-                                    <Field name="AddProjectMember">
-                                        {({ field }) => (
-                                            <Select
-                                                {...field}
-                                                className="w-full mt-2"
-                                                mode="multiple"
-                                                placeholder="Select AddProjectMember"
-                                                onChange={(value) => setFieldValue('AddProjectMember', value)}
-                                                value={values.AddProjectMember}
-                                                onBlur={() => setFieldTouched("AddProjectMember", true)}
-                                            >
-                                                <Option value="xyz">XYZ</Option>
-                                                <Option value="abc">ABC</Option>
-                                            </Select>
-                                        )}
-                                    </Field>
-                                    <ErrorMessage name="AddProjectMember" component="div" className="error-message text-red-500 my-1" />
-                                </div>
-                            </Col>
-                        </Row>
-                        <div className="form-buttons text-right mt-4">
-                            <Button type="default" className="mr-2" onClick={() => navigate('/apps/project/projectmember')}>Cancel</Button>
-                            <Button type="primary" htmlType="submit">Create</Button>
-                        </div>
-                    </Form>
-                )}
-            </Formik>
-        </div>
-    );
+
+    dispatch(Addmember(payload)) // Use the modified payload here
+      .then(() => {
+        dispatch(GetProject())
+          .then(() => {
+            message.success("Project added successfully!");
+            resetForm();
+            // onClose();
+          })
+          .catch((error) => {
+            message.error("Failed to fetch the latest meeting data.");
+            console.error("MeetData API error:", error);
+          });
+      })
+      .catch((error) => {
+        message.error("Failed to add meeting.");
+        console.error("AddMeet API error:", error);
+      });
+  };
+
+  const allempdata = useSelector((state) => state.employee);
+  const empData = allempdata?.employee?.data;
+
+  const Allpeoject = useSelector((state) => state.Project);
+  const Filterdta = Allpeoject?.Project?.data;
+
+  const project = Filterdta.find((item) => item.id === id);
+
+  console.log("swswswsw", project.project_members);
+
+  useEffect(() => {
+    dispatch(empdata());
+    dispatch(GetProject());
+  }, [dispatch]);
+
+  return (
+    <div className="add-project-member-form">
+      <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+      <Formik
+        initialValues={initialValues}
+        // validationSchema={validationSchema}
+        onSubmit={onSubmit}
+      >
+        {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
+          <Form className="formik-form" onSubmit={handleSubmit}>
+            <Row gutter={16}>
+              <Col span={24} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold text-[12] text-dark-gray-500 ">
+                    Add Project Member
+                  </label>
+                  <Field name="project_members">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-2"
+                        mode="multiple"
+                        placeholder="Select AddProjectMember"
+                        onChange={(value) =>
+                          setFieldValue("project_members", value)
+                        }
+                        value={values.project_members}
+                        onBlur={() => setFieldTouched("project_members", true)}
+                      >
+                        {empData && empData.length > 0 ? (
+                          empData.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.firstName ||
+                                client.username ||
+                                "Unnamed Client"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Clients Available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="project_members"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+            </Row>
+            <div className="form-buttons text-right mt-4">
+              <Button
+                type="default"
+                className="mr-2"
+                onClick={() => navigate("/apps/sales/expenses")}
+              >
+                Cancel
+              </Button>
+              <Button type="primary" htmlType="submit">
+                Create
+              </Button>
+            </div>
+            {/* <Modal
+                          
+                        </Modal> */}
+          </Form>
+        )}
+      </Formik>
+    </div>
+  );
 };
 export default AddProjectMember;

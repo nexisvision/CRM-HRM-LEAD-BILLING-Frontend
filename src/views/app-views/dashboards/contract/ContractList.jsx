@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
@@ -37,11 +37,21 @@ import userData from "../../../../assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
 import { IoCopyOutline } from "react-icons/io5";
 import utils from "utils";
+import { GetProject } from "../project/project-list/projectReducer/ProjectSlice";
+import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
+import { useDispatch, useSelector } from "react-redux";
+import { ContaractData, DeleteCon } from "./ContractReducers/ContractSlice";
+
 const ContractList = () => {
   const [users, setUsers] = useState(userData);
   const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
+
+  const [idd, setIdd] = useState("");
+
+  const dispatch = useDispatch();
+
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddContractModalVisible, setIsAddContractModalVisible] =
     useState(false);
@@ -52,6 +62,9 @@ const ContractList = () => {
     const navigate = useNavigate();
   //   const [dealStatisticData] = useState(DealStatisticData);
   // Open Add Job Modal
+
+  const tabledata = useSelector((state) => state.Contract);
+
   const openAddContractModal = () => {
     setIsAddContractModalVisible(true);
   };
@@ -88,10 +101,31 @@ const ContractList = () => {
     setSelectedRowKeys([]);
   };
   // Delete user
-  const deleteUser = (userId) => {
-    setUsers(users.filter((item) => item.id !== userId));
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
+  // const deleteUser = (userId) => {
+  //   dispatch(DeleteCon(userId));
+
+  //   message.success({ content: `Deleted user ${userId}`, duration: 2 });
+  // };
+
+  const deleteUser = async (userId) => {
+    try {
+      await dispatch(DeleteCon(userId));
+
+      const updatedData = await dispatch(ContaractData());
+
+      setUsers(users.filter((item) => item.id !== userId));
+
+      message.success({ content: "Deleted user successfully", duration: 2 });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
   };
+
+  const Editfun = (id) => {
+    openEditContractModal();
+    setIdd(id);
+  };
+
   // Show user profile
   const showUserProfile = (userInfo) => {
     setSelectedUser(userInfo);
@@ -102,6 +136,22 @@ const ContractList = () => {
     setSelectedUser(null);
     setUserProfileVisible(false);
   };
+
+  useEffect(() => {
+    dispatch(GetProject());
+    dispatch(ClientData());
+  }, []);
+
+  useEffect(() => {
+    dispatch(ContaractData());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (tabledata && tabledata.Contract && tabledata.Contract.data) {
+      setUsers(tabledata.Contract.data);
+    }
+  }, [tabledata]);
+
   const dropdownMenu = (elm) => (
     <Menu>
       <Menu.Item>
@@ -136,7 +186,7 @@ const ContractList = () => {
             type=""
             className=""
             icon={<EditOutlined />}
-            onClick={openEditContractModal}
+            onClick={() => Editfun(elm.id)}
             size="small"
           >
             <span className="">Edit</span>
@@ -188,7 +238,7 @@ const ContractList = () => {
     },
     {
       title: "Client",
-      dataIndex: "name",
+      dataIndex: "client",
       sorter: (a, b) => dayjs(a.startdate).unix() - dayjs(b.startdate).unix(),
     },
     {
@@ -205,7 +255,7 @@ const ContractList = () => {
     },
     {
       title: "Contract Type",
-      dataIndex: "contracttype",
+      dataIndex: "type",
       // render: (_, record) => (
       //     <div className="d-flex">
       //         <AvatarStatus size={30} src={record.image} name={record.name}/>
@@ -217,7 +267,7 @@ const ContractList = () => {
     },
     {
       title: "Contract Value",
-      dataIndex: "contractvalue",
+      dataIndex: "value",
       // render: (_, record) => (
       //     <div className="d-flex">
       //         <AvatarStatus size={30} src={record.image} name={record.name}/>
@@ -229,7 +279,7 @@ const ContractList = () => {
     },
     {
       title: "Start Date",
-      dataIndex: "startdate",
+      dataIndex: "startDate",
       // render: (_, record) => (
       //     <div className="d-flex">
       //         <AvatarStatus size={30} src={record.image} name={record.name}/>
@@ -241,7 +291,7 @@ const ContractList = () => {
     },
     {
       title: "End Date",
-      dataIndex: "enddate",
+      dataIndex: "endDate",
       // render: (_, record) => (
       //     <div className="d-flex">
       //         <AvatarStatus size={30} src={record.image} name={record.name}/>
@@ -346,7 +396,7 @@ const ContractList = () => {
         width={800}
         className="mt-[-70px]"
       >
-        <EditContract onClose={closeEditContractModal} />
+        <EditContract onClose={closeEditContractModal} id={idd} />
       </Modal>
     </Card>
   );

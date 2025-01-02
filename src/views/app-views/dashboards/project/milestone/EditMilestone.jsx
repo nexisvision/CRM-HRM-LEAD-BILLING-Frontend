@@ -1,202 +1,286 @@
-import React, { useEffect } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, DatePicker } from 'antd';
-import { EyeOutlined, DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
-// import { Card, Table,  Badge, Menu, Tag,Modal } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import 'react-quill/dist/quill.snow.css';
-import ReactQuill from 'react-quill';
-import { useSelector, useDispatch } from 'react-redux';
-import { getallcurrencies } from "../../../setting/currencies/currenciesreducer/currenciesSlice"
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Row,
+  Col,
+  Input,
+  message,
+  Button,
+  Select,
+  DatePicker,
+} from "antd";
+import { useNavigate, useParams } from "react-router-dom";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import moment from "moment";
+import { Editmins, Getmins } from "./minestoneReducer/minestoneSlice";
 
 const { Option } = Select;
 
-const EditMilestone = ({ onClose }) => {
-    const navigate = useNavigate();
-    const { currencies } = useSelector((state) => state.currencies);
-    const dispatch = useDispatch();
+const EditMilestone = ({ idd, onClose }) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { id } = useParams();
 
-    useEffect(() => {
-        dispatch(getallcurrencies());
-    }, [dispatch]);
+  const allempdata = useSelector((state) => state.Milestone);
+  const milestones = allempdata.Milestone.data;
 
+  const [initialValues, setInitialValues] = useState({
+    milestone_title: "",
+    milestone_cost: "",
+    milestone_status: "",
+    add_cost_to_project_budget: "",
+    milestone_summary: "",
+    milestone_start_date: null,
+    milestone_end_date: null,
+  });
 
-    const onSubmit = (values) => {
-        console.log('Submitted values:', values);
-        message.success('Milestone updated successfully!');
-        onClose();
-        navigate('/app/dashboards/project/milestone');
-    };
+  useEffect(() => {
+    const milestone = milestones.find((item) => item.id === idd);
+    if (milestone) {
+      setInitialValues({
+        id: milestone.id, // Include ID for update
+        milestone_title: milestone.milestone_title || "",
+        milestone_cost: milestone.milestone_cost || "",
+        milestone_status: milestone.milestone_status || "",
+        add_cost_to_project_budget: milestone.add_cost_to_project_budget || "",
+        milestone_summary: milestone.milestone_summary || "",
+        milestone_start_date: milestone.milestone_start_date
+          ? moment(milestone.milestone_start_date)
+          : null,
+        milestone_end_date: milestone.milestone_end_date
+          ? moment(milestone.milestone_end_date)
+          : null,
+      });
+    } else {
+      message.error("Milestone not found!");
+      navigate("/app/dashboards/project/milestone");
+    }
+  }, [idd, milestones]);
 
-    const initialValues = {
-        milestoneTitle: '',
-        milestoneCost: '',
-        status: '',
-        milestoneSummary: '',
-        startDate: null,
-        endDate: null,
-    };
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      const formattedValues = {
+        ...values,
+        milestone_start_date: values.milestone_start_date
+          ? values.milestone_start_date.format("YYYY-MM-DD")
+          : null,
+        milestone_end_date: values.milestone_end_date
+          ? values.milestone_end_date.format("YYYY-MM-DD")
+          : null,
+      };
 
-    const validationSchema = Yup.object({
-        milestoneTitle: Yup.string().required('Please enter milestone title.'),
-        milestoneCost: Yup.string().required('Please enter milestone cost.'),
-        status: Yup.string().required('Please select status.'),
-        milestoneSummary: Yup.string().required('Please enter milestone summary.'),
-        startDate: Yup.date().nullable().required('Start Date is required.'),
-        endDate: Yup.date().nullable().required('End Date is required.'),
+      await dispatch(Editmins({ id, data: formattedValues })).unwrap();
+      dispatch(Getmins());
+      onClose();
+      message.success("Milestone updated successfully!");
+    } catch (error) {
+      message.error("Failed to update milestone: " + error.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-    });
+  const validationSchema = Yup.object({
+    milestone_title: Yup.string().required("Please enter milestone title."),
+    milestone_cost: Yup.string().required("Please enter milestone cost."),
+    milestone_status: Yup.string().required("Please select status."),
+    add_cost_to_project_budget: Yup.string().required(
+      "Please select add cost to project budget."
+    ),
+    milestone_summary: Yup.string().required("Please enter milestone summary."),
+    milestone_start_date: Yup.date()
+      .nullable()
+      .required("Start Date is required."),
+    milestone_end_date: Yup.date()
+      .nullable()
+      .required("End Date is required")
+      .min(
+        Yup.ref("milestone_start_date"),
+        "End date must be after start date"
+      ),
+  });
 
-
-    return (
-        <>
-            <div>
-                <div className=' ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4'>
-                    <h2 className=" border-b pb-[30px] font-medium"></h2>
-
-                    <div className="">
-                        <div className=" p-2">
-                            <Formik
-                                initialValues={initialValues}
-                                validationSchema={validationSchema}
-                                onSubmit={onSubmit}
-                            >
-                                {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
-                                    <Form className="formik-form" onSubmit={handleSubmit}>
-                                        <Row gutter={16}>
-                                            <Col span={12} className="mt-4">
-                                                <div className="form-item">
-                                                    <label className='font-semibold mb-2'>Milestone Title </label>
-                                                    <div className='flex'>
-                                                        <Field name="milestoneTitle" as={Input} placeholder="Enter Milestone Title" onBlur={() => setFieldTouched("milestoneTitle", true)} className=' rounded-e-lg rounded-s-none mt-2' />
-                                                    </div>
-                                                    <ErrorMessage name="milestoneTitle" component="div" className="error-message text-red-500 my-1" />
-                                                </div>
-                                            </Col>
-                                            <Col span={12} className="mt-4">
-                                                <div className="form-item">
-                                                    <label className='font-semibold mb-2'>Milestone Cost </label>
-                                                    <div className='flex'>
-                                                        <Field name="milestoneCost" as={Input} placeholder="Enter Milestone Cost" onBlur={() => setFieldTouched("milestoneCost", true)} className=' rounded-e-lg rounded-s-none mt-2' />
-                                                    </div>
-                                                    <ErrorMessage name="milestoneCost" component="div" className="error-message text-red-500 my-1" />
-                                                </div>
-                                            </Col>
-                                            <Col span={12} className='mt-4'>
-                                                <div className="form-item">
-                                                    <label className='font-semibold mb-2'>Status</label>
-                                                    <Field name="currency">
-                                                        {({ field }) => (
-                                                            <Select
-                                                                {...field}
-                                                                className="w-full mt-2"
-                                                                placeholder="Select Status"
-                                                                onChange={(value) => setFieldValue('status', value)}
-                                                                value={values.status}
-                                                                onBlur={() => setFieldTouched("status", true)}
-                                                            >
-                                                                <Option value="active">Active</Option>
-                                                                <Option value="inactive">Inactive</Option>
-                                                            </Select>
-                                                        )}
-                                                    </Field>
-                                                    <ErrorMessage name="status" component="div" className="error-message text-red-500 my-1" />
-                                                </div>
-                                            </Col>
-                                            <Col span={12} className="mt-4">
-                                                <div className="form-item">
-                                                    <label className='font-semibold mb-2'>Currency</label>
-                                                    <div className="flex gap-2">
-                                                        <Field name="currency">
-                                                            {({ field, form }) => (
-                                                                <Select
-                                                                    {...field}
-                                                                    className="w-full mt-2"
-                                                                    placeholder="Select Currency"
-                                                                    onChange={(value) => {
-                                                                        const selectedCurrency = currencies.find(c => c.id === value);
-                                                                        form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
-                                                                    }}
-                                                                >
-                                                                    {currencies?.map((currency) => (
-                                                                        <Option
-                                                                            key={currency.id}
-                                                                            value={currency.id}
-                                                                        >
-                                                                            {currency.currencyCode}
-                                                                        </Option>
-                                                                    ))}
-                                                                </Select>
-                                                            )}
-                                                        </Field>
-                                                    </div>
-                                                    <ErrorMessage
-                                                        name="currency"
-                                                        component="div"
-                                                        className="error-message text-red-500 my-1"
-                                                    />
-                                                </div>
-                                            </Col>
-
-
-                                            <Col span={24} className='mt-4'>
-                                                <div className="form-item">
-                                                    <label className='font-semibold'>Milestone Summary</label>
-                                                    <ReactQuill
-                                                        value={values.milestoneSummary}
-                                                        className='mt-2'
-                                                        onChange={(value) => setFieldValue('milestoneSummary', value)}
-                                                        placeholder="Enter Milestone Summary"
-                                                    />
-                                                    <ErrorMessage name="milestoneSummary" component="div" className="error-message text-red-500 my-1" />
-                                                </div>
-                                            </Col>
-
-                                            <Col span={12} className='mt-4'>
-                                                <div className="form-item">
-                                                    <label className='font-semibold mb-2'>Start Date</label>
-                                                    <DatePicker
-                                                        className="w-full mt-2"
-                                                        format="DD-MM-YYYY"
-
-                                                        value={values.startDate}
-                                                        onChange={(startDate) => setFieldValue('startDate', startDate)}
-                                                        onBlur={() => setFieldTouched("startDate", true)}
-                                                    />
-                                                    <ErrorMessage name="startDate" component="div" className="error-message text-red-500 my-1" />
-                                                </div>
-                                            </Col>
-                                            <Col span={12} className='mt-4'>
-                                                <div className="form-item">
-                                                    <label className='font-semibold mb-2'>End Date</label>
-                                                    <DatePicker
-                                                        className="w-full mt-2"
-                                                        format="DD-MM-YYYY"
-                                                        value={values.endDate}
-                                                        onChange={(endDate) => setFieldValue('endDate', endDate)}
-                                                        onBlur={() => setFieldTouched("endDate", true)}
-                                                    />
-                                                    <ErrorMessage name="endDate" component="div" className="error-message text-red-500 my-1" />
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                    </Form>
-                                )}
-                            </Formik>
-                        </div>
+  return (
+    <div>
+      <div className="ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4">
+        <h2 className="border-b pb-[30px] font-medium">Edit Milestone</h2>
+        <div className="p-2">
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            enableReinitialize={true}
+            onSubmit={handleSubmit}
+          >
+            {({ values, setFieldValue, setFieldTouched, isSubmitting }) => (
+              <Form className="formik-form">
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <div className="form-item">
+                      <label className="font-semibold mb-2">
+                        Milestone Title
+                      </label>
+                      <Field
+                        name="milestone_title"
+                        as={Input}
+                        placeholder="Enter Milestone Title"
+                        className="rounded-e-lg rounded-s-none"
+                      />
+                      <ErrorMessage
+                        name="milestone_title"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
                     </div>
-
-
-                    <div className="form-buttons text-right py-2">
-                        <Button type="default" className="mr-2" onClick={() => navigate('/app/dashboards/project/milestone')}>Cancel</Button>
-                        <Button type="primary" htmlType="submit">Update</Button>
+                  </Col>
+                  <Col span={12}>
+                    <div className="form-item">
+                      <label className="font-semibold mb-2">
+                        Milestone Cost
+                      </label>
+                      <Field
+                        name="milestone_cost"
+                        as={Input}
+                        placeholder="Enter Milestone Cost"
+                        className="rounded-e-lg rounded-s-none"
+                      />
+                      <ErrorMessage
+                        name="milestone_cost"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
                     </div>
+                  </Col>
+                  <Col span={12} className="mt-2">
+                    <div className="form-item">
+                      <label className="font-semibold mb-2">Status</label>
+                      <Select
+                        value={values.milestone_status}
+                        onChange={(value) =>
+                          setFieldValue("milestone_status", value)
+                        }
+                        onBlur={() => setFieldTouched("milestone_status", true)}
+                        className="w-full"
+                        placeholder="Select Status"
+                      >
+                        <Option value="active">Active</Option>
+                        <Option value="inactive">Inactive</Option>
+                      </Select>
+                      <ErrorMessage
+                        name="milestone_status"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+                  <Col span={12} className="mt-2">
+                    <div className="form-item">
+                      <label className="font-semibold mb-2">
+                        Add Cost To Project Budget
+                      </label>
+                      <Select
+                        value={values.add_cost_to_project_budget}
+                        onChange={(value) =>
+                          setFieldValue("add_cost_to_project_budget", value)
+                        }
+                        onBlur={() =>
+                          setFieldTouched("add_cost_to_project_budget", true)
+                        }
+                        className="w-full"
+                        placeholder="Select Option"
+                      >
+                        <Option value="no">No</Option>
+                        <Option value="yes">Yes</Option>
+                      </Select>
+                      <ErrorMessage
+                        name="add_cost_to_project_budget"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+                  <Col span={24} className="mt-2">
+                    <div className="form-item">
+                      <label className="font-semibold">Milestone Summary</label>
+                      <ReactQuill
+                        value={values.milestone_summary}
+                        onChange={(value) =>
+                          setFieldValue("milestone_summary", value)
+                        }
+                        placeholder="Enter Milestone Summary"
+                      />
+                      <ErrorMessage
+                        name="milestone_summary"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+                  <Col span={12} className="mt-2">
+                    <div className="form-item">
+                      <label className="font-semibold mb-2">Start Date</label>
+                      <DatePicker
+                        className="w-full"
+                        format="DD-MM-YYYY"
+                        value={values.milestone_start_date}
+                        onChange={(date) =>
+                          setFieldValue("milestone_start_date", date)
+                        }
+                        onBlur={() =>
+                          setFieldTouched("milestone_start_date", true)
+                        }
+                      />
+                      <ErrorMessage
+                        name="milestone_start_date"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+                  <Col span={12} className="mt-2">
+                    <div className="form-item">
+                      <label className="font-semibold mb-2">End Date</label>
+                      <DatePicker
+                        className="w-full"
+                        format="DD-MM-YYYY"
+                        value={values.milestone_end_date}
+                        onChange={(date) =>
+                          setFieldValue("milestone_end_date", date)
+                        }
+                        onBlur={() =>
+                          setFieldTouched("milestone_end_date", true)
+                        }
+                      />
+                      <ErrorMessage
+                        name="milestone_end_date"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+                </Row>
+                <div className="form-buttons text-right py-2">
+                  <Button type="default" className="mr-2" onClick={onClose}>
+                    Cancel
+                  </Button>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={isSubmitting}
+                  >
+                    Update
+                  </Button>
                 </div>
-            </div>
-        </>
-    );
+              </Form>
+            )}
+          </Formik>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default EditMilestone;
-

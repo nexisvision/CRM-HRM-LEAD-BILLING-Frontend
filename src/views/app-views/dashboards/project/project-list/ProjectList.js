@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Tooltip, Tag, Progress, Avatar, Modal, Card, Radio, Row, Col, Dropdown, Menu } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, AppstoreOutlined, UnorderedListOutlined, PaperClipOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
-
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import ProjectListData from './ProjectListData';
 import AddProject from './AddProject';
@@ -11,9 +10,9 @@ import { useNavigate,useParams } from 'react-router-dom';
 import PageHeaderAlt from 'components/layout-components/PageHeaderAlt';
 import Flex from 'components/shared-components/Flex';
 import { empdata } from 'views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice';
-import { ClientData } from 'views/app-views/company/CompanyReducers/CompanySlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { DeletePro, GetProject } from './projectReducer/ProjectSlice';
+import { ClientData } from 'views/app-views/Users/client-list/CompanyReducers/CompanySlice';
 
 const VIEW_LIST = 'LIST';
 const VIEW_GRID = 'GRID';
@@ -31,9 +30,9 @@ const ProjectList = () => {
 
 	const dispatch = useDispatch();
 
-	const Allclientdata = useSelector((state) => state.ClientData);
+	const Allclientdata = useSelector((state) => state.SubClient);
 
-	const dataclient = Allclientdata.ClientData.data;
+	const dataclient = Allclientdata.SubClient.data;
 
 	const navigate = useNavigate();
 
@@ -61,8 +60,8 @@ const ProjectList = () => {
 			const formattedData = properdata?.map(item => {
 				// Calculate days left
 				const currentDate = new Date();
-				const endDate = new Date(item.enddate);
-				const startDate = new Date(item.startdate);
+				const endDate = new Date(item.endDate);
+				const startDate = new Date(item.startDate);
 
 				// Calculate total project days
 				const totalDays = Math.ceil((endDate - startDate) / (1000 * 3600 * 24));
@@ -83,7 +82,7 @@ const ProjectList = () => {
 					// Update completedTask to show days progress
 					completedTask: `${adjustedCompletedDays}/${totalDays}`,
 					
-					progression: item?.startdate || item.progression,
+					progression: item?.startDate || item.progression,
 					dayleft: Math.max(0, Math.ceil((endDate - currentDate) / (1000 * 3600 * 24))),
 					statusColor: item?.status || item.statusColor,
 					member: datac || item.member,

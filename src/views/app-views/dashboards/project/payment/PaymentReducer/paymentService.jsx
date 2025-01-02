@@ -7,10 +7,10 @@ import axios from "axios";
 //     return res
 // };
 
-const fetchEmpData = async () => {
+const GetPayment = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/employees/", {
+    const res = await axios.get(`http://localhost:5353/api/v1/payments/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -22,13 +22,15 @@ const fetchEmpData = async () => {
   }
 };
 
-const createEmp = async (payload) => {
+const AddPyment = async (id, values) => {
   const token = localStorage.getItem("auth_token");
+
+  console.log("wewwew", values);
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/employees/",
-      payload,
+      `http://localhost:5353/api/v1/payments/${id}`,
+      values,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -43,12 +45,12 @@ const createEmp = async (payload) => {
   }
 };
 
-const Empdelete = async (id) => {
+const DeletePayment = async (exid) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/employees/${id}`,
+      `http://localhost:5353/api/v1/payments/${exid}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -63,12 +65,12 @@ const Empdelete = async (id) => {
   }
 };
 
-const EditEmp = async (employeeIdd, values) => {
+const EditPayment = async (id, data) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/employees/${employeeIdd}`,
-      values,
+      `http://localhost:5353/api/v1/payments/${id}`,
+      data,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -104,10 +106,10 @@ const EditEmp = async (employeeIdd, values) => {
 
 const UserService = {
   // addUser,
-  fetchEmpData,
-  createEmp,
-  Empdelete,
-  EditEmp,
+  GetPayment,
+  AddPyment,
+  DeletePayment,
+  EditPayment,
   // getAllUsers,
   // getUserById,
   // deleteUser,

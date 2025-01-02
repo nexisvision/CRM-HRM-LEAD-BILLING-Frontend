@@ -7,14 +7,17 @@ import axios from "axios";
 //     return res
 // };
 
-const fetchEmpData = async () => {
+const GetMin = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/employees/", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await axios.get(
+      `http://localhost:5353/api/v1/milestones/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -22,13 +25,15 @@ const fetchEmpData = async () => {
   }
 };
 
-const createEmp = async (payload) => {
+const AddMin = async (id, values) => {
   const token = localStorage.getItem("auth_token");
+
+  console.log("wewwew", values);
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/employees/",
-      payload,
+      `http://localhost:5353/api/v1/milestones/${id}`,
+      values,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -43,12 +48,12 @@ const createEmp = async (payload) => {
   }
 };
 
-const Empdelete = async (id) => {
+const Deletemin = async (userId) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/employees/${id}`,
+      `http://localhost:5353/api/v1/milestones/${userId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -63,12 +68,12 @@ const Empdelete = async (id) => {
   }
 };
 
-const EditEmp = async (employeeIdd, values) => {
+const EditMin = async (id, data) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/employees/${employeeIdd}`,
-      values,
+      `http://localhost:5353/api/v1/milestones/${id}`,
+      data,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -104,10 +109,10 @@ const EditEmp = async (employeeIdd, values) => {
 
 const UserService = {
   // addUser,
-  fetchEmpData,
-  createEmp,
-  Empdelete,
-  EditEmp,
+  GetMin,
+  AddMin,
+  Deletemin,
+  EditMin,
   // getAllUsers,
   // getUserById,
   // deleteUser,

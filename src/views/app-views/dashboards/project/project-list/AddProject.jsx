@@ -19,9 +19,9 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { AddPro, GetProject } from "./projectReducer/ProjectSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
-import { ClientData } from "views/app-views/company/CompanyReducers/CompanySlice";
 import { PlusOutlined } from "@ant-design/icons";
 import { GetTagspro, AddTags } from "./tagReducer/TagSlice";
+import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 
 const { Option } = Select;
 
@@ -56,25 +56,25 @@ const AddProject = ({ onClose }) => {
 
   const initialValues = {
     project_name: "",
-    category: "",
-    startdate: null,
-    enddate: null,
+    project_category: "",
+    startDate: null,
+    endDate: null,
     // projectimage: "",
     client: "",
     user: "",
     budget: "",
     estimatedmonths: "",
     estimatedhours: "",
-    description: "",
+    project_description: "",
     tag: "",
     status: "",
   };
 
   const validationSchema = Yup.object({
     project_name: Yup.string().required("Please enter a Project Name."),
-    category: Yup.string().required("Please enter a Category."),
-    startdate: Yup.date().nullable().required("Start date is required."),
-    enddate: Yup.date().nullable().required("End date is required."),
+    project_category: Yup.string().required("Please enter a Category."),
+    startDate: Yup.date().nullable().required("Start date is required."),
+    endDate: Yup.date().nullable().required("End date is required."),
     // projectimage: Yup.mixed().required("Please upload a Project Image."),
     client: Yup.string().required("Please select Client."),
     user: Yup.string().required("Please select User."),
@@ -89,7 +89,9 @@ const AddProject = ({ onClose }) => {
       .required("Please enter Estimated Hours.")
       .positive("Hours must be positive.")
       .integer("Hours must be a whole number"),
-    description: Yup.string().required("Please enter a Project Description."),
+    project_description: Yup.string().required(
+      "Please enter a Project Description."
+    ),
     tag: Yup.string().required("Please enter a Tag."),
     status: Yup.string().required("Please select Status."),
   });
@@ -192,13 +194,13 @@ const AddProject = ({ onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Category</label>
                   <Field
-                    name="category"
+                    name="project_category"
                     as={Input}
-                    placeholder="Enter Project Category"
+                    placeholder="Enter Project project_category"
                     rules={[{ required: true }]}
                   />
                   <ErrorMessage
-                    name="category"
+                    name="project_category"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -211,12 +213,12 @@ const AddProject = ({ onClose }) => {
                   <DatePicker
                     className="w-full"
                     format="DD-MM-YYYY"
-                    value={values.startdate}
-                    onChange={(date) => setFieldValue("startdate", date)}
-                    onBlur={() => setFieldTouched("startdate", true)}
+                    value={values.startDate}
+                    onChange={(date) => setFieldValue("startDate", date)}
+                    onBlur={() => setFieldTouched("startDate", true)}
                   />
                   <ErrorMessage
-                    name="startdate"
+                    name="startDate"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -229,12 +231,12 @@ const AddProject = ({ onClose }) => {
                   <DatePicker
                     className="w-full"
                     format="DD-MM-YYYY"
-                    value={values.enddate}
-                    onChange={(date) => setFieldValue("enddate", date)}
-                    onBlur={() => setFieldTouched("enddate", true)}
+                    value={values.endDate}
+                    onChange={(date) => setFieldValue("endDate", date)}
+                    onBlur={() => setFieldTouched("endDate", true)}
                   />
                   <ErrorMessage
-                    name="enddate"
+                    name="endDate"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -381,13 +383,15 @@ const AddProject = ({ onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Description</label>
                   <ReactQuill
-                    value={values.description}
-                    onChange={(value) => setFieldValue("description", value)}
-                    placeholder="Enter Description"
-                    onBlur={() => setFieldTouched("description", true)}
+                    value={values.project_description}
+                    onChange={(value) =>
+                      setFieldValue("project_description", value)
+                    }
+                    placeholder="Enter project_description"
+                    onBlur={() => setFieldTouched("project_description", true)}
                   />
                   <ErrorMessage
-                    name="description"
+                    name="project_description"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />

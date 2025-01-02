@@ -43,7 +43,7 @@ const CreateCon = async (payload) => {
   }
 };
 
-const DeleteDeals = async (id) => {
+const DeleteCon = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
@@ -63,7 +63,7 @@ const DeleteDeals = async (id) => {
   }
 };
 
-const EditDeals = async (id, values) => {
+const Editcon = async (id, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
@@ -106,8 +106,8 @@ const UserService = {
   // addUser,
   ContaractData,
   CreateCon,
-  DeleteDeals,
-  EditDeals,
+  DeleteCon,
+  Editcon,
   // getAllUsers,
   // getUserById,
   // deleteUser,

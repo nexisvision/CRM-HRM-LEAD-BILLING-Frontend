@@ -1,33 +1,32 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./ContractService";
+import UserService from "./ExpenceService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
-export const AddCon = createAsyncThunk(
-  "users/AddCon",
-  async (userData, thunkAPI) => {
+
+export const Addexp = createAsyncThunk(
+  "users/Addexp",
+  async ({ id, values }, thunkAPI) => {
     try {
-      const response = await UserService.CreateCon(userData);
+      const response = await UserService.AddExpence(id, values);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
+
 // Async thunk for user login
 
-export const ContaractData = createAsyncThunk(
-  "emp/ContaractData",
-  async (thunkAPI) => {
-    try {
-      const response = await UserService.ContaractData();
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
+export const Getexp = createAsyncThunk("emp/Getexp", async (id, thunkAPI) => {
+  try {
+    const response = await UserService.Getex(id);
+    return response;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response.data);
   }
-);
+});
 
 // Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
@@ -56,23 +55,23 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const DeleteCon = createAsyncThunk(
-  "users/DeleteCon",
-  async (userId, thunkAPI) => {
+export const DeleteExp = createAsyncThunk(
+  "users/DeleteExp",
+  async (exid, thunkAPI) => {
     try {
-      const response = await UserService.DeleteCon(userId);
+      const response = await UserService.DeleteEx(exid);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const Editcon = createAsyncThunk(
-  "users/Editcon",
+export const EditExp = createAsyncThunk(
+  "users/EditExp",
   async ({ id, values }, thunkAPI) => {
     try {
-      console.log("jkjkjkjkjjkj", id);
-      const response = await UserService.Editcon(id, values);
+      console.log("idinslice", id);
+      const response = await UserService.EditEx(id, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -95,9 +94,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "Contract",
+  name: "Expense",
   initialState: {
-    Contract: [],
+    Expense: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -134,27 +133,27 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(AddCon.pending, (state) => {
+      .addCase(Addexp.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(AddCon.fulfilled, (state, action) => {
+      .addCase(Addexp.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(AddCon.rejected, (state, action) => {
+      .addCase(Addexp.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(ContaractData.pending, (state) => {
+      .addCase(Getexp.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(ContaractData.fulfilled, (state, action) => {
+      .addCase(Getexp.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.Contract = action?.payload;
+        state.Expense = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(ContaractData.rejected, (state, action) => {
+      .addCase(Getexp.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
@@ -187,27 +186,27 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
       //delete
-      .addCase(DeleteCon.pending, (state) => {
+      .addCase(DeleteExp.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(DeleteCon.fulfilled, (state, action) => {
+      .addCase(DeleteExp.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload.message);
       })
-      .addCase(DeleteCon.rejected, (state, action) => {
+      .addCase(DeleteExp.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(Editcon.pending, (state) => {
+      .addCase(EditExp.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(Editcon.fulfilled, (state, action) => {
+      .addCase(EditExp.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload;
       })
-      .addCase(Editcon.rejected, (state, action) => {
+      .addCase(EditExp.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
       });

@@ -21,6 +21,9 @@ import SubClient from "../views/app-views/Users/client-list/CompanyReducers/Comp
 import Contract from "../views/app-views/dashboards/contract/ContractReducers/ContractSlice"
 import countries from "../views/app-views/setting/countries/countriesreducer/countriesSlice"
 import currencies from "../views/app-views/setting/currencies/currenciesreducer/currenciesSlice"
+import Milestone from "../views/app-views/dashboards/project/milestone/minestoneReducer/minestoneSlice"
+import Expense from "../views/app-views/dashboards/project/expenses/Expencereducer/ExpenseSlice"
+import Payment from "../views/app-views/dashboards/project/payment/PaymentReducer/paymentSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -46,6 +49,9 @@ const rootReducer = (asyncReducers) => (state, action) => {
         Contract,
         countries,
         currencies,
+        Milestone,
+        Expense,
+        Payment,
         // employee,
         // department,
         ...asyncReducers,
