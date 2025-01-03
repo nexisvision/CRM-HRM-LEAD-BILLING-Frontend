@@ -14,15 +14,16 @@ import {
 } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { AddTasks, GetTasks } from "./TaskReducer/TaskSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import useSelection from "antd/es/table/hooks/useSelection";
+import { assign } from "lodash";
 
 const { Option } = Select;
 
@@ -35,29 +36,38 @@ const AddTask = ({ onClose }) => {
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
   const initialValues = {
-    taskTitle: "",
-    TaskCategory: "",
-    projectName: "",
-    taskDate: null,
+    taskName: "",
+    category: "",
+    project: "",
+    startDate: null,
     dueDate: null,
-    AssignTo: [],
-    taskDescription: "",
+    assignTo: [],
+    description: "",
   };
 
   const validationSchema = Yup.object({
-    taskTitle: Yup.string().required("Please enter TaskName."),
-    TaskCategory: Yup.string().required("Please enter TaskCategory."),
-    projectName: Yup.string().required("Please enter Project."),
-    taskDate: Yup.date().nullable().required("Date is required."),
+    taskName: Yup.string().required("Please enter TaskName."),
+    category: Yup.string().required("Please enter TaskCategory."),
+    project: Yup.string().required("Please enter Project."),
+    startDate: Yup.date().nullable().required("Date is required."),
     dueDate: Yup.date().nullable().required("Date is required."),
-    AssignTo: Yup.array().min(1, "Please select at least one AssignTo."),
-    taskDescription: Yup.string().required("Please enter a Description."),
+    assignTo: Yup.array().min(1, "Please select at least one AssignTo."),
+    description: Yup.string().required("Please enter a Description."),
   });
 
+  const { id } = useParams();
+
+  const allempdata = useSelector((state) => state.employee);
+  const empData = allempdata?.employee?.data;
+
   const onSubmit = async (values, { resetForm }) => {
-    dispatch(AddTasks(values))
+    if (Array.isArray(values.AssignTo) && values.AssignTo.length > 0) {
+      values.AssignTo = { [values.AssignTo[0]]: undefined };
+    }
+
+    dispatch(AddTasks({ id, values }))
       .then(() => {
-        dispatch(GetTasks())
+        dispatch(GetTasks(id))
           .then(() => {
             message.success("Expenses added successfully!");
             resetForm();
@@ -97,13 +107,13 @@ const AddTask = ({ onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Task Name</label>
                   <Field
-                    name="taskTitle"
+                    name="taskName"
                     as={Input}
                     placeholder="Enter taskTitle"
                     className="mt-2"
                   />
                   <ErrorMessage
-                    name="taskTitle"
+                    name="taskName"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -113,17 +123,15 @@ const AddTask = ({ onClose }) => {
               <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Task Category</label>
-                  <Field name="TaskCategory">
+                  <Field name="category">
                     {({ field }) => (
                       <Select
                         {...field}
-                        placeholder="Select TaskCategory"
+                        placeholder="Select category"
                         className="w-full mt-2"
-                        onChange={(value) =>
-                          setFieldValue("TaskCategory", value)
-                        }
-                        value={values.TaskCategory}
-                        onBlur={() => setFieldTouched("TaskCategory", true)}
+                        onChange={(value) => setFieldValue("category", value)}
+                        value={values.category}
+                        onBlur={() => setFieldTouched("category", true)}
                         allowClear={false}
                       >
                         <Option value="Task Category">Task Category</Option>
@@ -132,7 +140,7 @@ const AddTask = ({ onClose }) => {
                     )}
                   </Field>
                   <ErrorMessage
-                    name="TaskCategory"
+                    name="category"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -143,13 +151,13 @@ const AddTask = ({ onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Project</label>
                   <Field
-                    name="projectName"
+                    name="project"
                     as={Input}
                     placeholder="Enter projectName"
                     className="mt-2"
                   />
                   <ErrorMessage
-                    name="projectName"
+                    name="project"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -160,12 +168,12 @@ const AddTask = ({ onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold ">StartDate</label>
                   <DatePicker
-                    name="taskDate"
+                    name="startDate"
                     className="w-full mt-2"
-                    placeholder="Select taskDate"
-                    onChange={(value) => setFieldValue("taskDate", value)}
-                    value={values.taskDate}
-                    onBlur={() => setFieldTouched("taskDate", true)}
+                    placeholder="Select startDate"
+                    onChange={(value) => setFieldValue("startDate", value)}
+                    value={values.startDate}
+                    onBlur={() => setFieldTouched("startDate", true)}
                   />
                   <ErrorMessage
                     name="taskDate"
@@ -197,25 +205,56 @@ const AddTask = ({ onClose }) => {
               <Col span={24} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">AssignTo</label>
-                  <Field name="AssignTo">
+                  <Field name="assignTo">
                     {({ field }) => (
+                      // <Select
+                      //   {...field}
+                      //   mode="multiple"
+                      //   placeholder="Select assignTo"
+                      //   className="w-full mt-2"
+                      //   onChange={(value) => {
+                      //     const assignToObjects = value.map((id) => ({
+                      //       id,
+                      //       name:
+                      //         id === "xyz" ? "XYZ" : id === "abc" ? "ABC" : "",
+                      //     }));
+                      //     setFieldValue("assignTo", assignToObjects);
+                      //   }}
+                      //   value={values.assignTo.map((item) => item.id)}
+                      //   onBlur={() => setFieldTouched("assignTo", true)}
+                      //   allowClear={false}
+                      // >
+                      //   <Option value="xyz">XYZ</Option>
+                      //   <Option value="abc">ABC</Option>
+                      // </Select>
+
                       <Select
                         {...field}
-                        mode="multiple"
-                        placeholder="Select AssignTo"
                         className="w-full mt-2"
-                        onChange={(value) => setFieldValue("AssignTo", value)}
-                        value={values.AssignTo}
-                        onBlur={() => setFieldTouched("AssignTo", true)}
-                        allowClear={false}
+                        mode="multiple"
+                        placeholder="Select AddProjectMember"
+                        onChange={(value) => setFieldValue("assignTo", value)}
+                        value={values.assignTo}
+                        onBlur={() => setFieldTouched("assignTo", true)}
                       >
-                        <Option value="xyz">XYZ</Option>
-                        <Option value="abc">ABC</Option>
+                        {empData && empData.length > 0 ? (
+                          empData.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.firstName ||
+                                client.username ||
+                                "Unnamed Client"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Clients Available
+                          </Option>
+                        )}
                       </Select>
                     )}
                   </Field>
                   <ErrorMessage
-                    name="AssignTo"
+                    name="assignTo"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -226,15 +265,13 @@ const AddTask = ({ onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Description</label>
                   <ReactQuill
-                    value={values.taskDescription}
-                    onChange={(value) =>
-                      setFieldValue("taskDescription", value)
-                    }
-                    placeholder="Enter taskDescription"
-                    onBlur={() => setFieldTouched("taskDescription", true)}
+                    value={values.description}
+                    onChange={(value) => setFieldValue("description", value)}
+                    placeholder="Enter description"
+                    onBlur={() => setFieldTouched("description", true)}
                   />
                   <ErrorMessage
-                    name="taskDescription"
+                    name="description"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -244,13 +281,13 @@ const AddTask = ({ onClose }) => {
               <Col span={9}>
                 <div className="form-item">
                   <label className="font-semibold mb-2">Status</label>
-                  <Field name="taskStatus">
+                  <Field name="status">
                     {({ field }) => (
                       <Select
                         {...field}
                         className="w-full mt-2"
-                        onChange={(value) => setFieldValue("taskStatus", value)}
-                        value={values.taskStatus}
+                        onChange={(value) => setFieldValue("status", value)}
+                        value={values.status}
                       >
                         <Option value="Incomplete">
                           <div className="flex items-center">
@@ -271,15 +308,13 @@ const AddTask = ({ onClose }) => {
               <Col span={10}>
                 <div className="form-item">
                   <label className="font-semibold">Priority</label>
-                  <Field name="taskPriority">
+                  <Field name="priority">
                     {({ field }) => (
                       <Select
                         {...field}
                         className="w-full mt-2"
-                        onChange={(value) =>
-                          setFieldValue("taskPriority", value)
-                        }
-                        value={values.taskPriority}
+                        onChange={(value) => setFieldValue("priority", value)}
+                        value={values.priority}
                       >
                         <Option value="Medium">
                           <div className="flex items-center">

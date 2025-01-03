@@ -7,9 +7,9 @@ import { navigate } from "react-big-calendar/lib/utils/constants";
 
 export const AddTasks = createAsyncThunk(
   "users/AddTasks",
-  async (values, thunkAPI) => {
+  async ({ id, values }, thunkAPI) => {
     try {
-      const response = await UserService.Addtask(values);
+      const response = await UserService.Addtask(id, values);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -19,14 +19,17 @@ export const AddTasks = createAsyncThunk(
 
 // Async thunk for user login
 
-export const GetTasks = createAsyncThunk("emp/GetTasks", async (thunkAPI) => {
-  try {
-    const response = await UserService.GetTask();
-    return response;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.response.data);
+export const GetTasks = createAsyncThunk(
+  "emp/GetTasks",
+  async (id, thunkAPI) => {
+    try {
+      const response = await UserService.GetTask(id);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
 // Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(

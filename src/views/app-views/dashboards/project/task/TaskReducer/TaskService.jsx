@@ -7,10 +7,10 @@ import axios from "axios";
 //     return res
 // };
 
-const GetTask = async () => {
+const GetTask = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(`http://localhost:5353/api/v1/tasks/`, {
+    const res = await axios.get(`http://localhost:5353/api/v1/tasks/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -22,14 +22,14 @@ const GetTask = async () => {
   }
 };
 
-const Addtask = async (values) => {
+const Addtask = async (id, values) => {
   const token = localStorage.getItem("auth_token");
 
   console.log("wewwew", values);
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/tasks/`,
+      `http://localhost:5353/api/v1/tasks/${id}`,
       values,
       {
         headers: {

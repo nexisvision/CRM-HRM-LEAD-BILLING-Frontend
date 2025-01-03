@@ -36,7 +36,7 @@ import { TiPinOutline } from "react-icons/ti";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 // import NumberFormat from 'react-number-format';
 import dayjs from "dayjs";
 import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
@@ -87,6 +87,7 @@ export const TaskList = () => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
+  const { id } = useParams();
 
   const alldatatask = useSelector((state) => state.Tasks);
   const fnddata = alldatatask.Tasks.data;
@@ -139,7 +140,7 @@ export const TaskList = () => {
   };
 
   useEffect(() => {
-    dispatch(GetTasks());
+    dispatch(GetTasks(id));
   }, [dispatch]);
 
   useEffect(() => {
@@ -154,7 +155,7 @@ export const TaskList = () => {
       if (response.error) {
         throw new Error(response.error.message);
       }
-      const updatedData = await dispatch(GetTasks());
+      const updatedData = await dispatch(GetTasks(id));
       setList(list.filter((item) => item.id !== idd));
 
       message.success({ content: "Deleted user successfully", duration: 2 });
