@@ -7,17 +7,14 @@ import axios from "axios";
 //     return res
 // };
 
-const GetMin = async (id) => {
+const GetLable = async (lid) => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(
-      `http://localhost:5353/api/v1/milestones/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const res = await axios.get(`http://localhost:5353/api/v1/labels/${lid}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -25,15 +22,13 @@ const GetMin = async (id) => {
   }
 };
 
-const AddMin = async (id, values) => {
+const AddLable = async (lid, payload) => {
   const token = localStorage.getItem("auth_token");
-
-  console.log("wewwew", values);
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/milestones/${id}`,
-      values,
+      `http://localhost:5353/api/v1/labels/${lid}`,
+      payload,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -53,7 +48,7 @@ const Deletemin = async (userId) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/milestones/${userId}`,
+      `http://localhost:5353/api/v1/labels/${userId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -72,7 +67,7 @@ const EditMin = async (idd, data) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/milestones/${idd}`,
+      `http://localhost:5353/api/v1/labels/${idd}`,
       data,
       {
         headers: {
@@ -109,8 +104,8 @@ const EditMin = async (idd, data) => {
 
 const UserService = {
   // addUser,
-  GetMin,
-  AddMin,
+  GetLable,
+  AddLable,
   Deletemin,
   EditMin,
   // getAllUsers,

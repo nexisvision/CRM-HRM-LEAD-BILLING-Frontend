@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./minstoneService";
+import UserService from "./LableService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
 
-export const AddMins = createAsyncThunk(
-  "users/AddMins",
-  async ({ id, values }, thunkAPI) => {
+export const AddLable = createAsyncThunk(
+  "users/AddLable",
+  async ({ lid, payload }, thunkAPI) => {
     try {
-      const response = await UserService.AddMin(id, values);
+      const response = await UserService.AddLable(lid, payload);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -19,14 +19,17 @@ export const AddMins = createAsyncThunk(
 
 // Async thunk for user login
 
-export const Getmins = createAsyncThunk("emp/Getmins", async (id, thunkAPI) => {
-  try {
-    const response = await UserService.GetMin(id);
-    return response;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.response.data);
+export const GetLable = createAsyncThunk(
+  "emp/GetLable",
+  async (lid, thunkAPI) => {
+    try {
+      const response = await UserService.GetLable(lid);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
 // Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
@@ -93,9 +96,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "Milestone",
+  name: "Lable",
   initialState: {
-    Milestone: [],
+    Lable: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -132,27 +135,27 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(AddMins.pending, (state) => {
+      .addCase(AddLable.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(AddMins.fulfilled, (state, action) => {
+      .addCase(AddLable.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(AddMins.rejected, (state, action) => {
+      .addCase(AddLable.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(Getmins.pending, (state) => {
+      .addCase(GetLable.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(Getmins.fulfilled, (state, action) => {
+      .addCase(GetLable.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.Milestone = action?.payload;
+        state.Lable = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(Getmins.rejected, (state, action) => {
+      .addCase(GetLable.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })

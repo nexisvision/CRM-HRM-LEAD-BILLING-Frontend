@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./minstoneService";
+import UserService from "./TaskService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
 
-export const AddMins = createAsyncThunk(
-  "users/AddMins",
-  async ({ id, values }, thunkAPI) => {
+export const AddTasks = createAsyncThunk(
+  "users/AddTasks",
+  async (values, thunkAPI) => {
     try {
-      const response = await UserService.AddMin(id, values);
+      const response = await UserService.Addtask(values);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -19,9 +19,9 @@ export const AddMins = createAsyncThunk(
 
 // Async thunk for user login
 
-export const Getmins = createAsyncThunk("emp/Getmins", async (id, thunkAPI) => {
+export const GetTasks = createAsyncThunk("emp/GetTasks", async (thunkAPI) => {
   try {
-    const response = await UserService.GetMin(id);
+    const response = await UserService.GetTask();
     return response;
   } catch (error) {
     return thunkAPI.rejectWithValue(error.response.data);
@@ -55,22 +55,22 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const Deletemins = createAsyncThunk(
-  "users/Deletemins",
-  async (userId, thunkAPI) => {
+export const DeleteTasks = createAsyncThunk(
+  "users/DeleteTasks",
+  async (idd, thunkAPI) => {
     try {
-      const response = await UserService.Deletemin(userId);
+      const response = await UserService.Deletetask(idd);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const Editmins = createAsyncThunk(
-  "users/Editmins",
-  async ({ idd, data }, thunkAPI) => {
+export const EditTasks = createAsyncThunk(
+  "users/EditTasks",
+  async ({ idd, values }, thunkAPI) => {
     try {
-      const response = await UserService.EditMin(idd, data);
+      const response = await UserService.EditTask(idd, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -93,9 +93,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "Milestone",
+  name: "Tasks",
   initialState: {
-    Milestone: [],
+    Tasks: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -132,27 +132,27 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(AddMins.pending, (state) => {
+      .addCase(AddTasks.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(AddMins.fulfilled, (state, action) => {
+      .addCase(AddTasks.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(AddMins.rejected, (state, action) => {
+      .addCase(AddTasks.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(Getmins.pending, (state) => {
+      .addCase(GetTasks.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(Getmins.fulfilled, (state, action) => {
+      .addCase(GetTasks.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.Milestone = action?.payload;
+        state.Tasks = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(Getmins.rejected, (state, action) => {
+      .addCase(GetTasks.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
@@ -185,27 +185,27 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
       //delete
-      .addCase(Deletemins.pending, (state) => {
+      .addCase(DeleteTasks.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(Deletemins.fulfilled, (state, action) => {
+      .addCase(DeleteTasks.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload.message);
       })
-      .addCase(Deletemins.rejected, (state, action) => {
+      .addCase(DeleteTasks.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(Editmins.pending, (state) => {
+      .addCase(EditTasks.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(Editmins.fulfilled, (state, action) => {
+      .addCase(EditTasks.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload;
       })
-      .addCase(Editmins.rejected, (state, action) => {
+      .addCase(EditTasks.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
       });

@@ -27,7 +27,7 @@ import {
 } from "../project-list/projectReducer/ProjectSlice";
 import axios from "axios";
 const { Option } = Select;
-const AddProjectMember = () => {
+const AddProjectMember = ({ onClose }) => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
@@ -57,37 +57,42 @@ const AddProjectMember = () => {
           },
         }
       );
-      //    dispatch(empdata());
+      console.log("Addmember API response:", res.data); // Log response
       return res.data;
     } catch (error) {
-      console.error("Error fetching data:", error);
+      if (error.response) {
+        // Server responded with a status code out of the range of 2xx
+        console.error("Error response:", error.response.data);
+        console.error("Status code:", error.response.status);
+        console.error("Headers:", error.response.headers);
+      } else if (error.request) {
+        // Request was made, but no response was received
+        console.error("Error request:", error.request);
+      } else {
+        // Something happened in setting up the request
+        console.error("Error message:", error.message);
+      }
       throw error;
     }
   };
 
-  const onSubmit = (values, { resetForm }) => {
-    // Assuming values is an array like ["sdhbsdhbhsd", "sdbfhjsdf"]
-    const payload = {
-      project_members: values,
-    };
+  const onSubmit = async (values, { resetForm }) => {
+    try {
+      const payload = {
+        project_members: values,
+      };
 
-    dispatch(Addmember(payload)) // Use the modified payload here
-      .then(() => {
-        dispatch(GetProject())
-          .then(() => {
-            message.success("Project added successfully!");
-            resetForm();
-            // onClose();
-          })
-          .catch((error) => {
-            message.error("Failed to fetch the latest meeting data.");
-            console.error("MeetData API error:", error);
-          });
-      })
-      .catch((error) => {
-        message.error("Failed to add meeting.");
-        console.error("AddMeet API error:", error);
-      });
+      await Addmember(payload);
+
+      await dispatch(GetProject()).unwrap();
+
+      message.success("Project added successfully!");
+      resetForm();
+      onClose();
+    } catch (error) {
+      message.error("Failed to add project or fetch data!");
+      console.error("Error in onSubmit:", error);
+    }
   };
 
   const allempdata = useSelector((state) => state.employee);
@@ -159,11 +164,7 @@ const AddProjectMember = () => {
               </Col>
             </Row>
             <div className="form-buttons text-right mt-4">
-              <Button
-                type="default"
-                className="mr-2"
-                onClick={() => navigate("/apps/sales/expenses")}
-              >
+              <Button type="default" className="mr-2" onClick={onClose}>
                 Cancel
               </Button>
               <Button type="primary" htmlType="submit">

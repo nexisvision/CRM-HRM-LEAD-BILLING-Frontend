@@ -199,18 +199,20 @@ export const MilestoneList = () => {
       title: "budget ",
       dataIndex: "add_cost_to_project_budget",
       sorter: {
-        compare: (a, b) => a.add_cost_to_project_budget.length - b.add_cost_to_project_budget.length,
+        compare: (a, b) =>
+          a.add_cost_to_project_budget.length -
+          b.add_cost_to_project_budget.length,
       },
     },
     {
       title: "status",
       dataIndex: "milestone_status",
       render: (_, record) => (
-          <>
-            <Tag color={getMilestoneStatus(record.milestone_status)}>
-              {record.milestone_status}
-            </Tag>
-          </>
+        <>
+          <Tag color={getMilestoneStatus(record.milestone_status)}>
+            {record.milestone_status}
+          </Tag>
+        </>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "milestone_status"),
     },

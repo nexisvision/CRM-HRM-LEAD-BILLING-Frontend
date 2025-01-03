@@ -24,6 +24,10 @@ import currencies from "../views/app-views/setting/currencies/currenciesreducer/
 import Milestone from "../views/app-views/dashboards/project/milestone/minestoneReducer/minestoneSlice"
 import Expense from "../views/app-views/dashboards/project/expenses/Expencereducer/ExpenseSlice"
 import Payment from "../views/app-views/dashboards/project/payment/PaymentReducer/paymentSlice"
+import Notes from "../views/app-views/dashboards/project/notes/NotesReducer/NotesSlice"
+import Product from "../views/app-views/dashboards/project/product/ProductReducer/ProductsSlice"
+import Tasks from "../views/app-views/dashboards/project/task/TaskReducer/TaskSlice"
+import Lable from "../views/app-views/dashboards/project/milestone/LableReducer/LableSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -52,6 +56,10 @@ const rootReducer = (asyncReducers) => (state, action) => {
         Milestone,
         Expense,
         Payment,
+        Notes,
+        Product,
+        Tasks,
+        Lable,
         // employee,
         // department,
         ...asyncReducers,

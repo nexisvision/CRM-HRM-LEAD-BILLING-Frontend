@@ -57,7 +57,6 @@ const EditMilestone = ({ idd, onClose }) => {
       });
     } else {
       message.error("Milestone not found!");
-      navigate("/app/dashboards/project/milestone");
     }
   }, [idd, milestones]);
 
@@ -73,7 +72,7 @@ const EditMilestone = ({ idd, onClose }) => {
           : null,
       };
 
-      await dispatch(Editmins({ id, data: formattedValues })).unwrap();
+      await dispatch(Editmins({ idd, data: formattedValues })).unwrap();
       dispatch(Getmins());
       onClose();
       message.success("Milestone updated successfully!");

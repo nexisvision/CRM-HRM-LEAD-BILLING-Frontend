@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./minstoneService";
+import UserService from "./ProductService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
 
-export const AddMins = createAsyncThunk(
-  "users/AddMins",
+export const AddProdu = createAsyncThunk(
+  "users/AddProdu",
   async ({ id, values }, thunkAPI) => {
     try {
-      const response = await UserService.AddMin(id, values);
+      const response = await UserService.AddPro(id, values);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -19,14 +19,17 @@ export const AddMins = createAsyncThunk(
 
 // Async thunk for user login
 
-export const Getmins = createAsyncThunk("emp/Getmins", async (id, thunkAPI) => {
-  try {
-    const response = await UserService.GetMin(id);
-    return response;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.response.data);
+export const GetProdu = createAsyncThunk(
+  "emp/GetProdu",
+  async (id, thunkAPI) => {
+    try {
+      const response = await UserService.GetPro(id);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
 // Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
@@ -55,22 +58,23 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const Deletemins = createAsyncThunk(
-  "users/Deletemins",
+export const DeleteProdu = createAsyncThunk(
+  "users/DeleteProdu",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.Deletemin(userId);
+      const response = await UserService.DeletePro(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const Editmins = createAsyncThunk(
-  "users/Editmins",
-  async ({ idd, data }, thunkAPI) => {
+export const EditProdu = createAsyncThunk(
+  "users/EditProdu",
+  async ({ idd, values }, thunkAPI) => {
     try {
-      const response = await UserService.EditMin(idd, data);
+      console.log("idinslice", idd);
+      const response = await UserService.EditPro(idd, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -93,9 +97,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "Milestone",
+  name: "Product",
   initialState: {
-    Milestone: [],
+    Product: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -132,27 +136,27 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(AddMins.pending, (state) => {
+      .addCase(AddProdu.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(AddMins.fulfilled, (state, action) => {
+      .addCase(AddProdu.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(AddMins.rejected, (state, action) => {
+      .addCase(AddProdu.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(Getmins.pending, (state) => {
+      .addCase(GetProdu.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(Getmins.fulfilled, (state, action) => {
+      .addCase(GetProdu.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.Milestone = action?.payload;
+        state.Product = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(Getmins.rejected, (state, action) => {
+      .addCase(GetProdu.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
@@ -185,27 +189,27 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
       //delete
-      .addCase(Deletemins.pending, (state) => {
+      .addCase(DeleteProdu.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(Deletemins.fulfilled, (state, action) => {
+      .addCase(DeleteProdu.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload.message);
       })
-      .addCase(Deletemins.rejected, (state, action) => {
+      .addCase(DeleteProdu.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(Editmins.pending, (state) => {
+      .addCase(EditProdu.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(Editmins.fulfilled, (state, action) => {
+      .addCase(EditProdu.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload;
       })
-      .addCase(Editmins.rejected, (state, action) => {
+      .addCase(EditProdu.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
       });

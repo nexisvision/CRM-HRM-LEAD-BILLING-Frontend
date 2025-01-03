@@ -22,6 +22,7 @@ import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeS
 import { PlusOutlined } from "@ant-design/icons";
 import { GetTagspro, AddTags } from "./tagReducer/TagSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
+import { AddLable, GetLable } from "../milestone/LableReducer/LableSlice";
 
 const { Option } = Select;
 
@@ -54,9 +55,11 @@ const AddProject = ({ onClose }) => {
   const AllEmployee = useSelector((state) => state.employee);
   const employeedata = AllEmployee.employee.data;
 
+  const AllLoggeddtaa = useSelector((state) => state.user);
+
   const initialValues = {
     project_name: "",
-   
+
     project_category: "",
     startDate: null,
     endDate: null,
@@ -73,7 +76,7 @@ const AddProject = ({ onClose }) => {
 
   const validationSchema = Yup.object({
     project_name: Yup.string().required("Please enter a Project Name."),
-  
+
     project_category: Yup.string().required("Please enter a Category."),
     startDate: Yup.date().nullable().required("Start date is required."),
     endDate: Yup.date().nullable().required("End date is required."),
@@ -108,29 +111,40 @@ const AddProject = ({ onClose }) => {
             onClose();
           })
           .catch((error) => {
-            message.error("Failed to fetch the latest meeting data.");
-            console.error("MeetData API error:", error);
+            message.error("Failed to fetch the latest project data.");
+            console.error("Project Data API error:", error);
           });
       })
       .catch((error) => {
-        message.error("Failed to add meeting.");
-        console.error("AddMeet API error:", error);
+        message.error("Failed to add project.");
+        console.error("AddProject API error:", error);
       });
   };
 
   useEffect(() => {
-    fetchTags();
+    const lid = AllLoggeddtaa.loggedInUser.id;
+    GetLable(lid);
   }, []);
 
   const fetchTags = async () => {
     try {
-      const response = await dispatch(GetProject());
-      // Assuming the API returns projects with tags
-      // Extract unique tags from all projects
-      const uniqueTags = [
-        ...new Set(response.payload.data.map((project) => project.tag)),
-      ];
-      setTags(uniqueTags.filter((tag) => tag)); // Filter out null/undefined values
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const response = await dispatch(GetLable(lid));
+
+      if (response.payload && response.payload.data) {
+        const uniqueTags = response.payload.data
+          .filter((label) => label && label.name) // Filter out invalid labels
+          .map((label) => ({
+            id: label.id,
+            name: label.name.trim(),
+          }))
+          .filter(
+            (label, index, self) =>
+              index === self.findIndex((t) => t.name === label.name)
+          ); // Remove duplicates
+
+        setTags(uniqueTags);
+      }
     } catch (error) {
       console.error("Failed to fetch tags:", error);
       message.error("Failed to load tags");
@@ -144,13 +158,18 @@ const AddProject = ({ onClose }) => {
     }
 
     try {
-      await dispatch(AddTags({ name: newTag }));
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const payload = {
+        name: newTag.trim(),
+      };
 
+      await dispatch(AddLable({ lid, payload }));
       message.success("Tag added successfully");
       setNewTag("");
       setIsTagModalVisible(false);
-      // Refresh tags list
-      dispatch(GetTagspro());
+
+      // Fetch updated tags
+      await fetchTags();
     } catch (error) {
       console.error("Failed to add tag:", error);
       message.error("Failed to add tag");
@@ -244,27 +263,6 @@ const AddProject = ({ onClose }) => {
                   />
                 </div>
               </Col>
-
-              {/* <Col span={24} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Project Image</label>
-                  <Input
-                    type="file"
-                    onChange={(event) =>
-                      setFieldValue(
-                        "projectimage",
-                        event.currentTarget.files[0]
-                      )
-                    }
-                    onBlur={() => setFieldTouched("projectimage", true)}
-                  />
-                  <ErrorMessage
-                    name="projectimage"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
@@ -410,7 +408,9 @@ const AddProject = ({ onClose }) => {
                           {...field}
                           className="w-full"
                           placeholder="Select or add new tag"
-                          onChange={(value) => form.setFieldValue("tag", value)}
+                          onChange={(value) => {
+                            form.setFieldValue("tag", value);
+                          }}
                           onBlur={() => form.setFieldTouched("tag", true)}
                           dropdownRender={(menu) => (
                             <div>
@@ -433,12 +433,11 @@ const AddProject = ({ onClose }) => {
                             </div>
                           )}
                         >
-                          {AllTags &&
-                            AllTags.map((tag) => (
-                              <Option key={tag.id} value={tag.name}>
-                                {tag.name}
-                              </Option>
-                            ))}
+                          {tags.map((tag) => (
+                            <Option key={tag.id} value={tag.name}>
+                              {tag.name}
+                            </Option>
+                          ))}
                         </Select>
                       )}
                     </Field>
@@ -496,7 +495,7 @@ const AddProject = ({ onClose }) => {
       {/* Add Tag Modal */}
       <Modal
         title="Add New Tag"
-        visible={isTagModalVisible}
+        open={isTagModalVisible}
         onCancel={() => setIsTagModalVisible(false)}
         onOk={handleAddNewTag}
         okText="Add Tag"

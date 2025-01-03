@@ -85,11 +85,11 @@ const OverViewList = () => {
   const startDate = "Wed 24 Jul 2024";
   const deadline = "Sun 24 Nov 2024";
 
-  const dateendd = filterdata[0]?.startdate
-    ? new Date(filterdata[0]?.startdate).toISOString().split("T")[0]
+  const dateendd = filterdata[0]?.startDate
+    ? new Date(filterdata[0]?.startDate).toISOString().split("T")[0]
     : null;
-  const datestartt = filterdata[0]?.enddate
-    ? new Date(filterdata[0]?.enddate).toISOString().split("T")[0]
+  const datestartt = filterdata[0]?.endDate
+    ? new Date(filterdata[0]?.endDate).toISOString().split("T")[0]
     : null;
 
   const data = {

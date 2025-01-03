@@ -7,17 +7,14 @@ import axios from "axios";
 //     return res
 // };
 
-const GetMin = async (id) => {
+const GetTask = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(
-      `http://localhost:5353/api/v1/milestones/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const res = await axios.get(`http://localhost:5353/api/v1/tasks/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -25,14 +22,14 @@ const GetMin = async (id) => {
   }
 };
 
-const AddMin = async (id, values) => {
+const Addtask = async (values) => {
   const token = localStorage.getItem("auth_token");
 
   console.log("wewwew", values);
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/milestones/${id}`,
+      `http://localhost:5353/api/v1/tasks/`,
       values,
       {
         headers: {
@@ -48,12 +45,12 @@ const AddMin = async (id, values) => {
   }
 };
 
-const Deletemin = async (userId) => {
+const Deletetask = async (idd) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/milestones/${userId}`,
+      `http://localhost:5353/api/v1/tasks/${idd}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -68,12 +65,12 @@ const Deletemin = async (userId) => {
   }
 };
 
-const EditMin = async (idd, data) => {
+const EditTask = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/milestones/${idd}`,
-      data,
+      `http://localhost:5353/api/v1/tasks/${idd}`,
+      values,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -109,10 +106,10 @@ const EditMin = async (idd, data) => {
 
 const UserService = {
   // addUser,
-  GetMin,
-  AddMin,
-  Deletemin,
-  EditMin,
+  GetTask,
+  Addtask,
+  Deletetask,
+  EditTask,
   // getAllUsers,
   // getUserById,
   // deleteUser,

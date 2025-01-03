@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Card,
   Row,
@@ -8,35 +8,91 @@ import {
   Button,
   Select,
   DatePicker,
+  Modal,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AddMins, Getmins } from "./minestoneReducer/minestoneSlice";
+import { AddLable, GetLable } from "./LableReducer/LableSlice";
 
 const { Option } = Select;
 
 const AddMilestone = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
+  const [newTag, setNewTag] = useState("");
+
+  const [tags, setTags] = useState([]);
 
   const { id } = useParams();
 
+  const Tagsdetail = useSelector((state) => state.Lable);
+
+  const AllLoggeddtaa = useSelector((state) => state.user);
+  const AllTags = Tagsdetail?.Lable?.data;
+
+  // const onSubmit = (values, { resetForm }) => {
+  //   dispatch(AddLable({ id, values }))
+  //     .then(() => {
+  //       dispatch(Getmins(id));
+  //       message.success("Milestone added successfully!");
+  //       resetForm();
+  //       onClose();
+  //     })
+  //     .catch((error) => {
+  //       message.error("Failed to add Leads.");
+  //       console.error("Add API error:", error);
+  //     });
+  // };
+
   const onSubmit = (values, { resetForm }) => {
-    dispatch(AddMins({ id, values }))
-      .then(() => {
-        dispatch(Getmins());
-        message.success("Milestone added successfully!");
-        resetForm();
-        onClose();
-      })
-      .catch((error) => {
-        message.error("Failed to add Leads.");
-        console.error("Add API error:", error);
-      });
+    // Check if the selected tag is new or existing
+    const selectedTag = tags.find(
+      (tag) => tag.name === values.milestone_status
+    );
+
+    if (!selectedTag) {
+      // Call AddLable API only if the selected tag is new
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const newTagPayload = { name: values.milestone_status.trim() };
+
+      dispatch(AddLable({ lid, payload: newTagPayload }))
+        .then(() => {
+          dispatch(AddMins({ id, values }))
+            .then(() => {
+              dispatch(Getmins(id));
+              message.success("Milestone added successfully!");
+              resetForm();
+              onClose();
+            })
+            .catch((error) => {
+              message.error("Failed to add Milestone.");
+              console.error("Add Milestone API error:", error);
+            });
+        })
+        .catch((error) => {
+          message.error("Failed to add tag.");
+          console.error("Add Tag API error:", error);
+        });
+    } else {
+      // If tag exists, directly add the milestone
+      dispatch(AddMins({ id, values }))
+        .then(() => {
+          dispatch(Getmins(id));
+          message.success("Milestone added successfully!");
+          resetForm();
+          onClose();
+        })
+        .catch((error) => {
+          message.error("Failed to add Milestone.");
+          console.error("Add Milestone API error:", error);
+        });
+    }
   };
 
   const initialValues = {
@@ -62,6 +118,56 @@ const AddMilestone = ({ onClose }) => {
       .required("Start Date is required."),
     milestone_end_date: Yup.date().nullable().required("End Date is required."),
   });
+
+  const fetchTags = async () => {
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const response = await dispatch(GetLable(lid));
+
+      if (response.payload && response.payload.data) {
+        const uniqueTags = response.payload.data
+          .filter((label) => label && label.name) // Filter out invalid labels
+          .map((label) => ({
+            id: label.id,
+            name: label.name.trim(),
+          }))
+          .filter(
+            (label, index, self) =>
+              index === self.findIndex((t) => t.name === label.name)
+          ); // Remove duplicates
+
+        setTags(uniqueTags);
+      }
+    } catch (error) {
+      console.error("Failed to fetch tags:", error);
+      message.error("Failed to load tags");
+    }
+  };
+
+  const handleAddNewTag = async () => {
+    if (!newTag.trim()) {
+      message.error("Please enter a tag name");
+      return;
+    }
+
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const payload = {
+        name: newTag.trim(),
+      };
+
+      await dispatch(AddLable({ lid, payload }));
+      message.success("Tag added successfully");
+      setNewTag("");
+      setIsTagModalVisible(false);
+
+      // Fetch updated tags
+      await fetchTags();
+    } catch (error) {
+      console.error("Failed to add tag:", error);
+      message.error("Failed to add tag");
+    }
+  };
 
   return (
     <div>
@@ -112,21 +218,54 @@ const AddMilestone = ({ onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-2">
+
+                  <Col span={24} className="mt-4">
                     <div className="form-item">
-                      <label className="font-semibold mb-2">Status</label>
-                      <Select
-                        value={values.milestone_status}
-                        onChange={(value) =>
-                          setFieldValue("milestone_status", value)
-                        }
-                        onBlur={() => setFieldTouched("milestone_status", true)}
-                        className="w-full"
-                        placeholder="Select Status"
-                      >
-                        <Option value="active">Active</Option>
-                        <Option value="inactive">Inactive</Option>
-                      </Select>
+                      <label className="font-semibold">status</label>
+                      <div className="flex gap-2">
+                        <Field name="milestone_status">
+                          {({ field, form }) => (
+                            <Select
+                              {...field}
+                              className="w-full"
+                              placeholder="Select or add new tag"
+                              onChange={(value) =>
+                                form.setFieldValue("milestone_status", value)
+                              }
+                              onBlur={() =>
+                                form.setFieldTouched("milestone_status", true)
+                              }
+                              dropdownRender={(menu) => (
+                                <div>
+                                  {menu}
+                                  <div
+                                    style={{
+                                      padding: "8px",
+                                      borderTop: "1px solid #e8e8e8",
+                                    }}
+                                  >
+                                    <Button
+                                      type="link"
+                                      // icon={<PlusOutlined />}
+                                      onClick={() => setIsTagModalVisible(true)}
+                                      block
+                                    >
+                                      Add New Tag
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                            >
+                              {tags &&
+                                tags.map((tag) => (
+                                  <Option key={tag.id} value={tag.name}>
+                                    {tag.name}
+                                  </Option>
+                                ))}
+                            </Select>
+                          )}
+                        </Field>
+                      </div>
                       <ErrorMessage
                         name="milestone_status"
                         component="div"
@@ -134,6 +273,7 @@ const AddMilestone = ({ onClose }) => {
                       />
                     </div>
                   </Col>
+
                   <Col span={12} className="mt-2">
                     <div className="form-item">
                       <label className="font-semibold mb-2">
@@ -231,6 +371,20 @@ const AddMilestone = ({ onClose }) => {
               </Form>
             )}
           </Formik>
+
+          <Modal
+            title="Add New Tag"
+            open={isTagModalVisible}
+            onCancel={() => setIsTagModalVisible(false)}
+            onOk={handleAddNewTag}
+            okText="Add Tag"
+          >
+            <Input
+              placeholder="Enter new tag name"
+              value={newTag}
+              onChange={(e) => setNewTag(e.target.value)}
+            />
+          </Modal>
         </div>
       </div>
     </div>

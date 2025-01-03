@@ -111,9 +111,13 @@ const ProjectMember = () => {
 
   const handleDelete = async (userId) => {
     try {
-      console.log("yyyyy", userId);
-      await dispatch(DeletePro2(userId));
-      const updatedData = await dispatch(GetProject());
+      // await dispatch(DeletePro2(userId)).unwrap();
+      // const updatedData = await dispatch(GetProject());
+
+      await DeletePro2(userId);
+
+      await dispatch(GetProject()).unwrap();
+
       // setUsers(users.filter((item) => item.id !== userId));
       message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
