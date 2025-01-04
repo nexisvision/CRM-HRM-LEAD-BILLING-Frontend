@@ -337,14 +337,38 @@ export class Invoice extends Component {
 							</h2>
 						</div>
 					</div>
-					<p className="mt-5">
+					<div className="grid grid-cols-2 gap-8">
+					<div className="flex gap-4">
+						<div className='flex'>
+							<img src={Qr} alt="Image not show" className='w-28 h-28' />
+						</div>
+						<div>
+							<h4 className="font-medium mb-2">Payment Info:</h4>
+							<p>Debit Card : 465 ************645</p>
+							<p>Amount : $1,815</p>
+							<p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p>
+						</div>
+					</div>
+					<div>
+						<h4 className="font-medium mb-2">Terms & Conditions:</h4>
+						<ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
+							<li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
+							<li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
+						</ol>
+					</div>
+				</div>
+
+				<div className="text-center mt-8">
+					<p>Thanks for your Business</p>
+				</div>
+					{/* <p className="mt-5">
 						<small>
 							In exceptional circumstances, Financial Services can provide an urgent manually processed special cheque.
 							Note, however, that urgent special cheques should be requested only on an emergency basis as manually
 							produced cheques involve duplication of effort and considerable staff resources. Requests need to be
 							supported by a letter explaining the circumstances to justify the special cheque payment
 						</small>
-					</p>
+					</p> */}
 				</div>
 				{/* <hr className="d-print-none"/> */}
 				{/* <div className="text-right d-print-none">
@@ -458,14 +482,31 @@ export class Invoice extends Component {
 							</h2>
 						</div>
 					</div>
-					<p className="mt-5">
-						<small>
-							In exceptional circumstances, Financial Services can provide an urgent manually processed special cheque.
-							Note, however, that urgent special cheques should be requested only on an emergency basis as manually
-							produced cheques involve duplication of effort and considerable staff resources. Requests need to be
-							supported by a letter explaining the circumstances to justify the special cheque payment
-						</small>
-					</p>
+					<div className="grid grid-cols-2 gap-8">
+					<div className="flex gap-4">
+						<div className='flex'>
+							<img src={Qr} alt="Image not show" className='w-28 h-28' />
+						</div>
+						<div>
+							<h4 className="font-medium mb-2">Payment Info:</h4>
+							<p>Debit Card : 465 ************645</p>
+							<p>Amount : $1,815</p>
+							<p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p>
+						</div>
+					</div>
+					<div>
+						<h4 className="font-medium mb-2">Terms & Conditions:</h4>
+						<ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
+							<li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
+							<li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
+						</ol>
+					</div>
+				</div>
+
+				<div className="text-center mt-8">
+					<p>Thanks for your Business</p>
+				</div>
+					
 				</div>
 			</div>
 		);
@@ -553,14 +594,30 @@ export class Invoice extends Component {
 							</h2>
 						</div>
 					</div>
-					<p className="mt-5">
-						<small>
-							In exceptional circumstances, Financial Services can provide an urgent manually processed special cheque.
-							Note, however, that urgent special cheques should be requested only on an emergency basis as manually
-							produced cheques involve duplication of effort and considerable staff resources. Requests need to be
-							supported by a letter explaining the circumstances to justify the special cheque payment
-						</small>
-					</p>
+					<div className="grid grid-cols-2 gap-8">
+					<div className="flex gap-4">
+						<div className='flex'>
+							<img src={Qr} alt="Image not show" className='w-28 h-28' />
+						</div>
+						<div>
+							<h4 className="font-medium mb-2">Payment Info:</h4>
+							<p>Debit Card : 465 ************645</p>
+							<p>Amount : $1,815</p>
+							<p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p>
+						</div>
+					</div>
+					<div>
+						<h4 className="font-medium mb-2">Terms & Conditions:</h4>
+						<ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
+							<li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
+							<li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
+						</ol>
+					</div>
+				</div>
+
+				<div className="text-center mt-8">
+					<p>Thanks for your Business</p>
+				</div>
 				</div>
 			</div>
 		);

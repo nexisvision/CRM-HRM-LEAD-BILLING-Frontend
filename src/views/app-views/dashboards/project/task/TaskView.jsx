@@ -1,38 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ComplatedList from './Complated/ComplatedList';
 import IntroList from './List/IntroList';
 import GeneralList from './General/GeneralList';
 
-
-
 function TaskView() {
-    return (
-        <>
-            <div className="">
-                {/* <hr style={{ marginTop:"25px", border: '1px solid #e8e8e8' }} /> */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 mt-[30px]">
-                    <div className='flex flex-col lg:flex-row gap-6'>
-                        <div className=''>
-                            <div>
-                                <ComplatedList />
-                            </div>
-                            <div className='mt-3'>
-                                <GeneralList />
-                            </div>
-                            {/* <ComplatedList />   
-                            <IntroList /> */}
-                        </div>
-                        <div>
-                            <IntroList />
-                        </div>
-                    </div>
+  return (
+    <div className="p-4 lg:p-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Left Column - Takes 2/3 width on large screens */}
+        <div className="xl:col-span-2 space-y-6">
+          <ComplatedList />
+          <GeneralList />
+        </div>
 
-
-                </div>
-            </div>
-
-        </>
-    )
+        {/* Right Column - Takes 1/3 width on large screens */}
+        <div className="xl:col-span-1">
+          <IntroList />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default TaskView;

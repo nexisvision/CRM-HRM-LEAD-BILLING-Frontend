@@ -18,6 +18,7 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { AddMins, Getmins } from "./minestoneReducer/minestoneSlice";
 import { AddLable, GetLable } from "./LableReducer/LableSlice";
+import { getallcurrencies } from "../../../setting/currencies/currenciesreducer/currenciesSlice";
 
 const { Option } = Select;
 
@@ -28,8 +29,12 @@ const AddMilestone = ({ onClose }) => {
   const [newTag, setNewTag] = useState("");
 
   const [tags, setTags] = useState([]);
+    const { currencies } = useSelector((state) => state.currencies);
 
-  const { id } = useParams();
+    
+    useEffect(() => {
+        dispatch(getallcurrencies());
+    }, [dispatch]);
 
   const Tagsdetail = useSelector((state) => state.Lable);
 
@@ -94,30 +99,19 @@ const AddMilestone = ({ onClose }) => {
         });
     }
   };
+    const { id } = useParams();
 
-  const initialValues = {
-    milestone_title: "",
-    milestone_cost: "",
-    milestone_status: "",
-    add_cost_to_project_budget: "",
-    milestone_summary: "",
-    milestone_start_date: null,
-    milestone_end_date: null,
-  };
 
-  const validationSchema = Yup.object({
-    milestone_title: Yup.string().required("Please enter milestone title."),
-    milestone_cost: Yup.string().required("Please enter milestone cost."),
-    milestone_status: Yup.string().required("Please select status."),
-    add_cost_to_project_budget: Yup.string().required(
-      "Please select add cost to project budget."
-    ),
-    milestone_summary: Yup.string().required("Please enter milestone summary."),
-    milestone_start_date: Yup.date()
-      .nullable()
-      .required("Start Date is required."),
-    milestone_end_date: Yup.date().nullable().required("End Date is required."),
-  });
+
+    const initialValues = {
+        milestone_title: "",
+        milestone_cost: "",
+        milestone_status: "",
+        add_cost_to_project_budget: "",
+        milestone_summary: "",
+        milestone_start_date: null,
+        milestone_end_date: null,
+    };
 
   const fetchTags = async () => {
     try {
@@ -200,6 +194,41 @@ const AddMilestone = ({ onClose }) => {
                       />
                     </div>
                   </Col>
+
+                  <Col span={12} className="mt-4">
+                                        <div className="form-item">
+                                            <label className='font-semibold mb-2'>Currency</label>
+                                            <div className="flex gap-2">
+                                                <Field name="currency">
+                                                    {({ field, form }) => (
+                                                        <Select
+                                                            {...field}
+                                                            className="w-full mt-2"
+                                                            placeholder="Select Currency"
+                                                            onChange={(value) => {
+                                                                const selectedCurrency = currencies.find(c => c.id === value);
+                                                                form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
+                                                            }}
+                                                        >
+                                                            {currencies?.map((currency) => (
+                                                                <Option
+                                                                    key={currency.id}
+                                                                    value={currency.id}
+                                                                >
+                                                                    {currency.currencyCode}
+                                                                </Option>
+                                                            ))}
+                                                        </Select>
+                                                    )}
+                                                </Field>
+                                            </div>
+                                            <ErrorMessage
+                                                name="currency"
+                                                component="div"
+                                                className="error-message text-red-500 my-1"
+                                            />
+                                        </div>
+                                    </Col>
                   <Col span={12}>
                     <div className="form-item">
                       <label className="font-semibold mb-2">
@@ -386,9 +415,7 @@ const AddMilestone = ({ onClose }) => {
             />
           </Modal>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default AddMilestone;

@@ -77,9 +77,9 @@ const OverViewList = () => {
   }, [dispatch]);
 
   // Sample data for charts
-  const hoursData = [{ name: "Planned", value: filterdata[0].estimatedhours }];
+  const hoursData = [{ name: "Planned", value: filterdata[0]?.estimatedhours }];
 
-  const budgetData = [{ name: "Planned", value: filterdata[0].budget }];
+  const budgetData = [{ name: "Planned", value: filterdata[0]?.budget }];
 
   const progress = 50;
   const startDate = "Wed 24 Jul 2024";
@@ -167,10 +167,10 @@ const OverViewList = () => {
                 />
                 {/* Scale markers */}
                 <div className="relative mt-2">
-                  <span className="absolute left-2 text-xs text-gray-500">
+                  <span className="absolute left-0 top-[-68px] text-xs text-gray-500">
                     0
                   </span>
-                  <span className="absolute right-2 text-xs text-gray-500">
+                  <span className="absolute right-0 top-[-68px] text-xs text-gray-500">
                     100
                   </span>
                 </div>
