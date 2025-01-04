@@ -12,6 +12,7 @@ import {
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { getallcurrencies } from "../../../setting/currencies/currenciesreducer/currenciesSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { EditExp, Getexp } from "./Expencereducer/ExpenseSlice";
@@ -26,6 +27,11 @@ const EditExpenses = ({ idd, onClose }) => {
   const Expensedata = allempdata?.Expense?.data || [];
 
   const { id } = useParams();
+    const { currencies } = useSelector((state) => state.currencies);
+
+    useEffect(() => {
+        dispatch(getallcurrencies());
+    }, [dispatch]);
 
   const [initialValues, setInitialValues] = useState({
     item: "",
@@ -133,20 +139,39 @@ const EditExpenses = ({ idd, onClose }) => {
                 </div>
               </Col>
               <Col span={8}>
-                <div className="form-item">
-                  <label className="font-semibold">Currency</label>
-                  <Field
-                    name="currency"
-                    as={Input}
-                    placeholder="Enter currency"
-                  />
-                  <ErrorMessage
-                    name="currency"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                                <div className="form-item">
+                                    <label className='font-semibold mb-2'>Currency</label>
+                                    <div className="flex gap-2">
+                                        <Field name="currency">
+                                            {({ field, form }) => (
+                                                <Select
+                                                    {...field}
+                                                    className="w-full"
+                                                    placeholder="Select Currency"
+                                                    onChange={(value) => {
+                                                        const selectedCurrency = currencies.find(c => c.id === value);
+                                                        form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
+                                                    }}
+                                                >
+                                                    {currencies?.map((currency) => (
+                                                        <Option
+                                                            key={currency.id}
+                                                            value={currency.id}
+                                                        >
+                                                            {currency.currencyCode}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                            )}
+                                        </Field>
+                                    </div>
+                                    <ErrorMessage
+                                        name="currency"
+                                        component="div"
+                                        className="error-message text-red-500 my-1"
+                                    />
+                                </div>
+                            </Col>
 
               <Col span={8}>
                 <div className="form-item">

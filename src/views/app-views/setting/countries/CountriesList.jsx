@@ -205,34 +205,7 @@ export const CountriesList = () => {
      useEffect(() => {
         setFilteredData(countries);
     }, [countries]);
-    // const getallcountries = async () => {
-    //     try {
-    //         const response = await axios.get('http://localhost:5353/api/v1/countries/');
-    //         setCountries(response.data);
-    //     } catch (error) {
-    //         message.error('Failed to fetch countries');
-    //     }
-    // };
-    // const getallcountries = async () =>{
-    //     try{
-    //         const response = await axios.get('http://localhost:5353/api/v1/countries/');
-    //         setCountries(response.data);
-    //     }catch(error){
-    //         message.error('Failed to fetch countries');
-    //     }
-    // }
-    // const deleteUser = async (userId) => {
-    //     try {
-    //         await axios.delete(`http://localhost:5353/api/v1/countries/${userId}`);
-    //         setUsers(users.filter((item) => item.id !== userId));
-    //         message.success({ content: `Deleted user ${userId}`, duration: 2 });
-    //     } catch (error) {
-    //         message.error('Failed to delete user');
-    //     }
-    // };
-    // useEffect(() => {
-    //     getallcountries();
-    // }, []);
+  
     // Open Add Job Modal
     const openAddCountriesModal = () => {
         setIsAddCountriesModalVisible(true);
