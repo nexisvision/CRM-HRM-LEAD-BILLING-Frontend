@@ -32,6 +32,3 @@ function App() {
 }
 
 export default App;
-
-
-// my name is khan
