@@ -6,6 +6,7 @@ import InvoiceList from './invoice/InvoiceList';
 import PaymentList from './payment/PaymentList';
 import ProjectMember from './projectmember/ProjectMember';
 import ExpensesList from './expenses/ExpensesList';
+import EstimatesList from './estimates/EstimatesList';
 import MilestoneList from './milestone/MilestoneList';
 import NotesList from './notes/NotesList';
 import ProductList from './product/ProductList';
@@ -22,6 +23,7 @@ const ViewProject = () => {
     { id: 'tasks', label: 'Tasks' },
     { id: 'invoices', label: 'Invoices' },
     { id: 'expenses', label: 'Expenses' },
+    { id: 'estimate', label: 'Estimates' },
     { id: 'payments', label: 'Payments' },
     { id: 'notes', label: 'Notes' },
     { id: 'products', label: 'Products & Services' },
@@ -43,6 +45,8 @@ const ViewProject = () => {
         return <InvoiceList />;
       case "expenses":
         return <ExpensesList />;
+        case "estimate":
+        return <EstimatesList />;
       case "payments":
         return <PaymentList />;
       case "notes":
@@ -57,7 +61,7 @@ const ViewProject = () => {
   return (
     <div className="w-full">
       {/* Mobile Menu Button */}
-      <div className="lg:hidden p-4 border-b border-gray-200">
+      <div className="md:hidden p-4 border-b border-gray-200">
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="flex items-center justify-between w-full msm:w-[200px] px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -80,7 +84,7 @@ const ViewProject = () => {
       </div>
 
       {/* Mobile Menu */}
-      <div className={` lg:hidden ${isMenuOpen ? 'block' : 'hidden'}`}>
+      <div className={` md:hidden ${isMenuOpen ? 'block' : 'hidden'}`}>
         <div className="px-2 pt-2 pb-3 space-y-1">
           {tabs.map((tab) => (
             <button
@@ -108,7 +112,7 @@ const ViewProject = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`py-4 px-3 text-sm font-medium border-b-2 transition-colors duration-200 whitespace-nowrap ${
+              className={`py-4 px-3 text-base font-medium border-b-2 transition-colors duration-200 whitespace-nowrap ${
                 activeTab === tab.id
                   ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'

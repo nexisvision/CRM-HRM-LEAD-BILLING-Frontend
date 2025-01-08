@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import {
   Card,
   Row,
@@ -170,7 +170,7 @@ const AddMilestone = ({ onClose }) => {
         <div className="p-2">
           <Formik
             initialValues={initialValues}
-            validationSchema={validationSchema}
+            // validationSchema={validationSchema}
             onSubmit={onSubmit}
           >
             {({ values, setFieldValue, setFieldTouched, resetForm }) => (
@@ -415,6 +415,8 @@ const AddMilestone = ({ onClose }) => {
             />
           </Modal>
         </div>
+        </div>
+    </div>
     );
 };
 

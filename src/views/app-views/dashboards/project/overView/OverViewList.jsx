@@ -118,7 +118,7 @@ const OverViewList = () => {
 
   return (
     <>
-      <div className="p-6 bg-gray-50">
+      <div className="p-2 bg-gray-50">
         {/* Project Progress Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="bg-white p-6 rounded-lg shadow">

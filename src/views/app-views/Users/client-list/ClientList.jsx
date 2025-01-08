@@ -22,7 +22,7 @@ import {
   FileExcelOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-
+// import { useNavigate } from 'react-router-dom';
 import UserView from "../client-list/UserView";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
@@ -35,8 +35,10 @@ import userData from "assets/data/user-list.data.json";
 import ResetPassword from "./ResetPassword";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData, deleteClient } from "./CompanyReducers/CompanySlice";
+import ViewClient from "./ViewClient";
 import AddClient from "./AddClient";
 import EditClient from "./EditClient";
+import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 
@@ -49,11 +51,14 @@ const ClientList = () => {
     useState(false);
   const [isEditCompanyModalVisible, setIsEditCompanyModalVisible] =
     useState(false);
+    const [isViewCompanyModalVisible, setIsViewCompanyModalVisible] =
+    useState(false);
   const [isResetPasswordModalVisible, setIsResetPasswordModalVisible] =
     useState(false);
   const [isUpgradePlanModalVisible, setIsUpgradePlanModalVisible] =
     useState(false);
   const [comnyid, setCompnyid] = useState("");
+  const navigate = useNavigate();
 
   const tabledata = useSelector((state) => state.ClientData);
   console.log("ooooo", tabledata);
@@ -125,6 +130,14 @@ const ClientList = () => {
     setIsEditCompanyModalVisible(false);
   };
 
+  const openViewCompanyModal = () => {
+    setIsViewCompanyModalVisible(true);
+  };
+
+  const closeViewCompanyModal = () => {
+    setIsViewCompanyModalVisible(false);
+  };
+
   const openResetPasswordModal = () => {
     setIsResetPasswordModalVisible(true);
   };
@@ -151,6 +164,10 @@ const ClientList = () => {
     setSelectedUser(null);
   };
 
+  const handleClientClick = (id) => {
+    navigate(`/app/dashboards/project/list`);
+};
+
   const dropdownMenu = (user) => (
     <Menu>
       <Menu.Item>
@@ -158,7 +175,7 @@ const ClientList = () => {
           <Button
             type=""
             icon={<EyeOutlined />}
-            onClick={() => showUserProfile(user)}
+            onClick={() => openViewCompanyModal()}
             size="small"
             style={{ display: "block", marginBottom: "8px" }}
           >
@@ -233,7 +250,7 @@ const ClientList = () => {
       title: "Client",
       dataIndex: "name",
       render: (_, record) => (
-        <div className="d-flex">
+        <div className="d-flex" onClick={() => handleClientClick(record.id)}>
           <AvatarStatus
             src={record.img}
             name={record.name}
@@ -359,6 +376,16 @@ const ClientList = () => {
         width={1000}
       >
         <EditClient onClose={closeEditCompanyModal} comnyid={comnyid} />
+      </Modal>
+      <Modal
+        title="Company Details"
+        visible={isViewCompanyModalVisible}
+        onCancel={closeViewCompanyModal}
+        footer={null}
+        width={1400}
+        className="mt-[-70px]"
+      >
+        <ViewClient onClose={closeViewCompanyModal} />
       </Modal>
 
       <Modal

@@ -17,8 +17,8 @@ import { TiPinOutline } from "react-icons/ti";
 import AvatarStatus from 'components/shared-components/AvatarStatus';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import Flex from 'components/shared-components/Flex'
+import { getAllInvoices, deleteInvoice, getInvoiceById } from '../../../dashboards/project/invoice/invoicereducer/InvoiceSlice';
 import { useSelector, useDispatch } from 'react-redux';
-import { getAllInvoices, deleteInvoice ,getInvoiceById} from '../../../dashboards/project/invoice/invoicereducer/InvoiceSlice';
 import { useParams } from 'react-router-dom';
 // import NumberFormat from 'react-number-format';
 import dayjs from 'dayjs';
@@ -81,39 +81,39 @@ export const InvoiceList = () => {
 	const [idd, setIdd] = useState("");
 	const [selectedRowKeys, setSelectedRowKeys] = useState([])
 
-	 // Fetch invoices when component mounts
-	 useEffect(() => {
-        console.log('Fetching invoices for ID:', id);
-            dispatch(getAllInvoices(id));
-    }, [dispatch]);
+	// Fetch invoices when component mounts
+	useEffect(() => {
+		console.log('Fetching invoices for ID:', id);
+		dispatch(getAllInvoices(id));
+	}, [dispatch]);
 
-    // Update list when invoices change
-    useEffect(() => {
-        console.log('Invoices updated:', invoices);
-        if (invoices) {
-            setList(invoices);
-        }
-    }, [invoices]);
+	// Update list when invoices change
+	useEffect(() => {
+		console.log('Invoices updated:', invoices);
+		if (invoices) {
+			setList(invoices);
+		}
+	}, [invoices]);
 
 	const Editfunc = (idd) => {
 		openEditInvoiceModal();
 		setIdd(idd);
-	  };
-	console.log(idd,"idddd");
+	};
+	console.log(idd, "idddd");
 
 	const handleDelete = async (id) => {
-        try {
-            await dispatch(deleteInvoice(id));
+		try {
+			await dispatch(deleteInvoice(id));
 
-            // const updatedData = await dispatch(Getexp(id));
+			// const updatedData = await dispatch(Getexp(id));
 
-            // setList(list.filter((item) => item.id !== exid));
+			// setList(list.filter((item) => item.id !== exid));
 
-            message.success({ content: "Deleted user successfully", duration: 2 });
-        } catch (error) {
-            console.error("Error deleting user:", error);
-        }
-    };
+			message.success({ content: "Deleted user successfully", duration: 2 });
+		} catch (error) {
+			console.error("Error deleting user:", error);
+		}
+	};
 
 
 	const handleShowStatus = value => {
@@ -185,14 +185,16 @@ export const InvoiceList = () => {
 	const closeViewInvoiceModal = () => {
 		setViewInvoiceModalVisible(false);
 	};
+
 	const handleSearch = (e) => {
-        const value = e.target.value.toLowerCase();
-        const filtered = invoices.filter(item => 
-            item.client.toLowerCase().includes(value) ||
-            item._id.toLowerCase().includes(value)
-        );
-        setList(filtered);
-    };
+		const value = e.target.value.toLowerCase();
+		const filtered = invoices.filter(item =>
+			item.client.toLowerCase().includes(value) ||
+			item._id.toLowerCase().includes(value)
+		);
+		setList(filtered);
+	};
+	
 	const dropdownMenu = row => (
 		<Menu>
 			<Menu.Item>
@@ -271,22 +273,18 @@ export const InvoiceList = () => {
 	];
 
 	// const handleDelete = (record) => {
-    //     Modal.confirm({
-    //         title: 'Delete Invoice',
-    //         content: 'Are you sure you want to delete this invoice?',
-    //         okText: 'Yes',
-    //         okType: 'danger',
-    //         cancelText: 'No',
-    //         onOk: () => {
-    //             // Add delete logic here
-    //             message.success('Invoice deleted successfully');
-    //         }
-    //     });
-    // };
-
-
-
-
+	//     Modal.confirm({
+	//         title: 'Delete Invoice',
+	//         content: 'Are you sure you want to delete this invoice?',
+	//         okText: 'Yes',
+	//         okType: 'danger',
+	//         cancelText: 'No',
+	//         onOk: () => {
+	//             // Add delete logic here
+	//             message.success('Invoice deleted successfully');
+	//         }
+	//     });
+	// };
 
 
 	const rowSelection = {
@@ -307,7 +305,7 @@ export const InvoiceList = () => {
 
 
 	return (
-		<>
+		<> 
 			<div>
 				<Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
 					<Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
@@ -345,38 +343,47 @@ export const InvoiceList = () => {
 
 				<Card>
 
-				<Modal
-					title="Invoice Create"
-					visible={isAddInvoiceModalVisible}
-					onCancel={closeAddInvoiceModal}
-					footer={null}
-					width={1000}
-					className='mt-[-70px]'
-				>
-					<AddInvoice onClose={closeAddInvoiceModal} />
-				</Modal>	
-				<Modal
-					title="Edit Invoice"
-					visible={isEditInvoiceModalVisible}
-					onCancel={closeEditInvoiceModal}
-					footer={null}
-					width={1000}
-					className='mt-[-70px]'
-				>
-					<EditInvoice onClose={closeEditInvoiceModal} />
-				</Modal>
-				<Modal
-					title="Invoice"
-					visible={ViewInvoiceModalVisible}
-					onCancel={closeViewInvoiceModal}
-					footer={null}
-					width={1000}
-					className='mt-[-70px]'
-				>
-					<InvoiceView onClose={closeViewInvoiceModal} />
-				</Modal>
-			</Card>
-		</div>
+					<div className="table-responsive">
+						<Table
+							columns={tableColumns}
+							dataSource={invoices}
+							rowKey="id"
+							scroll={{ x: 1200 }}
+						/>
+					</div>
+
+					<Modal
+						title="Invoice Create"
+						visible={isAddInvoiceModalVisible}
+						onCancel={closeAddInvoiceModal}
+						footer={null}
+						width={1000}
+						className='mt-[-70px]'
+					>
+						<AddInvoice onClose={closeAddInvoiceModal} />
+					</Modal>
+					<Modal
+						title="Edit Invoice"
+						visible={isEditInvoiceModalVisible}
+						onCancel={closeEditInvoiceModal}
+						footer={null}
+						width={1000}
+						className='mt-[-70px]'
+					>
+						<EditInvoice onClose={closeEditInvoiceModal} />
+					</Modal>
+					<Modal
+						title="Invoice"
+						visible={ViewInvoiceModalVisible}
+						onCancel={closeViewInvoiceModal}
+						footer={null}
+						width={1000}
+						className='mt-[-70px]'
+					>
+						<InvoiceView onClose={closeViewInvoiceModal} />
+					</Modal>
+				</Card>
+			</div>
 		</>
 	);
 }

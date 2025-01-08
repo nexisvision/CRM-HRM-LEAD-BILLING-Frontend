@@ -62,6 +62,15 @@ const EstimatesList = () => {
 		setList(estimates); // Update list when estimates change
 	  }, [estimates]);
 
+	//   const handleSearch = (e) => {
+	// 	const value = e.target.value.toLowerCase();
+	// 	setSearchTerm(value);
+	// 	const filteredList = estimates.filter((item) =>
+	// 	  item.client.toLowerCase().includes(value)
+	// 	);
+	// 	setList(filteredList);
+	//   };
+
 	// Open Add Job Modal
 	const openAddEstimatesModal = () => {
 		setIsAddEstimatesModalVisible(true);
@@ -286,7 +295,7 @@ const EstimatesList = () => {
 				<Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
 					<Flex cclassName="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
 						<div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48 me-2">
-							<Input placeholder="Search" prefix={<SearchOutlined />} onChange={onSearch}
+							<Input placeholder="Search" prefix={<SearchOutlined />} onChange={() => onSearch()}
             />
 						</div>
 						<div className="w-full md:w-48 ">

@@ -110,6 +110,11 @@ export const protectedRoutes = [
         component: React.lazy(() => import('views/app-views/dashboards/project/project-list/ProjectList')),
     },
     {
+        key: 'dashboard.project.list',
+        path: `${APP_PREFIX_PATH}/dashboards/project/:id`,
+        component: React.lazy(() => import('views/app-views/dashboards/project/project-list/ProjectList')),
+    },
+    {
         key: 'dashboard.project.view',
         path: `${APP_PREFIX_PATH}/dashboards/project/view/:id`,
         component: React.lazy(() => import('views/app-views/dashboards/project/ViewProject')),
