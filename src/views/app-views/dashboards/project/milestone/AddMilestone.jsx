@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Row,
@@ -29,12 +29,11 @@ const AddMilestone = ({ onClose }) => {
   const [newTag, setNewTag] = useState("");
 
   const [tags, setTags] = useState([]);
-    const { currencies } = useSelector((state) => state.currencies);
+  const { currencies } = useSelector((state) => state.currencies);
 
-    
-    useEffect(() => {
-        dispatch(getallcurrencies());
-    }, [dispatch]);
+  useEffect(() => {
+    dispatch(getallcurrencies());
+  }, [dispatch]);
 
   const Tagsdetail = useSelector((state) => state.Lable);
 
@@ -99,19 +98,17 @@ const AddMilestone = ({ onClose }) => {
         });
     }
   };
-    const { id } = useParams();
+  const { id } = useParams();
 
-
-
-    const initialValues = {
-        milestone_title: "",
-        milestone_cost: "",
-        milestone_status: "",
-        add_cost_to_project_budget: "",
-        milestone_summary: "",
-        milestone_start_date: null,
-        milestone_end_date: null,
-    };
+  const initialValues = {
+    milestone_title: "",
+    milestone_cost: "",
+    milestone_status: "",
+    add_cost_to_project_budget: "",
+    milestone_summary: "",
+    milestone_start_date: null,
+    milestone_end_date: null,
+  };
 
   const fetchTags = async () => {
     try {
@@ -196,39 +193,41 @@ const AddMilestone = ({ onClose }) => {
                   </Col>
 
                   <Col span={12} className="mt-4">
-                                        <div className="form-item">
-                                            <label className='font-semibold mb-2'>Currency</label>
-                                            <div className="flex gap-2">
-                                                <Field name="currency">
-                                                    {({ field, form }) => (
-                                                        <Select
-                                                            {...field}
-                                                            className="w-full mt-2"
-                                                            placeholder="Select Currency"
-                                                            onChange={(value) => {
-                                                                const selectedCurrency = currencies.find(c => c.id === value);
-                                                                form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
-                                                            }}
-                                                        >
-                                                            {currencies?.map((currency) => (
-                                                                <Option
-                                                                    key={currency.id}
-                                                                    value={currency.id}
-                                                                >
-                                                                    {currency.currencyCode}
-                                                                </Option>
-                                                            ))}
-                                                        </Select>
-                                                    )}
-                                                </Field>
-                                            </div>
-                                            <ErrorMessage
-                                                name="currency"
-                                                component="div"
-                                                className="error-message text-red-500 my-1"
-                                            />
-                                        </div>
-                                    </Col>
+                    <div className="form-item">
+                      <label className="font-semibold mb-2">Currency</label>
+                      <div className="flex gap-2">
+                        <Field name="currency">
+                          {({ field, form }) => (
+                            <Select
+                              {...field}
+                              className="w-full mt-2"
+                              placeholder="Select Currency"
+                              onChange={(value) => {
+                                const selectedCurrency = currencies.find(
+                                  (c) => c.id === value
+                                );
+                                form.setFieldValue(
+                                  "currency",
+                                  selectedCurrency?.currencyCode || ""
+                                );
+                              }}
+                            >
+                              {currencies?.map((currency) => (
+                                <Option key={currency.id} value={currency.id}>
+                                  {currency.currencyCode}
+                                </Option>
+                              ))}
+                            </Select>
+                          )}
+                        </Field>
+                      </div>
+                      <ErrorMessage
+                        name="currency"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
                   <Col span={12}>
                     <div className="form-item">
                       <label className="font-semibold mb-2">
@@ -415,9 +414,9 @@ const AddMilestone = ({ onClose }) => {
             />
           </Modal>
         </div>
-        </div>
+      </div>
     </div>
-    );
+  );
 };
 
 export default AddMilestone;

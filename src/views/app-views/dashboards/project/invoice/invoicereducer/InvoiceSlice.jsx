@@ -1,79 +1,87 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import InvoiceService from '../../../project/invoice/invoicereducer/InvoiceService';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import InvoiceService from "../../../project/invoice/invoicereducer/InvoiceService";
 
 // Async thunks
 export const getAllInvoices = createAsyncThunk(
-  'invoice/getAllInvoices',
+  "invoice/getAllInvoices",
   async (id, { rejectWithValue }) => {
     try {
       const response = await InvoiceService.getAllInvoices(id);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to fetch invoices');
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch invoices"
+      );
     }
   }
 );
 
 export const getInvoiceById = createAsyncThunk(
-  'invoice/getInvoiceById',
+  "invoice/getInvoiceById",
   async (id, { rejectWithValue }) => {
     try {
       const response = await InvoiceService.getInvoiceById(id);
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to fetch invoice');
+      return rejectWithValue(error.response?.data || "Failed to fetch invoice");
     }
   }
 );
 
 export const createInvoice = createAsyncThunk(
-  'invoice/createInvoice',
+  "invoice/createInvoice",
   async ({ id, invoiceData }, { rejectWithValue }) => {
     try {
       if (!id) {
-        throw new Error('Product ID is required');
+        throw new Error("Product ID is required");
       }
       const response = await InvoiceService.createInvoice(id, invoiceData);
       return response;
     } catch (error) {
-      return rejectWithValue(error.message || 'Failed to create invoice');
+      return rejectWithValue(error.message || "Failed to create invoice");
     }
   }
 );
 
 export const updateInvoice = createAsyncThunk(
-  'invoice/updateInvoice',
-  async ({ id,data }, { rejectWithValue }) => {
+  "invoice/updateInvoice",
+  async ({ idd, data }, { rejectWithValue }) => {
     try {
-      const response = await InvoiceService.updateInvoice(id,data);
+      const response = await InvoiceService.updateInvoice(idd, data);
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to update invoice');
+      return rejectWithValue(
+        error.response?.data || "Failed to update invoice"
+      );
     }
   }
 );
 
 // Delete invoice thunk
 export const deleteInvoice = createAsyncThunk(
-  'invoice/deleteInvoice',
+  "invoice/deleteInvoice",
   async (id, { rejectWithValue }) => {
     try {
       const response = await InvoiceService.deleteInvoice(id);
       return id; // Return the ID for filtering
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to delete invoice');
+      return rejectWithValue(
+        error.response?.data || "Failed to delete invoice"
+      );
     }
   }
 );
 
 export const getMilestoneDetails = createAsyncThunk(
-  'invoice/getMilestoneDetails',
+  "invoice/getMilestoneDetails",
   async (id, { rejectWithValue }) => {
     try {
       const response = await InvoiceService.getMilestoneDetails(id);
       return response;
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to fetch milestone details');
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch milestone details"
+      );
     }
   }
 );
@@ -92,7 +100,7 @@ export const getMilestoneDetails = createAsyncThunk(
 
 // Slice
 const invoiceSlice = createSlice({
-  name: 'invoice',
+  name: "invoice",
   initialState: {
     invoices: [],
     currentInvoice: null,
@@ -228,6 +236,7 @@ const invoiceSlice = createSlice({
   },
 });
 
-export const { clearError, clearSuccess, resetInvoiceState } = invoiceSlice.actions;
+export const { clearError, clearSuccess, resetInvoiceState } =
+  invoiceSlice.actions;
 
 export default invoiceSlice.reducer;

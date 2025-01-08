@@ -30,6 +30,7 @@ import Tasks from "../views/app-views/dashboards/project/task/TaskReducer/TaskSl
 import Lable from "../views/app-views/dashboards/project/milestone/LableReducer/LableSlice"
 import invoice from "../views/app-views/dashboards/project/invoice/invoicereducer/InvoiceSlice"
 import estimate from 'views/app-views/dashboards/sales/estimates/estimatesReducer/EstimatesSlice'
+import Jobs from "../views/app-views/hrm/Jobs/JobReducer/JobSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -64,6 +65,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
         Lable,
         invoice,
         estimate,
+        Jobs,
         // employee,
         // department,
         ...asyncReducers,
