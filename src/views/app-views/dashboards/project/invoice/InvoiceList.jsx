@@ -333,7 +333,7 @@ export const InvoiceList = () => {
 								defaultValue="All"
 								className="w-100"
 								style={{ minWidth: 180 }}
-								onChange={handleShowStatus}
+								// onChange={handleShowStatus}
 								placeholder="Status"
 							>
 								<Option value="All">All payment </Option>

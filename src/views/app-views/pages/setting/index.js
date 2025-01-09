@@ -34,22 +34,22 @@ const SettingOption = () => {
 			mode="inline"
 			selectedKeys={[currentpath]}
 			items={[
-				{
-					key: 'edit-profile',
-					label: <MenuItem label="Edit Profile" icon={<UserOutlined />} path="edit-profile" />
-				},
-				{
-					key: 'change-password',
-					label: <MenuItem label="Change Password" icon={<LockOutlined />} path="change-password" />
-				},
-				{
-					key: 'billing',
-					label: <MenuItem label="Billing" icon={<CreditCardOutlined />} path="billing" />
-				},
-				{
-					key: 'notification',
-					label: <MenuItem label="Notification" icon={<BellOutlined />} path="notification" />
-				},
+				// {
+				// 	key: 'edit-profile',
+				// 	label: <MenuItem label="Edit Profile" icon={<UserOutlined />} path="edit-profile" />
+				// },
+				// {
+				// 	key: 'change-password',
+				// 	label: <MenuItem label="Change Password" icon={<LockOutlined />} path="change-password" />
+				// },
+				// {
+				// 	key: 'billing',
+				// 	label: <MenuItem label="Billing" icon={<CreditCardOutlined />} path="billing" />
+				// },
+				// {
+				// 	key: 'notification',
+				// 	label: <MenuItem label="Notification" icon={<BellOutlined />} path="notification" />
+				// },
 			]}
 		/>
 	);
@@ -59,9 +59,9 @@ const SettingContent = () => {
 
 	return (
 		<Routes>
-			<Route path="edit-profile" element={<EditProfile />} />
+			{/* <Route path="edit-profile" element={<EditProfile />} />
 			<Route path="change-password" element={<ChangePassword />} />
-			<Route path="billing" element={<Billing />} />
+			<Route path="billing" element={<Billing />} /> */}
 			<Route path="notification" element={<Notification />} />
 			<Route path="*" element={<Navigate to="edit-profile" replace />} />
 		</Routes>

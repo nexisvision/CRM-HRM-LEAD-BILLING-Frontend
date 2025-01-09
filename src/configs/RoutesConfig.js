@@ -869,6 +869,11 @@ export const protectedRoutes = [
         path: `${APP_PREFIX_PATH}/pages/profile`,
         component: React.lazy(() => import('views/app-views/pages/profile')),
     },
+    {
+        key: 'pages.setting.notificationview',
+        path: `${APP_PREFIX_PATH}/pages/setting/notificationview`,
+        component: React.lazy(() => import('views/app-views/pages/setting/NotificationView')),
+    },
 
 
     {
