@@ -886,7 +886,11 @@ export const protectedRoutes = [
         path: `${APP_PREFIX_PATH}/hrm/employee`,
         component: React.lazy(() => import('views/app-views/hrm/Employee')),
     },
-    // {
+    {
+        key: 'hrm.trainingSetup',
+        path: `${APP_PREFIX_PATH}/hrm/trainingSetup`,
+        component: React.lazy(() => import('views/app-views/hrm/trainingSetup')),
+    },
     //     key: 'hrm.payroll',
     //     path: `${APP_PREFIX_PATH}/hrm/payroll`,
     //     component: React.lazy(() => import('views/app-views/hrm/PayRoll')),

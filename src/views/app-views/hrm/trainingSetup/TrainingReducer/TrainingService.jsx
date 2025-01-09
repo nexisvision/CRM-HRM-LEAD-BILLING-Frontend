@@ -7,10 +7,10 @@ import axios from "axios";
 //     return res
 // };
 
-const GetLable = async (lid) => {
+const Gettrainning = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(`http://localhost:5353/api/v1/labels/${lid}`, {
+    const res = await axios.get("http://localhost:5353/api/v1/trainings/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -22,12 +22,12 @@ const GetLable = async (lid) => {
   }
 };
 
-const AddLable = async (lid, payload) => {
+const Createtraiuning = async (payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/labels/${lid}`,
+      "http://localhost:5353/api/v1/trainings/",
       payload,
       {
         headers: {
@@ -35,6 +35,7 @@ const AddLable = async (lid, payload) => {
         },
       }
     );
+    //    dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -42,12 +43,12 @@ const AddLable = async (lid, payload) => {
   }
 };
 
-const Deletelable = async (userId) => {
+const Deletetraing = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/labels/${userId}`,
+      `http://localhost:5353/api/v1/trainings/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -62,11 +63,11 @@ const Deletelable = async (userId) => {
   }
 };
 
-const EditMin = async (idd, payload) => {
+const Edittrainag = async (idd, payload) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/labels/${idd}`,
+      `http://localhost:5353/api/v1/trainings/${idd}`,
       payload,
       {
         headers: {
@@ -103,10 +104,10 @@ const EditMin = async (idd, payload) => {
 
 const UserService = {
   // addUser,
-  GetLable,
-  AddLable,
-  Deletelable,
-  EditMin,
+  Gettrainning,
+  Createtraiuning,
+  Deletetraing,
+  Edittrainag,
   // getAllUsers,
   // getUserById,
   // deleteUser,

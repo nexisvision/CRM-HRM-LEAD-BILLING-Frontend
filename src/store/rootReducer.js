@@ -31,6 +31,11 @@ import Lable from "../views/app-views/dashboards/project/milestone/LableReducer/
 import invoice from "../views/app-views/dashboards/project/invoice/invoicereducer/InvoiceSlice"
 import estimate from 'views/app-views/dashboards/sales/estimates/estimatesReducer/EstimatesSlice'
 import Jobs from "../views/app-views/hrm/Jobs/JobReducer/JobSlice"
+import Training from "../views/app-views/hrm/trainingSetup/TrainingReducer/TrainingSlice"
+import Piplines from "../views/app-views/dashboards/systemsetup/Pipeline/PiplineReducer/piplineSlice"
+import Ticket from "../views/app-views/pages/customersupports/ticket/TicketReducer/TicketSlice"
+import StagesLeadsDeals from "../views/app-views/dashboards/systemsetup/LeadStages/LeadsReducer/LeadsstageSlice"
+import Notifications from "../views/app-views/pages/setting/NotificationReducer/NotificationSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -66,6 +71,11 @@ const rootReducer = (asyncReducers) => (state, action) => {
         invoice,
         estimate,
         Jobs,
+        Training,
+        Piplines,
+        Ticket,
+        StagesLeadsDeals,
+        Notifications,
         // employee,
         // department,
         ...asyncReducers,

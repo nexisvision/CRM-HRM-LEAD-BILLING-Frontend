@@ -60,12 +60,12 @@ const DeleteJob = async (id) => {
   }
 };
 
-const EditMeet = async (idd, values) => {
+const Editjobdata = async (idd, transformedValues) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
       `http://localhost:5353/api/v1/jobs/${idd}`,
-      values,
+      transformedValues,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -104,7 +104,7 @@ const UserService = {
   Getjobs,
   CreateJob,
   DeleteJob,
-  EditMeet,
+  Editjobdata,
   // getAllUsers,
   // getUserById,
   // deleteUser,

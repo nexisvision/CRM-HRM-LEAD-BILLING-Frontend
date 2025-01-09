@@ -511,6 +511,14 @@ const extraNavvTree = [
           },
         ]
       },
+      {
+        key: 'extra-hrm-trainingSetup',
+        path: `${APP_PREFIX_PATH}/hrm/trainingSetup`,
+        title: 'trainingSetup',
+        icon: CrownOutlined,
+        breadcrumb: false,
+        submenu: []
+      },
 
       
     ]

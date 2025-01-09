@@ -62,7 +62,7 @@ export const Deletemins = createAsyncThunk(
   "users/Deletemins",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.Deletemin(userId);
+      const response = await UserService.Deletelable(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -71,9 +71,9 @@ export const Deletemins = createAsyncThunk(
 );
 export const Editmins = createAsyncThunk(
   "users/Editmins",
-  async ({ idd, data }, thunkAPI) => {
+  async ({ idd, payload }, thunkAPI) => {
     try {
-      const response = await UserService.EditMin(idd, data);
+      const response = await UserService.EditMin(idd, payload);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(

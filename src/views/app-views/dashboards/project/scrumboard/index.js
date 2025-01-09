@@ -156,14 +156,14 @@ const BoardWrapper = ({ containerHeight, useClone, isCombineEnabled, withScrolla
 						<div>
 							<h3>Backlog</h3>
 						</div>
-						<div className="text-right">
+						{/* <div className="text-right">
 							<div className="d-flex align-items-center">
 								{memberIds.map((member, i) => i < 4 ? <AssigneeAvatar key={member} id={member} size={30} chain/> : null)}
 								<Avatar className="ml-n2" size={30}>
 									<span className="text-gray font-weight-semibold font-size-base">+9</span>
 								</Avatar>
 							</div>
-						</div>
+						</div> */}
 					</div>
 					<Scrollbars className="scrumboard-body">
 						{ordered.map((key, index) => (
@@ -177,7 +177,7 @@ const BoardWrapper = ({ containerHeight, useClone, isCombineEnabled, withScrolla
 								useClone={useClone}
 							/>
 						))}
-						{provided.placeholder}
+						{/* {provided.placeholder}
 						<div className="board-column add">
 							<div className="board-title" onClick={() => onAddBoardModal()}>
 								<h4 className="mb-0">
@@ -185,7 +185,7 @@ const BoardWrapper = ({ containerHeight, useClone, isCombineEnabled, withScrolla
 									<span>Add List</span>
 								</h4>
 							</div>
-						</div>
+						</div> */}
 					</Scrollbars>
 				</div>
 			)}

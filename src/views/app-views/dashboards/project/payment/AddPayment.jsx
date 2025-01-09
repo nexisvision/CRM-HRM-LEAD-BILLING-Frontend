@@ -296,11 +296,7 @@ const AddPayment = ({ onClose }) => {
               </Col>
             </Row>
             <div className="form-buttons text-right mt-4">
-              <Button
-                type="default"
-                className="mr-2"
-                onClick={() => navigate("/app/dashboards/project/list")}
-              >
+              <Button type="default" className="mr-2" onClick={onClose}>
                 Cancel
               </Button>
               <Button type="primary" htmlType="submit">

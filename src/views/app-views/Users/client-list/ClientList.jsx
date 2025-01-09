@@ -39,10 +39,12 @@ import ViewClient from "./ViewClient";
 import AddClient from "./AddClient";
 import EditClient from "./EditClient";
 import { useNavigate } from "react-router-dom";
+import ProjectList from "views/app-views/dashboards/project/project-list/ProjectList";
 
 const { Option } = Select;
 
 const ClientList = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState(userData);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -51,17 +53,17 @@ const ClientList = () => {
     useState(false);
   const [isEditCompanyModalVisible, setIsEditCompanyModalVisible] =
     useState(false);
-    const [isViewCompanyModalVisible, setIsViewCompanyModalVisible] =
+  const [isViewCompanyModalVisible, setIsViewCompanyModalVisible] =
     useState(false);
   const [isResetPasswordModalVisible, setIsResetPasswordModalVisible] =
     useState(false);
   const [isUpgradePlanModalVisible, setIsUpgradePlanModalVisible] =
     useState(false);
   const [comnyid, setCompnyid] = useState("");
-  const navigate = useNavigate();
 
   const tabledata = useSelector((state) => state.ClientData);
-  console.log("ooooo", tabledata);
+
+  const [idd, setIdd] = useState("");
 
   const dispatch = useDispatch();
 
@@ -164,9 +166,17 @@ const ClientList = () => {
     setSelectedUser(null);
   };
 
-  const handleClientClick = (id) => {
-    navigate(`/app/dashboards/project/list`);
-};
+  const ClickFun = (idd) => {
+    console.log("dsfvysdvf", idd);
+    setIdd(idd);
+    // navigate("/app/dashboards/project/list");
+
+    navigate("/app/dashboards/project/list", {
+      state: {
+        idd,
+      },
+    });
+  };
 
   const dropdownMenu = (user) => (
     <Menu>
@@ -250,7 +260,7 @@ const ClientList = () => {
       title: "Client",
       dataIndex: "name",
       render: (_, record) => (
-        <div className="d-flex" onClick={() => handleClientClick(record.id)}>
+        <div className="d-flex" onClick={() => ClickFun(record.id)}>
           <AvatarStatus
             src={record.img}
             name={record.name}

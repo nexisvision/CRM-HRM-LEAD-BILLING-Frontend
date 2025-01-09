@@ -1,82 +1,140 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal, Select, DatePicker } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
-// import { Card, Table,  Badge, Menu, Tag,Modal } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import 'react-quill/dist/quill.snow.css';
-import ReactQuill from 'react-quill';
-import OrderListData from 'assets/data/order-list.data.json';
-import Flex from 'components/shared-components/Flex'
-import utils from 'utils';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import userData from 'assets/data/user-list.data.json';
-import dayjs from 'dayjs';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+import React, { useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Row,
+  Col,
+  Tag,
+  Input,
+  message,
+  Button,
+  Modal,
+  Select,
+  DatePicker,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  MailOutlined,
+  PlusOutlined,
+  PushpinOutlined,
+  FileExcelOutlined,
+  CopyOutlined,
+  EditOutlined,
+  LinkOutlined,
+} from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import "react-quill/dist/quill.snow.css";
+import ReactQuill from "react-quill";
+import OrderListData from "assets/data/order-list.data.json";
+import Flex from "components/shared-components/Flex";
+import utils from "utils";
+import AvatarStatus from "components/shared-components/AvatarStatus";
+import userData from "assets/data/user-list.data.json";
+import dayjs from "dayjs";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import {
+  AddLable,
+  GetLable,
+} from "../../project/milestone/LableReducer/LableSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const { Option } = Select;
 
-const AddSources = () => {
-    const [users, setUsers] = useState(userData);
+const AddSources = ({ onClose }) => {
+  const [users, setUsers] = useState(userData);
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-    const onSubmit = (values) => {
-        console.log('Submitted values:', values);
-        message.success('Country added successfully!');
-        navigate('/app/systemsetup/sources/');
+  const allloggeddata = useSelector((state) => state.user);
+  const userdata = allloggeddata.loggedInUser;
+
+  const lid = userdata.id;
+
+  const onSubmit = (values, { resetForm }) => {
+    // Add static labelType to payload
+    const payload = {
+      ...values,
+      labelType: "source",
     };
 
-    const initialValues = {
-        sourcename: '',
-    };
+    dispatch(AddLable({ lid, payload }));
+    dispatch(GetLable(lid));
+    dispatch(GetLable(lid));
+    onClose();
+    resetForm();
+    console.log("Submitted values:", payload);
+    message.success("Country added successfully!");
+  };
 
-    const validationSchema = Yup.object({
-        sourcename: Yup.string().required('Please enter sourcename.'),
-    });
+  const initialValues = {
+    name: "",
+  };
 
-    return (
-        <>
-            <div>
-                <div className=''>
-                    <h2 className="mb-1 border-b font-medium"></h2>
-                   
-                        <div className="">
-                            <div className=" p-2">
-                                <Formik
-                                    initialValues={initialValues}
-                                    validationSchema={validationSchema}
-                                    onSubmit={onSubmit}
-                                >
-                                    {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
-                                        <Form className="formik-form" onSubmit={handleSubmit}>
-                                            <Row gutter={16}>
-                    
-                                                <Col span={24} className='mt-2'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold'>Source Name</label>
-                                                        <Field name="sourcename" as={Input} placeholder="Enter Source Name" />
-                                                        <ErrorMessage name="sourcename" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
-                                                </Col>
+  const validationSchema = Yup.object({
+    name: Yup.string().required("Please enter sourcename."),
+  });
 
-                                            </Row>
-                                        </Form>
-                                    )}
-                                </Formik>
-                            </div>
+  return (
+    <>
+      <div>
+        <div className="">
+          <h2 className="mb-1 border-b font-medium"></h2>
+
+          <div className="">
+            <div className="p-2">
+              <Formik
+                initialValues={initialValues}
+                validationSchema={validationSchema}
+                onSubmit={onSubmit}
+              >
+                {({
+                  values,
+                  setFieldValue,
+                  handleSubmit,
+                  setFieldTouched,
+                  resetForm,
+                }) => (
+                  <Form className="formik-form" onSubmit={handleSubmit}>
+                    <Row gutter={16}>
+                      <Col span={24} className="mt-2">
+                        <div className="form-item">
+                          <label className="font-semibold">Source Name</label>
+                          <Field
+                            name="name"
+                            as={Input}
+                            placeholder="Enter Source Name"
+                          />
+                          <ErrorMessage
+                            name="name"
+                            component="div"
+                            className="error-message text-red-500 my-1"
+                          />
                         </div>
-
-
-                    <div className="form-buttons text-right">
-                        <Button type="default" className="mr-2">Cancel</Button>
-                        <Button type="primary" htmlType="submit">Create</Button>
+                      </Col>
+                    </Row>
+                    <div className="form-buttons text-right mt-4">
+                      <Button type="default" className="mr-2" onClick={onClose}>
+                        Cancel
+                      </Button>
+                      <Button type="primary" htmlType="submit">
+                        Create
+                      </Button>
                     </div>
-                </div>
+                  </Form>
+                )}
+              </Formik>
             </div>
-        </>
-    );
+          </div>
+        </div>
+      </div>
+    </>
+  );
 };
 
 export default AddSources;

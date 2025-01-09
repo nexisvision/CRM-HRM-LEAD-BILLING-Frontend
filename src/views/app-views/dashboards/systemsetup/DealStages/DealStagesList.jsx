@@ -1,152 +1,183 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { TiArrowMove } from "react-icons/ti";
-import AddDealStages from './AddDealStages';
-import EditDealStages from './EditDealStages';
-import Flex from 'components/shared-components/Flex'
-import { Button, Modal } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-// import { DragHandle } from '@mui/icons-material';
+
+import Flex from "components/shared-components/Flex";
+import { Button, Modal, Select } from "antd";
+import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deletestages,
+  getstages,
+} from "../LeadStages/LeadsReducer/LeadsstageSlice";
+import EditDealStages from "./EditDealStages";
+import AddDealStages from "./AddDealStages";
+import { Option } from "antd/es/mentions";
 
 const DealStagesList = () => {
-  const [selectedTab, setSelectedTab] = useState('sales');
+  const [isEditLeadStagesModalVisible, setIsEditLeadStagesModalVisible] =
+    useState(false);
+  const [isAddLeadStagesModalVisible, setIsAddLeadStagesModalVisible] =
+    useState(false);
 
-  const [isEditDealStagesModalVisible, setIsEditDealStagesModalVisible] = useState(false);
-  const [isAddDealStagesModalVisible, setIsAddDealStagesModalVisible] = useState(false);
+  const [selectedPipeline, setSelectedPipeline] = useState("all");
 
-  // Open Add Job Modal
-  const openAddDealStagesModal = () => {
-    setIsAddDealStagesModalVisible(true);
+  const dispatch = useDispatch();
+
+  const allfdata = useSelector((state) => state.StagesLeadsDeals);
+  const fnddata = allfdata?.StagesLeadsDeals?.data || [];
+  const [leadadatafilter, setLeadadatafilter] = useState([]);
+  const [idd, setIdd] = useState("");
+
+  const Allpipline = useSelector((state) => state.Piplines);
+  const Filterpipline = Allpipline?.Piplines?.data || [];
+
+  useEffect(() => {
+    dispatch(getstages());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (fnddata) {
+      const filteredData = fnddata.filter((item) => item.stageType === "deal");
+      setLeadadatafilter(filteredData);
+    }
+  }, [fnddata]);
+
+  const openAddLeadStagesModal = () => {
+    setIsAddLeadStagesModalVisible(true);
   };
 
-  // Close Add Job Modal
-  const closeAddDealStagesModal = () => {
-    setIsAddDealStagesModalVisible(false);
+  const closeAddLeadStagesModal = () => {
+    setIsAddLeadStagesModalVisible(false);
   };
 
-  // Open Add Job Modal
-  const openEditDealStagesModal = () => {
-    setIsEditDealStagesModalVisible(true);
+  const openEditLeadStagesModal = () => {
+    setIsEditLeadStagesModalVisible(true);
   };
 
-  // Close Add Job Modal
-  const closeEditDealStagesModal = () => {
-    setIsEditDealStagesModalVisible(false);
+  const closeEditLeadStagesModal = () => {
+    setIsEditLeadStagesModalVisible(false);
   };
 
+  const deletefun = (userId) => {
+    dispatch(deletestages(userId));
+    setLeadadatafilter(leadadatafilter.filter((item) => item.id !== userId));
+    dispatch(getstages());
+    dispatch(getstages());
+  };
 
-  // Sample data for Sales and Marketing
-  const salesData = [
-    { id: 1, name: 'Initial Contact', order: 1 },
-    { id: 2, name: 'Meeting', order: 2 },
-    { id: 3, name: 'Qualification', order: 3 },
-    { id: 4, name: 'Proposal', order: 4 },
-    { id: 5, name: 'Close', order: 5 },
-  ];
+  const Editfun = (idd) => {
+    openEditLeadStagesModal();
+    setIdd(idd);
+  };
 
-  const marketingData = [
-    { id: 1, name: 'Initial Contact', order: 1 },
-    { id: 2, name: 'Qualification', order: 2 },
-    { id: 3, name: 'Meeting', order: 3 },
-    { id: 4, name: 'Close', order: 4 },
-  ];
+  const handlePipelineChange = (value) => {
+    setSelectedPipeline(value);
+    if (value === "all") {
+      setLeadadatafilter(fnddata.filter((item) => item.stageType === "deal"));
+    } else {
+      const filtered = fnddata.filter(
+        (item) => item.stageType === "deal" && item.pipeline === value
+      );
+      setLeadadatafilter(filtered);
+    }
+  };
 
   return (
-
     <>
-
-      <div className='flex justify-between items-center mb-4'>
-        <div className='flex items-center'>
-          <h1 className='text-lg font-bold'>Manage Deal Stages</h1>
-        </div>
-        <Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap mt-2 gap-4'>
-          <div className='flex justify-end'>
-            <Button type="primary" onClick={openAddDealStagesModal}>
-              <PlusOutlined />
-            </Button>
-          </div>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-lg font-bold">Manage Lead Stages</h1>
+        <Flex
+          alignItems="center"
+          justifyContent="space-between"
+          mobileFlex={false}
+          className="flex flex-wrap mt-2 gap-4"
+        >
+          <Button type="primary" onClick={openAddLeadStagesModal}>
+            <PlusOutlined />
+          </Button>
         </Flex>
       </div>
 
+      <div className="mb-4">
+        <Select
+          placeholder="Select Pipeline"
+          style={{ width: 200 }}
+          onChange={handlePipelineChange}
+          value={selectedPipeline}
+        >
+          <Option value="all">All Pipelines</Option>
+          {Filterpipline?.map((pipeline) => (
+            <Option key={pipeline?.id} value={pipeline?.id}>
+              {pipeline?.pipeline_name}
+            </Option>
+          ))}
+        </Select>
+      </div>
+
       <div className="flex min-h-screen bg-gray-100">
-
-        {/* Main Content */}
         <div className="flex-1">
-          {/* Tabs */}
-          <div className="flex space-x-4 mb-6 ">
-            <button
-              onClick={() => setSelectedTab('sales')}
-              className={`w-full py-2 px-4 rounded-md transition-colors duration-200
-              ${selectedTab === 'sales'
-                  ? 'bg-green-500 text-white'
-                  : 'bg-white text-gray-600 hover:bg-gray-50'
-                }
-            `}
-            >
-              Sales
-            </button>
-            <button
-              onClick={() => setSelectedTab('marketing')}
-              className={`w-full py-2 px-4 rounded-md transition-colors duration-200
-              ${selectedTab === 'marketing'
-                  ? 'bg-green-500 text-white'
-                  : 'bg-white text-gray-600 hover:bg-gray-50'
-                }
-            `}
-            >
-              Marketing
-            </button>
-          </div>
-
-          {/* List Items */}
-          <div className="bg-white rounded-lg shadow ">
-            {(selectedTab === 'sales' ? salesData : marketingData).map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center justify-between px-6 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200 border"
-              >
-                <div className="flex items-center space-x-4">
-                  <TiArrowMove className="text-black text-4xl font-medium cursor-move" />
-                  {/* <DragHandle className="text-gray-400 cursor-move" /> */}
-                  <span className="text-black text-lg font-normal">{item.name}</span>
+          <div className="bg-white rounded-lg shadow">
+            {leadadatafilter.length > 0 ? (
+              leadadatafilter.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between px-6 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200"
+                >
+                  <div className="flex items-center space-x-4">
+                    <TiArrowMove className="text-black text-4xl font-medium cursor-move" />
+                    <span className="text-black text-lg font-normal">
+                      {item.stageName}
+                    </span>
+                  </div>
+                  <div className="flex space-x-2">
+                    <button
+                      className="p-2 text-teal-500 hover:bg-teal-50 rounded-md transition-colors duration-200"
+                      onClick={() => Editfun(item.id)}
+                    >
+                      <EditOutlined className="text-xl" />
+                    </button>
+                    <button
+                      className="p-2 text-pink-500 hover:bg-pink-50 rounded-md transition-colors duration-200"
+                      onClick={() => deletefun(item.id)}
+                    >
+                      <DeleteOutlined className="text-xl" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex space-x-2">
-                  <button className="p-2 text-teal-500 hover:bg-teal-50 rounded-md transition-colors duration-200" onClick={openEditDealStagesModal}>
-                    <EditOutlined className=' text-xl' />
-                  </button>
-                  <button className="p-2 text-pink-500 hover:bg-pink-50 rounded-md transition-colors duration-200">
-                    <DeleteOutlined className='text-xl' />
-                  </button>
-                </div>
+              ))
+            ) : (
+              <div className="text-center p-4 text-gray-500">
+                No lead stages available.
               </div>
-            ))}
-            {/* Note */}
-            <div className=" font-medium text-sm p-3">
-              Note: You can easily change order of lead stage using drag & drop.
+            )}
+            <div className="font-medium text-sm p-3">
+              Note: You can easily change the order of lead stages using drag &
+              drop.
             </div>
           </div>
-
         </div>
       </div>
+
       <Modal
         title="Add Lead Stages"
-        visible={isAddDealStagesModalVisible}
-        onCancel={closeAddDealStagesModal}
-        footer={null} 
+        visible={isAddLeadStagesModalVisible}
+        onCancel={closeAddLeadStagesModal}
+        footer={null}
         width={700}
-        className='mt-[-70px]'
+        className="mt-[-70px]"
       >
-        <AddDealStages onClose={closeAddDealStagesModal} />
+        <AddDealStages onClose={closeAddLeadStagesModal} />
       </Modal>
 
       <Modal
         title="Edit Lead Stages"
-        visible={isEditDealStagesModalVisible}
-        onCancel={closeEditDealStagesModal}
+        visible={isEditLeadStagesModalVisible}
+        onCancel={closeEditLeadStagesModal}
         footer={null}
         width={700}
-        className='mt-[-70px]'
+        className="mt-[-70px]"
       >
-        <EditDealStages onClose={closeEditDealStagesModal} />
+        <EditDealStages onClose={closeEditLeadStagesModal} idd={idd} />
       </Modal>
     </>
   );

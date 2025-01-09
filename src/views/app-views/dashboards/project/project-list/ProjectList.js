@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Tooltip, Tag, Progress, Avatar, Modal, Card, Radio, Row, Col, Dropdown, Menu } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, AppstoreOutlined, UnorderedListOutlined, PaperClipOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, AppstoreOutlined, UnorderedListOutlined, PaperClipOutlined, CheckCircleOutlined, ClockCircleOutlined, ConsoleSqlOutlined } from '@ant-design/icons';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import ProjectListData from './ProjectListData';
 import AddProject from './AddProject';
 import EditProject from './EditProject';
 import utils from 'utils';
-import { useNavigate,useParams } from 'react-router-dom';
+import { useLocation, useNavigate,useParams } from 'react-router-dom';
 import PageHeaderAlt from 'components/layout-components/PageHeaderAlt';
 import Flex from 'components/shared-components/Flex';
 import { empdata } from 'views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice';
@@ -18,15 +18,25 @@ const VIEW_LIST = 'LIST';
 const VIEW_GRID = 'GRID';
 
 const ProjectList = () => {
+
 	const [view, setView] = useState(VIEW_GRID);
 	const [list, setList] = useState([]);
 	const [isAddProjectModalVisible, setIsAddProjectModalVisible] = useState(false);
 	const [isEditProjectModalVisible, setIsEditProjectModalVisible] = useState(false);
+	const [clientid,setClientId] = useState("");
 
 	const [idd,setIdd]= useState("");
 
 	  const AllProject = useSelector((state) => state.Project);
 	  const properdata = AllProject.Project.data;
+
+	  const {state} = useLocation();
+ 
+	  useEffect(()=>{
+		setClientId(state?.idd) 
+	  },[])
+
+	  const matchingClients = properdata?.filter(client => client?.client === clientid);
 
 	const dispatch = useDispatch();
 
@@ -40,7 +50,6 @@ const ProjectList = () => {
         navigate(`/app/dashboards/project/view/${id}`);
     };
 
-	
 	  useEffect(() => {
 		dispatch(empdata());
 	  }, [dispatch]);
@@ -53,47 +62,62 @@ const ProjectList = () => {
 		dispatch(GetProject());
 	  }, [dispatch]);
 
-	
-	useEffect(() => {
-		if (properdata) {
-			const datac = dataclient?.find((item) => item.id === item?.member || item?.client )		
+	  useEffect(() => {
+		  if (matchingClients?.length > 0) {
+			const formattedData1 = matchingClients?.map(item => {
+			  const currentDate = new Date();
+			  const endDate = new Date(item?.endDate);
+			  const startDate = new Date(item?.startDate);
+	  
+			  const totalDays = Math?.ceil((endDate - startDate) / (1000 * 3600 * 24));
+			  const completedDays = Math?.ceil((currentDate - startDate) / (1000 * 3600 * 24));
+			  const adjustedCompletedDays = Math?.min(Math?.max(0, completedDays), totalDays);
+	  
+			  return {
+				id: item.id,
+				name: item.project_name || item.name,
+				category: item?.category || item.category,
+				attachmentCount: item?.attachmentCount,
+				totalTask: item?.budget || item.budget,
+				completedTask: `${adjustedCompletedDays}/${totalDays}`,
+				progression: item?.startDate || item.progression,
+				dayleft: Math.max(0, Math.ceil((endDate - currentDate) / (1000 * 3600 * 24))),
+				statusColor: item?.status || item.statusColor,
+				member: item?.member,
+				tag: item?.tag || item.tag_name || item.tag,
+			  };
+			});
+			setList(formattedData1);
+		  } else {
 			const formattedData = properdata?.map(item => {
-				// Calculate days left
-				const currentDate = new Date();
-				const endDate = new Date(item.endDate);
-				const startDate = new Date(item.startDate);
-
-				// Calculate total project days
-				const totalDays = Math.ceil((endDate - startDate) / (1000 * 3600 * 24));
-				
-				// Calculate completed days
-				const completedDays = Math.ceil((currentDate - startDate) / (1000 * 3600 * 24));
-				
-				// Ensure completedDays doesn't exceed totalDays
-				const adjustedCompletedDays = Math.min(Math.max(0, completedDays), totalDays);
-
-				console.log("opopoop",properdata)
-				return {
-					id: item.id,
-					name: item.project_name || item.name,
-					category: item?.category || item.category,
-					attachmentCount: datac || item.attachmentCount,
-					totalTask: item?.budget || item.budget,
-					// Update completedTask to show days progress
-					completedTask: `${adjustedCompletedDays}/${totalDays}`,
-					
-					progression: item?.startDate || item.progression,
-					dayleft: Math.max(0, Math.ceil((endDate - currentDate) / (1000 * 3600 * 24))),
-					statusColor: item?.status || item.statusColor,
-					member: datac || item.member,
-					tag: item?.tag || item.tag_name || item.tag,
-				};
+			  const currentDate = new Date();
+			  const endDate = new Date(item.endDate);
+			  const startDate = new Date(item.startDate);
+	  
+			  const totalDays = Math.ceil((endDate - startDate) / (1000 * 3600 * 24));
+			  const completedDays = Math.ceil((currentDate - startDate) / (1000 * 3600 * 24));
+			  const adjustedCompletedDays = Math.min(Math.max(0, completedDays), totalDays);
+	  
+			  return {
+				id: item.id,
+				name: item.project_name || item.name,
+				category: item?.category || item.category,
+				attachmentCount: item?.attachmentCount,
+				totalTask: item?.budget || item.budget,
+				completedTask: `${adjustedCompletedDays}/${totalDays}`,
+				progression: item?.startDate || item.progression,
+				dayleft: Math.max(0, Math.ceil((endDate - currentDate) / (1000 * 3600 * 24))),
+				statusColor: item?.status || item.statusColor,
+				member: item?.member,
+				tag: item?.tag || item.tag_name || item.tag,
+			  };
 			});
 			setList(formattedData);
-		}
-	}, [properdata]);
+		  }
+	  }, [clientid, properdata]); 
 
 
+	  
 	// Open Add Project Modal
 	const openAddProjectModal = () => setIsAddProjectModalVisible(true);
 	const closeAddProjectModal = () => setIsAddProjectModalVisible(false);
@@ -120,6 +144,8 @@ const ProjectList = () => {
 		setView(e.target.value);
 	};
 
+
+
 	// Generate Action Menu for Dropdown
 	const dropdownMenu = (id) => (
 		<Menu>
@@ -133,17 +159,7 @@ const ProjectList = () => {
 	);
 
 	const tableColumns = [
-		// {
-		// 	title: 'Project',
-		// 	dataIndex: 'name',
-		// 	key: 'name',
-		// 	render: (name, record) => (
-		// 		<div>
-		// 			<h4 className="mb-0">{name}</h4>
-		// 			<span className="text-muted">{record.category}</span>
-		// 		</div>
-		// 	),
-		// },
+		
 		{
             title: 'Project',
             dataIndex: 'name',

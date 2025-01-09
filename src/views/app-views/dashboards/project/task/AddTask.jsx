@@ -61,12 +61,15 @@ const AddTask = ({ onClose }) => {
   const empData = allempdata?.employee?.data;
 
   const onSubmit = async (values, { resetForm }) => {
-    if (Array.isArray(values.AssignTo) && values.AssignTo.length > 0) {
-      values.AssignTo = { [values.AssignTo[0]]: undefined };
-    }
+    // Convert AssignTo array into an object containing the array
+    // if (Array.isArray(values.AssignTo) && values.AssignTo.length > 0) {
+    //   values.AssignTo = { AssignTo: [...values.AssignTo] };
+    // }
 
+    // Dispatch AddTasks with updated values
     dispatch(AddTasks({ id, values }))
       .then(() => {
+        // Fetch updated tasks after successfully adding
         dispatch(GetTasks(id))
           .then(() => {
             message.success("Expenses added successfully!");

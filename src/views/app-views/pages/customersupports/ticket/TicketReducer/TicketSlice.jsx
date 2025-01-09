@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./JobService";
+import UserService from "./TicketService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
 
-export const AddJobs = createAsyncThunk(
-  "users/addUser",
+export const AddTickets = createAsyncThunk(
+  "users/addt",
   async (userData, thunkAPI) => {
     try {
-      const response = await UserService.CreateJob(userData);
+      const response = await UserService.CreateTicket(userData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -19,11 +19,11 @@ export const AddJobs = createAsyncThunk(
 
 // Async thunk for user login
 
-export const GetJobdata = createAsyncThunk(
-  "emp/getmeet",
+export const getAllTicket = createAsyncThunk(
+  "emp/gett",
   async (loginData, thunkAPI) => {
     try {
-      const response = await UserService.Getjobs(loginData);
+      const response = await UserService.GetTicket(loginData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -58,22 +58,22 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const Deletejobs = createAsyncThunk(
-  "users/Deletejobseet",
+export const DeleteTicket = createAsyncThunk(
+  "users/DeleteTicketeet",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.DeleteJob(userId);
+      const response = await UserService.Deleteticket(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const EditJobs = createAsyncThunk(
-  "users/EditJobs",
-  async ({ idd, transformedValues }, thunkAPI) => {
+export const Editicket = createAsyncThunk(
+  "users/Editicket",
+  async ({ idd, values }, thunkAPI) => {
     try {
-      const response = await UserService.Editjobdata(idd, transformedValues);
+      const response = await UserService.Editticket(idd, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -94,9 +94,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "Jobs",
+  name: "Ticket",
   initialState: {
-    Jobs: [],
+    Ticket: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -133,27 +133,27 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(AddJobs.pending, (state) => {
+      .addCase(AddTickets.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(AddJobs.fulfilled, (state, action) => {
+      .addCase(AddTickets.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(AddJobs.rejected, (state, action) => {
+      .addCase(AddTickets.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(GetJobdata.pending, (state) => {
+      .addCase(getAllTicket.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(GetJobdata.fulfilled, (state, action) => {
+      .addCase(getAllTicket.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.Jobs = action?.payload;
+        state.Ticket = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(GetJobdata.rejected, (state, action) => {
+      .addCase(getAllTicket.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
@@ -186,27 +186,27 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
       //delete
-      .addCase(Deletejobs.pending, (state) => {
+      .addCase(DeleteTicket.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(Deletejobs.fulfilled, (state, action) => {
+      .addCase(DeleteTicket.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload.message);
       })
-      .addCase(Deletejobs.rejected, (state, action) => {
+      .addCase(DeleteTicket.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(EditJobs.pending, (state) => {
+      .addCase(Editicket.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(EditJobs.fulfilled, (state, action) => {
+      .addCase(Editicket.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload; // Update the state with the updated employee data
       })
-      .addCase(EditJobs.rejected, (state, action) => {
+      .addCase(Editicket.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
       });
