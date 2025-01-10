@@ -24,6 +24,8 @@ import { AddTasks, GetTasks } from "./TaskReducer/TaskSlice";
 import { useDispatch, useSelector } from "react-redux";
 import useSelection from "antd/es/table/hooks/useSelection";
 import { assign } from "lodash";
+import { AddLable, GetLable } from "./LableReducer/LableSlice";
+// import { AddLable, GetLable } from "./LableReducer/LableSlice";
 
 const { Option } = Select;
 
@@ -33,6 +35,14 @@ const AddTask = ({ onClose }) => {
   const [isWithoutDueDate, setIsWithoutDueDate] = useState(false);
   const [isOtherDetailsVisible, setIsOtherDetailsVisible] = useState(false);
   const [showReceiptUpload, setShowReceiptUpload] = useState(false);
+  const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
+  const [newStatus, setNewStatus] = useState("");
+
+  const [status, setStatus] = useState([]);
+
+  const Statusdetail = useSelector((state) => state.Lable);
+  const AllLoggeddtaa = useSelector((state) => state.user);
+  const AllStatus = Statusdetail?.Lable?.data;
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
   const initialValues = {
@@ -61,30 +71,123 @@ const AddTask = ({ onClose }) => {
   const empData = allempdata?.employee?.data;
 
   const onSubmit = async (values, { resetForm }) => {
-    // Convert AssignTo array into an object containing the array
-    // if (Array.isArray(values.AssignTo) && values.AssignTo.length > 0) {
-    //   values.AssignTo = { AssignTo: [...values.AssignTo] };
-    // }
+    if (Array.isArray(values.AssignTo) && values.AssignTo.length > 0) {
+      values.AssignTo = { [values.AssignTo[0]]: undefined };
+    }
+    
+    // Check if the selected tag is new or existing
+    const selectedStatus = status.find(
+      (status) => status.name === values.status
+    );
+  
+    if (!selectedStatus) {
+      // Call AddLable API only if the selected tag is new
+      const lid = AllLoggeddtaa.loggedInUser.id;
+        const newStatusPayload = { 
+          name: values.status.trim(),
+          // lableType: "task" 
+        };
+      
+      try {
+        await dispatch(AddLable({ lid, payload: newStatusPayload }));
+        await dispatch(AddTasks({ id, values }));
+        await dispatch(GetTasks(id));
+        
+        message.success("Task added successfully!");
+        resetForm();
+        onClose();
+      } catch (error) {
+        message.error("Failed to add task");
+        console.error("Task API error:", error);
+      }
+    } else {
+      // If tag already exists, just add the task
+      try {
+        await dispatch(AddTasks({ id, values }));
+        await dispatch(GetTasks(id));
+        
+        message.success("Task added successfully!");
+        resetForm();
+        onClose();
+      } catch (error) {
+        message.error("Failed to add task");
+        console.error("Task API error:", error);
+      }
+    }
+  };
 
-    // Dispatch AddTasks with updated values
-    dispatch(AddTasks({ id, values }))
-      .then(() => {
-        // Fetch updated tasks after successfully adding
-        dispatch(GetTasks(id))
-          .then(() => {
-            message.success("Expenses added successfully!");
-            resetForm();
-            onClose();
-          })
-          .catch((error) => {
-            message.error("Failed to fetch the latest meeting data.");
-            console.error("MeetData API error:", error);
-          });
-      })
-      .catch((error) => {
-        message.error("Failed to add meeting.");
-        console.error("AddMeet API error:", error);
-      });
+  // const onSubmit = async (values, { resetForm }) => {
+  //   if (Array.isArray(values.AssignTo) && values.AssignTo.length > 0) {
+  //     values.AssignTo = { [values.AssignTo[0]]: undefined };
+  //   }
+
+  //   dispatch(AddTasks({ id, values }))
+  //     .then(() => {
+  //       dispatch(GetTasks(id))
+  //         .then(() => {
+  //           message.success("Expenses added successfully!");
+  //           resetForm();
+  //           onClose();
+  //         })
+  //         .catch((error) => {
+  //           message.error("Failed to fetch the latest meeting data.");
+  //           console.error("MeetData API error:", error);
+  //         });
+  //     })
+  //     .catch((error) => {
+  //       message.error("Failed to add meeting.");
+  //       console.error("AddMeet API error:", error);
+  //     });
+  // };
+
+  const fetchStatus = async () => {
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const response = await dispatch(GetLable(lid));
+
+      if (response.payload && response.payload.data) {
+        const uniqueStatus = response.payload.data
+          .filter((label) => label && label.name) // Filter out invalid labels
+          .map((label) => ({
+            id: label.id,
+            name: label.name.trim(),
+          }))
+          .filter(
+            (label, index, self) =>
+              index === self.findIndex((t) => t.name === label.name)
+          ); // Remove duplicates
+
+        setStatus(uniqueStatus);
+      }
+    } catch (error) {
+      console.error("Failed to fetch status:", error);
+      message.error("Failed to load status");
+    }
+  };
+
+  const handleAddNewStatus = async () => {
+    if (!newStatus.trim()) {
+      message.error("Please enter a status name");
+      return;
+    }
+
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const payload = {
+        name: newStatus.trim(),
+      };
+
+      await dispatch(AddLable({ lid, payload }));
+      message.success("Status added successfully");
+      setNewStatus("");
+      setIsStatusModalVisible(false);
+
+      // Fetch updated status
+      await fetchStatus();
+    } catch (error) {
+      console.error("Failed to add status:", error);
+      message.error("Failed to add status");
+    }
   };
 
   const handleCheckboxChange = () => {
@@ -281,32 +384,60 @@ const AddTask = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={9}>
-                <div className="form-item">
-                  <label className="font-semibold mb-2">Status</label>
-                  <Field name="status">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-2"
-                        onChange={(value) => setFieldValue("status", value)}
-                        value={values.status}
-                      >
-                        <Option value="Incomplete">
-                          <div className="flex items-center">
-                            <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
-                            Incomplete
-                          </div>
-                        </Option>
-                        <Option value="To Do">To Do</Option>
-                        <Option value="In Progress">Doing</Option>
-                        <Option value="Completed">Completed</Option>
-                        <Option value="On Hold">Waiting Approval</Option>
-                      </Select>
-                    )}
-                  </Field>
-                </div>
-              </Col>
+              <Col span={24} className="mt-4">
+                    <div className="form-item">
+                      <label className="font-semibold">status</label>
+                      <div className="flex gap-2">
+                        <Field name="status">
+                          {({ field, form }) => (
+                            <Select
+                              {...field}
+                              className="w-full"
+                              placeholder="Select or add new status"
+                              onChange={(value) =>
+                                form.setFieldValue("status", value)
+                              }
+                              onBlur={() =>
+                                form.setFieldTouched("status", true)
+                              }
+                              dropdownRender={(menu) => (
+                                <div>
+                                  {menu}
+                                  <div
+                                    style={{
+                                      padding: "8px",
+                                      borderTop: "1px solid #e8e8e8",
+                                    }}
+                                  >
+                                    <Button
+                                      type="link"
+                                      // icon={<PlusOutlined />}
+                                      onClick={() => setIsStatusModalVisible(true)}
+                                      block
+                                    >
+                                      Add New Status
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                            >
+                              {status &&
+                                status.map((status) => (
+                                  <Option key={status.id} value={status.name}>
+                                    {status.name}
+                                  </Option>
+                                ))}
+                            </Select>
+                          )}
+                        </Field>
+                      </div>
+                      <ErrorMessage
+                        name="status"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
 
               <Col span={10}>
                 <div className="form-item">
@@ -345,6 +476,20 @@ const AddTask = ({ onClose }) => {
           </Form>
         )}
       </Formik>
+
+      <Modal
+            title="Add New Status"
+            open={isStatusModalVisible}
+            onCancel={() => setIsStatusModalVisible(false)}
+            onOk={handleAddNewStatus}
+            okText="Add Status"
+          >
+            <Input
+              placeholder="Enter new status name"
+              value={newStatus}
+              onChange={(e) => setNewStatus(e.target.value)}
+            />
+          </Modal>
     </div>
   );
 };

@@ -37,6 +37,7 @@ import Ticket from "../views/app-views/pages/customersupports/ticket/TicketReduc
 import StagesLeadsDeals from "../views/app-views/dashboards/systemsetup/LeadStages/LeadsReducer/LeadsstageSlice"
 import Notifications from "../views/app-views/pages/setting/NotificationReducer/NotificationSlice"
 import Users from "../views/app-views/Users/UserReducers/UserSlice"
+import scrumboard from "../views/app-views/dashboards/project/scrumboard/scrumboardreducer/scrumboardSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -78,6 +79,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
         StagesLeadsDeals,
         Notifications,
         Users,
+        scrumboard,
         // employee,
         // department,
         ...asyncReducers,
