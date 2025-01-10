@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Table,
@@ -9,7 +9,7 @@ import {
   message,
   Button,
   Modal,
-} from 'antd';
+} from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
@@ -17,34 +17,55 @@ import {
   EditOutlined,
   PlusOutlined,
   FileExcelOutlined,
-} from '@ant-design/icons';
-import dayjs from 'dayjs';
-import UserView from './UserView';
-import Flex from 'components/shared-components/Flex';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import userData from 'assets/data/user-list.data.json';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import OrderListData from 'assets/data/order-list.data.json';
-import AddUser from './AddUser'; // Assuming AddUser is a component
-import EditUser from './EditUser'; // Assuming EditUser is a component
-import utils from 'utils';
-import ResetPassword from './ResetPassword';
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+import UserView from "./UserView";
+import Flex from "components/shared-components/Flex";
+import AvatarStatus from "components/shared-components/AvatarStatus";
+import userData from "assets/data/user-list.data.json";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import OrderListData from "assets/data/order-list.data.json";
+import AddUser from "./AddUser"; // Assuming AddUser is a component
+import EditUser from "./EditUser"; // Assuming EditUser is a component
+import utils from "utils";
+import ResetPassword from "./ResetPassword";
+import { Dleteusetr, GetUsers } from "../UserReducers/UserSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const UserList = () => {
   const [users, setUsers] = useState(userData);
+  const dispatch = useDispatch();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [list, setList] = useState(OrderListData);
   const [isAddUserModalVisible, setIsAddUserModalVisible] = useState(false);
   const [isEditUserModalVisible, setIsEditUserModalVisible] = useState(false);
-  const [isResetPasswordModalVisible, setIsResetPasswordModalVisible] = useState(false);
+  const [isResetPasswordModalVisible, setIsResetPasswordModalVisible] =
+    useState(false);
 
+  const [idd, setIdd] = useState("");
 
-  const paymentStatusList = ['active', 'blocked'];
+  const paymentStatusList = ["active", "blocked"];
+
+  const alluserdata = useSelector((state) => state.Users);
+  const fndfdata = alluserdata.Users.data;
+
+  const allroledata = useSelector((state) => state.role);
+  const fnddata = allroledata.role.data;
+
+  useEffect(() => {
+    dispatch(GetUsers());
+  }, []);
+
+  useEffect(() => {
+    if (fndfdata) {
+      setUsers(fndfdata);
+    }
+  }, [fndfdata]);
 
   const handleShowStatus = (value) => {
-    if (value !== 'All') {
-      const key = 'status';
+    if (value !== "All") {
+      const key = "status";
       const data = utils.filterArray(OrderListData, key, value);
       setList(data);
     } else {
@@ -60,6 +81,9 @@ const UserList = () => {
   };
 
   const deleteUser = (userId) => {
+    dispatch(Dleteusetr(userId));
+    dispatch(GetUsers());
+    dispatch(GetUsers());
     setUsers(users.filter((user) => user.id !== userId));
     message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
@@ -98,6 +122,11 @@ const UserList = () => {
     setIsResetPasswordModalVisible(false);
   };
 
+  const Editfun = (idd) => {
+    openEditUserModal();
+    setIdd(idd);
+  };
+
   const dropdownMenu = (elm) => (
     <Menu>
       <Menu.Item>
@@ -117,7 +146,7 @@ const UserList = () => {
           <Button
             type=""
             icon={<EditOutlined />}
-            onClick={openEditUserModal}
+            onClick={() => Editfun(elm.id)}
             size="small"
           >
             Edit
@@ -153,11 +182,15 @@ const UserList = () => {
 
   const tableColumns = [
     {
-      title: 'User',
-      dataIndex: 'name',
+      title: "User",
+      dataIndex: "name",
       render: (_, record) => (
         <div className="d-flex">
-          <AvatarStatus src={record.img} name={record.name} subTitle={record.email} />
+          <AvatarStatus
+            src={record.img}
+            name={record.name}
+            subTitle={record.email}
+          />
         </div>
       ),
       sorter: (a, b) =>
@@ -167,24 +200,24 @@ const UserList = () => {
           ? 1
           : 0,
     },
+    // {
+    //   title: "Role",
+    //   dataIndex: "role",
+    //   sorter: (a, b) => a.role.length - b.role.length,
+    // },
     {
-      title: 'Role',
-      dataIndex: 'role',
-      sorter: (a, b) => a.role.length - b.role.length,
+      title: "Last online",
+      dataIndex: "updatedAt",
+      // render: (date) => <span>{dayjs.unix(date).format("MM/DD/YYYY")} </span>,
+      sorter: (a, b) => dayjs(a.updatedAt).unix() - dayjs(b.updatedAt).unix(),
     },
     {
-      title: 'Last online',
-      dataIndex: 'lastOnline',
-      render: (date) => <span>{dayjs.unix(date).format('MM/DD/YYYY')} </span>,
-      sorter: (a, b) => dayjs(a.lastOnline).unix() - dayjs(b.lastOnline).unix(),
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
+      title: "Status",
+      dataIndex: "status",
       render: (status) => (
         <Tag
           className="text-capitalize"
-          color={status === 'active' ? 'cyan' : 'red'}
+          color={status === "active" ? "cyan" : "red"}
         >
           {status}
         </Tag>
@@ -192,8 +225,8 @@ const UserList = () => {
       sorter: (a, b) => a.status.length - b.status.length,
     },
     {
-      title: 'Action',
-      dataIndex: 'actions',
+      title: "Action",
+      dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
           <EllipsisDropdown menu={dropdownMenu(elm)} />
@@ -203,8 +236,12 @@ const UserList = () => {
   ];
 
   return (
-    <Card bodyStyle={{ padding: '-3px' }}>
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+    <Card bodyStyle={{ padding: "-3px" }}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+      >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
@@ -265,7 +302,7 @@ const UserList = () => {
         footer={null}
         width={1000}
       >
-        <EditUser onClose={closeEditUserModal} />
+        <EditUser onClose={closeEditUserModal} idd={idd} />
       </Modal>
 
       <Modal
@@ -283,18 +320,6 @@ const UserList = () => {
 
 export default UserList;
 
-
-
-
-
-
-
-
-
-
-
-
-
 // import React, { Component, useState } from 'react'
 // import { Card, Table, Tag, Select,Input,Menu, message, Button } from 'antd';
 // import { EyeOutlined, DeleteOutlined,SearchOutlined,PlusOutlined,FileExcelOutlined } from '@ant-design/icons';
@@ -308,20 +333,15 @@ export default UserList;
 
 // import utils from 'utils'
 
-
 // export class UserList extends Component {
 
-
-	
 // 	state = {
 // 		users: userData,
 // 		userProfileVisible: false,
 // 		selectedUser: null,
 // 		list: OrderListData, // Initialize with OrderListData
-//         selectedRowKeys: [], 
+//         selectedRowKeys: [],
 // 	}
-
-
 
 //  // Open Add Job Modal
 //  const openAddUserModal = () => {
@@ -375,7 +395,7 @@ export default UserList;
 // 			selectedUser: userInfo
 // 		});
 // 	};
-	
+
 // 	closeUserProfile = () => {
 // 		this.setState({
 // 			userProfileVisible: false,
@@ -385,8 +405,7 @@ export default UserList;
 
 // 	render() {
 // 		const { users, userProfileVisible, selectedUser } = this.state;
-	
-	
+
 // 		// const handleShowStatus = value => {
 // 		// 	if(value !== 'All') {
 // 		// 		const key = 'priority'
@@ -397,7 +416,6 @@ export default UserList;
 // 		// 	}
 // 		// }
 
-		
 // const { Column } = Table;
 
 // const { Option } = Select
@@ -427,12 +445,12 @@ export default UserList;
 
 // const dropdownMenu = elm => (
 // 	<Menu>
-		
+
 // 		<Menu.Item>
 // 			<Flex alignItems="center">
 // 				{/* <EyeOutlined />
 // 				<span className="ml-2">View Details</span> */}
-			 
+
 // 			<Button type="" className="" icon={<EyeOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
 // 			<span className="">View Details</span>
 // 			</Button>
@@ -442,7 +460,7 @@ export default UserList;
 // 			<Flex alignItems="center">
 // 				{/* <EyeOutlined />
 // 				<span className="ml-2">View Details</span> */}
-			 
+
 // 			<Button type="" className="" icon={<EyeOutlined />} onClick={openEditUserModal} size="small">
 // 			<span className="">Edit</span>
 // 			</Button>
@@ -452,14 +470,13 @@ export default UserList;
 // 			<Flex alignItems="center">
 // 				{/* <DeleteOutlined />
 // 				<span className="ml-2">Delete</span> */}
-			
-// <Button type="" className="" icon={<DeleteOutlined />} onClick={() => {this.deleteUser(elm.id)}} size="small"> 
+
+// <Button type="" className="" icon={<DeleteOutlined />} onClick={() => {this.deleteUser(elm.id)}} size="small">
 // <span className="">Delete</span>
 // </Button>
 
-
 // 			</Flex>
-// 		</Menu.Item>	
+// 		</Menu.Item>
 // 	</Menu>
 // );
 
@@ -507,7 +524,6 @@ export default UserList;
 // 					compare: (a, b) => a.status.length - b.status.length,
 // 				},
 // 			},
-
 
 // 			{
 // 				title: 'Action',
@@ -565,9 +581,9 @@ export default UserList;
 //   ))}
 // </Select>
 // 					</div>
-// 				</Flex>								
+// 				</Flex>
 // 				<Flex gap="7px">
-				
+
 // 				<Button type="primary" className="ml-2" onClick={openAddUserModal}>
 // 								<PlusOutlined />
 // 								<span>New</span>

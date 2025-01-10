@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Form,
@@ -10,14 +10,29 @@ import {
   Row,
   Col,
 } from "antd";
+import { AddUserss, GetUsers } from "../UserReducers/UserSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { roledata } from "views/app-views/hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice";
 
 const { Option } = Select;
 
-const AddUser = ({ visible, onCancel, onCreate }) => {
+const AddUser = ({ visible, onClose, onCreate }) => {
   const [form] = Form.useForm();
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false); // Manage password field visibility
 
+  const getalllrole = useSelector((state) => state.role);
+  const fnddata = getalllrole.role.data;
+
+  useEffect(() => {
+    dispatch(roledata());
+  }, []);
+
   const handleFinish = (values) => {
+    dispatch(AddUserss(values));
+    dispatch(GetUsers());
+    dispatch(GetUsers());
+    onClose();
     console.log("Form Values:", values);
     onCreate(values); // Pass form values to the parent component
     form.resetFields();
@@ -45,7 +60,7 @@ const AddUser = ({ visible, onCancel, onCreate }) => {
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item
-            name="name"
+            name="username"
             label="Name"
             rules={[{ required: true, message: "Please enter the user name" }]}
           >
@@ -68,18 +83,20 @@ const AddUser = ({ visible, onCancel, onCreate }) => {
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item
-            name="userRole"
+            name="role_id"
             label="User Role"
             rules={[{ required: true, message: "Please select a user role" }]}
           >
             <Select placeholder="Select Role">
-              <Option value="accountant">Accountant</Option>
-              <Option value="admin">Admin</Option>
-              <Option value="manager">Manager</Option>
+              {fnddata?.map((tag) => (
+                <Option key={tag?.id} value={tag?.id}>
+                  {tag?.role_name}
+                </Option>
+              ))}
             </Select>
           </Form.Item>
         </Col>
-        <Col span={12}>
+        {/* <Col span={12}>
           <Form.Item
             name="loginEnabled"
             label="Login is enabled"
@@ -87,35 +104,33 @@ const AddUser = ({ visible, onCancel, onCreate }) => {
           >
             <Switch onChange={handleToggleChange} />
           </Form.Item>
+        </Col> */}
+      </Row>
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item
+            name="password"
+            label="Password"
+            rules={[
+              { required: true, message: "Please enter the password" },
+              { min: 6, message: "Password must be at least 6 characters" },
+            ]}
+          >
+            <Input.Password placeholder="Enter Password" />
+          </Form.Item>
         </Col>
       </Row>
-      {showPassword && ( // Conditionally render the password field
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="password"
-              label="Password"
-              rules={[
-                { required: true, message: "Please enter the password" },
-                { min: 6, message: "Password must be at least 6 characters" },
-              ]}
-            >
-              <Input.Password placeholder="Enter Password" />
-            </Form.Item>
-          </Col>
-        </Row>
-      )}
-      <Form.Item
+      {/* <Form.Item
         name="dob"
         label="Date Of Birth"
         rules={[{ required: true, message: "Please select the date of birth" }]}
       >
         <DatePicker format="DD-MM-YYYY" style={{ width: "100%" }} />
-      </Form.Item>
+      </Form.Item> */}
       <Form.Item>
         <Row justify="end" gutter={16}>
           <Col>
-            <Button onClick={onCancel}>Cancel</Button>
+            <Button onClick={onClose}>Cancel</Button>
           </Col>
           <Col>
             <Button type="primary" htmlType="submit">
@@ -129,14 +144,6 @@ const AddUser = ({ visible, onCancel, onCreate }) => {
 };
 
 export default AddUser;
-
-
-
-
-
-
-
-
 
 // import React, { useState } from "react";
 // import {

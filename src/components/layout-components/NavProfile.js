@@ -101,8 +101,8 @@ export const NavProfile = ({ mode }) => {
   const [current, setCurrent] = useState("");
 
   useEffect(() => {
-	const roless = roles?.role;
-    const userRole = roless?.find(
+	const roless = roles?.role.data;
+    const userRole = roless && roless?.find(
       (role) => role?.role_id === currentuser?.loggedInUser?.role_id
     );
 

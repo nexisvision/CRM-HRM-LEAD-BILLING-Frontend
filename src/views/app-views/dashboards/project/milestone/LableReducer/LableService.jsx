@@ -7,10 +7,10 @@ import axios from "axios";
 //     return res
 // };
 
-const GetLable = async (lid) => {
+const GetLable = async (id, lid) => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(`http://localhost:5353/api/v1/labels/${lid}`, {
+    const res = await axios.get(`http://localhost:5353/api/v1/labels/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

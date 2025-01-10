@@ -92,6 +92,7 @@ const NotificationPage = () => {
                 <p className="text-sm text-gray-500">Due: {reminder.time}</p>
               </div>
             ))}
+            
         </div>
       </div>
     </div>
@@ -99,3 +100,9 @@ const NotificationPage = () => {
 };
 
 export default NotificationPage;
+
+
+
+
+
+

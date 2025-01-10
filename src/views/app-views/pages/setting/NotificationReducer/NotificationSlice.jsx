@@ -21,9 +21,9 @@ export const AddTickets = createAsyncThunk(
 
 export const GetAllNotifications = createAsyncThunk(
   "emp/getn",
-  async (loginData, thunkAPI) => {
+  async (thunkAPI) => {
     try {
-      const response = await UserService.GetNoti(loginData);
+      const response = await UserService.GetNoti();
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -150,7 +150,7 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(GetAllNotifications.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.Ticket = action?.payload;
+        state.Notifications = action?.payload;
         toast.success(action.payload?.data?.message);
       })
       .addCase(GetAllNotifications.rejected, (state, action) => {

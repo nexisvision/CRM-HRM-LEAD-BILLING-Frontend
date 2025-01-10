@@ -147,7 +147,7 @@ const AddMilestone = ({ onClose }) => {
         name: newTag.trim(),
       };
 
-      await dispatch(AddLable({ lid, payload }));
+      await dispatch(AddLable({ id, payload }));
       message.success("Tag added successfully");
       setNewTag("");
       setIsTagModalVisible(false);
