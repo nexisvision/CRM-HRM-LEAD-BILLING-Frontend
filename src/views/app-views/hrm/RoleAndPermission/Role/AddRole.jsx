@@ -142,6 +142,7 @@ const AddRole = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [selectedModule, setSelectedModule] = useState(modules[0]); // Default to first module
+  const [modulePermissions, setModulePermissions] = useState({});
 
   const handleModuleChange = (module) => {
     setSelectedModule(module);
@@ -165,12 +166,19 @@ const AddRole = () => {
     });
   };
 
-  const togglePermission = (permission) => {
-    const updatedPermissions = selectedModule.permissions.map((perm) =>
-      perm.name === permission.name ? { ...perm, checked: !perm.checked } : perm
-    );
-    setSelectedModule({ ...selectedModule, permissions: updatedPermissions });
+  const togglePermission = (moduleName, permissionName) => {
+    setModulePermissions(prev => ({
+      ...prev,
+      [moduleName]: {
+        ...prev[moduleName],
+        [permissionName]: !prev?.[moduleName]?.[permissionName]
+      }
+    }));
   };
+
+  // const isPermissionChecked = (moduleName, permissionName) => {
+  //   return modulePermissions?.[moduleName]?.[permissionName] || false;
+  // };
 
   // const togglePermission = (permission) => {
   //   const updatedPermissions = selectedModule.permissions.map((perm) =>
@@ -179,19 +187,54 @@ const AddRole = () => {
   //   setSelectedModule({ ...selectedModule, permissions: updatedPermissions });
   // };
 
+  // const toggleModule = (module) => {
+  //   const updatedModules = selectedModule.modual.map((mod) =>
+  //     mod.name === module.name ? { ...mod, checked: !mod.checked } : mod
+  //   );
+  //   setSelectedModule({ ...selectedModule, modual: updatedModules });
+  // };
+
+
   const toggleModule = (module) => {
+    // When module is checked/unchecked, update both module and its permissions
     const updatedModules = selectedModule.modual.map((mod) =>
       mod.name === module.name ? { ...mod, checked: !mod.checked } : mod
     );
+
+    // If module is being checked, set all its permissions to checked
+    const isChecking = !module.checked;
+    const updatedPermissions = {
+      ...modulePermissions,
+      [module.name]: selectedModule.permissions.reduce((acc, permission) => {
+        acc[permission.name] = isChecking;
+        return acc;
+      }, {})
+    };
+
     setSelectedModule({ ...selectedModule, modual: updatedModules });
+    setModulePermissions(updatedPermissions);
   };
+
+  const isPermissionChecked = (moduleName, permissionName) => {
+    return modulePermissions?.[moduleName]?.[permissionName] || false;
+  };
+  
 
   const onFinish = (values) => {
     console.log("Submitted values:", values);
     console.log("Selected module:", selectedModule);
     message.success("Role added successfully!");
-    navigate("app/hrm/role");
+    navigate("/app/hrm/role");
   };
+
+  const areAllChecked = () => {
+    return selectedModule.modual.every((mod) => mod.checked) &&
+      Object.values(modulePermissions).every((modPerms) => 
+        Object.values(modPerms).every((perm) => perm)
+      );
+  };
+
+  
 
   const onFinishFailed = (errorInfo) => {
     console.error("Form submission failed:", errorInfo);
@@ -256,11 +299,11 @@ const AddRole = () => {
           {selectedModule.modual.map((mod) => (
             <tr key={mod.name}>
               <td className="border px-4 py-2">
-                <input
-                  type="checkbox"
-                  checked={mod.checked}
-                  onChange={() => toggleModule(mod)}
-                />
+              <input
+                      type="checkbox"
+                      checked={mod.checked}
+                      onChange={() => toggleModule(mod)}
+                    />
                 <span className="ms-2">{mod.name}</span>
               </td>
               <td className="border px-4 py-2 flex space-x-4">
@@ -269,8 +312,8 @@ const AddRole = () => {
                     <input
                       type="checkbox"
                       className="mr-2"
-                      checked={permission.checked}
-                      onChange={() => togglePermission(permission)}
+                      checked={isPermissionChecked(mod.name, permission.name)}
+                      onChange={() => togglePermission(mod.name, permission.name)}
                     />
                     <span>{permission.name}</span>
                   </div>

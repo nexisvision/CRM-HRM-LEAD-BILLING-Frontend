@@ -1,138 +1,149 @@
-import React, { useEffect, useState } from "react";
-import { Card, Table, Input, Button, Modal } from "antd";
-import {
-  SearchOutlined,
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
-import { Deletepip, GetPip } from "./PiplineReducer/piplineSlice";
-import AddPipeLine from "./AddPipeLine";
-import EditPipeLine from "./EditPipeLine";
-import utils from "utils";
+/* eslint-disable no-unused-vars */
+import React, { useState,useEffect } from 'react'
+import { Card, Table, Select, Input, Button, Badge, Menu, Tag, Modal, Row, Col } from 'antd';
+import OrderListData from "../../../../../assets/data/order-list.data.json"
+import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
+import Flex from 'components/shared-components/Flex'
+import utils from 'utils'
+import { PaymentStatisticData } from '../../../dashboards/default/DefaultDashboardData';
+import AddPipeLine from './AddPipeLine';
+import EditPipeLine from './EditPipeLine';
+import { useDispatch, useSelector } from 'react-redux';
+import { GetPip } from './PiplineReducer/piplineSlice';
+
+
+const { Option } = Select
+
 
 const PipelineList = () => {
-  const dispatch = useDispatch();
-  const [list, setList] = useState([]);
-  const [isAddPipeLineModalVisible, setIsAddPipeLineModalVisible] =
-    useState(false);
-  const [isEditPipeLineModalVisible, setIsEditPipeLineModalVisible] =
-    useState(false);
 
-  const [idd, setIdd] = useState(null);
+	const [list, setList] = useState([])
+	const [selectedRows, setSelectedRows] = useState([])
+	const [selectedRowKeys, setSelectedRowKeys] = useState([])
+	const [isAddPipeLineModalVisible, setIsAddPipeLineModalVisible] = useState(false);
+	const [isEditPipeLineModalVisible, setIsEditPipeLineModalVisible] = useState(false);
+	const dispatch = useDispatch();
 
-  const alldata = useSelector((state) => state.Piplines);
-  const fnddata = alldata?.Piplines?.data || [];
+	// Open Add Job Modal
+	const openAddPipeLineModal = () => {
+		setIsAddPipeLineModalVisible(true);
+	};
 
-  // Open and Close Modals
-  const openAddPipeLineModal = () => setIsAddPipeLineModalVisible(true);
-  const closeAddPipeLineModal = () => setIsAddPipeLineModalVisible(false);
-  const openEditPipeLineModal = () => setIsEditPipeLineModalVisible(true);
-  const closeEditPipeLineModal = () => setIsEditPipeLineModalVisible(false);
+	// Close Add Job Modal
+	const closeAddPipeLineModal = () => {
+		setIsAddPipeLineModalVisible(false);
+	};
 
-  const deltfun = (userId) => {
-    dispatch(Deletepip(userId));
-    setList(list.filter((item) => item.id !== userId));
-    dispatch(GetPip());
-    dispatch(GetPip());
-  };
+	// Open Add Job Modal
+	const openEditPipeLineModal = () => {
+		setIsEditPipeLineModalVisible(true);
+	};
 
-  const editfub = (idd) => {
-    openEditPipeLineModal();
-    setIdd(idd);
-  };
+	// Close Add Job Modal
+	const closeEditPipeLineModal = () => {
+		setIsEditPipeLineModalVisible(false);
+	};
 
-  const tableColumns = [
-    {
-      title: "Pipeline",
-      dataIndex: "pipeline_name",
-      sorter: (a, b) => utils.antdTableSorter(a, b, "pipeline_name"),
-    },
-    {
-      title: "Action",
-      dataIndex: "actions",
-      render: (_, record) => (
-        <div className="flex space-x-2">
-          <button
-            className="p-2 text-teal-500 hover:bg-teal-50 rounded-md transition-colors duration-200"
-            onClick={() => editfub(record.id)}
-          >
-            <EditOutlined className="text-xl" />
-          </button>
-          <button
-            className="p-2 text-pink-500 hover:bg-pink-50 rounded-md transition-colors duration-200"
-            onClick={() => deltfun(record.id)}
-          >
-            <DeleteOutlined className="text-xl" />
-          </button>
+	const tableColumns = [
+		{
+			title: 'Pipeline',
+			dataIndex: 'pipeline',
+			sorter: (a, b) => utils.antdTableSorter(a, b, 'pipeline')
+		},
+
+		{
+			title: 'Action',
+			dataIndex: 'actions',
+			render: (_, elm) => (
+				<div className="flex space-x-2">
+                  <button className="p-2 text-teal-500 hover:bg-teal-50 rounded-md transition-colors duration-200" onClick={openEditPipeLineModal}>
+                    <EditOutlined className=' text-xl' />
+                  </button>
+                  <button className="p-2 text-pink-500 hover:bg-pink-50 rounded-md transition-colors duration-200">
+                    <DeleteOutlined className='text-xl' />
+                  </button>
+                </div>
+			)
+		}
+	];
+
+
+	const onSearch = e => {
+		const value = e.currentTarget.value
+		const searchArray = e.currentTarget.value ? list : OrderListData
+		const data = utils.wildCardSearch(searchArray, value)
+		setList(data)
+		setSelectedRowKeys([])
+	}
+
+	useEffect(() => {
+		dispatch(GetPip());
+	}, [dispatch]);
+
+// 	useEffect(() => {
+// 	   setFilteredData(pipelinedata);
+//    }, [pipelinedata]);
+
+	return (
+		<>
+		<div className='flex justify-between items-center mb-4'>
+        <div className='flex items-center'>
+          <h1 className='text-lg font-bold'>Manage Pipeline</h1>
         </div>
-      ),
-    },
-  ];
-
-  const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = value ? list : fnddata;
-    const filteredData = utils.wildCardSearch(searchArray, value);
-    setList(filteredData);
-  };
-
-  useEffect(() => {
-    dispatch(GetPip());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (Array.isArray(fnddata)) {
-      setList(fnddata);
-    } else {
-      console.warn("fnddata is not an array:", fnddata);
-      setList([]);
-    }
-  }, [fnddata]);
-
-  return (
-    <>
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-lg font-bold">Manage Pipeline</h1>
-        <Button type="primary" onClick={openAddPipeLineModal}>
-          <PlusOutlined /> Add Pipeline
-        </Button>
+        <Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap mt-2 gap-4'>
+          <div className='flex justify-end'>
+            <Button type="primary"  onClick={openAddPipeLineModal}>
+              <PlusOutlined />
+            </Button>
+          </div>
+        </Flex>
       </div>
-      <Card>
-        <div className="mb-3">
-          <Input
-            placeholder="Search"
-            prefix={<SearchOutlined />}
-            onChange={onSearch}
-          />
-        </div>
-        <Table
-          columns={tableColumns}
-          dataSource={Array.isArray(list) ? list : []}
-          rowKey="id"
-        />
-      </Card>
-      <Modal
-        title="Add Pipeline"
-        visible={isAddPipeLineModalVisible}
-        onCancel={closeAddPipeLineModal}
-        footer={null}
-        width={700}
-      >
-        <AddPipeLine onClose={closeAddPipeLineModal} />
-      </Modal>
-      <Modal
-        title="Edit Pipeline"
-        visible={isEditPipeLineModalVisible}
-        onCancel={closeEditPipeLineModal}
-        footer={null}
-        width={700}
-      >
-        <EditPipeLine onClose={closeEditPipeLineModal} idd={idd} />
-      </Modal>
-    </>
-  );
-};
+			<Card>
+				<Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap mt-2 gap-4'>
+					
+						<div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
+							<Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)} />
+						</div>
+				</Flex>
+				<div className="table-responsive">
+					<Table
+						columns={tableColumns}
+						dataSource={list}
+						rowKey='id'
+					// scroll={{x:1000}}
+					// rowSelection={{
+					// 	selectedRowKeys: selectedRowKeys,
+					// 	type: 'checkbox',
+					// 	preserveSelectedRowKeys: false,
+					// 	...rowSelection,
+					// }}
+					/>
+				</div>
+			</Card>
+			<Modal
+				title="Add Pipeline"
+				visible={isAddPipeLineModalVisible}
+				onCancel={closeAddPipeLineModal}
+				footer={null}
+				width={700}
+			// className='mt-[-70px]'
+			>
+				<AddPipeLine onClose={closeAddPipeLineModal} />
+			</Modal>
+			<Modal
+				title="Edit Pipeline"
+				visible={isEditPipeLineModalVisible}
+				onCancel={closeEditPipeLineModal}
+				footer={null}
+				width={700}
+			// className='mt-[-70px]'
+			>
+				<EditPipeLine onClose={closeEditPipeLineModal} />
+			</Modal>
 
-export default PipelineList;
+		</>
+	)
+}
+
+export default PipelineList

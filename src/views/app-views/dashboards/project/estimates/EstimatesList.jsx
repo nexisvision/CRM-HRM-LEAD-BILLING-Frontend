@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
-import { Card, Table, Select, Input, Row, Col, Button, Badge, Menu, Tag, Modal } from 'antd';
+import { Card, Table, Select, Input, Row, Col, Button, message, Menu, Tag, Modal } from 'antd';
 import OrderListData from "../../../../../assets/data/order-list.data.json"
 // import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 // import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
@@ -10,6 +10,7 @@ import StatisticWidget from 'components/shared-components/StatisticWidget';
 import {
 	AnnualStatisticData,
 } from '../../../dashboards/default/DefaultDashboardData';
+import {deleteestimate} from "../../../dashboards/project/estimates/estimatesReducer/EstimatesSlice"
 import { TiPinOutline } from "react-icons/ti";
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import Flex from 'components/shared-components/Flex'
@@ -45,7 +46,7 @@ const EstimatesList = () => {
 	const [list, setList] = useState([])
 	const [selectedRows, setSelectedRows] = useState([])
 	const [selectedRowKeys, setSelectedRowKeys] = useState([])
-
+	const [selectedEstimate, setSelectedEstimate] = useState(null);
 	const [isAddEstimatesModalVisible, setIsAddEstimatesModalVisible] = useState(false);
 	const [isEditEstimatesModalVisible, setIsEditEstimatesModalVisible] = useState(false);
 	const [isViewEstimatesModalVisible, setIsViewEstimatesModalVisible] = useState(false);
@@ -61,6 +62,25 @@ const EstimatesList = () => {
 	useEffect(() => {
 		setList(estimates); // Update list when estimates change
 	  }, [estimates]);
+
+	  const handleEdit = (record) => {
+		setSelectedEstimate(record._id);
+		setIsEditEstimatesModalVisible(true);
+	  };
+
+	  const handleDelete = async (id) => {
+		try {
+			await dispatch(deleteestimate(id));
+
+			// const updatedData = await dispatch(Getexp(id));
+
+			// setList(list.filter((item) => item.id !== exid));
+
+			message.success({ content: "Deleted user successfully", duration: 2 });
+		} catch (error) {
+			console.error("Error deleting user:", error);
+		}
+	};
 
 	//   const handleSearch = (e) => {
 	// 	const value = e.target.value.toLowerCase();
@@ -138,7 +158,7 @@ const EstimatesList = () => {
 						type=""
 						className=""
 						icon={<EditOutlined />}
-						onClick={openEditEstimatesModal}
+						onClick={() => handleEdit(row.id)}
 						size="small"
 					>
 						<span className="">Edit</span>
@@ -152,7 +172,7 @@ const EstimatesList = () => {
 				</Flex>
 			</Menu.Item>
 			<Menu.Item>
-				<Flex alignItems="center">
+				<Flex alignItems="center" onClick={() => handleDelete(row.id)}>
 					<DeleteOutlined />
 					<span className="ml-2">Delete</span>
 				</Flex>
@@ -339,7 +359,7 @@ const EstimatesList = () => {
 				</div>
 			</Card>
 
-			<Card>
+	
 				<Modal
 					title="Add Estimate"
 					visible={isAddEstimatesModalVisible}
@@ -375,7 +395,7 @@ const EstimatesList = () => {
 				>
 					<ViewEstimates onClose={closeViewEstimatesModal} />
 				</Modal>
-			</Card>
+		
 		</>
 	)
 }

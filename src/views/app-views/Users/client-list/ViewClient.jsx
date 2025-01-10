@@ -25,7 +25,21 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const ViewClient = () => {
     const dispatch = useDispatch();
+    const { SubClient, loading, error } = useSelector((state) => state.SubClient);
+    const tabledata = useSelector((state) => state.ClientData);
 
+	const [list, setList] = useState([])
+
+    useEffect(() => {
+		dispatch(ClientData());
+	}, [dispatch]);
+	console.log('SubClient', SubClient)
+
+    // useEffect(() => {
+	// 	setList(SubClient); // Update list when estimates change
+	//   }, [SubClient]);
+
+      
     //   const [proo, setProo] = useState("");
 
     //   const allempdata = useSelector((state) => state.Project);
@@ -149,10 +163,10 @@ const ViewClient = () => {
                                 className="w-20 h-20 rounded-sm object-fit-cover position-relative"
                             />
                             <div className="ms-5">
-                                <h2 className="font-medium text-base f-w-500 mb-0 text-black">Gustave Koelpin</h2>
+                                <h2 className="font-medium text-base f-w-500 mb-0 text-black">{SubClient?.data?.[0]?.username}</h2>
                                 <h3 className="f-18 f-w-500 mb-0 ">
                                     {/* {updatedList[0]?.username} */}
-                                    Douglas, DuBuque and Roob
+                                    {SubClient?.data?.[0]?.email}
                                 </h3>
                                 <p className="f-14 mb-0 font-normal">
                                     {/* {updatedList[0]?.email} */}
@@ -210,107 +224,50 @@ const ViewClient = () => {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-6">
-                    {/* Task */}
-
-                    <div className="bg-white shadow rounded-lg p-4 lg:p-6">
-                        <div className="overflow-x-auto">
-                            <div>
-                                <span className="text-xl font-semibold text-left text-black uppercase tracking-wider"> Profile Info</span>
-                            </div>
-                            <table className="w-full mt-2">
-                                
-                                <tbody >
-                                    <tr>
-                                        <td className="py-2 text-gray-500 w-1/4 lg:w-1/5">Full Name</td>
-                                        <td className="py-2 text-gray-700 hover:text-black transition-colors">
-                                            Gustave Koelpin
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td className="py-2 text-gray-500">Priority</td>
-                                        <td className="py-2 text-gray-700">Low</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td className="py-2 text-gray-500">Email</td>
-                                        <td className="py-2">
-                                            caitlyn66@example.net7
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td className="py-2 text-gray-500">Company Name</td>
-                                        <td className="py-2 text-gray-700">Douglas, DuBuque and Roob</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td className="py-2 text-gray-500">Company Logo</td>
-                                        <td className="py-2 text-gray-700">--</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td className="py-2 text-gray-500">Mobile</td>
-                                        <td className="py-2 text-gray-700">--</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td className="py-2 text-gray-500">Gender</td>
-                                        <td className="py-2 text-gray-700">Male</td>
-                                    </tr>
-
-                                    <tr>
-                                        <td className="py-2 text-gray-500">Office Phone Number</td>
-                                        <td className="py-2 text-gray-700 whitespace-pre-wrap">
-                                        --
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-2 text-gray-500">Official Website</td>
-                                        <td className="py-2 text-gray-700 whitespace-pre-wrap">
-                                        https://worksuite.biz
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-2 text-gray-500">GST/VAT Number</td>
-                                        <td className="py-2 text-gray-700 whitespace-pre-wrap">
-                                        --
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-2 text-gray-500">Address</td>
-                                        <td className="py-2 text-gray-700 whitespace-pre-wrap">
-                                        16738 Swift Drive Katarinaborough, AK 18081-4580
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-2 text-gray-500">State</td>
-                                        <td className="py-2 text-gray-700 whitespace-pre-wrap">
-                                        --
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-2 text-gray-500">City</td>
-                                        <td className="py-2 text-gray-700 whitespace-pre-wrap">
-                                        --
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-2 text-gray-500">Postal code</td>
-                                        <td className="py-2 text-gray-700 whitespace-pre-wrap">
-                                        --
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td className="py-2 text-gray-500">Language</td>
-                                        <td className="py-2 text-gray-700 whitespace-pre-wrap">
-                                        English
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+            <div className="bg-white shadow rounded-lg p-4 lg:p-6">
+                <div className="overflow-x-auto">
+                    <div>
+                        <span className="text-xl font-semibold text-left text-black uppercase tracking-wider">
+                            Profile Info
+                        </span>
                     </div>
+                    <table className="w-full mt-2">
+                        <tbody>
+                            {[
+                                { key: 'username', label: 'Full Name' },
+                                // { key: 'password', label: 'Priority' },
+                                { key: 'email', label: 'Email' },
+                                { key: 'profilePic', label: 'Profile Pic' },
+                                { key: 'firstName', label: 'First Name' },
+                                { key: 'lastName', label: 'Last Name' },
+                                { key: 'phone', label: 'Phone' },
+                                { key: 'accountholder', label: 'Account Holder' },
+                                { key: 'accountnumber', label: 'Account Number' },
+                                { key: 'ifsc', label: 'IFSC Code' },
+                                { key: 'bankname', label: 'Bank Name' },
+                                { key: 'branchname', label: 'Branch Name' },
+                                { key: 'banklocation', label: 'Bank Location' },
+                                { key: 'bankaddress', label: 'Bank Address' },
+                                { key: 'bankcity', label: 'Bank City' },
+                                { key: 'bankstate', label: 'Bank State' },
+                                { key: 'bankcountry', label: 'Bank Country' },
+                                { key: 'bankpincode', label: 'Bank Pincode' },
+                              
+                            ].map((field) => (
+                                <tr key={field.key}>
+                                    <td className="py-2 text-gray-500 w-1/4 lg:w-1/5">
+                                        {field.label}
+                                    </td>
+                                    <td className="py-2 text-gray-700 whitespace-pre-wrap">
+                                    {SubClient?.data?.[0]?.[field.key] || '--'}
+                                    </td>
+                                </tr>
+                            ))}
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
 
                     <div>
                         <div className="bg-white rounded-lg shadow-lg p-6 w-full h-[325px] flex flex-col items-center justify-center">
