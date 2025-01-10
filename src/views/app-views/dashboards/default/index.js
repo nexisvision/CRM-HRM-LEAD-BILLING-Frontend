@@ -166,9 +166,9 @@ export const DefaultDashboard = () => {
 //   dispatch(useradata())
 // }
   
-//   useEffect(() => {
-//     dispatch(roledata()); 
-// }, [dispatch]);
+  useEffect(() => {
+    dispatch(roledata()); 
+}, [dispatch]);
 
 
   return (
