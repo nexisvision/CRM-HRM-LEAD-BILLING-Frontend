@@ -68,7 +68,7 @@ const NavNotification = ({ mode }) => {
                 <span className="font-weight-bold text-dark">{item?.title} </span>
                 <span className="text-gray-light">{item?.message}</span>
               </div>
-              <small className="ml-auto">{item?.time}</small>
+              <small className="ml-auto">{item?.updatedAt}</small>
             </Flex>
           </List.Item>
         )}
