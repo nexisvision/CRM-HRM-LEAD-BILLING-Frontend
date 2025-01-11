@@ -37,6 +37,7 @@ export const publicRoutes = [
         path: `${AUTH_PREFIX_PATH}/error-page-1`,
         component: React.lazy(() => import('views/auth-views/errors/error-page-1')),
     },
+    
     {
         key: 'error-page-2',
         path: `${AUTH_PREFIX_PATH}/error-page-2`,
@@ -1056,7 +1057,11 @@ export const protectedRoutes = [
     //     path: `${APP_PREFIX_PATH}/hrm/myattendance`,
     //     component: React.lazy(() => import('views/app-views/hrm/MyAttendance')),
     // },
-
+    {
+        key: 'dashboard',
+        path: `${APP_PREFIX_PATH}/superadmin/dashboard`,
+        component: React.lazy(() => import('views/app-views/dashboards/dashboard')),
+    },
     {
         key: 'coupon',
         path: `${APP_PREFIX_PATH}/superadmin/coupon`,

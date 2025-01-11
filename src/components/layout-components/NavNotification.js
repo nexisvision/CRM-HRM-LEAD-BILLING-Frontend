@@ -224,7 +224,7 @@ const NavNotification = ({ mode }) => {
   const notificationList = (
     <div className="max-w-xs w-full bg-white shadow-md rounded-lg border border-gray-200">
       <div className="border-b flex justify-between items-center px-3 py-2">
-        <h4 className="mb-0">Notifications</h4>
+        <h1 className="mb-0 font-bold">Notifications</h1  >
       </div>
       <div className="nav-notification-body">{getNotificationBody(list)}</div>
       {list?.length > 0 && (
