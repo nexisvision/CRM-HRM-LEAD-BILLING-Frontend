@@ -22,7 +22,7 @@ import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeS
 import { PlusOutlined } from "@ant-design/icons";
 import { GetTagspro, AddTags } from "./tagReducer/TagSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
-import { AddLable, GetLable } from "../milestone/LableReducer/LableSlice";
+import { AddLablee, GetLablee } from "../milestone/LableReducer/LableSlice";
 
 const { Option } = Select;
 
@@ -31,8 +31,19 @@ const AddProject = ({ onClose }) => {
   const [list, setList] = useState();
   const dispatch = useDispatch();
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
   const [newTag, setNewTag] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [newStatus, setNewStatus] = useState("");
   const [tags, setTags] = useState([]);
+
+  const [categories, setCategories] = useState([]);
+  const [statuses, setStatuses] = useState([]);
+ 
+ 
+  const AllLoggedData = useSelector((state) => state.user);
+
 
   useEffect(() => {
     dispatch(empdata());
@@ -51,11 +62,22 @@ const AddProject = ({ onClose }) => {
 
   const Allclient = useSelector((state) => state.ClientData);
   const clientdata = Allclient.ClientData.data;
+  
+  
+
 
   const AllEmployee = useSelector((state) => state.employee);
   const employeedata = AllEmployee.employee.data;
 
   const AllLoggeddtaa = useSelector((state) => state.user);
+
+  
+ 
+
+
+
+
+
 
   const initialValues = {
     project_name: "",
@@ -123,58 +145,173 @@ const AddProject = ({ onClose }) => {
 
   useEffect(() => {
     const lid = AllLoggeddtaa.loggedInUser.id;
-    GetLable(lid);
+    GetLablee(lid);
   }, []);
 
-  const fetchTags = async () => {
+
+  // const fetchLabels = async (labelType, setter) => {
+  //   try {
+  //     const lid = AllLoggedData.loggedInUser.id;
+  //     const response = await dispatch(GetLablee(lid));
+  //     if (response.payload && response.payload.data) {
+  //       const filteredLabels = response.payload.data
+  //         .filter((label) => label.labelType === labelType)
+  //         .map((label) => ({ id: label.id, name: label.name.trim() }));
+  //       setter(filteredLabels);
+  //     }
+  //   } catch (error) {
+  //     console.error(`Failed to fetch ${labelType}:`, error);
+  //     message.error(`Failed to load ${labelType}`);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchLabels("tag", setTags);
+  //   fetchLabels("category", setCategories);
+  //   fetchLabels("status", setStatuses);
+  // }, []);
+
+
+
+
+
+  const fetchLables = async (lableType, setter) => {
     try {
-      const lid = AllLoggeddtaa.loggedInUser.id;
-      const response = await dispatch(GetLable(lid));
-
+      const lid = AllLoggedData.loggedInUser.id; // User ID to fetch specific labels
+      const response = await dispatch(GetLablee(lid)); // Fetch all labels
       if (response.payload && response.payload.data) {
-        const uniqueTags = response.payload.data
-          .filter((label) => label && label.name) // Filter out invalid labels
-          .map((label) => ({
-            id: label.id,
-            name: label.name.trim(),
-          }))
-          .filter(
-            (label, index, self) =>
-              index === self.findIndex((t) => t.name === label.name)
-          ); // Remove duplicates
-
-        setTags(uniqueTags);
+        const filteredLables = response.payload.data
+          .filter((lable) => lable.lableType === lableType) // Filter by labelType
+          .map((lable) => ({ id: lable.id, name: lable.name.trim() })); // Trim and format
+        setter(filteredLables); // Update state
       }
     } catch (error) {
-      console.error("Failed to fetch tags:", error);
-      message.error("Failed to load tags");
+      console.error(`Failed to fetch ${lableType}:`, error);
+      message.error(`Failed to load ${lableType}`);
     }
   };
+  
+  // Call fetchLabels for each labelType on mount
+  useEffect(() => {
+    fetchLables("tag", setTags);
+    fetchLables("category", setCategories);
+    fetchLables("status", setStatuses);
+  }, []);
 
-  const handleAddNewTag = async () => {
-    if (!newTag.trim()) {
-      message.error("Please enter a tag name");
+
+
+
+
+
+  // const handleAddNewLabel = async (labelType, newValue, setter, modalSetter) => {
+  //   if (!newValue.trim()) {
+  //     message.error(`Please enter a ${labelType} name.`);
+  //     return;
+  //   }
+
+  //   try {
+  //     const lid = AllLoggedData.loggedInUser.id;
+  //     const payload = {
+  //       name: newValue.trim(),
+  //       labelType,
+  //     };
+  //     await dispatch(AddLablee({ lid, payload }));
+  //     message.success(`${labelType} added successfully.`);
+  //     setter("");
+  //     modalSetter(false);
+  //     await fetchLabels(labelType, labelType === "tag" ? setTags : labelType === "category" ? setCategories : setStatuses);
+  //   } catch (error) {
+  //     console.error(`Failed to add ${labelType}:`, error);
+  //     message.error(`Failed to add ${labelType}.`);
+  //   }
+  // };
+
+
+
+
+
+
+
+  const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
+    if (!newValue.trim()) {
+      message.error(`Please enter a ${lableType} name.`);
       return;
     }
-
+  
     try {
-      const lid = AllLoggeddtaa.loggedInUser.id;
+      const lid = AllLoggedData.loggedInUser.id; // User ID
       const payload = {
-        name: newTag.trim(),
+        name: newValue.trim(), // Label name
+        lableType, // Dynamic labelType
       };
-
-      await dispatch(AddLable({ lid, payload }));
-      message.success("Tag added successfully");
-      setNewTag("");
-      setIsTagModalVisible(false);
-
-      // Fetch updated tags
-      await fetchTags();
+      await dispatch(AddLablee({ lid, payload })); // Add new label
+      message.success(`${lableType} added successfully.`);
+      setter(""); // Reset input field
+      modalSetter(false); // Close modal
+      await fetchLables(lableType, lableType === "tag" ? setTags : lableType === "category" ? setCategories : setStatuses); // Re-fetch labels
     } catch (error) {
-      console.error("Failed to add tag:", error);
-      message.error("Failed to add tag");
+      console.error(`Failed to add ${lableType}:`, error);
+      message.error(`Failed to add ${lableType}.`);
     }
   };
+
+
+
+
+
+
+
+  // const fetchTags = async () => {
+  //   try {
+  //     const lid = AllLoggeddtaa.loggedInUser.id;
+  //     const response = await dispatch(GetLablee(lid));
+
+  //     if (response.payload && response.payload.data) {
+  //       const uniqueTags = response.payload.data
+  //         .filter((label) => label && label.name) // Filter out invalid labels
+  //         .map((label) => ({
+  //           id: label.id,
+  //           name: label.name.trim(),
+  //         }))
+  //         .filter(
+  //           (label, index, self) =>
+  //             index === self.findIndex((t) => t.name === label.name)
+  //         ); // Remove duplicates
+
+  //       setTags(uniqueTags);
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to fetch tags:", error);
+  //     message.error("Failed to load tags");
+  //   }
+  // };
+
+  // const handleAddNewTag = async () => {
+  //   if (!newTag.trim()) {
+  //     message.error("Please enter a tag name");
+  //     return;
+  //   }
+
+  //   try {
+  //     const lid = AllLoggeddtaa.loggedInUser.id;
+  //     const payload = {
+  //       name: newTag.trim(),
+  //       labelType: "tag",
+
+  //     };
+
+  //     await dispatch(AddLablee({ lid, payload }));
+  //     message.success("Tag added successfully");
+  //     setNewTag("");
+  //     setIsTagModalVisible(false);
+
+  //     // Fetch updated tags
+  //     await fetchTags();
+  //   } catch (error) {
+  //     console.error("Failed to add tag:", error);
+  //     message.error("Failed to add tag");
+  //   }
+  // };
 
   return (
     <div className="add-job-form">
@@ -211,7 +348,51 @@ const AddProject = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24} className="mt-4">
+              <Col span={24}>
+                <div className="form-item">
+                  <label className="font-semibold">Category</label>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new category"
+                    value={values.project_category}
+                    onChange={(value) => setFieldValue("project_category", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsCategoryModalVisible(true)}
+                          >
+                            Add New Category
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  >
+                    {categories.map((category) => (
+                      <Option key={category.id} value={category.name}>
+                        {category.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage
+                    name="project_category"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+
+
+
+
+
+
+
+              {/* <Col span={24} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Category</label>
                   <Field
@@ -226,7 +407,7 @@ const AddProject = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
@@ -264,7 +445,50 @@ const AddProject = ({ onClose }) => {
                 </div>
               </Col>
 
+
+
               <Col span={12} className="mt-4">
+  <div className="form-item">
+    <label className="font-semibold">Client</label>
+    <Select
+      style={{ width: "100%" }}
+      placeholder="Select Client"
+      loading={!clientdata}
+      value={values.client} // Bind value to Formik's field
+      onChange={(value) => setFieldValue("client", value)} // Update Formik's field value
+      onBlur={() => setFieldTouched("client", true)} // Set touched state
+    >
+      {clientdata && clientdata.length > 0 ? (
+        clientdata
+          .filter(client => client.created_by === AllLoggedData.loggedInUser.username) // Filter clients based on created_by
+          .map((client) => (
+            <Option key={client.id} value={client.id}>
+              {client.firstName || client.username || "Unnamed Client"}
+            </Option>
+          ))
+      ) : (
+        <Option value="" disabled>
+          No Clients Available
+        </Option>
+      )}
+    </Select>
+    <ErrorMessage
+      name="client"
+      component="div"
+      className="error-message text-red-500 my-1"
+    />
+  </div>
+</Col>
+
+
+
+
+
+
+
+
+
+              {/* <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Client</label>
                   <Select
@@ -295,7 +519,7 @@ const AddProject = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
@@ -311,7 +535,7 @@ const AddProject = ({ onClose }) => {
                     {employeedata && employeedata.length > 0 ? (
                       employeedata.map((employee) => (
                         <Option key={employee.id} value={employee.id}>
-                          {employee.firstName || "Unnamed User"}
+                          {employee.username || "Unnamed User"}
                         </Option>
                       ))
                     ) : (
@@ -396,9 +620,52 @@ const AddProject = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
+             
               </Col>
 
-              <Col span={24} className="mt-4">
+
+
+              <Col span={24}>
+                <div className="form-item">
+                  <label className="font-semibold">Tag</label>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new tag"
+                    value={values.tag}
+                    onChange={(value) => setFieldValue("tag", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsTagModalVisible(true)}
+                          >
+                            Add New Tag
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  >
+                    {tags.map((tag) => (
+                      <Option key={tag.id} value={tag.name}>
+                        {tag.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage name="tag" component="div" className="error-message text-red-500 my-1" />
+                </div>
+              </Col>
+
+
+
+
+
+
+
+
+              {/* <Col span={24} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Tag</label>
                   <div className="flex gap-2">
@@ -448,9 +715,53 @@ const AddProject = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
+              </Col> */}
+
+<Col span={24}>
+                <div className="form-item">
+                  <label className="font-semibold">Status</label>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new status"
+                    value={values.status}
+                    onChange={(value) => setFieldValue("status", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsStatusModalVisible(true)}
+                          >
+                            Add New Status
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  >
+                    {statuses.map((status) => (
+                      <Option key={status.id} value={status.name}>
+                        {status.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage
+                    name="status"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+
+
+
+
+
+
+
+              {/* <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Status</label>
                   <Field name="status">
@@ -477,7 +788,7 @@ const AddProject = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
             </Row>
 
             <div className="form-buttons text-right mt-4">
@@ -494,18 +805,48 @@ const AddProject = ({ onClose }) => {
 
       {/* Add Tag Modal */}
       <Modal
-        title="Add New Tag"
-        open={isTagModalVisible}
-        onCancel={() => setIsTagModalVisible(false)}
-        onOk={handleAddNewTag}
-        okText="Add Tag"
-      >
-        <Input
-          placeholder="Enter new tag name"
-          value={newTag}
-          onChange={(e) => setNewTag(e.target.value)}
-        />
-      </Modal>
+              title="Add New Tag"
+              open={isTagModalVisible}
+              onCancel={() => setIsTagModalVisible(false)}
+              onOk={() => handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible)}
+              okText="Add Tag"
+            >
+              <Input
+                placeholder="Enter new tag name"
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+              />
+            </Modal>
+
+            {/* Add Category Modal */}
+            <Modal
+              title="Add New Category"
+              open={isCategoryModalVisible}
+              onCancel={() => setIsCategoryModalVisible(false)}
+              onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
+              okText="Add Category"
+            >
+              <Input
+                placeholder="Enter new category name"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+              />
+            </Modal>
+
+            {/* Add Status Modal */}
+            <Modal
+              title="Add New Status"
+              open={isStatusModalVisible}
+              onCancel={() => setIsStatusModalVisible(false)}
+              onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible)}
+              okText="Add Status"
+            >
+              <Input
+                placeholder="Enter new status name"
+                value={newStatus}
+                onChange={(e) => setNewStatus(e.target.value)}
+              />
+            </Modal>
     </div>
   );
 };

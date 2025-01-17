@@ -5,7 +5,6 @@ import { addClient, ClientData, empdata } from "./CompanyReducers/CompanySlice";
 
 const AddClient = ({ visible, onClose, onCreate }) => {
   const [form] = Form.useForm();
-  const [loginEnabled, setLoginEnabled] = useState(true);
   const dispatch = useDispatch();
 
   const handleFinish = async (values) => {
@@ -32,9 +31,7 @@ const AddClient = ({ visible, onClose, onCreate }) => {
     }
   };
 
-  const handleSwitchChange = (checked) => {
-    setLoginEnabled(checked);
-  };
+  
 
   return (
     <Form
@@ -65,30 +62,21 @@ const AddClient = ({ visible, onClose, onCreate }) => {
       >
         <Input placeholder="Enter Client Email" />
       </Form.Item>
-
       <Form.Item
-        name="loginEnabled"
-        label="Login is enabled"
-        valuePropName="checked"
-      >
-        <Switch onChange={handleSwitchChange} />
-      </Form.Item>
-
-      {/* Conditionally render password field based on loginEnabled state */}
-      {loginEnabled && (
-        <Form.Item
           name="password"
           label="Password"
           rules={[
             {
-              required: loginEnabled,
+             
               message: "Please enter the client password",
             },
           ]}
         >
           <Input.Password placeholder="Enter Client Password" />
         </Form.Item>
-      )}
+     
+       
+      
 
       <Form.Item>
         <Row justify="end" gutter={16}>

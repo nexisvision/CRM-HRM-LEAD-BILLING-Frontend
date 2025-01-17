@@ -214,7 +214,7 @@ export const TaskList = () => {
     // },
     {
       title: "Task",
-      dataIndex: "taskTitle",
+      dataIndex: "taskName",
       sorter: {
         compare: (a, b) => a.task.length - b.task.length,
       },
@@ -228,7 +228,7 @@ export const TaskList = () => {
     },
     {
       title: "Priority",
-      dataIndex: "taskPriority",
+      dataIndex: "priority",
       sorter: {
         compare: (a, b) => a.milestone.length - b.milestone.length,
       },
@@ -254,16 +254,16 @@ export const TaskList = () => {
     //   dataIndex: "estimatedtime",
     //   sorter: (a, b) => utils.antdTableSorter(a, b, "estimatedtime"),
     // },
-    {
-      title: "projectName ",
-      dataIndex: "projectName",
-      sorter: (a, b) => utils.antdTableSorter(a, b, "hourslogged"),
-    },
     // {
-    //   title: "Assigned To",
-    //   dataIndex: "assignedto",
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "assignedto"),
+    //   title: "projectName ",
+    //   dataIndex: "projectName",
+    //   sorter: (a, b) => utils.antdTableSorter(a, b, "hourslogged"),
     // },
+    {
+      title: "Assigned To",
+      dataIndex: "assignedto",
+      sorter: (a, b) => utils.antdTableSorter(a, b, "assignedto"),
+    },
     {
       title: "status",
       dataIndex: "taskStatus",

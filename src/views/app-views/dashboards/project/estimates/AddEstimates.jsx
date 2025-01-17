@@ -19,6 +19,19 @@ const AddEstimates = ({ onClose }) => {
     const [loading, setLoading] = useState(false);
     const [discountValue, setDiscountValue] = useState(0);
     const { currencies } = useSelector((state) => state.currencies);
+
+
+    const subClients = useSelector((state) => state.SubClient);
+const sub = subClients?.SubClient?.data;
+
+    const allproject = useSelector((state) => state.Project);
+    const fndrewduxxdaa = allproject.Project.data
+    const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
+    
+    const client = fnddata?.client;
+    
+    const subClientData = sub?.find((subClient) => subClient?.id === client);
+
     const [discountRate, setDiscountRate] = useState(10);
     const dispatch = useDispatch();
     const [form] = Form.useForm();
@@ -46,7 +59,17 @@ const AddEstimates = ({ onClose }) => {
         dispatch(getallcurrencies());
     }, [dispatch]);
 
- 
+ const initialValues = {
+                valid_till:"",
+                currency:"",
+                calculatedTax:"",
+                client: fnddata?.client || "",
+                project: fnddata?.id || "",
+                discount:"",
+                tax:"",
+                total:"",
+            };
+
 
 
     const handleFinish = async (values) => {
@@ -59,6 +82,9 @@ const AddEstimates = ({ onClose }) => {
             const discount = (subTotal * discountRate) / 100;
             const totalAmount = subTotal - discount + totalTax;
     
+            
+
+
             const estimateData = {
                 valid_till: values.valid_till.format('YYYY-MM-DD'), // Ensure date format
                 currency: values.currency,
@@ -215,34 +241,46 @@ const AddEstimates = ({ onClose }) => {
                         form={form}
                         layout="vertical"
                         onFinish={handleFinish}
-                        initialValues={{
-                            loginEnabled: true,
-                        }}
+                        initialValues={initialValues}
+
                     >
                         {/* <Card className="border-0 mt-2"> */}
                         <div className="">
                             <div className=" p-2">
 
                                 <Row gutter={16}>
-                                <Col span={12}>
-                                        <Form.Item
-                                            name="client"
-                                            label="Client Name"
-                                            rules={[{ required: true, message: "Please enter the client name" }]}
-                                        >
-                                            <Input placeholder="Enter client name" />
-                                        </Form.Item>
-                                    </Col>
-
-                                    <Col span={12}>
-                                        <Form.Item
-                                            name="project"
-                                            label="Project"
-                                            rules={[{ required: true, message: "Please enter the project name" }]}
-                                        >
-                                            <Input placeholder="Enter project name" />
-                                        </Form.Item>
-                                    </Col>
+                               <Col span={12}>
+                                   <Form.Item
+                                       name="clientName"
+                                       label="Client Name"
+                                       initialValue={subClientData?.username}
+                                       rules={[{ required: true, message: "Please enter the client name" }]}
+                                   >
+                                       <Input placeholder="Enter client name" disabled />
+                                   </Form.Item>
+                                   {/* Hidden field to pass the client ID */}
+                                   <Form.Item name="client" initialValue={fnddata?.client} hidden>
+                                       <Input type="hidden" />
+                                   </Form.Item>
+                               </Col>
+                               
+                                                                       
+                               <Col span={12}>
+                                   {/* Display the project name */}
+                                   <Form.Item
+                                       name="projectName"
+                                       label="Project Name"
+                                       initialValue={fnddata?.project_name}
+                                       rules={[{ required: true, message: "Please enter the project name" }]}
+                                   >
+                                       <Input placeholder="Enter project name" disabled />
+                                   </Form.Item>
+                                   
+                                   {/* Hidden field to pass the project ID */}
+                                   <Form.Item name="project" initialValue={fnddata?.id} hidden>
+                                       <Input type="hidden" />
+                                   </Form.Item>
+                               </Col>
 
                                     <Col span={12}>
                                         <Form.Item

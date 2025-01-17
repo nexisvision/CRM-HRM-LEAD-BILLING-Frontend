@@ -19,6 +19,8 @@ const { Option } = Select;
 
 const AddInvoice = () => {
     const [users, setUsers] = useState(userData);
+        const [selectedProduct, setSelectedProduct] = useState(null);
+    
     // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     // const [list, setList] = useState(OrderListData);
 
@@ -53,6 +55,21 @@ const AddInvoice = () => {
                 isNew: true,
             },
         ]);
+    };
+
+
+    const handleProductChange = (value) => {
+        setSelectedProduct(value);
+
+        setRows([{  // Reset table data
+            id: Date.now(),
+            item: "",
+            quantity: 1,
+            price: "",
+            tax: 0,
+            amount: "0",
+            description: "",
+        }]);
     };
 
     // Function to handle deleting a row
@@ -213,11 +230,32 @@ const AddInvoice = () => {
 
                     <Col span={24}>
                         <h4 className='ms-4 font-semibold text-lg mb-3'>Product & Services</h4>
+
+                        
                     </Col>
 
                     <Card>
                         <div>
                             <div className="overflow-x-auto">
+                            <Flex className="flex " mobileFlex={false}>
+                                       
+                                            <div>
+                                                <Select
+                                                    value={selectedProduct}
+                                                    onChange={handleProductChange}
+                                                    className="w-full !rounded-none"
+                                                    placeholder="Select Product"
+                                                    rootClassName="!rounded-none"
+                                                >
+                                                    <Option value="smart_speakers">Smart Speakers</Option>
+                                                    <Option value="electric_kettle">Electric Kettle</Option>
+                                                    <Option value="headphones">Headphones</Option>
+                                                </Select>
+                                            </div>
+
+                                       
+
+                                    </Flex>
                                 <div className="form-buttons text-right mb-2">
                                     <Button type="primary" onClick={handleAddRow}>
                                         <PlusOutlined />  Add Items

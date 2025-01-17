@@ -207,7 +207,7 @@ const BoardWrapper = ({
         <div className="scrumboard" ref={provided.innerRef} {...provided.droppableProps}>
           <div className="scrumboard-header">
             <div>
-              <h3>Backlog</h3>
+              {/* <h3>Backlog</h3> */}
             </div>
             <div className="text-right">
               <div className="d-flex align-items-center">

@@ -97,7 +97,7 @@ const EditMilestone = ({ idd, onClose }) => {
   return (
     <div>
       <div className="ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4">
-        <h2 className="border-b pb-[30px] font-medium">Edit Milestone</h2>
+        {/* <h2 className="border-b pb-[30px] font-medium">Edit Milestone</h2> */}
         <div className="p-2">
           <Formik
             initialValues={initialValues}

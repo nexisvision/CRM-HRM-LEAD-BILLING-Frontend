@@ -7,9 +7,9 @@ import { navigate } from "react-big-calendar/lib/utils/constants";
 
 export const AddLable = createAsyncThunk(
   "users/AddLable",
-  async ({ lid, payload }, thunkAPI) => {
+  async ({ id, payload }, thunkAPI) => {
     try {
-      const response = await UserService.AddLable(lid, payload);
+      const response = await UserService.AddLable(id, payload);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -21,9 +21,9 @@ export const AddLable = createAsyncThunk(
 
 export const GetLable = createAsyncThunk(
   "emp/GetLable",
-  async (lid, thunkAPI) => {
+  async (id, thunkAPI) => {
     try {
-      const response = await UserService.GetLable(lid);
+      const response = await UserService.GetLable(id);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);

@@ -1,9 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./PiplineService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 
-// Async thunk for adding user
 
 export const AddPip = createAsyncThunk(
   "users/addpip",
@@ -83,15 +81,7 @@ export const Editpipl = createAsyncThunk(
   }
 );
 
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
 
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const RoleAndPermissionSlice = createSlice({
   name: "Piplines",

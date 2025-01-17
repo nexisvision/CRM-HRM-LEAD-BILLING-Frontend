@@ -52,6 +52,8 @@ const UserList = () => {
 
   const allroledata = useSelector((state) => state.role);
   const fnddata = allroledata.role.data;
+    const loggedInUser = useSelector((state) => state.user.loggedInUser);
+  
 
   useEffect(() => {
     dispatch(GetUsers());

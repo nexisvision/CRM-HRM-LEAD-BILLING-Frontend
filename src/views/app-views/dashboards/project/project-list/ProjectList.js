@@ -30,6 +30,9 @@ const ProjectList = () => {
 	  const AllProject = useSelector((state) => state.Project);
 	  const properdata = AllProject.Project.data;
 
+	  const loggedInUser = useSelector((state) => state.user.loggedInUser);
+	  const username = loggedInUser ? loggedInUser.username : "";
+
 	  const {state} = useLocation();
  
 	  useEffect(()=>{
@@ -63,42 +66,29 @@ const ProjectList = () => {
 	  }, [dispatch]);
 
 	  useEffect(() => {
-		  if (matchingClients?.length > 0) {
-			const formattedData1 = matchingClients?.map(item => {
-			  const currentDate = new Date();
-			  const endDate = new Date(item?.endDate);
-			  const startDate = new Date(item?.startDate);
+		let filteredProjects = [];
+
+		if (matchingClients?.length > 0) {
+		  // Filter the matching clients first
+		  filteredProjects = matchingClients?.filter(
+			(item) => item.created_by === username
+		  );
+		} else {
+		  // Filter the entire project list based on `created_by`
+		  filteredProjects = properdata?.filter(
+			(item) => item.created_by === username
+		  );
+		}
+		const formattedData = filteredProjects?.map((item) => {
+			const currentDate = new Date();
+			const endDate = new Date(item.endDate);
+			const startDate = new Date(item.startDate);
 	  
-			  const totalDays = Math?.ceil((endDate - startDate) / (1000 * 3600 * 24));
-			  const completedDays = Math?.ceil((currentDate - startDate) / (1000 * 3600 * 24));
-			  const adjustedCompletedDays = Math?.min(Math?.max(0, completedDays), totalDays);
+			const totalDays = Math.ceil((endDate - startDate) / (1000 * 3600 * 24));
+			const completedDays = Math.ceil((currentDate - startDate) / (1000 * 3600 * 24));
+			const adjustedCompletedDays = Math.min(Math.max(0, completedDays), totalDays);
 	  
-			  return {
-				id: item.id,
-				name: item.project_name || item.name,
-				category: item?.category || item.category,
-				attachmentCount: item?.attachmentCount,
-				totalTask: item?.budget || item.budget,
-				completedTask: `${adjustedCompletedDays}/${totalDays}`,
-				progression: item?.startDate || item.progression,
-				dayleft: Math.max(0, Math.ceil((endDate - currentDate) / (1000 * 3600 * 24))),
-				statusColor: item?.status || item.statusColor,
-				member: item?.member,
-				tag: item?.tag || item.tag_name || item.tag,
-			  };
-			});
-			setList(formattedData1);
-		  } else {
-			const formattedData = properdata?.map(item => {
-			  const currentDate = new Date();
-			  const endDate = new Date(item.endDate);
-			  const startDate = new Date(item.startDate);
-	  
-			  const totalDays = Math.ceil((endDate - startDate) / (1000 * 3600 * 24));
-			  const completedDays = Math.ceil((currentDate - startDate) / (1000 * 3600 * 24));
-			  const adjustedCompletedDays = Math.min(Math.max(0, completedDays), totalDays);
-	  
-			  return {
+			return {
 				id: item.id,
 				name: item.project_name || item.name,
 				category: item?.category || item.category,
@@ -113,8 +103,7 @@ const ProjectList = () => {
 			  };
 			});
 			setList(formattedData);
-		  }
-	  }, [clientid, properdata]); 
+		}, [clientid, properdata, username, matchingClients]);
 
 
 	  

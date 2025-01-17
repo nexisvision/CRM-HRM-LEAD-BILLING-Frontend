@@ -1,54 +1,36 @@
 import React, { useState } from "react";
 import {
-  Card,
-  Table,
-  Menu,
+ 
   Row,
   Col,
-  Tag,
+ 
   Input,
   message,
   Button,
-  Modal,
+
   Select,
-  DatePicker,
+ 
 } from "antd";
-import {
-  EyeOutlined,
-  DeleteOutlined,
-  SearchOutlined,
-  MailOutlined,
-  PlusOutlined,
-  PushpinOutlined,
-  FileExcelOutlined,
-  CopyOutlined,
-  EditOutlined,
-  LinkOutlined,
-} from "@ant-design/icons";
+
 import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
-import ReactQuill from "react-quill";
-import OrderListData from "assets/data/order-list.data.json";
-import Flex from "components/shared-components/Flex";
-import utils from "utils";
-import AvatarStatus from "components/shared-components/AvatarStatus";
+
 import userData from "assets/data/user-list.data.json";
-import dayjs from "dayjs";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import {
-  AddLable,
-  GetLable,
+  AddLablee,
+  GetLablee,
 } from "../../project/milestone/LableReducer/LableSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-const { Option } = Select;
+
 
 const AddContractType = ({ onClose }) => {
-  const [users, setUsers] = useState(userData);
+  // const [users, setUsers] = useState(userData);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const allloggeddata = useSelector((state) => state.user);
@@ -60,12 +42,12 @@ const AddContractType = ({ onClose }) => {
     // Add static labelType to payload
     const payload = {
       ...values,
-      labelType: "source",
+      labelType: "contract",
     };
 
-    dispatch(AddLable({ lid, payload }));
-    dispatch(GetLable(lid));
-    dispatch(GetLable(lid));
+    dispatch(AddLablee({ lid, payload }));
+    dispatch(GetLablee(lid));
+    dispatch(GetLablee(lid));
     onClose();
     resetForm();
     console.log("Submitted values:", payload);
@@ -94,11 +76,9 @@ const AddContractType = ({ onClose }) => {
                 onSubmit={onSubmit}
               >
                 {({
-                  values,
-                  setFieldValue,
+                
                   handleSubmit,
-                  setFieldTouched,
-                  resetForm,
+                 
                 }) => (
                   <Form className="formik-form" onSubmit={handleSubmit}>
                     <Row gutter={16}>

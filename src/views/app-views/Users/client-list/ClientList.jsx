@@ -63,9 +63,13 @@ const ClientList = () => {
 
   const tabledata = useSelector((state) => state.ClientData);
 
+  const loggedInUser = useSelector((state) => state.user.loggedInUser);
+
   const [idd, setIdd] = useState("");
 
   const dispatch = useDispatch();
+
+
 
   const deleteUser = (userId) => {
     dispatch(deleteClient(userId));
@@ -91,11 +95,22 @@ const ClientList = () => {
     dispatch(ClientData());
   }, [dispatch]);
 
+
+
   useEffect(() => {
     if (tabledata && tabledata.ClientData && tabledata.ClientData.data) {
-      setUsers(tabledata.ClientData.data);
+      const filteredUsers = tabledata.ClientData.data.filter(
+        (client) => client.created_by === loggedInUser?.username
+      );
+      setUsers(filteredUsers);
     }
-  }, [tabledata]);
+  }, [tabledata, loggedInUser]);
+
+  // useEffect(() => {
+  //   if (tabledata && tabledata.ClientData && tabledata.ClientData.data) {
+  //     setUsers(tabledata.ClientData.data);
+  //   }
+  // }, [tabledata]); 
 
   const companyStatusList = ["active", "blocked"];
 
@@ -167,7 +182,7 @@ const ClientList = () => {
   };
 
   const ClickFun = (idd) => {
-    console.log("dsfvysdvf", idd);
+    // console.log("dsfvysdvf", idd);
     setIdd(idd);
     // navigate("/app/dashboards/project/list");
 
@@ -369,7 +384,7 @@ const ClientList = () => {
         />
       )}
       <Modal
-        title="Create Company"
+        title="Create Client"
         visible={isAddCompanyModalVisible}
         onCancel={closeAddCompanyModal}
         footer={null}
@@ -379,7 +394,7 @@ const ClientList = () => {
         <AddClient onClose={closeAddCompanyModal} />
       </Modal>
       <Modal
-        title="Edit Company"
+        title="Edit Client"
         visible={isEditCompanyModalVisible}
         onCancel={closeEditCompanyModal}
         footer={null}
@@ -388,7 +403,7 @@ const ClientList = () => {
         <EditClient onClose={closeEditCompanyModal} comnyid={comnyid} />
       </Modal>
       <Modal
-        title="Company Details"
+        title="Client Details"
         visible={isViewCompanyModalVisible}
         onCancel={closeViewCompanyModal}
         footer={null}

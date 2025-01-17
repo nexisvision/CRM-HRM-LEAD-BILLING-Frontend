@@ -21,6 +21,13 @@ const ProjectMember = () => {
 
   const { id } = useParams();
 
+
+  const allproject = useSelector((state) => state.Project);
+  const fndrewduxxdaa = allproject.Project.data
+  const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
+  
+
+
   const DeletePro2 = async (payload) => {
     const token = localStorage.getItem("auth_token");
 
@@ -50,7 +57,9 @@ const ProjectMember = () => {
 
   const project = projectData[0]; // Accessing the first project as an example
 
-  const userField = project?.project_members; // The 'user' field in the project
+console.log("sdfsdfsdf",project);
+
+  const userField = fnddata?.project_members; // The 'user' field in the project
   let userArray = [];
   console.log("popopop", userField);
 
@@ -76,9 +85,9 @@ const ProjectMember = () => {
   const tableColumns = [
     {
       title: "Name",
-      dataIndex: "firstName",
-      key: "firstName",
-      render: (text, record) => <span>{record?.firstName || "N/A"}</span>,
+      dataIndex: "username",
+      key: "username",
+      render: (text, record) => <span>{record?.username || "N/A"}</span>,
     },
     {
       title: "Email",

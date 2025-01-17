@@ -17,7 +17,7 @@ import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AddPay, Getpay } from "./PaymentReducer/paymentSlice";
 const { Option } = Select;
 const AddPayment = ({ onClose }) => {
@@ -26,9 +26,16 @@ const AddPayment = ({ onClose }) => {
 
   const dispatch = useDispatch();
   const { id } = useParams();
+
+
+    const allproject = useSelector((state) => state.Project);
+    const fndrewduxxdaa = allproject.Project.data
+    const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
+    
+
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const initialValues = {
-    project: "",
+    project: fnddata?.id || "",
     invoice: "",
     paidOn: "",
     amount: "",
@@ -84,11 +91,10 @@ const AddPayment = ({ onClose }) => {
                     name="project"
                     as={Input}
                     placeholder="Enter Project"
-                  />
-                  <ErrorMessage
-                    name="project"
-                    component="div"
-                    className="error-message text-red-500 my-1"
+                    className="mt-2"
+                    initialValue={fnddata?.project_name}
+                    value={fnddata?.project_name}
+                    disabled
                   />
                 </div>
               </Col>

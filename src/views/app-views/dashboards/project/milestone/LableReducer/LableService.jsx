@@ -7,7 +7,7 @@ import axios from "axios";
 //     return res
 // };
 
-const GetLable = async (id, lid) => {
+const GetLable = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.get(`http://localhost:5353/api/v1/labels/${id}`, {
@@ -22,7 +22,47 @@ const GetLable = async (id, lid) => {
   }
 };
 
-const AddLable = async (lid, payload) => {
+const AddLable = async (id, payload) => {
+  const token = localStorage.getItem("auth_token");
+
+  try {
+    const res = await axios.post(
+      `http://localhost:5353/api/v1/labels/${id}`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    //    dispatch(empdata());
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+
+
+
+
+const GetLablee = async (lid) => {
+  const token = localStorage.getItem("auth_token");
+  try {
+    const res = await axios.get(`http://localhost:5353/api/v1/labels/${lid}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+const AddLablee = async (lid, payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
@@ -41,7 +81,6 @@ const AddLable = async (lid, payload) => {
     throw error;
   }
 };
-
 const Deletelable = async (userId) => {
   const token = localStorage.getItem("auth_token");
 
@@ -107,6 +146,8 @@ const UserService = {
   AddLable,
   Deletelable,
   EditMin,
+  AddLablee,
+  GetLablee,
   // getAllUsers,
   // getUserById,
   // deleteUser,

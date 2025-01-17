@@ -5,7 +5,7 @@ const EstimateService = {
   getAllEstimate: async (id) => {
     const token = localStorage.getItem('auth_token');
     try {
-      const response = await axios.get(`http://localhost:5353/api/v1/estimates/${id}`, {
+      const response = await axios.get(`http://localhost:5353/api/v1/quotations/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -22,7 +22,7 @@ const EstimateService = {
     const token = localStorage.getItem('auth_token');
     try {
       const response = await axios.post(
-        `http://localhost:5353/api/v1/estimates/${id}`,
+        `http://localhost:5353/api/v1/quotations/${id}`,
         estimateData,
         {
           headers: {
@@ -42,7 +42,7 @@ const EstimateService = {
     const token = localStorage.getItem("auth_token");
     try {
       const response = await axios.get(
-        `http://localhost:5353/api/v1/estimates/${id}`,
+        `http://localhost:5353/api/v1/quotations/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -60,7 +60,7 @@ const EstimateService = {
     const token = localStorage.getItem('auth_token');
     try {
       const response = await axios.put(
-        `http://localhost:5353/api/v1/estimates/${idd}`,
+        `http://localhost:5353/api/v1/quotations/${idd}`,
         data,
         {
           headers: {
@@ -81,7 +81,7 @@ const EstimateService = {
   const token = localStorage.getItem("auth_token");
   try {
     const response = await axios.delete(
-      `http://localhost:5353/api/v1/estimates/${id}`,
+      `http://localhost:5353/api/v1/quotations/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

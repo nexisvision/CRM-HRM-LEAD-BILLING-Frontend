@@ -1,3 +1,104 @@
+import axios from "axios";
+const getAllQuotations = async (id) => {
+  const token = localStorage.getItem("auth_token");
+  try {
+    const res = await axios.get(`http://localhost:5353/api/v1/sales-quotations/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+const createQuotations = async (values) => {
+  const token = localStorage.getItem("auth_token");
+  try {
+    const res = await axios.post(
+      "http://localhost:5353/api/v1/sales-quotations/",
+      values,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error creating quotation:", error);
+    throw error;
+  }
+};
+const deleteQuotations = async (id) => {
+  const token = localStorage.getItem("auth_token");
+  try {
+    const res = await axios.delete(
+      `http://localhost:5353/api/v1/sales-quotations/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    //   dispatch(empdata());
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+const getQuotationsById = async (id) => {
+  const token = localStorage.getItem("auth_token");
+  try {
+    const response = await axios.get(
+      `http://localhost:5353/api/v1/sales-quotations/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("response.data",response.data);
+    return response.data;
+    
+  } catch (error) {
+    throw error;
+  }
+};
+const updateQuotations = async (id, values) => {
+  const token = localStorage.getItem("auth_token");
+  try {
+    const res = await axios.put(
+      `http://localhost:5353/api/v1/sales-quotations/${id}`,values,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("res.data",res.data);
+    console.log("updateQuoid",id);
+    
+    return res.data;
+  } catch (error) {
+    console.error("Error updating Quotations :", error);
+    throw error;
+  }
+};
+const QuotationsService = {
+  // addUser,
+  getAllQuotations,
+  createQuotations,
+  deleteQuotations,
+  updateQuotations,
+  getQuotationsById
+};
+export default QuotationsService;
+
+
+
 // import axios from 'axios';
 // // import { API_BASE_URL } from 'configs/AppConfig';
 
@@ -125,122 +226,122 @@
 
 
 
-import axios from "axios";
-// const baseUrl = import.meta.env.VITE_BASE_URL;
-// import { getToken } from "../../../configs/axiosConfig"
+// import axios from "axios";
+// // const baseUrl = import.meta.env.VITE_BASE_URL;
+// // import { getToken } from "../../../configs/axiosConfig"
 
-// const addUser = async (data) => {
-//     const res = await axios.post(`${baseUrl}users/add`, data, getToken());
-//     return res
+// // const addUser = async (data) => {
+// //     const res = await axios.post(`${baseUrl}users/add`, data, getToken());
+// //     return res
+// // };
+
+// const getAllEstimate = async (id) => {
+//   const token = localStorage.getItem("auth_token");
+//   try {
+//     const res = await axios.get(`http://localhost:5353/api/v1/estimates/${id}`, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+//     return res.data;
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     throw error;
+//   }
 // };
 
-const getAllEstimate = async (id) => {
-  const token = localStorage.getItem("auth_token");
-  try {
-    const res = await axios.get(`http://localhost:5353/api/v1/estimates/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;
-  }
-};
+// const createEstimate = async (id, values) => {
+//   const token = localStorage.getItem("auth_token");
 
-const createEstimate = async (id, values) => {
-  const token = localStorage.getItem("auth_token");
+//   console.log("wewwew", values);
 
-  console.log("wewwew", values);
+//   try {
+//     const res = await axios.post(
+//       `http://localhost:5353/api/v1/estimates/${id}`,
+//       values,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
+//     //    dispatch(empdata());
+//     return res.data;
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     throw error;
+//   }
+// };
 
-  try {
-    const res = await axios.post(
-      `http://localhost:5353/api/v1/estimates/${id}`,
-      values,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    //    dispatch(empdata());
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;
-  }
-};
+// const deleteEstimate = async (exid) => {
+//   const token = localStorage.getItem("auth_token");
 
-const deleteEstimate = async (exid) => {
-  const token = localStorage.getItem("auth_token");
+//   try {
+//     const res = await axios.delete(
+//       `http://localhost:5353/api/v1/estimates/${exid}`,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
+//     //   dispatch(empdata());
+//     return res.data;
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     throw error;
+//   }
+// };
 
-  try {
-    const res = await axios.delete(
-      `http://localhost:5353/api/v1/estimates/${exid}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    //   dispatch(empdata());
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;
-  }
-};
+// const updateEstimate = async (id, values) => {
+//   const token = localStorage.getItem("auth_token");
+//   try {
+//     const res = await axios.put(
+//       `http://localhost:5353/api/v1/estimates/${id}`,
+//       values,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
+//     return res.data;
+//   } catch (error) {
+//     console.error("Error updating employee data:", error);
+//     throw error;
+//   }
+// };
 
-const updateEstimate = async (id, values) => {
-  const token = localStorage.getItem("auth_token");
-  try {
-    const res = await axios.put(
-      `http://localhost:5353/api/v1/estimates/${id}`,
-      values,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return res.data;
-  } catch (error) {
-    console.error("Error updating employee data:", error);
-    throw error;
-  }
-};
+// // const getAllUsers = async () => {
+// //     const res = await axios.get(`${baseUrl}users/all`, getToken());
+// //     return res.data
+// // }
 
-// const getAllUsers = async () => {
-//     const res = await axios.get(`${baseUrl}users/all`, getToken());
-//     return res.data
-// }
+// // const getUserById = async (data) => {
+// //     const res = await axios.get(`${baseUrl}users/${data}`, getToken());
+// //     return res.data
+// // }
 
-// const getUserById = async (data) => {
-//     const res = await axios.get(`${baseUrl}users/${data}`, getToken());
-//     return res.data
-// }
+// // const deleteUser = async (data) => {
+// //     const res = await axios.delete(`${baseUrl}users/${data}`, getToken());
+// //     return res.data
+// // }
 
-// const deleteUser = async (data) => {
-//     const res = await axios.delete(`${baseUrl}users/${data}`, getToken());
-//     return res.data
-// }
+// // const updateUser = async (data) => {
+// //     const res = await axios.put(`${baseUrl}users/${data?.id}`, data?.data, getToken());
+// //     return res.data
+// // }
 
-// const updateUser = async (data) => {
-//     const res = await axios.put(`${baseUrl}users/${data?.id}`, data?.data, getToken());
-//     return res.data
-// }
+// const UserService = {
+//   // addUser,
+//   getAllEstimate,
+//   createEstimate,
+//   deleteEstimate,
+//   updateEstimate,
+//   // getAllUsers,
+//   // getUserById,
+//   // deleteUser,
+//   // updateUser
+// };
 
-const UserService = {
-  // addUser,
-  getAllEstimate,
-  createEstimate,
-  deleteEstimate,
-  updateEstimate,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
-};
-
-export default UserService;
+// export default UserService;

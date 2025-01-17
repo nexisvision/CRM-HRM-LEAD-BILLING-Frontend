@@ -211,20 +211,20 @@ export const InvoiceList = () => {
 
   const tableColumns = [
     {
-      title: "Invoice ID",
-      dataIndex: "id",
-      sorter: (a, b) => a.id.localeCompare(b.id),
+      title: "Invoice Number",
+      dataIndex: "invoiceNumber",
+      sorter: (a, b) => a.invoiceNumber.localeCompare(b.invoiceNumber),
     },
-    {
-      title: "Project",
-      dataIndex: "project",
-      sorter: (a, b) => a.project.localeCompare(b.project),
-    },
-    {
-      title: "Client",
-      dataIndex: "client",
-      sorter: (a, b) => a.client.localeCompare(b.client),
-    },
+      // {
+      //   title: "Project",
+      //   dataIndex: "project",
+      //   sorter: (a, b) => a.project.localeCompare(b.project),
+      // },
+      // {
+      //   title: "Client",
+      //   dataIndex: "client",
+      //   sorter: (a, b) => a.client.localeCompare(b.client),
+      // },
     {
       title: "Issue Date",
       dataIndex: "issueDate",
@@ -240,7 +240,7 @@ export const InvoiceList = () => {
     {
       title: "Total",
       dataIndex: "total",
-      render: (total) => `$${total.toFixed(2)}`,
+      // render: (total) => `$${total.toFixed(2)}`,
       sorter: (a, b) => a.total - b.total,
     },
     {
