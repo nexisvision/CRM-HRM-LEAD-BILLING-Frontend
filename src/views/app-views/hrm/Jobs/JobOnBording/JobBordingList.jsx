@@ -1,31 +1,71 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal,Select } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, FilePdfOutlined, FileExcelOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
-import UserView from '../../../Users/user-list/UserView';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import StatisticWidget from 'components/shared-components/StatisticWidget';
-import { AnnualStatisticData } from '../../../dashboards/default/DefaultDashboardData';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import AddJobOnBording from './AddJobOnBording';
-import userData from 'assets/data/user-list.data.json';
-import OrderListData from 'assets/data/order-list.data.json';
-import utils from 'utils';
-import EditJobOnBording from './EditJobOnBording';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Row,
+  Col,
+  Tag,
+  Input,
+  message,
+  Button,
+  Modal,
+  Select,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  EditOutlined,
+  PlusOutlined,
+  FilePdfOutlined,
+  FileExcelOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+import UserView from "../../../Users/user-list/UserView";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import StatisticWidget from "components/shared-components/StatisticWidget";
+import { AnnualStatisticData } from "../../../dashboards/default/DefaultDashboardData";
+import AvatarStatus from "components/shared-components/AvatarStatus";
+import AddJobOnBording from "./AddJobOnBording";
+import userData from "assets/data/user-list.data.json";
+import OrderListData from "assets/data/order-list.data.json";
+import utils from "utils";
+import EditJobOnBording from "./EditJobOnBording";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteJobonBoarding,
+  getJobonBoarding,
+} from "./JobOnBoardingReducer/jobonboardingSlice";
 
-const {Option} = Select;
+const { Option } = Select;
 const JobOnBordingList = () => {
   const [users, setUsers] = useState(userData);
+  const dispatch = useDispatch();
   const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isAddJobOnBordingModalVisible, setIsAddJobOnBordingModalVisible] = useState(false);
-  const [isEditJobOnBordingModalVisible, setIsEditJobOnBordingModalVisible] = useState(false);
+  const [isAddJobOnBordingModalVisible, setIsAddJobOnBordingModalVisible] =
+    useState(false);
+  const [isEditJobOnBordingModalVisible, setIsEditJobOnBordingModalVisible] =
+    useState(false);
   const navigate = useNavigate();
 
+  const alldata = useSelector((state) => state.jobonboarding);
+  const fnddata = alldata.jobonboarding.data;
+
+  useEffect(() => {
+    dispatch(getJobonBoarding());
+  }, []);
+
+  useEffect(() => {
+    if (fnddata) {
+      setUsers(fnddata);
+    }
+  }, [fnddata]);
 
   const [annualStatisticData] = useState(AnnualStatisticData);
 
@@ -58,14 +98,18 @@ const JobOnBordingList = () => {
 
   // Delete user
   const deleteUser = (userId) => {
-    setUsers(users.filter((item) => item.id !== userId));
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    dispatch(deleteJobonBoarding(userId)).then(() => {
+      dispatch(getJobonBoarding());
+      setUsers(users.filter((item) => item.id !== userId));
+      message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    });
   };
 
-
   const openViewJobOnBordingModal = () => {
-    navigate('/app/hrm/jobs/viewjobonbording', { state: { user: selectedUser } }); // Pass user data as state if needed
-  }
+    navigate("/app/hrm/jobs/viewjobonbording", {
+      state: { user: selectedUser },
+    }); // Pass user data as state if needed
+  };
 
   // Show user profile
   const showUserProfile = (userInfo) => {
@@ -79,27 +123,27 @@ const JobOnBordingList = () => {
     setUserProfileVisible(false);
   };
 
-  const getjobStatus = status => {
-    if (status === 'active') {
-      return 'blue'
+  const getjobStatus = (status) => {
+    if (status === "active") {
+      return "blue";
     }
-    if (status === 'blocked') {
-      return 'cyan'
+    if (status === "blocked") {
+      return "cyan";
     }
-    return ''
-  }
-  
-  const handleShowStatus = value => {
-		if (value !== 'All') {
-			const key = 'status'
-			const data = utils.filterArray(userData, key, value)
-			setUsers(data)
-		} else {
-			setUsers(userData)
-		}
-	}
-  
-  const jobStatusList = ['active', 'blocked']
+    return "";
+  };
+
+  const handleShowStatus = (value) => {
+    if (value !== "All") {
+      const key = "status";
+      const data = utils.filterArray(userData, key, value);
+      setUsers(data);
+    } else {
+      setUsers(userData);
+    }
+  };
+
+  const jobStatusList = ["active", "blocked"];
 
   const dropdownMenu = (elm) => (
     <Menu>
@@ -160,50 +204,57 @@ const JobOnBordingList = () => {
 
   const tableColumns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
+      title: "Name",
+      dataIndex: "Interviewer",
       sorter: {
         compare: (a, b) => a.branch.length - b.branch.length,
       },
     },
     {
-      title: 'Job',
-      dataIndex: 'job',
+      title: "Job",
+      dataIndex: "JobType",
       sorter: {
         compare: (a, b) => a.job.length - b.job.length,
       },
     },
-    
-    {
-        title: 'Branch',
-        dataIndex: 'branch',
-        sorter: {
-          compare: (a, b) => a.branch.length - b.branch.length,
-        },
-      },
 
     {
-      title: 'Applied At',
-      dataIndex: 'createdat',
+      title: "Salary",
+      dataIndex: "Salary",
+      sorter: {
+        compare: (a, b) => a.branch.length - b.branch.length,
+      },
+    },
+
+    {
+      title: "JoiningDate",
+      dataIndex: "JoiningDate",
       sorter: (a, b) => dayjs(a.createdat).unix() - dayjs(b.createdat).unix(),
     },
-    
+
     {
-        title: 'Joinnig At',
-        dataIndex: 'createdat',
-        sorter: (a, b) => dayjs(a.createdat).unix() - dayjs(b.createdat).unix(),
-      },
-      {
-        title: 'Status',
-        dataIndex: 'status',
-        render: (_, record) => (
-          <><Tag color={getjobStatus(record.status)}>{record.status}</Tag></>
-        ),
-        sorter: (a, b) => utils.antdTableSorter(a, b, 'status')
-      },
+      title: "SalaryType",
+      dataIndex: "SalaryType",
+      sorter: (a, b) => dayjs(a.createdat).unix() - dayjs(b.createdat).unix(),
+    },
     {
-      title: 'Action',
-      dataIndex: 'actions',
+      title: "SalaryDuration",
+      dataIndex: "SalaryDuration",
+      sorter: (a, b) => dayjs(a.createdat).unix() - dayjs(b.createdat).unix(),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (_, record) => (
+        <>
+          <Tag color={getjobStatus(record.Status)}>{record.Status}</Tag>
+        </>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
+    },
+    {
+      title: "Action",
+      dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
           <EllipsisDropdown menu={dropdownMenu(elm)} />
@@ -213,7 +264,7 @@ const JobOnBordingList = () => {
   ];
 
   return (
-    <Card bodyStyle={{ padding: '-3px' }}>
+    <Card bodyStyle={{ padding: "-3px" }}>
       {/* <Row gutter={16}>
         {annualStatisticData.map((elm, i) => (
           <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
@@ -226,26 +277,42 @@ const JobOnBordingList = () => {
           </Col>
         ))}
       </Row> */}
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+      >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={(e) => onSearch(e)} />
+            <Input
+              placeholder="Search"
+              prefix={<SearchOutlined />}
+              onChange={(e) => onSearch(e)}
+            />
           </div>
           <div className="w-full md:w-48 ">
-                        <Select
-                          defaultValue="All"
-                          className="w-100"
-                          style={{ minWidth: 180 }}
-                          onChange={handleShowStatus}
-                          placeholder="Status"
-                        >
-                          <Option value="All">All Job </Option>
-                          {jobStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
-                        </Select>
-                      </div>
+            <Select
+              defaultValue="All"
+              className="w-100"
+              style={{ minWidth: 180 }}
+              onChange={handleShowStatus}
+              placeholder="Status"
+            >
+              <Option value="All">All Job </Option>
+              {jobStatusList.map((elm) => (
+                <Option key={elm} value={elm}>
+                  {elm}
+                </Option>
+              ))}
+            </Select>
+          </div>
         </Flex>
         <Flex gap="7px">
-          <Button type="primary" className="ml-2" onClick={openAddJobOnBordingModal}>
+          <Button
+            type="primary"
+            className="ml-2"
+            onClick={openAddJobOnBordingModal}
+          >
             <PlusOutlined />
             <span>New</span>
           </Button>
@@ -262,7 +329,11 @@ const JobOnBordingList = () => {
           scroll={{ x: 1200 }}
         />
       </div>
-      <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+      <UserView
+        data={selectedUser}
+        visible={userProfileVisible}
+        close={closeUserProfile}
+      />
 
       {/* Add Job Modal */}
       <Modal
@@ -288,4 +359,3 @@ const JobOnBordingList = () => {
 };
 
 export default JobOnBordingList;
-

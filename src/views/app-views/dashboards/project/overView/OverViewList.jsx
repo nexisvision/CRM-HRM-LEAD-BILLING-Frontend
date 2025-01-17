@@ -97,7 +97,7 @@ const OverViewList = () => {
     datasets: [
       {
         label: "Task Distribution",
-        data: [25, 30, 20, 25], // Percentages
+        data: [25, 30, 20, 25],
         backgroundColor: ["#FF5722", "#FFC107", "#4CAF50", "#03A9F4"],
         borderWidth: 1,
       },

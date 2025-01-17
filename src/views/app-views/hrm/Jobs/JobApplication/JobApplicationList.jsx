@@ -1,27 +1,74 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Tag, Input, message, Button, Modal,Select } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
-import UserView from '../../../Users/user-list/UserView';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import AddJobApplication from './AddJobApplication';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Tag,
+  Input,
+  message,
+  Button,
+  Modal,
+  Select,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  MailOutlined,
+  PlusOutlined,
+  PushpinOutlined,
+  FileExcelOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+import UserView from "../../../Users/user-list/UserView";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import AvatarStatus from "components/shared-components/AvatarStatus";
+import AddJobApplication from "./AddJobApplication";
+import EditJobApplication from "./EditJobApplication";
 import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
-import utils from 'utils';
+import utils from "utils";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deletejobapplication,
+  getjobapplication,
+} from "./JobapplicationReducer/JobapplicationSlice";
 // import ViewJobApplication from './ViewJobApplication';
 
-const { Option } = Select
+const { Option } = Select;
 
 const JobApplicationList = () => {
+  const dispatch = useDispatch();
   const [users, setUsers] = useState(userData);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   // const [viewApplicationVisible, setViewApplicationVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [isAddJobApplicationModalVisible, setIsAddJobApplicationModalVisible] = useState(false);
+  const [isAddJobApplicationModalVisible, setIsAddJobApplicationModalVisible] =
+    useState(false);
+
+  const [idd, setIdd] = useState("");
+
+  const [
+    isAddJobAEditlicationModalVisible,
+    setIsEditJobApplicationModalVisible,
+  ] = useState(false);
+
+  const alldata = useSelector((state) => state.jobapplications);
+  const fnddta = alldata.jobapplications.data;
+
+  useEffect(() => {
+    dispatch(getjobapplication());
+  }, []);
+
+  useEffect(() => {
+    if (fnddta) {
+      setUsers(fnddta);
+    }
+  }, [fnddta]);
 
   const openAddJobApplicationModal = () => {
     setIsAddJobApplicationModalVisible(true);
@@ -29,6 +76,14 @@ const JobApplicationList = () => {
 
   const closeAddJobApplicationModal = () => {
     setIsAddJobApplicationModalVisible(false);
+  };
+
+  const openEditJobApplicationModal = () => {
+    setIsEditJobApplicationModalVisible(true);
+  };
+
+  const closeEditJobApplicationModal = () => {
+    setIsEditJobApplicationModalVisible(false);
   };
 
   const onSearch = (e) => {
@@ -40,9 +95,12 @@ const JobApplicationList = () => {
   };
 
   const deleteUser = (userId) => {
-    const updatedUsers = users.filter(item => item.id !== userId);
-    setUsers(updatedUsers);
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    dispatch(deletejobapplication(userId)).then(() => {
+      dispatch(getjobapplication());
+      const updatedUsers = users.filter((item) => item.id !== userId);
+      setUsers(updatedUsers);
+      message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    });
   };
 
   const showUserProfile = (userInfo) => {
@@ -55,8 +113,6 @@ const JobApplicationList = () => {
     setSelectedUser(null);
   };
 
-
-
   // const showViewApplication = (userInfo) => {
   //   setViewApplicationVisible(true);
   //   setSelectedUser(userInfo);
@@ -67,55 +123,90 @@ const JobApplicationList = () => {
   //   setSelectedUser(null);
   // };
 
-  const getjobStatus = status => {
-    if (status === 'active') {
-      return 'blue'
+  const getjobStatus = (status) => {
+    if (status === "active") {
+      return "blue";
     }
-    if (status === 'blocked') {
-      return 'cyan'
+    if (status === "blocked") {
+      return "cyan";
     }
-    return ''
-  }
-  
-  const handleShowStatus = value => {
-		if (value !== 'All') {
-			const key = 'status'
-			const data = utils.filterArray(userData, key, value)
-			setUsers(data)
-		} else {
-			setUsers(userData)
-		}
-	}
-  
-  const jobStatusList = ['active', 'blocked']
+    return "";
+  };
 
+  const handleShowStatus = (value) => {
+    if (value !== "All") {
+      const key = "status";
+      const data = utils.filterArray(userData, key, value);
+      setUsers(data);
+    } else {
+      setUsers(userData);
+    }
+  };
+
+  const jobStatusList = ["active", "blocked"];
+
+  const eidtfun = (idd) => {
+    openEditJobApplicationModal();
+    setIdd(idd);
+  };
 
   const dropdownMenu = (elm) => (
     <Menu>
       <Menu.Item>
         <Flex alignItems="center">
-          <Button type="" className="" icon={<EyeOutlined />}  size="small">
+          <Button type="" className="" icon={<EyeOutlined />} size="small">
             <span>View Details</span>
           </Button>
         </Flex>
       </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-          <Button type="" className="" icon={<MailOutlined />} onClick={() => showUserProfile(elm)} size="small">
+          <Button
+            type=""
+            className=""
+            icon={<MailOutlined />}
+            onClick={() => showUserProfile(elm)}
+            size="small"
+          >
             <span>Send Mail</span>
           </Button>
         </Flex>
       </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-          <Button type="" className="" icon={<PushpinOutlined />} onClick={() => showUserProfile(elm)} size="small">
+          <Button
+            type=""
+            className=""
+            icon={<PushpinOutlined />}
+            onClick={() => showUserProfile(elm)}
+            size="small"
+          >
             <span className="ml-2">Add to Job OnBoard</span>
           </Button>
         </Flex>
       </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-          <Button type="" className="" icon={<DeleteOutlined />} onClick={() => deleteUser(elm.id)} size="small">
+          <Button
+            type=""
+            className=""
+            icon={<EditOutlined />}
+            onClick={() => eidtfun(elm.id)}
+            size="small"
+          >
+            <span className="ml-2">Edit</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
+      <Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className=""
+            icon={<DeleteOutlined />}
+            onClick={() => deleteUser(elm.id)}
+            size="small"
+          >
             <span>Delete</span>
           </Button>
         </Flex>
@@ -125,56 +216,63 @@ const JobApplicationList = () => {
 
   const tableColumns = [
     {
-      title: 'Employee',
-      dataIndex: 'name',
+      title: "name",
+      dataIndex: "name",
       render: (_, record) => (
         <div className="d-flex">
-          <AvatarStatus src={record.img} name={record.name} subTitle={record.email} />
+          <AvatarStatus
+            src={record.img}
+            name={record.name}
+            subTitle={record.email}
+          />
         </div>
       ),
-      sorter: (a, b) => a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1,
+      sorter: (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1),
     },
     {
-      title: 'Leave Type',
-      dataIndex: 'leavetype',
+      title: "notice_period",
+      dataIndex: "notice_period",
       sorter: (a, b) => a.leavetype.length - b.leavetype.length,
     },
     {
-      title: 'Applied On',
-      dataIndex: 'appliedon',
-      sorter: (a, b) => dayjs(a.appliedon).unix() - dayjs(b.appliedon).unix(),
+      title: "location",
+      dataIndex: "location",
+      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
     },
     {
-      title: 'Start Date',
-      dataIndex: 'startdate',
-      sorter: (a, b) => dayjs(a.startdate).unix() - dayjs(b.startdate).unix(),
+      title: "job",
+      dataIndex: "job",
+      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
     },
     {
-      title: 'End Date',
-      dataIndex: 'enddate',
-      sorter: (a, b) => dayjs(a.enddate).unix() - dayjs(b.enddate).unix(),
+      title: "current_location",
+      dataIndex: "current_location",
+      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
     },
+
     {
-      title: 'Total Days',
-      dataIndex: 'totaldays',
+      title: "phone",
+      dataIndex: "phone",
       sorter: (a, b) => a.totaldays.length - b.totaldays.length,
     },
     {
-      title: 'Leave Reason',
-      dataIndex: 'leavereason',
+      title: "total_experience",
+      dataIndex: "total_experience",
       sorter: (a, b) => a.leavereason.length - b.leavereason.length,
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-     render: (_, record) => (
-				<><Tag color={getjobStatus(record.status)}>{record.status}</Tag></>
-			),
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'status')
+      title: "Status",
+      dataIndex: "status",
+      render: (_, record) => (
+        <>
+          <Tag color={getjobStatus(record.status)}>{record.status}</Tag>
+        </>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
     },
     {
-      title: 'Action',
-      dataIndex: 'actions',
+      title: "Action",
+      dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
           <EllipsisDropdown menu={dropdownMenu(elm)} />
@@ -184,11 +282,19 @@ const JobApplicationList = () => {
   ];
 
   return (
-    <Card bodyStyle={{ padding: '-3px' }}>
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+    <Card bodyStyle={{ padding: "-3px" }}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+      >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={onSearch} />
+            <Input
+              placeholder="Search"
+              prefix={<SearchOutlined />}
+              onChange={onSearch}
+            />
           </div>
           <div className="w-full md:w-48 ">
             <Select
@@ -199,12 +305,20 @@ const JobApplicationList = () => {
               placeholder="Status"
             >
               <Option value="All">All Job </Option>
-              {jobStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
+              {jobStatusList.map((elm) => (
+                <Option key={elm} value={elm}>
+                  {elm}
+                </Option>
+              ))}
             </Select>
           </div>
         </Flex>
         <Flex gap="7px">
-          <Button type="primary" className="ml-2" onClick={openAddJobApplicationModal}>
+          <Button
+            type="primary"
+            className="ml-2"
+            onClick={openAddJobApplicationModal}
+          >
             <PlusOutlined />
             <span>New</span>
           </Button>
@@ -214,9 +328,18 @@ const JobApplicationList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-        <Table columns={tableColumns} dataSource={users} rowKey="id" scroll={{ x: 1200 }} />
+        <Table
+          columns={tableColumns}
+          dataSource={users}
+          rowKey="id"
+          scroll={{ x: 1200 }}
+        />
       </div>
-      <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+      <UserView
+        data={selectedUser}
+        visible={userProfileVisible}
+        close={closeUserProfile}
+      />
 
       {/* <ViewJobApplication data={selectedUser} visible={viewApplicationVisible} close={closeViewApplication} /> */}
       <Modal
@@ -225,9 +348,20 @@ const JobApplicationList = () => {
         onCancel={closeAddJobApplicationModal}
         footer={null}
         width={1000}
-        className='mt-[-70px]'
+        className="mt-[-70px]"
       >
         <AddJobApplication onClose={closeAddJobApplicationModal} />
+      </Modal>
+
+      <Modal
+        title="Add Job Application"
+        visible={isAddJobAEditlicationModalVisible}
+        onCancel={closeEditJobApplicationModal}
+        footer={null}
+        width={1000}
+        className="mt-[-70px]"
+      >
+        <EditJobApplication onClose={closeEditJobApplicationModal} idd={idd} />
       </Modal>
       {/* <Modal
         title=""
@@ -244,16 +378,6 @@ const JobApplicationList = () => {
 };
 
 export default JobApplicationList;
-
-
-
-
-
-
-
-
-
-
 
 // import React, { Component } from 'react';
 // import { Card, Table, Menu, Tag, Input, message, Button, Modal } from 'antd';
@@ -320,15 +444,14 @@ export default JobApplicationList;
 //   render() {
 //     const { users, userProfileVisible, selectedUser, isAddJobApplicationModalVisible } = this.state;
 
-
 //     const dropdownMenu = elm => (
 //         <Menu>
-            
+
 //             <Menu.Item>
 //                 <Flex alignItems="center">
 //                     {/* <EyeOutlined />
 //                     <span className="ml-2">View Details</span> */}
-                 
+
 //                 <Button type="" className="" icon={<EyeOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
 //                 <span className="">View Details</span>
 //                 </Button>
@@ -338,7 +461,7 @@ export default JobApplicationList;
 //                 <Flex alignItems="center">
 //                     {/* <EyeOutlined />
 //                     <span className="ml-2">View Details</span> */}
-                 
+
 //                  <Button type="" className="" icon={<MailOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
 //                 <span className="">Send Mail</span>
 //                 </Button>
@@ -348,7 +471,7 @@ export default JobApplicationList;
 //                 <Flex alignItems="center">
 //                     {/* <EyeOutlined />
 //                     <span className="ml-2">View Details</span> */}
-                 
+
 //                  <Button type="" className="" icon={<PushpinOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
 //                 <span className="ml-2">Pin</span>
 //                 </Button>
@@ -358,17 +481,15 @@ export default JobApplicationList;
 //                 <Flex alignItems="center">
 //                     {/* <DeleteOutlined />
 //                     <span className="ml-2">Delete</span> */}
-                
-//     <Button type="" className="" icon={<DeleteOutlined />} onClick={() => {this.deleteUser(elm.id)}} size="small"> 
+
+//     <Button type="" className="" icon={<DeleteOutlined />} onClick={() => {this.deleteUser(elm.id)}} size="small">
 //     <span className="">Delete</span>
 //     </Button>
-    
-    
+
 //                 </Flex>
-//             </Menu.Item>	
+//             </Menu.Item>
 //         </Menu>
 //     );
-
 
 //     const tableColumns = [
 //       {
@@ -397,19 +518,19 @@ export default JobApplicationList;
 //       {
 //         title: 'Applied On',
 //         dataIndex: 'appliedon',
-       
+
 //         sorter: (a, b) => dayjs(a.appliedon).unix() - dayjs(b.appliedon).unix(),
 //       },
 //       {
 //         title: 'Start Date',
 //         dataIndex: 'startdate',
-       
+
 //         sorter: (a, b) => dayjs(a.startdate).unix() - dayjs(b.startdate).unix(),
 //       },
 //       {
 //         title: 'End Date',
 //         dataIndex: 'enddate',
-       
+
 //         sorter: (a, b) => dayjs(a.enddate).unix() - dayjs(b.enddate).unix(),
 //       },
 //       {
@@ -509,12 +630,3 @@ export default JobApplicationList;
 // }
 
 // export default JobApplicationList;
-
-
-
-
-
-
-
-
-

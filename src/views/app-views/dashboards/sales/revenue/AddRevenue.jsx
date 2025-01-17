@@ -1,43 +1,57 @@
-import React from 'react';
-import { Input, Button, DatePicker, Select, message, Row, Col, Checkbox } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import 'react-quill/dist/quill.snow.css';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import ReactQuill from 'react-quill';
+import React from "react";
+import {
+  Input,
+  Button,
+  DatePicker,
+  Select,
+  message,
+  Row,
+  Col,
+  Checkbox,
+} from "antd";
+import { useNavigate } from "react-router-dom";
+import "react-quill/dist/quill.snow.css";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import ReactQuill from "react-quill";
+import { useDispatch } from "react-redux";
+import { AddRevenues, getRevenue } from "./RevenueReducer/RevenueSlice";
 
 const { Option } = Select;
 
-const AddRevenue = () => {
+const AddRevenue = ({ onClose }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const onSubmit = (values) => {
-    console.log('Submitted values:', values);
-    message.success('Job added successfully!');
-    navigate('/app/hrm/jobs');
+  const onSubmit = (values, { resetForm }) => {
+    dispatch(AddRevenues(values)).then(() => {
+      dispatch(getRevenue());
+      message.success("Job added successfully!");
+      onClose();
+      resetForm();
+    });
   };
-
 
   const initialValues = {
     date: null,
-    amount: '',
-    account: '',
-    customer: '',
-    description: '',
-    category: '',
-    reference:'',
-    paymentreceipt: '',
+    amount: "",
+    account: "",
+    customer: "",
+    description: "",
+    category: "",
+    reference: "",
+    paymentreceipt: "",
   };
 
   const validationSchema = Yup.object({
-    date: Yup.date().nullable().required('Date is required.'),
-    amount: Yup.string().required('Please enter a amount.'),
-    account: Yup.string().required('Please select account.'),
-    customer: Yup.string().required('Please select customer.'),
-    description: Yup.string().required('Please enter description.'),
-    category: Yup.string().required('Please select customer.'),
-    reference: Yup.string().required('Please enter description.'),
-    paymentreceipt: Yup.string().required('Please enter a paymentreceipt.'),
+    date: Yup.date().nullable().required("Date is required."),
+    amount: Yup.string().required("Please enter a amount."),
+    account: Yup.string().required("Please select account."),
+    customer: Yup.string().required("Please select customer."),
+    description: Yup.string().required("Please enter description."),
+    category: Yup.string().required("Please select customer."),
+    reference: Yup.string().required("Please enter description."),
+    paymentreceipt: Yup.string().optional("Please enter a paymentreceipt."),
   });
 
   return (
@@ -51,39 +65,60 @@ const AddRevenue = () => {
             validationSchema={validationSchema}
             onSubmit={onSubmit}
           >
-            {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
+            {({
+              values,
+              setFieldValue,
+              handleSubmit,
+              setFieldTouched,
+              resetForm,
+            }) => (
               <Form className="formik-form" onSubmit={handleSubmit}>
                 <Row gutter={16}>
-                  <Col span={12} className='mt-2'>
+                  <Col span={12} className="mt-2">
                     <div className="form-item">
-                      <label className='font-semibold'> Date</label>
+                      <label className="font-semibold"> Date</label>
                       <DatePicker
                         className="w-full"
                         format="DD-MM-YYYY"
                         value={values.date}
-                        onChange={(date) => setFieldValue('date', date)}
+                        onChange={(date) => setFieldValue("date", date)}
                         onBlur={() => setFieldTouched("date", true)}
                       />
-                      <ErrorMessage name="date" component="div" className="error-message text-red-500 my-1" />
+                      <ErrorMessage
+                        name="date"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
                     </div>
                   </Col>
-                  <Col span={12} className='mt-2'>
+                  <Col span={12} className="mt-2">
                     <div className="form-item">
-                      <label className='font-semibold'>Amount</label>
-                      <Field name="amount" as={Input} placeholder="Enter Amount" onBlur={() => setFieldTouched("amount", true)}/>
-                      <ErrorMessage name="amount" component="div" className="error-message text-red-500 my-1" />
+                      <label className="font-semibold">Amount</label>
+                      <Field
+                        name="amount"
+                        as={Input}
+                        placeholder="Enter Amount"
+                        onBlur={() => setFieldTouched("amount", true)}
+                      />
+                      <ErrorMessage
+                        name="amount"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
                     </div>
                   </Col>
-                  <Col span={12} className='mt-2'>
+                  <Col span={12} className="mt-2">
                     <div className="form-item">
-                      <label className='font-semibold'>Account</label>
+                      <label className="font-semibold">Account</label>
                       <Field name="account">
                         {({ field }) => (
                           <Select
                             {...field}
                             className="w-full"
                             placeholder="Select Account"
-                            onChange={(value) => setFieldValue('account', value)}
+                            onChange={(value) =>
+                              setFieldValue("account", value)
+                            }
                             value={values.account}
                             onBlur={() => setFieldTouched("account", true)}
                           >
@@ -92,19 +127,25 @@ const AddRevenue = () => {
                           </Select>
                         )}
                       </Field>
-                      <ErrorMessage name="account" component="div" className="error-message text-red-500 my-1" />
+                      <ErrorMessage
+                        name="account"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
                     </div>
                   </Col>
-                  <Col span={12} className='mt-2'>
+                  <Col span={12} className="mt-2">
                     <div className="form-item">
-                      <label className='font-semibold'>Customer</label>
+                      <label className="font-semibold">Customer</label>
                       <Field name="customer">
                         {({ field }) => (
                           <Select
                             {...field}
                             className="w-full"
                             placeholder="Select customer"
-                            onChange={(value) => setFieldValue('customer', value)}
+                            onChange={(value) =>
+                              setFieldValue("customer", value)
+                            }
                             value={values.category}
                             onBlur={() => setFieldTouched("customer", true)}
                           >
@@ -113,35 +154,48 @@ const AddRevenue = () => {
                           </Select>
                         )}
                       </Field>
-                      <ErrorMessage name="customer" component="div" className="error-message text-red-500 my-1" />
+                      <ErrorMessage
+                        name="customer"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
                     </div>
                   </Col>
-                  <Col span={24} className='mt-2'>
+                  <Col span={24} className="mt-2">
                     <div className="form-item">
                       <label className="font-semibold">Description</label>
                       <Field name="description">
                         {({ field }) => (
                           <ReactQuill
                             {...field}
-                            value={values.notes}
-                            onChange={(value) => setFieldValue('description', value)}
+                            placeholder="Enter Description"
+                            value={values.description}
+                            onChange={(value) =>
+                              setFieldValue("description", value)
+                            }
                             onBlur={() => setFieldTouched("description", true)}
                           />
                         )}
                       </Field>
-                      <ErrorMessage name="description" component="div" className="error-message text-red-500 my-1" />
+                      <ErrorMessage
+                        name="description"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
                     </div>
                   </Col>
-                  <Col span={12} className='mt-2'>
+                  <Col span={12} className="mt-2">
                     <div className="form-item">
-                      <label className='font-semibold'>Category</label>
+                      <label className="font-semibold">Category</label>
                       <Field name="category">
                         {({ field }) => (
                           <Select
                             {...field}
                             className="w-full"
                             placeholder="Select Category"
-                            onChange={(value) => setFieldValue('category', value)}
+                            onChange={(value) =>
+                              setFieldValue("category", value)
+                            }
                             value={values.category}
                             onBlur={() => setFieldTouched("category", true)}
                           >
@@ -150,32 +204,59 @@ const AddRevenue = () => {
                           </Select>
                         )}
                       </Field>
-                      <ErrorMessage name="category" component="div" className="error-message text-red-500 my-1" />
+                      <ErrorMessage
+                        name="category"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
                     </div>
                   </Col>
                   <Col span={12}>
                     <div className="form-item">
                       <label className="font-semibold">Reference</label>
-                      <Field name="reference" as={Input} placeholder="Enter Reference" type='number' />
-                      <ErrorMessage name="reference" component="div" className="error-message text-red-500 my-1" />
+                      <Field
+                        name="reference"
+                        as={Input}
+                        placeholder="Enter Reference"
+                        type="number"
+                      />
+                      <ErrorMessage
+                        name="reference"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
                     </div>
                   </Col>
-                  <Col span={12} className='mt-2'>
+                  <Col span={12} className="mt-2">
                     <div className="form-item">
                       <label className="font-semibold">Payment Receipt</label>
-                      <Field name="paymentreceipt" type='file' as={Input} placeholder="Enter payment receipt" />
-                      <ErrorMessage name="paymentreceipt" component="div" className="error-message text-red-500 my-1" />
+                      <Field
+                        name="paymentreceipt"
+                        type="file"
+                        as={Input}
+                        placeholder="Enter payment receipt"
+                      />
+                      <ErrorMessage
+                        name="paymentreceipt"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
                     </div>
                   </Col>
-
-
                 </Row>
 
                 <div className="form-buttons text-right mt-4">
-                  <Button type="default" className="mr-2" onClick={() => navigate('/apps/sales/expenses')}>Cancel</Button>
-                  <Button type="primary" htmlType="submit">Create</Button>
+                  <Button
+                    type="default"
+                    className="mr-2"
+                    onClick={() => navigate("/apps/sales/expenses")}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="primary" htmlType="submit">
+                    Create
+                  </Button>
                 </div>
-
               </Form>
             )}
           </Formik>
@@ -262,6 +343,3 @@ const AddRevenue = () => {
 };
 
 export default AddRevenue;
-
-
-

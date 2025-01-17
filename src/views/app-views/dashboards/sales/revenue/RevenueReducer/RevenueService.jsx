@@ -7,10 +7,10 @@ import axios from "axios";
 //     return res
 // };
 
-const getcustomers = async () => {
+const getreve = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/customers/", {
+    const res = await axios.get("http://localhost:5353/api/v1/sales-revenue/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -22,12 +22,12 @@ const getcustomers = async () => {
   }
 };
 
-const creatrecustomers = async (payload) => {
+const addreve = async (payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/customers/",
+      "http://localhost:5353/api/v1/sales-revenue/",
       payload,
       {
         headers: {
@@ -43,12 +43,12 @@ const creatrecustomers = async (payload) => {
   }
 };
 
-const deletecustomers = async (id) => {
+const deletereve = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/customers/${id}`,
+      `http://localhost:5353/api/v1/sales-revenue/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -63,12 +63,12 @@ const deletecustomers = async (id) => {
   }
 };
 
-const editcustomers = async (idd, payload) => {
+const editreve = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/customers/${idd}`,
-      payload,
+      `http://localhost:5353/api/v1/sales-revenue/${idd}`,
+      values,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -104,10 +104,10 @@ const editcustomers = async (idd, payload) => {
 
 const UserService = {
   // addUser,
-  getcustomers,
-  creatrecustomers,
-  deletecustomers,
-  editcustomers,
+  getreve,
+  addreve,
+  deletereve,
+  editreve,
   // getAllUsers,
   // getUserById,
   // deleteUser,

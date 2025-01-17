@@ -38,6 +38,13 @@ import StagesLeadsDeals from "../views/app-views/dashboards/systemsetup/LeadStag
 import Notifications from "../views/app-views/pages/setting/NotificationReducer/NotificationSlice"
 import Users from "../views/app-views/Users/UserReducers/UserSlice"
 import scrumboard from "../views/app-views/dashboards/project/scrumboard/scrumboardreducer/scrumboardSlice"
+import customers from "../views/app-views/dashboards/sales/customer/CustomerReducer/CustomerSlice"
+import creditnotes from "../views/app-views/dashboards/sales/creditnotes/CustomerReducer/CreditnoteSlice"
+import Revenue from "../views/app-views/dashboards/sales/revenue/RevenueReducer/RevenueSlice"
+import salesInvoices from "../views/app-views/dashboards/sales/invoice/InvoiceReducer/InvoiceSlice"
+import jobapplications from "../views/app-views/hrm/Jobs/JobApplication/JobapplicationReducer/JobapplicationSlice"
+import Interviews from "../views/app-views/hrm/Jobs/Interview/interviewReducer/interviewSlice"
+import jobonboarding from "../views/app-views/hrm/Jobs/JobOnBording/JobOnBoardingReducer/jobonboardingSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -80,6 +87,13 @@ const rootReducer = (asyncReducers) => (state, action) => {
         Notifications,
         Users,
         scrumboard,
+        customers,
+        creditnotes,
+        Revenue,
+        salesInvoices,
+        jobapplications,
+        Interviews,
+        jobonboarding,
         // employee,
         // department,
         ...asyncReducers,

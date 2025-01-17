@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./CustomerService";
+import UserService from "./InvoiceService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
 
-export const addcus = createAsyncThunk(
-  "users/addcus",
+export const AddInvoices = createAsyncThunk(
+  "users/AddInvoices",
   async (userData, thunkAPI) => {
     try {
-      const response = await UserService.creatrecustomers(userData);
+      const response = await UserService.addinv(userData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -19,11 +19,11 @@ export const addcus = createAsyncThunk(
 
 // Async thunk for user login
 
-export const Getcus = createAsyncThunk(
-  "emp/Getcus",
-  async (loginData, thunkAPI) => {
+export const getInvoice = createAsyncThunk(
+  "emp/getInvoice",
+  async (thunkAPI) => {
     try {
-      const response = await UserService.getcustomers(loginData);
+      const response = await UserService.getinv();
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -58,22 +58,22 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const delcus = createAsyncThunk(
-  "users/delcuseet",
+export const deleteInvoice = createAsyncThunk(
+  "users/deleteInvoiceeet",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.deletecustomers(userId);
+      const response = await UserService.deleteinv(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const editcus = createAsyncThunk(
-  "users/editcus",
-  async ({ idd, payload }, thunkAPI) => {
+export const editInvoice = createAsyncThunk(
+  "users/editInvoice",
+  async ({ idd, values }, thunkAPI) => {
     try {
-      const response = await UserService.editcustomers(idd, payload);
+      const response = await UserService.editinv(idd, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -94,9 +94,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "customers",
+  name: "salesInvoices",
   initialState: {
-    customers: [],
+    salesInvoices: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -133,27 +133,27 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(addcus.pending, (state) => {
+      .addCase(AddInvoices.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(addcus.fulfilled, (state, action) => {
+      .addCase(AddInvoices.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(addcus.rejected, (state, action) => {
+      .addCase(AddInvoices.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(Getcus.pending, (state) => {
+      .addCase(getInvoice.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(Getcus.fulfilled, (state, action) => {
+      .addCase(getInvoice.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.customers = action?.payload;
+        state.salesInvoices = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(Getcus.rejected, (state, action) => {
+      .addCase(getInvoice.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
@@ -186,27 +186,27 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
       //delete
-      .addCase(delcus.pending, (state) => {
+      .addCase(deleteInvoice.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(delcus.fulfilled, (state, action) => {
+      .addCase(deleteInvoice.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload.message);
       })
-      .addCase(delcus.rejected, (state, action) => {
+      .addCase(deleteInvoice.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(editcus.pending, (state) => {
+      .addCase(editInvoice.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(editcus.fulfilled, (state, action) => {
+      .addCase(editInvoice.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload; // Update the state with the updated employee data
       })
-      .addCase(editcus.rejected, (state, action) => {
+      .addCase(editInvoice.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
       });

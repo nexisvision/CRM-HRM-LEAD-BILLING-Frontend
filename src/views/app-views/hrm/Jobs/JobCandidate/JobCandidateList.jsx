@@ -1,19 +1,41 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, FilePdfOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
-import UserView from '../../../Users/user-list/UserView';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import StatisticWidget from 'components/shared-components/StatisticWidget';
-import { AnnualStatisticData } from '../../../dashboards/default/DefaultDashboardData';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import AddJobCandidate from './AddJobCandidate';
-import userData from 'assets/data/user-list.data.json';
-import OrderListData from 'assets/data/order-list.data.json';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Row,
+  Col,
+  Tag,
+  Input,
+  message,
+  Button,
+  Modal,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  MailOutlined,
+  PlusOutlined,
+  FilePdfOutlined,
+  PushpinOutlined,
+  FileExcelOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+import UserView from "../../../Users/user-list/UserView";
+import { utils, writeFile } from "xlsx";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import StatisticWidget from "components/shared-components/StatisticWidget";
+import { AnnualStatisticData } from "../../../dashboards/default/DefaultDashboardData";
+import AvatarStatus from "components/shared-components/AvatarStatus";
+import AddJobCandidate from "./AddJobCandidate";
+import userData from "assets/data/user-list.data.json";
+import OrderListData from "assets/data/order-list.data.json";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
-import utils from 'utils';
+import { getjobapplication } from "../JobApplication/JobapplicationReducer/JobapplicationSlice";
 
 const JobCandidateList = () => {
   const [users, setUsers] = useState(userData);
@@ -21,10 +43,25 @@ const JobCandidateList = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isAddJobCandidateModalVisible, setIsAddJobCandidateModalVisible] = useState(false);
+  const [isAddJobCandidateModalVisible, setIsAddJobCandidateModalVisible] =
+    useState(false);
   const [annualStatisticData] = useState(AnnualStatisticData);
   const navigate = useNavigate();
 
+  const dispatch = useDispatch();
+
+  const alldata = useSelector((state) => state.jobapplications);
+  const fnddta = alldata.jobapplications.data;
+
+  useEffect(() => {
+    dispatch(getjobapplication());
+  }, []);
+
+  useEffect(() => {
+    if (fnddta) {
+      setUsers(fnddta);
+    }
+  }, [fnddta]);
 
   // Open Add Job Modal
   const openAddJobCandidateModal = () => {
@@ -36,11 +73,19 @@ const JobCandidateList = () => {
     setIsAddJobCandidateModalVisible(false);
   };
 
-  const handleJob = () => {
-    navigate('/app/hrm/jobs/jobcandidate/viewjobcandidate', { state: { user: selectedUser } }); // Pass user data as state if needed
+  const exportToExcel = () => {
+    const ws = utils.json_to_sheet(users);
+    const wb = utils.book_new();
+    utils.book_append_sheet(wb, ws, "Candidates");
+    writeFile(wb, "JobCandidates.xlsx");
   };
 
-  // Search functionality
+  const handleJob = () => {
+    navigate("/app/hrm/jobs/jobcandidate/viewjobcandidate", {
+      state: { user: selectedUser },
+    });
+  };
+
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     const searchArray = value ? list : OrderListData;
@@ -124,71 +169,97 @@ const JobCandidateList = () => {
     </Menu>
   );
 
+  const getjobStatus = (status) => {
+    if (status === "active") {
+      return "blue";
+    }
+    if (status === "blocked") {
+      return "cyan";
+    }
+    return "";
+  };
+
   const tableColumns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
-      sorter: {
-        compare: (a, b) => a.branch.length - b.branch.length,
-      },
-    },
-    {
-      title: 'Applied For',
-      dataIndex: 'appliedfor',
-      sorter: {
-        compare: (a, b) => a.appliedfor.length - b.appliedfor.length,
-      },
-    },
-    
-    {
-      title: 'Rating',
-      dataIndex: 'rating',
-      sorter: {
-        compare: (a, b) => a.rating.length - b.rating.length,
-      },
-    },
-    {
-      title: 'Created At',
-      dataIndex: 'createdat',
-      sorter: (a, b) => dayjs(a.createdat).unix() - dayjs(b.createdat).unix(),
-    },
-    {
-      title: 'Action',
-      dataIndex: 'actions',
-      render: (_, elm) => (
-        <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
+      title: "name",
+      dataIndex: "name",
+      render: (_, record) => (
+        <div className="d-flex">
+          <AvatarStatus
+            src={record.img}
+            name={record.name}
+            subTitle={record.email}
+          />
         </div>
       ),
+      sorter: (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1),
+    },
+    {
+      title: "notice_period",
+      dataIndex: "notice_period",
+      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+    },
+    {
+      title: "location",
+      dataIndex: "location",
+      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+    },
+    {
+      title: "job",
+      dataIndex: "job",
+      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+    },
+    {
+      title: "current_location",
+      dataIndex: "current_location",
+      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+    },
+
+    {
+      title: "phone",
+      dataIndex: "phone",
+      sorter: (a, b) => a.totaldays.length - b.totaldays.length,
+    },
+    {
+      title: "total_experience",
+      dataIndex: "total_experience",
+      sorter: (a, b) => a.leavereason.length - b.leavereason.length,
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (_, record) => (
+        <>
+          <Tag color={getjobStatus(record.status)}>{record.status}</Tag>
+        </>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
     },
   ];
 
   return (
-    <Card bodyStyle={{ padding: '-3px' }}>
-      {/* <Row gutter={16}>
-        {annualStatisticData.map((elm, i) => (
-          <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-            <StatisticWidget
-              title={elm.title}
-              value={elm.value}
-              status={elm.status}
-              subtitle={elm.subtitle}
-            />
-          </Col>
-        ))}
-      </Row> */}
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+    <Card bodyStyle={{ padding: "-3px" }}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+      >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={(e) => onSearch(e)} />
+            <Input
+              placeholder="Search"
+              prefix={<SearchOutlined />}
+              onChange={(e) => onSearch(e)}
+            />
           </div>
         </Flex>
         <Flex gap="7px">
-          <Button type="primary" className="ml-2" onClick={openAddJobCandidateModal}>
-            <PlusOutlined />
-            <span>New</span>
-          </Button>
-          <Button type="primary" icon={<FileExcelOutlined />} block>
+          <Button
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel} // Call export function when the button is clicked
+            block
+          >
             Export All
           </Button>
         </Flex>
@@ -201,7 +272,11 @@ const JobCandidateList = () => {
           scroll={{ x: 1200 }}
         />
       </div>
-      <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+      <UserView
+        data={selectedUser}
+        visible={userProfileVisible}
+        close={closeUserProfile}
+      />
 
       {/* Add Job Modal */}
       <Modal
@@ -218,4 +293,3 @@ const JobCandidateList = () => {
 };
 
 export default JobCandidateList;
-

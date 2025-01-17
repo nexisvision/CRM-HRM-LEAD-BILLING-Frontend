@@ -7,14 +7,17 @@ import axios from "axios";
 //     return res
 // };
 
-const getcustomers = async () => {
+const getcreditn = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/customers/", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await axios.get(
+      "http://localhost:5353/api/v1/sales-creditnote/",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -22,12 +25,12 @@ const getcustomers = async () => {
   }
 };
 
-const creatrecustomers = async (payload) => {
+const createcredit = async (payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/customers/",
+      "http://localhost:5353/api/v1/sales-creditnote/",
       payload,
       {
         headers: {
@@ -43,12 +46,12 @@ const creatrecustomers = async (payload) => {
   }
 };
 
-const deletecustomers = async (id) => {
+const deletecredit = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/customers/${id}`,
+      `http://localhost:5353/api/v1/sales-creditnote/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -63,12 +66,12 @@ const deletecustomers = async (id) => {
   }
 };
 
-const editcustomers = async (idd, payload) => {
+const editcredit = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/customers/${idd}`,
-      payload,
+      `http://localhost:5353/api/v1/sales-creditnote/${idd}`,
+      values,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -104,10 +107,10 @@ const editcustomers = async (idd, payload) => {
 
 const UserService = {
   // addUser,
-  getcustomers,
-  creatrecustomers,
-  deletecustomers,
-  editcustomers,
+  getcreditn,
+  createcredit,
+  deletecredit,
+  editcredit,
   // getAllUsers,
   // getUserById,
   // deleteUser,

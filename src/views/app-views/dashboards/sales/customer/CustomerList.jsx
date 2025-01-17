@@ -1,33 +1,75 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined ,CopyOutlined,EditOutlined} from '@ant-design/icons';
-import dayjs from 'dayjs';
-import UserView from '../../../Users/user-list/UserView';
-import ViewCustomer from '../customer/ViewCustomer';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import StatisticWidget from 'components/shared-components/StatisticWidget';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Row,
+  Col,
+  Tag,
+  Input,
+  message,
+  Button,
+  Modal,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  MailOutlined,
+  PlusOutlined,
+  PushpinOutlined,
+  FileExcelOutlined,
+  CopyOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+import UserView from "../../../Users/user-list/UserView";
+import ViewCustomer from "../customer/ViewCustomer";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import StatisticWidget from "components/shared-components/StatisticWidget";
 // import { DealStatisticData } from '../../dashboards/default/DefaultDashboardData';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import AddCustomer from './AddCustomer';
-import userData from '../../../../../assets/data/user-list.data.json';
+import AvatarStatus from "components/shared-components/AvatarStatus";
+import AddCustomer from "./AddCustomer";
+import userData from "../../../../../assets/data/user-list.data.json";
 // import userData from 'assets/data/user-list.data.json';
-import OrderListData from '../../../../../assets/data/order-list.data.json';
+import OrderListData from "../../../../../assets/data/order-list.data.json";
 import { IoCopyOutline } from "react-icons/io5";
-import utils from 'utils';
-import EditCustomer from './EditCustomer';
+import utils from "utils";
+import EditCustomer from "./EditCustomer";
+import { delcus, Getcus } from "./CustomerReducer/CustomerSlice";
+import { useDispatch, useSelector } from "react-redux";
+import useSelection from "antd/es/table/hooks/useSelection";
 
 const CustomerList = () => {
   const [users, setUsers] = useState(userData);
+  const dispatch = useDispatch();
   const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
-//   const [customerVisible,setCustomerVisible] = useState(false)
+  //   const [customerVisible,setCustomerVisible] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] = useState(false);
-  const [isEditCustomerModalVisible, setIsEditCustomerModalVisible] = useState(false);
-  const [isViewCustomerModalVisible, setIsViewCustomerModalVisible] = useState(false);
+  const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] =
+    useState(false);
+  const [isEditCustomerModalVisible, setIsEditCustomerModalVisible] =
+    useState(false);
+  const [isViewCustomerModalVisible, setIsViewCustomerModalVisible] =
+    useState(false);
 
+  const [idd, setIdd] = useState("");
+
+  const alldata = useSelector((state) => state.customers);
+  const fnddata = alldata.customers.data;
+
+  useEffect(() => {
+    dispatch(Getcus());
+  }, []);
+
+  useEffect(() => {
+    if (fnddata) {
+      setUsers(fnddata);
+    }
+  }, [fnddata]);
 
   // Open Add Job Modal
   const openAddCustomerModal = () => {
@@ -39,8 +81,8 @@ const CustomerList = () => {
     setIsAddCustomerModalVisible(false);
   };
 
-   // Open Add Job Modal
-   const openEditCustomerModal = () => {
+  // Open Add Job Modal
+  const openEditCustomerModal = () => {
     setIsEditCustomerModalVisible(true);
   };
 
@@ -48,7 +90,6 @@ const CustomerList = () => {
   const closeEditCustomerModal = () => {
     setIsEditCustomerModalVisible(false);
   };
-
 
   const openviewCustomerModal = () => {
     setIsViewCustomerModalVisible(true);
@@ -58,9 +99,6 @@ const CustomerList = () => {
   const closeViewCustomerModal = () => {
     setIsViewCustomerModalVisible(false);
   };
-
-
-  
 
   // Search functionality
   const onSearch = (e) => {
@@ -73,6 +111,9 @@ const CustomerList = () => {
 
   // Delete user
   const deleteUser = (userId) => {
+    dispatch(delcus(userId));
+    dispatch(Getcus());
+    dispatch(Getcus());
     setUsers(users.filter((item) => item.id !== userId));
     message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
@@ -83,10 +124,10 @@ const CustomerList = () => {
     setUserProfileVisible(true);
   };
 
-//   const showCustomerView = (userInfo) => {
-//     setSelectedUser(userInfo);
-//     setCustomerVisible(true);
-//   };
+  //   const showCustomerView = (userInfo) => {
+  //     setSelectedUser(userInfo);
+  //     setCustomerVisible(true);
+  //   };
 
   // Close user profile
   const closeUserProfile = () => {
@@ -94,11 +135,15 @@ const CustomerList = () => {
     setUserProfileVisible(false);
   };
 
+  //   const closeCustomerView = () => {
+  //     setSelectedUser(null);
+  //     setCustomerVisible(false);
+  //   };
 
-//   const closeCustomerView = () => {
-//     setSelectedUser(null);
-//     setCustomerVisible(false);
-//   };
+  const editfun = (idd) => {
+    openEditCustomerModal();
+    setIdd(idd);
+  };
 
   const dropdownMenu = (elm) => (
     <Menu>
@@ -121,7 +166,7 @@ const CustomerList = () => {
             type=""
             className=""
             icon={<EditOutlined />}
-            onClick={openEditCustomerModal}
+            onClick={() => editfun(elm.id)}
             size="small"
           >
             <span className="">Edit</span>
@@ -159,37 +204,37 @@ const CustomerList = () => {
 
   const tableColumns = [
     {
-      title: 'Name',
-      dataIndex: 'name',
+      title: "Name",
+      dataIndex: "name",
       sorter: {
         compare: (a, b) => a.branch.length - b.branch.length,
       },
     },
     {
-      title: 'Contact',
-      dataIndex: 'contact',
+      title: "Contact",
+      dataIndex: "contact",
       sorter: {
         compare: (a, b) => a.title.length - b.title.length,
       },
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
+      title: "Email",
+      dataIndex: "email",
       sorter: {
         compare: (a, b) => a.title.length - b.title.length,
       },
     },
     {
-      title: 'Balance',
-      dataIndex: 'balance',
+      title: "tax_number",
+      dataIndex: "tax_number",
       sorter: {
         compare: (a, b) => a.balance.length - b.balance.length,
       },
     },
-    
+
     {
-      title: 'Action',
-      dataIndex: 'actions',
+      title: "Action",
+      dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
           <EllipsisDropdown menu={dropdownMenu(elm)} />
@@ -199,16 +244,28 @@ const CustomerList = () => {
   ];
 
   return (
-    <Card bodyStyle={{ padding: '-3px' }}>
-      
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
+    <Card bodyStyle={{ padding: "-3px" }}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+        className="flex flex-wrap  gap-4"
+      >
         <Flex mobileFlex={false} className="flex flex-wrap gap-4 mb-4 md:mb-0">
           <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
-            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={(e) => onSearch(e)} />
+            <Input
+              placeholder="Search"
+              prefix={<SearchOutlined />}
+              onChange={(e) => onSearch(e)}
+            />
           </div>
         </Flex>
         <Flex gap="7px" className="flex">
-          <Button type="primary" className="flex items-center" onClick={openAddCustomerModal}>
+          <Button
+            type="primary"
+            className="flex items-center"
+            onClick={openAddCustomerModal}
+          >
             <PlusOutlined />
             <span className="ml-2">New</span>
           </Button>
@@ -225,7 +282,11 @@ const CustomerList = () => {
           scroll={{ x: 1200 }}
         />
       </div>
-      <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+      <UserView
+        data={selectedUser}
+        visible={userProfileVisible}
+        close={closeUserProfile}
+      />
 
       {/* Add Job Modal */}
       <Modal
@@ -234,7 +295,7 @@ const CustomerList = () => {
         onCancel={closeAddCustomerModal}
         footer={null}
         width={1000}
-        className='mt-[-70px]'
+        className="mt-[-70px]"
       >
         <AddCustomer onClose={closeAddCustomerModal} />
       </Modal>
@@ -245,8 +306,7 @@ const CustomerList = () => {
         onCancel={closeViewCustomerModal}
         footer={null}
         width={1100}
-        className='mt-[-70px]'
-        
+        className="mt-[-70px]"
       >
         <ViewCustomer onClose={closeViewCustomerModal} />
       </Modal>
@@ -257,15 +317,12 @@ const CustomerList = () => {
         onCancel={closeEditCustomerModal}
         footer={null}
         width={1000}
-        className='mt-[-70px]'
-        
+        className="mt-[-70px]"
       >
-        <EditCustomer onClose={closeEditCustomerModal} />
+        <EditCustomer onClose={closeEditCustomerModal} idd={idd} />
       </Modal>
-
     </Card>
   );
 };
 
 export default CustomerList;
-
