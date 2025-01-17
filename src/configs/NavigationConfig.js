@@ -25,6 +25,7 @@ import {
   GlobalOutlined ,
   // SolutionOutlined,
   BankOutlined,
+  BranchesOutlined, 
   DeploymentUnitOutlined,
   CreditCardOutlined,
   CalendarOutlined,
@@ -375,6 +376,14 @@ const extraNavvTree = [
             path: `${APP_PREFIX_PATH}/hrm/department`,
             title: 'Department',
             icon: BankOutlined,
+            breadcrumb: false,
+            submenu: []
+          },
+          {
+            key: 'extra-hrm-branch',
+            path: `${APP_PREFIX_PATH}/hrm/branch`,
+            title: 'Branch',
+            icon: BranchesOutlined,
             breadcrumb: false,
             submenu: []
           },

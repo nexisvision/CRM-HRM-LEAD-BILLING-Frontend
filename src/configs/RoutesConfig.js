@@ -960,6 +960,12 @@ export const protectedRoutes = [
     },
 
     {
+        key: 'hrm.branch',
+        path: `${APP_PREFIX_PATH}/hrm/branch`,
+        component: React.lazy(() => import('views/app-views/hrm/Branch')),
+    },
+
+    {
         key: 'hrm.department',
         path: `${APP_PREFIX_PATH}/hrm/department/particulardepartment`,
         component: React.lazy(() => import('views/app-views/hrm/Department/ParticularDepartment')),

@@ -61,6 +61,9 @@ const AddDesignation = ({ onClose }) => {
                   )}
                 </div>
               </Col>
+              
+              <Col>
+              </Col>
             </Row>
 
             <div className="text-right">
