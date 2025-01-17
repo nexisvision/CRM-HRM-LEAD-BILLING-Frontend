@@ -43,7 +43,7 @@ const NotificationPage = () => {
 
   return (
     <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="bg-white rounded-lg shadow-lg">
+      <div className="bg-white rounded shadow">
         <div className="p-4 flex justify-between items-center">
           <h2 className="text-xl font-semibold">Notifications</h2>
         </div>
@@ -63,9 +63,9 @@ const NotificationPage = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-lg p-6">
+      <div className="bg-white rounded shadow p-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-green-600">Reminders</h2>
+          <h2 className="text-xl font-semibold text-black">Reminders</h2>
         </div>
 
         <div className="space-y-4">
@@ -100,9 +100,5 @@ const NotificationPage = () => {
 };
 
 export default NotificationPage;
-
-
-
-
 
 

@@ -33,6 +33,7 @@ import {
   CrownOutlined,
   FireOutlined,
   BarChartOutlined,
+  HomeOutlined,
   CompassOutlined,
   AppstoreAddOutlined,
   LayoutOutlined,
@@ -53,6 +54,7 @@ import {
   FundOutlined,
   ShoppingCartOutlined,
   UserOutlined,
+
   BookOutlined,
   FileUnknownOutlined,
   ProfileOutlined,
@@ -534,6 +536,14 @@ const extraNavvvTree = [
     breadcrumb: true,
     isGroupTitle: true,
     submenu: [
+      {
+        key: 'superadmin-dashboard',
+        path: `${APP_PREFIX_PATH}/superadmin/dashboard`,
+        title: 'Dashboard',
+        icon: HomeOutlined ,
+        breadcrumb: true,
+        submenu: []
+      },
       {
         key: 'superadmin-company',
         path: `${APP_PREFIX_PATH}/superadmin/company`,
