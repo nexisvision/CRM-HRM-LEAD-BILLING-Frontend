@@ -63,6 +63,7 @@ const AddDesignation = ({ onClose }) => {
               </Col>
               
               <Col>
+              
               </Col>
             </Row>
 

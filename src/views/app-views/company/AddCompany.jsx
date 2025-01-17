@@ -274,6 +274,7 @@ const AddCompany = ({ visible, onClose, onCreate }) => {
             An OTP has been sent to your registered email. Please enter the OTP below to verify your account.
           </p>
           <Input
+            type="number"
             placeholder="Enter OTP"
             className="mt-4 p-3 border border-gray-300 rounded-md"
             style={{ width: "100%" }}
