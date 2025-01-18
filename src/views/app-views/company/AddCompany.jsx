@@ -256,6 +256,7 @@ const AddCompany = ({ visible, onClose, onCreate }) => {
                 Create
               </Button>
             </Col>
+            
           </Row>
         </Form.Item>
       </Form>

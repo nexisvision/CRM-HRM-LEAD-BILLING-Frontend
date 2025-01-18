@@ -121,23 +121,23 @@ export const protectedRoutes = [
         component: React.lazy(() => import('views/app-views/dashboards/project/ViewProject')),
     },
     {
-        key: 'dashboard.project.scrumboard',
-        path: `${APP_PREFIX_PATH}/dashboards/project/scrumboard`,
+        key: 'dashboard.scrumboard',
+        path: `${APP_PREFIX_PATH}/dashboards/scrumboard`,
         component: React.lazy(() => import('views/app-views/dashboards/project/scrumboard')),
     },
     {
-        key: 'dashboard.project.lead',
-        path: `${APP_PREFIX_PATH}/dashboards/project/lead`,
+        key: 'dashboard.lead',
+        path: `${APP_PREFIX_PATH}/dashboards/lead`,
         component: React.lazy(() => import('views/app-views/dashboards/leads')),
     },
     {
         key: 'dashboard.project.lead',
-        path: `${APP_PREFIX_PATH}/dashboards/project/lead/viewLead`,
+        path: `${APP_PREFIX_PATH}/dashboards/project/lead/ViewLead`,
         component: React.lazy(() => import('views/app-views/dashboards/leads/ViewLead')),
     },
     {
-        key: 'dashboard.project.deal',
-        path: `${APP_PREFIX_PATH}/dashboards/project/deal`,
+        key: 'dashboard.deal',
+        path: `${APP_PREFIX_PATH}/dashboards/deal`,
         component: React.lazy(() => import('views/app-views/dashboards/deals')),
     },
     {
@@ -161,13 +161,13 @@ export const protectedRoutes = [
         component: React.lazy(() => import('views/app-views/dashboards/bug')),
     },
     {
-        key: 'dashboard.project.systemsetup',
-        path: `${APP_PREFIX_PATH}/dashboards/project/systemsetup`,
+        key: 'dashboard.systemsetup',
+        path: `${APP_PREFIX_PATH}/dashboards/systemsetup`,
         component: React.lazy(() => import('views/app-views/dashboards/systemsetup')),
     },
     {
-        key: 'dashboard.project.task',
-        path: `${APP_PREFIX_PATH}/dashboards/project/task`,
+        key: 'dashboard.task',
+        path: `${APP_PREFIX_PATH}/dashboards/task`,
         component: React.lazy(() => import('views/app-views/dashboards/task')),
     },
     {
@@ -182,8 +182,8 @@ export const protectedRoutes = [
     },
 
     {
-        key: 'dashboard.project.taskcalendar',
-        path: `${APP_PREFIX_PATH}/dashboards/project/taskcalendar`,
+        key: 'dashboard.taskcalendar',
+        path: `${APP_PREFIX_PATH}/dashboards/taskcalendar`,
         component: React.lazy(() => import('views/app-views/dashboards/taskcalendar')),
     },
     {
@@ -971,11 +971,11 @@ export const protectedRoutes = [
         component: React.lazy(() => import('views/app-views/hrm/Department/ParticularDepartment')),
     },
 
-    {
-        key: 'hrm.eventsetup',
-        path: `${APP_PREFIX_PATH}/hrm/eventsetup`,
-        component: React.lazy(() => import('views/app-views/hrm/EventSetup')),
-    },
+    // {
+    //     key: 'hrm.eventsetup',
+    //     path: `${APP_PREFIX_PATH}/hrm/eventsetup`,
+    //     component: React.lazy(() => import('views/app-views/hrm/EventSetup')),
+    // },
 
     {
         key: 'hrm.meeting',
@@ -1136,16 +1136,16 @@ export const protectedRoutes = [
         path: `${APP_PREFIX_PATH}/pages/pricing`,
         component: React.lazy(() => import('views/app-views/pages/pricing')),
     },
-    {
-        key: 'pages.customersupports',
-        path: `${APP_PREFIX_PATH}/pages/customersupports`,
-        component: React.lazy(() => import('views/app-views/pages/customersupports')),
-    },
-    {
-        key: 'pages.customersupports.ticket',
-        path: `${APP_PREFIX_PATH}/pages/customersupports/ticket`,
-        component: React.lazy(() => import('views/app-views/pages/customersupports/ticket')),
-    },
+    // {
+    //     key: 'pages.customersupports',
+    //     path: `${APP_PREFIX_PATH}/pages/customersupports`,
+    //     component: React.lazy(() => import('views/app-views/pages/customersupports')),
+    // },
+    // {
+    //     key: 'pages.customersupports.ticket',
+    //     path: `${APP_PREFIX_PATH}/pages/customersupports/ticket`,
+    //     component: React.lazy(() => import('views/app-views/pages/customersupports/ticket')),
+    // },
     {
         key: 'pages.faq',
         path: `${APP_PREFIX_PATH}/pages/faq`,
@@ -1170,6 +1170,16 @@ export const protectedRoutes = [
         key: 'users.client-user-list',
         path: `${APP_PREFIX_PATH}/users/client-user-list`,
         component: React.lazy(() => import('views/app-views/Users/client-user')),
+    },
+    {
+        key: 'pages.customersupports',
+        path: `${APP_PREFIX_PATH}/pages/customersupports`,
+        component: React.lazy(() => import('views/app-views/pages/customersupports')),
+    },
+    {
+        key: 'pages.customersupports.ticket',
+        path: `${APP_PREFIX_PATH}/pages/customersupports/ticket`,
+        component: React.lazy(() => import('views/app-views/pages/customersupports/ticket')),
     },
     
     {
