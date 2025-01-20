@@ -45,6 +45,7 @@ import salesInvoices from "../views/app-views/dashboards/sales/invoice/InvoiceRe
 import jobapplications from "../views/app-views/hrm/Jobs/JobApplication/JobapplicationReducer/JobapplicationSlice"
 import Interviews from "../views/app-views/hrm/Jobs/Interview/interviewReducer/interviewSlice"
 import jobonboarding from "../views/app-views/hrm/Jobs/JobOnBording/JobOnBoardingReducer/jobonboardingSlice"
+import Branch from "../views/app-views/hrm/Branch/BranchReducer/BranchSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -94,6 +95,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
         jobapplications,
         Interviews,
         jobonboarding,
+        Branch,
         // employee,
         // department,
         ...asyncReducers,

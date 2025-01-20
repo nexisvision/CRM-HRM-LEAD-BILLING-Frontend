@@ -25,6 +25,7 @@ import {
   GlobalOutlined ,
   // SolutionOutlined,
   BankOutlined,
+  BranchesOutlined, 
   DeploymentUnitOutlined,
   CreditCardOutlined,
   CalendarOutlined,
@@ -379,6 +380,14 @@ const extraNavvTree = [
             submenu: []
           },
           {
+            key: 'extra-hrm-branch',
+            path: `${APP_PREFIX_PATH}/hrm/branch`,
+            title: 'Branch',
+            icon: BranchesOutlined,
+            breadcrumb: false,
+            submenu: []
+          },
+          {
             key: 'extra-hrm-attendance',
             path: `${APP_PREFIX_PATH}/hrm/attendance`,
             title: 'Attendance',
@@ -429,14 +438,14 @@ const extraNavvTree = [
             ]
             
           },
-          {
-            key: 'extra-hrm-eventsetup',
-            path: `${APP_PREFIX_PATH}/hrm/eventsetup`,
-            title: 'EventSetup',
-            icon: AlertOutlined,
-            breadcrumb: false,
-            submenu: []
-          },
+          // {
+          //   key: 'extra-hrm-eventsetup',
+          //   path: `${APP_PREFIX_PATH}/hrm/eventsetup`,
+          //   title: 'EventSetup',
+          //   icon: AlertOutlined,
+          //   breadcrumb: false,
+          //   submenu: []
+          // },
           {
             key: 'extra-hrm-meeting',
             path: `${APP_PREFIX_PATH}/hrm/meeting`,
@@ -697,30 +706,30 @@ const dashBoardNavTree = [{
                 breadcrumb: false,
                 submenu: []
               },
-              {
-                key: 'dashboards-project-scrumboard',
-                path: `${APP_PREFIX_PATH}/dashboards/project/scrumboard`,
-                title: 'Leads',
-                icon: RiseOutlined,
-                breadcrumb: false,
-                submenu: []
-              },
-              {
-                key: 'dashboards-project-lead',
-                path: `${APP_PREFIX_PATH}/dashboards/project/lead`,
-                title: 'Leadss',
-                icon: RiseOutlined,
-                breadcrumb: false,
-                submenu: []
-              },
-              {
-                key: 'dashboards-project-deal',
-                path: `${APP_PREFIX_PATH}/dashboards/project/deal`,
-                title: 'Deals',
-                icon: FundProjectionScreenOutlined,
-                breadcrumb: false,
-                submenu: []
-              },
+              // {
+              //   key: 'dashboards-project-scrumboard',
+              //   path: `${APP_PREFIX_PATH}/dashboards/project/scrumboard`,
+              //   title: 'Leads',
+              //   icon: RiseOutlined,
+              //   breadcrumb: false,
+              //   submenu: []
+              // },
+              // {
+              //   key: 'dashboards-project-lead',
+              //   path: `${APP_PREFIX_PATH}/dashboards/project/lead`,
+              //   title: 'Leadss',
+              //   icon: RiseOutlined,
+              //   breadcrumb: false,
+              //   submenu: []
+              // },
+              // {
+              //   key: 'dashboards-project-deal',
+              //   path: `${APP_PREFIX_PATH}/dashboards/project/deal`,
+              //   title: 'Deals',
+              //   icon: FundProjectionScreenOutlined,
+              //   breadcrumb: false,
+              //   submenu: []
+              // },
               {
                 key: 'dashboards-project-Contract',
                 path: `${APP_PREFIX_PATH}/dashboards/project/contract`,
@@ -737,22 +746,22 @@ const dashBoardNavTree = [{
               //   breadcrumb: false,
               //   submenu: []
               // },
-              {
-                key: 'dashboards-project-Task',
-                path: `${APP_PREFIX_PATH}/dashboards/project/task`,
-                title: 'Task',
-                icon: BugOutlined,
-                breadcrumb: false,
-                submenu: []
-              },
-              {
-                key: 'dashboards-project-TaskCalendar',
-                path: `${APP_PREFIX_PATH}/dashboards/project/taskcalendar`,
-                title: 'Task Calendar',
-                icon: CalendarOutlined,
-                breadcrumb: false,
-                submenu: []
-              },
+              // {
+              //   key: 'dashboards-project-Task',
+              //   path: `${APP_PREFIX_PATH}/dashboards/project/task`,
+              //   title: 'Task',
+              //   icon: BugOutlined,
+              //   breadcrumb: false,
+              //   submenu: []
+              // },
+              // {
+              //   key: 'dashboards-project-TaskCalendar',
+              //   path: `${APP_PREFIX_PATH}/dashboards/project/taskcalendar`,
+              //   title: 'Task Calendar',
+              //   icon: CalendarOutlined,
+              //   breadcrumb: false,
+              //   submenu: []
+              // },
               {
                 key: 'dashboards-project-projectreport',
                 path: `${APP_PREFIX_PATH}/dashboards/project/projectreport`,
@@ -761,14 +770,14 @@ const dashBoardNavTree = [{
                 breadcrumb: false,
                 submenu: []
               },
-              {
-                key: 'dashboards-project-systemsetup',
-                path: `${APP_PREFIX_PATH}/dashboards/project/systemsetup`,
-                title: 'System Setup',
-                icon: BugOutlined,
-                breadcrumb: false,
-                submenu: []
-              },
+              // {
+              //   key: 'dashboards-project-systemsetup',
+              //   path: `${APP_PREFIX_PATH}/dashboards/project/systemsetup`,
+              //   title: 'System Setup',
+              //   icon: BugOutlined,
+              //   breadcrumb: false,
+              //   submenu: []
+              // },
       
             ]
           },
@@ -844,6 +853,54 @@ const dashBoardNavTree = [{
                 submenu: []
               },
             ]
+          },
+          {
+            key: 'dashboards-scrumboard',
+            path: `${APP_PREFIX_PATH}/dashboards/scrumboard`,
+            title: 'Leads',
+            icon: RiseOutlined,
+            breadcrumb: false,
+            submenu: []
+          },
+          {
+            key: 'dashboards-lead',
+            path: `${APP_PREFIX_PATH}/dashboards/lead`,
+            title: 'Leadss',
+            icon: RiseOutlined,
+            breadcrumb: false,
+            submenu: []
+          },
+          {
+            key: 'dashboards-deal',
+            path: `${APP_PREFIX_PATH}/dashboards/deal`,
+            title: 'Deals',
+            icon: FundProjectionScreenOutlined,
+            breadcrumb: false,
+            submenu: []
+          },
+          {
+            key: 'dashboards-Task',
+            path: `${APP_PREFIX_PATH}/dashboards/task`,
+            title: 'Task',
+            icon: BugOutlined,
+            breadcrumb: false,
+            submenu: []
+          },
+          {
+            key: 'dashboards-TaskCalendar',
+            path: `${APP_PREFIX_PATH}/dashboards/taskcalendar`,
+            title: 'Task Calendar',
+            icon: CalendarOutlined,
+            breadcrumb: false,
+            submenu: []
+          },
+          {
+            key: 'dashboards-systemsetup',
+            path: `${APP_PREFIX_PATH}/dashboards/systemsetup`,
+            title: 'System Setup',
+            icon: BugOutlined,
+            breadcrumb: false,
+            submenu: []
           },
           {
             key: 'dashboards-contacts',
@@ -976,21 +1033,21 @@ const dashBoardNavTree = [{
               //   breadcrumb: true,
               //   submenu: []
               // },
-              {
-                key: 'extra-pages-customersupports',
-                path: `${APP_PREFIX_PATH}/pages/customersupports`,
-                title: 'Supports',
-                icon:  CommentOutlined,
-                breadcrumb: true,
-                submenu: [
-                  {
-                    key: 'extra-pages-customersupports-ticket',
-                    path: `${APP_PREFIX_PATH}/pages/customersupports/ticket`,
-                    title: 'Ticket',
-                    icon: MenuUnfoldOutlined,
-                    breadcrumb: true,
-                    submenu: []
-                  },
+              // {
+              //   key: 'extra-pages-customersupports',
+              //   path: `${APP_PREFIX_PATH}/pages/customersupports`,
+              //   title: 'Supports',
+              //   icon:  CommentOutlined,
+              //   breadcrumb: true,
+              //   submenu: [
+              //     {
+              //       key: 'extra-pages-customersupports-ticket',
+              //       path: `${APP_PREFIX_PATH}/pages/customersupports/ticket`,
+              //       title: 'Ticket',
+              //       icon: MenuUnfoldOutlined,
+              //       breadcrumb: true,
+              //       submenu: []
+              //     },
                   // {
                   //   key: 'extra-errors-error-2',
                   //   path: `${APP_PREFIX_PATH}/error-page-2`,
@@ -999,8 +1056,8 @@ const dashBoardNavTree = [{
                   //   breadcrumb: true,
                   //   submenu: []
                   // }
-                ]
-              }
+            //     ]
+            //   }
             ]
           },
           { 
@@ -1034,6 +1091,32 @@ const dashBoardNavTree = [{
               submenu: []
             },
           ]},
+
+          {
+            key: 'extra-pages-customersupports',
+            path: `${APP_PREFIX_PATH}/pages/customersupports`,
+            title: 'Supports',
+            icon:  CommentOutlined,
+            breadcrumb: true,
+            submenu: [
+              {
+                key: 'extra-pages-customersupports-ticket',
+                path: `${APP_PREFIX_PATH}/pages/customersupports/ticket`,
+                title: 'Ticket',
+                icon: MenuUnfoldOutlined,
+                breadcrumb: true,
+                submenu: []
+              },
+              // {
+              //   key: 'extra-errors-error-2',
+              //   path: `${APP_PREFIX_PATH}/error-page-2`,
+              //   title: 'sidenav.errors.error.2',
+              //   icon: '',
+              //   breadcrumb: true,
+              //   submenu: []
+              // }
+            ]
+          }
           
         
     // 

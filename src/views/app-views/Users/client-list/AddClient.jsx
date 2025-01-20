@@ -6,6 +6,7 @@ import { addClient, ClientData, empdata } from "./CompanyReducers/CompanySlice";
 const AddClient = ({ visible, onClose, onCreate }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+  const [showOtpModal, setShowOtpModal] = useState(false);
 
   const handleFinish = async (values) => {
     try {
@@ -31,9 +32,24 @@ const AddClient = ({ visible, onClose, onCreate }) => {
     }
   };
 
+  const handleOtpVerify = () => {
+    // Handle OTP verification logic here
+    console.log("OTP Verified");
+
+    // Close OTP modal after verification
+    setShowOtpModal(false);
+  };
+
+  const onOpenOtpModal = () => {
+    setShowOtpModal(true);
+  };
+  const onCloseOtpModal = () => {
+    setShowOtpModal(false);
+  };
   
 
   return (
+    <div>
     <Form
       form={form}
       layout="vertical"
@@ -84,13 +100,39 @@ const AddClient = ({ visible, onClose, onCreate }) => {
             <Button onClick={onClose}>Cancel</Button>
           </Col>
           <Col>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" onClick={onOpenOtpModal}>
               Create
             </Button>
           </Col>
         </Row>
       </Form.Item>
     </Form>
+    <Modal
+        title="Verify OTP"
+        visible={showOtpModal} 
+        onCancel={onCloseOtpModal} 
+        footer={null} 
+        centered
+      >
+        <div className="p-4 rounded-lg bg-white">
+          <h2 className="text-xl font-semibold mb-4">OTP Page</h2>
+          <p>
+            An OTP has been sent to your registered email. Please enter the OTP below to verify your account.
+          </p>
+          <Input
+          type="number"
+            placeholder="Enter OTP"
+            className="mt-4 p-3 border border-gray-300 rounded-md"
+            style={{ width: "100%" }}
+          />
+          <div className="mt-4">
+            <Button type="primary" className="w-full" onClick={handleOtpVerify}>
+              Verify OTP
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    </div>
   );
 };
 

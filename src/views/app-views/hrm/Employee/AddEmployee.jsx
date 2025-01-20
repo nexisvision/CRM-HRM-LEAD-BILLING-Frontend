@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  Modal,
   Input,
   Button,
   DatePicker,
@@ -24,6 +25,21 @@ const AddEmployee = ({ onClose, setSub }) => {
   // const [form] = Form.useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const handleOtpVerify = () => {
+    // Handle OTP verification logic here
+    console.log("OTP Verified");
+    
+    // Close OTP modal after verification
+    setShowOtpModal(false);
+  };
+  const [showOtpModal, setShowOtpModal] = useState(false);
+
+  const onOpenOtpModal = () => {
+    setShowOtpModal(true);
+  };
+  const onCloseOtpModal = () => {
+    setShowOtpModal(false);
+  };
 
   // const onSubmit = async (values) => {
   //   console.log("Submitted values:", values);
@@ -671,9 +687,10 @@ const AddEmployee = ({ onClose, setSub }) => {
               >
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit"  onClick={onOpenOtpModal}>
                 <button type="submit" disabled={isSubmitting}>
                   {isSubmitting ? "Submitting..." : "Submit"}
+
                 </button>
                 {/* Submit */}
               </Button>
@@ -681,6 +698,31 @@ const AddEmployee = ({ onClose, setSub }) => {
           </Form>
         )}
       </Formik>
+      <Modal
+        title="Verify OTP"
+        visible={showOtpModal} // Control visibility based on showOtpModal state
+        onCancel={onCloseOtpModal} // Close OTP modal
+        footer={null} // Remove footer buttons
+        centered
+      >
+        <div className="p-4 rounded-lg bg-white">
+          <h2 className="text-xl font-semibold mb-4">OTP Page</h2>
+          <p>
+            An OTP has been sent to your registered email. Please enter the OTP below to verify your account.
+          </p>
+          <Input
+          type="number"
+            placeholder="Enter OTP"
+            className="mt-4 p-3 border border-gray-300 rounded-md"
+            style={{ width: "100%" }}
+          />
+          <div className="mt-4">
+            <Button type="primary" className="w-full" onClick={handleOtpVerify}>
+              Verify OTP
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

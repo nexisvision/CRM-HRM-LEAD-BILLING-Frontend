@@ -1,11 +1,13 @@
 import React from 'react';
-import { Formik, Form as FormikForm, Field } from 'formik';
-import { Input, Button, Row, Col, message } from 'antd';
+import { Formik, Form as FormikForm, Field , ErrorMessage} from 'formik';
+import { Input, Button, Row, Col, message, Select } from 'antd';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { AddDept, getDept } from './DepartmentReducers/DepartmentSlice';
+import { getBranch } from '../Branch/BranchReducer/BranchSlice';
 
+const { Option } = Select;
 // Validation Schema using Yup
 const validationSchema = Yup.object().shape({
   department_name: Yup.string()
@@ -22,6 +24,7 @@ const AddDepartment = ({ onClose }) => {
     dispatch(AddDept(values))
       .then(() => {
         dispatch(getDept());
+       
         message.success('Department added successfully!');
         resetForm();
         onClose();
@@ -44,7 +47,7 @@ const AddDepartment = ({ onClose }) => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ errors, touched, setFieldValue, resetForm }) => (
+        {({ errors, touched, setFieldValue, resetForm, setFieldTouched, values }) => (
           <FormikForm>
             <Row gutter={16}>
               <Col span={12}>
@@ -61,6 +64,32 @@ const AddDepartment = ({ onClose }) => {
                   )}
                 </div>
               </Col>
+              <Col span={12} className="mb-4">
+                <div className="form-item">
+                  <label>Branch</label>
+                  <Field name="branch">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full"
+                        placeholder="Select Branch"
+                        onChange={(value) => setFieldValue("branch", value)}
+                        value={values.branch}
+                        onBlur={() => setFieldTouched("branch", true)}
+                      >
+                         <Option value="all">All</Option>
+                         <Option value="branch1">Branch 1</Option>
+                        
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="branch"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+                </Col>
             </Row>
 
             <div className="text-right">
