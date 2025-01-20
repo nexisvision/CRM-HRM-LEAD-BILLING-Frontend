@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Button,
@@ -11,8 +11,10 @@ import {
 } from "antd";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form } from "antd";
-import { AddInvoices } from "./InvoiceReducer/InvoiceSlice";
-import { useDispatch } from "react-redux";
+import { AddInvoices, getInvoice } from "./InvoiceReducer/InvoiceSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { ErrorMessage } from "formik";
+import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 
 const { Option } = Select;
 
@@ -53,6 +55,13 @@ const AddInvoice = ({ onClose }) => {
       },
     ]);
   };
+
+  useEffect(() => {
+    dispatch(Getcus());
+  }, []);
+
+  const customerdata = useSelector((state) => state.customers);
+  const fnddata = customerdata.customers.data;
 
   const handleDeleteRow = (id) => {
     const updatedRows = rows.filter((row) => row.id !== id);
@@ -141,6 +150,7 @@ const AddInvoice = ({ onClose }) => {
         dispatch(AddInvoices(invoiceData))
           .then(() => {
             message.success("Invoice added successfully!");
+            dispatch(getInvoice());
             onClose();
           })
           .catch((error) => {
@@ -158,15 +168,30 @@ const AddInvoice = ({ onClose }) => {
       <Form form={form} layout="vertical">
         <Card className="border-0 mt-4">
           <Row gutter={16}>
-            <Col span={8}>
+            <Col span={12} className="mt-4">
               <Form.Item
                 label="Customer"
                 name="customer"
-                rules={[{ required: true, message: "Please select customer" }]}
+                rules={[
+                  { required: true, message: "Please select a customer" },
+                ]}
               >
-                <Select placeholder="Select Customer">
-                  <Option value="xyz">XYZ</Option>
-                  <Option value="abc">ABC</Option>
+                <Select
+                  style={{ width: "100%" }}
+                  placeholder="Select Client"
+                  loading={!fnddata}
+                >
+                  {fnddata && fnddata.length > 0 ? (
+                    fnddata.map((client) => (
+                      <Option key={client.id} value={client.id}>
+                        {client.name || "Unnamed Client"}
+                      </Option>
+                    ))
+                  ) : (
+                    <Option value="" disabled>
+                      No customers available
+                    </Option>
+                  )}
                 </Select>
               </Form.Item>
             </Col>

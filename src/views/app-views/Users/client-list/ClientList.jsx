@@ -69,8 +69,6 @@ const ClientList = () => {
 
   const dispatch = useDispatch();
 
-
-
   const deleteUser = (userId) => {
     dispatch(deleteClient(userId));
     setUsers(users.filter((user) => user.id !== userId));
@@ -95,8 +93,6 @@ const ClientList = () => {
     dispatch(ClientData());
   }, [dispatch]);
 
-
-
   useEffect(() => {
     if (tabledata && tabledata.ClientData && tabledata.ClientData.data) {
       const filteredUsers = tabledata.ClientData.data.filter(
@@ -110,7 +106,7 @@ const ClientList = () => {
   //   if (tabledata && tabledata.ClientData && tabledata.ClientData.data) {
   //     setUsers(tabledata.ClientData.data);
   //   }
-  // }, [tabledata]); 
+  // }, [tabledata]);
 
   const companyStatusList = ["active", "blocked"];
 

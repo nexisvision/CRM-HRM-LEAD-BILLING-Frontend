@@ -157,7 +157,7 @@ const AddMeeting = ({ onClose }) => {
                         {empData && empData.length > 0 ? (
                           empData.map((emp) => (
                             <Option key={emp.id} value={emp.id}>
-                              {emp.firstName || "Unnamed Employee"}
+                              {emp.username || "Unnamed Employee"}
                             </Option>
                           ))
                         ) : (

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { TiArrowMove } from "react-icons/ti";
 
 import Flex from "components/shared-components/Flex";
-import { Button, Modal, Select } from "antd";
+import { Button, message, Modal, Select } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -59,10 +59,11 @@ const DealStagesList = () => {
   };
 
   const deletefun = (userId) => {
-    dispatch(deletestages(userId));
-    setLeadadatafilter(leadadatafilter.filter((item) => item.id !== userId));
-    dispatch(getstages());
-    dispatch(getstages());
+    dispatch(deletestages(userId)).then(() => {
+      setLeadadatafilter(leadadatafilter.filter((item) => item.id !== userId));
+      dispatch(getstages());
+      message.success("Leade stage deleted successfully");
+    });
   };
 
   const Editfun = (idd) => {
@@ -150,7 +151,6 @@ const DealStagesList = () => {
                 No lead stages available.
               </div>
             )}
-           
           </div>
         </div>
       </div>

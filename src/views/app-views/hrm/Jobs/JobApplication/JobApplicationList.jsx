@@ -239,11 +239,11 @@ const JobApplicationList = () => {
       dataIndex: "location",
       sorter: (a, b) => a.leavetype.length - b.leavetype.length,
     },
-    {
-      title: "job",
-      dataIndex: "job",
-      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
-    },
+    // {
+    //   title: "job",
+    //   dataIndex: "job",
+    //   sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+    // },
     {
       title: "current_location",
       dataIndex: "current_location",

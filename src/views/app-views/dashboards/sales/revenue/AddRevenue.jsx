@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Input,
   Button,
@@ -14,14 +14,22 @@ import "react-quill/dist/quill.snow.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import ReactQuill from "react-quill";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AddRevenues, getRevenue } from "./RevenueReducer/RevenueSlice";
+import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 
 const { Option } = Select;
 
 const AddRevenue = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(Getcus());
+  }, []);
+
+  const customerdata = useSelector((state) => state.customers);
+  const fnddata = customerdata.customers.data;
 
   const onSubmit = (values, { resetForm }) => {
     dispatch(AddRevenues(values)).then(() => {
@@ -142,15 +150,25 @@ const AddRevenue = ({ onClose }) => {
                           <Select
                             {...field}
                             className="w-full"
-                            placeholder="Select customer"
+                            placeholder="Select Customer"
+                            loading={!fnddata} // Loading state
                             onChange={(value) =>
                               setFieldValue("customer", value)
                             }
-                            value={values.category}
+                            value={values.customer}
                             onBlur={() => setFieldTouched("customer", true)}
                           >
-                            <Option value="xyz">XYZ</Option>
-                            <Option value="abc">ABC</Option>
+                            {fnddata && fnddata.length > 0 ? (
+                              fnddata.map((client) => (
+                                <Option key={client.id} value={client.id}>
+                                  {client.name || "Unnamed Client"}
+                                </Option>
+                              ))
+                            ) : (
+                              <Option value="" disabled>
+                                No customers available
+                              </Option>
+                            )}
                           </Select>
                         )}
                       </Field>

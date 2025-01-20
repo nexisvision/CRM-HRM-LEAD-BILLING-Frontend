@@ -31,15 +31,11 @@ export const GetLablee = createAsyncThunk(
   }
 );
 
-
-
-
-
 export const AddLable = createAsyncThunk(
   "users/AddLable",
-  async ({ id, payload }, thunkAPI) => {
+  async ({ lid, payload }, thunkAPI) => {
     try {
-      const response = await UserService.AddLable(id, payload);
+      const response = await UserService.AddLable(lid, payload);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);

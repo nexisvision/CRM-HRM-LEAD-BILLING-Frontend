@@ -17,6 +17,7 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { editRevenue, getRevenue } from "./RevenueReducer/RevenueSlice";
 import moment from "moment/moment";
+import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 
 const { Option } = Select;
 
@@ -46,10 +47,17 @@ const EditRevenue = ({ idd, onClose }) => {
   }, [dispatch]);
 
   useEffect(() => {
+    dispatch(Getcus());
+  }, []);
+
+  const customerdata = useSelector((state) => state.customers);
+  const fnddatas = customerdata.customers.data;
+
+  useEffect(() => {
     if (fnd) {
-      // Set initial values when `fnd` is available
+      console.log("popopop", fnd);
       setInitialValues({
-        date: fnd.date ? moment(fnd.date, "YYYY-MM-DD") : null, // Ensure the date is formatted correctly
+        date: fnd.date ? moment(fnd.date, "YYYY-MM-DD") : null,
         amount: fnd.amount || "",
         account: fnd.account || "",
         customer: fnd.customer || "",
@@ -162,15 +170,25 @@ const EditRevenue = ({ idd, onClose }) => {
                           <Select
                             {...field}
                             className="w-full"
-                            placeholder="Select customer"
+                            placeholder="Select Customer"
+                            loading={!fnddatas} // Loading state
                             onChange={(value) =>
                               setFieldValue("customer", value)
                             }
                             value={values.customer}
                             onBlur={() => setFieldTouched("customer", true)}
                           >
-                            <Option value="xyz">XYZ</Option>
-                            <Option value="abc">ABC</Option>
+                            {fnddatas && fnddatas.length > 0 ? (
+                              fnddatas.map((client) => (
+                                <Option key={client.id} value={client.id}>
+                                  {client.name || "Unnamed Client"}
+                                </Option>
+                              ))
+                            ) : (
+                              <Option value="" disabled>
+                                No customers available
+                              </Option>
+                            )}
                           </Select>
                         )}
                       </Field>

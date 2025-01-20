@@ -45,8 +45,7 @@ const AddTrainingSetup = ({ onClose }) => {
     ]);
   };
 
-  const onSubmit = (values, { resetForm }) => {
-    // Convert rows into the desired `links` structure
+  const onSubmit = async (values, { resetForm }) => {
     const links = rows.reduce((acc, row, index) => {
       acc[index] = { title: row.title, url: row.link };
       return acc;
@@ -54,17 +53,27 @@ const AddTrainingSetup = ({ onClose }) => {
 
     const payload = {
       category: values.category,
-      links: links, // Object of arrays
+      links: links,
     };
 
-    console.log("Payload to send:", payload);
-    dispatch(AddTrainng(payload));
-    dispatch(GetallTrainng());
-    onClose();
-    resetForm();
-    message.success("Training setup added successfully!");
-    resetForm();
-    navigate("/app/hrm/trainingSetup");
+    try {
+      await dispatch(AddTrainng(payload));
+      await dispatch(GetallTrainng());
+
+      message.success("Training setup added successfully!");
+      form.setFieldsValue(initialValues);
+      setRows([
+        {
+          id: Date.now(),
+          link: "",
+          title: "",
+        },
+      ]);
+
+      onClose();
+    } catch (error) {
+      message.error("Failed to add training setup!");
+    }
   };
 
   return (

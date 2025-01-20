@@ -14,6 +14,8 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { EditInterview, getInterview } from "./interviewReducer/interviewSlice";
 import moment from "moment/moment";
+import { GetJobdata } from "../JobReducer/JobSlice";
+import { getjobapplication } from "../JobApplication/JobapplicationReducer/JobapplicationSlice";
 const { Option } = Select;
 
 const EditInterviewForm = ({ idd, onClose, onEditInterview }) => {
@@ -21,6 +23,20 @@ const EditInterviewForm = ({ idd, onClose, onEditInterview }) => {
   const alldat = useSelector((state) => state.Interviews);
   const fnddata = alldat.Interviews.data;
   const intData = fnddata.find((item) => item.id === idd);
+
+  useEffect(() => {
+    dispatch(GetJobdata());
+  }, []);
+
+  const customerdata = useSelector((state) => state.Jobs);
+  const fnddatas = customerdata.Jobs.data;
+
+  useEffect(() => {
+    dispatch(getjobapplication());
+  }, []);
+
+  const allappdata = useSelector((state) => state.jobapplications);
+  const datafnd = allappdata.jobapplications.data;
 
   const [initialValues, setInitialValues] = useState({
     job: "",
@@ -120,53 +136,70 @@ const EditInterviewForm = ({ idd, onClose, onEditInterview }) => {
             {/* Job Dropdown */}
             <Col span={12} className="mt-2">
               <div className="form-item">
-                <label className="font-semibold">Job</label>
+                <label className="font-semibold">job</label>
                 <Field name="job">
                   {({ field }) => (
                     <Select
                       {...field}
                       className="w-full"
-                      placeholder="Select Job"
+                      placeholder="Select job"
+                      loading={!fnddatas} // Loading state
                       onChange={(value) => setFieldValue("job", value)}
+                      value={values.customer}
                       onBlur={() => setFieldTouched("job", true)}
                     >
-                      <Option value="Frontend Developer">
-                        Frontend Developer
-                      </Option>
-                      <Option value="Backend Developer">
-                        Backend Developer
-                      </Option>
+                      {fnddatas && fnddatas.length > 0 ? (
+                        fnddatas.map((client) => (
+                          <Option key={client.id} value={client.id}>
+                            {client.title || "Unnamed job"}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option value="" disabled>
+                          No customers available
+                        </Option>
+                      )}
                     </Select>
                   )}
                 </Field>
                 <ErrorMessage
-                  name="job"
+                  name="customer"
                   component="div"
                   className="error-message text-red-500 my-1"
                 />
               </div>
             </Col>
 
-            {/* Candidate Dropdown */}
             <Col span={12} className="mt-2">
               <div className="form-item">
-                <label className="font-semibold">Candidate</label>
+                <label className="font-semibold">candidate</label>
                 <Field name="candidate">
                   {({ field }) => (
                     <Select
                       {...field}
                       className="w-full"
-                      placeholder="Select Candidate"
+                      placeholder="Select candidate"
+                      loading={!fnddata} // Loading state
                       onChange={(value) => setFieldValue("candidate", value)}
+                      value={values.customer}
                       onBlur={() => setFieldTouched("candidate", true)}
                     >
-                      <Option value="Alice">Alice</Option>
-                      <Option value="Bob">Bob</Option>
+                      {datafnd && datafnd.length > 0 ? (
+                        datafnd.map((client) => (
+                          <Option key={client.id} value={client.id}>
+                            {client.name || "Unnamed candidate"}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option value="" disabled>
+                          No customers available
+                        </Option>
+                      )}
                     </Select>
                   )}
                 </Field>
                 <ErrorMessage
-                  name="candidate"
+                  name="customer"
                   component="div"
                   className="error-message text-red-500 my-1"
                 />

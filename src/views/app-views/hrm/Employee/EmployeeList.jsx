@@ -24,6 +24,7 @@ import utils from "utils";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteEmp, empdata } from "./EmployeeReducers/EmployeeSlice";
+import { roledata } from "../RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice";
 
 const EmployeeList = () => {
   // State declarations
@@ -41,6 +42,13 @@ const EmployeeList = () => {
     useState(false);
   const tabledata = useSelector((state) => state.employee);
   const [sub, setSub] = useState(false);
+
+  const allroledata = useSelector((state) => state.role);
+  const fndroledata = allroledata.role.data;
+
+  useEffect(() => {
+    dispatch(roledata());
+  }, []);
 
   // Modal handlers
   const openAddEmployeeModal = () => setIsAddEmployeeModalVisible(true);
@@ -98,9 +106,21 @@ const EmployeeList = () => {
 
   useEffect(() => {
     if (tabledata && tabledata.employee && tabledata.employee.data) {
-      setUsers(tabledata.employee.data);
+      const datas = tabledata.employee.data;
+
+      if (datas) {
+        // const matchingRoleData = fndroledata.find(
+        //   (item) => item.role_name === "employee"
+        // );
+
+        // const filteredData = datas.filter(
+        //   (item) => item.role_id && item.role_name === "employee"
+        // );
+
+        setUsers(datas);
+      }
     }
-  }, [tabledata]);
+  }, [tabledata]); // Make sure to include roleiddd in dependencies if it changes
 
   // Dropdown menu component
   const dropdownMenu = (elm) => (
@@ -176,7 +196,7 @@ const EmployeeList = () => {
   const tableColumns = [
     {
       title: "User",
-      dataIndex: `firstName`,
+      dataIndex: `username` || `firstName`,
       sorter: {
         compare: (a, b) => a.firstName.length - b.firstName.length,
       },

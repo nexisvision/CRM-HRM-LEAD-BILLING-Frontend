@@ -37,7 +37,6 @@ const EditLeave = ({ editid, onClose }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    console.log("iiiiii", editid);
     if (
       editid &&
       leaveData?.Leave?.data.length > 0 &&
@@ -112,7 +111,7 @@ const EditLeave = ({ editid, onClose }) => {
               <Select placeholder="Select Employee">
                 {employeedata.map((emp) => (
                   <Option key={emp.id} value={emp.id}>
-                    {emp.firstName} {emp.lastName}
+                    {emp.username}
                   </Option>
                 ))}
               </Select>

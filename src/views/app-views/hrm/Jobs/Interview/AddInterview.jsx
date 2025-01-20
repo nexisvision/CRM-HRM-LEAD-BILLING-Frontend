@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Input,
   Button,
@@ -9,13 +9,29 @@ import {
   Row,
   Col,
 } from "antd";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { AddInterviews, getInterview } from "./interviewReducer/interviewSlice";
+import { GetJobdata } from "../JobReducer/JobSlice";
+import { getjobapplication } from "../JobApplication/JobapplicationReducer/JobapplicationSlice";
 const { Option } = Select;
 const AddInterview = ({ onClose, onAddInterview }) => {
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(GetJobdata());
+  }, []);
+
+  const customerdata = useSelector((state) => state.Jobs);
+  const fnddata = customerdata.Jobs.data;
+
+  useEffect(() => {
+    dispatch(getjobapplication());
+  }, []);
+
+  const allappdata = useSelector((state) => state.jobapplications);
+  const datafnd = allappdata.jobapplications.data;
 
   const onSubmit = (values, { resetForm }) => {
     const formattedData = {
@@ -82,54 +98,73 @@ const AddInterview = ({ onClose, onAddInterview }) => {
           <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
           <Row gutter={16}>
             {/* Job Dropdown */}
+
             <Col span={12} className="mt-2">
               <div className="form-item">
-                <label className="font-semibold">Job</label>
+                <label className="font-semibold">job</label>
                 <Field name="job">
                   {({ field }) => (
                     <Select
                       {...field}
                       className="w-full"
-                      placeholder="Select Job"
+                      placeholder="Select job"
+                      loading={!fnddata} // Loading state
                       onChange={(value) => setFieldValue("job", value)}
+                      value={values.customer}
                       onBlur={() => setFieldTouched("job", true)}
                     >
-                      <Option value="Frontend Developer">
-                        Frontend Developer
-                      </Option>
-                      <Option value="Backend Developer">
-                        Backend Developer
-                      </Option>
+                      {fnddata && fnddata.length > 0 ? (
+                        fnddata.map((client) => (
+                          <Option key={client.id} value={client.id}>
+                            {client.title || "Unnamed job"}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option value="" disabled>
+                          No customers available
+                        </Option>
+                      )}
                     </Select>
                   )}
                 </Field>
                 <ErrorMessage
-                  name="job"
+                  name="customer"
                   component="div"
                   className="error-message text-red-500 my-1"
                 />
               </div>
             </Col>
-            {/* Candidate Dropdown */}
+
             <Col span={12} className="mt-2">
               <div className="form-item">
-                <label className="font-semibold">Candidate</label>
+                <label className="font-semibold">candidate</label>
                 <Field name="candidate">
                   {({ field }) => (
                     <Select
                       {...field}
                       className="w-full"
-                      placeholder="Select Candidate"
+                      placeholder="Select candidate"
+                      loading={!fnddata} // Loading state
                       onChange={(value) => setFieldValue("candidate", value)}
+                      value={values.customer}
                       onBlur={() => setFieldTouched("candidate", true)}
                     >
-                      <Option value="Alice">Alice</Option>
-                      <Option value="Bob">Bob</Option>
+                      {datafnd && datafnd.length > 0 ? (
+                        datafnd.map((client) => (
+                          <Option key={client.id} value={client.id}>
+                            {client.name || "Unnamed candidate"}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option value="" disabled>
+                          No customers available
+                        </Option>
+                      )}
                     </Select>
                   )}
                 </Field>
                 <ErrorMessage
-                  name="candidate"
+                  name="customer"
                   component="div"
                   className="error-message text-red-500 my-1"
                 />

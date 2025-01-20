@@ -1,43 +1,71 @@
 import React, { useState } from "react";
-import { Modal, Form, Input, Switch, Button, Row, Col } from "antd";
+import { Modal, Form, Input, Switch, Button, Row, Col, message } from "antd";
 import { useDispatch } from "react-redux";
 import { addClient, ClientData, empdata } from "./CompanyReducers/CompanySlice";
+import axios from "axios";
 
 const AddClient = ({ visible, onClose, onCreate }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const [showOtpModal, setShowOtpModal] = useState(false);
 
-  const handleFinish = async (values) => {
+  const [otpToken, setOtpToken] = useState(null);
+  const [otp, setOtp] = useState("");
+
+  const otpapi = async (otp) => {
     try {
-      // Dispatch the addClient action and wait for it to complete
-      await dispatch(addClient(values)).unwrap();
-
-      console.log("Client Data Added Successfully:", values);
-
-      onClose();
-
-      // Fetch the latest client data
-      await dispatch(ClientData());
-
-      // Call the onCreate callback (if any)
-      onCreate(values);
-
-      // Reset the form fields
-      form.resetFields();
-
-      // Close the modal or form
+      const res = await axios.post(
+        "http://localhost:5353/api/v1/auth/verify-signup",
+        { otp },
+        {
+          headers: {
+            Authorization: `Bearer ${otpToken}`,
+          },
+        }
+      );
+      return res.data;
     } catch (error) {
-      console.error("Error Adding Client:", error);
+      console.error("Error verifying OTP:", error);
+      throw error;
     }
   };
 
-  const handleOtpVerify = () => {
-    // Handle OTP verification logic here
-    console.log("OTP Verified");
+  const handleOtpVerify = async () => {
+    if (!otp || otp.length !== 6) {
+      message.error("Please enter a valid 6-digit OTP.");
+      return;
+    }
 
-    // Close OTP modal after verification
-    setShowOtpModal(false);
+    try {
+      const response = await otpapi(otp);
+      if (response.success) {
+        message.success("OTP Verified Successfully");
+        setShowOtpModal(false);
+        dispatch(ClientData()); // Re-fetch the users after success
+        onCloseOtpModal();
+      } else {
+        message.error("Invalid OTP. Please try again.");
+      }
+    } catch (error) {
+      message.error("Failed to verify OTP. Please try again.");
+    }
+  };
+
+  const handleFinish = async (values) => {
+    try {
+      const response = await dispatch(addClient(values));
+      if (response.payload?.data?.sessionToken) {
+        setOtpToken(response.payload?.data?.sessionToken);
+        message.success("Employee added successfully! Please verify OTP.");
+        setShowOtpModal(true); // Show OTP modal when user is added
+        onClose(); // Close the form modal
+      }
+      onCreate(values); // Callback after user creation
+      form.resetFields();
+      dispatch(ClientData()); // Refetch user list after addition
+    } catch (error) {
+      message.error("Failed to add employee. Please try again.");
+    }
   };
 
   const onOpenOtpModal = () => {
@@ -46,84 +74,82 @@ const AddClient = ({ visible, onClose, onCreate }) => {
   const onCloseOtpModal = () => {
     setShowOtpModal(false);
   };
-  
 
   return (
     <div>
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={handleFinish}
-      initialValues={{
-        loginEnabled: true,
-      }}
-    >
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
-
-      <Form.Item
-        name="username"
-        label="Name"
-        rules={[{ required: true, message: "Please enter the client name" }]}
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleFinish}
+        initialValues={{
+          loginEnabled: true,
+        }}
       >
-        <Input placeholder="Enter client Name" />
-      </Form.Item>
+        <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
 
-      <Form.Item
-        name="email"
-        label="E-Mail Address"
-        rules={[
-          { required: true, message: "Please enter the client email" },
-          { type: "email", message: "Please enter a valid email address" },
-        ]}
-      >
-        <Input placeholder="Enter Client Email" />
-      </Form.Item>
-      <Form.Item
+        <Form.Item
+          name="username"
+          label="Name"
+          rules={[{ required: true, message: "Please enter the client name" }]}
+        >
+          <Input placeholder="Enter client Name" />
+        </Form.Item>
+
+        <Form.Item
+          name="email"
+          label="E-Mail Address"
+          rules={[
+            { required: true, message: "Please enter the client email" },
+            { type: "email", message: "Please enter a valid email address" },
+          ]}
+        >
+          <Input placeholder="Enter Client Email" />
+        </Form.Item>
+        <Form.Item
           name="password"
           label="Password"
           rules={[
             {
-             
               message: "Please enter the client password",
             },
           ]}
         >
           <Input.Password placeholder="Enter Client Password" />
         </Form.Item>
-     
-       
-      
 
-      <Form.Item>
-        <Row justify="end" gutter={16}>
-          <Col>
-            <Button onClick={onClose}>Cancel</Button>
-          </Col>
-          <Col>
-            <Button type="primary" htmlType="submit" onClick={onOpenOtpModal}>
-              Create
-            </Button>
-          </Col>
-        </Row>
-      </Form.Item>
-    </Form>
-    <Modal
+        <Form.Item>
+          <Row justify="end" gutter={16}>
+            <Col>
+              <Button onClick={onClose}>Cancel</Button>
+            </Col>
+            <Col>
+              <Button type="primary" htmlType="submit" onClick={onOpenOtpModal}>
+                Create
+              </Button>
+            </Col>
+          </Row>
+        </Form.Item>
+      </Form>
+      <Modal
         title="Verify OTP"
-        visible={showOtpModal} 
-        onCancel={onCloseOtpModal} 
-        footer={null} 
+        visible={showOtpModal} // Control visibility based on showOtpModal state
+        onCancel={() => setShowOtpModal(false)} // Close OTP modal
+        footer={null} // Remove footer buttons
         centered
       >
         <div className="p-4 rounded-lg bg-white">
           <h2 className="text-xl font-semibold mb-4">OTP Page</h2>
           <p>
-            An OTP has been sent to your registered email. Please enter the OTP below to verify your account.
+            An OTP has been sent to your registered email. Please enter the OTP
+            below to verify your account.
           </p>
           <Input
-          type="number"
+            type="number"
             placeholder="Enter OTP"
             className="mt-4 p-3 border border-gray-300 rounded-md"
             style={{ width: "100%" }}
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
           />
           <div className="mt-4">
             <Button type="primary" className="w-full" onClick={handleOtpVerify}>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Form,
   Input,
@@ -15,13 +15,21 @@ import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { UploadOutlined } from "@ant-design/icons";
 import { AddTickets, getAllTicket } from "./TicketReducer/TicketSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 
 const { Option } = Select;
 
 const AddTicket = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(empdata());
+  }, []);
+
+  const alldata = useSelector((state) => state.employee);
+  const fnddata = alldata.employee.data;
 
   const initialValues = {
     ticketSubject: "",
@@ -76,11 +84,10 @@ const AddTicket = ({ onClose }) => {
                 </Field>
               </Col>
 
-              {/* Support for User */}
-              <Col span={12}>
+              {/* <Col span={12}>
                 <Field name="requestor">
                   {({ field }) => (
-                    <Form.Item label="Support for User" required>
+                    <Form.Item label="Support for Employee" required>
                       <Select
                         {...field}
                         onChange={(value) => setFieldValue("requestor", value)}
@@ -92,6 +99,41 @@ const AddTicket = ({ onClose }) => {
                     </Form.Item>
                   )}
                 </Field>
+              </Col> */}
+
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Employee</label>
+                  <Field name="requestor">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full"
+                        placeholder="Select requestor"
+                        loading={!fnddata} // Loading state
+                        onChange={(value) => setFieldValue("requestor", value)}
+                        value={values.customer}
+                      >
+                        {fnddata && fnddata.length > 0 ? (
+                          fnddata.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.username || "Unnamed requestor"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Employee available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="requestor"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
               </Col>
 
               {/* Priority */}

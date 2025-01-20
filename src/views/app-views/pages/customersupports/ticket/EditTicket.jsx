@@ -18,6 +18,7 @@ import moment from "moment";
 import { useSelector } from "react-redux";
 import { Editicket, getAllTicket } from "./TicketReducer/TicketSlice";
 import { useDispatch } from "react-redux";
+import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 
 const { Option } = Select;
 
@@ -26,6 +27,13 @@ const EditTicket = ({ idd, onClose }) => {
   const { ticketId } = useParams();
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(empdata());
+  }, []);
+
+  const alldata = useSelector((state) => state.employee);
+  const fnddatas = alldata.employee.data;
 
   const alldatat = useSelector((state) => state.Ticket);
   const fndfdata = alldatat.Ticket.data;
@@ -107,22 +115,39 @@ const EditTicket = ({ idd, onClose }) => {
                 </Field>
               </Col>
 
-              {/* Support for User */}
-              <Col span={12}>
-                <Field name="requestor">
-                  {({ field }) => (
-                    <Form.Item label="Support for User" required>
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Employee</label>
+                  <Field name="requestor">
+                    {({ field }) => (
                       <Select
                         {...field}
+                        className="w-full"
+                        placeholder="Select requestor"
+                        loading={!fnddatas} // Loading state
                         onChange={(value) => setFieldValue("requestor", value)}
-                        placeholder="Select User"
+                        value={values.customer}
                       >
-                        <Option value="Buffy Walter">Buffy Walter</Option>
-                        <Option value="John Doe">John Doe</Option>
+                        {fnddatas && fnddatas.length > 0 ? (
+                          fnddatas.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.username || "Unnamed requestor"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Employee available
+                          </Option>
+                        )}
                       </Select>
-                    </Form.Item>
-                  )}
-                </Field>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="requestor"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
               </Col>
 
               {/* Priority */}

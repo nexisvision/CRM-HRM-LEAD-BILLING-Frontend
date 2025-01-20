@@ -1,16 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Input, Button, Select, Radio, message, Row, Col } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import ReactQuill from "react-quill";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Addjobapplication,
   getjobapplication,
 } from "./JobapplicationReducer/JobapplicationSlice";
+import { GetJobdata } from "../JobReducer/JobSlice";
 const { Option } = Select;
 const AddJobApplication = ({ onClose }) => {
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(GetJobdata());
+  }, []);
+
+  const customerdata = useSelector((state) => state.Jobs);
+  const fnddata = customerdata.Jobs.data;
+
   const onSubmit = async (values) => {
     console.log("Form submitted:", values);
     try {
@@ -77,21 +86,37 @@ const AddJobApplication = ({ onClose }) => {
           >
             <Row gutter={16}>
               {/* Job */}
-              <Col span={24}>
+
+              <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Job</label>
-                  <Select
-                    placeholder="Select Job"
-                    value={values.job}
-                    onChange={(value) => setFieldValue("job", value)}
-                    onBlur={() => setFieldTouched("job", true)}
-                    className="w-full"
-                  >
-                    <Option value="developer">Software Developer</Option>
-                    <Option value="designer">Graphic Designer</Option>
-                  </Select>
+                  <label className="font-semibold">job</label>
+                  <Field name="job">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full"
+                        placeholder="Select job"
+                        loading={!fnddata} // Loading state
+                        onChange={(value) => setFieldValue("job", value)}
+                        value={values.customer}
+                        onBlur={() => setFieldTouched("job", true)}
+                      >
+                        {fnddata && fnddata.length > 0 ? (
+                          fnddata.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.title || "Unnamed job"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No customers available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
                   <ErrorMessage
-                    name="job"
+                    name="customer"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
