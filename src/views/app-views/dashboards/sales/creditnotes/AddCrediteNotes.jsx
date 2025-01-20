@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Row, Col, Input, message, Button, Select, DatePicker } from "antd";
 import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
@@ -6,16 +6,29 @@ import ReactQuill from "react-quill";
 import userData from "assets/data/user-list.data.json";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Addcreditnote,
   getcreditnote,
 } from "./CustomerReducer/CreditnoteSlice";
+import { getInvoice } from "../invoice/InvoiceReducer/InvoiceSlice";
 
 const { Option } = Select;
 
 const AddCrediteNotes = ({ onClose }) => {
   const dispatch = useDispatch();
+  
+
+  useEffect(()=>{
+    dispatch(getInvoice())
+  },[])
+
+  const allinvcoicedata = useSelector((state)=>state.salesInvoices);
+  const fnddata = allinvcoicedata.salesInvoices.data;
+
+
+
+
 
   const [rows, setRows] = useState([
     {
@@ -104,26 +117,33 @@ const AddCrediteNotes = ({ onClose }) => {
                 {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
                   <Form className="formik-form" onSubmit={handleSubmit}>
                     <Row gutter={16}>
-                      <Col span={24}>
+                      
+                      <Col span={24} className="mt-2">
                         <div className="form-item">
-                          <label className="font-semibold">Invoice</label>
+                          <label className="font-semibold">invoice</label>
                           <Field name="invoice">
                             {({ field }) => (
                               <Select
                                 {...field}
                                 className="w-full"
-                                placeholder="Select Invoice"
+                                placeholder="Select invoice"
                                 onChange={(value) =>
                                   setFieldValue("invoice", value)
                                 }
                                 value={values.invoice}
                                 onBlur={() => setFieldTouched("invoice", true)}
                               >
-                                <Option value="Select Invoice">
-                                  Select Invoice
-                                </Option>
-                                <Option value="xyz">xyz</Option>
-                                <Option value="abc">ABC</Option>
+                                {fnddata && fnddata.length > 0 ? (
+                                  fnddata.map((client) => (
+                                    <Option key={client.id} value={client.id}>
+                                      {client.salesInvoiceNumber || "Unnamed Client"}
+                                    </Option>
+                                  ))
+                                ) : (
+                                  <Option value="" disabled>
+                                    No invoice Available
+                                  </Option>
+                                )}
                               </Select>
                             )}
                           </Field>

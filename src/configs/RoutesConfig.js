@@ -1048,6 +1048,11 @@ export const protectedRoutes = [
         path: `${APP_PREFIX_PATH}/hrm/jobs/jobapplication`,
         component: React.lazy(() => import('views/app-views/hrm/Jobs/JobApplication')),
     },
+    // {
+    //     key: 'hrm.jobs.jobofferletter',
+    //     path: `${APP_PREFIX_PATH}/hrm/jobs/jobofferletter`,
+    //     component: React.lazy(() => import('views/app-views/hrm/Jobs/JobOfferLetter')),
+    // },
     {
         key: 'hrm.jobs.interview',
         path: `${APP_PREFIX_PATH}/hrm/jobs/interview`,
@@ -1186,9 +1191,13 @@ export const protectedRoutes = [
         key: 'docs.documentation',
         path: `${APP_PREFIX_PATH}/docs/documentation/*`,
         component: React.lazy(() => import('views/app-views/docs')),
-    }
+    },
+    {
+        key: 'hrm.jobs.jobofferletter',
+        path: `${APP_PREFIX_PATH}/hrm/jobs/jobofferletter`,
+        component: React.lazy(() => import('views/app-views/hrm/Jobs/JobOfferLetter')),
+    },
 ]
-
 
 // import React from 'react'
 // import { AUTH_PREFIX_PATH, APP_PREFIX_PATH } from 'configs/AppConfig'

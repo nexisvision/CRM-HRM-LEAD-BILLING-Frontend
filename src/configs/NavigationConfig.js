@@ -502,6 +502,14 @@ const extraNavvTree = [
                 submenu: []
               },
               {
+                key: 'extra-hrm-jobs-jobofferlatter',
+                path: `${APP_PREFIX_PATH}/hrm/jobs/jobofferlatter`,
+                title: 'Job Offer Letter',
+                icon: SolutionOutlined,
+                breadcrumb: true,
+                submenu: []
+              },
+              {
                 key: 'extra-hrm-jobs-interview',
                 path: `${APP_PREFIX_PATH}/hrm/jobs/interview`,
                 title: 'Interviews',
