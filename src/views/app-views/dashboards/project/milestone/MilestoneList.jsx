@@ -158,7 +158,7 @@ export const MilestoneList = () => {
     openEditMilestoneModal();
     setIdd(id);
   };
-console.log(idd,"idddd");
+// console.log(idd,"idddd");
   const dropdownMenu = (row) => (
     <Menu>
       <Menu.Item>

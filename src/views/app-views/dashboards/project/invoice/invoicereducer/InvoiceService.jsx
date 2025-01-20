@@ -91,7 +91,7 @@ const InvoiceService = {
     try {
       const response = await axios.put(
         `http://localhost:5353/api/v1/invoices/${idd}`,
-        data,
+        data, 
         {
           headers: {
             Authorization: `Bearer ${token}`,

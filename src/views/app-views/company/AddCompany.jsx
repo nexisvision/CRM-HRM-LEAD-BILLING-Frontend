@@ -36,9 +36,7 @@ const AddCompany = ({ visible, onClose, onCreate }) => {
   };
  
 
-  const handleSwitchChange = (checked) => {
-    setLoginEnabled(checked);
-  };
+  
 
   return (
   
@@ -71,16 +69,10 @@ const AddCompany = ({ visible, onClose, onCreate }) => {
           <Input placeholder="Enter Client Email" />
         </Form.Item>
 
-        <Form.Item
-          name="loginEnabled"
-          label="Login is enabled"
-          valuePropName="checked"
-        >
-          <Switch onChange={handleSwitchChange} />
-        </Form.Item>
+        
 
         {/* Conditionally render password field based on loginEnabled state */}
-        {loginEnabled && (
+        
           <Form.Item
             name="password"
             label="Password"
@@ -88,7 +80,7 @@ const AddCompany = ({ visible, onClose, onCreate }) => {
           >
             <Input.Password placeholder="Enter Client Password" />
           </Form.Item>
-        )}
+       
 
         <Form.Item>
           <Row justify="end" gutter={16}>

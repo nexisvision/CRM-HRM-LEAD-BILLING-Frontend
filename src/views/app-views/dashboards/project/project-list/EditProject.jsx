@@ -159,7 +159,7 @@ const EditProject = ({ id, onClose }) => {
                   <DatePicker
                     className="w-full"
                     format="DD-MM-YYYY"
-                    value={values.startdate ? moment(values.startdate) : null}
+                    value={values.startDate ? moment(values.startDate) : null}
                     onChange={(date) => setFieldValue("startdate", date)}
                     onBlur={() => setFieldTouched("startdate", true)}
                   />
@@ -177,7 +177,7 @@ const EditProject = ({ id, onClose }) => {
                   <DatePicker
                     className="w-full"
                     format="DD-MM-YYYY"
-                    value={values.enddate ? moment(values.enddate) : null}
+                    value={values.endDate ? moment(values.endDate) : null}
                     onChange={(date) => setFieldValue("enddate", date)}
                     onBlur={() => setFieldTouched("enddate", true)}
                   />
@@ -198,7 +198,7 @@ const EditProject = ({ id, onClose }) => {
                         style={{ width: "100%" }}
                         placeholder="Select User"
                         loading={!employeedata}
-                        value={values.user}
+                        value={values.client}
                         onChange={(value) => setFieldValue("user", value)}
                         onBlur={() => setFieldTouched("user", true)}
                       >

@@ -12,9 +12,9 @@ import {
   Modal,
   Checkbox,
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -24,6 +24,7 @@ import { useSelector } from "react-redux";
 import { EditTasks, GetTasks } from "./TaskReducer/TaskSlice";
 import { useDispatch } from "react-redux";
 import moment from "moment";
+import { AddLable, GetLable } from "./LableReducer/LableSlice";
 
 const { Option } = Select;
 
@@ -33,6 +34,22 @@ const EditTask = ({ idd, onClose }) => {
   const [isWithoutDueDate, setIsWithoutDueDate] = useState(false);
   const [isOtherDetailsVisible, setIsOtherDetailsVisible] = useState(false);
   const [showReceiptUpload, setShowReceiptUpload] = useState(false);
+
+  const { id } = useParams();
+
+    const [isPriorityModalVisible, setIsPriorityModalVisible] = useState(false);
+    const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+    const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
+    const [newPriority, setNewPriority] = useState("");
+    const [newCategory, setNewCategory] = useState("");
+    const [newStatus, setNewStatus] = useState("");
+    // const [priorites, setTags] = useState([]);
+  
+    const [priorities, setPriorities] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [statuses, setStatuses] = useState([]);
+
+
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
   const [initialValues, setInitialValues] = useState({
@@ -58,21 +75,24 @@ const EditTask = ({ idd, onClose }) => {
   const allempdata = useSelector((state) => state.Tasks);
   const Expensedata = allempdata?.Tasks?.data || [];
 
+ const AllLoggedData = useSelector((state) => state.user);
+
+
   useEffect(() => {
     if (idd) {
       const milestone = Expensedata.find((item) => item.id === idd);
 
       if (milestone) {
         const updatedValues = {
-          taskTitle: milestone.taskTitle || "",
-          TaskCategory: milestone.TaskCategory || "",
+          taskName: milestone.taskName || "",
+          category: milestone.category || "",
           projectName: milestone.projectName || "",
-          taskDate: milestone.taskDate ? moment(milestone.taskDate) : null, // Ensure date values are compatible with DatePicker
+          startDate: milestone.startDate ? moment(milestone.startDate) : null, // Ensure date values are compatible with DatePicker
           dueDate: milestone.dueDate ? moment(milestone.dueDate) : null,
           AssignTo: milestone.AssignTo || [],
-          taskDescription: milestone.taskDescription || "",
-          taskStatus: milestone.taskStatus || "",
-          taskPriority: milestone.taskPriority || "",
+          description: milestone.description || "",
+          status: milestone.status || "",
+          priority: milestone.priority || "",
         };
 
         setInitialValues(updatedValues); // Update the initial values state
@@ -81,6 +101,62 @@ const EditTask = ({ idd, onClose }) => {
       }
     }
   }, [idd, Expensedata]); // Dependencies ensure this runs when `idd` or `Expensedata` changes
+
+
+
+
+  const fetchLables = async (lableType, setter) => {
+    try {
+      const lid = AllLoggedData.loggedInUser.id; // User ID to fetch specific labels
+      const response = await dispatch(GetLable(id)); // Fetch all labels
+      if (response.payload && response.payload.data) {
+        const filteredLables = response.payload.data
+          .filter((lable) => lable.lableType === lableType) // Filter by labelType
+          .map((lable) => ({ id: lable.id, name: lable.name.trim() })); // Trim and format
+        setter(filteredLables); // Update state
+      }
+    } catch (error) {
+      console.error(`Failed to fetch ${lableType}:`, error);
+      message.error(`Failed to load ${lableType}`);
+    }
+  };
+  
+  // Call fetchLabels for each labelType on mount
+  useEffect(() => {
+    fetchLables("priority", setPriorities);
+    fetchLables("category", setCategories);
+    fetchLables("status", setStatuses);
+  }, []);
+
+
+
+
+
+  const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
+    if (!newValue.trim()) {
+      message.error(`Please enter a ${lableType} name.`);
+      return;
+    }
+  
+    try {
+      const lid = AllLoggedData.loggedInUser.id; // User ID
+      const payload = {
+        name: newValue.trim(), // Label name
+        lableType, // Dynamic labelType
+      };
+      await dispatch(AddLable({ id, payload })); // Add new label
+      message.success(`${lableType} added successfully.`);
+      setter(""); // Reset input field
+      modalSetter(false); // Close modal
+      await fetchLables(lableType, lableType === "priority" ? setPriorities : lableType === "category" ? setCategories : setStatuses); // Re-fetch labels
+    } catch (error) {
+      console.error(`Failed to add ${lableType}:`, error);
+      message.error(`Failed to add ${lableType}.`);
+    }
+  };
+
+
+
 
   const onSubmit = (values, { resetForm }) => {
     dispatch(EditTasks({ idd, values }))
@@ -122,6 +198,7 @@ const EditTask = ({ idd, onClose }) => {
                   <Field
                     name="taskTitle"
                     as={Input}
+                    // value={values.taskName}
                     placeholder="Enter taskTitle"
                     className="mt-2"
                   />
@@ -133,7 +210,7 @@ const EditTask = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12}>
+              {/* <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Task Category</label>
                   <Field name="TaskCategory">
@@ -145,7 +222,7 @@ const EditTask = ({ idd, onClose }) => {
                         onChange={(value) =>
                           setFieldValue("TaskCategory", value)
                         }
-                        value={values.TaskCategory}
+                        value={values.category}
                         onBlur={() => setFieldTouched("TaskCategory", true)}
                         allowClear={false}
                       >
@@ -160,7 +237,48 @@ const EditTask = ({ idd, onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
+              </Col> */}
+
+
+
+<Col span={24}>
+                <div className="form-item">
+                  <label className="font-semibold">Category</label>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new category"
+                    value={values.category}
+                    onChange={(value) => setFieldValue("category", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsCategoryModalVisible(true)}
+                          >
+                            Add New Category
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  >
+                    {categories.map((category) => (
+                      <Option key={category.id} value={category.name}>
+                        {category.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage
+                    name="project_category"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
               </Col>
+
+
 
               <Col span={24} className="mt-4">
                 <div className="form-item">
@@ -187,7 +305,7 @@ const EditTask = ({ idd, onClose }) => {
                     className="w-full mt-2"
                     placeholder="Select taskDate"
                     onChange={(value) => setFieldValue("taskDate", value)}
-                    value={values.taskDate}
+                    // value={values.startDate}
                     onBlur={() => setFieldTouched("taskDate", true)}
                   />
                   <ErrorMessage
@@ -206,7 +324,7 @@ const EditTask = ({ idd, onClose }) => {
                     className="w-full mt-2"
                     placeholder="Select DueDate"
                     onChange={(value) => setFieldValue("dueDate", value)}
-                    value={values.dueDate}
+                    // value={values.dueDate}
                     onBlur={() => setFieldTouched("dueDate", true)}
                   />
                   <ErrorMessage
@@ -249,7 +367,7 @@ const EditTask = ({ idd, onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Description</label>
                   <ReactQuill
-                    value={values.taskDescription}
+                    value={values.description}
                     onChange={(value) =>
                       setFieldValue("taskDescription", value)
                     }
@@ -264,7 +382,7 @@ const EditTask = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={9}>
+              {/* <Col span={9}>
                 <div className="form-item">
                   <label className="font-semibold mb-2">Status</label>
                   <Field name="taskStatus">
@@ -273,7 +391,7 @@ const EditTask = ({ idd, onClose }) => {
                         {...field}
                         className="w-full mt-2"
                         onChange={(value) => setFieldValue("taskStatus", value)}
-                        value={values.taskStatus}
+                        value={values.status}
                       >
                         <Option value="Incomplete">
                           <div className="flex items-center">
@@ -289,9 +407,49 @@ const EditTask = ({ idd, onClose }) => {
                     )}
                   </Field>
                 </div>
+              </Col> */}
+
+
+<Col span={24}>
+                <div className="form-item">
+                  <label className="font-semibold">Status</label>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new status"
+                    value={values.status}
+                    onChange={(value) => setFieldValue("status", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsStatusModalVisible(true)}
+                          >
+                            Add New Status
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  >
+                    {statuses.map((status) => (
+                      <Option key={status.id} value={status.name}>
+                        {status.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage
+                    name="status"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
               </Col>
 
-              <Col span={10}>
+
+
+              {/* <Col span={10}>
                 <div className="form-item">
                   <label className="font-semibold">Priority</label>
                   <Field name="taskPriority">
@@ -302,7 +460,7 @@ const EditTask = ({ idd, onClose }) => {
                         onChange={(value) =>
                           setFieldValue("taskPriority", value)
                         }
-                        value={values.taskPriority}
+                        value={values.priority}
                       >
                         <Option value="Medium">
                           <div className="flex items-center">
@@ -316,7 +474,45 @@ const EditTask = ({ idd, onClose }) => {
                     )}
                   </Field>
                 </div>
+              </Col> */}
+
+<Col span={24}>
+                <div className="form-item">
+                  <label className="font-semibold">Priority</label>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new Priority"
+                    value={values.priority}
+                    onChange={(value) => setFieldValue("priority", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsPriorityModalVisible(true)}
+                          >
+                            Add New priority
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  >
+                    {priorities.map((priority) => (
+                      <Option key={priority.id} value={priority.name}>
+                        {priority.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage name="tag" component="div" className="error-message text-red-500 my-1" />
+                </div>
               </Col>
+
+
+
+
+
             </Row>
 
             <div className="form-buttons text-right mt-4">
@@ -330,6 +526,51 @@ const EditTask = ({ idd, onClose }) => {
           </Form>
         )}
       </Formik>
+
+ <Modal
+                    title="Add New priority"
+                    open={isPriorityModalVisible}
+                    onCancel={() => setIsPriorityModalVisible(false)}
+                    onOk={() => handleAddNewLable("priority", newPriority, setNewPriority, setIsPriorityModalVisible)}
+                    okText="Add priority"
+                  >
+                    <Input
+                      placeholder="Enter new priority name"
+                      value={newPriority}
+                      onChange={(e) => setNewPriority(e.target.value)}
+                    />
+                  </Modal>
+      
+                  {/* Add Category Modal */}
+                  <Modal
+                    title="Add New Category"
+                    open={isCategoryModalVisible}
+                    onCancel={() => setIsCategoryModalVisible(false)}
+                    onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
+                    okText="Add Category"
+                  >
+                    <Input
+                      placeholder="Enter new category name"
+                      value={newCategory}
+                      onChange={(e) => setNewCategory(e.target.value)}
+                    />
+                  </Modal>
+      
+                  {/* Add Status Modal */}
+                  <Modal
+                    title="Add New Status"
+                    open={isStatusModalVisible}
+                    onCancel={() => setIsStatusModalVisible(false)}
+                    onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible)}
+                    okText="Add Status"
+                  >
+                    <Input
+                      placeholder="Enter new status name"
+                      value={newStatus}
+                      onChange={(e) => setNewStatus(e.target.value)}
+                    />
+                  </Modal>
+
     </div>
   );
 };

@@ -44,7 +44,7 @@ import * as Yup from "yup";
 
 const { Option } = Select;
 
-const EditInvoice = ({ onClose }) => {
+const EditInvoice = ({ idd, onClose }) => {
   const { id } = useParams();
   const [discountType, setDiscountType] = useState("%");
   const [loading, setLoading] = useState(false);
@@ -57,6 +57,22 @@ const EditInvoice = ({ onClose }) => {
   const { data: milestones } = useSelector(
     (state) => state.Milestone.Milestone
   );
+
+
+
+    const subClients = useSelector((state) => state.SubClient);
+const sub = subClients?.SubClient?.data;
+
+    const allproject = useSelector((state) => state.Project);
+    const fndrewduxxdaa = allproject.Project.data
+    const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
+    
+    const client = fnddata?.client;
+    
+    const subClientData = sub?.find((subClient) => subClient?.id === client);
+
+
+
   const { currencies } = useSelector((state) => state.currencies);
   const dispatch = useDispatch();
   const [form] = Form.useForm();
@@ -148,6 +164,18 @@ const EditInvoice = ({ onClose }) => {
     }
   }, [currentInvoice, form]);
 
+
+
+  const initialValues = {
+    issueDate: null,
+    dueDate: null,
+    currency: '',
+    client: fnddata?.client || "",
+    project: fnddata?.id || "",
+    calctax: '',
+};
+
+
   // Handle form submission
   const handleFinish = async (values) => {
     try {
@@ -168,7 +196,7 @@ const EditInvoice = ({ onClose }) => {
         // total,
       };
 
-      await dispatch(updateInvoice({ id, data: invoiceData }));
+      await dispatch(updateInvoice({ idd, data: invoiceData }));
       message.success("Invoice updated successfully");
       onClose();
       navigate("/app/dashboards/project/list");
@@ -278,9 +306,7 @@ const EditInvoice = ({ onClose }) => {
             form={form}
             layout="vertical"
             onFinish={handleFinish}
-            initialValues={{
-              loginEnabled: true,
-            }}
+            initialValues={initialValues}
           >
             {/* <Card className="border-0 mt-2"> */}
             <div className="">
@@ -345,7 +371,7 @@ const EditInvoice = ({ onClose }) => {
                       </Select>
                     </Form.Item>
                   </Col>
-                  <Col span={12}>
+                  {/* <Col span={12}>
                     <Form.Item
                       name="client"
                       label="Client Name"
@@ -373,7 +399,44 @@ const EditInvoice = ({ onClose }) => {
                     >
                       <Input placeholder="Enter project name" />
                     </Form.Item>
-                  </Col>
+                  </Col> */}
+
+
+<Col span={12}>
+    <Form.Item
+        name="clientName"
+        label="Client Name"
+        initialValue={subClientData?.username}
+        rules={[{ required: true, message: "Please enter the client name" }]}
+    >
+        <Input placeholder="Enter client name" disabled />
+    </Form.Item>
+    {/* Hidden field to pass the client ID */}
+    <Form.Item name="client" initialValue={fnddata?.client} hidden>
+        <Input type="hidden" />
+    </Form.Item>
+</Col>
+
+                                        
+<Col span={12}>
+    {/* Display the project name */}
+    <Form.Item
+        name="projectName"
+        label="Project Name"
+        initialValue={fnddata?.project_name}
+        rules={[{ required: true, message: "Please enter the project name" }]}
+    >
+        <Input placeholder="Enter project name" disabled />
+    </Form.Item>
+    
+    {/* Hidden field to pass the project ID */}
+    <Form.Item name="project" initialValue={fnddata?.id} hidden>
+        <Input type="hidden" />
+    </Form.Item>
+</Col>
+
+
+
 
                   <Col span={12}>
                     <Form.Item

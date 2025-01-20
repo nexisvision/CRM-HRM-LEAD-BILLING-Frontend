@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Input,
   Button,
@@ -12,7 +12,7 @@ import {
   Modal,
   Checkbox,
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -23,7 +23,9 @@ import * as Yup from "yup";
 import { AddTasks, GetTasks } from "./TaskReducer/TaskSlice";
 import { useDispatch, useSelector } from "react-redux";
 import useSelection from "antd/es/table/hooks/useSelection";
-import { assign } from "lodash";
+import { assign, values } from "lodash";
+import { AddLable, GetLable } from "./LableReducer/LableSlice";
+
 
 const { Option } = Select;
 
@@ -34,6 +36,20 @@ const AddTask = ({ onClose }) => {
   const [isOtherDetailsVisible, setIsOtherDetailsVisible] = useState(false);
   const [showReceiptUpload, setShowReceiptUpload] = useState(false);
 
+   const [isPriorityModalVisible, setIsPriorityModalVisible] = useState(false);
+    const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+    const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
+    const [newPriority, setNewPriority] = useState("");
+    const [newCategory, setNewCategory] = useState("");
+    const [newStatus, setNewStatus] = useState("");
+    // const [priorites, setTags] = useState([]);
+  
+    const [priorities, setPriorities] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [statuses, setStatuses] = useState([]);
+
+
+
 
   const { id } = useParams();
 
@@ -41,7 +57,9 @@ const AddTask = ({ onClose }) => {
   const allproject = useSelector((state) => state.Project);
   const fndrewduxxdaa = allproject.Project.data
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
+    // const AllLoggeddtaa = useSelector((state) => state.user);
   
+  const AllLoggedData = useSelector((state) => state.user);
 
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data;
@@ -69,6 +87,58 @@ const AddTask = ({ onClose }) => {
   });
 
 
+
+  const fetchLables = async (lableType, setter) => {
+    try {
+      const lid = AllLoggedData.loggedInUser.id; // User ID to fetch specific labels
+      const response = await dispatch(GetLable(id)); // Fetch all labels
+      if (response.payload && response.payload.data) {
+        const filteredLables = response.payload.data
+          .filter((lable) => lable.lableType === lableType) // Filter by labelType
+          .map((lable) => ({ id: lable.id, name: lable.name.trim() })); // Trim and format
+        setter(filteredLables); // Update state
+      }
+    } catch (error) {
+      console.error(`Failed to fetch ${lableType}:`, error);
+      message.error(`Failed to load ${lableType}`);
+    }
+  };
+  
+  // Call fetchLabels for each labelType on mount
+  useEffect(() => {
+    fetchLables("priority", setPriorities);
+    fetchLables("category", setCategories);
+    fetchLables("status", setStatuses);
+  }, []);
+
+
+
+
+
+  const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
+    if (!newValue.trim()) {
+      message.error(`Please enter a ${lableType} name.`);
+      return;
+    }
+  
+    try {
+      const lid = AllLoggedData.loggedInUser.id; // User ID
+      const payload = {
+        name: newValue.trim(), // Label name
+        lableType, // Dynamic labelType
+      };
+      await dispatch(AddLable({ id, payload })); // Add new label
+      message.success(`${lableType} added successfully.`);
+      setter(""); // Reset input field
+      modalSetter(false); // Close modal
+      await fetchLables(lableType, lableType === "priority" ? setPriorities : lableType === "category" ? setCategories : setStatuses); // Re-fetch labels
+    } catch (error) {
+      console.error(`Failed to add ${lableType}:`, error);
+      message.error(`Failed to add ${lableType}.`);
+    }
+  };
+
+
   const onSubmit = async (values, { resetForm }) => {
     // Convert AssignTo array into an object containing the array
     // if (Array.isArray(values.AssignTo) && values.AssignTo.length > 0) {
@@ -81,20 +151,24 @@ const AddTask = ({ onClose }) => {
         // Fetch updated tasks after successfully adding
         dispatch(GetTasks(id))
           .then(() => {
-            message.success("Expenses added successfully!");
+            message.success("Task added successfully!");
             resetForm();
             onClose();
           })
           .catch((error) => {
-            message.error("Failed to fetch the latest meeting data.");
+            message.error("Failed to fetch the latest Task data.");
             console.error("MeetData API error:", error);
           });
       })
       .catch((error) => {
-        message.error("Failed to add meeting.");
-        console.error("AddMeet API error:", error);
+        message.error("Failed to add Task.");
+        console.error("AddTask API error:", error);
       });
   };
+
+
+// console.log("asdasdasd",values);
+
 
   const handleCheckboxChange = () => {
     setIsWithoutDueDate(!isWithoutDueDate);
@@ -109,7 +183,7 @@ const AddTask = ({ onClose }) => {
       <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
@@ -132,7 +206,7 @@ const AddTask = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12}>
+              {/* <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Task Category</label>
                   <Field name="category">
@@ -157,7 +231,48 @@ const AddTask = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
+              </Col> */}
+
+
+<Col span={24}>
+                <div className="form-item">
+                  <label className="font-semibold">Category</label>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new category"
+                    value={values.category}
+                    onChange={(value) => setFieldValue("category", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsCategoryModalVisible(true)}
+                          >
+                            Add New Category
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  >
+                    {categories.map((category) => (
+                      <Option key={category.id} value={category.name}>
+                        {category.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage
+                    name="project_category"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
               </Col>
+
+
+
 
               <Col span={24} className="mt-4">
                 <div className="form-item">
@@ -292,57 +407,76 @@ const AddTask = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={9}>
+              <Col span={24}>
                 <div className="form-item">
-                  <label className="font-semibold mb-2">Status</label>
-                  <Field name="status">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-2"
-                        onChange={(value) => setFieldValue("status", value)}
-                        value={values.status}
-                      >
-                        <Option value="Incomplete">
-                          <div className="flex items-center">
-                            <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
-                            Incomplete
-                          </div>
-                        </Option>
-                        <Option value="To Do">To Do</Option>
-                        <Option value="In Progress">Doing</Option>
-                        <Option value="Completed">Completed</Option>
-                        <Option value="On Hold">Waiting Approval</Option>
-                      </Select>
+                  <label className="font-semibold">Status</label>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new status"
+                    value={values.status}
+                    onChange={(value) => setFieldValue("status", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsStatusModalVisible(true)}
+                          >
+                            Add New Status
+                          </Button>
+                        </div>
+                      </div>
                     )}
-                  </Field>
+                  >
+                    {statuses.map((status) => (
+                      <Option key={status.id} value={status.name}>
+                        {status.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage
+                    name="status"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 
-              <Col span={10}>
+              <Col span={24}>
                 <div className="form-item">
                   <label className="font-semibold">Priority</label>
-                  <Field name="priority">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-2"
-                        onChange={(value) => setFieldValue("priority", value)}
-                        value={values.priority}
-                      >
-                        <Option value="Medium">
-                          <div className="flex items-center">
-                            <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
-                            Medium
-                          </div>
-                        </Option>
-                        <Option value="High">High</Option>
-                        <Option value="Low">Low</Option>
-                      </Select>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new Priority"
+                    value={values.priority}
+                    onChange={(value) => setFieldValue("priority", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsPriorityModalVisible(true)}
+                          >
+                            Add New priority
+                          </Button>
+                        </div>
+                      </div>
                     )}
-                  </Field>
+                  >
+                    {priorities.map((priority) => (
+                      <Option key={priority.id} value={priority.name}>
+                        {priority.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage name="tag" component="div" className="error-message text-red-500 my-1" />
                 </div>
               </Col>
+
             </Row>
 
             <div className="form-buttons text-right mt-4">
@@ -356,6 +490,50 @@ const AddTask = ({ onClose }) => {
           </Form>
         )}
       </Formik>
+
+       <Modal
+                    title="Add New priority"
+                    open={isPriorityModalVisible}
+                    onCancel={() => setIsPriorityModalVisible(false)}
+                    onOk={() => handleAddNewLable("priority", newPriority, setNewPriority, setIsPriorityModalVisible)}
+                    okText="Add priority"
+                  >
+                    <Input
+                      placeholder="Enter new priority name"
+                      value={newPriority}
+                      onChange={(e) => setNewPriority(e.target.value)}
+                    />
+                  </Modal>
+      
+                  {/* Add Category Modal */}
+                  <Modal
+                    title="Add New Category"
+                    open={isCategoryModalVisible}
+                    onCancel={() => setIsCategoryModalVisible(false)}
+                    onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
+                    okText="Add Category"
+                  >
+                    <Input
+                      placeholder="Enter new category name"
+                      value={newCategory}
+                      onChange={(e) => setNewCategory(e.target.value)}
+                    />
+                  </Modal>
+      
+                  {/* Add Status Modal */}
+                  <Modal
+                    title="Add New Status"
+                    open={isStatusModalVisible}
+                    onCancel={() => setIsStatusModalVisible(false)}
+                    onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible)}
+                    okText="Add Status"
+                  >
+                    <Input
+                      placeholder="Enter new status name"
+                      value={newStatus}
+                      onChange={(e) => setNewStatus(e.target.value)}
+                    />
+                  </Modal>
     </div>
   );
 };

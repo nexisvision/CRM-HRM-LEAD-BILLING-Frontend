@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import utils from "utils";
-import OrderListData from "assets/data/order-list.data.json";
+
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -63,8 +63,6 @@ const AddProject = ({ onClose }) => {
   const Allclient = useSelector((state) => state.ClientData);
   const clientdata = Allclient.ClientData.data;
   
-  
-
 
   const AllEmployee = useSelector((state) => state.employee);
   const employeedata = AllEmployee.employee.data;
@@ -72,16 +70,9 @@ const AddProject = ({ onClose }) => {
   const AllLoggeddtaa = useSelector((state) => state.user);
 
   
- 
-
-
-
-
-
 
   const initialValues = {
     project_name: "",
-
     project_category: "",
     startDate: null,
     endDate: null,
@@ -103,7 +94,7 @@ const AddProject = ({ onClose }) => {
     startDate: Yup.date().nullable().required("Start date is required."),
     endDate: Yup.date().nullable().required("End date is required."),
     // projectimage: Yup.mixed().required("Please upload a Project Image."),
-    client: Yup.string().required("Please select Client."),
+    // client: Yup.string().required("Please select Client."),
     user: Yup.string().required("Please select User."),
     budget: Yup.number()
       .required("Please enter a Project Budget.")
@@ -455,6 +446,7 @@ const AddProject = ({ onClose }) => {
       placeholder="Select Client"
       loading={!clientdata}
       value={values.client} // Bind value to Formik's field
+      // value="sdfsdf"
       onChange={(value) => setFieldValue("client", value)} // Update Formik's field value
       onBlur={() => setFieldTouched("client", true)} // Set touched state
     >

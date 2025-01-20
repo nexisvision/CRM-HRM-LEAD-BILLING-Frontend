@@ -88,6 +88,7 @@ export const InvoiceList = () => {
   const [isEditInvoiceModalVisible, setIsEditInvoiceModalVisible] =
     useState(false);
   const [ViewInvoiceModalVisible, setViewInvoiceModalVisible] = useState(false);
+  // const [idd, setIdd] = useState("");
 
   const [isViewInvoiceModalVisible, setIsViewInvoiceModalVisible] =
     useState(false);
@@ -112,9 +113,9 @@ export const InvoiceList = () => {
     }
   }, [invoices]);
 
-  const Editfunc = (idd) => {
+  const Editfunc = (id) => {
     openEditInvoiceModal();
-    setIdd(idd);
+    setIdd(id);
   };
   console.log(idd, "idddd");
 
@@ -386,7 +387,7 @@ export const InvoiceList = () => {
 						width={1000}
 						className='mt-[-70px]'
 					>
-						<EditInvoice onClose={closeEditInvoiceModal} />
+						<EditInvoice onClose={closeEditInvoiceModal} idd={idd} />
 					</Modal>
 					<Modal
 						title="Invoice"
