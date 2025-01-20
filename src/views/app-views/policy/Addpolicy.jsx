@@ -7,7 +7,7 @@ import ReactQuill from "react-quill";
 const { Option } = Select;
 
 
-const EditJobOfferLetter = ({ onClose }) => {
+const  AddpolicyList = ({ onClose }) => {
   const dispatch = useDispatch();
   const onSubmit = async (values) => {
     // console.log("Form submitted:", values);
@@ -24,24 +24,13 @@ const EditJobOfferLetter = ({ onClose }) => {
     // }
   };
   const initialValues = {
-    job: "",
-    jobApplication: "",
-    offerExpireOn: "",
-    expectedJoiningDate: "",
-    salary: "",
-    rate: "",
+    branch: "",
+    title: "",
     description: "",
   };
   const validationSchema = Yup.object({
-    job: Yup.string().required("Please select a job."),
-    jobApplication: Yup.string().required("Please enter a job Application."),
-    offerExpireOn: Yup.string().required("Please enter an offerExpireOn."),
-    expectedJoiningDate: Yup.string().required("Please enter a phone expected Joining Date."),
-    salary: Yup.string().required("Please enter a salary."),
-    rate: Yup.string().required(
-      "Please select your total rate."
-    ),
-
+    branch: Yup.string().required("Please select a Branch."),
+    title: Yup.string().required("Please enter a Title."),
     description: Yup.string().required("Please enter a description."),
   });
   return (
@@ -66,20 +55,20 @@ const EditJobOfferLetter = ({ onClose }) => {
 
               <Col span={12}>
                 <div className="form-item ">
-                  <label className="font-semibold">Job</label>
+                  <label className="font-semibold">Branch</label>
                   <Select
 
-                    placeholder="Select Job"
-                    value={values.job}
-                    onChange={(value) => setFieldValue("job", value)}
-                    onBlur={() => setFieldTouched("job", true)}
+                    placeholder="Select Branch"
+                    value={values.branch}
+                    onChange={(value) => setFieldValue("branch", value)}
+                    onBlur={() => setFieldTouched("branch", true)}
                     className="w-full"
                   >
-                    <Option value="developer">Software Developer</Option>
-                    <Option value="designer">Graphic Designer</Option>
+                    <Option value="All">All</Option>
+                    <Option value="Branch1">Branch1</Option>
                   </Select>
                   <ErrorMessage
-                    name="job"
+                    name="branch"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -88,85 +77,16 @@ const EditJobOfferLetter = ({ onClose }) => {
 
               <Col span={12}>
                 <div className="form-item ">
-                  <label className="font-semibold ">job Application</label>
-                  <Field name="jobapplication" as={Input} placeholder="Enter job Application" />
+                  <label className="font-semibold ">Title</label>
+                  <Field name="jobapplication" as={Input} placeholder="Enter Title" />
                   <ErrorMessage
-                    name="job application"
+                    name="title"
                     component="div"
                     className="error-message text-red-500  my-1"
                   />
                 </div>
               </Col>
 
-              <Col span={12}>
-                <div className="form-item mt-4">
-                  <label className="font-semibold">Offer Expire On</label>
-                  <DatePicker
-                    className="w-full"
-                    format="DD-MM-YYYY"
-                    value={values.offerexpireon}
-                    onChange={(date) => setFieldValue("offerexpireon", date)}
-                    onBlur={() => setFieldTouched("offerexpireon", true)}
-                  />
-                 
-                  <ErrorMessage
-                    name="offerexpireon"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12}>
-                <div className="form-item mt-4">
-                  <label className="font-semibold">Expected Joining Date</label>
-                 
-                  <DatePicker
-                    className="w-full"
-                    format="DD-MM-YYYY"
-                    value={values.expectedjoiningdate}
-                    onChange={(date) => setFieldValue("expectedjoiningdate", date)}
-                    onBlur={() => setFieldTouched("expectedjoiningdate", true)}
-                  />
-                  <ErrorMessage
-                    name="expectedjoiningdate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12}>
-                <div className="form-item mt-4">
-                  <label className="font-semibold">Salary</label>
-                  <Field
-                    name="salary"
-                    as={Input}
-                    placeholder="Enter Salary"
-                  />
-                  <ErrorMessage
-                    name="salary"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12}>
-                <div className="form-item mt-4">
-                  <label className="font-semibold">Rate</label>
-                  <Field
-                    name="rate"
-                    as={Input}
-                    placeholder="Enter Rate"
-                  />
-                  <ErrorMessage
-                    name="rate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
 
               <Col span={24}>
                 <div className="form-item mt-4">
@@ -216,4 +136,4 @@ const EditJobOfferLetter = ({ onClose }) => {
   );
 };
 
-export default EditJobOfferLetter;
+export default AddpolicyList;

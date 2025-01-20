@@ -1048,11 +1048,11 @@ export const protectedRoutes = [
         path: `${APP_PREFIX_PATH}/hrm/jobs/jobapplication`,
         component: React.lazy(() => import('views/app-views/hrm/Jobs/JobApplication')),
     },
-    // {
-    //     key: 'hrm.jobs.jobofferletter',
-    //     path: `${APP_PREFIX_PATH}/hrm/jobs/jobofferletter`,
-    //     component: React.lazy(() => import('views/app-views/hrm/Jobs/JobOfferLetter')),
-    // },
+    {
+        key: 'hrm.jobs.jobofferletter',
+        path: `${APP_PREFIX_PATH}/hrm/jobs/jobofferletter`,
+        component: React.lazy(() => import('views/app-views/hrm/Jobs/JobOfferLetter')),
+    },
     {
         key: 'hrm.jobs.interview',
         path: `${APP_PREFIX_PATH}/hrm/jobs/interview`,
@@ -1082,6 +1082,11 @@ export const protectedRoutes = [
         key: 'notes',
         path: `${APP_PREFIX_PATH}/superadmin/notes`,
         component: React.lazy(() => import('views/app-views/notes')),
+    },
+    {
+        key: 'policy',
+        path: `${APP_PREFIX_PATH}/superadmin/policy`,
+        component: React.lazy(() => import('views/app-views/policy')),
     },
     {
         key: 'company',
@@ -1192,11 +1197,7 @@ export const protectedRoutes = [
         path: `${APP_PREFIX_PATH}/docs/documentation/*`,
         component: React.lazy(() => import('views/app-views/docs')),
     },
-    {
-        key: 'hrm.jobs.jobofferletter',
-        path: `${APP_PREFIX_PATH}/hrm/jobs/jobofferletter`,
-        component: React.lazy(() => import('views/app-views/hrm/Jobs/JobOfferLetter')),
-    },
+   
 ]
 
 // import React from 'react'

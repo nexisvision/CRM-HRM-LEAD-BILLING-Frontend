@@ -1,15 +1,16 @@
-// CRM-HRM-LEAD-BILLING-Frontend/src/views/app-views/company/CompanyList.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 import { deleteClient, ClientData } from "./CompanyReducers/CompanySlice";
 import { EyeOutlined, DeleteOutlined, EditOutlined, PushpinOutlined, RocketOutlined, PlusOutlined, FileExcelOutlined, AppstoreOutlined, UnorderedListOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, Input, Select, Modal, message, Radio, Row, Col, Dropdown, Tag, Menu } from "antd";
+import { Button, Input, Select, Modal, message, Radio, Row, Col, Dropdown, Tag, Menu,Table} from "antd";
 import AddCompany from "./AddCompany";
 import EditCompany from "./EditCompany";
 import ResetPassword from "./ResetPassword";
+import utils from "utils";
 import PlanUpgrade from "./PlanUpgrade";
 import CompanyCard from './CompanyCard'; // Import the CompanyCard component
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 
 const { Option } = Select;
 const VIEW_LIST = 'LIST';
@@ -17,7 +18,7 @@ const VIEW_GRID = 'GRID';
 
 const CompanyList = () => {
   const [users, setUsers] = useState([]);
-  const [view, setView] = useState(VIEW_GRID);
+  const [view, setView] = useState(VIEW_GRID);  // Default to grid view
   const [isAddCompanyModalVisible, setIsAddCompanyModalVisible] = useState(false);
   const [isEditCompanyModalVisible, setIsEditCompanyModalVisible] = useState(false);
   const [isResetPasswordModalVisible, setIsResetPasswordModalVisible] = useState(false);
@@ -81,6 +82,52 @@ const CompanyList = () => {
   const onChangeCompanyView = (e) => {
     setView(e.target.value);
   };
+  const tableColumns = [
+    {
+      title: "Company",
+      sorter: (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1),
+    },
+    {
+      title: "Email",
+      dataIndex: "Email",
+      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+    },
+    {
+      title: " Application",
+      dataIndex: " Application",
+      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+    },
+    {
+      title: "Add By",
+      dataIndex: "Add By",
+      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+    },
+    {
+      title: "Offer Exprire On",
+      dataIndex: "Offer Exprire On",
+      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+    },
+
+    {
+      title: "Expected Joining Date",
+      dataIndex: "Expected Joining Date",
+      sorter: (a, b) => a.totaldays.length - b.totaldays.length,
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
+    },
+    {
+      title: "Action",
+      dataIndex: "actions",
+      render: (_, elm) => (
+        <div className="text-center">
+          <EllipsisDropdown menu={dropdownMenu(elm)} />
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div className="p-6">
@@ -130,49 +177,27 @@ const CompanyList = () => {
         </div>
       </div>
 
+      {/* Conditional rendering of grid or list view */}
       {view === VIEW_LIST ? (
         <div className="overflow-x-auto">
-          <table className="min-w-full table-auto">
-            <thead>
-              <tr>
-                <th className="p-2 border">Company</th>
-                <th className="p-2 border">Status</th>
-                <th className="p-2 border">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-100">
-                  <td className="p-2 border cursor-pointer" onClick={() => handleCompanyClick(user.id)}>{user.name}</td>
-                  <td className="p-2 border">
-                    <Tag color={user.status === "active" ? "blue" : "red"}>{user.status}</Tag>
-                  </td>
-                  <td className="p-2 border">
-                    <Dropdown overlay={dropdownMenu(user)}>
-                      <Button type="text">...</Button>
-                    </Dropdown>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Table
+            columns={tableColumns}
+            dataSource={users}
+            rowKey="id"
+            scroll={{ x: 1200 }}
+          />
         </div>
       ) : (
         <Row gutter={16}>
           {users.map((user) => (
             <Col key={user.id} xs={24} sm={12} lg={8} xl={6}>
-              <CompanyCard company={{
-                name: user.name,
-                email: user.email,
-                plan: user.plan,
-                expiryDate: user.expiryDate,
-                image: user.image
-              }} />
+              <CompanyCard company={user} />
             </Col>
           ))}
         </Row>
       )}
 
+      {/* Modals */}
       <Modal title="Create Company" visible={isAddCompanyModalVisible} onCancel={() => setIsAddCompanyModalVisible(false)} footer={null} width={1100}>
         <AddCompany onClose={() => setIsAddCompanyModalVisible(false)} />
       </Modal>

@@ -502,8 +502,8 @@ const extraNavvTree = [
                 submenu: []
               },
               {
-                key: 'extra-hrm-jobs-jobofferlatter',
-                path: `${APP_PREFIX_PATH}/hrm/jobs/jobofferlatter`,
+                key: 'extra-hrm-jobs-jobofferletter',
+                path: `${APP_PREFIX_PATH}/hrm/jobs/jobofferletter`,
                 title: 'Job Offer Letter',
                 icon: SolutionOutlined,
                 breadcrumb: true,
@@ -597,6 +597,14 @@ const extraNavvvTree = [
         key: 'superadmin-notes',
         path: `${APP_PREFIX_PATH}/superadmin/notes`,
         title: 'Notes',
+        icon: FileTextOutlined,
+        breadcrumb: true,
+        submenu: []
+      },
+      {
+        key: 'superadmin-policy',
+        path: `${APP_PREFIX_PATH}/superadmin/policy`,
+        title: 'Policy',
         icon: FileTextOutlined,
         breadcrumb: true,
         submenu: []
