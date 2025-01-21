@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import {Input, Button,DatePicker,Select,message,Row,Col} from "antd";
+import React, { useEffect, useState } from "react";
+import { Input, Button, DatePicker, Select, message, Row, Col } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -7,19 +7,28 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { AddTasks, GetTasks } from "../project/task/TaskReducer/TaskSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 
 const { Option } = Select;
 
 const AddTask = ({ onClose }) => {
-
   const dispatch = useDispatch();
   const [isWithoutDueDate, setIsWithoutDueDate] = useState(false);
   const [isOtherDetailsVisible, setIsOtherDetailsVisible] = useState(false);
- 
+
   const { id } = useParams();
-  
+
+  useEffect(() => {
+    dispatch(empdata());
+  }, []);
+
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data;
+
+  const allloggeduserdata = useSelector((state) => state.user);
+  const loggedUserData = allloggeduserdata?.loggedInUser;
+
+  const idd = loggedUserData.id;
 
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
@@ -39,7 +48,6 @@ const AddTask = ({ onClose }) => {
     description: Yup.string().required("Please enter a Description."),
   });
 
-
   const onSubmit = async (values, { resetForm }) => {
     // Convert AssignTo array into an object containing the array
     // if (Array.isArray(values.AssignTo) && values.AssignTo.length > 0) {
@@ -47,10 +55,10 @@ const AddTask = ({ onClose }) => {
     // }
 
     // Dispatch AddTasks with updated values
-    dispatch(AddTasks({ id, values }))
+    dispatch(AddTasks({ idd, values }))
       .then(() => {
         // Fetch updated tasks after successfully adding
-        dispatch(GetTasks(id))
+        dispatch(GetTasks(idd))
           .then(() => {
             message.success("Expenses added successfully!");
             resetForm();
@@ -102,7 +110,6 @@ const AddTask = ({ onClose }) => {
                   />
                 </div>
               </Col>
-
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
@@ -201,7 +208,6 @@ const AddTask = ({ onClose }) => {
                 </div>
               </Col>
 
-
               <Col span={9} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold mb-2">Status</label>
@@ -253,7 +259,7 @@ const AddTask = ({ onClose }) => {
                   </Field>
                 </div>
               </Col>
-              
+
               <Col span={24} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Description</label>
@@ -288,14 +294,6 @@ const AddTask = ({ onClose }) => {
 };
 
 export default AddTask;
-
-
-
-
-
-
-
-
 
 // import React, { useState } from 'react';
 // import { Input, Button, DatePicker, Select, message, Row, Col, Switch, Upload, Card } from 'antd';
@@ -335,7 +333,6 @@ export default AddTask;
 //         description: description ? Yup.string().required("Description are required") : Yup.string(),
 
 //     });
-
 
 //     const onSubmit = (values) => {
 //         console.log('Submitted values:', values);

@@ -25,13 +25,14 @@ import dayjs from "dayjs";
 import Flex from "components/shared-components/Flex";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import AvatarStatus from "components/shared-components/AvatarStatus";
-import Addpolicy from './Addpolicy';
-import Editpolicy from './Editpolicy';
+import Addpolicy from "./Addpolicy";
+import Editpolicy from "./Editpolicy";
 // import EditJobOfferLetter from "./EditJobOfferLetter";
 import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
 import utils from "utils";
 import { useDispatch, useSelector } from "react-redux";
+import { deletepolicys, getpolicys } from "./policyReducer/policySlice";
 // import {
 //   deletejobapplication,
 //   getjobapplication,
@@ -48,28 +49,38 @@ const PolicyList = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [isAddpolicyModalVisible, setIsAddpolicyModalVisible] =
-    useState(false);
+  const [isAddpolicyModalVisible, setIsAddpolicyModalVisible] = useState(false);
 
   const [idd, setIdd] = useState("");
 
-  const [
-    isEditpolicyModalVisible,
-    setIsEditpolicyModalVisible,
-  ] = useState(false);
+  useEffect(() => {
+    dispatch(getpolicys());
+  }, []);
+
+  const allbranch = useSelector((state) => state.policy);
+  const fndbranch = allbranch.policy.data;
+
+  useEffect(() => {
+    if (fndbranch) {
+      setUsers(fndbranch);
+    }
+  }, [fndbranch]);
+
+  const [isEditpolicyModalVisible, setIsEditpolicyModalVisible] =
+    useState(false);
 
   const alldata = useSelector((state) => state.jobapplications);
   const fnddta = alldata.jobapplications.data;
 
-//   useEffect(() => {
-//     dispatch(getjobapplication());
-//   }, []);
+  //   useEffect(() => {
+  //     dispatch(getjobapplication());
+  //   }, []);
 
-//   useEffect(() => {
-//     if (fnddta) {
-//       setUsers(fnddta);
-//     }
-//   }, [fnddta]);
+  //   useEffect(() => {
+  //     if (fnddta) {
+  //       setUsers(fnddta);
+  //     }
+  //   }, [fnddta]);
 
   const openAddpolicyModal = () => {
     setIsAddpolicyModalVisible(true);
@@ -95,14 +106,14 @@ const PolicyList = () => {
     setSelectedRowKeys([]);
   };
 
-//   const deleteUser = (userId) => {
-//     dispatch(deletejobapplication(userId)).then(() => {
-//       dispatch(getjobapplication());
-//       const updatedUsers = users.filter((item) => item.id !== userId);
-//       setUsers(updatedUsers);
-//       message.success({ content: `Deleted user ${userId}`, duration: 2 });
-//     });
-//   };
+  const deleteUser = (userId) => {
+    dispatch(deletepolicys(userId)).then(() => {
+      dispatch(getpolicys());
+      const updatedUsers = users.filter((item) => item.id !== userId);
+      setUsers(updatedUsers);
+      message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    });
+  };
 
   const showUserProfile = (userInfo) => {
     setUserProfileVisible(true);
@@ -205,7 +216,7 @@ const PolicyList = () => {
             type=""
             className=""
             icon={<DeleteOutlined />}
-            // onClick={() => deleteUser(elm.id)}
+            onClick={() => deleteUser(elm.id)}
             size="small"
           >
             <span>Delete</span>
@@ -216,34 +227,34 @@ const PolicyList = () => {
   );
 
   const tableColumns = [
-    {
-      title: "Branch",
-      dataIndex: "Branch",
-    //   render: (_, record) => (
-    //     <div className="d-flex">
-    //       <AvatarStatus
-    //         src={record.img}
-    //         name={record.name}
-    //         subTitle={record.email}
-    //       />
-    //     </div>
-    //   ),
-      sorter: (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1),
-    },
+    // {
+    //   title: "Branch",
+    //   dataIndex: "Branch",
+    //   //   render: (_, record) => (
+    //   //     <div className="d-flex">
+    //   //       <AvatarStatus
+    //   //         src={record.img}
+    //   //         name={record.name}
+    //   //         subTitle={record.email}
+    //   //       />
+    //   //     </div>
+    //   //   ),
+    //   sorter: (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1),
+    // },
     {
       title: "Title",
-      dataIndex: "Title",
-      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+      dataIndex: "title",
+      sorter: (a, b) => a.title.length - b.title.length,
     },
     {
       title: "Description",
-      dataIndex: "Description",
-      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+      dataIndex: "description",
+      sorter: (a, b) => a.description.length - b.description.length,
     },
     {
-      title: "Attachment",
-      dataIndex: "Attachment",
-      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+      title: "created_by",
+      dataIndex: "created_by",
+      sorter: (a, b) => a.created_by.length - b.created_by.length,
     },
     {
       title: "Action",
@@ -289,11 +300,7 @@ const PolicyList = () => {
           </div> */}
         </Flex>
         <Flex gap="7px">
-          <Button
-            type="primary"
-            className="ml-2"
-            onClick={openAddpolicyModal}
-          >
+          <Button type="primary" className="ml-2" onClick={openAddpolicyModal}>
             <PlusOutlined />
             <span>New</span>
           </Button>
@@ -349,9 +356,7 @@ const PolicyList = () => {
         <ViewJobApplication onClose={closeViewApplication} />
       </Modal> */}
     </Card>
-  );    
+  );
 };
 
 export default PolicyList;
-
-

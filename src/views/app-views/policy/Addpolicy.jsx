@@ -1,27 +1,46 @@
-import React from 'react';
-import { Input, Button, Select, Radio, message, Row, Col, Upload ,    DatePicker,} from "antd";
+import React, { useEffect } from "react";
+import {
+  Input,
+  Button,
+  Select,
+  Radio,
+  message,
+  Row,
+  Col,
+  Upload,
+  DatePicker,
+} from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
+import { Addpolicys, getpolicys } from "./policyReducer/policySlice";
+import { getBranch } from "../hrm/Branch/BranchReducer/BranchSlice";
 const { Option } = Select;
 
-
-const  AddpolicyList = ({ onClose }) => {
+const AddpolicyList = ({ onClose }) => {
   const dispatch = useDispatch();
-  const onSubmit = async (values) => {
-    // console.log("Form submitted:", values);
-    // try {
-    //   dispatch(Addjobapplication(values)).then(() => {
-    //     dispatch(getjobapplication());
-    //     onClose();
-    //     message.success("Form submitted successfully");
-    //   });
-    //   message.success("Job application added successfully!");
-    // } catch (error) {
-    //   console.error("Submission error:", error);
-    //   message.error("An error occurred while submitting the job application.");
-    // }
+
+  useEffect(() => {
+    dispatch(getBranch());
+  }, []);
+
+  const allbranch = useSelector((state) => state.Branch);
+  const fndbranch = allbranch.Branch.data;
+
+  const onSubmit = async (values, { resetForm }) => {
+    try {
+      dispatch(Addpolicys(values)).then(() => {
+        dispatch(getpolicys());
+        onClose();
+        resetForm();
+        message.success("Form submitted successfully");
+      });
+      message.success("Job application added successfully!");
+    } catch (error) {
+      console.error("Submission error:", error);
+      message.error("An error occurred while submitting the job application.");
+    }
   };
   const initialValues = {
     branch: "",
@@ -42,7 +61,13 @@ const  AddpolicyList = ({ onClose }) => {
         validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
-        {({ values, setFieldValue, setFieldTouched, handleSubmit }) => (
+        {({
+          values,
+          setFieldValue,
+          setFieldTouched,
+          handleSubmit,
+          resetForm,
+        }) => (
           <Form
             onSubmit={handleSubmit}
             style={{
@@ -52,21 +77,27 @@ const  AddpolicyList = ({ onClose }) => {
             }}
           >
             <Row gutter={16}>
-
-              <Col span={12}>
-                <div className="form-item ">
-                  <label className="font-semibold">Branch</label>
-                  <Select
-
-                    placeholder="Select Branch"
-                    value={values.branch}
-                    onChange={(value) => setFieldValue("branch", value)}
-                    onBlur={() => setFieldTouched("branch", true)}
-                    className="w-full"
-                  >
-                    <Option value="All">All</Option>
-                    <Option value="Branch1">Branch1</Option>
-                  </Select>
+              <Col span={12} className="mb-4">
+                <div className="form-item">
+                  <label>Branch</label>
+                  <Field name="branch">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full"
+                        placeholder="Select Branch"
+                        onChange={(value) => setFieldValue("branch", value)}
+                        value={values.branch}
+                        onBlur={() => setFieldTouched("branch", true)}
+                      >
+                        {fndbranch?.map((branch) => (
+                          <Option key={branch.id} value={branch.id}>
+                            {branch.branchName}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
                   <ErrorMessage
                     name="branch"
                     component="div"
@@ -78,7 +109,7 @@ const  AddpolicyList = ({ onClose }) => {
               <Col span={12}>
                 <div className="form-item ">
                   <label className="font-semibold ">Title</label>
-                  <Field name="jobapplication" as={Input} placeholder="Enter Title" />
+                  <Field name="title" as={Input} placeholder="Enter Title" />
                   <ErrorMessage
                     name="title"
                     component="div"
@@ -86,7 +117,6 @@ const  AddpolicyList = ({ onClose }) => {
                   />
                 </div>
               </Col>
-
 
               <Col span={24}>
                 <div className="form-item mt-4">

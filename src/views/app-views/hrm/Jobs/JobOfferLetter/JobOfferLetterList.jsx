@@ -31,6 +31,10 @@ import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
 import utils from "utils";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  deletejobofferss,
+  getjobofferss,
+} from "./jobOfferletterReducer/jobofferlateerSlice";
 // import {
 //   deletejobapplication,
 //   getjobapplication,
@@ -52,6 +56,19 @@ const JobOfferLetterList = () => {
 
   const [idd, setIdd] = useState("");
 
+  useEffect(() => {
+    dispatch(getjobofferss());
+  }, []);
+
+  const alldatas = useSelector((state) => state.joboffers);
+  const fnddata = alldatas.joboffers.data;
+
+  useEffect(() => {
+    if (fnddata) {
+      setUsers(fnddata);
+    }
+  }, [fnddata]);
+
   const [
     isAddJobEditJobOfferLetterModalVisible,
     setIsEditJobOfferLetterModalVisible,
@@ -60,15 +77,15 @@ const JobOfferLetterList = () => {
   const alldata = useSelector((state) => state.jobapplications);
   const fnddta = alldata.jobapplications.data;
 
-//   useEffect(() => {
-//     dispatch(getjobapplication());
-//   }, []);
+  //   useEffect(() => {
+  //     dispatch(getjobapplication());
+  //   }, []);
 
-//   useEffect(() => {
-//     if (fnddta) {
-//       setUsers(fnddta);
-//     }
-//   }, [fnddta]);
+  //   useEffect(() => {
+  //     if (fnddta) {
+  //       setUsers(fnddta);
+  //     }
+  //   }, [fnddta]);
 
   const openAddJobOfferLetterModal = () => {
     setIsAddJobOfferLetterModalVisible(true);
@@ -94,14 +111,14 @@ const JobOfferLetterList = () => {
     setSelectedRowKeys([]);
   };
 
-//   const deleteUser = (userId) => {
-//     dispatch(deletejobapplication(userId)).then(() => {
-//       dispatch(getjobapplication());
-//       const updatedUsers = users.filter((item) => item.id !== userId);
-//       setUsers(updatedUsers);
-//       message.success({ content: `Deleted user ${userId}`, duration: 2 });
-//     });
-//   };
+  const deleteUser = (userId) => {
+    dispatch(deletejobofferss(userId)).then(() => {
+      dispatch(getjobofferss());
+      const updatedUsers = users.filter((item) => item.id !== userId);
+      setUsers(updatedUsers);
+      message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    });
+  };
 
   const showUserProfile = (userInfo) => {
     setUserProfileVisible(true);
@@ -204,7 +221,7 @@ const JobOfferLetterList = () => {
             type=""
             className=""
             icon={<DeleteOutlined />}
-            // onClick={() => deleteUser(elm.id)}
+            onClick={() => deleteUser(elm.id)}
             size="small"
           >
             <span>Delete</span>
@@ -215,45 +232,46 @@ const JobOfferLetterList = () => {
   );
 
   const tableColumns = [
+    // {
+    //   title: "Offer",
+    //   dataIndex: "Offer",
+    //   //   render: (_, record) => (
+    //   //     <div className="d-flex">
+    //   //       <AvatarStatus
+    //   //         src={record.img}
+    //   //         name={record.name}
+    //   //         subTitle={record.email}
+    //   //       />
+    //   //     </div>
+    //   //   ),
+    //   sorter: (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1),
+    // },
     {
-      title: "Offer",
-      dataIndex: "Offer",
-    //   render: (_, record) => (
-    //     <div className="d-flex">
-    //       <AvatarStatus
-    //         src={record.img}
-    //         name={record.name}
-    //         subTitle={record.email}
-    //       />
-    //     </div>
-    //   ),
-      sorter: (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1),
+      title: "salary",
+      dataIndex: "salary",
+      sorter: (a, b) => a.salary.length - b.salary.length,
     },
     {
-      title: "Job",
-      dataIndex: "Job",
-      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+      title: "offer_expiry",
+      dataIndex: "offer_expiry",
+      sorter: (a, b) => a.offer_expiry.length - b.offer_expiry.length,
     },
     {
-      title: "Job Application",
-      dataIndex: "Job Application",
-      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+      title: "expected_joining_date",
+      dataIndex: "expected_joining_date",
+      sorter: (a, b) =>
+        a.expected_joining_date.length - b.expected_joining_date.length,
     },
     {
-      title: "Add By",
-      dataIndex: "Add By",
-      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
-    },
-    {
-      title: "Offer Exprire On",
-      dataIndex: "Offer Exprire On",
-      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+      title: "description",
+      dataIndex: "description",
+      sorter: (a, b) => a.description.length - b.description.length,
     },
 
     {
-      title: "Expected Joining Date",
-      dataIndex: "Expected Joining Date",
-      sorter: (a, b) => a.totaldays.length - b.totaldays.length,
+      title: "created_by",
+      dataIndex: "created_by",
+      sorter: (a, b) => a.created_by.length - b.created_by.length,
     },
     {
       title: "Status",
@@ -373,5 +391,3 @@ const JobOfferLetterList = () => {
 };
 
 export default JobOfferLetterList;
-
-

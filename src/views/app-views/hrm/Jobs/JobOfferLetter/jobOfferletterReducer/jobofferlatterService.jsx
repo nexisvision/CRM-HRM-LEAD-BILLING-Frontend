@@ -7,10 +7,10 @@ import axios from "axios";
 //     return res
 // };
 
-const GetTask = async (id) => {
+const getoffer = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(`http://localhost:5353/api/v1/tasks/${id}`, {
+    const res = await axios.get("http://localhost:5353/api/v1/offer-letters/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -22,13 +22,13 @@ const GetTask = async (id) => {
   }
 };
 
-const Addtask = async (idd, values) => {
+const addoffer = async (payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/tasks/${idd}`,
-      values,
+      "http://localhost:5353/api/v1/offer-letters/",
+      payload,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -43,12 +43,12 @@ const Addtask = async (idd, values) => {
   }
 };
 
-const Deletetask = async (idd) => {
+const deldetoffer = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/tasks/${idd}`,
+      `http://localhost:5353/api/v1/offer-letters/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -63,12 +63,12 @@ const Deletetask = async (idd) => {
   }
 };
 
-const EditTask = async (iddd, values) => {
+const editoffer = async (idd, payload) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/tasks/${iddd}`,
-      values,
+      `http://localhost:5353/api/v1/offer-letters/${idd}`,
+      payload,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -104,10 +104,10 @@ const EditTask = async (iddd, values) => {
 
 const UserService = {
   // addUser,
-  GetTask,
-  Addtask,
-  Deletetask,
-  EditTask,
+  getoffer,
+  addoffer,
+  deldetoffer,
+  editoffer,
   // getAllUsers,
   // getUserById,
   // deleteUser,

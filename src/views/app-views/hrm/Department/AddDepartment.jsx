@@ -1,66 +1,84 @@
-import React from 'react';
-import { Formik, Form as FormikForm, Field , ErrorMessage} from 'formik';
-import { Input, Button, Row, Col, message, Select } from 'antd';
-import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { AddDept, getDept } from './DepartmentReducers/DepartmentSlice';
-import { getBranch } from '../Branch/BranchReducer/BranchSlice';
+import React, { useEffect } from "react";
+import { Formik, Form as FormikForm, Field, ErrorMessage } from "formik";
+import { Input, Button, Row, Col, message, Select } from "antd";
+import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { AddDept, getDept } from "./DepartmentReducers/DepartmentSlice";
+import { getBranch } from "../Branch/BranchReducer/BranchSlice";
 
 const { Option } = Select;
 // Validation Schema using Yup
 const validationSchema = Yup.object().shape({
   department_name: Yup.string()
-    .required('Department Name is required')
-    .min(2, 'Department name must be at least 2 characters')
-    .max(50, 'Department name cannot exceed 50 characters'),
+    .required("Department Name is required")
+    .min(2, "Department name must be at least 2 characters")
+    .max(50, "Department name cannot exceed 50 characters"),
 });
 
 const AddDepartment = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(getBranch());
+  }, [dispatch]);
+
+  const alldatas = useSelector((state) => state.Branch);
+  const fnddata = alldatas.Branch.data;
+
   const handleSubmit = (values, { resetForm }) => {
     dispatch(AddDept(values))
       .then(() => {
         dispatch(getDept());
-       
-        message.success('Department added successfully!');
+
+        message.success("Department added successfully!");
         resetForm();
         onClose();
-        navigate('/app/hrm/department');
+        navigate("/app/hrm/department");
       })
       .catch((error) => {
-        message.error('Failed to add department.');
-        console.error('Add API error:', error);
+        message.error("Failed to add department.");
+        console.error("Add API error:", error);
       });
   };
 
   return (
     <div className="add-employee">
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
 
       <Formik
         initialValues={{
-          department_name: '',
+          department_name: "",
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ errors, touched, setFieldValue, resetForm, setFieldTouched, values }) => (
+        {({
+          errors,
+          touched,
+          setFieldValue,
+          resetForm,
+          setFieldTouched,
+          values,
+        }) => (
           <FormikForm>
             <Row gutter={16}>
               <Col span={12}>
-                <div style={{ marginBottom: '16px' }}>
+                <div style={{ marginBottom: "16px" }}>
                   <label>Department*</label>
                   <Field
                     as={Input}
                     name="department_name"
                     placeholder="Enter Department Name"
-                    onChange={(e) => setFieldValue('department_name', e.target.value)}
+                    onChange={(e) =>
+                      setFieldValue("department_name", e.target.value)
+                    }
                   />
                   {errors.department_name && touched.department_name && (
-                    <div style={{ color: 'red', fontSize: '12px' }}>{errors.department_name}</div>
+                    <div style={{ color: "red", fontSize: "12px" }}>
+                      {errors.department_name}
+                    </div>
                   )}
                 </div>
               </Col>
@@ -77,9 +95,11 @@ const AddDepartment = ({ onClose }) => {
                         value={values.branch}
                         onBlur={() => setFieldTouched("branch", true)}
                       >
-                         <Option value="all">All</Option>
-                         <Option value="branch1">Branch 1</Option>
-                        
+                        {fnddata?.map((branch) => (
+                          <Option key={branch.id} value={branch.id}>
+                            {branch.branchName}
+                          </Option>
+                        ))}
                       </Select>
                     )}
                   </Field>
@@ -89,11 +109,18 @@ const AddDepartment = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-                </Col>
+              </Col>
             </Row>
 
             <div className="text-right">
-              <Button type="default" className="mr-2" onClick={() => { resetForm(); onClose(); }}>
+              <Button
+                type="default"
+                className="mr-2"
+                onClick={() => {
+                  resetForm();
+                  onClose();
+                }}
+              >
                 Cancel
               </Button>
               <Button type="primary" htmlType="submit">
@@ -108,15 +135,6 @@ const AddDepartment = ({ onClose }) => {
 };
 
 export default AddDepartment;
-
-
-
-
-
-
-
-
-
 
 // import React from 'react';
 // import { Form, Input, Button, DatePicker, Select, message, Row, Col } from 'antd';
@@ -139,8 +157,6 @@ export default AddDepartment;
 //     console.error('Form submission failed:', errorInfo);
 //     message.error('Please fill out all required fields.');
 //   };
-
-  
 
 //   return (
 //     <div className="add-employee">
@@ -180,12 +196,3 @@ export default AddDepartment;
 // };
 
 // export default AddDepartment;
-
-
-
-
-
-
-
-
-

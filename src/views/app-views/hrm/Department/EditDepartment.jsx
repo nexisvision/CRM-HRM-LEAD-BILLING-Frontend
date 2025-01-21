@@ -1,17 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { Formik, Form as FormikForm, Field } from 'formik';
-import { Input, Button, Row, Col, message } from 'antd';
-import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { EditDept, getDept } from './DepartmentReducers/DepartmentSlice';
+import React, { useEffect, useState } from "react";
+import { Formik, Form as FormikForm, Field, ErrorMessage } from "formik";
+import { Input, Button, Row, Col, message, Select } from "antd";
+import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { EditDept, getDept } from "./DepartmentReducers/DepartmentSlice";
+import { getBranch } from "../Branch/BranchReducer/BranchSlice";
+import { Option } from "antd/es/mentions";
 
 // Validation Schema using Yup
 const validationSchema = Yup.object().shape({
   department_name: Yup.string()
-    .required('Department Name is required')
-    .min(2, 'Department name must be at least 2 characters')
-    .max(50, 'Department name cannot exceed 50 characters'),
+    .required("Department Name is required")
+    .min(2, "Department name must be at least 2 characters")
+    .max(50, "Department name cannot exceed 50 characters"),
 });
 
 const EditDepartment = ({ comnyid, onClose }) => {
@@ -22,6 +24,13 @@ const EditDepartment = ({ comnyid, onClose }) => {
   const [singleEmp, setSingleEmp] = useState(null);
 
   useEffect(() => {
+    dispatch(getBranch());
+  }, [dispatch]);
+
+  const alldatas = useSelector((state) => state.Branch);
+  const fnddata = alldatas.Branch.data;
+
+  useEffect(() => {
     const empData = alldept?.Department?.data || [];
     const data = empData.find((item) => item.id === comnyid);
     setSingleEmp(data || null);
@@ -29,50 +38,81 @@ const EditDepartment = ({ comnyid, onClose }) => {
 
   const handleSubmit = (values) => {
     if (!comnyid) {
-      message.error('Company ID is missing.');
+      message.error("Company ID is missing.");
       return;
     }
 
     dispatch(EditDept({ comnyid, values }))
       .then(() => {
         dispatch(getDept());
-        message.success('Department updated successfully!');
+        message.success("Department updated successfully!");
         onClose();
-        navigate('/app/hrm/department');
+        navigate("/app/hrm/department");
       })
       .catch((error) => {
-        message.error('Failed to update department.');
-        console.error('Edit API error:', error);
+        message.error("Failed to update department.");
+        console.error("Edit API error:", error);
       });
   };
 
   return (
     <div className="edit-department">
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
 
       <Formik
         initialValues={{
-          department_name: singleEmp ? singleEmp.department_name : '',
+          department_name: singleEmp ? singleEmp.department_name : "",
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
-        enableReinitialize // This allows the form to reinitialize when initialValues change
+        enableReinitialize
       >
         {({ errors, touched, setFieldValue }) => (
           <FormikForm>
             <Row gutter={16}>
               <Col span={12}>
-                <div style={{ marginBottom: '16px' }}>
+                <div style={{ marginBottom: "16px" }}>
                   <label>Department*</label>
                   <Field
                     as={Input}
                     name="department_name"
                     placeholder="Enter Department Name"
-                    onChange={(e) => setFieldValue('department_name', e.target.value)}
+                    onChange={(e) =>
+                      setFieldValue("department_name", e.target.value)
+                    }
                   />
                   {errors.department_name && touched.department_name && (
-                    <div style={{ color: 'red', fontSize: '12px' }}>{errors.department_name}</div>
+                    <div style={{ color: "red", fontSize: "12px" }}>
+                      {errors.department_name}
+                    </div>
                   )}
+                </div>
+              </Col>
+
+              <Col span={12} className="mb-4">
+                <div className="form-item">
+                  <label>Branch</label>
+                  <Field name="branch">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full"
+                        placeholder="Select Branch"
+                        onChange={(value) => setFieldValue("branch", value)}
+                      >
+                        {fnddata?.map((branch) => (
+                          <Option key={branch.id} value={branch.id}>
+                            {branch.branchName}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="branch"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
             </Row>

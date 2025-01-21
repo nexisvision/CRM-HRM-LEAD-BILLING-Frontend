@@ -46,6 +46,8 @@ import jobapplications from "../views/app-views/hrm/Jobs/JobApplication/Jobappli
 import Interviews from "../views/app-views/hrm/Jobs/Interview/interviewReducer/interviewSlice"
 import jobonboarding from "../views/app-views/hrm/Jobs/JobOnBording/JobOnBoardingReducer/jobonboardingSlice"
 import Branch from "../views/app-views/hrm/Branch/BranchReducer/BranchSlice"
+import joboffers from "../views/app-views/hrm/Jobs/JobOfferLetter/jobOfferletterReducer/jobofferlateerSlice"
+import policy from "../views/app-views/policy/policyReducer/policySlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -96,6 +98,8 @@ const rootReducer = (asyncReducers) => (state, action) => {
         Interviews,
         jobonboarding,
         Branch,
+        joboffers,
+        policy,
         // employee,
         // department,
         ...asyncReducers,

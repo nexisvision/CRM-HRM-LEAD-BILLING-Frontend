@@ -1,33 +1,71 @@
-import React from 'react';
-import { Input, Button, Select, Radio, message, Row, Col, Upload ,    DatePicker,} from "antd";
+import React, { useEffect, useState } from "react";
+import {
+  Input,
+  Button,
+  Select,
+  Radio,
+  message,
+  Row,
+  Col,
+  Upload,
+  DatePicker,
+} from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
+import { editpolicys, getpolicys } from "./policyReducer/policySlice";
+import { getBranch } from "../hrm/Branch/BranchReducer/BranchSlice";
 const { Option } = Select;
 
-
-const  EditpolicyList = ({ onClose }) => {
+const EditpolicyList = ({ idd, onClose }) => {
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getBranch());
+  }, []);
+
+  useEffect(() => {
+    dispatch(getpolicys());
+  }, []);
+
+  const allbranch = useSelector((state) => state.Branch);
+  const fndbranch = allbranch.Branch.data;
+
+  const allpolicy = useSelector((state) => state.policy);
+  const fndpolicy = allpolicy.policy.data;
+
+  useEffect(() => {
+    if (fndpolicy) {
+      const findofferdatas = fndpolicy.find((item) => item.id === idd);
+      if (findofferdatas) {
+        setInitialValues({
+          branch: findofferdatas.branch,
+          title: findofferdatas.title,
+          description: findofferdatas.description,
+        });
+      }
+    }
+  }, [fndpolicy]);
+
   const onSubmit = async (values) => {
-    // console.log("Form submitted:", values);
-    // try {
-    //   dispatch(Addjobapplication(values)).then(() => {
-    //     dispatch(getjobapplication());
-    //     onClose();
-    //     message.success("Form submitted successfully");
-    //   });
-    //   message.success("Job application added successfully!");
-    // } catch (error) {
-    //   console.error("Submission error:", error);
-    //   message.error("An error occurred while submitting the job application.");
-    // }
+    try {
+      dispatch(editpolicys({ idd, values })).then(() => {
+        dispatch(getpolicys());
+        onClose();
+        message.success("Form submitted successfully");
+      });
+      message.success("Job application added successfully!");
+    } catch (error) {
+      console.error("Submission error:", error);
+      message.error("An error occurred while submitting the job application.");
+    }
   };
-  const initialValues = {
+  const [initialValues, setInitialValues] = useState({
     branch: "",
     title: "",
     description: "",
-  };
+  });
   const validationSchema = Yup.object({
     branch: Yup.string().required("Please select a Branch."),
     title: Yup.string().required("Please enter a Title."),
@@ -41,6 +79,7 @@ const  EditpolicyList = ({ onClose }) => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
+        enableReinitialize
       >
         {({ values, setFieldValue, setFieldTouched, handleSubmit }) => (
           <Form
@@ -52,21 +91,27 @@ const  EditpolicyList = ({ onClose }) => {
             }}
           >
             <Row gutter={16}>
-
-              <Col span={12}>
-                <div className="form-item ">
-                  <label className="font-semibold">Branch</label>
-                  <Select
-
-                    placeholder="Select Branch"
-                    value={values.branch}
-                    onChange={(value) => setFieldValue("branch", value)}
-                    onBlur={() => setFieldTouched("branch", true)}
-                    className="w-full"
-                  >
-                    <Option value="All">All</Option>
-                    <Option value="Branch1">Branch1</Option>
-                  </Select>
+              <Col span={12} className="mb-4">
+                <div className="form-item">
+                  <label>Branch</label>
+                  <Field name="branch">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full"
+                        placeholder="Select Branch"
+                        onChange={(value) => setFieldValue("branch", value)}
+                        value={values.branch}
+                        onBlur={() => setFieldTouched("branch", true)}
+                      >
+                        {fndbranch?.map((branch) => (
+                          <Option key={branch.id} value={branch.id}>
+                            {branch.branchName}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
                   <ErrorMessage
                     name="branch"
                     component="div"
@@ -78,7 +123,7 @@ const  EditpolicyList = ({ onClose }) => {
               <Col span={12}>
                 <div className="form-item ">
                   <label className="font-semibold ">Title</label>
-                  <Field name="jobapplication" as={Input} placeholder="Enter Title" />
+                  <Field name="title" as={Input} placeholder="Enter Title" />
                   <ErrorMessage
                     name="title"
                     component="div"
@@ -86,7 +131,6 @@ const  EditpolicyList = ({ onClose }) => {
                   />
                 </div>
               </Col>
-
 
               <Col span={24}>
                 <div className="form-item mt-4">
@@ -115,8 +159,7 @@ const  EditpolicyList = ({ onClose }) => {
                     showUploadList={{ showRemoveIcon: true }}
                     className="border-2 flex justify-center items-center p-10 "
                   >
-                    <span className="text-xl">Choose File</span>
-                    {/* <CloudUploadOutlined className='text-4xl' /> */}
+                    <span className="text-xl">Choose Files</span>
                   </Upload>
                 </Col>
               </div>

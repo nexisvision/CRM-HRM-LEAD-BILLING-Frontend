@@ -1,20 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Input, Button, Modal, message } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
-import UserView from '../../Users/user-list/UserView';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import { useNavigate } from 'react-router-dom';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import AddBranch from './AddBranch';
-import EditBranch from './EditBranch';
+import React, { useEffect, useState } from "react";
+import { Card, Table, Menu, Input, Button, Modal, message } from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  MailOutlined,
+  PlusOutlined,
+  PushpinOutlined,
+  FileExcelOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+import UserView from "../../Users/user-list/UserView";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import { useNavigate } from "react-router-dom";
+import AvatarStatus from "components/shared-components/AvatarStatus";
+import AddBranch from "./AddBranch";
+import EditBranch from "./EditBranch";
 
 import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
-import utils from 'utils';
-import { useDispatch, useSelector } from 'react-redux';
-import { getBranch } from './BranchReducer/BranchSlice';
+import utils from "utils";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteBranch, getBranch } from "./BranchReducer/BranchSlice";
 // import { DeleteDept, getDept } from './DepartmentReducers/DepartmentSlice';
 
 const BranchList = () => {
@@ -27,22 +36,24 @@ const BranchList = () => {
   const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
-  const [isEditBranchModalVisible, setIsEditBranchModalVisible] = useState(false);
-  const  [dept,setDept] = useState("");
+  const [isEditBranchModalVisible, setIsEditBranchModalVisible] =
+    useState(false);
+  const [dept, setDept] = useState("");
+
+  const [idd, setIdd] = useState("");
 
   const tabledata = useSelector((state) => state.Branch);
   const fnddata = tabledata.Branch.data;
 
-  useEffect(()=>{
-    dispatch(getBranch())
-  },[])
+  useEffect(() => {
+    dispatch(getBranch());
+  }, []);
 
-  useEffect(()=>{
-    if(fnddata){
-        setUsers(fnddata)
+  useEffect(() => {
+    if (fnddata) {
+      setUsers(fnddata);
     }
-  },[fnddata])
-
+  }, [fnddata]);
 
   // const navigate = useNavigate();
 
@@ -54,8 +65,6 @@ const BranchList = () => {
     setIsAddBranchModalVisible(false);
   };
 
-
-
   const openEditBranchModal = () => {
     setIsEditBranchModalVisible(true);
   };
@@ -64,9 +73,10 @@ const BranchList = () => {
     setIsEditBranchModalVisible(false);
   };
 
-
   const handleParticularBranchModal = () => {
-    navigate('/app/hrm/department/particulardepartment', { state: { user: selectedUser } });
+    navigate("/app/hrm/department/particulardepartment", {
+      state: { user: selectedUser },
+    });
   };
 
   const onSearch = (e) => {
@@ -77,30 +87,22 @@ const BranchList = () => {
     setSelectedRowKeys([]);
   };
 
-//   useEffect(()=>{
-//     dispatch(getDept())
-//   },[dispatch]);
+  //   useEffect(()=>{
+  //     dispatch(getDept())
+  //   },[dispatch]);
 
-
-
-//   const deleteUser = (userId) => {
-    // dispatch(DeleteDept());
-    // dispatch(getDept());
-    // setUsers(users.filter(item => item.id !== userId));
-    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
-
-//       dispatch(DeleteDept( userId ))
-//             .then(() => {
-//               dispatch(getDept());
-//               message.success('Department Deleted successfully!');
-//               setUsers(users.filter(item => item.id !== userId));
-//               navigate('/app/hrm/department');
-//             })
-//             .catch((error) => {
-//               message.error('Failed to update department.');
-//               console.error('Edit API error:', error);
-//             });
-//   };
+  const deleteUser = (userId) => {
+    dispatch(deleteBranch(userId))
+      .then(() => {
+        dispatch(getBranch());
+        message.success("Department Deleted successfully!");
+        setUsers(users.filter((item) => item.id !== userId));
+      })
+      .catch((error) => {
+        message.error("Failed to update department.");
+        console.error("Edit API error:", error);
+      });
+  };
 
   const showUserProfile = (userInfo) => {
     setSelectedUser(userInfo);
@@ -112,46 +114,66 @@ const BranchList = () => {
     setSelectedUser(null);
   };
 
-  const editDept = (Deptid) =>{
+  const editDept = (Deptid) => {
     openEditBranchModal();
-    setDept(Deptid)
-
-  }
+    setDept(Deptid);
+    setIdd(Deptid);
+  };
 
   const dropdownMenu = (elm) => (
     <Menu>
       <Menu.Item>
-        <Button type="" icon={<EyeOutlined />} onClick={handleParticularBranchModal} size="small">
+        <Button
+          type=""
+          icon={<EyeOutlined />}
+          onClick={handleParticularBranchModal}
+          size="small"
+        >
           <span>View Details</span>
         </Button>
       </Menu.Item>
       <Menu.Item>
-        <Button type="" icon={<EditOutlined />} onClick={() => editDept(elm.id)} size="small">
+        <Button
+          type=""
+          icon={<EditOutlined />}
+          onClick={() => editDept(elm.id)}
+          size="small"
+        >
           <span>Edit</span>
         </Button>
       </Menu.Item>
       <Menu.Item>
-        <Button type="" icon={<PushpinOutlined />} onClick={() => showUserProfile(elm)} size="small">
+        <Button
+          type=""
+          icon={<PushpinOutlined />}
+          onClick={() => showUserProfile(elm)}
+          size="small"
+        >
           <span>Pin</span>
         </Button>
       </Menu.Item>
       <Menu.Item>
-        {/* <Button type="" icon={<DeleteOutlined />} onClick={() => deleteUser(elm.id)} size="small">
+        <Button
+          type=""
+          icon={<DeleteOutlined />}
+          onClick={() => deleteUser(elm.id)}
+          size="small"
+        >
           <span>Delete</span>
-        </Button> */}
+        </Button>
       </Menu.Item>
     </Menu>
   );
 
   const tableColumns = [
     {
-      title: 'Branch',
-      dataIndex: 'branchName',
+      title: "Branch",
+      dataIndex: "branchName",
       sorter: (a, b) => a.branchName.length - b.branchName.length,
     },
     {
-      title: 'Action',
-      dataIndex: 'actions',
+      title: "Action",
+      dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
           <EllipsisDropdown menu={dropdownMenu(elm)} />
@@ -161,11 +183,19 @@ const BranchList = () => {
   ];
 
   return (
-    <Card bodyStyle={{ padding: '-3px' }}>
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+    <Card bodyStyle={{ padding: "-3px" }}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+      >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={onSearch} />
+            <Input
+              placeholder="Search"
+              prefix={<SearchOutlined />}
+              onChange={onSearch}
+            />
           </div>
         </Flex>
         <Flex gap="7px">
@@ -181,7 +211,11 @@ const BranchList = () => {
       <div className="table-responsive mt-2">
         <Table columns={tableColumns} dataSource={users} rowKey="id" />
       </div>
-      <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+      <UserView
+        data={selectedUser}
+        visible={userProfileVisible}
+        close={closeUserProfile}
+      />
 
       {/* Add Department Modal */}
       <Modal
@@ -194,8 +228,6 @@ const BranchList = () => {
         <AddBranch onClose={closeAddBranchModal} />
       </Modal>
 
-
-
       {/* Edit Department Modal */}
       <Modal
         title="Edit Branch"
@@ -204,9 +236,8 @@ const BranchList = () => {
         footer={null}
         width={800}
       >
-        <EditBranch onClose={closeEditBranchModal} comnyid={dept}/>
+        <EditBranch onClose={closeEditBranchModal} comnyid={dept} idd={idd} />
       </Modal>
-
     </Card>
   );
 };

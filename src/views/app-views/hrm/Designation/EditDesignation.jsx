@@ -1,22 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { Formik, Form as FormikForm, Field } from 'formik';
-import { Input, Button, Row, Col, message } from 'antd';
-import * as Yup from 'yup';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { EditDes, getDes } from './DesignationReducers/DesignationSlice';
+import React, { useEffect, useState } from "react";
+import { Formik, Form as FormikForm, Field, ErrorMessage } from "formik";
+import { Input, Button, Row, Col, message, Select } from "antd";
+import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { EditDes, getDes } from "./DesignationReducers/DesignationSlice";
+import { getBranch } from "../Branch/BranchReducer/BranchSlice";
+import { Option } from "antd/es/mentions";
 
 // Validation Schema using Yup
 const validationSchema = Yup.object().shape({
   designation_name: Yup.string()
-    .required('Designation Name is required')
-    .min(2, 'Designation name must be at least 2 characters')
-    .max(50, 'Designation name cannot exceed 50 characters'),
+    .required("Designation Name is required")
+    .min(2, "Designation name must be at least 2 characters")
+    .max(50, "Designation name cannot exceed 50 characters"),
 });
 
 const EditDesignation = ({ id, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getBranch());
+  }, [dispatch]);
+
+  const alldatas = useSelector((state) => state.Branch);
+  const fnddata = alldatas.Branch.data;
 
   const alldept = useSelector((state) => state.Designation);
   const [singleEmp, setSingleEmp] = useState(null);
@@ -29,30 +38,30 @@ const EditDesignation = ({ id, onClose }) => {
 
   const handleSubmit = (values) => {
     if (!id) {
-      message.error('Designation ID is missing.');
+      message.error("Designation ID is missing.");
       return;
     }
 
     dispatch(EditDes({ id, values }))
       .then(() => {
         dispatch(getDes());
-        message.success('Designation updated successfully!');
+        message.success("Designation updated successfully!");
         onClose();
-        navigate('/app/hrm/designation');
+        navigate("/app/hrm/designation");
       })
       .catch((error) => {
-        message.error('Failed to update designation.');
-        console.error('Edit API error:', error);
+        message.error("Failed to update designation.");
+        console.error("Edit API error:", error);
       });
   };
 
   return (
     <div className="edit-designation">
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
 
       <Formik
         initialValues={{
-          designation_name: singleEmp ? singleEmp.designation_name : '',
+          designation_name: singleEmp ? singleEmp.designation_name : "",
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -62,17 +71,48 @@ const EditDesignation = ({ id, onClose }) => {
           <FormikForm>
             <Row gutter={16}>
               <Col span={12}>
-                <div style={{ marginBottom: '16px' }}>
+                <div style={{ marginBottom: "16px" }}>
                   <label>Designation*</label>
                   <Field
                     as={Input}
                     name="designation_name"
                     placeholder="Enter Designation Name"
-                    onChange={(e) => setFieldValue('designation_name', e.target.value)}
+                    onChange={(e) =>
+                      setFieldValue("designation_name", e.target.value)
+                    }
                   />
                   {errors.designation_name && touched.designation_name && (
-                    <div style={{ color: 'red', fontSize: '12px' }}>{errors.designation_name}</div>
+                    <div style={{ color: "red", fontSize: "12px" }}>
+                      {errors.designation_name}
+                    </div>
                   )}
+                </div>
+              </Col>
+
+              <Col span={12} className="mb-4">
+                <div className="form-item">
+                  <label>Branch</label>
+                  <Field name="branch">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full"
+                        placeholder="Select Branch"
+                        onChange={(value) => setFieldValue("branch", value)}
+                      >
+                        {fnddata?.map((branch) => (
+                          <Option key={branch.id} value={branch.id}>
+                            {branch.branchName}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="branch"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
             </Row>
