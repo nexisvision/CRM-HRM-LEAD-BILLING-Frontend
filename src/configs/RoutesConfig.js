@@ -1099,6 +1099,11 @@ export const protectedRoutes = [
         component: React.lazy(() => import('views/app-views/policy')),
     },
     {
+        key: 'inquiry',
+        path: `${APP_PREFIX_PATH}/superadmin/inquiry`,
+        component: React.lazy(() => import('views/app-views/inquiry')),
+    },
+    {
         key: 'company',
         path: `${APP_PREFIX_PATH}/superadmin/company`,
         component: React.lazy(() => import('views/app-views/company')),
