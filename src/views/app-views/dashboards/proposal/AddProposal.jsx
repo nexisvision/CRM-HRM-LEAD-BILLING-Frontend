@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Row, Col, message, Upload, Select } from "antd";
+import { Form, Input, Button, Row, Col, message, Upload, Select, DatePicker } from "antd";
 import { useNavigate } from "react-router-dom";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { RxCross2 } from "react-icons/rx";
@@ -27,7 +27,7 @@ const AddProposal = ({ onClose }) => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [selectedMilestone, setSelectedMilestone] = useState(null);
     const [discountRate, setDiscountRate] = useState(0);
-    const [totals, setTotals] = useState({ subtotal: 0, totalTax: 0, finalTotal: 0 });
+    const [totals, setTotals] = useState({ subtotal: 0, totalTax: 0, finalTotal: 0, totaldiscount: 0 });
     const [loading, setLoading] = useState(false);
     const [milestones, setMilestones] = useState([]);
 
@@ -37,10 +37,10 @@ const AddProposal = ({ onClose }) => {
         vaildtill: "",
         currency: "",
         calculatedtax: "",
-        item:"",
-        discount:"",
-        tax:"",
-        total:"",   
+        item: "",
+        discount: "",
+        tax: "",
+        total: "",
         description: "",
     };
 
@@ -92,7 +92,7 @@ const AddProposal = ({ onClose }) => {
         const links = rows.reduce((acc, row, index) => {
             acc[index] = { title: row.title, url: row.link };
             return acc;
-        }, {});     
+        }, {});
         message.success("Proposal added successfully!");
         resetForm();
         onClose();
@@ -106,7 +106,7 @@ const AddProposal = ({ onClose }) => {
                 validationSchema={validationSchema}
                 onSubmit={onSubmit}
             >
-                {({ handleSubmit ,values,setFieldValue,setFieldTouched}) => (
+                {({ handleSubmit, values, setFieldValue, setFieldTouched }) => (
                     <Form
                         layout="vertical"
                         form={form}
@@ -150,47 +150,51 @@ const AddProposal = ({ onClose }) => {
                                     />
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
-                                <Form.Item label="Vaild Till" name="vaildtill">
-                                    <Field name="vaildtill">
-                                        {({ field }) => (
-                                            <Input
-                                                placeholder="Enter Vaild Till"
-                                                {...field}
-
-                                            />
-                                        )}
-                                    </Field>
-                                    <ErrorMessage
-                                        name="vaildtill"
-                                        component="div"
-                                        className="error-message text-red-500 my-1"
+                            <Col span={12} className=''>
+                                <div className="form-item">
+                                    <label className=''>Date</label>
+                                    <DatePicker
+                                        className="w-full mt-2"
+                                        format="DD-MM-YYYY"
+                                        value={values.date}
+                                        onChange={(date) => setFieldValue('date', date)}
+                                        onBlur={() => setFieldTouched("date", true)}
                                     />
-                                </Form.Item>
+                                    <ErrorMessage name="date" component="div" className="error-message text-red-500 my-1" />
+                                </div>
                             </Col>
-                            <Col span={12}>
-                                <Form.Item label="Currency" name="currency">
+                            <Col span={12} className="">
+                                <div className="form-item">
+                                    <label className="">Currency</label>
                                     <Field name="currency">
                                         {({ field }) => (
-                                            <Input
-                                                placeholder="Enter Currency"
+                                            <Select
                                                 {...field}
-
-                                            />
+                                                placeholder="Select Currency"
+                                                className="w-full mt-2"
+                                                onChange={(value) => setFieldValue("currency", value)}
+                                                value={values.role}
+                                                onBlur={() => setFieldTouched("currency", true)}
+                                                allowClear={false}
+                                            >
+                                                <Option value="ABC">ABC</Option>
+                                                <Option value="XYZ">XYZ</Option>
+                                            </Select>
                                         )}
                                     </Field>
                                     <ErrorMessage
-                                        name="currency"
+                                        name="role"
                                         component="div"
                                         className="error-message text-red-500 my-1"
                                     />
-                                </Form.Item>
+                                </div>
                             </Col>
-                            <Col span={12}>
+                            <Col span={12} className="mt-2">
                                 <Form.Item label="Calculated Tax" name="calculatedtax">
                                     <Field name="calculatedtax">
                                         {({ field }) => (
                                             <Input
+
                                                 placeholder="Enter Calculated Tax"
                                                 {...field}
 
@@ -204,61 +208,8 @@ const AddProposal = ({ onClose }) => {
                                     />
                                 </Form.Item>
                             </Col>
-                            <Col span={12}>
-                                <Form.Item label="Discount" name="discount">
-                                    <Field name="discount">
-                                        {({ field }) => (
-                                            <Input
-                                                placeholder="Enter Discount"
-                                                {...field}
 
-                                            />
-                                        )}
-                                    </Field>
-                                    <ErrorMessage
-                                        name="discount"
-                                        component="div"
-                                        className="error-message text-red-500 my-1"
-                                    />
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label="Tax" name="tax">
-                                    <Field name="tax">
-                                        {({ field }) => (
-                                            <Input
-                                                placeholder="Enter Tax"
-                                                {...field}
-
-                                            />
-                                        )}
-                                    </Field>
-                                    <ErrorMessage
-                                        name="tax"
-                                        component="div"
-                                        className="error-message text-red-500 my-1"
-                                    />
-                                </Form.Item>
-                            </Col>
-                            <Col span={12}>
-                                <Form.Item label="Total" name="total">
-                                    <Field name="total">
-                                        {({ field }) => (
-                                            <Input
-                                                placeholder="Enter Total"
-                                                {...field}
-
-                                            />
-                                        )}
-                                    </Field>
-                                    <ErrorMessage
-                                        name="total"
-                                        component="div"
-                                        className="error-message text-red-500 my-1"
-                                    />
-                                </Form.Item>
-                            </Col>
-                            <Col span={24} className="mt-2">
+                            {/* <Col span={24} className="mt-2">
                                 <div className="form-item">
                                     <label className="">Description</label>
                                     <Field name="description">
@@ -278,7 +229,7 @@ const AddProposal = ({ onClose }) => {
                                         )}
                                     </Field>
                                 </div>
-                            </Col>
+                            </Col> */}
                         </Row>
 
                         <div>
@@ -287,7 +238,7 @@ const AddProposal = ({ onClose }) => {
                                     <Flex className="flex " mobileFlex={false}>
                                         <div className="w-full flex gap-4">
                                             <div>
-                                                <Select
+                                                {/* <Select
                                                     value={selectedProduct}
                                                     onChange={handleProductChange}
                                                     className="w-full !rounded-none"
@@ -297,14 +248,14 @@ const AddProposal = ({ onClose }) => {
                                                     <Option value="smart_speakers">Smart Speakers</Option>
                                                     <Option value="electric_kettle">Electric Kettle</Option>
                                                     <Option value="headphones">Headphones</Option>
-                                                </Select>
+                                                </Select> */}
                                             </div>
                                         </div>
                                     </Flex>
                                     <Flex gap="7px" className="flex">
                                         <div className="w-full flex gap-4">
                                             <div>
-                                                <Select
+                                                {/* <Select
                                                     value={selectedMilestone}
                                                     onChange={handleMilestoneChange}
                                                     className="w-full !rounded-none"
@@ -317,17 +268,21 @@ const AddProposal = ({ onClose }) => {
                                                             {milestone.milestone_title}
                                                         </Option>
                                                     ))}
-                                                </Select>
+                                                </Select> */}
                                             </div>
                                         </div>
                                     </Flex>
                                 </Flex>
-
+                                <div className="form-buttons text-end mb-2">
+                                    <Button className='border-0 text-white bg-blue-500' onClick={handleAddRow}>
+                                        <PlusOutlined />  Add Items
+                                    </Button>
+                                </div>
                                 <table className="w-full border border-gray-200 bg-white">
                                     <thead className="bg-gray-100">
                                         <tr>
                                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                                Description<span className="text-red-500">*</span>
+                                                Items<span className="text-red-500">*</span>
                                             </th>
                                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Quantity<span className="text-red-500">*</span>
@@ -341,6 +296,9 @@ const AddProposal = ({ onClose }) => {
                                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Amount<span className="text-red-500">*</span>
                                             </th>
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                                Action<span className="text-red-500">*</span>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -348,13 +306,15 @@ const AddProposal = ({ onClose }) => {
                                             <React.Fragment key={row.id}>
                                                 <tr>
                                                     <td className="px-4 py-2 border-b">
-                                                        <input
-                                                            type="text"
+                                                        <select
                                                             value={row.item}
                                                             onChange={(e) => handleTableDataChange(row.id, 'item', e.target.value)}
-                                                            placeholder="Item Name"
-                                                            className="w-full p-2 border rounded-s"
-                                                        />
+                                                            className="w-full p-2 border"
+                                                        >
+                                                            <option value="item1">Item1</option>
+                                                            <option value="item2">Item2</option>
+
+                                                        </select>
                                                     </td>
                                                     <td className="px-4 py-2 border-b">
                                                         <input
@@ -375,7 +335,7 @@ const AddProposal = ({ onClose }) => {
                                                         />
                                                     </td>
                                                     <td className="px-4 py-2 border-b">
-                                                        <select
+                                                        {/* <select
                                                             value={row.tax}
                                                             onChange={(e) => handleTableDataChange(row.id, 'tax', e.target.value)}
                                                             className="w-full p-2 border"
@@ -386,7 +346,14 @@ const AddProposal = ({ onClose }) => {
                                                             <option value="10">VAT:10%</option>
                                                             <option value="10">IGST:10%</option>
                                                             <option value="10">UTGST:10%</option>
-                                                        </select>
+                                                        </select> */}
+                                                        <input
+                                                            type="number"
+                                                            value={row.tax}
+                                                            onChange={(e) => handleTableDataChange(row.id, 'tax', e.target.value)}
+                                                            placeholder="tax"
+                                                            className="w-full p-2 border rounded-s"
+                                                        />
                                                     </td>
                                                     <td className="px-4 py-2 border-b">
                                                         <span>{row.amount}</span>
@@ -400,29 +367,18 @@ const AddProposal = ({ onClose }) => {
                                                         </Button>
                                                     </td>
                                                 </tr>
-                                                <tr>
-                                                    <td colSpan={6} className="px-4 py-2 border-b">
-                                                        <textarea
-                                                            rows={2}
-                                                            value={row.description}
-                                                            onChange={(e) => handleTableDataChange(row.id, 'description', e.target.value)}
-                                                            placeholder="Description"
-                                                            className="w-[70%] p-2 border"
-                                                        />
-                                                    </td>
-                                                </tr>
                                             </React.Fragment>
                                         ))}
                                     </tbody>
                                 </table>
                             </div>
-                            <div className="form-buttons text-left mt-2">
+                            {/* <div className="form-buttons text-left mt-2">
                                 <Button className='border-0 text-blue-500' onClick={handleAddRow}>
                                     <PlusOutlined />  Add Items
                                 </Button>
-                            </div>
+                            </div> */}
 
-                            <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
+                            <div className=" flex flex-col justify-end items-end  space-y-2">
                                 <table className='w-full lg:w-[50%] p-2'>
                                     <tr className="flex justify-between px-2 py-2 border-x-2">
                                         <td className="font-medium">Sub Total</td>
@@ -466,11 +422,11 @@ const AddProposal = ({ onClose }) => {
                                     </tr>
                                 </table>
                             </div>
-                            <div className="pt-4 text-right">
+                            {/* <div className="pt-4 text-right">
                                 <h3 className="font-medium">Terms and Conditions</h3>
                                 <p className="text-sm text-gray-600">Thank you for your business.</p>
-                            </div>
-                            <div className='mt-4'>
+                            </div> */}
+                            {/* <div className='mt-4'>
                                 <span className='block mb-2'>Add File</span>
                                 <Col span={24} >
                                     <Upload
@@ -484,7 +440,7 @@ const AddProposal = ({ onClose }) => {
                                         <span className='text-xl'>Choose File</span>
                                     </Upload>
                                 </Col>
-                            </div>
+                            </div> */}
                         </div>
 
                         <Form.Item>

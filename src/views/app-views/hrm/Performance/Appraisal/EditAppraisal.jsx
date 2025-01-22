@@ -136,54 +136,62 @@ const EditAppraisal = () => {
                   <h2 className="font-semibold">Appraisal</h2>
                 </div>
               </div>
-              <hr className="mb-4 border border-gray-300" />    
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <hr className="mb-4 border border-gray-300" />
+              
+              <Row gutter={16}>
+                <Col span={12}>
                   <label className="block mb-1">Business Process</label>
                   <label className="block mt-4">Oral Communication</label>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <Rate defaultValue={4} />
-                  <Rate defaultValue={3} />
-                  <Rate defaultValue={5} />
-                  <Rate defaultValue={2} />
-                </div>
-              </div>
+                </Col>
+                <Col span={12}>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Rate  />
+                    <Rate  />
+                    <Rate />
+                    <Rate  />
+                  </div>
+                </Col>
+              </Row>
             </div>
 
             {/* Organizational Competencies */}
             <div className="flex flex-col gap-4">
-            <h1 className="text-lg font-semibold mb-3 mt-6">Organizational Competencies</h1>
-            <hr className="mb-4 border border-gray-300" />
-            <div className="grid grid-cols-2 gap-4">
-                <div>
+              <h1 className="text-lg font-semibold mb-3 mt-6">Organizational Competencies</h1>
+              <hr className="mb-4 border border-gray-300" />
+              
+              <Row gutter={16}>
+                <Col span={12}>
                   <label className="block mb-1">LeaderShip</label>
                   <label className="block mt-4">Project Management</label>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <Rate defaultValue={4} />
-                  <Rate defaultValue={3} />
-                  <Rate defaultValue={5} />
-                  <Rate defaultValue={2} />
-                </div>
-              </div>
+                </Col>
+                <Col span={12}>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Rate  />
+                    <Rate  />
+                    <Rate  />
+                    <Rate  />
+                  </div>
+                </Col>
+              </Row>
             </div>
 
             {/* Technical Competencies */}
             <div className="flex flex-col gap-4">
-            <h1 className="text-lg font-semibold mb-3 mt-6">Technical Competencies</h1>
-            <hr className="mb-4 border border-gray-300" />
-            <div className="grid grid-cols-2 gap-4">
-                <div>
+              <h1 className="text-lg font-semibold mb-3 mt-6">Technical Competencies</h1>
+              <hr className="mb-4 border border-gray-300" />
+              
+              <Row gutter={16}>
+                <Col span={12}>
                   <label className="block mb-1">Allocating Resources</label>
-                
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <Rate defaultValue={4} />
-                  <Rate defaultValue={3} />
-                </div>
-              </div>
-              </div>
+                </Col>
+                <Col span={12}>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Rate  />
+                    <Rate />
+                  </div>
+                </Col>
+              </Row>
+            </div>
 
             <Form.Item>
               <div className="text-right mt-3">

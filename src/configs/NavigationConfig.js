@@ -671,7 +671,18 @@ const extraNavvvTree = [
             ]
             
           },
+          {
+            key: 'superadmin-inquiry',
+            path: `${APP_PREFIX_PATH}/superadmin/inquiry`,
+            title: 'Inquiry',
+            icon: FileTextOutlined,
+            breadcrumb: true,
+            submenu: []
+          },
+
         ]
+
+        
   }
 ]
 
