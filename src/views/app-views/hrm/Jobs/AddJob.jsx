@@ -159,7 +159,7 @@ const AddJob = ({ onClose }) => {
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
             <Row gutter={16}>
-              <Col span={8}>
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Job Title</label>
                   <Field
@@ -176,7 +176,7 @@ const AddJob = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24} className="mt-4">
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Job Category</label>
                   <div className="flex gap-2">
@@ -185,7 +185,7 @@ const AddJob = ({ onClose }) => {
                         <Select
                           {...field}
                           className="w-full"
-                          placeholder="Select or add new tag"
+                          placeholder="Select or add new category"
                           onChange={(value) => {
                             form.setFieldValue("category", value);
                           }}
@@ -205,7 +205,7 @@ const AddJob = ({ onClose }) => {
                                   onClick={() => setIsTagModalVisible(true)}
                                   block
                                 >
-                                  Add New Tag
+                                  Add New Category
                                 </Button>
                               </div>
                             </div>
@@ -227,28 +227,50 @@ const AddJob = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={8}>
-                <div className="form-item">
+              <Col span={12}>
+                <div className="form-item mt-2">
                   <label className="font-semibold">Skill</label>
-                  <Field name="skills">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        mode="multiple"
-                        placeholder="Select skills"
-                        className="w-full mt-2"
-                        onChange={(value) => setFieldValue("skills", value)}
-                        value={values.skills}
-                        onBlur={() => setFieldTouched("skills", true)}
-                        allowClear={false}
-                      >
-                        <Option value="xyz">XYZ</Option>
-                        <Option value="abc">ABC</Option>
-                      </Select>
-                    )}
-                  </Field>
+                  <Field name="skill">
+                      {({ field, form }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-2"
+                          placeholder="Select or add new skill"
+                          onChange={(value) => {
+                            form.setFieldValue("skill", value);
+                          }}
+                          onBlur={() => form.setFieldTouched("skill", true)}
+                          dropdownRender={(menu) => (
+                            <div>
+                              {menu}
+                              <div
+                                style={{
+                                  padding: "8px",
+                                  borderTop: "1px solid #e8e8e8",
+                                }}
+                              >
+                                <Button
+                                  type="link"
+                                  //   icon={<PlusOutlined />}
+                                  onClick={() => setIsTagModalVisible(true)}
+                                  block
+                                >
+                                  Add New Skill
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        >
+                          {tags.map((tag) => (
+                            <Option key={tag.id} value={tag.name}>
+                              {tag.name}
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
                   <ErrorMessage
-                    name="category"
+                    name="skill"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -257,22 +279,13 @@ const AddJob = ({ onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold mb-2">Location</label>
-                  <Field name="location">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        placeholder="Select location"
-                        className="w-full mt-2"
-                        onChange={(value) => setFieldValue("location", value)}
-                        value={values.location}
-                        onBlur={() => setFieldTouched("location", true)}
-                        allowClear={false}
-                      >
-                        <Option value="xyz">XYZ</Option>
-                        <Option value="abc">ABC</Option>
-                      </Select>
-                    )}
-                  </Field>
+                  <Field
+                    className="mt-2"
+                    name="location"
+                    as={Input}
+                    placeholder="Enter location"
+                  />
+                  
                   <ErrorMessage
                     name="invoiceDate"
                     component="div"
@@ -309,7 +322,7 @@ const AddJob = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={8} className="mt-3">
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Start Date </label>
                   <DatePicker
@@ -327,7 +340,7 @@ const AddJob = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={8} className="mt-3">
+              <Col span={8} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">End Date</label>
 
@@ -346,7 +359,7 @@ const AddJob = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={8} className="mt-3">
+              <Col span={8} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Recuiter</label>
                   <Field name="recruiter">
@@ -374,7 +387,7 @@ const AddJob = ({ onClose }) => {
               </Col>
 
               <Col span={8} className="mt-2">
-                <div className="mt-4 w-full">
+                <div className="w-full">
                   <div className="form-item">
                     <label className="font-semibold">Job Types</label>
                     <Field name="jobType">
@@ -406,24 +419,12 @@ const AddJob = ({ onClose }) => {
                 <div className="mt-4 w-full">
                   <div className="form-item">
                     <label className="font-semibold">Work Experence</label>
-                    <Field name="workExperience">
-                      {({ field }) => (
-                        <Select
-                          {...field}
-                          placeholder="Select workExperience"
-                          className="w-full mt-2"
-                          onChange={(value) =>
-                            setFieldValue("workExperience", value)
-                          }
-                          value={values.workexperence}
-                          onBlur={() => setFieldTouched("workExperience", true)}
-                          allowClear={false}
-                        >
-                          <Option value="xyz">XYZ</Option>
-                          <Option value="abc">ABC</Option>
-                        </Select>
-                      )}
-                    </Field>
+                    <Field
+                    className="mt-2"
+                    name="work experence"
+                    as={Input}
+                    placeholder="Enter work experence"
+                  />
                     <ErrorMessage
                       name="workExperience"
                       component="div"
@@ -462,37 +463,51 @@ const AddJob = ({ onClose }) => {
                 </div>
               </Col>
 
-              <div className="mt-4 w-full">
-                <Col span={24} className="mt-2">
-                  <div className="form-item">
-                    <label className="font-semibold">Job Discription</label>
+         
 
-                    <ReactQuill
-                      value={values.endDate}
-                      onChange={(value) => setFieldValue("description", value)}
-                      placeholder="Enter discription"
-                      onBlur={() => setFieldTouched("description", true)}
-                      className="mt-2"
-                    />
-                    <ErrorMessage
-                      name="description"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-              </div>
-
-              <div className="mt-4 w-full">
+              <div className="mt-2 w-full">
                 <Col span={24} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">Status</label>
-                    <Field
-                      className="mt-2"
-                      name="status"
-                      as={Input}
-                      placeholder="Enter status"
-                    />
+                    <Field name="status">
+                      {({ field, form }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-2"
+                          placeholder="Select or add new status"
+                          onChange={(value) => {
+                            form.setFieldValue("status", value);
+                          }}
+                          onBlur={() => form.setFieldTouched("staus", true)}
+                          dropdownRender={(menu) => (
+                            <div>
+                              {menu}
+                              <div
+                                style={{
+                                  padding: "8px",
+                                  borderTop: "1px solid #e8e8e8",
+                                }}
+                              >
+                                <Button
+                                  type="link"
+                                  //   icon={<PlusOutlined />}
+                                  onClick={() => setIsTagModalVisible(true)}
+                                  block
+                                >
+                                  Add New Status
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        >
+                          {tags.map((tag) => (
+                            <Option key={tag.id} value={tag.name}>
+                              {tag.name}
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
                     <ErrorMessage
                       name="status"
                       component="div"
@@ -502,7 +517,7 @@ const AddJob = ({ onClose }) => {
                 </Col>
               </div>
 
-              <div className="mt-4 w-full">
+              <div className="mt-2 w-full">
                 <Col span={24} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">Expect Salary</label>
@@ -514,6 +529,26 @@ const AddJob = ({ onClose }) => {
                     />
                     <ErrorMessage
                       name="expectedSalary"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+              </div>
+
+              <div className="mt-2 w-full">
+                <Col span={24} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Job Discription</label>
+                    <ReactQuill
+                      value={values.discription}
+                      onChange={(value) => setFieldValue("description", value)}
+                      placeholder="Enter discription"
+                      onBlur={() => setFieldTouched("description", true)}
+                      className="mt-2"
+                    />
+                    <ErrorMessage
+                      name="description"
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
@@ -533,14 +568,40 @@ const AddJob = ({ onClose }) => {
         )}
       </Formik>
       <Modal
-        title="Add New Tag"
+        title="Add New Category"
         open={isTagModalVisible}
         onCancel={() => setIsTagModalVisible(false)}
         onOk={handleAddNewTag}
-        okText="Add Tag"
+        okText="Add Category"
       >
         <Input
-          placeholder="Enter new tag name"
+          placeholder="Enter new category name"
+          value={newTag}
+          onChange={(e) => setNewTag(e.target.value)}
+        />
+      </Modal>
+      <Modal
+        title="Add New Skill"
+        open={isTagModalVisible}
+        onCancel={() => setIsTagModalVisible(false)}
+        onOk={handleAddNewTag}
+        okText="Add Skill"
+      >
+        <Input
+          placeholder="Enter new skill name"
+          value={newTag}
+          onChange={(e) => setNewTag(e.target.value)}
+        />
+      </Modal>
+      <Modal
+        title="Add New Status"
+        open={isTagModalVisible}
+        onCancel={() => setIsTagModalVisible(false)}
+        onOk={handleAddNewTag}
+        okText="Add Status"
+      >
+        <Input
+          placeholder="Enter new status name"
           value={newTag}
           onChange={(e) => setNewTag(e.target.value)}
         />

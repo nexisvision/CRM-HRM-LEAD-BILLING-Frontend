@@ -8,6 +8,7 @@ import {
   BugOutlined,
   SafetyOutlined,
   BlockOutlined,
+  PaperClipOutlined,
   StopOutlined,
   SnippetsOutlined,
   DotChartOutlined,
@@ -19,6 +20,7 @@ import {
   MessageOutlined,
   PicRightOutlined,
   StockOutlined,
+  PullRequestOutlined,
   EuroCircleOutlined,
   ScheduleOutlined,
   CheckSquareOutlined,
@@ -531,9 +533,17 @@ const extraNavvTree = [
         ]
       },
       {
+        key: 'extra-hrm-document',
+        path: `${APP_PREFIX_PATH}/hrm/document`,
+        title: 'Document',
+        icon: PaperClipOutlined ,
+        breadcrumb: false,
+        submenu: []
+      },
+      {
         key: 'extra-hrm-trainingSetup',
         path: `${APP_PREFIX_PATH}/hrm/trainingSetup`,
-        title: 'trainingSetup',
+        title: 'TrainingSetup',
         icon: CrownOutlined,
         breadcrumb: false,
         submenu: []
@@ -574,6 +584,14 @@ const extraNavvvTree = [
         path: `${APP_PREFIX_PATH}/superadmin/plan`,
         title: 'Plan',
         icon: BlockOutlined,
+        breadcrumb: true,
+        submenu: []
+      },
+      {
+        key: 'superadmin-planrequest',
+        path: `${APP_PREFIX_PATH}/superadmin/planrequest`,
+        title: 'Plan Request',
+        icon: PullRequestOutlined ,
         breadcrumb: true,
         submenu: []
       },
@@ -890,6 +908,14 @@ const dashBoardNavTree = [{
             key: 'dashboards-deal',
             path: `${APP_PREFIX_PATH}/dashboards/deal`,
             title: 'Deals',
+            icon: FundProjectionScreenOutlined,
+            breadcrumb: false,
+            submenu: []
+          },
+          {
+            key: 'dashboards-proposal',
+            path: `${APP_PREFIX_PATH}/dashboards/proposal`,
+            title: 'Proposal',
             icon: FundProjectionScreenOutlined,
             breadcrumb: false,
             submenu: []

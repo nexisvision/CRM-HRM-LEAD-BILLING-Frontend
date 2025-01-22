@@ -40,8 +40,8 @@ const AddProject = ({ onClose }) => {
 
   const [categories, setCategories] = useState([]);
   const [statuses, setStatuses] = useState([]);
- 
- 
+
+
   const AllLoggedData = useSelector((state) => state.user);
 
 
@@ -62,14 +62,14 @@ const AddProject = ({ onClose }) => {
 
   const Allclient = useSelector((state) => state.ClientData);
   const clientdata = Allclient.ClientData.data;
-  
+
 
   const AllEmployee = useSelector((state) => state.employee);
   const employeedata = AllEmployee.employee.data;
 
   const AllLoggeddtaa = useSelector((state) => state.user);
 
-  
+
 
   const initialValues = {
     project_name: "",
@@ -181,7 +181,7 @@ const AddProject = ({ onClose }) => {
       message.error(`Failed to load ${lableType}`);
     }
   };
-  
+
   // Call fetchLabels for each labelType on mount
   useEffect(() => {
     fetchLables("tag", setTags);
@@ -228,7 +228,7 @@ const AddProject = ({ onClose }) => {
       message.error(`Please enter a ${lableType} name.`);
       return;
     }
-  
+
     try {
       const lid = AllLoggedData.loggedInUser.id; // User ID
       const payload = {
@@ -439,38 +439,38 @@ const AddProject = ({ onClose }) => {
 
 
               <Col span={12} className="mt-4">
-  <div className="form-item">
-    <label className="font-semibold">Client</label>
-    <Select
-      style={{ width: "100%" }}
-      placeholder="Select Client"
-      loading={!clientdata}
-      value={values.client} // Bind value to Formik's field
-      // value="sdfsdf"
-      onChange={(value) => setFieldValue("client", value)} // Update Formik's field value
-      onBlur={() => setFieldTouched("client", true)} // Set touched state
-    >
-      {clientdata && clientdata.length > 0 ? (
-        clientdata
-          .filter(client => client.created_by === AllLoggedData.loggedInUser.username) // Filter clients based on created_by
-          .map((client) => (
-            <Option key={client.id} value={client.id}>
-              {client.firstName || client.username || "Unnamed Client"}
-            </Option>
-          ))
-      ) : (
-        <Option value="" disabled>
-          No Clients Available
-        </Option>
-      )}
-    </Select>
-    <ErrorMessage
-      name="client"
-      component="div"
-      className="error-message text-red-500 my-1"
-    />
-  </div>
-</Col>
+                <div className="form-item">
+                  <label className="font-semibold">Client</label>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select Client"
+                    loading={!clientdata}
+                    value={values.client} // Bind value to Formik's field
+                    // value="sdfsdf"
+                    onChange={(value) => setFieldValue("client", value)} // Update Formik's field value
+                    onBlur={() => setFieldTouched("client", true)} // Set touched state
+                  >
+                    {clientdata && clientdata.length > 0 ? (
+                      clientdata
+                        .filter(client => client.created_by === AllLoggedData.loggedInUser.username) // Filter clients based on created_by
+                        .map((client) => (
+                          <Option key={client.id} value={client.id}>
+                            {client.firstName || client.username || "Unnamed Client"}
+                          </Option>
+                        ))
+                    ) : (
+                      <Option value="" disabled>
+                        No Clients Available
+                      </Option>
+                    )}
+                  </Select>
+                  <ErrorMessage
+                    name="client"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
 
 
 
@@ -612,7 +612,7 @@ const AddProject = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-             
+
               </Col>
 
 
@@ -709,7 +709,7 @@ const AddProject = ({ onClose }) => {
                 </div>
               </Col> */}
 
-<Col span={24}>
+              <Col span={24}>
                 <div className="form-item">
                   <label className="font-semibold">Status</label>
                   <Select
@@ -797,48 +797,48 @@ const AddProject = ({ onClose }) => {
 
       {/* Add Tag Modal */}
       <Modal
-              title="Add New Tag"
-              open={isTagModalVisible}
-              onCancel={() => setIsTagModalVisible(false)}
-              onOk={() => handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible)}
-              okText="Add Tag"
-            >
-              <Input
-                placeholder="Enter new tag name"
-                value={newTag}
-                onChange={(e) => setNewTag(e.target.value)}
-              />
-            </Modal>
+        title="Add New Tag"
+        open={isTagModalVisible}
+        onCancel={() => setIsTagModalVisible(false)}
+        onOk={() => handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible)}
+        okText="Add Tag"
+      >
+        <Input
+          placeholder="Enter new tag name"
+          value={newTag}
+          onChange={(e) => setNewTag(e.target.value)}
+        />
+      </Modal>
 
-            {/* Add Category Modal */}
-            <Modal
-              title="Add New Category"
-              open={isCategoryModalVisible}
-              onCancel={() => setIsCategoryModalVisible(false)}
-              onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
-              okText="Add Category"
-            >
-              <Input
-                placeholder="Enter new category name"
-                value={newCategory}
-                onChange={(e) => setNewCategory(e.target.value)}
-              />
-            </Modal>
+      {/* Add Category Modal */}
+      <Modal
+        title="Add New Category"
+        open={isCategoryModalVisible}
+        onCancel={() => setIsCategoryModalVisible(false)}
+        onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
+        okText="Add Category"
+      >
+        <Input
+          placeholder="Enter new category name"
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value)}
+        />
+      </Modal>
 
-            {/* Add Status Modal */}
-            <Modal
-              title="Add New Status"
-              open={isStatusModalVisible}
-              onCancel={() => setIsStatusModalVisible(false)}
-              onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible)}
-              okText="Add Status"
-            >
-              <Input
-                placeholder="Enter new status name"
-                value={newStatus}
-                onChange={(e) => setNewStatus(e.target.value)}
-              />
-            </Modal>
+      {/* Add Status Modal */}
+      <Modal
+        title="Add New Status"
+        open={isStatusModalVisible}
+        onCancel={() => setIsStatusModalVisible(false)}
+        onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible)}
+        okText="Add Status"
+      >
+        <Input
+          placeholder="Enter new status name"
+          value={newStatus}
+          onChange={(e) => setNewStatus(e.target.value)}
+        />
+      </Modal>
     </div>
   );
 };

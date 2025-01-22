@@ -141,6 +141,11 @@ export const protectedRoutes = [
         component: React.lazy(() => import('views/app-views/dashboards/deals')),
     },
     {
+        key: 'dashboard.proposal',
+        path: `${APP_PREFIX_PATH}/dashboards/proposal`,
+        component: React.lazy(() => import('views/app-views/dashboards/proposal')),
+    },
+    {
         key: 'dashboard.project.deal',
         path: `${APP_PREFIX_PATH}/dashboards/project/deal/viewDeal`,
         component: React.lazy(() => import('views/app-views/dashboards/deals/ViewDeal')),
@@ -888,6 +893,11 @@ export const protectedRoutes = [
         component: React.lazy(() => import('views/app-views/hrm/Employee')),
     },
     {
+        key: 'hrm.document',
+        path: `${APP_PREFIX_PATH}/hrm/document`,
+        component: React.lazy(() => import('views/app-views/hrm/document')),
+    },
+    {
         key: 'hrm.trainingSetup',
         path: `${APP_PREFIX_PATH}/hrm/trainingSetup`,
         component: React.lazy(() => import('views/app-views/hrm/trainingSetup')),
@@ -1097,6 +1107,11 @@ export const protectedRoutes = [
         key: 'plan',
         path: `${APP_PREFIX_PATH}/superadmin/plan`,
         component: React.lazy(() => import('views/app-views/plan')),
+    },
+    {
+        key: 'planrequest',
+        path: `${APP_PREFIX_PATH}/superadmin/planrequest`,
+        component: React.lazy(() => import('views/app-views/planrequest')),
     },
     {
         key: 'subscribeduserplans',

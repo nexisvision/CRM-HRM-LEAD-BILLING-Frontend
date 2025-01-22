@@ -248,10 +248,10 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
               </Col>
 
               <Col span={12}>
-                <div className="form-item mt-4">
-                  <label className="font-semibold">Offer Expire On</label>
+                <div className="form-item mt-2">
+                  <label >Offer Expire On</label>
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-2"
                     format="DD-MM-YYYY"
                     value={values.offer_expiry}
                     onChange={(date) => setFieldValue("offer_expiry", date)}
@@ -266,10 +266,11 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
               </Col>
 
               <Col span={12}>
-                <div className="form-item mt-4">
-                  <label className="font-semibold">Expected Joining Date</label>
+                <div className="form-item mt-2">
+                  <label >Expected Joining Date</label>
+                 
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-2"
                     format="DD-MM-YYYY"
                     value={values.expected_joining_date}
                     onChange={(date) =>
@@ -288,9 +289,14 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
               </Col>
 
               <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Salary</label>
-                  <Field name="salary" as={Input} placeholder="Enter Salary" />
+                <div className="form-item mt-2">
+                  <label >Salary</label>
+                  <Field
+                  className="mt-2"
+                    name="salary"
+                    as={Input}
+                    placeholder="Enter Salary"
+                  />
                   <ErrorMessage
                     name="salary"
                     component="div"
@@ -299,16 +305,35 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                 </div>
               </Col>
 
+              <Col span={12}>
+                <div className="form-item mt-2">
+                  <label>Rate</label>
+                  <Field
+                  className="mt-2"
+                    name="rate"
+                    as={Input}
+                    placeholder="Enter Rate"
+                  />
+                  <ErrorMessage
+                    name="rate"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
               <Col span={24}>
-                <div className="form-item">
-                  <label className="font-semibold">Description</label>
+                <div className="form-item mt-2">
+                  <label >Description</label>
                   <ReactQuill
+                    className="mt-2"
                     value={values.description}
                     onChange={(value) => setFieldValue("description", value)}
                     onBlur={() => setFieldTouched("description", true)}
                     placeholder="Enter Description"
                   />
                   <ErrorMessage
+                
                     name="description"
                     component="div"
                     className="error-message text-red-500 my-1"
@@ -316,19 +341,15 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              <div className="mt-4 w-full">
-                <span className="block font-semibold p-2">Add File</span>
+              <div className="mt-2 w-full">
+                <span className="block p-2">Add File</span>
                 <Col span={24}>
                   <Upload
                     listType="picture"
                     accept=".pdf"
                     maxCount={1}
                     showUploadList={{ showRemoveIcon: true }}
-                    className="border-2 flex justify-center items-center p-10"
-                    customRequest={({ file, onSuccess }) => {
-                      setFieldValue("file", file);
-                      onSuccess();
-                    }}
+                    className="border-2 flex justify-center items-center p-10 mt-2"
                   >
                     <span className="text-xl">Choose File</span>
                   </Upload>
