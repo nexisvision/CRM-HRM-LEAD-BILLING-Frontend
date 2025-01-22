@@ -10,7 +10,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 
-const AddInquiry = ({ onClose }) => {
+const EditInquiry = ({ onClose }) => {
   const dispatch = useDispatch();
 
   const allbranch = useSelector((state) => state.Branch);
@@ -145,4 +145,4 @@ const AddInquiry = ({ onClose }) => {
   );
 };
 
-export default AddInquiry;
+export default EditInquiry;

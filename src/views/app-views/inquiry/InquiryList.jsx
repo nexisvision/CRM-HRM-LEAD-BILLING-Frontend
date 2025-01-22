@@ -33,6 +33,7 @@ import OrderListData from "assets/data/order-list.data.json";
 import utils from "utils";
 import { useDispatch, useSelector } from "react-redux";
 import AddInquiry from "./AddInquiry";
+import EditInquiry from "./EditInquiry"
 // import { deletepolicys, getpolicys } from "./policyReducer/policySlice";
 // import {
 //   deletejobapplication,
@@ -67,7 +68,7 @@ const InquiryList = () => {
     }
   }, [fndbranch]);
 
-  const [isEditpolicyModalVisible, setIsEditpolicyModalVisible] =
+  const [isEditinquiryModalVisible, setIsEditinquiryModalVisible] =
     useState(false);
 
   const alldata = useSelector((state) => state.jobapplications);
@@ -91,12 +92,12 @@ const InquiryList = () => {
     setIsAddinquiryModalVisible(false);
   };
 
-  const openEditJobOfferLetterModal = () => {
-    setIsEditpolicyModalVisible(true);
+  const openEditinquiryModal = () => {
+    setIsEditinquiryModalVisible(true);
   };
 
-  const closeEditpolicyModal = () => {
-    setIsEditpolicyModalVisible(false);
+  const closeEditinquiryModal = () => {
+    setIsEditinquiryModalVisible(false);
   };
 
   const onSearch = (e) => {
@@ -159,7 +160,7 @@ const InquiryList = () => {
   const jobStatusList = ["active", "blocked"];
 
   const eidtfun = (idd) => {
-    openEditJobOfferLetterModal();
+    openEditinquiryModal();
     setIdd(idd);
   };
 
@@ -172,32 +173,8 @@ const InquiryList = () => {
           </Button>
         </Flex>
       </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<MailOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span>Send Mail</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<PushpinOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span className="ml-2">Add to Job OnBoard</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
+      
+      
       <Menu.Item>
         <Flex alignItems="center">
           <Button
@@ -346,16 +323,16 @@ const InquiryList = () => {
         <AddInquiry onClose={closeAddinquiryModal} />
       </Modal>
 
-      {/* <Modal
-        title="Edit Policy"
-        visible={isEditpolicyModalVisible}
-        onCancel={closeEditpolicyModal}
+      <Modal
+        title="Edit Inquiry"
+        visible={isEditinquiryModalVisible}
+        onCancel={closeEditinquiryModal}
         footer={null}
         width={1000}
         className="mt-[-70px]"
       >
-        <Editpolicy onClose={closeEditpolicyModal} idd={idd} />
-      </Modal> */}
+        <EditInquiry onClose={closeEditinquiryModal} idd={idd} />
+      </Modal>
       {/* <Modal
         title=""
         visible={viewApplicationVisible}
