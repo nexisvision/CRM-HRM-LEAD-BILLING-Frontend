@@ -88,11 +88,8 @@ const AddProposal = ({ onClose }) => {
         setTotals({ subtotal, totalTax, finalTotal });
     };
 
-    const onSubmit = async (values, { resetForm }) => {
-        const links = rows.reduce((acc, row, index) => {
-            acc[index] = { title: row.title, url: row.link };
-            return acc;
-        }, {});
+    const onSubmit = (values, { resetForm }) => {
+        console.log(values);
         message.success("Proposal added successfully!");
         resetForm();
         onClose();

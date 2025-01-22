@@ -306,14 +306,14 @@ const extraNavvTree = [
                 breadcrumb: true,
                 submenu: []
               },
-              {
-                key: 'extra-hrm-payroll-payslip',
-                path: `${APP_PREFIX_PATH}/hrm/payroll/payslip`,
-                title: 'PaySlip',
-                icon: FileTextOutlined,
-                breadcrumb: true,
-                submenu: []
-              },
+              // {
+              //   key: 'extra-hrm-payroll-payslip',
+              //   path: `${APP_PREFIX_PATH}/hrm/payroll/payslip`,
+              //   title: 'PaySlip',
+              //   icon: FileTextOutlined,
+              //   breadcrumb: true,
+              //   submenu: []
+              // },
             ]
           },
           {
@@ -339,14 +339,14 @@ const extraNavvTree = [
                 breadcrumb: true,
                 submenu: []
               },
-              {
-                key: 'extra-hrm-performance-goaltracking',
-                path: `${APP_PREFIX_PATH}/hrm/performance/goaltracking`,
-                title: 'GoalTracking',
-                icon: DeploymentUnitOutlined,
-                breadcrumb: true,
-                submenu: []
-              },
+              // {
+              //   key: 'extra-hrm-performance-goaltracking',
+              //   path: `${APP_PREFIX_PATH}/hrm/performance/goaltracking`,
+              //   title: 'GoalTracking',
+              //   icon: DeploymentUnitOutlined,
+              //   breadcrumb: true,
+              //   submenu: []
+              // },
             ]
           },
           {
@@ -603,14 +603,14 @@ const extraNavvvTree = [
         breadcrumb: true,
         submenu: []
       },
-      {
-        key: 'superadmin-coupon',
-        path: `${APP_PREFIX_PATH}/superadmin/coupon`,
-        title: 'Coupon',
-        icon: FileTextOutlined,
-        breadcrumb: true,
-        submenu: []
-      },
+      // {
+      //   key: 'superadmin-coupon',
+      //   path: `${APP_PREFIX_PATH}/superadmin/coupon`,
+      //   title: 'Coupon',
+      //   icon: FileTextOutlined,
+      //   breadcrumb: true,
+      //   submenu: []
+      // },
       {
         key: 'superadmin-notes',
         path: `${APP_PREFIX_PATH}/superadmin/notes`,
@@ -718,22 +718,22 @@ const dashBoardNavTree = [{
       breadcrumb: false,
       submenu: []
     },
-    {
-      key: 'dashboards-sales',
-      path: `${APP_PREFIX_PATH}/dashboards/sales`,
-      title: 'Sales Pipeline Management',
-      icon: FundOutlined,
-      breadcrumb: false,
-      submenu: []
-    },
-    {
-      key: 'dashboards-superadmindashboard',
-      path: `${APP_PREFIX_PATH}/dashboards/superadmindashboard`,
-      title: 'Super Admin Dashboard',
-      icon: PicRightOutlined,
-      breadcrumb: false,
-      submenu: []
-    },
+    // {
+    //   key: 'dashboards-sales',
+    //   path: `${APP_PREFIX_PATH}/dashboards/sales`,
+    //   title: 'Sales Pipeline Management',
+    //   icon: FundOutlined,
+    //   breadcrumb: false,
+    //   submenu: []
+    // },
+    // {
+    //   key: 'dashboards-superadmindashboard',
+    //   path: `${APP_PREFIX_PATH}/dashboards/superadmindashboard`,
+    //   title: 'Super Admin Dashboard',
+    //   icon: PicRightOutlined,
+    //   breadcrumb: false,
+    //   submenu: []
+    // },
     // 
    
     {
@@ -807,14 +807,14 @@ const dashBoardNavTree = [{
               //   breadcrumb: false,
               //   submenu: []
               // },
-              {
-                key: 'dashboards-project-projectreport',
-                path: `${APP_PREFIX_PATH}/dashboards/project/projectreport`,
-                title: 'Project Report',
-                icon: FundProjectionScreenOutlined,
-                breadcrumb: false,
-                submenu: []
-              },
+              // {
+              //   key: 'dashboards-project-projectreport',
+              //   path: `${APP_PREFIX_PATH}/dashboards/project/projectreport`,
+              //   title: 'Project Report',
+              //   icon: FundProjectionScreenOutlined,
+              //   breadcrumb: false,
+              //   submenu: []
+              // },
               // {
               //   key: 'dashboards-project-systemsetup',
               //   path: `${APP_PREFIX_PATH}/dashboards/project/systemsetup`,
@@ -857,14 +857,14 @@ const dashBoardNavTree = [{
                 breadcrumb: false,
                 submenu: []
               },
-              {
-                key: 'dashboards-sales-payments',
-                path: `${APP_PREFIX_PATH}/dashboards/sales/payments`,
-                title: 'Payments',
-                icon: DollarOutlined,
-                breadcrumb: false,
-                submenu: []
-              },
+              // {
+              //   key: 'dashboards-sales-payments',
+              //   path: `${APP_PREFIX_PATH}/dashboards/sales/payments`,
+              //   title: 'Payments',
+              //   icon: DollarOutlined,
+              //   breadcrumb: false,
+              //   submenu: []
+              // },
               {
                 key: 'dashboards-sales-revenue',
                 path: `${APP_PREFIX_PATH}/dashboards/sales/revenue`,
@@ -881,14 +881,14 @@ const dashBoardNavTree = [{
                 breadcrumb: false,
                 submenu: []
               },
-              {
-                key: 'dashboards-sales-expenses',
-                path: `${APP_PREFIX_PATH}/dashboards/sales/expenses`,
-                title: 'Expenses',
-                icon: EuroCircleOutlined,
-                breadcrumb: false,
-                submenu: []
-              },
+              // {
+              //   key: 'dashboards-sales-expenses',
+              //   path: `${APP_PREFIX_PATH}/dashboards/sales/expenses`,
+              //   title: 'Expenses',
+              //   icon: EuroCircleOutlined,
+              //   breadcrumb: false,
+              //   submenu: []
+              // },
               {
                 key: 'dashboards-sales-creditnotes',
                 path: `${APP_PREFIX_PATH}/dashboards/sales/creditnotes`,
@@ -955,14 +955,14 @@ const dashBoardNavTree = [{
             breadcrumb: false,
             submenu: []
           },
-          {
-            key: 'dashboards-contacts',
-            path: `${APP_PREFIX_PATH}/dashboards/contacts`,
-            title: 'Contacts',
-            icon: ContactsOutlined,
-            breadcrumb: false,
-            submenu: []
-          },
+          // {
+          //   key: 'dashboards-contacts',
+          //   path: `${APP_PREFIX_PATH}/dashboards/contacts`,
+          //   title: 'Contacts',
+          //   icon: ContactsOutlined,
+          //   breadcrumb: false,
+          //   submenu: []
+          // },
           {
             key: 'dashboards-mail',
             path: `${APP_PREFIX_PATH}/dashboards/mail/inbox`,
@@ -1037,14 +1037,14 @@ const dashBoardNavTree = [{
             icon: FileTextOutlined,
             breadcrumb: true,
             submenu: [
-              {
-                key: 'extra-pages-profile',
-                path: `${APP_PREFIX_PATH}/pages/profile`,
-                title: 'sidenav.pages.profile',
-                icon: SolutionOutlined,
-                breadcrumb: false,
-                submenu: []
-              },
+              // {
+              //   key: 'extra-pages-profile',
+              //   path: `${APP_PREFIX_PATH}/pages/profile`,
+              //   title: 'sidenav.pages.profile',
+              //   icon: SolutionOutlined,
+              //   breadcrumb: false,
+              //   submenu: []
+              // },
               {
                 key: 'extra-pages-invoice',
                 path: `${APP_PREFIX_PATH}/pages/invoice`,
@@ -1135,14 +1135,14 @@ const dashBoardNavTree = [{
               breadcrumb: true,
               submenu: []
             },
-            {
-              key: 'extra-users-client-user-list',
-              path: `${APP_PREFIX_PATH}/users/client-user-list`,
-              title: 'Client Users',
-              icon: UserOutlined,
-              breadcrumb: true,
-              submenu: []
-            },
+            // {
+            //   key: 'extra-users-client-user-list',
+            //   path: `${APP_PREFIX_PATH}/users/client-user-list`,
+            //   title: 'Client Users',
+            //   icon: UserOutlined,
+            //   breadcrumb: true,
+            //   submenu: []
+            // },
           ]},
 
           {

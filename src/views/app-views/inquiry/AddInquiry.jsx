@@ -34,19 +34,9 @@ const AddInquiry = ({ onClose }) => {
 
   // onSubmit function
   const onSubmit = (values, { resetForm }) => {
-    // Example: Log the values (or replace this with an API call)
     console.log(values);
-
-    // Here you would typically dispatch an action or make an API request
-    // Example: dispatch(addInquiry(values));
-
-    // Show success message
     message.success("Inquiry submitted successfully!");
-
-    // Reset form after submission
     resetForm();
-    
-    // Optionally close the form/modal
     onClose();
   };
 
