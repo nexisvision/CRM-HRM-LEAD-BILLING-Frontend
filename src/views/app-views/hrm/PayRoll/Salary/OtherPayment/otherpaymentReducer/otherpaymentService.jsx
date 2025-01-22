@@ -7,14 +7,17 @@ import axios from "axios";
 //     return res
 // };
 
-const getsal = async () => {
+const getotherpayment = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/salary/", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await axios.get(
+      "http://localhost:5353/api/v1/other-payments/",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -22,12 +25,12 @@ const getsal = async () => {
   }
 };
 
-const addsal = async (payload) => {
+const addotherpayment = async (payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/salary/",
+      "http://localhost:5353/api/v1/other-payments/",
       payload,
       {
         headers: {
@@ -43,12 +46,12 @@ const addsal = async (payload) => {
   }
 };
 
-const deletsal = async (id) => {
+const delotherpayment = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/salary/${id}`,
+      `http://localhost:5353/api/v1/other-payments/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -63,11 +66,11 @@ const deletsal = async (id) => {
   }
 };
 
-const editsal = async (idd, values) => {
+const editotherpayment = async (meetid, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/salary/${idd}`,
+      `http://localhost:5353/api/v1/other-paymentsv/${meetid}`,
       values,
       {
         headers: {
@@ -104,10 +107,10 @@ const editsal = async (idd, values) => {
 
 const UserService = {
   // addUser,
-  getsal,
-  addsal,
-  deletsal,
-  editsal,
+  getotherpayment,
+  addotherpayment,
+  delotherpayment,
+  editotherpayment,
   // getAllUsers,
   // getUserById,
   // deleteUser,

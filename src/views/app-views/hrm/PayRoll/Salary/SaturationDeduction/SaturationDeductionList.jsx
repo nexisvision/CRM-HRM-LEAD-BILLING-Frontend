@@ -1,16 +1,51 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Input, Button, Modal, message } from 'antd';
-import { EyeOutlined, DeleteOutlined, PlusOutlined, SearchOutlined, FileExcelOutlined } from '@ant-design/icons';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import AddSaturationDeduction from './AddSaturationDeduction';
-import employeeSalaryData from 'assets/data/employee-salary.data.json';
-import utils from 'utils';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Row,
+  Col,
+  Input,
+  Button,
+  Modal,
+  message,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  FileExcelOutlined,
+} from "@ant-design/icons";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import AddSaturationDeduction from "./AddSaturationDeduction";
+import employeeSalaryData from "assets/data/employee-salary.data.json";
+import utils from "utils";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deltededucati,
+  getdeducati,
+} from "./deducationReducer/deducationSlice";
 
 const SaturationDeductionList = () => {
+  const dispatch = useDispatch();
   const [salaryData, setSalaryData] = useState(employeeSalaryData); // Salary data
   const [isModalVisible, setIsModalVisible] = useState(false); // Add Salary Modal
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Selected rows for batch actions
+
+  useEffect(() => {
+    dispatch(getdeducati());
+  }, []);
+
+  const alldata = useSelector((state) => state.deducation);
+  const fnddata = alldata.deducation.data;
+
+  useEffect(() => {
+    if (fnddata) {
+      setSalaryData(fnddata);
+    }
+  }, [fnddata]);
 
   // Open Add Salary Modal
   const openModal = () => {
@@ -32,8 +67,11 @@ const SaturationDeductionList = () => {
 
   // Delete a salary entry
   const deleteSalaryEntry = (id) => {
-    setSalaryData(salaryData.filter((item) => item.id !== id));
-    message.success({ content: `Salary record deleted`, duration: 2 });
+    dispatch(deltededucati(id)).then(() => {
+      dispatch(getdeducati());
+      setSalaryData(salaryData.filter((item) => item.id !== id));
+      message.success({ content: `Salary record deleted`, duration: 2 });
+    });
   };
 
   // Dropdown menu for action options
@@ -59,46 +97,54 @@ const SaturationDeductionList = () => {
 
   // Table columns
   const tableColumns = [
+    // {
+    //   title: "Employee",
+    //   dataIndex: "name",
+    //   sorter: (a, b) => a.name.localeCompare(b.name),
+    // },
+
     {
-      title: 'Employee',
-      dataIndex: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      title: "Deduction Option",
+      dataIndex: "deductionOption",
+      sorter: (a, b) => a.deductionoption.localeCompare(b.deductionoption),
     },
-   
     {
-        title: 'Deduction Option',
-        dataIndex: 'deductionoption',
-        sorter: (a, b) => a.deductionoption.localeCompare(b.deductionoption),
-      },
-    {
-      title: 'Title',
-      dataIndex: 'title',
+      title: "Title",
+      dataIndex: "title",
       sorter: (a, b) => a.title - b.title,
     },
     {
-      title: 'Type',
-      dataIndex: 'type',
+      title: "Type",
+      dataIndex: "type",
       sorter: (a, b) => a.type.localeCompare(b.type),
     },
     {
-        title: 'Amount',
-        dataIndex: 'amount',
-        sorter: (a, b) => a.amount.localeCompare(b.amount),
-      },
+      title: "Amount",
+      dataIndex: "amount",
+      sorter: (a, b) => a.amount.localeCompare(b.amount),
+    },
     {
-      title: 'Action',
-      dataIndex: 'actions',
-      render: (_, record) => (
-        <EllipsisDropdown menu={dropdownMenu(record)} />
-      ),
+      title: "Action",
+      dataIndex: "actions",
+      render: (_, record) => <EllipsisDropdown menu={dropdownMenu(record)} />,
     },
   ];
 
   return (
     <Card>
-       <h3 className='text-lg font-bold'>Saturation Deduction</h3>
-        <hr style={{ marginBottom: '20px',marginTop:"5px", border: '1px solid #e8e8e8' }} />
-      <Flex justifyContent="space-between" alignItems="center" mobileFlex={false}>
+      <h3 className="text-lg font-bold">Saturation Deduction</h3>
+      <hr
+        style={{
+          marginBottom: "20px",
+          marginTop: "5px",
+          border: "1px solid #e8e8e8",
+        }}
+      />
+      <Flex
+        justifyContent="space-between"
+        alignItems="center"
+        mobileFlex={false}
+      >
         <div className="mr-md-3 mb-3">
           <Input
             placeholder="Search"
@@ -109,7 +155,6 @@ const SaturationDeductionList = () => {
         <Flex gap="7px">
           <Button type="primary" onClick={openModal}>
             <PlusOutlined />
-           
           </Button>
           {/* <Button type="primary" icon={<FileExcelOutlined />} block>
             Export All

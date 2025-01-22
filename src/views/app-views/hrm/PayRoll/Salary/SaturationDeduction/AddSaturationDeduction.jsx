@@ -1,60 +1,193 @@
-import React from 'react';
-import { Form, Input, Select, Row, Col, Button } from 'antd';
+import React, { useEffect } from "react";
+import { Input, Button, Col, message, Select } from "antd";
+import { ErrorMessage, Field, Formik } from "formik";
+import { useDispatch, useSelector } from "react-redux";
+import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
+import { Option } from "antd/es/mentions";
+import { adddeducati, getdeducati } from "./deducationReducer/deducationSlice";
+const AddSaturationDeduction = ({ onClose }) => {
+  const dispatch = useDispatch();
 
-const { Option } = Select;
+  useEffect(() => {
+    dispatch(empdata());
+  }, [dispatch]);
 
-const AddSaturationDeduction = () => {
+  const alldataemp = useSelector((state) => state.employee);
+  const fnddata = alldataemp.employee.data;
+
+  useEffect(() => {
+    dispatch(getallcurrencies());
+  }, [dispatch]);
+
+  const allempdatass = useSelector((state) => state.currencies);
+  const fnddatass = allempdatass?.currencies;
+
+  const handleSubmit = (values, { setSubmitting, resetForm }) => {
+    dispatch(adddeducati(values))
+      .then(() => {
+        dispatch(getdeducati());
+        message.success("Other payment added successfully");
+        onClose();
+        resetForm();
+      })
+      .catch((error) => {
+        message.error("Something went wrong. Please try again!");
+      })
+      .finally(() => {
+        setSubmitting(false);
+      });
+  };
+
   return (
-    <div className="other-payment">
-      {/* <h3>Create Other Payment</h3> */}
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
-      <Form layout="vertical">
-        <Row gutter={16}>
-          {/* Title Field */}
-          <Col span={12}>
-            <Form.Item label="Title" name="title" rules={[{ required: true, message: 'Please enter a title' }]}>
-              <Input placeholder="Enter Title" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Deduction option" name="Deductionoption" rules={[{ required: true, message: 'Please select a type' }]}>
-              <Select placeholder="Select option">
-                <Option value="fixed">Fixed</Option>
-                <Option value="percentage">Percentage</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          {/* Type Field */}
-          <Col span={12}>
-            <Form.Item label="Type" name="type" rules={[{ required: true, message: 'Please select a type' }]}>
-              <Select placeholder="Select Type">
-                <Option value="fixed">Fixed</Option>
-                <Option value="percentage">Percentage</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          {/* Amount Field */}
-          <Col span={12}>
-            <Form.Item label="Amount" name="amount" rules={[{ required: true, message: 'Please enter an amount' }]}>
-              <Input placeholder="Enter Amount" />
-            </Form.Item>
-          </Col>
-        </Row>
-        {/* Action Buttons */}
-        <Row justify="end" gutter={16}>
-          <Col>
-            <Button type="default">Cancel</Button>
-          </Col>
-          <Col>
-            <Button type="primary" htmlType="submit">Create</Button>
-          </Col>
-        </Row>
-      </Form>
+    <div className="employee-salary p-4">
+      <hr className="my-2 border-gray-300" />
+      <Formik
+        initialValues={{
+          title: "",
+          type: "",
+          deductionOption: "",
+          currency: "",
+          amount: "",
+        }}
+        onSubmit={handleSubmit}
+      >
+        {({ handleSubmit, resetForm, setFieldValue, values }) => (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Title */}
+
+            <Col span={24} className="mt-4">
+              <div className="form-item">
+                <label className="font-semibold">Employee</label>
+                <Field name="employeeId">
+                  {({ field }) => (
+                    <Select
+                      {...field}
+                      className="w-full mt-2"
+                      placeholder="Select Employee"
+                      onChange={(value) => setFieldValue("employeeId", value)}
+                      value={values.employeeId}
+                    >
+                      {fnddata && fnddata.length > 0 ? (
+                        fnddata.map((client) => (
+                          <Option key={client.id} value={client.id}>
+                            {client.firstName ||
+                              client.username ||
+                              "Unnamed employee"}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option value="" disabled>
+                          No Employees Available
+                        </Option>
+                      )}
+                    </Select>
+                  )}
+                </Field>
+                <ErrorMessage
+                  name="employeeId"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
+              </div>
+            </Col>
+
+            <div>
+              <label className="font-semibold">Title</label>
+              <Field name="title">
+                {({ field }) => <Input {...field} placeholder="Enter Title" />}
+              </Field>
+              <ErrorMessage
+                name="title"
+                component="div"
+                className="text-red-500"
+              />
+            </div>
+            {/* Type */}
+            <div>
+              <label className="font-semibold">Type</label>
+              <Field name="type">
+                {({ field }) => <Input {...field} placeholder="Enter Type" />}
+              </Field>
+              <ErrorMessage
+                name="type"
+                component="div"
+                className="text-red-500"
+              />
+            </div>
+            {/* Deduction Option */}
+            <div>
+              <label className="font-semibold">Deduction Option</label>
+              <Field name="deductionOption">
+                {({ field }) => (
+                  <Input {...field} placeholder="Enter Deduction Option" />
+                )}
+              </Field>
+              <ErrorMessage
+                name="deductionOption"
+                component="div"
+                className="text-red-500"
+              />
+            </div>
+            {/* Currency */}
+            <Col span={24} className="mt-4">
+              <div className="form-item">
+                <label className="font-semibold">Currency</label>
+                <Field name="currency">
+                  {({ field }) => (
+                    <Select
+                      {...field}
+                      className="w-full mt-2"
+                      placeholder="Select Currency"
+                      onChange={(value) => setFieldValue("currency", value)}
+                      value={values.currency}
+                    >
+                      {fnddatass && fnddatass.length > 0 ? (
+                        fnddatass.map((client) => (
+                          <Option key={client.id} value={client.id}>
+                            {client.currencyIcon ||
+                              client.currencyCode ||
+                              "Unnamed currency"}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option value="" disabled>
+                          No Currencies Available
+                        </Option>
+                      )}
+                    </Select>
+                  )}
+                </Field>
+                <ErrorMessage
+                  name="currency"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
+              </div>
+            </Col>
+
+            {/* Amount */}
+            <div>
+              <label className="font-semibold">Amount</label>
+              <Field name="amount">
+                {({ field }) => <Input {...field} placeholder="Enter Amount" />}
+              </Field>
+              <ErrorMessage
+                name="amount"
+                component="div"
+                className="text-red-500"
+              />
+            </div>
+            {/* Submit Button */}
+            <div className="text-right">
+              <Button type="primary" htmlType="submit">
+                Submit
+              </Button>
+            </div>
+          </form>
+        )}
+      </Formik>
     </div>
   );
 };
-
 export default AddSaturationDeduction;
-

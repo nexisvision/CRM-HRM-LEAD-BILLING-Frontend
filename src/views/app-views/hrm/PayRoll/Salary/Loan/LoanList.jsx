@@ -1,16 +1,48 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Input, Button, Modal, message } from 'antd';
-import { EyeOutlined, DeleteOutlined, PlusOutlined, SearchOutlined, FileExcelOutlined } from '@ant-design/icons';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import AddLoan from './AddLoan';
-import employeeSalaryData from 'assets/data/employee-salary.data.json';
-import utils from 'utils';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Row,
+  Col,
+  Input,
+  Button,
+  Modal,
+  message,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  FileExcelOutlined,
+} from "@ant-design/icons";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import AddLoan from "./AddLoan";
+import employeeSalaryData from "assets/data/employee-salary.data.json";
+import utils from "utils";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteloans, getloans } from "./loanReducer/loanSlice";
 
 const LoanList = () => {
   const [salaryData, setSalaryData] = useState(employeeSalaryData); // Salary data
   const [isModalVisible, setIsModalVisible] = useState(false); // Add Salary Modal
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Selected rows for batch actions
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getloans());
+  }, []);
+
+  const alldata = useSelector((state) => state.loan);
+  const fnsdata = alldata.loan.data;
+
+  useEffect(() => {
+    if (fnsdata) {
+      setSalaryData(fnsdata);
+    }
+  }, [fnsdata]);
 
   // Open Add Salary Modal
   const openModal = () => {
@@ -32,8 +64,11 @@ const LoanList = () => {
 
   // Delete a salary entry
   const deleteSalaryEntry = (id) => {
-    setSalaryData(salaryData.filter((item) => item.id !== id));
-    message.success({ content: `Salary record deleted`, duration: 2 });
+    dispatch(deleteloans(id)).then(() => {
+      dispatch(getloans());
+      setSalaryData(salaryData.filter((item) => item.id !== id));
+      message.success({ content: `Salary record deleted`, duration: 2 });
+    });
   };
 
   // Dropdown menu for action options
@@ -60,44 +95,52 @@ const LoanList = () => {
   // Table columns
   const tableColumns = [
     {
-      title: 'Employee',
-      dataIndex: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      title: "amount",
+      dataIndex: "amount",
+      sorter: (a, b) => a.amount.localeCompare(b.amount),
     },
     {
-      title: 'Loan Option',
-      dataIndex: 'loanoption',
-      sorter: (a, b) => a.loanoption.localeCompare(b.loanoption),
+      title: "Loan Option",
+      dataIndex: "loanOption",
+      sorter: (a, b) => a.loanOption.localeCompare(b.loanOption),
     },
     {
-      title: 'Title',
-      dataIndex: 'title',
-      sorter: (a, b) => a.title - b.title,
+      title: "reason",
+      dataIndex: "reason",
+      sorter: (a, b) => a.reason - b.reason,
     },
     {
-      title: 'Type',
-      dataIndex: 'type',
+      title: "title",
+      dataIndex: "title",
+      sorter: (a, b) => a.title.localeCompare(b.title),
+    },
+    {
+      title: " type",
+      dataIndex: "type",
       sorter: (a, b) => a.type.localeCompare(b.type),
     },
     {
-        title: 'Loan Amount',
-        dataIndex: 'loanamount',
-        sorter: (a, b) => a.loanamount.localeCompare(b.loanamount),
-      },
-    {
-      title: 'Action',
-      dataIndex: 'actions',
-      render: (_, record) => (
-        <EllipsisDropdown menu={dropdownMenu(record)} />
-      ),
+      title: "Action",
+      dataIndex: "actions",
+      render: (_, record) => <EllipsisDropdown menu={dropdownMenu(record)} />,
     },
   ];
 
   return (
     <Card>
-        <h3 className='text-lg font-bold'>Loan</h3>
-        <hr style={{ marginBottom: '20px',marginTop:"5px", border: '1px solid #e8e8e8' }} />
-      <Flex justifyContent="space-between" alignItems="center" mobileFlex={false}>
+      <h3 className="text-lg font-bold">Loan</h3>
+      <hr
+        style={{
+          marginBottom: "20px",
+          marginTop: "5px",
+          border: "1px solid #e8e8e8",
+        }}
+      />
+      <Flex
+        justifyContent="space-between"
+        alignItems="center"
+        mobileFlex={false}
+      >
         <div className="mr-md-3 mb-3">
           <Input
             placeholder="Search"
@@ -108,7 +151,6 @@ const LoanList = () => {
         <Flex gap="7px">
           <Button type="primary" onClick={openModal}>
             <PlusOutlined />
-          
           </Button>
           {/* <Button type="primary" icon={<FileExcelOutlined />} block>
             Export All

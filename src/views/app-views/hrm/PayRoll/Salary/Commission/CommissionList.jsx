@@ -1,17 +1,49 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Input, Button, Modal, message } from 'antd';
-import { EyeOutlined, DeleteOutlined, PlusOutlined, SearchOutlined, FileExcelOutlined } from '@ant-design/icons';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Row,
+  Col,
+  Input,
+  Button,
+  Modal,
+  message,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  FileExcelOutlined,
+} from "@ant-design/icons";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 // import AddAllowance from './AddAllowance';
-import employeeSalaryData from 'assets/data/employee-salary.data.json';
-import utils from 'utils';
-import AddCommission from './AddCommission';
+import employeeSalaryData from "assets/data/employee-salary.data.json";
+import utils from "utils";
+import AddCommission from "./AddCommission";
+import { useDispatch, useSelector } from "react-redux";
+import { delcommi, getcommi } from "./commistionReducer/commitionSlice";
 
 const CommissionList = () => {
   const [salaryData, setSalaryData] = useState(employeeSalaryData); // Salary data
   const [isModalVisible, setIsModalVisible] = useState(false); // Add Salary Modal
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Selected rows for batch actions
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getcommi());
+  }, []);
+
+  const alaldata = useSelector((state) => state.commistion);
+  const fnddata = alaldata.commistion.data;
+
+  useEffect(() => {
+    if (fnddata) {
+      setSalaryData(fnddata);
+    }
+  }, [fnddata]);
 
   // Open Add Salary Modal
   const openModal = () => {
@@ -33,8 +65,11 @@ const CommissionList = () => {
 
   // Delete a salary entry
   const deleteSalaryEntry = (id) => {
-    setSalaryData(salaryData.filter((item) => item.id !== id));
-    message.success({ content: `Salary record deleted`, duration: 2 });
+    dispatch(delcommi(id)).then(() => {
+      dispatch(getcommi());
+      setSalaryData(salaryData.filter((item) => item.id !== id));
+      message.success({ content: `Salary record deleted`, duration: 2 });
+    });
   };
 
   // Dropdown menu for action options
@@ -60,41 +95,49 @@ const CommissionList = () => {
 
   // Table columns
   const tableColumns = [
-    {
-      title: 'Employee Name',
-      dataIndex: 'employeename',
-      sorter: (a, b) => a.name.localeCompare(b.name),
-    },
+    // {
+    //   title: "Employee Name",
+    //   dataIndex: "employeename",
+    //   sorter: (a, b) => a.name.localeCompare(b.name),
+    // },
 
     {
-      title: 'Title',
-      dataIndex: 'title',
+      title: "Title",
+      dataIndex: "title",
       sorter: (a, b) => a.title - b.title,
     },
     {
-      title: 'Type',
-      dataIndex: 'type',
+      title: "Type",
+      dataIndex: "type",
       sorter: (a, b) => a.type.localeCompare(b.type),
     },
     {
-        title: 'Amount',
-        dataIndex: 'amount',
-        sorter: (a, b) => a.amount.localeCompare(b.amount),
-      },
+      title: "Amount",
+      dataIndex: "amount",
+      sorter: (a, b) => a.amount.localeCompare(b.amount),
+    },
     {
-      title: 'Action',
-      dataIndex: 'actions',
-      render: (_, record) => (
-        <EllipsisDropdown menu={dropdownMenu(record)} />
-      ),
+      title: "Action",
+      dataIndex: "actions",
+      render: (_, record) => <EllipsisDropdown menu={dropdownMenu(record)} />,
     },
   ];
 
   return (
     <Card>
-        <h3 className='text-lg font-bold'>Commission</h3>
-        <hr style={{ marginBottom: '20px',marginTop:"5px", border: '1px solid #e8e8e8' }} />
-      <Flex justifyContent="space-between" alignItems="center" mobileFlex={false}>
+      <h3 className="text-lg font-bold">Commission</h3>
+      <hr
+        style={{
+          marginBottom: "20px",
+          marginTop: "5px",
+          border: "1px solid #e8e8e8",
+        }}
+      />
+      <Flex
+        justifyContent="space-between"
+        alignItems="center"
+        mobileFlex={false}
+      >
         <div className="mr-md-3 mb-3">
           <Input
             placeholder="Search"
@@ -105,7 +148,6 @@ const CommissionList = () => {
         <Flex gap="7px">
           <Button type="primary" onClick={openModal}>
             <PlusOutlined />
-            
           </Button>
           {/* <Button type="primary" icon={<FileExcelOutlined />} block>
             Export All

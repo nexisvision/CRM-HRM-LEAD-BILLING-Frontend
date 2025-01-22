@@ -1,23 +1,22 @@
-import React from 'react';
-import EmployeeSalary from './EmployeeSalary/index';
-import Allowance from './Allowance/index';
-import Commission from './Commission';
-import Loan from './Loan';
-import OtherPayment from './OtherPayment';
-import Overtime from './Overtime';
-import SaturationDeduction from './SaturationDeduction';
+import React from "react";
+import Allowance from "./Allowance/index";
+import Commission from "./Commission";
+import Loan from "./Loan";
+import OtherPayment from "./OtherPayment";
+import Overtime from "./Overtime";
+import SaturationDeduction from "./SaturationDeduction";
 
 const SetSalary = () => (
   <div className="p-3 md:p-4 min-h-screen w-full">
-    <div className='mt-[-10px] mb-2'>
-      <h1 className='text-2xl font-semibold'>Set Salary</h1>
+    <div className="mt-[-10px] mb-2">
+      <h1 className="text-2xl font-semibold">Set Salary</h1>
     </div>
     <hr className="mb-6 border-gray-300" />
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 ml-[-12px] mr-[-12px] mb-[-20px] sm:gap-3 md:gap-3">
       {/* Employee Salary Section */}
-      <div className=" rounded-lg lg:p-1">
+      {/* <div className=" rounded-lg lg:p-1">
         <EmployeeSalary />
-      </div>
+      </div> */}
 
       {/* Allowance Section */}
       <div className=" rounded-lg lg:p-1">
@@ -53,22 +52,6 @@ const SetSalary = () => (
 );
 
 export default SetSalary;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import React from 'react';
 // import EmployeeSalary from './EmployeeSalary/index';
@@ -131,12 +114,6 @@ export default SetSalary;
 // );
 
 // export default SetSalary;
-
-
-
-
-
-
 
 // import React from 'react';
 // // import { Navigate, Route, Routes } from 'react-router-dom';

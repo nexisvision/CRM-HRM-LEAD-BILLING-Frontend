@@ -7,10 +7,10 @@ import axios from "axios";
 //     return res
 // };
 
-const getsal = async () => {
+const getovertime = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/salary/", {
+    const res = await axios.get("http://localhost:5353/api/v1/overtime/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -22,12 +22,12 @@ const getsal = async () => {
   }
 };
 
-const addsal = async (payload) => {
+const addovertime = async (payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/salary/",
+      "http://localhost:5353/api/v1/overtime/",
       payload,
       {
         headers: {
@@ -43,12 +43,12 @@ const addsal = async (payload) => {
   }
 };
 
-const deletsal = async (id) => {
+const deleteovertime = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/salary/${id}`,
+      `http://localhost:5353/api/v1/overtime/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -63,11 +63,11 @@ const deletsal = async (id) => {
   }
 };
 
-const editsal = async (idd, values) => {
+const editovertime = async (meetid, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/salary/${idd}`,
+      `http://localhost:5353/api/v1/overtimev/${meetid}`,
       values,
       {
         headers: {
@@ -104,10 +104,10 @@ const editsal = async (idd, values) => {
 
 const UserService = {
   // addUser,
-  getsal,
-  addsal,
-  deletsal,
-  editsal,
+  getovertime,
+  addovertime,
+  deleteovertime,
+  editovertime,
   // getAllUsers,
   // getUserById,
   // deleteUser,

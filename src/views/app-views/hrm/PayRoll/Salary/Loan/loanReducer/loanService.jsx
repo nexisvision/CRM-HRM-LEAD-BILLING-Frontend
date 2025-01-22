@@ -7,10 +7,10 @@ import axios from "axios";
 //     return res
 // };
 
-const getsal = async () => {
+const getloan = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/salary/", {
+    const res = await axios.get("http://localhost:5353/api/v1/loan/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -22,12 +22,12 @@ const getsal = async () => {
   }
 };
 
-const addsal = async (payload) => {
+const addloan = async (payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/salary/",
+      "http://localhost:5353/api/v1/loan/",
       payload,
       {
         headers: {
@@ -43,18 +43,15 @@ const addsal = async (payload) => {
   }
 };
 
-const deletsal = async (id) => {
+const deleteloan = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
-    const res = await axios.delete(
-      `http://localhost:5353/api/v1/salary/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const res = await axios.delete(`http://localhost:5353/api/v1/loan/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     //   dispatch(empdata());
     return res.data;
   } catch (error) {
@@ -63,11 +60,11 @@ const deletsal = async (id) => {
   }
 };
 
-const editsal = async (idd, values) => {
+const editloan = async (meetid, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/salary/${idd}`,
+      `http://localhost:5353/api/v1/loan/${meetid}`,
       values,
       {
         headers: {
@@ -104,10 +101,10 @@ const editsal = async (idd, values) => {
 
 const UserService = {
   // addUser,
-  getsal,
-  addsal,
-  deletsal,
-  editsal,
+  getloan,
+  addloan,
+  deleteloan,
+  editloan,
   // getAllUsers,
   // getUserById,
   // deleteUser,

@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./SalaryService";
+import UserService from "./commistionService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
 
-export const AddSalaryss = createAsyncThunk(
-  "users/AddSalaryss",
+export const addcommi = createAsyncThunk(
+  "users/addcommi",
   async (userData, thunkAPI) => {
     try {
-      const response = await UserService.addsal(userData);
+      const response = await UserService.addcom(userData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -19,11 +19,11 @@ export const AddSalaryss = createAsyncThunk(
 
 // Async thunk for user login
 
-export const getSalaryss = createAsyncThunk(
-  "emp/getSalaryss",
-  async (thunkAPI) => {
+export const getcommi = createAsyncThunk(
+  "emp/getcommi",
+  async (loginData, thunkAPI) => {
     try {
-      const response = await UserService.getsal();
+      const response = await UserService.getcom(loginData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -58,22 +58,22 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const deleteSalaryss = createAsyncThunk(
-  "users/deleteSalaryss",
+export const delcommi = createAsyncThunk(
+  "users/delcommi",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.deletsal(userId);
+      const response = await UserService.deletecom(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const editSalaryss = createAsyncThunk(
-  "users/editSalaryss",
-  async ({ idd, values }, thunkAPI) => {
+export const editcommi = createAsyncThunk(
+  "users/editcommi",
+  async ({ meetid, values }, thunkAPI) => {
     try {
-      const response = await UserService.editsal(idd, values);
+      const response = await UserService.editcom(meetid, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -82,6 +82,8 @@ export const editSalaryss = createAsyncThunk(
     }
   }
 );
+
+// Async thunk for updating a user
 
 const initialUser = () => {
   const item = window.localStorage.getItem("USER");
@@ -94,9 +96,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "salary",
+  name: "commistion",
   initialState: {
-    salary: [],
+    commistion: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -133,27 +135,27 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(AddSalaryss.pending, (state) => {
+      .addCase(addcommi.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(AddSalaryss.fulfilled, (state, action) => {
+      .addCase(addcommi.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(AddSalaryss.rejected, (state, action) => {
+      .addCase(addcommi.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(getSalaryss.pending, (state) => {
+      .addCase(getcommi.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(getSalaryss.fulfilled, (state, action) => {
+      .addCase(getcommi.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.salary = action?.payload;
+        state.commistion = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(getSalaryss.rejected, (state, action) => {
+      .addCase(getcommi.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
@@ -186,27 +188,27 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
       //delete
-      .addCase(deleteSalaryss.pending, (state) => {
+      .addCase(delcommi.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(deleteSalaryss.fulfilled, (state, action) => {
+      .addCase(delcommi.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload.message);
       })
-      .addCase(deleteSalaryss.rejected, (state, action) => {
+      .addCase(delcommi.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(editSalaryss.pending, (state) => {
+      .addCase(editcommi.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(editSalaryss.fulfilled, (state, action) => {
+      .addCase(editcommi.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload; // Update the state with the updated employee data
       })
-      .addCase(editSalaryss.rejected, (state, action) => {
+      .addCase(editcommi.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
       });

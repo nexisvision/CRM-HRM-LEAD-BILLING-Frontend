@@ -48,6 +48,13 @@ import jobonboarding from "../views/app-views/hrm/Jobs/JobOnBording/JobOnBoardin
 import Branch from "../views/app-views/hrm/Branch/BranchReducer/BranchSlice"
 import joboffers from "../views/app-views/hrm/Jobs/JobOfferLetter/jobOfferletterReducer/jobofferlateerSlice"
 import policy from "../views/app-views/policy/policyReducer/policySlice"
+import salary from "../views/app-views/hrm/PayRoll/Salary/SalaryReducers/SalarySlice"
+import allowance from "../views/app-views/hrm/PayRoll/Salary/Allowance/AllowancwReducer/AllowanceSlice"
+import commistion from "../views/app-views/hrm/PayRoll/Salary/Commission/commistionReducer/commitionSlice"
+import loan from "../views/app-views/hrm/PayRoll/Salary/Loan/loanReducer/loanSlice"
+import otherpayment from "../views/app-views/hrm/PayRoll/Salary/OtherPayment/otherpaymentReducer/otherpaymentSlice"
+import deducation from "../views/app-views/hrm/PayRoll/Salary/SaturationDeduction/deducationReducer/deducationSlice"
+import overtime from "../views/app-views/hrm/PayRoll/Salary/Overtime/overtimeReducer/overtimeSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -100,6 +107,13 @@ const rootReducer = (asyncReducers) => (state, action) => {
         Branch,
         joboffers,
         policy,
+        salary,
+        allowance,
+        commistion,
+        loan,
+        otherpayment,
+        deducation,
+        overtime,
         // employee,
         // department,
         ...asyncReducers,

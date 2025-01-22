@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./SalaryService";
+import UserService from "./overtimeService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
 
-export const AddSalaryss = createAsyncThunk(
-  "users/AddSalaryss",
+export const addovertimess = createAsyncThunk(
+  "users/addovertimess",
   async (userData, thunkAPI) => {
     try {
-      const response = await UserService.addsal(userData);
+      const response = await UserService.addovertime(userData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -19,11 +19,11 @@ export const AddSalaryss = createAsyncThunk(
 
 // Async thunk for user login
 
-export const getSalaryss = createAsyncThunk(
-  "emp/getSalaryss",
-  async (thunkAPI) => {
+export const getovertimess = createAsyncThunk(
+  "emp/getovertimess",
+  async (loginData, thunkAPI) => {
     try {
-      const response = await UserService.getsal();
+      const response = await UserService.getovertime(loginData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -58,22 +58,22 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const deleteSalaryss = createAsyncThunk(
-  "users/deleteSalaryss",
+export const deleteovertimess = createAsyncThunk(
+  "users/deleteovertimess",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.deletsal(userId);
+      const response = await UserService.deleteovertime(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const editSalaryss = createAsyncThunk(
-  "users/editSalaryss",
-  async ({ idd, values }, thunkAPI) => {
+export const editovertimess = createAsyncThunk(
+  "users/editovertimess",
+  async ({ meetid, values }, thunkAPI) => {
     try {
-      const response = await UserService.editsal(idd, values);
+      const response = await UserService.editovertime(meetid, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -82,6 +82,8 @@ export const editSalaryss = createAsyncThunk(
     }
   }
 );
+
+// Async thunk for updating a user
 
 const initialUser = () => {
   const item = window.localStorage.getItem("USER");
@@ -94,9 +96,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "salary",
+  name: "overtime",
   initialState: {
-    salary: [],
+    overtime: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -133,27 +135,27 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(AddSalaryss.pending, (state) => {
+      .addCase(addovertimess.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(AddSalaryss.fulfilled, (state, action) => {
+      .addCase(addovertimess.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(AddSalaryss.rejected, (state, action) => {
+      .addCase(addovertimess.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(getSalaryss.pending, (state) => {
+      .addCase(getovertimess.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(getSalaryss.fulfilled, (state, action) => {
+      .addCase(getovertimess.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.salary = action?.payload;
+        state.overtime = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(getSalaryss.rejected, (state, action) => {
+      .addCase(getovertimess.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
@@ -186,27 +188,27 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
       //delete
-      .addCase(deleteSalaryss.pending, (state) => {
+      .addCase(deleteovertimess.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(deleteSalaryss.fulfilled, (state, action) => {
+      .addCase(deleteovertimess.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload.message);
       })
-      .addCase(deleteSalaryss.rejected, (state, action) => {
+      .addCase(deleteovertimess.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(editSalaryss.pending, (state) => {
+      .addCase(editovertimess.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(editSalaryss.fulfilled, (state, action) => {
+      .addCase(editovertimess.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload; // Update the state with the updated employee data
       })
-      .addCase(editSalaryss.rejected, (state, action) => {
+      .addCase(editovertimess.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
       });

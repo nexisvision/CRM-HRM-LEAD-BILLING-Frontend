@@ -1,218 +1,294 @@
-import React from 'react';
-import { Input, Button, DatePicker, Select, message, Row, Col, Checkbox } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import 'react-quill/dist/quill.snow.css';
-import ReactQuill from 'react-quill';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+import React, { useEffect } from "react";
+import {
+  Input,
+  Button,
+  DatePicker,
+  Select,
+  message,
+  Row,
+  Col,
+  Checkbox,
+} from "antd";
+import { useNavigate } from "react-router-dom";
+import "react-quill/dist/quill.snow.css";
+import ReactQuill from "react-quill";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { AddSalaryss, getSalaryss } from "./SalaryReducers/SalarySlice";
+import { useDispatch, useSelector } from "react-redux";
+import { empdata } from "../../Employee/EmployeeReducers/EmployeeSlice";
+import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 
 const { Option } = Select;
 
-const AddSalary = () => {
-  // const [form] = Form.useForm();
+const AddSalary = ({ onClose }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const onSubmit = (values) => {
-    console.log('Submitted values:', values);
-    message.success('Job added successfully!');
-    navigate('/app/hrm/jobs');
+  useEffect(() => {
+    dispatch(empdata());
+  }, []);
+
+  const allempdata = useSelector((state) => state.employee);
+  const fnddata = allempdata.employee.data;
+
+  useEffect(() => {
+    dispatch(getallcurrencies());
+  }, []);
+
+  const allempdatass = useSelector((state) => state.currencies);
+  const fnddatass = allempdatass?.currencies;
+
+  const onSubmit = (values, { resetForm }) => {
+    dispatch(AddSalaryss(values)).then(() => {
+      dispatch(getSalaryss());
+      onClose();
+      resetForm();
+      message.success("salary added successfully");
+    });
+    console.log("Submitted values:", values);
+    message.success("Job added successfully!");
   };
 
   const initialValues = {
-    jobTitle: '',
-    branch: '',
-    jobCategory: '',
-    positions: '',
-    startDate: null,
-    endDate: null,
-    skills: '',
-    jobDescription: '',
-    jobRequirement: '',
-  }
+    employeeId: "",
+    payslipType: "",
+    currency: "",
+    salary: "",
+    netSalary: "",
+    status: "unpaid",
+    bankAccount: "",
+  };
 
   const validationSchema = Yup.object({
-    jobTitle: Yup.string().required('Please enter a jobTitle.'),
-    branch: Yup.string().required('Please Select a branch.'),
-    jobCategory: Yup.string().required('Please select a jobCategory.'),
-    positions: Yup.string().required('Please select positions for the job.'),
-    startDate: Yup.date().nullable().required('Start Date is required.'),
-    endDate: Yup.date().nullable().required('End Date is required.'),
-    skills: Yup.string().required('Please enter a  skills.'),
-    jobDescription: Yup.string().required('Please enter a job description.'),
-    jobRequirement: Yup.string().required('Please select a job requirement.'),
+    employeeId: Yup.string().required("Employee ID is required"),
+    payslipType: Yup.string().required("Payroll type is required"),
+    currency: Yup.string().required("Currency is required"),
+    salary: Yup.string().required("Salary is required"),
+    netSalary: Yup.string().required("Net salary is required"),
+    status: Yup.string().required("Status is required"),
+    bankAccount: Yup.string().required("Bank account is required"),
   });
 
   return (
     <div className="add-salary">
-      {/* <h2 className="mb-4">Create Job</h2> */}
       <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
-        {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
+        {({
+          values,
+          setFieldValue,
+          handleSubmit,
+          setFieldTouched,
+          resetForm,
+        }) => (
           <Form
             layout="vertical"
-            // form={form}
-            name="add-job"
-            className="formik-form" onSubmit={handleSubmit}
+            name="add-salary"
+            className="formik-form"
+            onSubmit={handleSubmit}
           >
             <Row gutter={16}>
+              <Col span={24} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">employee</label>
+                  <Field name="employeeId">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-2"
+                        placeholder="Select AddProjectMember"
+                        onChange={(value) => setFieldValue("employeeId", value)}
+                        value={values.employeeId}
+                        onBlur={() => setFieldTouched("employeeId", true)}
+                      >
+                        {fnddata && fnddata.length > 0 ? (
+                          fnddata.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.firstName ||
+                                client.username ||
+                                "Unnamed employee"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Clients Available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="employeeId"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
               <Col span={12}>
                 <div className="form-item">
-                  <label className='font-semibold'>Job Title</label>
-                  <Field name="jobTitle" as={Input} placeholder="Enter Job Title" />
-                  <ErrorMessage name="jobTitle" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-
-
-              <Col span={12} >
-                <div className="form-item">
-                  <label className='font-semibold'>Branch</label>
-                  <Field name="branch">
+                  <label className="font-semibold">Payroll Type</label>
+                  <Field name="payslipType">
                     {({ field }) => (
                       <Select
                         {...field}
                         className="w-full"
-                        placeholder="Select Branch"
-                        onChange={(value) => setFieldValue('branch', value)}
-                        value={values.branch}
-                        onBlur={() => setFieldTouched("branch", true)}
+                        placeholder="Select Payroll Type"
+                        onChange={(value) =>
+                          setFieldValue("payslipType", value)
+                        }
+                        onBlur={() => setFieldTouched("payslipType", true)}
                       >
-                        <Option value="all">All</Option>
-                        <Option value="branch1">Branch 1</Option>
+                        <Option value="monthly">Monthly</Option>
+                        <Option value="hourly">Hourly</Option>
+                        <Option value="weekly">Weekly</Option>
                       </Select>
                     )}
                   </Field>
-                  <ErrorMessage name="branch" component="div" className="error-message text-red-500 my-1" />
+                  <ErrorMessage
+                    name="payslipType"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 
-
-              <Col span={12} className='mt-2'>
+              <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className='font-semibold'>Job Category</label>
-                  <Field name="jobCategory">
+                  <label className="font-semibold">currency</label>
+                  <Field name="currency">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-2"
+                        placeholder="Select AddProjectMember"
+                        onChange={(value) => setFieldValue("currency", value)}
+                        value={values.currency}
+                        onBlur={() => setFieldTouched("currency", true)}
+                      >
+                        {fnddatass && fnddatass?.length > 0 ? (
+                          fnddatass?.map((client) => (
+                            <Option key={client.id} value={client?.id}>
+                              {client?.currencyIcon ||
+                                client?.currencyCode ||
+                                "Unnamed currency"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Clients Available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="currency"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Salary</label>
+                  <Field
+                    name="salary"
+                    as={Input}
+                    type="string"
+                    placeholder="Enter Salary Amount"
+                  />
+                  <ErrorMessage
+                    name="salary"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Net Salary</label>
+                  <Field
+                    name="netSalary"
+                    as={Input}
+                    type="string"
+                    placeholder="Enter Net Salary Amount"
+                  />
+                  <ErrorMessage
+                    name="netSalary"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Status</label>
+                  <Field name="status">
                     {({ field }) => (
                       <Select
                         {...field}
                         className="w-full"
-                        placeholder="Select Job Category"
-                        onChange={(value) => setFieldValue('jobCategory', value)}
-                        value={values.jobCategory}
-                        onBlur={() => setFieldTouched("jobCategory", true)}
+                        placeholder="Select Status"
+                        onChange={(value) => setFieldValue("status", value)}
+                        onBlur={() => setFieldTouched("status", true)}
                       >
-                        <Option value="it">IT</Option>
-                        <Option value="hr">HR</Option>
+                        <Option value="paid">Paid</Option>
+                        <Option value="unpaid">Unpaid</Option>
                       </Select>
                     )}
                   </Field>
-                  <ErrorMessage name="jobCategory" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-
-
-              <Col span={12} className='mt-2'>
-                <div className="form-item">
-                  <label className='font-semibold'>Positions</label>
-                  <Field name="positions" as={Input} placeholder="Enter Positions" />
-                  <ErrorMessage name="positions" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-
-              <Col span={12} className='mt-2'>
-                <div className="form-item">
-                  <label className='font-semibold'>Start Date</label>
-                  <DatePicker
-                    className="w-full"
-                    format="DD-MM-YYYY"
-                    value={values.startDate}
-                    onChange={(startDate) => setFieldValue('startDate', startDate)}
-                    onBlur={() => setFieldTouched("startDate", true)}
+                  <ErrorMessage
+                    name="status"
+                    component="div"
+                    className="error-message text-red-500 my-1"
                   />
-                  <ErrorMessage name="startDate" component="div" className="error-message text-red-500 my-1" />
                 </div>
               </Col>
 
-
-              <Col span={12} className='mt-2'>
+              <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className='font-semibold'>End Date</label>
-                  <DatePicker
-                    className="w-full"
-                    format="DD-MM-YYYY"
-                    value={values.endDate}
-                    onChange={(endDate) => setFieldValue('endDate', endDate)}
-                    onBlur={() => setFieldTouched("endDate", true)}
-                  />
-                  <ErrorMessage name="endDate" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-
-
-              <Col span={24} className='mt-2'>
-                <div className="form-item">
-                  <label className='font-semibold'>Skill</label>
-                  <Field name="skills" as={Input} placeholder="Enter Skill" />
-                  <ErrorMessage name="skills" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-
-
-              <Col span={12} className='mt-2'>
-                <div className="form-item">
-                  <label className="font-semibold">Job Description</label>
-                  <Field name="jobDescription">
+                  <label className="font-semibold">Bank Account</label>
+                  <Field name="bankAccount">
                     {({ field }) => (
-                      <ReactQuill
+                      <Select
                         {...field}
-                        value={values.jobDescription}
-                        onChange={(value) => setFieldValue('jobDescription', value)}
-                        onBlur={() => setFieldTouched("jobDescription", true)}
-                        placeholder="Write here..."
-                      />
+                        className="w-full"
+                        placeholder="Select Bank"
+                        onChange={(value) =>
+                          setFieldValue("bankAccount", value)
+                        }
+                        onBlur={() => setFieldTouched("bankAccount", true)}
+                      >
+                        <Option value="ICICI">ICICI Bank</Option>
+                        <Option value="HDFC">HDFC Bank</Option>
+                        <Option value="AXIS">Axis Bank</Option>
+                      </Select>
                     )}
                   </Field>
-                  <ErrorMessage name="jobDescription" component="div" className="error-message text-red-500 my-1" />
+                  <ErrorMessage
+                    name="bankAccount"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
-              </Col>
-
-
-              <Col span={12} className='mt-2'>
-                <div className="form-item">
-                  <label className="font-semibold">Job Requirement</label>
-                  <Field name="jobRequirement">
-                    {({ field }) => (
-                      <ReactQuill
-                        {...field}
-                        value={values.jobRequirement}
-                        onChange={(value) => setFieldValue('jobRequirement', value)}
-                        onBlur={() => setFieldTouched("jobRequirement", true)}
-                        placeholder="Write here..."
-                      />
-                    )}
-                  </Field>
-                  <ErrorMessage name="jobRequirement" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-
-              <Col span={24} className='mt-2'>
-                <Checkbox.Group>
-                  <Row>
-                    <Col span={6}><Checkbox value="gender">Gender</Checkbox></Col>
-                    <Col span={6}><Checkbox value="dob">Date of Birth</Checkbox></Col>
-                    <Col span={6}><Checkbox value="country">Country</Checkbox></Col>
-                    <Col span={6}><Checkbox value="profileImage">Profile Image</Checkbox></Col>
-                  </Row>
-                </Checkbox.Group>
               </Col>
             </Row>
 
-            <div className="form-buttons text-right">
-              <Button type="default" className="mr-2" onClick={() => navigate('/app/hrm/jobs')}>Cancel</Button>
-              <Button type="primary" htmlType="submit">Create</Button>
+            <div className="form-buttons text-right mt-4">
+              <Button type="default" className="mr-2" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="primary" htmlType="submit">
+                Create Salary
+              </Button>
             </div>
           </Form>
         )}
@@ -222,13 +298,3 @@ const AddSalary = () => {
 };
 
 export default AddSalary;
-
-
-
-
-
-
-
-
-
-

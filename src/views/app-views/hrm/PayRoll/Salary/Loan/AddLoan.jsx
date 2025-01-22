@@ -1,46 +1,195 @@
-import React from 'react';
-import { Form, Input, Select } from 'antd';
-import TextArea from 'antd/es/input/TextArea';
-
-
+import React, { useEffect } from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Input, Select, Button, Col, message } from "antd";
+import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+import { useSelector } from "react-redux";
+import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
+import { useDispatch } from "react-redux";
+import { addloans, getloans } from "./loanReducer/loanSlice";
 const { Option } = Select;
+const AddLoan = ({ onClose }) => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(empdata());
+  }, []);
 
-const AddLoan = () => {
+  const alldataemp = useSelector((state) => state.employee);
+  const fnddata = alldataemp.employee.data;
+
+  useEffect(() => {
+    dispatch(getallcurrencies());
+  }, []);
+
+  const allempdatass = useSelector((state) => state.currencies);
+  const fnddatass = allempdatass?.currencies;
+
+  const handleSubmit = (values, { resetForm }) => {
+    dispatch(addloans(values)).then(() => {
+      dispatch(getloans());
+      message.success("loans added successfully");
+      onClose();
+      resetForm();
+    });
+  };
   return (
-    <div className="loan">
-      
-      {/* <h3>Loan</h3> */}
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
-      <Form.Item label="Title" name="title" rules={[{ required: true }]}>
-      <Input placeholder="Title" />
-        
+    <div className="employee-salary p-4">
+      <hr className="my-2 border-gray-300" />
+      <Formik
+        initialValues={{
+          title: "",
+          loanOption: "",
+          type: "",
+          currency: "",
+          amount: "",
+          reason: "",
+        }}
+        onSubmit={handleSubmit}
+      >
+        {({ values, setFieldValue, resetForm }) => (
+          <Form className="space-y-4">
+            {/* title */}
 
-      </Form.Item>
-      <Form.Item label="Loan Option" name="loanOption" rules={[{ required: true }]}>
-        <Select placeholder="Select Loan Option">
-          <Option value="emergency">Emergency Loan</Option>
-          <Option value="housing">Housing Loan</Option>
-        </Select>
-      </Form.Item>
-      <Form.Item label="Type" name="type" rules={[{ required: true }]}>
-      <Select placeholder="Type">
-          <Option value="fixed">Fixed</Option>
-          <Option value="percentage">Percentage</Option>
-          {/* <Option value="health">Health and Wellness Allowance</Option> */}
-        </Select>
-      </Form.Item>
-      <Form.Item label="Loan Amount" name="loanamount" rules={[{ required: true }]}>
-      <Input placeholder="Loan Amount" />
-        
+            <Col span={24} className="mt-4">
+              <div className="form-item">
+                <label className="font-semibold">employee</label>
+                <Field name="employeeId">
+                  {({ field }) => (
+                    <Select
+                      {...field}
+                      className="w-full mt-2"
+                      placeholder="Select AddProjectMember"
+                      onChange={(value) => setFieldValue("employeeId", value)}
+                      value={values.employeeId}
+                    >
+                      {fnddata && fnddata.length > 0 ? (
+                        fnddata.map((client) => (
+                          <Option key={client.id} value={client.id}>
+                            {client.firstName ||
+                              client.username ||
+                              "Unnamed employee"}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option value="" disabled>
+                          No Clients Available
+                        </Option>
+                      )}
+                    </Select>
+                  )}
+                </Field>
+                <ErrorMessage
+                  name="employeeId"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
+              </div>
+            </Col>
 
-      </Form.Item>
-      <Form.Item label="Reason" name="reason" rules={[{ required: true }]}>
-      <TextArea placeholder="Reason" />
-        
+            <div>
+              <label className="font-semibold">Title</label>
+              <Field name="title">
+                {({ field }) => <Input {...field} placeholder="Enter Title" />}
+              </Field>
+              <ErrorMessage
+                name="title"
+                component="div"
+                className="text-red-500"
+              />
+            </div>
+            {/* Salary */}
+            <div>
+              <label className="font-semibold">LoanOption</label>
+              <Field name="loanOption">
+                {({ field }) => (
+                  <Input {...field} placeholder="Enter LoanOption" />
+                )}
+              </Field>
+              <ErrorMessage
+                name="loanOption"
+                component="div"
+                className="text-red-500"
+              />
+            </div>
+            {/* Account */}
+            <div>
+              <label className="font-semibold">Type</label>
+              <Field name="type">
+                {({ field }) => <Input {...field} placeholder="Enter Type" />}
+              </Field>
+              <ErrorMessage
+                name="type"
+                component="div"
+                className="text-red-500"
+              />
+            </div>
+            <Col span={24} className="mt-4">
+              <div className="form-item">
+                <label className="font-semibold">currency</label>
+                <Field name="currency">
+                  {({ field }) => (
+                    <Select
+                      {...field}
+                      className="w-full mt-2"
+                      placeholder="Select AddProjectMember"
+                      onChange={(value) => setFieldValue("currency", value)}
+                      value={values.currency}
+                    >
+                      {fnddatass && fnddatass?.length > 0 ? (
+                        fnddatass?.map((client) => (
+                          <Option key={client.id} value={client?.id}>
+                            {client?.currencyIcon ||
+                              client?.currencyCode ||
+                              "Unnamed currency"}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option value="" disabled>
+                          No Clients Available
+                        </Option>
+                      )}
+                    </Select>
+                  )}
+                </Field>
+                <ErrorMessage
+                  name="currency"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
+              </div>
+            </Col>
 
-      </Form.Item>
+            <div>
+              <label className="font-semibold">Amount</label>
+              <Field name="amount">
+                {({ field }) => <Input {...field} placeholder="Enter Amount" />}
+              </Field>
+              <ErrorMessage
+                name="amount"
+                component="div"
+                className="text-red-500"
+              />
+            </div>
+            <div>
+              <label className="font-semibold">Reason</label>
+              <Field name="reason">
+                {({ field }) => <Input {...field} placeholder="Enter Reason" />}
+              </Field>
+              <ErrorMessage
+                name="reason"
+                component="div"
+                className="text-red-500"
+              />
+            </div>
+            {/* Submit Button */}
+            <div className="text-right">
+              <Button type="primary" htmlType="submit">
+                Submit
+              </Button>
+            </div>
+          </Form>
+        )}
+      </Formik>
     </div>
   );
 };
-
 export default AddLoan;

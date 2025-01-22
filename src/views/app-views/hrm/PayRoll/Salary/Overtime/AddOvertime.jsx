@@ -1,55 +1,140 @@
-import React from 'react';
-import { Form, Input, Select, Row, Col, Button } from 'antd';
-
+import React, { useEffect } from "react";
+import { Form, Input, Select, Row, Col, Button, message } from "antd";
+import { ErrorMessage, Field, Formik } from "formik";
+import { useDispatch, useSelector } from "react-redux";
+import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+import { addovertimess, getovertimess } from "./overtimeReducer/overtimeSlice";
 const { Option } = Select;
+const AddOvertime = ({ onClose }) => {
+  const dispatch = useDispatch();
 
-const AddOvertime = () => {
+  useEffect(() => {
+    dispatch(empdata());
+  }, [dispatch]);
+
+  const alldataemp = useSelector((state) => state.employee);
+  const fnddata = alldataemp.employee.data;
+
+  const handleSubmit = (values, { setSubmitting, resetForm }) => {
+    dispatch(addovertimess(values))
+      .then(() => {
+        dispatch(getovertimess());
+        message.success("Other payment added successfully");
+        onClose();
+        resetForm();
+      })
+      .catch((error) => {
+        message.error("Something went wrong. Please try again!");
+      })
+      .finally(() => {
+        setSubmitting(false);
+      });
+  };
   return (
-    <div className="other-payment">
-      {/* <h3>Create Other Payment</h3> */}
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
-      <Form layout="vertical">
-        <Row gutter={16}>
-          {/* Title Field */}
-          <Col span={12}>
-            <Form.Item label="Title" name="title" rules={[{ required: true, message: 'Please enter a title' }]}>
-              <Input placeholder="Overtime Title" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Days" name="numberofdays" rules={[{ required: true, message: 'Please enter days' }]}>
-            <Input placeholder="Number Of Days" />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          {/* Type Field */}
-          
-          {/* Amount Field */}
-          <Col span={12}>
-            <Form.Item label="Hours" name="hours" rules={[{ required: true, message: 'Please enter an hour' }]}>
-              <Input placeholder="Hours" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item label="Rate" name="rate" rules={[{ required: true, message: 'Please enter an rate' }]}>
-              <Input placeholder="Rate" />
-            </Form.Item>
-          </Col>
-        </Row>
-        {/* Action Buttons */}
-        <Row justify="end" gutter={16}>
-          <Col>
-            <Button type="default">Cancel</Button>
-          </Col>
-          <Col>
-            <Button type="primary" htmlType="submit">Create</Button>
-          </Col>
-        </Row>
-      </Form>
+    <div className="employee-salary p-4">
+      <hr className="my-2 border-gray-300" />
+      <Formik
+        initialValues={{ title: "", days: "", Hours: "", rate: "" }}
+        onSubmit={handleSubmit}
+      >
+        {({ handleSubmit, resetForm, setFieldValue, values }) => (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Title */}
+
+            <Col span={24} className="mt-4">
+              <div className="form-item">
+                <label className="font-semibold">Employee</label>
+                <Field name="employeeId">
+                  {({ field }) => (
+                    <Select
+                      {...field}
+                      className="w-full mt-2"
+                      placeholder="Select Employee"
+                      onChange={(value) => setFieldValue("employeeId", value)}
+                      value={values.employeeId}
+                    >
+                      {fnddata && fnddata.length > 0 ? (
+                        fnddata.map((client) => (
+                          <Option key={client.id} value={client.id}>
+                            {client.firstName ||
+                              client.username ||
+                              "Unnamed employee"}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option value="" disabled>
+                          No Employees Available
+                        </Option>
+                      )}
+                    </Select>
+                  )}
+                </Field>
+                <ErrorMessage
+                  name="employeeId"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
+              </div>
+            </Col>
+
+            <div>
+              <label className="font-semibold">Title</label>
+              <Field name="title">
+                {({ field }) => <Input {...field} placeholder="Enter Title" />}
+              </Field>
+              <ErrorMessage
+                name="title"
+                component="div"
+                className="text-red-500"
+              />
+            </div>
+            {/* Type */}
+            <div>
+              <label className="font-semibold">Days</label>
+              <Field name="days">
+                {({ field }) => <Input {...field} placeholder="Enter Days" />}
+              </Field>
+              <ErrorMessage
+                name="days"
+                component="div"
+                className="text-red-500"
+              />
+            </div>
+            {/* Deduction Option */}
+            <div>
+              <label className="font-semibold">Hours</label>
+              <Field name="Hours">
+                {({ field }) => <Input {...field} placeholder="Enter Hours" />}
+              </Field>
+              <ErrorMessage
+                name="Hours"
+                component="div"
+                className="text-red-500"
+              />
+            </div>
+            {/* Currency */}
+            <div>
+              <label className="font-semibold">Rate</label>
+              <Field name="rate">
+                {({ field }) => <Input {...field} placeholder="Enter Rate" />}
+              </Field>
+              <ErrorMessage
+                name="rate"
+                component="div"
+                className="text-red-500"
+              />
+            </div>
+
+            {/* Submit Button */}
+            <div className="text-right">
+              <Button type="primary" htmlType="submit">
+                Submit
+              </Button>
+            </div>
+          </form>
+        )}
+      </Formik>
     </div>
   );
 };
-
 export default AddOvertime;
-

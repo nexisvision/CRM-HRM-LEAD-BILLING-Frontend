@@ -1,28 +1,61 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Input, Button, Modal, message } from 'antd';
-import { EyeOutlined, DeleteOutlined, PlusOutlined, SearchOutlined, FileExcelOutlined } from '@ant-design/icons';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import AddOvertime from './AddOvertime';
-import employeeSalaryData from 'assets/data/employee-salary.data.json';
-import utils from 'utils';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Row,
+  Col,
+  Input,
+  Button,
+  Modal,
+  message,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  FileExcelOutlined,
+} from "@ant-design/icons";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import AddOvertime from "./AddOvertime";
+import employeeSalaryData from "assets/data/employee-salary.data.json";
+import utils from "utils";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteovertimess,
+  getovertimess,
+} from "./overtimeReducer/overtimeSlice";
 
 const OvertimeList = () => {
-  const [salaryData, setSalaryData] = useState(employeeSalaryData); // Salary data
-  const [isModalVisible, setIsModalVisible] = useState(false); // Add Salary Modal
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Selected rows for batch actions
+  const [salaryData, setSalaryData] = useState(employeeSalaryData);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
-  // Open Add Salary Modal
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getovertimess());
+  }, []);
+
+  const alldata = useSelector((state) => state.overtime);
+  const fnddata = alldata.overtime.data;
+
+  useEffect(() => {
+    if (fnddata) {
+      setSalaryData(fnddata);
+    }
+  }, [fnddata]);
+
   const openModal = () => {
     setIsModalVisible(true);
   };
 
-  // Close Add Salary Modal
   const closeModal = () => {
     setIsModalVisible(false);
   };
 
-  // Search functionality
   const onSearch = (e) => {
     const value = e.currentTarget.value.toLowerCase();
     const filteredData = utils.wildCardSearch(employeeSalaryData, value);
@@ -32,8 +65,11 @@ const OvertimeList = () => {
 
   // Delete a salary entry
   const deleteSalaryEntry = (id) => {
-    setSalaryData(salaryData.filter((item) => item.id !== id));
-    message.success({ content: `Salary record deleted`, duration: 2 });
+    dispatch(deleteovertimess(id)).then(() => {
+      dispatch(getovertimess());
+      setSalaryData(salaryData.filter((item) => item.id !== id));
+      message.success({ content: `Salary record deleted`, duration: 2 });
+    });
   };
 
   // Dropdown menu for action options
@@ -57,48 +93,53 @@ const OvertimeList = () => {
     </Menu>
   );
 
-  // Table columns
   const tableColumns = [
     {
-      title: 'Employee',
-      dataIndex: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      title: "Hours",
+      dataIndex: "Hours",
+      sorter: (a, b) => (a.Hours || 0) - (b.Hours || 0), // Use fallback if data is missing
     },
-   
+
     {
-      title: 'Overtime Title',
-      dataIndex: 'overtimetitle',
+      title: "days",
+      dataIndex: "days",
+      sorter: (a, b) => (a.days || 0) - (b.days || 0), // Use fallback if data is missing
+    },
+
+    {
+      title: "rate",
+      dataIndex: "rate",
+      sorter: (a, b) => (a.rate || 0) - (b.rate || 0), // Use fallback if data is missing
+    },
+
+    {
+      title: "title",
+      dataIndex: "title",
       sorter: (a, b) => a.title - b.title,
     },
+
     {
-      title: 'Number Of Days',
-      dataIndex: 'numberofdays',
-      sorter: (a, b) => a.numberofdays.localeCompare(b.numberofdays),
-    },
-    {
-        title: 'Hours',
-        dataIndex: 'hours',
-        sorter: (a, b) => a.hours.localeCompare(b.hours),
-      },
-      {
-        title: 'Rate',
-        dataIndex: 'rate',
-        sorter: (a, b) => a.rate.localeCompare(b.rate),
-      },
-        {
-      title: 'Action',
-      dataIndex: 'actions',
-      render: (_, record) => (
-        <EllipsisDropdown menu={dropdownMenu(record)} />
-      ),
+      title: "Action",
+      dataIndex: "actions",
+      render: (_, record) => <EllipsisDropdown menu={dropdownMenu(record)} />,
     },
   ];
 
   return (
     <Card>
-       <h3 className='text-lg font-bold'>Overtime</h3>
-        <hr style={{ marginBottom: '20px',marginTop:"5px", border: '1px solid #e8e8e8' }} />
-      <Flex justifyContent="space-between" alignItems="center" mobileFlex={false}>
+      <h3 className="text-lg font-bold">Overtime</h3>
+      <hr
+        style={{
+          marginBottom: "20px",
+          marginTop: "5px",
+          border: "1px solid #e8e8e8",
+        }}
+      />
+      <Flex
+        justifyContent="space-between"
+        alignItems="center"
+        mobileFlex={false}
+      >
         <div className="mr-md-3 mb-3">
           <Input
             placeholder="Search"
@@ -109,11 +150,7 @@ const OvertimeList = () => {
         <Flex gap="7px">
           <Button type="primary" onClick={openModal}>
             <PlusOutlined />
-            
           </Button>
-          {/* <Button type="primary" icon={<FileExcelOutlined />} block>
-            Export All
-          </Button> */}
         </Flex>
       </Flex>
       <div className="table-responsive mt-3">
