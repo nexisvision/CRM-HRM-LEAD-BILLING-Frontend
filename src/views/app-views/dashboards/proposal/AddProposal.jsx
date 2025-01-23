@@ -1,429 +1,474 @@
-import React, { useState, useEffect } from 'react';
-import { Card, Form, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, DatePicker, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
-import { useNavigate, useParams } from 'react-router-dom';
-import 'react-quill/dist/quill.snow.css';
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  Form,
+  Menu,
+  Row,
+  Col,
+  Tag,
+  Input,
+  message,
+  Button,
+  Upload,
+  Select,
+  DatePicker,
+  Modal,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  CloudUploadOutlined,
+  MailOutlined,
+  PlusOutlined,
+  PushpinOutlined,
+  FileExcelOutlined,
+  FilterOutlined,
+  EditOutlined,
+  LinkOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+import { useNavigate, useParams } from "react-router-dom";
+import "react-quill/dist/quill.snow.css";
 // import { getallcurrencies } from '../../../setting/currencies/currenciesreducer/currenciesSlice';
-import OrderListData from 'assets/data/order-list.data.json';
-import Flex from 'components/shared-components/Flex';
+import OrderListData from "assets/data/order-list.data.json";
+import Flex from "components/shared-components/Flex";
 // import { Getmins } from '../../../dashboards/project/milestone/minestoneReducer/minestoneSlice';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from "react-redux";
 // import { Formik, Form, Field, ErrorMessage } from 'formik';
 // import { createInvoice } from '../../../dashboards/project/invoice/invoicereducer/InvoiceSlice';
-import * as Yup from 'yup';
-import { getallcurrencies } from 'views/app-views/setting/currencies/currenciesreducer/currenciesSlice';
-import { createProposal, getAllProposals } from './proposalReducers/proposalSlice';
-import { GetLeads } from '../leads/LeadReducers/LeadSlice';
-import { GetDeals } from '../deals/DealReducers/DealSlice';
+import * as Yup from "yup";
+import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
+
+import { GetLeads } from "../leads/LeadReducers/LeadSlice";
+import { GetDeals } from "../deals/DealReducers/DealSlice";
+import { addpropos } from "./proposalReducers/proposalSlice";
+import { getpropos } from "./proposalReducers/proposalSlice";
 
 const { Option } = Select;
 
 const AddProposal = ({ onClose }) => {
+  const { id } = useParams();
+  const [discountType, setDiscountType] = useState("%");
+  const [loading, setLoading] = useState(false);
+  const [discountValue, setDiscountValue] = useState(0);
+  const [isAddProductModalVisible, setIsAddProductModalVisible] =
+    useState(false);
+  const [list, setList] = useState(OrderListData);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedMilestone, setSelectedMilestone] = useState(null);
+  const [showFields, setShowFields] = useState(false);
+  const { data: milestones } = useSelector(
+    (state) => state.Milestone.Milestone
+  );
 
-    const { id } = useParams();
-    const [discountType, setDiscountType] = useState("%");
-    const [loading, setLoading] = useState(false);
-    const [discountValue, setDiscountValue] = useState(0);
-    const [isAddProductModalVisible, setIsAddProductModalVisible] = useState(false);
-    const [list, setList] = useState(OrderListData)
-    const [selectedProduct, setSelectedProduct] = useState(null);
-    const [selectedMilestone, setSelectedMilestone] = useState(null);
-    const [showFields, setShowFields] = useState(false);
-    const { data: milestones } = useSelector((state) => state.Milestone.Milestone);
+  // const [selectedProject, setSelectedProject] = useState(null);
+  // const [clientOptions, setClientOptions] = useState([]);
 
+  const { currencies } = useSelector((state) => state.currencies);
+  const [discountRate, setDiscountRate] = useState(10);
+  const dispatch = useDispatch();
 
-    // const [selectedProject, setSelectedProject] = useState(null);
-    // const [clientOptions, setClientOptions] = useState([]);
+  const { data: Leads } = useSelector((state) => state.Leads.Leads);
+  const { data: Deals } = useSelector((state) => state.Deals.Deals);
 
-    const { currencies } = useSelector((state) => state.currencies);
-    const [discountRate, setDiscountRate] = useState(10);
-    const dispatch = useDispatch();
+  // console.log("SubClient Data:", subClientData.username);
 
+  // const { subClients } = useSelector((state) => state.SubClient.SubClient.data);
 
+  const [form] = Form.useForm();
+  const [totals, setTotals] = useState({
+    subtotal: 0,
+    discount: 0,
+    totalTax: 0,
+    finalTotal: 0,
+  });
 
-      const { data: Leads } = useSelector((state) => state.Leads.Leads);
-      const { data: Deals } = useSelector((state) => state.Deals.Deals);
-    
+  const [tableData, setTableData] = useState([
+    {
+      id: Date.now(),
+      item: "",
+      quantity: 1,
+      price: "",
+      tax: 0,
+      amount: "0",
+      description: "",
+    },
+  ]);
 
-  
+  // Fetch currencies
+  useEffect(() => {
+    dispatch(getallcurrencies());
+  }, [dispatch]);
 
-    // console.log("SubClient Data:", subClientData.username);
+  useEffect(() => {
+    dispatch(GetLeads());
+    dispatch(GetDeals());
+  }, [dispatch]);
 
-    // const { subClients } = useSelector((state) => state.SubClient.SubClient.data); 
+  // Fetch milestones when product changes
+  // useEffect(() => {
+  //     dispatch(Getmins(id));
+  // }, [dispatch]);
 
-    const [form] = Form.useForm();
-    const [totals, setTotals] = useState({
-        subtotal: 0,
-        discount: 0,
-        totalTax: 0,
-        finalTotal: 0,
-    });
-
-
-    const [tableData, setTableData] = useState([
-        {
-            id: Date.now(),
-            item: "",
-            quantity: 1,
-            price: "",
-            tax: 0,
-            amount: "0",
-            description: "",
-        }
+  // Handle product selection
+  const handleProductChange = (value) => {
+    setSelectedProduct(value);
+    setSelectedMilestone(null); // Reset milestone selection
+    setTableData([
+      {
+        // Reset table data
+        id: Date.now(),
+        item: "",
+        quantity: 1,
+        price: "",
+        tax: 0,
+        amount: "0",
+        description: "",
+      },
     ]);
+  };
+  // Handle milestone selection
+  const handleMilestoneChange = (value) => {
+    const selectedMile = milestones?.find((m) => m.id === value);
+    setSelectedMilestone(value);
 
-    // Fetch currencies
-    useEffect(() => {
-        dispatch(getallcurrencies());
-    }, [dispatch]);
-
-     useEffect(() => {
-        dispatch(GetLeads());
-        dispatch(GetDeals());
-      }, [dispatch]);
-
-
-
-    // Fetch milestones when product changes
-    // useEffect(() => {
-    //     dispatch(Getmins(id));
-    // }, [dispatch]);
-
-
-    // Handle product selection
-    const handleProductChange = (value) => {
-        setSelectedProduct(value);
-        setSelectedMilestone(null); // Reset milestone selection
-        setTableData([{  // Reset table data
-            id: Date.now(),
-            item: "",
-            quantity: 1,
-            price: "",
-            tax: 0,
-            amount: "0",
-            description: "",
-        }]);
-    };
-    // Handle milestone selection
-    const handleMilestoneChange = (value) => {
-        const selectedMile = milestones?.find(m => m.id === value);
-        setSelectedMilestone(value);
-
-        if (selectedMile) {
-            // Update table data with milestone information
-            setTableData([
-                {
-                    id: Date.now(),
-                    item: selectedMile.milestone_title,
-                    quantity: 1,
-                    price: selectedMile.milestone_cost,
-                    tax: 0,
-                    amount: selectedMile.milestone_cost.toString(),
-                    description: selectedMile.milestone_summary
-                }
-            ]);
-        }
-    };
-
-
-    const handleFinish = async (values) => {
-        dispatch(createProposal(values));
-        try {
-            setLoading(true);
-
-            const subTotal = calculateSubTotal();
-            const totalTax = calculateTotalTax();
-            // const discount = calculateDiscount();
-            // const totalAmount = calculateTotal();
-            const discount = (subTotal * discountRate) / 100; // Discount calculation
-            const totalAmount = subTotal - discount + totalTax; // Final total calculation
-
-            const proposalData = {
-                lead_title: values.lead_title,
-                deal_title: values.deal_title,
-                valid_till: values.valid_till.format('YYYY-MM-DD'),
-                currency: values.currency,
-                calculatedtax:values.calculatedtax,
-                items: tableData.map(item => ({
-                    
-                    quantity: parseFloat(item.quantity),
-                    price: parseFloat(item.price),
-                    tax: parseFloat(item.tax),
-                    amount: parseFloat(item.amount),
-                    description: item.description
-                })),
-                sub_total: subTotal.toFixed(2),
-                discount: discount.toFixed(2),
-                total_tax: totalTax.toFixed(2),
-                total: totalAmount.toFixed(2),
-                status: 'pending'
-            };
-
-            console.log('Proposal Data:', proposalData);
-
-            // Dispatch create proposal action
-             dispatch(createProposal(values))
-                            .then(() => {
-                              message.success("Proposal added successfully!");
-                              dispatch(getAllProposals());
-                              onClose();
-                            })
-                            .catch((error) => {
-                              message.error("Failed to add proposal. Please try again.");
-                              console.error("Error during proposal submission:", error);
-                            });
-
-            // Dispatch create invoice action
-            // const result = await dispatch(createInvoice({ id, invoiceData })).unwrap();
-
-            // if (result) {
-            //     message.success('Invoice created successfully');
-            //     form.resetFields();
-            //     onClose();
-            // }
-        } catch (error) {
-            message.error('Failed to create proposal: ' + error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const [rows, setRows] = useState([
+    if (selectedMile) {
+      // Update table data with milestone information
+      setTableData([
         {
-            id: Date.now(),
-            item: "",
-            quantity: "",
-            price: "",
-            discount: "",
-            tax: "",
-            amount: "0",
-            description: "",
-            isNew: false,
+          id: Date.now(),
+          item: selectedMile.milestone_title,
+          quantity: 1,
+          price: selectedMile.milestone_cost,
+          tax: 0,
+          amount: selectedMile.milestone_cost.toString(),
+          description: selectedMile.milestone_summary,
         },
-    ]);
+      ]);
+    }
+  };
 
-    // Function to handle adding a new row
-    const handleAddRow = () => {
-        setTableData([...tableData, { id: Date.now(), item: "", quantity: 1, price: 0, tax: "0", description: "", amount: 0 }]);
-    };
+  const handleFinish = async (values) => {
+    try {
+      setLoading(true);
 
-    // Delete row
-    const handleDeleteRow = (id) => {
-        if (rows.length > 1) {
-            setRows(rows.filter(row => row.id !== id));
-        } else {
-            message.warning('At least one item is required');
-        }
-    };
+      const subTotal = calculateSubTotal();
+      const totalTax = calculateTotalTax();
+      const discount = (subTotal * discountRate) / 100;
+      const totalAmount = subTotal - discount + totalTax;
 
-    const navigate = useNavigate();
+      // Restructured proposal data to match backend requirements
+      const proposalData = {
+        lead_title: values.lead_title,
+        deal_title: values.deal_title,
+        valid_till: values.valid_till.format("YYYY-MM-DD"),
+        currency: values.currency,
+        calculatedTax: totalTax, // Changed from calculatedtax to calculatedTax
+        description: "", // Add description field
+        items: tableData.map((item) => ({
+          item: item.item,
+          quantity: parseFloat(item.quantity),
+          price: parseFloat(item.price),
+          tax: parseFloat(item.tax),
+          amount: parseFloat(item.amount),
+          description: item.description,
+        })),
+        discount: parseFloat(discount.toFixed(2)),
+        tax: totalTax, // Added separate tax field
+        total: parseFloat(totalAmount.toFixed(2)),
+      };
 
+      console.log("Proposal Data:", proposalData);
 
-    // Calculate discount amount
-    const calculateDiscount = () => {
-        const subTotal = calculateSubTotal();
-        if (discountType === '%') {
-            return subTotal * (parseFloat(discountValue) || 0) / 100;
-        }
-        return parseFloat(discountValue) || 0;
-    };
-
-    // Calculate total tax
-    const calculateTotalTax = () => {
-        const subTotal = calculateSubTotal();
-        const discount = calculateDiscount();
-        const taxableAmount = form.getFieldValue('calctax') === 'before'
-            ? subTotal
-            : (subTotal - discount);
-
-        return tableData.reduce((sum, row) => {
-            const quantity = parseFloat(row.quantity) || 0;
-            const price = parseFloat(row.price) || 0;
-            const tax = parseFloat(row.tax) || 0;
-            const rowAmount = quantity * price;
-            return sum + (rowAmount * (tax / 100));
-        }, 0);
-    };
-
-    // Calculate subtotal (sum of all row amounts before discount)
-    const calculateSubTotal = () => {
-        return rows.reduce((sum, row) => {
-            const quantity = parseFloat(row.quantity || 0);
-            const price = parseFloat(row.price || 0);
-            return sum + (quantity * price);
-        }, 0);
-    };
-
-
-    const calculateTotal = (data, discountRate) => {
-        let subtotal = 0;
-        let totalTax = 0;
-
-        data.forEach((row) => {
-            const amount = row.quantity * row.price;
-            const taxAmount = (amount * row.tax) / 100;
-
-            row.amount = amount; // Update the row's amount
-            subtotal += amount;
-            totalTax += taxAmount;
+      // Dispatch create proposal action
+      dispatch(addpropos(proposalData))
+        .then(() => {
+          message.success("Proposal added successfully!");
+          dispatch(getpropos());
+          onClose();
+        })
+        .catch((error) => {
+          message.error("Failed to add proposal. Please try again.");
+          console.error("Error during proposal submission:", error);
         });
+    } catch (error) {
+      message.error("Failed to create proposal: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        const discount = (subtotal * discountRate) / 100;
-        const finalTotal = subtotal - discount + totalTax;
+  const [rows, setRows] = useState([
+    {
+      id: Date.now(),
+      item: "",
+      quantity: "",
+      price: "",
+      discount: "",
+      tax: "",
+      amount: "0",
+      description: "",
+      isNew: false,
+    },
+  ]);
 
-        setTotals({ subtotal, discount, totalTax, finalTotal });
-    };
+  // Function to handle adding a new row
+  const handleAddRow = () => {
+    setTableData([
+      ...tableData,
+      {
+        id: Date.now(),
+        item: "",
+        quantity: 1,
+        price: 0,
+        tax: "0",
+        description: "",
+        amount: 0,
+      },
+    ]);
+  };
 
-    const handleTableDataChange = (id, field, value) => {
-        const updatedData = tableData.map((row) =>
-            row.id === id ? { ...row, [field]: field === 'quantity' || field === 'price' || field === 'tax' ? parseFloat(value) || 0 : value } : row
-        );
+  // Delete row
+  const handleDeleteRow = (id) => {
+    if (rows.length > 1) {
+      setRows(rows.filter((row) => row.id !== id));
+    } else {
+      message.warning("At least one item is required");
+    }
+  };
 
-        setTableData(updatedData);
-        calculateTotal(updatedData, discountRate); // Recalculate totals
-    };
+  const navigate = useNavigate();
 
-    const initialValues = {
-        lead_title: null,
-        deal_title: null,
-        valid_till:'',
-        currency: '',
-        calculatedtax:  "",
-       
-    };
+  // Calculate discount amount
+  const calculateDiscount = () => {
+    const subTotal = calculateSubTotal();
+    if (discountType === "%") {
+      return (subTotal * (parseFloat(discountValue) || 0)) / 100;
+    }
+    return parseFloat(discountValue) || 0;
+  };
 
-    const validationSchema = Yup.object({
-        lead_title: Yup.date().nullable().required('Please select Lead Title .'),
-        deal_title: Yup.date().nullable().required('Please select Deal Title .'),
-        currency: Yup.string().required('Please select crrency.'),
-        valid_till: Yup.string().required('Date is require'),
-        calculatedtax: Yup.string().required('Please select calculatedtax.'),
+  // Calculate total tax
+  const calculateTotalTax = () => {
+    const subTotal = calculateSubTotal();
+    const discount = calculateDiscount();
+    const taxableAmount =
+      form.getFieldValue("calctax") === "before"
+        ? subTotal
+        : subTotal - discount;
+
+    return tableData.reduce((sum, row) => {
+      const quantity = parseFloat(row.quantity) || 0;
+      const price = parseFloat(row.price) || 0;
+      const tax = parseFloat(row.tax) || 0;
+      const rowAmount = quantity * price;
+      return sum + rowAmount * (tax / 100);
+    }, 0);
+  };
+
+  // Calculate subtotal (sum of all row amounts before discount)
+  const calculateSubTotal = () => {
+    return rows.reduce((sum, row) => {
+      const quantity = parseFloat(row.quantity || 0);
+      const price = parseFloat(row.price || 0);
+      return sum + quantity * price;
+    }, 0);
+  };
+
+  const calculateTotal = (data, discountRate) => {
+    let subtotal = 0;
+    let totalTax = 0;
+
+    data.forEach((row) => {
+      const amount = row.quantity * row.price;
+      const taxAmount = (amount * row.tax) / 100;
+
+      row.amount = amount; // Update the row's amount
+      subtotal += amount;
+      totalTax += taxAmount;
     });
 
+    const discount = (subtotal * discountRate) / 100;
+    const finalTotal = subtotal - discount + totalTax;
 
-    return (
-        <>
-            <div>
-                <div className=' ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4'>
-                    <h2 className="mb-4 border-b pb-[30px] font-medium"></h2>
-                    <Form
-                        form={form}
-                        layout="vertical"
-                        onFinish={handleFinish}
-                        validationSchema={validationSchema}
+    setTotals({ subtotal, discount, totalTax, finalTotal });
+  };
 
-                        initialValues={initialValues}
+  const handleTableDataChange = (id, field, value) => {
+    const updatedData = tableData.map((row) =>
+      row.id === id
+        ? {
+            ...row,
+            [field]:
+              field === "quantity" || field === "price" || field === "tax"
+                ? parseFloat(value) || 0
+                : value,
+          }
+        : row
+    );
 
-                    // initialValues={{
-                    //     loginEnabled: true,
-                    // }}
+    setTableData(updatedData);
+    calculateTotal(updatedData, discountRate); // Recalculate totals
+  };
+
+  const initialValues = {
+    lead_title: null,
+    deal_title: null,
+    valid_till: "",
+    currency: "",
+    calculatedTax: "",
+  };
+
+  const validationSchema = Yup.object({
+    lead_title: Yup.date().nullable().required("Please select Lead Title ."),
+    deal_title: Yup.date().nullable().required("Please select Deal Title ."),
+    currency: Yup.string().required("Please select crrency."),
+    valid_till: Yup.string().required("Date is require"),
+    calculatedTax: Yup.string().required("Please select calculatedtax."),
+  });
+
+  return (
+    <>
+      <div>
+        <div className=" ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4">
+          <h2 className="mb-4 border-b pb-[30px] font-medium"></h2>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={handleFinish}
+            validationSchema={validationSchema}
+            initialValues={initialValues}
+
+            // initialValues={{
+            //     loginEnabled: true,
+            // }}
+          >
+            {/* <Card className="border-0 mt-2"> */}
+            <div className="">
+              <div className=" p-2">
+                {/* <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} /> */}
+
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Form.Item
+                      name="lead_title"
+                      label="Lead Title"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please select a Lead Title",
+                        },
+                      ]} // Validation rule
                     >
-                        {/* <Card className="border-0 mt-2"> */}
-                        <div className="">
-                            <div className=" p-2">
-                             
+                      <Select placeholder="Select Lead Title">
+                        {/* Populate dropdown options from Leads */}
+                        {Array.isArray(Leads) && Leads.length > 0 ? (
+                          Leads.map((lead) => (
+                            <Option key={lead.id} value={lead.id}>
+                              {lead.leadTitle}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option disabled>No Leads Available</Option>
+                        )}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col span={12}>
+                    <Form.Item
+                      name="deal_title"
+                      label="Deal Title"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please select a Deal Title",
+                        },
+                      ]} // Validation rule
+                    >
+                      <Select placeholder="Select Deal Title">
+                        {/* Populate dropdown options from Deals */}
+                        {Array.isArray(Deals) && Deals.length > 0 ? (
+                          Deals.map((deal) => (
+                            <Option key={deal.id} value={deal.id}>
+                              {deal.dealTitle}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option disabled>No Deals Available</Option>
+                        )}
+                      </Select>
+                    </Form.Item>
+                  </Col>
 
-                                {/* <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} /> */}
+                  <Col span={12}>
+                    <Form.Item
+                      name="valid_till"
+                      label=" Date"
+                      rules={[
+                        { required: true, message: "Please select the Date" },
+                      ]}
+                    >
+                      <DatePicker className="w-full" format="DD-MM-YYYY" />
+                    </Form.Item>
+                  </Col>
 
-                                <Row gutter={16}>
+                  <Col span={12}>
+                    <Form.Item
+                      name="currency"
+                      label="Currency"
+                      rules={[
+                        { required: true, message: "Currency is required" },
+                      ]}
+                    >
+                      <Select placeholder="Select Currency ">
+                        <Option value="ABC">ABC</Option>
+                        <Option value="XYZ">XYZ</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
 
-                                <Col span={12}>
-          <Form.Item
-            name="lead_title"
-            label="Lead Title"
-            rules={[{ required: true, message: "Please select a Lead Title" }]} // Validation rule
-          >
-            <Select placeholder="Select Lead Title">
-              {/* Populate dropdown options from Leads */}
-              {Array.isArray(Leads) && Leads.length > 0 ? (
-                Leads.map((lead) => (
-                  <Option key={lead.id} value={lead.id}>
-                    {lead.leadTitle}
-                  </Option>
-                ))
-              ) : (
-                <Option disabled>No Leads Available</Option>
-              )}
-            </Select>
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item
-            name="deal_title"
-            label="Deal Title"
-            rules={[{ required: true, message: "Please select a Deal Title" }]} // Validation rule
-          >
-            <Select placeholder="Select Deal Title">
-              {/* Populate dropdown options from Deals */}
-              {Array.isArray(Deals) && Deals.length > 0 ? (
-                Deals.map((deal) => (
-                  <Option key={deal.id} value={deal.id}>
-                    {deal.dealTitle}
-                  </Option>
-                ))
-              ) : (
-                <Option disabled>No Deals Available</Option>
-              )}
-            </Select>
-          </Form.Item>
-        </Col>
+                  <Col span={12}>
+                    <Form.Item
+                      name="calculatedTax"
+                      label="Calculate Tax"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please select a tax calculation method",
+                        },
+                      ]}
+                    >
+                      <Select placeholder="Select Tax Calculation Method">
+                        <Option value="after">After Discount</Option>
+                        <Option value="before">Before Discount</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </div>
+            </div>
+            {/* </Card> */}
 
-                                    <Col span={12}>
-                                        <Form.Item
-                                            name="valid_till"
-                                            label=" Date"
-                                            rules={[{ required: true, message: "Please select the Date" }]}
-                                        >
-                                            <DatePicker className="w-full" format="DD-MM-YYYY" />
-                                        </Form.Item>
-                                    </Col>
-
-
-
-                                    <Col span={12}>
-                                        <Form.Item
-                                            name="currency"
-                                            label="Currency"
-                                            rules={[{ required: true, message: 'Currency is required' }]} >
-                                            <Select placeholder="Select Currency ">
-                                                <Option value="ABC">ABC</Option>
-                                                <Option value="XYZ">XYZ</Option>
-                                            </Select>
-                                        </Form.Item>
-                                    </Col>
-
-                                    <Col span={12}>
-                                        <Form.Item
-                                            name="calculatedtax"
-                                            label="Calculate Tax"
-                                            rules={[{ required: true, message: "Please select a tax calculation method" }]}
-                                        >
-                                            <Select placeholder="Select Tax Calculation Method">
-                                                <Option value="after">After Discount</Option>
-                                                <Option value="before">Before Discount</Option>
-                                            </Select>
-                                        </Form.Item>
-                                    </Col>
-                                </Row>
-
-                                
-                            </div>
-                        </div>
-                        {/* </Card> */}
-
-                        {/* <Card> */}
-                        <div className="form-buttons text-end mb-2">
-                                    <Button className='border-0 text-white bg-blue-500' onClick={handleAddRow}>
-                                        <PlusOutlined />  Add Items
-                                    </Button>
-                                </div>
-                        <div>
-                            <div className="overflow-x-auto">
-                                <Flex alignItems="center" mobileFlex={false} className='flex mb-4 gap-4'>
-                                    <Flex className="flex " mobileFlex={false}>
-                                        <div className="w-full flex gap-4">
-                                            <div>
-                                                {/* <Select
+            {/* <Card> */}
+            <div className="form-buttons text-end mb-2">
+              <Button
+                className="border-0 text-white bg-blue-500"
+                onClick={handleAddRow}
+              >
+                <PlusOutlined /> Add Items
+              </Button>
+            </div>
+            <div>
+              <div className="overflow-x-auto">
+                <Flex
+                  alignItems="center"
+                  mobileFlex={false}
+                  className="flex mb-4 gap-4"
+                >
+                  <Flex className="flex " mobileFlex={false}>
+                    <div className="w-full flex gap-4">
+                      <div>
+                        {/* <Select
                                                     value={selectedProduct}
                                                     onChange={handleProductChange}
                                                     className="w-full !rounded-none"
@@ -434,15 +479,13 @@ const AddProposal = ({ onClose }) => {
                                                     <Option value="electric_kettle">Electric Kettle</Option>
                                                     <Option value="headphones">Headphones</Option>
                                                 </Select> */}
-                                            </div>
-
-                                        </div>
-
-                                    </Flex>
-                                    <Flex gap="7px" className="flex">
-                                        <div className="w-full flex gap-4">
-                                            <div>
-                                                {/* <Select
+                      </div>
+                    </div>
+                  </Flex>
+                  <Flex gap="7px" className="flex">
+                    <div className="w-full flex gap-4">
+                      <div>
+                        {/* <Select
                                                     value={selectedMilestone}
                                                     onChange={handleMilestoneChange}
                                                     className="w-full !rounded-none"
@@ -456,172 +499,197 @@ const AddProposal = ({ onClose }) => {
                                                         </Option>
                                                     ))}
                                                 </Select> */}
-                                            </div>
-                                        </div>
-                                    </Flex>
-                                </Flex>
+                      </div>
+                    </div>
+                  </Flex>
+                </Flex>
 
-                                <table className="w-full border border-gray-200 bg-white">
-                                    <thead className="bg-gray-100">
-                                        <tr>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                                Items<span className="text-red-500">*</span>
-                                            </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                                Quantity<span className="text-red-500">*</span>
-                                            </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                                Unit Price <span className="text-red-500">*</span>
-                                            </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                                TAX (%)
-                                            </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                                Amount<span className="text-red-500">*</span>
-                                            </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                                Action<span className="text-red-500">*</span>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {tableData.map((row) => (
-                                            <React.Fragment key={row.id}>
-                                                <tr>
-                                                    <td className="px-4 py-2 border-b">
-                                                    <Select placeholder="Select Item">
-                                                <Option value="item1">Item1</Option>
-                                                <Option value="item2">Item2</Option>
-                                            </Select>
-                                                    </td>
-                                                    <td className="px-4 py-2 border-b">
-                                                        <input
-                                                            type="number"
-                                                            value={row.quantity}
-                                                            onChange={(e) => handleTableDataChange(row.id, 'quantity', e.target.value)}
-                                                            placeholder="Qty"
-                                                            className="w-full p-2 border rounded"
-                                                        />
-                                                    </td>
-                                                    <td className="px-4 py-2 border-b">
-                                                        <input
-                                                            type="number"
-                                                            value={row.price}
-                                                            onChange={(e) => handleTableDataChange(row.id, 'price', e.target.value)}
-                                                            placeholder="Price"
-                                                            className="w-full p-2 border rounded-s"
-                                                        />
-                                                    </td>
-                                                    <td className="px-4 py-2 border-b">
-                                                        <select
-                                                            value={row.tax}
-                                                            onChange={(e) => handleTableDataChange(row.id, 'tax', e.target.value)}
-                                                            className="w-full p-2 border"
-                                                        >
-                                                            <option value="0">Nothing Selected</option>
-                                                            <option value="10">GST:10%</option>
-                                                            <option value="18">CGST:18%</option>
-                                                            <option value="10">VAT:10%</option>
-                                                            <option value="10">IGST:10%</option>
-                                                            <option value="10">UTGST:10%</option>
-                                                        </select>
-                                                        <input
-                                                            type="number"
-                                                            value={row.tax}
-                                                            onChange={(e) => handleTableDataChange(row.id, 'tax', e.target.value)}
-                                                            placeholder="tax"
-                                                            className="w-full p-2 border rounded-s"
-                                                        />
-                                                    </td>
-                                                    <td className="px-4 py-2 border-b">
-                                                        <span>{row.amount}</span>
-                                                    </td>
-                                                    <td className="px-2 py-1 border-b text-center">
-                                                        <Button
-                                                            danger
-                                                            onClick={() => handleDeleteRow(row.id)}
-                                                        >
-                                                            <DeleteOutlined />
-                                                        </Button> 
-                                                    </td>
-                                                </tr>
-                                            </React.Fragment>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            
+                <table className="w-full border border-gray-200 bg-white">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Items<span className="text-red-500">*</span>
+                      </th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Quantity<span className="text-red-500">*</span>
+                      </th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Unit Price <span className="text-red-500">*</span>
+                      </th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        TAX (%)
+                      </th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Amount<span className="text-red-500">*</span>
+                      </th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Action<span className="text-red-500">*</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tableData.map((row) => (
+                      <React.Fragment key={row.id}>
+                        <tr>
+                          <td className="px-4 py-2 border-b">
+                            <Select placeholder="Select Item">
+                              <Option value="item1">Item1</Option>
+                              <Option value="item2">Item2</Option>
+                            </Select>
+                          </td>
+                          <td className="px-4 py-2 border-b">
+                            <input
+                              type="number"
+                              value={row.quantity}
+                              onChange={(e) =>
+                                handleTableDataChange(
+                                  row.id,
+                                  "quantity",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Qty"
+                              className="w-full p-2 border rounded"
+                            />
+                          </td>
+                          <td className="px-4 py-2 border-b">
+                            <input
+                              type="number"
+                              value={row.price}
+                              onChange={(e) =>
+                                handleTableDataChange(
+                                  row.id,
+                                  "price",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Price"
+                              className="w-full p-2 border rounded-s"
+                            />
+                          </td>
+                          <td className="px-4 py-2 border-b">
+                            <select
+                              value={row.tax}
+                              onChange={(e) =>
+                                handleTableDataChange(
+                                  row.id,
+                                  "tax",
+                                  e.target.value
+                                )
+                              }
+                              className="w-full p-2 border"
+                            >
+                              <option value="0">Nothing Selected</option>
+                              <option value="10">GST:10%</option>
+                              <option value="18">CGST:18%</option>
+                              <option value="10">VAT:10%</option>
+                              <option value="10">IGST:10%</option>
+                              <option value="10">UTGST:10%</option>
+                            </select>
+                            <input
+                              type="number"
+                              value={row.tax}
+                              onChange={(e) =>
+                                handleTableDataChange(
+                                  row.id,
+                                  "tax",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="tax"
+                              className="w-full p-2 border rounded-s"
+                            />
+                          </td>
+                          <td className="px-4 py-2 border-b">
+                            <span>{row.amount}</span>
+                          </td>
+                          <td className="px-2 py-1 border-b text-center">
+                            <Button
+                              danger
+                              onClick={() => handleDeleteRow(row.id)}
+                            >
+                              <DeleteOutlined />
+                            </Button>
+                          </td>
+                        </tr>
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-                            {/* Summary Section */}
-                            <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
-                                <table className='w-full lg:w-[50%] p-2'>
-                                    {/* Sub Total */}
-                                    <tr className="flex justify-between px-2 py-2 border-x-2">
-                                        <td className="font-medium">Sub Total</td>
-                                        <td className="font-medium px-4 py-2">
-                                            ₹{totals.subtotal.toFixed(2)}
-                                        </td>
-                                    </tr>
+              {/* Summary Section */}
+              <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
+                <table className="w-full lg:w-[50%] p-2">
+                  {/* Sub Total */}
+                  <tr className="flex justify-between px-2 py-2 border-x-2">
+                    <td className="font-medium">Sub Total</td>
+                    <td className="font-medium px-4 py-2">
+                      ₹{totals.subtotal.toFixed(2)}
+                    </td>
+                  </tr>
 
-                                    {/* Discount */}
-                                    <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
-                                        <td className="font-medium">Discount</td>
-                                        <td className='flex items-center space-x-2'>
-                                            <div className="mb-4">
-                                                <label className="block text-sm font-medium text-gray-700">
-                                                    Discount Rate (%)
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    value={discountRate}
-                                                    onChange={(e) => {
-                                                        setDiscountRate(parseFloat(e.target.value) || 0);
-                                                        calculateTotal(tableData, parseFloat(e.target.value) || 0); // Recalculate with new discount rate
-                                                    }}
-                                                    className="mt-1 block w-full p-2 border rounded"
-                                                />
-                                            </div>
-                                        </td>
-                                    </tr>
+                  {/* Discount */}
+                  <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
+                    <td className="font-medium">Discount</td>
+                    <td className="flex items-center space-x-2">
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700">
+                          Discount Rate (%)
+                        </label>
+                        <input
+                          type="number"
+                          value={discountRate}
+                          onChange={(e) => {
+                            setDiscountRate(parseFloat(e.target.value) || 0);
+                            calculateTotal(
+                              tableData,
+                              parseFloat(e.target.value) || 0
+                            ); // Recalculate with new discount rate
+                          }}
+                          className="mt-1 block w-full p-2 border rounded"
+                        />
+                      </div>
+                    </td>
+                  </tr>
 
-                                    {/* Tax */}
-                                    <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
-                                        <td className="font-medium">Total Tax</td>
-                                        <td className="font-medium px-4 py-2">
-                                            ₹{totals.totalTax.toFixed(2)}
-                                        </td>
-                                    </tr>
+                  {/* Tax */}
+                  <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
+                    <td className="font-medium">Total Tax</td>
+                    <td className="font-medium px-4 py-2">
+                      ₹{totals.totalTax.toFixed(2)}
+                    </td>
+                  </tr>
 
-                                    {/* Total */}
-                                    <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
-                                        <td className="font-bold text-lg">Total Amount</td>
-                                        <td className="font-bold text-lg px-4">
-                                            ₹{totals.finalTotal.toFixed(2)}
-                                        </td>
-                                    </tr>
+                  {/* Total */}
+                  <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
+                    <td className="font-bold text-lg">Total Amount</td>
+                    <td className="font-bold text-lg px-4">
+                      ₹{totals.finalTotal.toFixed(2)}
+                    </td>
+                  </tr>
 
-                                    {/* Terms and Conditions */}
-                                </table>
-                            </div>
-                          
-                        </div>
-
-                        <Form.Item className='mt-3'>
-                            <Row justify="end" gutter={16}>
-                                <Col>
-                                    <Button onClick={onClose}>Cancel</Button>
-                                </Col>
-                                <Col>
-                                    <Button type="primary" htmlType="submit">
-                                        Create
-                                    </Button>
-                                </Col>
-                            </Row>
-                        </Form.Item>
-                    </Form>
-                </div>
+                  {/* Terms and Conditions */}
+                </table>
+              </div>
             </div>
-            {/* <Modal
+
+            <Form.Item className="mt-3">
+              <Row justify="end" gutter={16}>
+                <Col>
+                  <Button onClick={onClose}>Cancel</Button>
+                </Col>
+                <Col>
+                  <Button type="primary" htmlType="submit">
+                    Create
+                  </Button>
+                </Col>
+              </Row>
+            </Form.Item>
+          </Form>
+        </div>
+      </div>
+      {/* <Modal
                 title="Product Create"
                 visible={isAddProductModalVisible}
                 onCancel={closeAddProductModal}
@@ -631,8 +699,8 @@ const AddProposal = ({ onClose }) => {
             >
                 <AddProduct onClose={closeAddProductModal} />
             </Modal> */}
-        </>
-    );
+    </>
+  );
 };
 
 export default AddProposal;

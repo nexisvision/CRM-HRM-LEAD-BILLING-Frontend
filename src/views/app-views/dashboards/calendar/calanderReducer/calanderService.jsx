@@ -7,10 +7,10 @@ import axios from "axios";
 //     return res
 // };
 
-const getpropo = async () => {
+const getcalend = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/proposals/", {
+    const res = await axios.get("http://localhost:5353/api/v1/calendar/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -22,12 +22,12 @@ const getpropo = async () => {
   }
 };
 
-const addpropo = async (payload) => {
+const addcalend = async (payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/proposals/",
+      "http://localhost:5353/api/v1/calendar/",
       payload,
       {
         headers: {
@@ -43,12 +43,12 @@ const addpropo = async (payload) => {
   }
 };
 
-const delpropo = async (id) => {
+const dellcalend = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/proposals/${id}`,
+      `http://localhost:5353/api/v1/calendar/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -63,12 +63,12 @@ const delpropo = async (id) => {
   }
 };
 
-const editpropo = async (idd, values) => {
+const editcalend = async (idd, payload) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/proposals/${idd}`,
-      values,
+      `http://localhost:5353/api/v1/calendar/${idd}`,
+      payload,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -104,10 +104,10 @@ const editpropo = async (idd, values) => {
 
 const UserService = {
   // addUser,
-  getpropo,
-  addpropo,
-  delpropo,
-  editpropo,
+  getcalend,
+  addcalend,
+  dellcalend,
+  editcalend,
   // getAllUsers,
   // getUserById,
   // deleteUser,

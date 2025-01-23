@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AddDeals, GetDeals } from "./DealReducers/DealSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { getallcurrencies } from "../../setting/currencies/currenciesreducer/currenciesSlice";
-import { GetPip } from "../../dashboards/systemsetup/Pipeline/PiplineReducer/piplineSlice"
+import { GetPip } from "../../dashboards/systemsetup/Pipeline/PiplineReducer/piplineSlice";
 import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { GetLeads } from "../leads/LeadReducers/LeadSlice";
 import { GetProject } from "../project/project-list/projectReducer/ProjectSlice";
@@ -18,8 +18,12 @@ const AddDeal = ({ onClose }) => {
   const dispatch = useDispatch();
   const tabledata = useSelector((state) => state?.SubClient);
   const { currencies } = useSelector((state) => state.currencies);
-  const { data: Piplines, isLoading } = useSelector((state) => state.Piplines.Piplines);
-  const { data: StagesLeadsDeals } = useSelector((state) => state.StagesLeadsDeals.StagesLeadsDeals);
+  const { data: Piplines, isLoading } = useSelector(
+    (state) => state.Piplines.Piplines
+  );
+  const { data: StagesLeadsDeals } = useSelector(
+    (state) => state.StagesLeadsDeals.StagesLeadsDeals
+  );
   const { data: Leads } = useSelector((state) => state.Leads.Leads);
   const { data: Project } = useSelector((state) => state.Project.Project);
   const clientdata = tabledata?.SubClient?.data;
@@ -45,7 +49,7 @@ const AddDeal = ({ onClose }) => {
     pipeline: Yup.string().required("Please select a Pipeline."),
     stage: Yup.string().required("Please select a Stage."),
     closedDate: Yup.date().required("Please select a Closed Date."),
-    project: Yup.string().required("Please select a Project."),
+    project: Yup.string().optional("Please select a Project."),
   });
   const onSubmit = (values, { resetForm }) => {
     dispatch(AddDeals(values))
@@ -98,10 +102,7 @@ const AddDeal = ({ onClose }) => {
                 onChange={(value) => form.setFieldValue("currencyId", value)}
               >
                 {currencies?.map((currency) => (
-                  <Option
-                    key={currency.id}
-                    value={currency.id}
-                  >
+                  <Option key={currency.id} value={currency.id}>
                     {currency.currencyCode} ({currency.currencyIcon})
                   </Option>
                 ))}
@@ -177,42 +178,42 @@ const AddDeal = ({ onClose }) => {
                   />
                 </div>
               </Col>
-               <Col span={12} className="mt-4">
-                                  <div className="form-item">
-                                    <label className="font-semibold mb-2">Currency</label>
-                                    <div className="flex gap-2">
-                                      <Field name="currency">
-                                        {({ field, form }) => (
-                                          <Select
-                                            {...field}
-                                            className="w-full mt-2"
-                                            placeholder="Select Currency"
-                                            onChange={(value) => {
-                                              const selectedCurrency = currencies.find(
-                                                (c) => c.id === value
-                                              );
-                                              form.setFieldValue(
-                                                "currency",
-                                                selectedCurrency?.currencyCode || ""
-                                              );
-                                            }}
-                                          >
-                                            {currencies?.map((currency) => (
-                                              <Option key={currency.id} value={currency.id}>
-                                                {currency.currencyCode}
-                                              </Option>
-                                            ))}
-                                          </Select>
-                                        )}
-                                      </Field>
-                                    </div>
-                                    <ErrorMessage
-                                      name="currency"
-                                      component="div"
-                                      className="error-message text-red-500 my-1"
-                                    />
-                                  </div>
-                                </Col>
+              <Col span={12} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold mb-2">Currency</label>
+                  <div className="flex gap-2">
+                    <Field name="currency">
+                      {({ field, form }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-2"
+                          placeholder="Select Currency"
+                          onChange={(value) => {
+                            const selectedCurrency = currencies.find(
+                              (c) => c.id === value
+                            );
+                            form.setFieldValue(
+                              "currency",
+                              selectedCurrency?.currencyCode || ""
+                            );
+                          }}
+                        >
+                          {currencies?.map((currency) => (
+                            <Option key={currency.id} value={currency.id}>
+                              {currency.currencyCode}
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
+                  </div>
+                  <ErrorMessage
+                    name="currency"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Lead Title</label>
@@ -226,16 +227,22 @@ const AddDeal = ({ onClose }) => {
                           value={field.value || ""} // Ensure the select value is controlled by Formik
                           onChange={(value) => {
                             // Find the selected lead from the Leads array
-                            const selectedLead = Array.isArray(Leads) && Leads.find((e) => e.id === value);
+                            const selectedLead =
+                              Array.isArray(Leads) &&
+                              Leads.find((e) => e.id === value);
                             // Update Formik's field value with the selected lead's title
-                            form.setFieldValue("leadTitle", selectedLead?.leadTitle || "");
+                            form.setFieldValue(
+                              "leadTitle",
+                              selectedLead?.leadTitle || ""
+                            );
                           }}
                         >
-                          {Array.isArray(Leads) && Leads.map((lead) => (
-                            <Option key={lead.id} value={lead.id}>
-                              {lead.leadTitle}
-                            </Option>
-                          ))}
+                          {Array.isArray(Leads) &&
+                            Leads.map((lead) => (
+                              <Option key={lead.id} value={lead.id}>
+                                {lead.leadTitle}
+                              </Option>
+                            ))}
                         </Select>
                       )}
                     </Field>
@@ -247,7 +254,6 @@ const AddDeal = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              
 
               <Col span={12} className="">
                 <div className="form-item">
@@ -303,7 +309,10 @@ const AddDeal = ({ onClose }) => {
                               Array.isArray(StagesLeadsDeals) &&
                               StagesLeadsDeals.find((e) => e.id === value);
                             // Update the form with the selected stage id
-                            form.setFieldValue("stage", selectedStage?.id || "");
+                            form.setFieldValue(
+                              "stage",
+                              selectedStage?.id || ""
+                            );
                           }}
                         >
                           {Array.isArray(StagesLeadsDeals) &&
@@ -343,7 +352,7 @@ const AddDeal = ({ onClose }) => {
                   />
                 </div>
               </Col>
-            
+
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Project</label>
@@ -397,15 +406,6 @@ const AddDeal = ({ onClose }) => {
   );
 };
 export default AddDeal;
-
-
-
-
-
-
-
-
-
 
 // import React, { useEffect } from "react";
 // import { Input, Button, Select, DatePicker, message, Row, Col } from "antd";
@@ -686,14 +686,6 @@ export default AddDeal;
 // };
 
 // export default AddDeal;
-
-
-
-
-
-
-
-
 
 // import React, { useEffect, useState } from "react";
 // import { Input, Button, DatePicker, Select, message, Row, Col } from "antd";

@@ -32,12 +32,11 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import AddProposal from "./AddProposal";
 import EditProposal from "./EditProposal";
-
-
+import { delpropos, getpropos } from "./proposalReducers/proposalSlice";
 
 const { Option } = Select;
 
-const  ProposalList = () => {
+const ProposalList = () => {
   const [users, setUsers] = useState(userData);
   const dispatch = useDispatch();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
@@ -49,10 +48,21 @@ const  ProposalList = () => {
     useState(false);
   const [isEditProposalModalVisible, setIsEditProposalModalVisible] =
     useState(false);
-//   const [isViewTrainingSetupModalVisible, setIsViewTrainingSetupModalVisible] =
-//     useState(false);
+  //   const [isViewTrainingSetupModalVisible, setIsViewTrainingSetupModalVisible] =
+  //     useState(false);
 
   const [idd, setIdd] = useState("");
+
+  useEffect(() => {
+    dispatch(getpropos());
+  }, [dispatch]);
+
+  const allproposal = useSelector((state) => state?.proposal);
+  const fnddatas = allproposal?.proposal?.data;
+
+  useEffect(() => {
+    setUsers(fnddatas);
+  }, [fnddatas]);
 
   const allempdata = useSelector((state) => state.Training);
   const fnddata = allempdata.Training.data;
@@ -73,13 +83,13 @@ const  ProposalList = () => {
     setIsEditProposalModalVisible(false);
   };
 
-//   const openviewTrainingSetupModal = () => {
-//     setIsViewTrainingSetupModalVisible(true);
-//   };
+  //   const openviewTrainingSetupModal = () => {
+  //     setIsViewTrainingSetupModalVisible(true);
+  //   };
 
-//   const closeViewTrainingSetupModal = () => {
-//     setIsViewTrainingSetupModalVisible(false);
-//   };
+  //   const closeViewTrainingSetupModal = () => {
+  //     setIsViewTrainingSetupModalVisible(false);
+  //   };
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
@@ -89,12 +99,13 @@ const  ProposalList = () => {
     setSelectedRowKeys([]);
   };
 
-//   const deleteUser = (userId) => {
-//     dispatch(Deletetrainng(userId));
-//     dispatch(GetallTrainng());
-//     setUsers(users.filter((item) => item.id !== userId));
-//     message.success({ content: `Deleted user ${userId}`, duration: 2 });
-//   };
+  const deleteUser = (userId) => {
+    dispatch(delpropos(userId)).then(() => {
+      dispatch(getpropos());
+      setUsers(users.filter((item) => item.id !== userId));
+      message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    });
+  };
 
   const showUserProfile = (userInfo) => {
     setUserProfileVisible(true);
@@ -106,9 +117,9 @@ const  ProposalList = () => {
     setSelectedUser(null);
   };
 
-//   useEffect(() => {
-//     dispatch(GetallTrainng());
-//   }, []);
+  //   useEffect(() => {
+  //     dispatch(GetallTrainng());
+  //   }, []);
 
   useEffect(() => {
     if (fnddata) {
@@ -150,10 +161,10 @@ const  ProposalList = () => {
     openEditProposalModal();
     setIdd(idd);
   };
-//   const viewfun = (idd) => {
-//     openviewTrainingSetupModal();
-//     setIdd(idd);
-//   };
+  //   const viewfun = (idd) => {
+  //     openviewTrainingSetupModal();
+  //     setIdd(idd);
+  //   };
 
   const jobStatusList = ["active", "blocked"];
 
@@ -191,7 +202,7 @@ const  ProposalList = () => {
             type=""
             className=""
             icon={<DeleteOutlined />}
-            // onClick={() => deleteUser(elm.id)}
+            onClick={() => deleteUser(elm.id)}
             size="small"
           >
             <span>Delete</span>
@@ -203,46 +214,41 @@ const  ProposalList = () => {
 
   const tableColumns = [
     {
-      title: "Lead Title",
-      dataIndex: "leadtitle",
-      sorter: (a, b) => a.leadtitle.length - b.leadtitle.length,
+      title: "calculatedTax",
+      dataIndex: "calculatedTax",
+      sorter: (a, b) => a.calculatedTax.length - b.calculatedTax.length,
     },
     {
-        title: "Deal Title",
-        dataIndex: "dealtitle",
-        sorter: (a, b) => a.dealtitle.length - b.dealtitle.length,
-      },
-      {
-        title: "Calculated Tax",
-        dataIndex: "calculatedtax",
-        sorter: (a, b) => a.calculatedtax.length - b.calculatedtax.length,
-      },
-      {
-        title: "Description",
-        dataIndex: "description",
-        sorter: (a, b) => a.description.length - b.description.length,
-      },
-      {
-        title: "Description",
-        dataIndex: "description",
-        sorter: (a, b) => a.description.length - b.description.length,
-      },
-      {
-        title: "Discount",
-        dataIndex: "discount",
-        sorter: (a, b) => a.discount.length - b.discount.length,
-      },
-      {
-        title: "Tax",
-        dataIndex: "tax",
-        sorter: (a, b) => a.tax.length - b.tax.length,
-      },
-      {
-        title: "Total",
-        dataIndex: "total",
-        sorter: (a, b) => a.total.length - b.total.length,
-      },
-   
+      title: "created_by ",
+      dataIndex: "created_by",
+      sorter: (a, b) => a.created_by.length - b.created_by.length,
+    },
+    {
+      title: "description",
+      dataIndex: "description",
+      sorter: (a, b) => a.description.length - b.description.length,
+    },
+    {
+      title: "discount",
+      dataIndex: "discount",
+      sorter: (a, b) => a.discount.length - b.discount.length,
+    },
+    {
+      title: "tax",
+      dataIndex: "tax",
+      sorter: (a, b) => a.tax.length - b.tax.length,
+    },
+    {
+      title: "total",
+      dataIndex: "total",
+      sorter: (a, b) => a.total.length - b.total.length,
+    },
+    {
+      title: "valid_till",
+      dataIndex: "valid_till",
+      sorter: (a, b) => a.valid_till.length - b.valid_till.length,
+    },
+
     {
       title: "Action",
       dataIndex: "actions",
@@ -324,7 +330,7 @@ const  ProposalList = () => {
         className="mt-[-70px]"
       >
         <EditProposal onClose={closeEditProposalModal} idd={idd} />
-      </Modal> 
+      </Modal>
 
       {/* <Modal
         title="Edit Training Setup"

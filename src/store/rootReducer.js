@@ -58,6 +58,10 @@ import overtime from "../views/app-views/hrm/PayRoll/Salary/Overtime/overtimeRed
 import salesbilling from "../views/app-views/dashboards/sales/billing/billingReducers/billingSlice"
 import indicator from "../views/app-views/hrm/Performance/Indicator/IndicatorReducers/indicatorSlice"
 import appraisal from "../views/app-views/hrm/Performance/Appraisal/AppraisalReducers/AppraisalSlice"
+import Documents from "../views/app-views/hrm/document/DocumentReducers/documentSlice"
+import proposal from "../views/app-views/dashboards/proposal/proposalReducers/proposalSlice"
+import inquiry from "../views/app-views/inquiry/inquiryReducer/inquirySlice"
+import calendar from "../views/app-views/dashboards/calendar/calanderReducer/calanderSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -120,6 +124,10 @@ const rootReducer = (asyncReducers) => (state, action) => {
         salesbilling,
         indicator,
         appraisal,
+        Documents,
+        proposal,
+        inquiry,
+        calendar,
         // employee,
         // department,
         ...asyncReducers,

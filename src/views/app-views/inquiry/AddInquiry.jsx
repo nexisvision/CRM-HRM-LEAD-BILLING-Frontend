@@ -1,14 +1,9 @@
 import React, { useEffect } from "react";
-import {
-  Input,
-  Button,
-  Row,
-  Col,
-  message,
-} from "antd";
+import { Input, Button, Row, Col, message } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
+import { addinqu, getinqu } from "./inquiryReducer/inquirySlice";
 
 const AddInquiry = ({ onClose }) => {
   const dispatch = useDispatch();
@@ -26,7 +21,9 @@ const AddInquiry = ({ onClose }) => {
 
   const validationSchema = Yup.object({
     name: Yup.string().required("Please enter a Name."),
-    email: Yup.string().email("Invalid email address").required("Please enter an Email."),
+    email: Yup.string()
+      .email("Invalid email address")
+      .required("Please enter an Email."),
     phone: Yup.string().required("Please enter a Phone number."),
     subject: Yup.string().required("Please enter a Subject."),
     message: Yup.string().required("Please enter a Message."),
@@ -34,10 +31,12 @@ const AddInquiry = ({ onClose }) => {
 
   // onSubmit function
   const onSubmit = (values, { resetForm }) => {
-    console.log(values);
-    message.success("Inquiry submitted successfully!");
-    resetForm();
-    onClose();
+    dispatch(addinqu(values)).then(() => {
+      dispatch(getinqu());
+      message.success("Inquiry submitted successfully!");
+      resetForm();
+      onClose();
+    });
   };
 
   return (
@@ -62,7 +61,12 @@ const AddInquiry = ({ onClose }) => {
               <Col span={12} className="mb-4">
                 <div>
                   <label>Name</label>
-                  <Field name="name" as={Input} placeholder="Enter Name" className="mt-2" />
+                  <Field
+                    name="name"
+                    as={Input}
+                    placeholder="Enter Name"
+                    className="mt-2"
+                  />
                   <ErrorMessage
                     name="name"
                     component="div"
@@ -74,7 +78,12 @@ const AddInquiry = ({ onClose }) => {
               <Col span={12}>
                 <div className="form-item">
                   <label>Email</label>
-                  <Field name="email" as={Input} placeholder="Enter Email" className="mt-2" />
+                  <Field
+                    name="email"
+                    as={Input}
+                    placeholder="Enter Email"
+                    className="mt-2"
+                  />
                   <ErrorMessage
                     name="email"
                     component="div"
@@ -86,7 +95,13 @@ const AddInquiry = ({ onClose }) => {
               <Col span={12}>
                 <div className="form-item mt-2">
                   <label>Phone</label>
-                  <Field name="phone" as={Input} placeholder="Enter Phone" type="number" className="mt-2" />
+                  <Field
+                    name="phone"
+                    as={Input}
+                    placeholder="Enter Phone"
+                    type="number"
+                    className="mt-2"
+                  />
                   <ErrorMessage
                     name="phone"
                     component="div"
@@ -98,7 +113,11 @@ const AddInquiry = ({ onClose }) => {
               <Col span={12}>
                 <div className="w-full">
                   <label className="block p-2">Subject</label>
-                  <Field name="subject" as={Input} placeholder="Enter Subject" />
+                  <Field
+                    name="subject"
+                    as={Input}
+                    placeholder="Enter Subject"
+                  />
                   <ErrorMessage
                     name="subject"
                     component="div"
@@ -110,7 +129,11 @@ const AddInquiry = ({ onClose }) => {
               <Col span={24}>
                 <div className="mt-4 w-full">
                   <label className="block p-2">Message</label>
-                  <Field name="message" as={Input.TextArea} placeholder="Enter Message" />
+                  <Field
+                    name="message"
+                    as={Input.TextArea}
+                    placeholder="Enter Message"
+                  />
                   <ErrorMessage
                     name="message"
                     component="div"

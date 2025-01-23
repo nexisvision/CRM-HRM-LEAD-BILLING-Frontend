@@ -1,32 +1,46 @@
-import React, { useEffect } from "react";
-import {
-  Input,
-  Button,
-  Row,
-  Col,
-  message,
-} from "antd";
+import React, { useEffect, useState } from "react";
+import { Input, Button, Row, Col, message } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
+import { editinqu, getinqu } from "./inquiryReducer/inquirySlice";
 
-const EditInquiry = ({ onClose }) => {
+const EditInquiry = ({ idd, onClose }) => {
   const dispatch = useDispatch();
 
-  const allbranch = useSelector((state) => state.Branch);
-  const fndbranch = allbranch.Branch.data;
+  useEffect(() => {
+    dispatch(getinqu());
+  }, []);
 
-  const initialValues = {
+  const allbranch = useSelector((state) => state.inquiry);
+  const fndbranch = allbranch.inquiry.data;
+
+  useEffect(() => {
+    if (fndbranch) {
+      const ffd = fndbranch.find((item) => item.id === idd);
+      setInitialValues({
+        name: ffd.name,
+        email: ffd.email,
+        phone: ffd.phone,
+        subject: ffd.subject,
+        message: ffd.message,
+      });
+    }
+  }, [fndbranch]);
+
+  const [initialValues, setInitialValues] = useState({
     name: "",
     email: "",
     phone: "",
     subject: "",
     message: "",
-  };
+  });
 
   const validationSchema = Yup.object({
     name: Yup.string().required("Please enter a Name."),
-    email: Yup.string().email("Invalid email address").required("Please enter an Email."),
+    email: Yup.string()
+      .email("Invalid email address")
+      .required("Please enter an Email."),
     phone: Yup.string().required("Please enter a Phone number."),
     subject: Yup.string().required("Please enter a Subject."),
     message: Yup.string().required("Please enter a Message."),
@@ -34,20 +48,12 @@ const EditInquiry = ({ onClose }) => {
 
   // onSubmit function
   const onSubmit = (values, { resetForm }) => {
-    // Example: Log the values (or replace this with an API call)
-    console.log(values);
-
-    // Here you would typically dispatch an action or make an API request
-    // Example: dispatch(addInquiry(values));
-
-    // Show success message
-    message.success("Inquiry submitted successfully!");
-
-    // Reset form after submission
-    resetForm();
-    
-    // Optionally close the form/modal
-    onClose();
+    dispatch(editinqu({ idd, values })).then(() => {
+      dispatch(getinqu());
+      message.success("Inquiry submitted successfully");
+      onClose();
+      resetForm();
+    });
   };
 
   return (
@@ -58,6 +64,7 @@ const EditInquiry = ({ onClose }) => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
+        enableReinitialize
       >
         {({ values, handleSubmit }) => (
           <Form
@@ -72,7 +79,12 @@ const EditInquiry = ({ onClose }) => {
               <Col span={12} className="mb-4">
                 <div>
                   <label>Name</label>
-                  <Field name="name" as={Input} placeholder="Enter Name" className="mt-2" />
+                  <Field
+                    name="name"
+                    as={Input}
+                    placeholder="Enter Name"
+                    className="mt-2"
+                  />
                   <ErrorMessage
                     name="name"
                     component="div"
@@ -84,7 +96,12 @@ const EditInquiry = ({ onClose }) => {
               <Col span={12}>
                 <div className="form-item">
                   <label>Email</label>
-                  <Field name="email" as={Input} placeholder="Enter Email" className="mt-2" />
+                  <Field
+                    name="email"
+                    as={Input}
+                    placeholder="Enter Email"
+                    className="mt-2"
+                  />
                   <ErrorMessage
                     name="email"
                     component="div"
@@ -96,7 +113,13 @@ const EditInquiry = ({ onClose }) => {
               <Col span={12}>
                 <div className="form-item mt-2">
                   <label>Phone</label>
-                  <Field name="phone" as={Input} placeholder="Enter Phone" type="number" className="mt-2" />
+                  <Field
+                    name="phone"
+                    as={Input}
+                    placeholder="Enter Phone"
+                    type="number"
+                    className="mt-2"
+                  />
                   <ErrorMessage
                     name="phone"
                     component="div"
@@ -108,7 +131,11 @@ const EditInquiry = ({ onClose }) => {
               <Col span={12}>
                 <div className="w-full">
                   <label className="block p-2">Subject</label>
-                  <Field name="subject" as={Input} placeholder="Enter Subject" />
+                  <Field
+                    name="subject"
+                    as={Input}
+                    placeholder="Enter Subject"
+                  />
                   <ErrorMessage
                     name="subject"
                     component="div"
@@ -120,7 +147,11 @@ const EditInquiry = ({ onClose }) => {
               <Col span={24}>
                 <div className="mt-4 w-full">
                   <label className="block p-2">Message</label>
-                  <Field name="message" as={Input.TextArea} placeholder="Enter Message" />
+                  <Field
+                    name="message"
+                    as={Input.TextArea}
+                    placeholder="Enter Message"
+                  />
                   <ErrorMessage
                     name="message"
                     component="div"

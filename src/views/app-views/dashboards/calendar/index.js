@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Badge, Card, Row, Col, Modal, Form, Input, Select, TimePicker, Button, Tooltip } from 'antd';
+import { Calendar, Badge, Card, Row, Col, Modal, Form, Input, Select, TimePicker, Button, Tooltip, DatePicker, message } from 'antd';
 import CalendarData from './CalendarData';
 import dayjs from 'dayjs';
-import { CalendarOutlined, DeleteOutlined } from '@ant-design/icons';
+import { CalendarOutlined, DeleteOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { useDispatch, useSelector } from 'react-redux';
+import { addcalends, getcalends, deletecalends } from './calanderReducer/calanderSlice';
+import moment from 'moment';
 
 const { Option } = Select;
 
@@ -31,37 +34,75 @@ const initialFormValues = {
 
 const dateFormat = 'DD MMMM'
 
-const AgendaList = props => {
-	const { list, onDelete } = props
+const EventCard = ({ event }) => (
+	<div 
+		className="event-card mb-3" 
+		style={{ borderLeft: `4px solid ${event.color}` }}
+	>
+		<h5 className="event-card-title">{event.name}</h5>
+		<div className="event-card-time">
+			<div>{moment(event.startDate).format('MMM DD, YYYY')}</div>
+			<div className="text-muted">
+				{moment(event.startDate).format('HH:mm')} - 
+				{moment(event.endDate).format('HH:mm')}
+			</div>
+		</div>
+	</div>
+);
+
+const SidebarEvents = ({ events, onDeleteEvent }) => {
+	const sortedEvents = Array.isArray(events) 
+		? [...events].sort((a, b) => moment(a.startDate).valueOf() - moment(b.startDate).valueOf())
+		: [];
+
+	const handleDelete = (event) => {
+		Modal.confirm({
+			title: 'Delete Event',
+			content: `Are you sure you want to delete "${event.name}"?`,
+			okText: 'Yes',
+			okType: 'danger',
+			cancelText: 'No',
+			onOk() {
+				onDeleteEvent(event.id);
+			},
+		});
+	};
+
 	return (
-		list.map(list => (
-			<div key={list.date} className="calendar-list">
-				<h4>
-					<CalendarOutlined />
-					<span className="ml-2">{list.date}</span>
-				</h4>
-				{
-					list.event.map((eventItem, i) => (
-						<div key={`${eventItem.title}-${i}`} className="calendar-list-item">
-							<div className="d-flex">
-								<Badge className="mr-2"color={eventItem.bullet} />
-								<div>
-									<h5 className="mb-1">{eventItem.title}</h5>
-									<span className="text-muted">{eventItem.start} - {eventItem.end}</span>
+		<div className="sidebar-events">
+			<h4 className="mb-3">Upcoming Events</h4>
+			{sortedEvents.length === 0 ? (
+				<div className="text-muted">No events scheduled</div>
+			) : (
+				sortedEvents.map((event) => (
+					<div key={event.id} className="event-card-wrapper">
+						<div 
+							className="event-card mb-3" 
+							style={{ borderLeft: `4px solid ${event.color}` }}
+						>
+							<h5 className="event-card-title">{event.name}</h5>
+							<div className="event-card-time">
+								<div>{moment(event.startDate).format('MMM DD, YYYY')}</div>
+								<div className="text-muted">
+									{moment(event.startDate).format('HH:mm')} - 
+									{moment(event.endDate).format('HH:mm')}
 								</div>
 							</div>
-							<div className="calendar-list-item-delete">
+							<div className="event-card-actions">
 								<Tooltip title="Delete event">
-									<DeleteOutlined onClick={() => onDelete(list.date, i)}/>
+									<DeleteOutlined 
+										onClick={() => handleDelete(event)}
+										className="delete-icon"
+									/>
 								</Tooltip>
 							</div>
 						</div>
-					))
-				}
-			</div>
-		))
-	)
-}
+					</div>
+				))
+			)}
+		</div>
+	);
+};
 
 const EventModal = ({ open, addEvent, cancel }) => {
 	const [form] = Form.useForm();
@@ -126,101 +167,228 @@ const EventModal = ({ open, addEvent, cancel }) => {
 }
 
 const CalendarApp = () => {
-	const [calendarList, setCalendarList] = useState(CalendarData);
+	const dispatch = useDispatch();
+	const allclanderdata = useSelector((state) => state.calendar);
+	const realdata = allclanderdata?.calendar?.data || [];
 	const [modalVisible, setModalVisible] = useState(false);
 	const [selectedDate, setSelectedDate] = useState(null);
+	const [form] = Form.useForm();
+
+	useEffect(() => {
+		dispatch(getcalends());
+	}, [dispatch]);
+
+	const onDeleteEvent = async (eventId) => {
+		try {
+			await dispatch(deletecalends(eventId));
+			await dispatch(getcalends());
+			message.success('Event deleted successfully');
+		} catch (error) {
+			message.error('Failed to delete event');
+			console.error('Delete error:', error);
+		}
+	};
+
+	const onAddEvent = async (values) => {
+		try {
+			const eventData = {
+				name: values.name,
+				color: values.color,
+				startDate: moment(selectedDate).set({
+					hour: values.startTime.hour(),
+					minute: values.startTime.minute()
+				}).toISOString(),
+				endDate: moment(selectedDate).set({
+					hour: values.endTime.hour(),
+					minute: values.endTime.minute()
+				}).toISOString(),
+			};
+
+			await dispatch(addcalends(eventData));
+			await dispatch(getcalends());
+			setModalVisible(false);
+			form.resetFields();
+			message.success('Event added successfully');
+		} catch (error) {
+			message.error('Failed to add event');
+			console.error('Add event error:', error);
+		}
+	};
 
 	const cellRender = value => {
-		const listData = getListData(value.format((dateFormat)));
+		const currentDate = value.format('YYYY-MM-DD');
+		const listData = Array.isArray(realdata) 
+			? realdata.filter(event => {
+				const eventStart = new Date(event.startDate);
+				return eventStart.toISOString().split('T')[0] === currentDate;
+			}) 
+			: [];
+		
 		return (
 			<ul className="calendar-event">
 				{listData.map((item, i) => (
-					<li key={`${item.title}-${i}`}>
-						<Badge color={item.bullet} text={item.title}/>
+					<li key={`${item.name}-${i}`}>
+						<Badge color={item.color} text={item.name}/>
 					</li>
 				))}
 			</ul>
 		);
-	}
+	};
 
-	const getListData = (value) => {
-		let listData = [];
-		calendarList.forEach(elm => {
-			if(elm.date === value) {
-				listData = elm.event
-			}
-		})
-		return listData;
-	}
-
-	const onSelect = value => {
-		const selectedDate = value.format((dateFormat))
+	const handleDateSelect = (date) => {
+		setSelectedDate(date.format('YYYY-MM-DD'));
 		setModalVisible(true);
-		setSelectedDate(selectedDate)
-	}
-
-	const onDeleteEvent = (date, index) => {
-		const data = calendarList.map(calendarList => {
-			if(calendarList.date === date) {
-				calendarList.event = calendarList.event.filter( (_, i) => i !== index)
-			}
-			return calendarList
-		}).filter(elm => elm.event.length !== 0)
-		setCalendarList(data)
-	}
-
-	const onAddEvent = values => {
-		const data = [{
-			title: values.title? values.title : 'Untitled Event',
-			bullet: values.bullet,
-			start: values.start.format(('HH:mm A')),
-			end: values.end.format(('HH:mm A')),
-		}]
-		const newCalendarArr = calendarList
-		const isExistingDate = newCalendarArr.find(x => x.date === selectedDate)
-		if (isExistingDate) {
-			for (let elm of newCalendarArr) { 
-				if (elm.date === selectedDate) {
-					elm.event = [...elm.event, ...data]
-				}
-			}
-		} else {
-			newCalendarArr.push({date: selectedDate, event: data})
-		}
-		const sortedNewCalendarArr  = newCalendarArr.sort((a,b) => dayjs(a.date) - dayjs(b.date))
-		setModalVisible(false)
-		setCalendarList(sortedNewCalendarArr)
-	}
-
-	const onAddEventCancel = () => {
-		setModalVisible(false)
-	}
+	};
 
 	return (
-		<Card className="calendar mb-0">
-			<Row>
-				<Col xs={24} sm={24} md={9} lg={6}>
-					<h2 className="mb-4">Agenda</h2>
-					<AgendaList 
-						list={calendarList} 
-						onDelete={onDeleteEvent}
-					/>
+		<div className="calendar-container">
+			<Row gutter={16}>
+				<Col xs={24} sm={24} md={8} lg={6}>
+					<Card className="sidebar-card">
+						<SidebarEvents 
+							events={realdata}
+							onDeleteEvent={onDeleteEvent}
+						/>
+					</Card>
 				</Col>
-				<Col xs={24} sm={24} md={15} lg={18}>
-					<Calendar 
-						onSelect={val => onSelect(val)} 
-						dateCellRender={cellRender}
-					/>
+				<Col xs={24} sm={24} md={16} lg={18}>
+					<Card className="mb-4">
+						<Calendar 
+							cellRender={cellRender}
+							onSelect={handleDateSelect}
+						/>
+					</Card>
 				</Col>
 			</Row>
-			<EventModal 
-				open={modalVisible}
-				addEvent={onAddEvent}
-				cancel={onAddEventCancel}
-			/>
-		</Card>
-	)
-}
 
-export default CalendarApp
+			<Modal
+				title="Add New Event"
+				visible={modalVisible}
+				onCancel={() => {
+					setModalVisible(false);
+					form.resetFields();
+				}}
+				onOk={() => form.submit()}
+				destroyOnClose
+			>
+				<Form
+					form={form}
+					onFinish={onAddEvent}
+					layout="vertical"
+				>
+					<Form.Item
+						label="Event Name"
+						name="name"
+						rules={[{ required: true, message: 'Please enter event name' }]}
+					>
+						<Input placeholder="Enter event name" />
+					</Form.Item>
+					
+					<Form.Item
+						label="Event Color"
+						name="color"
+						rules={[{ required: true, message: 'Please select event color' }]}
+					>
+						<Select>
+							<Select.Option value="#1890ff">Blue</Select.Option>
+							<Select.Option value="#f5222d">Red</Select.Option>
+							<Select.Option value="#52c41a">Green</Select.Option>
+							<Select.Option value="#faad14">Yellow</Select.Option>
+							<Select.Option value="#722ed1">Purple</Select.Option>
+							<Select.Option value="#eb2f96">Pink</Select.Option>
+						</Select>
+					</Form.Item>
+
+					<Form.Item
+						label="Start Time"
+						name="startTime"
+						rules={[{ required: true, message: 'Please select start time' }]}
+					>
+						<TimePicker format="HH:mm" />
+					</Form.Item>
+
+					<Form.Item
+						label="End Time"
+						name="endTime"
+						rules={[
+							{ required: true, message: 'Please select end time' },
+							({ getFieldValue }) => ({
+								validator(_, value) {
+									if (!value || !getFieldValue('startTime') || 
+										value.isAfter(getFieldValue('startTime'))) {
+										return Promise.resolve();
+									}
+									return Promise.reject(new Error('End time must be after start time'));
+								},
+							}),
+						]}
+					>
+						<TimePicker format="HH:mm" />
+					</Form.Item>
+
+					<div className="selected-date-info" style={{ marginBottom: 16 }}>
+						<InfoCircleOutlined style={{ marginRight: 8 }} />
+						Selected Date: {selectedDate ? moment(selectedDate).format('MMMM D, YYYY') : 'None'}
+					</div>
+				</Form>
+			</Modal>
+		</div>
+	);
+};
+
+const styles = `
+	.event-card-wrapper {
+		position: relative;
+	}
+
+	.event-card-wrapper.deleting {
+		opacity: 0.5;
+		pointer-events: none;
+	}
+
+	.delete-icon {
+		transition: all 0.3s;
+	}
+
+	.delete-icon:hover {
+		transform: scale(1.1);
+		color: #ff1f1f;
+	}
+
+	.ant-modal-confirm-btns .ant-btn-dangerous {
+		background-color: #ff4d4f;
+		border-color: #ff4d4f;
+		color: white;
+	}
+
+	.ant-modal-confirm-btns .ant-btn-dangerous:hover {
+		background-color: #ff7875;
+		border-color: #ff7875;
+	}
+
+	.selected-date-info {
+		padding: 8px;
+		background-color: #f5f5f5;
+		border-radius: 4px;
+		color: #666;
+		font-size: 14px;
+	}
+
+	.ant-form-item-label > label {
+		font-weight: 500;
+	}
+
+	.ant-picker {
+		width: 100%;
+	}
+`;
+
+const CalendarAppWithStyles = () => (
+	<>
+		<style>{styles}</style>
+		<CalendarApp />
+	</>
+);
+
+export default CalendarAppWithStyles;
 

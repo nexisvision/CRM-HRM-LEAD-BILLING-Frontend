@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./proposalService";
+import UserService from "./calanderService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
 
-export const addpropos = createAsyncThunk(
-  "users/addpropos",
+export const addcalends = createAsyncThunk(
+  "users/addcalends",
   async (userData, thunkAPI) => {
     try {
-      const response = await UserService.addpropo(userData);
+      const response = await UserService.addcalend(userData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -19,14 +19,17 @@ export const addpropos = createAsyncThunk(
 
 // Async thunk for user login
 
-export const getpropos = createAsyncThunk("emp/getpropos", async (thunkAPI) => {
-  try {
-    const response = await UserService.getpropo();
-    return response;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.response.data);
+export const getcalends = createAsyncThunk(
+  "emp/getcalends",
+  async (thunkAPI) => {
+    try {
+      const response = await UserService.getcalend();
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
 // Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
@@ -55,22 +58,22 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const delpropos = createAsyncThunk(
-  "users/delpropos",
+export const deletecalends = createAsyncThunk(
+  "users/deletecalends",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.delpropo(userId);
+      const response = await UserService.dellcalend(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const edpropos = createAsyncThunk(
-  "users/edpropos",
-  async ({ idd, values }, thunkAPI) => {
+export const editcalends = createAsyncThunk(
+  "users/editcalends",
+  async ({ idd, payload }, thunkAPI) => {
     try {
-      const response = await UserService.editpropo(idd, values);
+      const response = await UserService.editcalend(idd, payload);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -79,8 +82,6 @@ export const edpropos = createAsyncThunk(
     }
   }
 );
-
-// Async thunk for updating a user
 
 const initialUser = () => {
   const item = window.localStorage.getItem("USER");
@@ -93,9 +94,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "proposal",
+  name: "calendar",
   initialState: {
-    proposal: [],
+    calendar: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -132,27 +133,27 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(addpropos.pending, (state) => {
+      .addCase(addcalends.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(addpropos.fulfilled, (state, action) => {
+      .addCase(addcalends.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(addpropos.rejected, (state, action) => {
+      .addCase(addcalends.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(getpropos.pending, (state) => {
+      .addCase(getcalends.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(getpropos.fulfilled, (state, action) => {
+      .addCase(getcalends.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.proposal = action?.payload;
+        state.calendar = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(getpropos.rejected, (state, action) => {
+      .addCase(getcalends.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
@@ -185,27 +186,27 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
       //delete
-      .addCase(delpropos.pending, (state) => {
+      .addCase(deletecalends.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(delpropos.fulfilled, (state, action) => {
+      .addCase(deletecalends.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload.message);
       })
-      .addCase(delpropos.rejected, (state, action) => {
+      .addCase(deletecalends.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(edpropos.pending, (state) => {
+      .addCase(editcalends.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(edpropos.fulfilled, (state, action) => {
+      .addCase(editcalends.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload;
+        state.editItem = action.payload; // Update the state with the updated employee data
       })
-      .addCase(edpropos.rejected, (state, action) => {
+      .addCase(editcalends.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
       });

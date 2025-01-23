@@ -33,7 +33,8 @@ import OrderListData from "assets/data/order-list.data.json";
 import utils from "utils";
 import { useDispatch, useSelector } from "react-redux";
 import AddInquiry from "./AddInquiry";
-import EditInquiry from "./EditInquiry"
+import EditInquiry from "./EditInquiry";
+import { deleteinqu, getinqu } from "./inquiryReducer/inquirySlice";
 // import { deletepolicys, getpolicys } from "./policyReducer/policySlice";
 // import {
 //   deletejobapplication,
@@ -51,16 +52,17 @@ const InquiryList = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [isAddinquiryModalVisible, setIsAddinquiryModalVisible] = useState(false);
+  const [isAddinquiryModalVisible, setIsAddinquiryModalVisible] =
+    useState(false);
 
   const [idd, setIdd] = useState("");
 
-//   useEffect(() => {
-//     dispatch(getpolicys());
-//   }, []);
+  useEffect(() => {
+    dispatch(getinqu());
+  }, []);
 
-  const allbranch = useSelector((state) => state.policy);
-  const fndbranch = allbranch.policy.data;
+  const allbranch = useSelector((state) => state.inquiry);
+  const fndbranch = allbranch.inquiry.data;
 
   useEffect(() => {
     if (fndbranch) {
@@ -108,14 +110,14 @@ const InquiryList = () => {
     setSelectedRowKeys([]);
   };
 
-//   const deleteUser = (userId) => {
-//     dispatch(deletepolicys(userId)).then(() => {
-//       dispatch(getpolicys());
-//       const updatedUsers = users.filter((item) => item.id !== userId);
-//       setUsers(updatedUsers);
-//       message.success({ content: `Deleted user ${userId}`, duration: 2 });
-//     });
-//   };
+  const deleteUser = (userId) => {
+    dispatch(deleteinqu(userId)).then(() => {
+      dispatch(getinqu());
+      const updatedUsers = users.filter((item) => item.id !== userId);
+      setUsers(updatedUsers);
+      message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    });
+  };
 
   const showUserProfile = (userInfo) => {
     setUserProfileVisible(true);
@@ -173,8 +175,7 @@ const InquiryList = () => {
           </Button>
         </Flex>
       </Menu.Item>
-      
-      
+
       <Menu.Item>
         <Flex alignItems="center">
           <Button
@@ -194,7 +195,7 @@ const InquiryList = () => {
             type=""
             className=""
             icon={<DeleteOutlined />}
-            // onClick={() => deleteUser(elm.id)}
+            onClick={() => deleteUser(elm.id)}
             size="small"
           >
             <span>Delete</span>
@@ -228,6 +229,16 @@ const InquiryList = () => {
       title: "Email",
       dataIndex: "email",
       sorter: (a, b) => a.email.length - b.email.length,
+    },
+    {
+      title: "message",
+      dataIndex: "message",
+      sorter: (a, b) => a.message.length - b.message.length,
+    },
+    {
+      title: "subject",
+      dataIndex: "subject",
+      sorter: (a, b) => a.subject.length - b.subject.length,
     },
     // {
     //   title: "Phone",

@@ -7,10 +7,10 @@ import axios from "axios";
 //     return res
 // };
 
-const getpropo = async () => {
+const getinq = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/proposals/", {
+    const res = await axios.get("http://localhost:5353/api/v1/inquiry/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -22,12 +22,12 @@ const getpropo = async () => {
   }
 };
 
-const addpropo = async (payload) => {
+const addinq = async (payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/proposals/",
+      "http://localhost:5353/api/v1/inquiry/",
       payload,
       {
         headers: {
@@ -43,12 +43,12 @@ const addpropo = async (payload) => {
   }
 };
 
-const delpropo = async (id) => {
+const delinq = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/proposals/${id}`,
+      `http://localhost:5353/api/v1/inquiry/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -63,11 +63,11 @@ const delpropo = async (id) => {
   }
 };
 
-const editpropo = async (idd, values) => {
+const editinq = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/proposals/${idd}`,
+      `http://localhost:5353/api/v1/inquiry/${idd}`,
       values,
       {
         headers: {
@@ -104,10 +104,10 @@ const editpropo = async (idd, values) => {
 
 const UserService = {
   // addUser,
-  getpropo,
-  addpropo,
-  delpropo,
-  editpropo,
+  getinq,
+  addinq,
+  delinq,
+  editinq,
   // getAllUsers,
   // getUserById,
   // deleteUser,

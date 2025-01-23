@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./proposalService";
+import UserService from "./documentService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
 
-export const addpropos = createAsyncThunk(
-  "users/addpropos",
+export const AddDocu = createAsyncThunk(
+  "users/AddDocu",
   async (userData, thunkAPI) => {
     try {
-      const response = await UserService.addpropo(userData);
+      const response = await UserService.adddoc(userData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -19,9 +19,9 @@ export const addpropos = createAsyncThunk(
 
 // Async thunk for user login
 
-export const getpropos = createAsyncThunk("emp/getpropos", async (thunkAPI) => {
+export const getDocu = createAsyncThunk("emp/getDocu", async (thunkAPI) => {
   try {
-    const response = await UserService.getpropo();
+    const response = await UserService.getdoc();
     return response;
   } catch (error) {
     return thunkAPI.rejectWithValue(error.response.data);
@@ -55,22 +55,22 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const delpropos = createAsyncThunk(
-  "users/delpropos",
+export const deleteDocu = createAsyncThunk(
+  "users/deleteDocu",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.delpropo(userId);
+      const response = await UserService.deldoc(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const edpropos = createAsyncThunk(
-  "users/edpropos",
+export const editDocu = createAsyncThunk(
+  "users/editDocu",
   async ({ idd, values }, thunkAPI) => {
     try {
-      const response = await UserService.editpropo(idd, values);
+      const response = await UserService.editdoc(idd, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -93,9 +93,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "proposal",
+  name: "Documents",
   initialState: {
-    proposal: [],
+    Documents: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -132,27 +132,27 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(addpropos.pending, (state) => {
+      .addCase(AddDocu.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(addpropos.fulfilled, (state, action) => {
+      .addCase(AddDocu.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(addpropos.rejected, (state, action) => {
+      .addCase(AddDocu.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(getpropos.pending, (state) => {
+      .addCase(getDocu.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(getpropos.fulfilled, (state, action) => {
+      .addCase(getDocu.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.proposal = action?.payload;
+        state.Documents = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(getpropos.rejected, (state, action) => {
+      .addCase(getDocu.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
@@ -185,27 +185,27 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
       //delete
-      .addCase(delpropos.pending, (state) => {
+      .addCase(deleteDocu.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(delpropos.fulfilled, (state, action) => {
+      .addCase(deleteDocu.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload.message);
       })
-      .addCase(delpropos.rejected, (state, action) => {
+      .addCase(deleteDocu.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(edpropos.pending, (state) => {
+      .addCase(editDocu.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(edpropos.fulfilled, (state, action) => {
+      .addCase(editDocu.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload;
       })
-      .addCase(edpropos.rejected, (state, action) => {
+      .addCase(editDocu.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
       });

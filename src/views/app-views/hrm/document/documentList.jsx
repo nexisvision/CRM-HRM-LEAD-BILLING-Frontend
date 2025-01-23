@@ -26,7 +26,7 @@ import Flex from "components/shared-components/Flex";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddDocument from "./AddDocument";
-import EditDocument from "./EditDocument"
+import EditDocument from "./EditDocument";
 // import userData from "assets/data/user-list.data.json";
 // import AddDocument from "./AddDocument";
 // import EditTrainingSetup from "./EditTrainingSetup";
@@ -37,12 +37,13 @@ import utils from "utils";
 import useSelection from "antd/es/table/hooks/useSelection";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
+import { deleteDocu, getDocu } from "./DocumentReducers/documentSlice";
 // import ViewTrainingSetup from "./ViewTrainingSetup";
 // import ViewJobApplication from './ViewJobApplication';
 
 const { Option } = Select;
 
-const  DocumentList = () => {
+const DocumentList = () => {
   const [users, setUsers] = useState(userData);
   const dispatch = useDispatch();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
@@ -54,10 +55,23 @@ const  DocumentList = () => {
     useState(false);
   const [isEditTrainingSetupModalVisible, setIsEditTrainingSetupModalVisible] =
     useState(false);
-//   const [isViewTrainingSetupModalVisible, setIsViewTrainingSetupModalVisible] =
-//     useState(false);
+  //   const [isViewTrainingSetupModalVisible, setIsViewTrainingSetupModalVisible] =
+  //     useState(false);
 
   const [idd, setIdd] = useState("");
+
+  useEffect(() => {
+    dispatch(getDocu());
+  }, []);
+
+  const alladatas = useSelector((state) => state.Documents);
+  const fnddtaas = alladatas.Documents.data;
+
+  useEffect(() => {
+    if (fnddtaas) {
+      setUsers(fnddtaas);
+    }
+  }, [fnddtaas]);
 
   const allempdata = useSelector((state) => state.Training);
   const fnddata = allempdata.Training.data;
@@ -78,13 +92,13 @@ const  DocumentList = () => {
     setIsEditTrainingSetupModalVisible(false);
   };
 
-//   const openviewTrainingSetupModal = () => {
-//     setIsViewTrainingSetupModalVisible(true);
-//   };
+  //   const openviewTrainingSetupModal = () => {
+  //     setIsViewTrainingSetupModalVisible(true);
+  //   };
 
-//   const closeViewTrainingSetupModal = () => {
-//     setIsViewTrainingSetupModalVisible(false);
-//   };
+  //   const closeViewTrainingSetupModal = () => {
+  //     setIsViewTrainingSetupModalVisible(false);
+  //   };
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
@@ -94,12 +108,13 @@ const  DocumentList = () => {
     setSelectedRowKeys([]);
   };
 
-//   const deleteUser = (userId) => {
-//     dispatch(Deletetrainng(userId));
-//     dispatch(GetallTrainng());
-//     setUsers(users.filter((item) => item.id !== userId));
-//     message.success({ content: `Deleted user ${userId}`, duration: 2 });
-//   };
+  const deleteUser = (userId) => {
+    dispatch(deleteDocu(userId)).then(() => {
+      dispatch(getDocu());
+      setUsers(users.filter((item) => item.id !== userId));
+      message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    });
+  };
 
   const showUserProfile = (userInfo) => {
     setUserProfileVisible(true);
@@ -111,9 +126,9 @@ const  DocumentList = () => {
     setSelectedUser(null);
   };
 
-//   useEffect(() => {
-//     dispatch(GetallTrainng());
-//   }, []);
+  //   useEffect(() => {
+  //     dispatch(GetallTrainng());
+  //   }, []);
 
   useEffect(() => {
     if (fnddata) {
@@ -155,10 +170,10 @@ const  DocumentList = () => {
     openEditTrainingSetupModal();
     setIdd(idd);
   };
-//   const viewfun = (idd) => {
-//     openviewTrainingSetupModal();
-//     setIdd(idd);
-//   };
+  //   const viewfun = (idd) => {
+  //     openviewTrainingSetupModal();
+  //     setIdd(idd);
+  //   };
 
   const jobStatusList = ["active", "blocked"];
 
@@ -222,7 +237,7 @@ const  DocumentList = () => {
             type=""
             className=""
             icon={<DeleteOutlined />}
-            // onClick={() => deleteUser(elm.id)}
+            onClick={() => deleteUser(elm.id)}
             size="small"
           >
             <span>Delete</span>
@@ -239,21 +254,21 @@ const  DocumentList = () => {
       sorter: (a, b) => a.name.length - b.name.length,
     },
     {
-        title: "role",
-        dataIndex: "role",
-        sorter: (a, b) => a.role.length - b.role.length,
-      },
-      {
-        title: "description",
-        dataIndex: "description",
-        sorter: (a, b) => a.description.length - b.description.length,
-      },
+      title: "role",
+      dataIndex: "role",
+      sorter: (a, b) => a.role.length - b.role.length,
+    },
+    {
+      title: "description",
+      dataIndex: "description",
+      sorter: (a, b) => a.description.length - b.description.length,
+    },
     //   {
     //     title: "files",
     //     dataIndex: "files",
     //     sorter: (a, b) => a.files.length - b.files.length,
     //   },
-   
+
     {
       title: "Action",
       dataIndex: "actions",

@@ -1,17 +1,39 @@
-import React, { useState } from "react";
-import { Form, Input, Button, Row, Col, message, Upload } from "antd";
+import React, { useEffect, useState } from "react";
+import { Form, Input, Button, Row, Col, message, Upload, Select } from "antd";
 import { useNavigate } from "react-router-dom";
 import { PlusOutlined } from "@ant-design/icons";
 import { RxCross2 } from "react-icons/rx";
 import * as Yup from "yup";
 import { Formik, Field, ErrorMessage } from "formik";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import ReactQuill from "react-quill";
+import { AddDocu, editDocu, getDocu } from "./DocumentReducers/documentSlice";
 // import { AddTrainng, GetallTrainng } from "./TrainingReducer/TrainingSlice";
-
-const EditDocument = ({ onClose }) => {
+const { Option } = Select;
+const EditDocument = ({ idd, onClose }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(getDocu());
+  }, []);
+
+  const alladatas = useSelector((state) => state.Documents);
+  const fnddtaas = alladatas.Documents.data;
+
+  useEffect(() => {
+    if (fnddtaas) {
+      const fdd = fnddtaas.find((item) => item.id === idd);
+
+      setinitialValues({
+        name: fdd.name,
+        role: fdd.role,
+        description: fdd.description,
+      });
+    }
+  }, [fnddtaas]);
+
   const [rows, setRows] = useState([
     {
       id: Date.now(),
@@ -19,25 +41,16 @@ const EditDocument = ({ onClose }) => {
       title: "",
     },
   ]);
-
-  const initialValues = {
-    employee: "",
-    title: "",
-    deductionOption: "",
-    type: "",
-    currency: "",
-    amount: "",
-  };
-
-  const validationSchema = Yup.object({
-    employee: Yup.string().required("Please enter employee"),
-    title: Yup.string().required("Please enter title"),
-    deductionOption: Yup.string().required("Please enter deduction option"),
-    type: Yup.string().required("Please enter type"),
-    currency: Yup.string().required("Please enter currency"),
-    amount: Yup.number().required("Please enter amount").positive().integer(),
+  const [initialValues, setinitialValues] = useState({
+    name: "",
+    role: "",
+    description: "",
   });
-
+  const validationSchema = Yup.object({
+    name: Yup.string().required("Please enter Name"),
+    role: Yup.string().required("Please enter Role"),
+    description: Yup.string().required("Please enter Description"),
+  });
   const handleAddRow = () => {
     setRows([
       ...rows,
@@ -48,36 +61,40 @@ const EditDocument = ({ onClose }) => {
       },
     ]);
   };
+  // const onSubmit = async (values, { resetForm }) => {
+  //   const links = rows.reduce((acc, row, index) => {
+  //     acc[index] = { title: row.title, url: row.link };
+  //     return acc;
+  //   }, {});
+  //   const payload = {
+  //     category: values.category,
+  //     links: links,
+  //   };
+  //   try {
+  //     await dispatch(AddDocu(payload));
+  //     await dispatch(getDocu());
+  //     message.success("Training setup added successfully!");
+  //     resetForm();
+  //     setRows([
+  //       {
+  //         id: Date.now(),
+  //         link: "",
+  //         title: "",
+  //       },
+  //     ]);
+  //     onClose();
+  //   } catch (error) {
+  //     message.error("Failed to add training setup!");
+  //   }
+  // };
 
   const onSubmit = async (values, { resetForm }) => {
-    const links = rows.reduce((acc, row, index) => {
-      acc[index] = { title: row.title, url: row.link };
-      return acc;
-    }, {});
-
-    const payload = {
-      category: values.category,
-      links: links,
-    };
-
-    try {
-      //   await dispatch(AddTrainng(payload));
-      //   await dispatch(GetallTrainng());
-
-      message.success("Training setup added successfully!");
+    dispatch(editDocu({ idd, values })).then(() => {
+      dispatch(getDocu());
+      message.success("Document added successfully!");
       resetForm();
-      setRows([
-        {
-          id: Date.now(),
-          link: "",
-          title: "",
-        },
-      ]);
-
       onClose();
-    } catch (error) {
-      message.error("Failed to add training setup!");
-    }
+    });
   };
 
   return (
@@ -87,8 +104,9 @@ const EditDocument = ({ onClose }) => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
+        enableReinitialize
       >
-        {({ handleSubmit }) => (
+        {({ handleSubmit, setFieldValue, setFieldTouched, values }) => (
           <Form
             layout="vertical"
             form={form}
@@ -97,114 +115,67 @@ const EditDocument = ({ onClose }) => {
           >
             <Row gutter={16}>
               <Col span={12}>
-                <Form.Item label="Employee" name="employee">
-                  <Field name="employee">
+                <Form.Item label="Name" name="name">
+                  <Field name="name">
                     {({ field }) => (
-                      <Input
-                        placeholder="Enter Employee"
-                        {...field}
-                       
-                      />
+                      <Input placeholder="Enter Name" {...field} />
                     )}
                   </Field>
                   <ErrorMessage
-                    name="employee"
+                    name="name"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
                 </Form.Item>
               </Col>
-              <Col span={12}>
-                <Form.Item label="Title" name="title">
-                  <Field name="title">
+              <Col span={8} className="">
+                <div className="form-item">
+                  <label className="">Role</label>
+                  <Field name="role">
                     {({ field }) => (
-                      <Input
-                        placeholder="Enter Title"
+                      <Select
                         {...field}
-                     
-                      />
+                        placeholder="Select role"
+                        className="w-full mt-2"
+                        onChange={(value) => setFieldValue("role", value)}
+                        value={values.role}
+                        onBlur={() => setFieldTouched("role", true)}
+                        allowClear={false}
+                      >
+                        <Option value="cilent">Cilent</Option>
+                        <Option value="sub client">Sub Client</Option>
+                        <Option value="user">User</Option>
+                        <Option value="employee">Employee</Option>
+                        <Option value="super admin">Super Admin</Option>
+                      </Select>
                     )}
                   </Field>
                   <ErrorMessage
-                    name="title"
+                    name="role"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
-                </Form.Item>
+                </div>
               </Col>
-              <Col span={12}>
-                <Form.Item label="Deduction Option" name="deductionOption">
-                  <Field name="deductionOption">
-                    {({ field }) => (
-                      <Input
-                        placeholder="Enter Deduction Option"
-                        {...field}
-                       
-                      />
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="deductionOption"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label="Type" name="type">
-                  <Field name="type">
-                    {({ field }) => (
-                      <Input
-                        placeholder="Enter Type"
-                        {...field}
-                      
-                      />
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="type"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label="Currency" name="currency">
-                  <Field name="currency">
-                    {({ field }) => (
-                      <Input
-                        placeholder="Enter Currency"
-                        {...field}
-                     
-                      />
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="currency"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item label="Amount" name="amount">
-                  <Field name="amount">
-                    {({ field }) => (
-                      <Input
-                        placeholder="Enter Amount"
-                        {...field}
-                       
-                      />
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="amount"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={24} className="mt-2">
+              <div className="mt-2 w-full">
+                <Col span={24} className="mt-2">
+                  <div className="form-item">
+                    <label className="">Description</label>
+                    <ReactQuill
+                      value={values.description}
+                      onChange={(value) => setFieldValue("description", value)}
+                      placeholder="Enter description"
+                      onBlur={() => setFieldTouched("description", true)}
+                    />
+                    <ErrorMessage
+                      name="description"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+              </div>
+              {/* <Col span={24} className="mt-2">
                 <span className="block p-2">Add File</span>
                 <Upload
                   listType="picture"
@@ -215,9 +186,8 @@ const EditDocument = ({ onClose }) => {
                 >
                   <span className="text-xl">Choose File</span>
                 </Upload>
-              </Col>
+              </Col> */}
             </Row>
-
             <Form.Item>
               <div className="text-right mt-2">
                 <Button type="default" className="mr-2" onClick={onClose}>
@@ -234,5 +204,4 @@ const EditDocument = ({ onClose }) => {
     </div>
   );
 };
-
 export default EditDocument;
