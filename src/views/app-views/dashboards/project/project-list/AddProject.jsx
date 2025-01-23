@@ -140,28 +140,6 @@ const AddProject = ({ onClose }) => {
   }, []);
 
 
-  // const fetchLabels = async (labelType, setter) => {
-  //   try {
-  //     const lid = AllLoggedData.loggedInUser.id;
-  //     const response = await dispatch(GetLablee(lid));
-  //     if (response.payload && response.payload.data) {
-  //       const filteredLabels = response.payload.data
-  //         .filter((label) => label.labelType === labelType)
-  //         .map((label) => ({ id: label.id, name: label.name.trim() }));
-  //       setter(filteredLabels);
-  //     }
-  //   } catch (error) {
-  //     console.error(`Failed to fetch ${labelType}:`, error);
-  //     message.error(`Failed to load ${labelType}`);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchLabels("tag", setTags);
-  //   fetchLabels("category", setCategories);
-  //   fetchLabels("status", setStatuses);
-  // }, []);
-
 
 
 
@@ -193,36 +171,6 @@ const AddProject = ({ onClose }) => {
 
 
 
-
-  // const handleAddNewLabel = async (labelType, newValue, setter, modalSetter) => {
-  //   if (!newValue.trim()) {
-  //     message.error(`Please enter a ${labelType} name.`);
-  //     return;
-  //   }
-
-  //   try {
-  //     const lid = AllLoggedData.loggedInUser.id;
-  //     const payload = {
-  //       name: newValue.trim(),
-  //       labelType,
-  //     };
-  //     await dispatch(AddLablee({ lid, payload }));
-  //     message.success(`${labelType} added successfully.`);
-  //     setter("");
-  //     modalSetter(false);
-  //     await fetchLabels(labelType, labelType === "tag" ? setTags : labelType === "category" ? setCategories : setStatuses);
-  //   } catch (error) {
-  //     console.error(`Failed to add ${labelType}:`, error);
-  //     message.error(`Failed to add ${labelType}.`);
-  //   }
-  // };
-
-
-
-
-
-
-
   const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
     if (!newValue.trim()) {
       message.error(`Please enter a ${lableType} name.`);
@@ -248,61 +196,6 @@ const AddProject = ({ onClose }) => {
 
 
 
-
-
-
-
-  // const fetchTags = async () => {
-  //   try {
-  //     const lid = AllLoggeddtaa.loggedInUser.id;
-  //     const response = await dispatch(GetLablee(lid));
-
-  //     if (response.payload && response.payload.data) {
-  //       const uniqueTags = response.payload.data
-  //         .filter((label) => label && label.name) // Filter out invalid labels
-  //         .map((label) => ({
-  //           id: label.id,
-  //           name: label.name.trim(),
-  //         }))
-  //         .filter(
-  //           (label, index, self) =>
-  //             index === self.findIndex((t) => t.name === label.name)
-  //         ); // Remove duplicates
-
-  //       setTags(uniqueTags);
-  //     }
-  //   } catch (error) {
-  //     console.error("Failed to fetch tags:", error);
-  //     message.error("Failed to load tags");
-  //   }
-  // };
-
-  // const handleAddNewTag = async () => {
-  //   if (!newTag.trim()) {
-  //     message.error("Please enter a tag name");
-  //     return;
-  //   }
-
-  //   try {
-  //     const lid = AllLoggeddtaa.loggedInUser.id;
-  //     const payload = {
-  //       name: newTag.trim(),
-  //       labelType: "tag",
-
-  //     };
-
-  //     await dispatch(AddLablee({ lid, payload }));
-  //     message.success("Tag added successfully");
-  //     setNewTag("");
-  //     setIsTagModalVisible(false);
-
-  //     // Fetch updated tags
-  //     await fetchTags();
-  //   } catch (error) {
-  //     console.error("Failed to add tag:", error);
-  //     message.error("Failed to add tag");
-  //   }
-  // };
 
   return (
     <div className="add-job-form">

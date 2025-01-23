@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Table, Menu, Tag, Input, message, Button, Modal, DatePicker } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -10,16 +10,35 @@ import AddAttendance from './AddAttendance';
 import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
 import utils from 'utils';
+import { deleteAttendance, getAttendances } from './AttendanceReducer/AttendanceSlice';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 const AttendanceList = () => {
   const [users, setUsers] = useState(userData);
+  const [list, setList] = useState();
+const dispatch = useDispatch();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
+  const navigate = useNavigate();
   const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddAttendanceModalVisible, setIsAddAttendanceModalVisible] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+
+ const tabledata = useSelector((state) => state.attendance);
+ const employeeData = useSelector((state) => state.employee?.employee?.data || []);
+
+ console.log(tabledata,"sdfdfdfsdfxdvx");
+
+ const fnddat = tabledata.Attendances.data;
+
+ useEffect(()=>{
+  if(fnddat){
+    setList(fnddat);
+  }
+ },[fnddat])
 
   // Open Add Attendance Modal
   const openAddAttendanceModal = () => {
@@ -31,13 +50,40 @@ const AttendanceList = () => {
     setIsAddAttendanceModalVisible(false);
   };
 
+  useEffect(() => {
+    dispatch(getAttendances());
+  }, [dispatch]);
+
+
+  
+  
+useEffect(() => {
+  if (tabledata?.Attendances?.data) {
+    const mappedData = tabledata.Attendances.data.map((attendance) => {
+      const employee = employeeData.find((e) => e.id === attendance.employee)?.username || 'N/A';
+    
+      return {
+        ...attendance,
+        employee,
+      };
+    });
+    setUsers(mappedData);
+console.log(mappedData,"users");
+
+  }
+}, [tabledata]);
+
+
+
   // Handle Search functionality
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const filteredList = value ? utils.wildCardSearch(list, value) : OrderListData;
+    const filteredList = value ? utils.wildCardSearch(list, value) : tabledata;
     setList(filteredList);
     setSelectedRowKeys([]);
   };
+
+
 
   // Handle Date Range Filtering
   const onDateChange = (dates) => {
@@ -57,11 +103,7 @@ const AttendanceList = () => {
   };
 
   // Delete User
-  const deleteUser = (userId) => {
-    const updatedUsers = users.filter(item => item.id !== userId);
-    setUsers(updatedUsers);
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
-  };
+  
 
   // Show User Profile
   const showUserProfile = (userInfo) => {
@@ -74,6 +116,27 @@ const AttendanceList = () => {
     setUserProfileVisible(false);
     setSelectedUser(null);
   };
+
+
+  
+     const deleteAttendances = (userId) => {
+        // setUsers(users.filter(item => item.id !== userId));
+        // dispatch(DeleteDes(userId));
+        // dispatch(getDes())
+        // message.success({ content: `Deleted user ${userId}`, duration: 2 });
+  
+          dispatch(deleteAttendance( userId )) 
+                    .then(() => {
+                      dispatch(getAttendances());
+                      message.success('Appraisal Deleted successfully!');
+                      setUsers(users.filter(item => item.id !== userId));
+               
+                    })
+                    .catch((error) => {
+                      // message.error('Failed to delete Indicator.');
+                      console.error('Edit API error:', error);
+                    });
+      };
 
   // Dropdown Menu
   const dropdownMenu = (elm) => (
@@ -92,16 +155,10 @@ const AttendanceList = () => {
           </Button>
         </Flex>
       </Menu.Item>
+      
       <Menu.Item>
         <Flex alignItems="center">
-          <Button type="" className="" icon={<PushpinOutlined />} onClick={() => { showUserProfile(elm) }} size="small">
-            <span className="ml-2">Pin</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" className="" icon={<DeleteOutlined />} onClick={() => { deleteUser(elm.id) }} size="small">
+          <Button type="" className="" icon={<DeleteOutlined />} onClick={() => { deleteAttendances(elm.id) }} size="small">
             <span className="">Delete</span>
           </Button>
         </Flex>
@@ -111,44 +168,33 @@ const AttendanceList = () => {
 
   const tableColumns = [
     {
-      title: 'User',
-      dataIndex: 'name',
-      render: (_, record) => (
-        <div className="d-flex">
-          <AvatarStatus src={record.img} name={record.name} subTitle={record.email} />
-        </div>
-      ),
+      title: 'Employee',
+      dataIndex: 'employee',
+
       sorter: {
-        compare: (a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
+        compare: (a, b) => a.employee.toLowerCase().localeCompare(b.employee.toLowerCase()),
       },
     },
     {
       title: 'In Time',
-      dataIndex: 'intime',
-      sorter: (a, b) => dayjs(a.intime).unix() - dayjs(b.intime).unix(),
+      dataIndex: 'startTime',
+      sorter: (a, b) => dayjs(a.startTime).unix() - dayjs(b.startTime).unix(),
     },
     {
       title: 'Out Time',
-      dataIndex: 'outtime',
+      dataIndex: 'endTime',
       render: (date) => <span>{dayjs.unix(date).format("MM/DD/YYYY")}</span>,
-      sorter: (a, b) => dayjs(a.outtime).unix() - dayjs(b.outtime).unix(),
-    },
+      sorter: (a, b) => dayjs(a.endTime).unix() - dayjs(b.endTime).unix(),
+    },  
     {
-      title: 'In Status',
-      dataIndex: 'instatus',
+      title: 'Half Day',
+      dataIndex: 'halfDay',
+
+      sorter: {
+        compare: (a, b) => a.halfDay.toLowerCase().localeCompare(b.halfDay.toLowerCase()),
+      },
     },
-    {
-      title: 'Out Status',
-      dataIndex: 'outStatus',
-    },
-    {
-      title: 'Total Hour',
-      dataIndex: 'totalhour',
-    },
-    {
-      title: 'Punch By',
-      dataIndex: 'punchby',
-    },
+   
     {
       title: 'Action',
       dataIndex: 'actions',
