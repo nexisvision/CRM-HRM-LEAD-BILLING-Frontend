@@ -1,19 +1,92 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal, Select, DatePicker } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
+import React, { useEffect, useState } from 'react';
+import { Card, Row, Col, Input, message, Button, Modal, Select, DatePicker } from 'antd';
+import { DeleteOutlined, PlusOutlined, } from '@ant-design/icons';
 // import { Card, Table,  Badge, Menu, Tag,Modal } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { Form } from "antd";
+
+
+import { AddLable,GetLable } from '../LableReducer/LableSlice';
+import { getAllBillings, updateBilling } from './billingReducers/billingSlice';
+import { useDispatch, useSelector } from "react-redux";
+import { navigate } from 'react-big-calendar/lib/utils/constants';
+import dayjs from 'dayjs';
+import moment from 'moment';
 
 const { Option } = Select;
+const EditBilling = ({ idd, billingData, onClose }) => {
+ const [form] = Form.useForm();
+    const [tags, setTags] = useState([]);
+    const [newTag, setNewTag] = useState("");
+    const [isTagModalVisible, setIsTagModalVisible] = useState(false);
+  
 
-const EditBilling = () => {
-    // const [users, setUsers] = useState(userData);
-    // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-    // const [list, setList] = useState(OrderListData);
 
+  const alladatas = useSelector((state) => state?.salesbilling);
+  const fnddata = alladatas?.billings;
+  const fnd = fnddata.find((item) => item.id === idd);
+
+
+    const dispatch = useDispatch();
+    const allinvoicedata = useSelector((state) => state.salesInvoices);
+    const dfnddadat = allinvoicedata.salesInvoices.data;
+    const AllLoggeddtaa = useSelector((state) => state.user);
+    const lid = AllLoggeddtaa.loggedInUser.id;
+  
+
+
+ 
+    // Fetch tags when the component mounts
+    useEffect(() => {
+      fetchTags();
+      if (billingData) {
+        preloadForm(billingData);
+      }
+    }, [billingData]);
+  
+
+
+    const [initialValues, setInitialValues] = useState({
+        vendor: '',
+        billdate: null,
+        duedate: null,
+        invoicenum: '',
+        category: '',
+        ordernumber: '',
+    });
+
+
+    // Preload form with existing billing data
+ useEffect(() => {
+    if (fnd) {
+      const parsedItems = JSON.parse(fnd.items || "{}");
+      setInitialValues({
+        vendor: fnd.customer,
+        billdate: fnd.issueDate ? moment(fnd.billdate, "YYYY-MM-DD") : null,
+        duedate: fnd.dueDate ? moment(fnd.duedate, "YYYY-MM-DD") : null,
+        category: fnd.category,
+        invoicenum: fnd.salesInvoiceNumber,
+        ordernumber:fnd.ordernumber,
+        items: parsedItems,
+      });
+      setRows([
+        {
+          id: Date.now(),
+          item: parsedItems.item || "",
+          quantity: parsedItems.quantity || "",
+          price: parsedItems.price || "",
+          discount: parsedItems.discount || "",
+          tax: parsedItems.tax || "",
+          amount: parsedItems.amount || "0",
+          description: parsedItems.description || "",
+          isNew: false,
+        },
+      ]);
+    }
+  }, [fnd]);
 
     const [rows, setRows] = useState([
         {
@@ -54,31 +127,211 @@ const EditBilling = () => {
         alert("Are you sure you want to delete this element?")
         // calculateTotals(updatedRows);
     };
-    const navigate = useNavigate();
 
-    const onSubmit = (values) => {
-        console.log('Submitted values:', values);
-        message.success('Job added successfully!');
-        navigate('/apps/sales/billing/');
+    const preloadForm = (data) => {
+      form.setFieldsValue({
+        vendor: data.vendor,
+        billdate: dayjs(data.billDate),
+        duedate: dayjs(data.dueDate),
+        invoicenum: data.invoiceNumber,
+        category: data.category,
+        ordernumber: data.orderNumber,
+      });
+    };
+  
+    const fetchTags = async () => {
+      try {
+        const response = await dispatch(GetLable(lid));
+        if (response.payload && response.payload.data) {
+          const uniqueTags = response.payload.data
+            .filter((label) => label && label.name)
+            .map((label) => ({
+              id: label.id,
+              name: label.name.trim(),
+            }))
+            .filter(
+              (label, index, self) =>
+                index === self.findIndex((t) => t.name === label.name)
+            );
+  
+          setTags(uniqueTags);
+        }
+      } catch (error) {
+        console.error("Failed to fetch tags:", error);
+        message.error("Failed to load tags");
+      }
+    };
+  
+
+    
+      const handleAddNewTag = async () => {
+        if (!newTag.trim()) {
+          message.error("Please enter a tag name");
+          return;
+        }
+    
+        try {
+          const lid = AllLoggeddtaa.loggedInUser.id;
+          const payload = {
+            name: newTag.trim(),
+            labelType: "status",
+          };
+    
+          await dispatch(AddLable({ lid, payload }));
+          message.success("Status added successfully");
+          setNewTag("");
+          setIsTagModalVisible(false);
+    
+          // Fetch updated tags
+          await fetchTags();
+        } catch (error) {
+          console.error("Failed to add Status:", error);
+          message.error("Failed to add Status");
+        }
+      };
+
+    const handleSubmit = () => {
+      form
+        .validateFields()
+        .then((values) => {
+          const selectedTag = tags.find((tag) => tag.name === values.category);
+  
+          const prepareBillingData = () => {
+            return {
+              vendor: values.vendor,
+              billDate: values.billdate?.format("YYYY-MM-DD"),
+              dueDate: values.duedate?.format("YYYY-MM-DD"),
+              invoiceNumber: values.invoicenum,
+              category: values.category,
+              orderNumber: values.ordernumber,
+            };
+          };
+  
+          if (!selectedTag) {
+            const newTagPayload = { name: values.category };
+  
+            dispatch(AddLable({ lid, payload: newTagPayload }))
+              .then(() => {
+                const billingData = prepareBillingData();
+                dispatch(updateBilling({ idd, billingId: billingData.id, billingData }))
+                  .then(() => {
+                    message.success("Billing updated successfully!");
+                    dispatch(getAllBillings(lid));
+                    onClose();
+                  })
+                  .catch((error) => {
+                    message.error("Failed to update billing. Please try again.");
+                    console.error("Error during update:", error);
+                  });
+              })
+              .catch((error) => {
+                message.error("Failed to add tag.");
+                console.error("Add Tag API error:", error);
+              });
+          } else {
+            const billingData = prepareBillingData();
+            dispatch(updateBilling({ lid, billingId: billingData.id, billingData }))
+              .then(() => {
+                message.success("Billing updated successfully!");
+                dispatch(getAllBillings(lid));
+                onClose();
+              })
+              .catch((error) => {
+                message.error("Failed to update billing. Please try again.");
+                console.error("Error during update:", error);
+              });
+          }
+        })
+        .catch((error) => {
+          console.error("Validation failed:", error);
+        });
     };
 
-    const initialValues = {
-        vendor: '',
-        billdate: null,
-        duedate: null,
-        billnub: '',
-        category: '',
-        ordernumber: '',
-    };
+
 
     const validationSchema = Yup.object({
         vendor: Yup.string().required('Please select vendor.'),
         billdate: Yup.date().nullable().required('Date is required.'),
         duedate: Yup.date().nullable().required('Date is required.'),
-        billnub: Yup.string().required('Please enter billnub.'),
+        invoicenum: Yup.string().required('Please enter invoicenum.'),
         category: Yup.string().required('Please select category.'),
         ordernumber: Yup.string().required('Please enter a order number.'),
     });
+
+
+
+
+
+// const EditBilling = ({ idd, onClose }) => {
+//     // const [users, setUsers] = useState(userData);
+//     // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+//     // const [list, setList] = useState(OrderListData);
+
+
+//     const [rows, setRows] = useState([
+//         {
+//             id: Date.now(),
+//             item: "",
+//             quantity: "",
+//             price: "",
+//             discount: "",
+//             tax: "",
+//             amount: "0",
+//             description: "",
+//             isNew: false,
+//         },
+//     ]);
+
+//     // Function to handle adding a new row
+//     const handleAddRow = () => {
+//         setRows([
+//             ...rows,
+//             {
+//                 id: Date.now(),
+//                 item: "",
+//                 quantity: "",
+//                 price: "",
+//                 discount: "",
+//                 tax: "",
+//                 amount: "0",
+//                 description: "",
+//                 isNew: true,
+//             },
+//         ]);
+//     };
+
+//     // Function to handle deleting a row
+//     const handleDeleteRow = (id) => {
+//         const updatedRows = rows.filter((row) => row.id !== id);
+//         setRows(updatedRows);
+//         alert("Are you sure you want to delete this element?")
+//         // calculateTotals(updatedRows);
+//     };
+//     const navigate = useNavigate();
+
+//     const onSubmit = (values) => {
+//         console.log('Submitted values:', values);
+//         message.success('Job added successfully!');
+//         navigate('/apps/sales/billing/');
+//     };
+
+//     const initialValues = {
+//         vendor: '',
+//         billdate: null,
+//         duedate: null,
+//         billnub: '',
+//         category: '',
+//         ordernumber: '',
+//     };
+
+//     const validationSchema = Yup.object({
+//         vendor: Yup.string().required('Please select vendor.'),
+//         billdate: Yup.date().nullable().required('Date is required.'),
+//         duedate: Yup.date().nullable().required('Date is required.'),
+//         billnub: Yup.string().required('Please enter billnub.'),
+//         category: Yup.string().required('Please select category.'),
+//         ordernumber: Yup.string().required('Please enter a order number.'),
+//     });
 
     return (
         <>
@@ -91,7 +344,7 @@ const EditBilling = () => {
                                 <Formik
                                     initialValues={initialValues}
                                     validationSchema={validationSchema}
-                                    onSubmit={onSubmit}
+                                    onClick={handleSubmit}
                                 >
                                     {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
                                         <Form className="formik-form " onSubmit={handleSubmit}>
@@ -146,42 +399,80 @@ const EditBilling = () => {
                                                     </div>
                                                 </Col>
 
-                                                <Col span={8} className='mt-2 hidden md:block lg:block'>
-                                                </Col>
+                                                <Col span={12} className="mt-4">
+  <Form.Item
+    label="Invoice"
+    name="salesInvoiceNumber"
+    rules={[{ required: true, message: "Please select an invoice" }]}
+  >
+    <Select
+      style={{ width: "100%" }}
+      placeholder="Select Invoice"
+      value={values.salesInvoiceNumber}
+      onChange={(value) => setFieldValue("salesInvoiceNumber", value)}
+    >
+      {Array.isArray(dfnddadat) && dfnddadat.length > 0 ? (
+        dfnddadat.map((invoice) => (
+          <Select.Option key={invoice.id} value={invoice.id}>
+            {invoice.salesInvoiceNumber} {/* Adjust property name as needed */}
+          </Select.Option>
+        ))
+      ) : (
+        <Select.Option value="" disabled>
+          No invoices available
+        </Select.Option>
+      )}
+    </Select>
+  </Form.Item>
+</Col>
 
 
-                                                <Col span={8} className='mt-2'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold'>Bill  Number</label>
-                                                        <Field name="billnub" as={Input} placeholder="Enter Bill Number" />
-                                                        <ErrorMessage name="billnub" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
-                                                </Col>
+                                            
+                                                 <Col span={12} className="">
+                                                                                                 {/* <Form.Item
+                                                                                                   label="Category"
+                                                                                                   name="category"
+                                                                                                   rules={[{ required: true, message: "Please select or add a category" }]}
+                                                                                                 > */}
+                                                
+                                                                                                 <div className="form-item">
+                                                                                                    <label className='font-semibold'>Category</label>
+                                                                                                   <Select
+                                                                                                     placeholder="Select or add new category"
+                                                                                                     dropdownRender={(menu) => (
+                                                                                                       <div>
+                                                                                                         {menu}
+                                                                                                         <div
+                                                                                                           style={{
+                                                                                                             padding: "8px",
+                                                                                                             borderTop: "1px solid #e8e8e8",
+                                                                                                           }}
+                                                                                                         >
+                                                                                                           <Button
+                                                                                                             type="link"
+                                                                                                             onClick={() => setIsTagModalVisible(true)}
+                                                                                                             block
+                                                                                                           >
+                                                                                                             Add New Category
+                                                                                                           </Button>
+                                                                                                         </div>
+                                                                                                       </div>
+                                                                                                     )}
+                                                                                                   >
+                                                                                                     {tags &&
+                                                                                                       tags.map((tag) => (
+                                                                                                         <Option key={tag.id} value={tag.name}>
+                                                                                                           {tag.name}
+                                                                                                         </Option>
+                                                                                                       ))}
+                                                                                                   </Select>
+                                                                                                   </div>
+                                                                                                 {/* </Form.Item> */}
+                                                                                               </Col>
+                                                
+                                                                                                
 
-                                                <Col span={8} className='mt-2'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold'>Category</label>
-                                                        <Field name="category">
-                                                            {({ field }) => (
-                                                                <Select
-                                                                    {...field}
-                                                                    className="w-full"
-                                                                    placeholder="Select Category"
-                                                                    onChange={(value) => setFieldValue('category', value)}
-                                                                    value={values.category}
-                                                                    onBlur={() => setFieldTouched("category", true)}
-                                                                >
-                                                                    <Option value="xyz">XYZ</Option>
-                                                                    <Option value="abc">ABC</Option>
-                                                                </Select>
-                                                            )}
-                                                        </Field>
-                                                        <ErrorMessage name="category" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
-                                                </Col>
-
-                                                <Col span={8} className='mt-2 hidden md:block lg:block'>
-                                                </Col>
+                                               
 
                                                 <Col span={8} className='mt-2'>
                                                     <div className="form-item">
@@ -359,9 +650,22 @@ const EditBilling = () => {
 
                     <div className="form-buttons text-right">
                         <Button type="default" className="mr-2" onClick={() => navigate('/apps/sales/billing')}>Cancel</Button>
-                        <Button type="primary" htmlType="submit">Update</Button>
+                        <Button type="primary" onClick={handleSubmit}>Update</Button>
                     </div>
                 </div>
+                 <Modal
+                                            title="Add New Category"
+                                            open={isTagModalVisible}
+                                            onCancel={() => setIsTagModalVisible(false)}
+                                            onOk={handleAddNewTag}
+                                            okText="Add Category"
+                                          >
+                                            <Input
+                                              placeholder="Enter new Category"
+                                              value={newTag}
+                                              onChange={(e) => setNewTag(e.target.value)}
+                                            />
+                                          </Modal>
             </div>
         </>
     );

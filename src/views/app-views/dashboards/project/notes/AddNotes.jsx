@@ -1,19 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Input, Button, Select, message, Row, Col } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AddNote, GetNote } from "./NotesReducer/NotesSlice";
+import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 
 const { Option } = Select;
 
 const AddNotes = ({ onClose }) => {
   const dispatch = useDispatch();
   const { id } = useParams();
+
+  const employeeData = useSelector((state) => 
+    (state.employee?.employee?.data || []).filter((employee) => employee.employeeId)
+  );
+
   const navigate = useNavigate();
+
+useEffect(() => {
+    dispatch(empdata());
+  }, []);
 
   const initialValues = {
     note_title: "",
@@ -79,26 +89,65 @@ const AddNotes = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24}>
-                <div className="mt-4">
-                  <label className="font-semibold">Employees</label>
-                  <Select
-                    mode="multiple"
-                    placeholder="Select Employees"
-                    className="w-full mt-2"
-                    onChange={(value) => setFieldValue("employees", value)}
-                    value={values.employees}
-                  >
-                    <Option value="xyz">XYZ</Option>
-                    <Option value="abc">ABC</Option>
-                  </Select>
-                  <ErrorMessage
-                    name="employees"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+
+ <Col span={12} className="mt-2">
+              <div className="form-item">
+            <label className="font-semibold">Employees</label>
+            <Field name="employee">
+              {({ field }) => (
+                <Select
+                  {...field}
+                  className="w-full"
+                  placeholder="Select Employee"
+                  onChange={(value) => setFieldValue("employee", value)}
+                  value={values.employee}
+                  onBlur={() => setFieldTouched("employee", true)}
+                >
+                  {employeeData.map((emp) => (
+                    <Option key={emp.id} value={emp.id}>
+                      {emp.username}
+                    </Option>
+                  ))}
+                </Select>
+              )}
+            </Field>
+            <ErrorMessage
+              name="employee"
+              component="div"
+              className="error-message text-red-500 my-1"
+            />
+          </div>
+              </Col> 
+{/* <Col span={12} className="mt-2">
+  <div className="form-item">
+    <label className="font-semibold">Employees</label>
+    <Field name="employees">
+      {({ field }) => (
+        <Select
+          {...field}
+          className="w-full"
+          placeholder="Select Employees"
+          mode="multiple" // Enable multiple selection
+          onChange={(value) => setFieldValue("employees", value)}
+          value={values.employees}
+          onBlur={() => setFieldTouched("employees", true)}
+        >
+          {employeeData.map((emp) => (
+            <Option key={emp.id} value={emp.id}>
+              {emp.username}
+            </Option>
+          ))}
+        </Select>
+      )}
+    </Field>
+    <ErrorMessage
+      name="employees"
+      component="div"
+      className="error-message text-red-500 my-1"
+    />
+  </div>
+</Col>   */}
+
 
               <Col span={24} className="mt-5">
                 <div className="form-item">

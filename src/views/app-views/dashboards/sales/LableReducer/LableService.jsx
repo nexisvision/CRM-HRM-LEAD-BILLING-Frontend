@@ -7,17 +7,14 @@ import axios from "axios";
 //     return res
 // };
 
-const getbra = async () => {
+const GetLable = async (lid) => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(
-      "http://localhost:5353/api/v1/branches/",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const res = await axios.get(`http://localhost:5353/api/v1/labels/${lid}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -25,13 +22,13 @@ const getbra = async () => {
   }
 };
 
-const addbra = async (values) => {
+const AddLable = async (lid, payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/branches/",
-      values,
+      `http://localhost:5353/api/v1/labels/${lid}`,
+      payload,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -46,12 +43,12 @@ const addbra = async (values) => {
   }
 };
 
-const deletebra = async (id) => {
+const Deletemin = async (userId) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/branches/${id}`,
+      `http://localhost:5353/api/v1/labels/${userId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -66,12 +63,12 @@ const deletebra = async (id) => {
   }
 };
 
-const editbra = async (idd, values) => {
+const EditMin = async (idd, data) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/branches/${idd}`,
-      values,
+      `http://localhost:5353/api/v1/labels/${idd}`,
+      data,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -107,10 +104,10 @@ const editbra = async (idd, values) => {
 
 const UserService = {
   // addUser,
-  getbra,
-  addbra,
-  deletebra,
-  editbra,
+  GetLable,
+  AddLable,
+  Deletemin,
+  EditMin,
   // getAllUsers,
   // getUserById,
   // deleteUser,

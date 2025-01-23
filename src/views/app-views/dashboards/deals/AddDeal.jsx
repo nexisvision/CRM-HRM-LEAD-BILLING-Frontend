@@ -177,6 +177,42 @@ const AddDeal = ({ onClose }) => {
                   />
                 </div>
               </Col>
+               <Col span={12} className="mt-4">
+                                  <div className="form-item">
+                                    <label className="font-semibold mb-2">Currency</label>
+                                    <div className="flex gap-2">
+                                      <Field name="currency">
+                                        {({ field, form }) => (
+                                          <Select
+                                            {...field}
+                                            className="w-full mt-2"
+                                            placeholder="Select Currency"
+                                            onChange={(value) => {
+                                              const selectedCurrency = currencies.find(
+                                                (c) => c.id === value
+                                              );
+                                              form.setFieldValue(
+                                                "currency",
+                                                selectedCurrency?.currencyCode || ""
+                                              );
+                                            }}
+                                          >
+                                            {currencies?.map((currency) => (
+                                              <Option key={currency.id} value={currency.id}>
+                                                {currency.currencyCode}
+                                              </Option>
+                                            ))}
+                                          </Select>
+                                        )}
+                                      </Field>
+                                    </div>
+                                    <ErrorMessage
+                                      name="currency"
+                                      component="div"
+                                      className="error-message text-red-500 my-1"
+                                    />
+                                  </div>
+                                </Col>
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Lead Title</label>
@@ -211,23 +247,8 @@ const AddDeal = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="">
-                <div className="form-item">
-                  <label className="font-semibold">Lead Value</label>
-                  <Field name="leadValue"
-                    className="mt-2" component={LeadValueField} />
-                  <ErrorMessage
-                    name="leadValue.amount"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                  <ErrorMessage
-                    name="leadValue.currencyId"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+              
+
               <Col span={12} className="">
                 <div className="form-item">
                   <label className="font-semibold">Pipeline</label>

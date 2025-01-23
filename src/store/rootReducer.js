@@ -55,6 +55,9 @@ import loan from "../views/app-views/hrm/PayRoll/Salary/Loan/loanReducer/loanSli
 import otherpayment from "../views/app-views/hrm/PayRoll/Salary/OtherPayment/otherpaymentReducer/otherpaymentSlice"
 import deducation from "../views/app-views/hrm/PayRoll/Salary/SaturationDeduction/deducationReducer/deducationSlice"
 import overtime from "../views/app-views/hrm/PayRoll/Salary/Overtime/overtimeReducer/overtimeSlice"
+import salesbilling from "../views/app-views/dashboards/sales/billing/billingReducers/billingSlice"
+import indicator from "../views/app-views/hrm/Performance/Indicator/IndicatorReducers/indicatorSlice"
+import appraisal from "../views/app-views/hrm/Performance/Appraisal/AppraisalReducers/AppraisalSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -114,6 +117,9 @@ const rootReducer = (asyncReducers) => (state, action) => {
         otherpayment,
         deducation,
         overtime,
+        salesbilling,
+        indicator,
+        appraisal,
         // employee,
         // department,
         ...asyncReducers,

@@ -7,6 +7,84 @@ import axios from "axios";
 //     return res
 // };
 
+const getRoles = async () => {
+  const token = localStorage.getItem("auth_token");
+  try {
+    const res = await axios.get(
+      "http://localhost:5353/api/v1/roles/",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+const addRole = async (values) => {
+  const token = localStorage.getItem("auth_token");
+
+  try {
+    const res = await axios.post(
+      "http://localhost:5353/api/v1/roles/",
+      values,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    //    dispatch(empdata());
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+const deleteRole = async (id) => {
+  const token = localStorage.getItem("auth_token");
+
+  try {
+    const res = await axios.delete(
+      `http://localhost:5353/api/v1/roles/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    //   dispatch(empdata());
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+const editRole = async (id, values) => {
+  const token = localStorage.getItem("auth_token");
+  try {
+    const res = await axios.put(
+      `http://localhost:5353/api/v1/roles/${id}`,
+      values,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error updating appraisal data:", error);
+    throw error;
+  }
+};
+
 const RoleData = async () => {
   const token = localStorage.getItem("auth_token");
 
@@ -22,6 +100,9 @@ const RoleData = async () => {
     console.error("Error fetching data:", error);
   }
 };
+
+
+
 
 // const getAllUsers = async () => {
 //     const res = await axios.get(`${baseUrl}users/all`, getToken());
@@ -43,13 +124,17 @@ const RoleData = async () => {
 //     return res.data
 // }
 
-const UserService = {
+const RoleAndPermissionService = {
   // addUser,
+  getRoles,
+  addRole,
+  deleteRole,
   RoleData,
+  editRole,
   // getAllUsers,
   // getUserById,
   // deleteUser,
   // updateUser
 };
 
-export default UserService;
+export default RoleAndPermissionService;

@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./BranchService";
+import UserService from "./AppraisalService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
 
-export const AddBranchs = createAsyncThunk(
-  "users/AddBranchs",
+export const addAppraisals = createAsyncThunk(
+  "users/addAppraisals",
   async (values, thunkAPI) => {
     try {
-      const response = await UserService.addbra(values);
+      const response = await UserService.addAppraisal(values);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -19,11 +19,11 @@ export const AddBranchs = createAsyncThunk(
 
 // Async thunk for user login
 
-export const getBranch = createAsyncThunk(
-  "emp/getBranch",
+export const getAppraisals = createAsyncThunk(
+  "emp/getAppraisals",
   async (thunkAPI) => {
     try {
-      const response = await UserService.getbra();
+      const response = await UserService.getAppraisals();
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -32,11 +32,11 @@ export const getBranch = createAsyncThunk(
 );
 
 // Async thunk for getting all users
-export const getAllUsers = createAsyncThunk(
-  "users/getAllUsers",
+export const getAllAppraisals = createAsyncThunk(
+  "users/getAllAppraisals",
   async (thunkAPI) => {
     try {
-      const response = await UserService.getAllUsers();
+      const response = await UserService.getAllAppraisals();
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -45,11 +45,11 @@ export const getAllUsers = createAsyncThunk(
 );
 
 // Async thunk for getting user by id
-export const getUserById = createAsyncThunk(
-  "users/getUserById",
+export const getAppraisalById = createAsyncThunk(
+  "users/getAppraisalById",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.getUserById(userId);
+      const response = await UserService.getAppraisalById(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -58,26 +58,26 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const deleteBranch = createAsyncThunk(
-  "users/deleteBrancheet",
+export const deleteAppraisal = createAsyncThunk(
+  "users/deleteAppraisal",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.deletebra(userId);
+      const response = await UserService.deleteAppraisal(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const editBranch = createAsyncThunk(
-  "users/editBranch",
-  async ({ idd, values }, thunkAPI) => {
+export const editAppraisal = createAsyncThunk(
+  "users/editAppraisal",
+  async ({ id, values }, thunkAPI) => {
     try {
-      const response = await UserService.editbra(idd, values);
+      const response = await UserService.editAppraisal(id, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data || "Error updating employee"
+        error.response?.data || "Error updating Appraisal"
       );
     }
   }
@@ -93,10 +93,10 @@ const initialIsAuth = () => {
   return item ? JSON.parse(item) : false;
 };
 
-const RoleAndPermissionSlice = createSlice({
-  name: "Branch",
+const AppraisalSlice = createSlice({
+  name: "Appraisal",
   initialState: {
-    Branch: [],
+    Appraisals: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -114,13 +114,7 @@ const RoleAndPermissionSlice = createSlice({
       state.editItem = action.payload;
       state.editModal = !state.editModal;
     },
-    handleLogout: (state, action) => {
-      state.isAuth = action.payload;
-      state.loggedInUser = null;
-      localStorage.removeItem("isAuth");
-      localStorage.removeItem("USER");
-      localStorage.removeItem("TOKEN");
-    },
+
     toggleDetailModal: (state, action) => {
       state.detailItem = action.payload;
       state.detailModal = !state.editModal;
@@ -133,86 +127,88 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(AddBranchs.pending, (state) => {
+      .addCase(addAppraisals.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(AddBranchs.fulfilled, (state, action) => {
+      .addCase(addAppraisals.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(AddBranchs.rejected, (state, action) => {
+      .addCase(addAppraisals.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(getBranch.pending, (state) => {
+      .addCase(getAppraisals.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(getBranch.fulfilled, (state, action) => {
+      .addCase(getAppraisals.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.Branch = action?.payload;
+        state.Appraisals = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(getBranch.rejected, (state, action) => {
+      .addCase(getAppraisals.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
       //getall
-      .addCase(getAllUsers.pending, (state) => {
+      .addCase(getAllAppraisals.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(getAllUsers.fulfilled, (state, action) => {
+      .addCase(getAllAppraisals.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.users = action.payload;
-        toast.success(`Users fetched successfully`);
+        state.Appraisals = action.payload;
+        toast.success(`Appraisals fetched successfully`);
       })
-      .addCase(getAllUsers.rejected, (state, action) => {
+      .addCase(getAllAppraisals.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
 
       //getuserbyid
-      .addCase(getUserById.pending, (state) => {
+      .addCase(getAppraisalById.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(getUserById.fulfilled, (state, action) => {
+      .addCase(getAppraisalById.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.detailItem = action.payload?.user;
+        state.detailItem = action.payload?.appraisal;
         toast.success(action.payload.message);
       })
-      .addCase(getUserById.rejected, (state, action) => {
+      .addCase(getAppraisalById.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //delete
-      .addCase(deleteBranch.pending, (state) => {
+      .addCase(deleteAppraisal.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(deleteBranch.fulfilled, (state, action) => {
+      .addCase(deleteAppraisal.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload.message);
       })
-      .addCase(deleteBranch.rejected, (state, action) => {
+      .addCase(deleteAppraisal.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(editBranch.pending, (state) => {
+      .addCase(editAppraisal.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(editBranch.fulfilled, (state, action) => {
+      .addCase(editAppraisal.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; // Update the state with the updated employee data
+        state.editItem = action.payload?.appraisal; // Update the state with the updated employee data
+        toast.success(action.payload.message);
       })
-      .addCase(editBranch.rejected, (state, action) => {
+      .addCase(editAppraisal.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
+        toast.error(action.payload?.response?.data?.message);
       });
   },
 });
 
 export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-  RoleAndPermissionSlice.actions;
-export default RoleAndPermissionSlice.reducer;
+  AppraisalSlice.actions;
+export default AppraisalSlice.reducer;

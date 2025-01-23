@@ -1,11 +1,11 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect } from 'react'
 import { useState } from 'react'
 // import { PrinterOutlined } from '@ant-design/icons';
 import StatisticWidget from 'components/shared-components/StatisticWidget';
 import {
     AnnualStatisticData,
 } from '../../../dashboards/default/DefaultDashboardData';
-import { Row, Card, Col, Table, Select, Input, Button, Badge, Menu, Modal, Tag } from 'antd';
+import { Row, Card, Col, Table, Select, Input, Button, Badge, Menu, Modal, Tag, message } from 'antd';
 // import { invoiceData } from '../../../pages/invoice/invoiceData';
 // import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
 import NumberFormat from 'react-number-format';
@@ -24,6 +24,9 @@ import utils from 'utils'
 import AddBilling from './AddBilling';
 import EditBilling from './EditBilling';
 import ViewBilling from './ViewBilling';
+import { getInvoice } from '../invoice/InvoiceReducer/InvoiceSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteBilling, getAllBillings } from './billingReducers/billingSlice';
 // import AddInvoice from './AddInvoice';
 // import EditInvoice from './EditInvoice';
 // import ViewInvoice from './ViewInvoice';
@@ -65,12 +68,26 @@ export const BillingList = () => {
     const [list, setList] = useState(OrderListData)
     const [selectedRows, setSelectedRows] = useState([])
     const [isAddBillingModalVisible, setIsAddBillingModalVisible] = useState(false);
-    const [isEditBillingModalVisible, setIsEditBillingModalVisible] = useState(false);
-    const [isViewBillingModalVisible, setIsViewBillingModalVisible] = useState(false);
+const [isEditBillingModalVisible, setIsEditBillingModalVisible] =
+    useState(false);
+  const [isViewBillingModalVisible, setIsViewBillingModalVisible] =
+    useState(false);
+    const dispatch = useDispatch();
+
+
 
 
 
     const [selectedRowKeys, setSelectedRowKeys] = useState([])
+
+
+          const AllLoggeddtaa = useSelector((state) => state.user);
+          const lid = AllLoggeddtaa.loggedInUser.id;
+      const [idd, setIdd] = useState("");
+    
+  const alldata = useSelector((state) => state.salesbilling);
+  const fnddata = alldata.billings;
+
 
     const handleShowStatus = value => {
         if (value !== 'All') {
@@ -81,6 +98,23 @@ export const BillingList = () => {
             setList(OrderListData)
         }
     }
+
+    useEffect(() => {
+        dispatch(getInvoice());
+      }, []);
+
+
+      useEffect(() => {
+          dispatch(getAllBillings(lid));
+        }, []);
+
+
+
+  useEffect(() => {
+    if (fnddata) {
+      setList(fnddata);
+    }
+  }, [fnddata]);
 
     // Open Add Job Modal
     const openAddBillingModal = () => {
@@ -95,7 +129,7 @@ export const BillingList = () => {
     // Open Add Job Modal
     const openEditBillingModal = () => {
         setIsEditBillingModalVisible(true);
-    };
+      };
 
     // Close Add Job Modal
     const closeEditBillingModal = () => {
@@ -112,6 +146,20 @@ export const BillingList = () => {
     const closeViewBillingModal = () => {
         setIsViewBillingModalVisible(false);
     };
+
+
+ const delfun = (idd) => {
+    dispatch(deleteBilling(idd)).then(() => {
+        message.success("Billing delete  successfully!");
+      dispatch(getAllBillings(lid));
+      setList(list.filter((item) => item.id !== idd));
+    });
+  };
+
+    const editfun = (idd) => {
+        openEditBillingModal();
+        setIdd(idd);
+      };
 
     const dropdownMenu = row => (
         <Menu>
@@ -130,7 +178,7 @@ export const BillingList = () => {
             </Menu.Item>
 
             <Menu.Item>
-                <Flex alignItems="center" onClick={openEditBillingModal}>
+                <Flex alignItems="center" onClick={() => editfun(row.id)}>
                     <EditOutlined />
                     {/* <EditOutlined /> */}
                     <span className="ml-2">Edit</span>
@@ -143,7 +191,7 @@ export const BillingList = () => {
                 </Flex>
             </Menu.Item>
             <Menu.Item>
-                <Flex alignItems="center">
+                <Flex alignItems="center" onClick={() => delfun(row.id)}>
                     <DeleteOutlined />
                     <span className="ml-2">Delete</span>
                 </Flex>
@@ -153,41 +201,26 @@ export const BillingList = () => {
 
     const tableColumns = [
         {
-            title: 'Bill',
-            dataIndex: 'bill'
-        },
+            title: "vendor",
+            dataIndex: "vendor",
+            render: (_, record) => <span>{record.vendor}</span>,
+            sorter: (a, b) => utils.antdTableSorter(a, b, "duedate"),
+          },
         {
-            title: 'Category',
-            dataIndex: 'category',
+            title: 'Discription',
+            dataIndex: 'discription',
             sorter: {
-                compare: (a, b) => a.title.length - b.title.length,
+                compare: (a, b) => a.discription.length - b.discription.length,
             },
         },
         {
-            title: 'Bill  Date',
-            dataIndex: 'billdate',
-            render: (_, record) => (
-                <span>{dayjs.unix(record.billdate).format(DATE_FORMAT_DD_MM_YYYY)}</span>
-            ),
-            sorter: (a, b) => utils.antdTableSorter(a, b, 'billdate')
-        },
-        {
-            title: 'Due Date',
-            dataIndex: 'duedate',
-            render: (_, record) => (
-                <span>{dayjs.unix(record.duedate).format(DATE_FORMAT_DD_MM_YYYY)}</span>
-            ),
-            sorter: (a, b) => utils.antdTableSorter(a, b, 'duedate')
-        },
-        {
-            title: 'status',
-            dataIndex: 'paymentStatus',
-            render: (_, record) => (
-                <><Tag color={getPaymentStatus(record.paymentStatus)}>{record.paymentStatus}</Tag></>
-                // <><Badge status={getPaymentStatus(record.paymentStatus)} /><span>{record.paymentStatus}</span></>
-            ),
-            sorter: (a, b) => utils.antdTableSorter(a, b, 'paymentStatus')
-        },
+            title: "Bill  Date",
+            dataIndex: "billDate",
+            render: (_, record) => <span>{record.billDate}</span>,
+            sorter: (a, b) => utils.antdTableSorter(a, b, "billDate"),
+          },
+       
+       
 
         {
             title: 'Action',
@@ -274,7 +307,7 @@ export const BillingList = () => {
 					width={1000}
 					className='mt-[-70px]'
 				>
-					<EditBilling onClose={closeEditBillingModal} />
+					<EditBilling onClose={closeEditBillingModal} idd={idd} />
 				</Modal>
                 <Modal
 					title="Billing"

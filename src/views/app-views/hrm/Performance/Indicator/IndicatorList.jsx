@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Tag, Input, message, Button, Modal } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Card, Table, Menu, Tag, Input, message, Button, Modal,Rate  } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, EditOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from '../../../Users/user-list/UserView';
@@ -14,16 +14,24 @@ import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
 import utils from 'utils';
 import ViewIndicator from './ViewIndicator';
+import { deleteIndicator, getIndicators } from './IndicatorReducers/indicatorSlice';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { navigate } from 'react-big-calendar/lib/utils/constants';
+import { getBranch } from '../../Branch/BranchReducer/BranchSlice';
+import { getDept } from '../../Department/DepartmentReducers/DepartmentSlice';
+import { getDes } from '../../Designation/DesignationReducers/DesignationSlice';
 
 const IndicatorList = () => {
   const [users, setUsers] = useState(userData);
   const [list, setList] = useState(OrderListData);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
+  const [id, setId] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddIndicatorModalVisible, setIsAddIndicatorModalVisible] = useState(false);
   const [isEditIndicatorModalVisible, setIsEditIndicatorModalVisible] = useState(false);
   const [isViewIndicatorModalVisible, setIsViewIndicatorModalVisible] = useState(false);
-
+const dispatch = useDispatch();
 
   const openAddIndicatorModal = () => setIsAddIndicatorModalVisible(true);
   const closeAddIndicatorModal = () => setIsAddIndicatorModalVisible(false);
@@ -31,12 +39,50 @@ const IndicatorList = () => {
   const openEditIndicatorModal = () => setIsEditIndicatorModalVisible(true);
   const closeEditIndicatorModal = () => setIsEditIndicatorModalVisible(false);
 
-
-
   const openViewIndicatorModal = () => setIsViewIndicatorModalVisible(true);
   const closeViewIndicatorModal = () => setIsViewIndicatorModalVisible(false);
 
+    const tabledata = useSelector((state) => state.indicator);
 
+const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
+  const departmentData = useSelector((state) => state.Department?.Department?.data || []);
+  const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
+
+  useEffect(() => {
+    dispatch(getBranch());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getDept());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getDes());
+  }, [dispatch]);
+
+
+useEffect(() => { 
+  dispatch(getIndicators());
+}, [dispatch]);
+
+
+useEffect(() => {
+  if (tabledata?.Indicators?.data) {
+    const mappedData = tabledata.Indicators.data.map((indicator) => {
+      const branch = branchData.find((b) => b.id === indicator.branch)?.branchName || 'N/A';
+      const department = departmentData.find((d) => d.id === indicator.department)?.department_name || 'N/A';
+      const designation = designationData.find((des) => des.id === indicator.designation)?.designation_name || 'N/A';
+
+      return {
+        ...indicator,
+        branch,
+        department,
+        designation,
+      };
+    });
+    setUsers(mappedData);
+  }
+}, [tabledata, branchData, departmentData, designationData]);
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
@@ -45,10 +91,7 @@ const IndicatorList = () => {
     setList(data);
   };
 
-  const deleteUser = (userId) => {
-    setUsers(users.filter(item => item.id !== userId));
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
-  };
+
 
   const showUserProfile = (userInfo) => {
     setUserProfileVisible(true);
@@ -59,6 +102,30 @@ const IndicatorList = () => {
     setUserProfileVisible(false);
     setSelectedUser(null);
   };
+
+  const editfun = (id) =>{
+    openEditIndicatorModal();
+    setId(id)
+  } 
+
+   const deleteIndicators = (userId) => {
+      // setUsers(users.filter(item => item.id !== userId));
+      // dispatch(DeleteDes(userId));
+      // dispatch(getDes())
+      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
+
+        dispatch(deleteIndicator( userId )) 
+                  .then(() => {
+                    dispatch(getIndicators());
+                    message.success('Indicator Deleted successfully!');
+                    setUsers(users.filter(item => item.id !== userId));
+                    navigate('/app/hrm/performance/indicator');
+                  })
+                  .catch((error) => {
+                    // message.error('Failed to delete Indicator.');
+                    console.error('Edit API error:', error);
+                  });
+    };
 
   const dropdownMenu = (elm) => (
     <Menu>
@@ -71,7 +138,7 @@ const IndicatorList = () => {
       </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-          <Button type="" className="" icon={<EditOutlined />} onClick={openEditIndicatorModal} size="small">
+          <Button type="" className="" icon={<EditOutlined />} onClick={()=>{editfun(elm.id)}} size="small">
             <span className="">Edit</span>
           </Button>
         </Flex>
@@ -85,7 +152,7 @@ const IndicatorList = () => {
       </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-          <Button type="" className="" icon={<DeleteOutlined />} onClick={() => deleteUser(elm.id)} size="small">
+          <Button type="" className="" icon={<DeleteOutlined />} onClick={() => { deleteIndicators(elm.id) }} size="small">
             <span className="">Delete</span>
           </Button>
         </Flex>
@@ -102,13 +169,6 @@ const IndicatorList = () => {
       },
     },
     {
-      title: 'Department',
-      dataIndex: 'department',
-      sorter: {
-        compare: (a, b) => a.department.length - b.department.length,
-      },
-    },
-    {
       title: 'Designation',
       dataIndex: 'designation',
       sorter: {
@@ -116,24 +176,70 @@ const IndicatorList = () => {
       },
     },
     {
+      title: 'Department',
+      dataIndex: 'department',
+      sorter: {
+        compare: (a, b) => a.department.length - b.department.length,
+      },
+    },
+   
+    {
       title: 'Overall Rating',
-      dataIndex: 'overallrating',
+      dataIndex: 'overallRating',
+      key: 'overallRating',
+      render: (rating) => <Rate disabled defaultValue={rating} />,
       sorter: {
-        compare: (a, b) => a.overallrating.length - b.overallrating.length,
+        compare: (a, b) => a.overallRating - b.overallRating,
       },
     },
     {
-      title: 'Added By',
-      dataIndex: 'addedby',
+      title: 'Business Process',
+      dataIndex: 'businessProcess',
+      key: 'businessProcess',
+      render: (rating) => <Rate disabled defaultValue={rating} />,
       sorter: {
-        compare: (a, b) => a.addedby.length - b.addedby.length,
+        compare: (a, b) => a.businessProcess - b.businessProcess,
       },
     },
     {
-      title: 'Created At',
-      dataIndex: 'startdate',
-      sorter: (a, b) => dayjs(a.startdate).unix() - dayjs(b.startdate).unix(),
+      title: 'Oral Communication',
+      dataIndex:'oralCommunication',
+      key: 'oralCommunication',
+      render: (rating) => <Rate disabled defaultValue={rating} />,
+      sorter: {
+        compare: (a, b) => a.oralCommunication - b.oralCommunication,
+      },
     },
+
+    {
+      title: 'Leadership',
+      dataIndex: 'leadership',
+      key: 'leadership',
+      render: (rating) => <Rate disabled defaultValue={rating} />,
+      sorter: {
+        compare: (a, b) => a.leadership - b.leadership,
+      },
+    },
+
+    {
+      title: 'Project Management',
+      dataIndex: 'projectManagement',
+      key: 'projectManagement',
+      render: (rating) => <Rate disabled defaultValue={rating} />,
+      sorter: {
+        compare: (a, b) => a.projectManagement - b.projectManagement,
+      },
+    },
+    {
+      title: 'Allocating Resources',
+      dataIndex: 'allocatingResources',
+      key: 'allocatingResources',
+      render: (rating) => <Rate disabled defaultValue={rating} />,
+      sorter: {
+        compare: (a, b) => a.allocatingResources - b.allocatingResources,
+      },
+    },
+
     {
       title: 'Action',
       dataIndex: 'actions',
@@ -187,7 +293,7 @@ const IndicatorList = () => {
         footer={null}
         width={1000}
       >
-        <EditIndicator onClose={closeEditIndicatorModal} />
+        <EditIndicator onClose={closeEditIndicatorModal} id={id} />
       </Modal>
 
       {/* View Indicator Modal */}

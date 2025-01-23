@@ -1,17 +1,62 @@
-import React from 'react';
-import { Form, Input, Button, Select, Rate, Row, Col, message } from 'antd';
+import React, { useEffect } from 'react';
+import { Form, Button, Select, Rate, Row, Col, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getBranch } from '../../Branch/BranchReducer/BranchSlice';
+import { getDept } from '../../Department/DepartmentReducers/DepartmentSlice';
+import { getDes } from '../../Designation/DesignationReducers/DesignationSlice';
+import { getIndicators, addIndicator } from './IndicatorReducers/indicatorSlice';
+// import AddIndicator from './IndicatorReducer/IndicatorSlice';
 
 const { Option } = Select;
 
-const AddIndicator = () => {
-  const [form] = Form.useForm();
+/*************  ✨ Codeium Command ⭐  *************/
+const AddIndicator = ({ onClose }) => {
+  const [form] = Form.useForm(); // Ensure this is called at the top
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const onFinish = (values) => {
-    console.log('Submitted values:', values);
-    message.success('Indicator added successfully!');
-    navigate('/app/hrm/indicator');
+  const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
+  const departmentData = useSelector((state) => state.Department?.Department?.data || []);
+  const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
+
+  useEffect(() => {
+    dispatch(getBranch());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getDept());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getDes());
+  }, [dispatch]);
+
+  const handleSubmit = (values) => {
+    dispatch(addIndicator(values)) // Fixed naming
+      .then(() => {
+        dispatch(getIndicators());
+        message.success('Indicator added successfully!');
+        onClose(); // Optional if provided
+        navigate('/app/hrm/performance/indicator');
+      })
+      .catch((error) => {
+        message.error('Failed to add indicator.');
+        console.error('Add API error:', error);
+      });
+  };
+
+  const initialValues = {
+    branch: "",
+    department: "",
+    designation: "",
+    businessProcess: "",
+    oralCommunication: "",
+    leadership: "",
+    overallRating: "",
+    allocatingResources: "",
+    projectManagement: "",
+    
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -21,17 +66,16 @@ const AddIndicator = () => {
 
   return (
     <div className="add-indicator">
-      {/* <h2>Create New Indicator</h2> */}
-
       <Form
         layout="vertical"
         form={form}
         name="add-indicator"
-        onFinish={onFinish}
+        initialValues={initialValues}
+        onFinish={handleSubmit}
         onFinishFailed={onFinishFailed}
       >
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
- 
+        <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
@@ -40,12 +84,15 @@ const AddIndicator = () => {
               rules={[{ required: true, message: 'Please select a branch' }]}
             >
               <Select placeholder="Select Branch">
-                <Option value="china">China</Option>
-                <Option value="usa">USA</Option>
-                <Option value="india">India</Option>
+                {branchData.map((branch) => (
+                  <Option key={branch.id} value={branch.id}>
+                    {branch.branchName}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>
+
           <Col span={12}>
             <Form.Item
               name="department"
@@ -53,12 +100,15 @@ const AddIndicator = () => {
               rules={[{ required: true, message: 'Please select a department' }]}
             >
               <Select placeholder="Select Department">
-                <Option value="hr">HR</Option>
-                <Option value="it">IT</Option>
-                <Option value="finance">Finance</Option>
+                {departmentData.map((dept) => (
+                  <Option key={dept.id} value={dept.id}>
+                    {dept.department_name}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>
+
           <Col span={12}>
             <Form.Item
               name="designation"
@@ -66,18 +116,17 @@ const AddIndicator = () => {
               rules={[{ required: true, message: 'Please select a designation' }]}
             >
               <Select placeholder="Select Designation">
-                <Option value="manager">Manager</Option>
-                <Option value="developer">Developer</Option>
-                <Option value="designer">Designer</Option>
+                {designationData.map((des) => (
+                  <Option key={des.id} value={des.id}>
+                    {des.designation_name}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>
         </Row>
 
-        {/* Behavioral Competencies */}
-        {/* <h3>Behavioral Competencies</h3> */}
         <h1 className="text-lg font-semibold mb-3">Behavioral Competencies</h1>
-
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
@@ -99,8 +148,6 @@ const AddIndicator = () => {
           </Col>
         </Row>
 
-        {/* Organizational Competencies */}
-        {/* <h3>Organizational Competencies</h3> */}
         <h1 className="text-lg font-semibold mb-3">Organizational Competencies</h1>
         <Row gutter={16}>
           <Col span={12}>
@@ -123,10 +170,7 @@ const AddIndicator = () => {
           </Col>
         </Row>
 
-        {/* Technical Competencies */}
-        {/* <h3>Technical Competencies</h3> */}
         <h1 className="text-lg font-semibold mb-3">Technical Competencies</h1>
-
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
@@ -137,11 +181,24 @@ const AddIndicator = () => {
               <Rate />
             </Form.Item>
           </Col>
+          <Col span={12}>
+            <Form.Item
+              name="overallRating"
+              label="overall Rating"
+              rules={[{ required: true, message: 'Please provide a rating for overall Rating' }]}
+            >
+              <Rate />
+            </Form.Item>
+          </Col>
         </Row>
 
         <Form.Item>
           <div className="text-right">
-            <Button type="default" onClick={() => navigate('/app/hrm/indicator')} style={{ marginRight: '10px' }}>
+            <Button
+              type="default"
+              onClick={() => navigate('/app/hrm/indicator')}
+              style={{ marginRight: '10px' }}
+            >
               Cancel
             </Button>
             <Button type="primary" htmlType="submit">
@@ -155,6 +212,7 @@ const AddIndicator = () => {
 };
 
 export default AddIndicator;
+
 
 
 

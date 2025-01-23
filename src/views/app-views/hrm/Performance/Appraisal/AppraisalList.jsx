@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Tag, Input, message, Button, Modal } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Card, Table, Menu, Tag, Input, message, Button, Modal, Rate } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined,EditOutlined , PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from '../../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-
+import { useNavigate } from 'react-router-dom';
 import AddAppraisal from './AddAppraisal';
 import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
@@ -13,17 +13,25 @@ import utils from 'utils';
 import EditAppraisal from './EditAppraisal';
 import { Model } from 'miragejs';
 import ViewAppraisal from './ViewAppraisal';
-
+import { empdata } from '../../Employee/EmployeeReducers/EmployeeSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { getBranch } from '../../Branch/BranchReducer/BranchSlice';
+import { deleteAppraisal, getAppraisals } from './AppraisalReducers/AppraisalSlice';
 const AppraisalList = () => {
   const [users, setUsers] = useState(userData);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [list, setList] = useState(OrderListData);
+    const [id, setId] = useState(null);
+   const navigate = useNavigate();
   const [isAddAppraisalModalVisible, setIsAddAppraisalModalVisible] = useState(false);
   const [isEditAppraisalModalVisible, setIsEditAppraisalModalVisible] = useState(false);
   const [isViewAppraisalModalVisible, setIsViewAppraisalModalVisible] = useState(false);
+  const dispatch = useDispatch();
 
-
+    const tabledata = useSelector((state) => state.appraisal);
+    const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
+ const employeeData = useSelector((state) => state.employee?.employee?.data || []);
 
   const openAddAppraisalModal = () => {
     setIsAddAppraisalModalVisible(true);
@@ -32,8 +40,6 @@ const AppraisalList = () => {
   const closeAddAppraisalModal = () => {
     setIsAddAppraisalModalVisible(false);
   };
-
-
 
   const openViewAppraisalModal = () => {
     setIsViewAppraisalModalVisible(true);
@@ -53,12 +59,52 @@ const AppraisalList = () => {
     setIsEditAppraisalModalVisible(false);
   };
 
+useEffect(() => {
+    dispatch(getBranch());
+  }, [dispatch]);
+
+  useEffect(() => { 
+    dispatch(getAppraisals());
+  }, [dispatch]);
+
+   useEffect(() => {
+      dispatch(empdata());
+    }, [dispatch]);
+
+
+
+
+useEffect(() => {
+  if (tabledata?.Appraisals?.data) {
+    const mappedData = tabledata.Appraisals.data.map((appraisal) => {
+      const branch = branchData.find((b) => b.id === appraisal.branch)?.branchName || 'N/A';
+      const employee = employeeData.find((e) => e.id === appraisal.employee)?.username || 'N/A';
+      
+      
+
+      return {
+        ...appraisal,
+        branch,
+        employee,
+      };
+    });
+    setUsers(mappedData);
+  }
+}, [tabledata, branchData, employeeData]);
+
+
+
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     const searchArray = value ? list : OrderListData;
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
   };
+
+  
+  // useEffect(() => {
+  //     dispatch(empdata());  
+  //   }, [dispatch]);
 
   const deleteUser = (userId) => {
     setUsers(users.filter(item => item.id !== userId));
@@ -74,6 +120,31 @@ const AppraisalList = () => {
     setUserProfileVisible(false);
     setSelectedUser(null);
   };
+
+ const editfun = (id) =>{
+    openEditAppraisalModal();
+    setId(id)
+  } 
+
+   const deleteAppraisals = (userId) => {
+      // setUsers(users.filter(item => item.id !== userId));
+      // dispatch(DeleteDes(userId));
+      // dispatch(getDes())
+      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
+
+        dispatch(deleteAppraisal( userId )) 
+                  .then(() => {
+                    dispatch(getAppraisals());
+                    message.success('Appraisal Deleted successfully!');
+                    setUsers(users.filter(item => item.id !== userId));
+                    navigate('/app/hrm/performance/appraisal');
+                  })
+                  .catch((error) => {
+                    // message.error('Failed to delete Indicator.');
+                    console.error('Edit API error:', error);
+                  });
+    };
+
 
   const dropdownMenu = (elm) => (
     <Menu>
@@ -94,7 +165,7 @@ const AppraisalList = () => {
           <Button
             type=""
             icon={<EditOutlined />}
-            onClick={openEditAppraisalModal}
+            onClick={()=>{editfun(elm.id)}}
             size="small"
           >
            Edit
@@ -105,20 +176,8 @@ const AppraisalList = () => {
         <Flex alignItems="center">
           <Button
             type=""
-            icon={<PushpinOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            Pin
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
             icon={<DeleteOutlined />}
-            onClick={() => deleteUser(elm.id)}
+            onClick={() => { deleteAppraisals(elm.id) }}
             size="small"
           >
             Delete
@@ -134,41 +193,73 @@ const AppraisalList = () => {
       dataIndex: 'branch',
       sorter: (a, b) => a.branch.length - b.branch.length,
     },
-    {
-      title: 'Department',
-      dataIndex: 'department',
-      sorter: (a, b) => a.department.length - b.department.length,
-    },
-    {
-      title: 'Designation',
-      dataIndex: 'designation',
-      sorter: (a, b) => a.designation.length - b.designation.length,
-    },
+ 
     {
       title: 'Employee',
-      dataIndex: 'name',
-      sorter: (a, b) => a.name.length - b.name.length,
+      dataIndex: 'employee',
+      sorter: (a, b) => a.employee.length - b.employee.length,
     },
-    {
-      title: 'Target Rating',
-      dataIndex: 'targetrating',
-      sorter: (a, b) => a.targetrating.length - b.targetrating.length,
-    },
+    
     {
       title: 'Overall Rating',
-      dataIndex: 'overallrating',
-      sorter: (a, b) => a.overallrating.length - b.overallrating.length,
+      dataIndex: 'overallRating',
+      key: 'overallRating',
+      render: (rating) => <Rate disabled defaultValue={rating} />,
+      sorter: {
+        compare: (a, b) => a.overallRating - b.overallRating,
+      },
     },
+
     {
-      title: 'Added By',
-      dataIndex: 'addedby',
-      sorter: (a, b) => a.addedby.length - b.addedby.length,
-    },
-    {
-      title: 'Appraisal',
-      dataIndex: 'startdate',
-      sorter: (a, b) => dayjs(a.startdate).unix() - dayjs(b.startdate).unix(),
-    },
+          title: 'Business Process',
+          dataIndex: 'businessProcess',
+          key: 'businessProcess',
+          render: (rating) => <Rate disabled defaultValue={rating} />,
+          sorter: {
+            compare: (a, b) => a.businessProcess - b.businessProcess,
+          },
+        },
+        {
+          title: 'Oral Communication',
+          dataIndex:'oralCommunication',
+          key: 'oralCommunication',
+          render: (rating) => <Rate disabled defaultValue={rating} />,
+          sorter: {
+            compare: (a, b) => a.oralCommunication - b.oralCommunication,
+          },
+        },
+    
+        {
+          title: 'Leadership',
+          dataIndex: 'leadership',
+          key: 'leadership',
+          render: (rating) => <Rate disabled defaultValue={rating} />,
+          sorter: {
+            compare: (a, b) => a.leadership - b.leadership,
+          },
+        },
+    
+        {
+          title: 'Project Management',
+          dataIndex: 'projectManagement',
+          key: 'projectManagement',
+          render: (rating) => <Rate disabled defaultValue={rating} />,
+          sorter: {
+            compare: (a, b) => a.projectManagement - b.projectManagement,
+          },
+        },
+        {
+          title: 'Allocating Resources',
+          dataIndex: 'allocatingResources',
+          key: 'allocatingResources',
+          render: (rating) => <Rate disabled defaultValue={rating} />,
+          sorter: {
+            compare: (a, b) => a.allocatingResources - b.allocatingResources,
+          },
+        },
+    
+  
+    
     {
       title: 'Action',
       dataIndex: 'actions',
@@ -223,7 +314,7 @@ const AppraisalList = () => {
         width={1000}
         className='mt-[-70px]'
       >
-        <EditAppraisal onClose={closeEditAppraisalModal} />
+        <EditAppraisal onClose={closeEditAppraisalModal} id={id} />
       </Modal>
       <Modal
         title="Appraisal Detail"

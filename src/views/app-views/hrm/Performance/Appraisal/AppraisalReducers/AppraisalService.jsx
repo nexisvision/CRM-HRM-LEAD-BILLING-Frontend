@@ -7,11 +7,11 @@ import axios from "axios";
 //     return res
 // };
 
-const getbra = async () => {
+const getAppraisals = async () => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.get(
-      "http://localhost:5353/api/v1/branches/",
+      "http://localhost:5353/api/v1/appraisal/",
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -25,12 +25,12 @@ const getbra = async () => {
   }
 };
 
-const addbra = async (values) => {
+const addAppraisal = async (values) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/branches/",
+      "http://localhost:5353/api/v1/appraisal/",
       values,
       {
         headers: {
@@ -46,12 +46,12 @@ const addbra = async (values) => {
   }
 };
 
-const deletebra = async (id) => {
+const deleteAppraisal = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/branches/${id}`,
+      `http://localhost:5353/api/v1/appraisal/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -66,11 +66,11 @@ const deletebra = async (id) => {
   }
 };
 
-const editbra = async (idd, values) => {
+const editAppraisal = async (id, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/branches/${idd}`,
+      `http://localhost:5353/api/v1/appraisal/${id}`,
       values,
       {
         headers: {
@@ -80,7 +80,7 @@ const editbra = async (idd, values) => {
     );
     return res.data;
   } catch (error) {
-    console.error("Error updating employee data:", error);
+    console.error("Error updating appraisal data:", error);
     throw error;
   }
 };
@@ -105,16 +105,16 @@ const editbra = async (idd, values) => {
 //     return res.data
 // }
 
-const UserService = {
+const AppraisalService = {
   // addUser,
-  getbra,
-  addbra,
-  deletebra,
-  editbra,
+  getAppraisals,
+  addAppraisal,
+  deleteAppraisal,
+  editAppraisal,
   // getAllUsers,
   // getUserById,
   // deleteUser,
   // updateUser
 };
 
-export default UserService;
+export default AppraisalService;

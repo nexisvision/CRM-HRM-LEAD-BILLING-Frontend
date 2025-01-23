@@ -20,7 +20,7 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
     const [discountValue, setDiscountValue] = useState(0);
     const [discountRate, setDiscountRate] = useState(10);
     const dispatch = useDispatch();
-    const allempdata = useSelector((state) => state.salesquotations);
+    const allempdata = useSelector((state) => state.estimate);
     const quotationData = allempdata.salesquotations.data;
     const [form] = Form.useForm();
     const [totals, setTotals] = useState({

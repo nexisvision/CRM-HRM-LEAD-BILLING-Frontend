@@ -58,7 +58,7 @@ const getShippingStatus = (orderStatus) => {
 const orderStatusList = ["Ready", "Shipped"];
 const EstimatesList = () => {
   const [annualStatisticData] = useState(AnnualStatisticData);
-  const { salesquotations, loading, error } = useSelector((state) => state.salesquotation);
+  const { salesquotations, loading, error } = useSelector((state) => state.estimate);
   const [list, setList] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);

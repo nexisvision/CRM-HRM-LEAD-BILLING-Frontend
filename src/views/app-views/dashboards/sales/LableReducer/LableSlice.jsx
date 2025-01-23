@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./BranchService";
+import UserService from "./LableService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
 
-export const AddBranchs = createAsyncThunk(
-  "users/AddBranchs",
-  async (values, thunkAPI) => {
+export const AddLable = createAsyncThunk(
+  "users/AddLable",
+  async ({ lid, payload }, thunkAPI) => {
     try {
-      const response = await UserService.addbra(values);
+      const response = await UserService.AddLable(lid, payload);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -19,11 +19,11 @@ export const AddBranchs = createAsyncThunk(
 
 // Async thunk for user login
 
-export const getBranch = createAsyncThunk(
-  "emp/getBranch",
-  async (thunkAPI) => {
+export const GetLable = createAsyncThunk(
+  "emp/GetLable",
+  async (lid, thunkAPI) => {
     try {
-      const response = await UserService.getbra();
+      const response = await UserService.GetLable(lid);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -58,22 +58,22 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const deleteBranch = createAsyncThunk(
-  "users/deleteBrancheet",
+export const Deletemins = createAsyncThunk(
+  "users/Deletemins",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.deletebra(userId);
+      const response = await UserService.Deletemin(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const editBranch = createAsyncThunk(
-  "users/editBranch",
-  async ({ idd, values }, thunkAPI) => {
+export const Editmins = createAsyncThunk(
+  "users/Editmins",
+  async ({ idd, data }, thunkAPI) => {
     try {
-      const response = await UserService.editbra(idd, values);
+      const response = await UserService.EditMin(idd, data);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -82,6 +82,8 @@ export const editBranch = createAsyncThunk(
     }
   }
 );
+
+// Async thunk for updating a user
 
 const initialUser = () => {
   const item = window.localStorage.getItem("USER");
@@ -94,9 +96,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "Branch",
+  name: "Lable",
   initialState: {
-    Branch: [],
+    Lable: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -133,27 +135,27 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(AddBranchs.pending, (state) => {
+      .addCase(AddLable.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(AddBranchs.fulfilled, (state, action) => {
+      .addCase(AddLable.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(AddBranchs.rejected, (state, action) => {
+      .addCase(AddLable.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(getBranch.pending, (state) => {
+      .addCase(GetLable.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(getBranch.fulfilled, (state, action) => {
+      .addCase(GetLable.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.Branch = action?.payload;
+        state.Lable = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(getBranch.rejected, (state, action) => {
+      .addCase(GetLable.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
@@ -186,27 +188,27 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
       //delete
-      .addCase(deleteBranch.pending, (state) => {
+      .addCase(Deletemins.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(deleteBranch.fulfilled, (state, action) => {
+      .addCase(Deletemins.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload.message);
       })
-      .addCase(deleteBranch.rejected, (state, action) => {
+      .addCase(Deletemins.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(editBranch.pending, (state) => {
+      .addCase(Editmins.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(editBranch.fulfilled, (state, action) => {
+      .addCase(Editmins.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; // Update the state with the updated employee data
+        state.editItem = action.payload;
       })
-      .addCase(editBranch.rejected, (state, action) => {
+      .addCase(Editmins.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
       });

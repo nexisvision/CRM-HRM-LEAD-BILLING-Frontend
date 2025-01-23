@@ -275,7 +275,7 @@ export const NotesList = () => {
                 onClick={openAddNotesModal}
               >
                 <PlusOutlined />
-                <span className="ml-2">Create Milestone</span>
+                <span className="ml-2">Create Note</span>
               </Button>
             </div>
           </Flex>

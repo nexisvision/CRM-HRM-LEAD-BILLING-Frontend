@@ -1,24 +1,69 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, Select, Rate, Row, Col, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
-
+import { getBranch } from '../../Branch/BranchReducer/BranchSlice';
+import { getDept } from '../../Department/DepartmentReducers/DepartmentSlice';
+import { getDes } from '../../Designation/DesignationReducers/DesignationSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { editIndicator, getIndicators } from './IndicatorReducers/indicatorSlice';
 const { Option } = Select;
 
-const EditIndicator = ({ initialData }) => {
+const EditIndicator = ({ id , onClose }) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  // Pre-fill the form with existing data when the component mounts
+  const alldept = useSelector((state) => state.indicator);
+  const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
+  const departmentData = useSelector((state) => state.Department?.Department?.data || []);
+  const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
+  const [singleEmp, setSingleEmp] = useState(null);
+
   useEffect(() => {
-    if (initialData) {
-      form.setFieldsValue(initialData);
+    // Find the specific indicator data by ID
+    const empData = alldept?.Indicators?.data || [];
+    const data = empData.find((item) => item.id === id);
+    setSingleEmp(data || null);
+
+    // Update form values when singleEmp is set
+    if (data) {
+      form.setFieldsValue({
+        branch: data.branch,
+        department: data.department,
+        designation: data.designation,
+        businessProcess: data.businessProcess,
+        oralCommunication: data.oralCommunication,
+        leadership: data.leadership,
+        overallRating: data.overallRating,
+        allocatingResources: data.allocatingResources,
+        projectManagement: data.projectManagement,
+      });
     }
-  }, [initialData, form]);
+  }, [id, alldept, form]);
+
+  // Dispatch initial data
+  useEffect(() => {
+    dispatch(getBranch());
+    dispatch(getDept());
+    dispatch(getDes());
+  }, [dispatch]);
 
   const onFinish = (values) => {
-    console.log('Updated values:', values);
-    message.success('Indicator updated successfully!');
-    navigate('/app/hrm/indicator');
+     if (!id) {
+          message.error('Indicator ID is missing.');
+          return;
+        }
+        dispatch(editIndicator({ id, values }))
+          .then(() => {
+            dispatch(getIndicators());
+            message.success('Indicator updated successfully!');
+            onClose();
+            navigate('/app/hrm/performance/indicator');
+          })
+          .catch((error) => {
+            message.error('Failed to update indicator.');
+            console.error('Edit API error:', error);
+          });
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -45,12 +90,15 @@ const EditIndicator = ({ initialData }) => {
               rules={[{ required: true, message: 'Please select a branch' }]}
             >
               <Select placeholder="Select Branch">
-                <Option value="china">China</Option>
-                <Option value="usa">USA</Option>
-                <Option value="india">India</Option>
+                {branchData.map((branch) => (
+                  <Option key={branch.id} value={branch.id}>
+                    {branch.branchName}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>
+
           <Col span={12}>
             <Form.Item
               name="department"
@@ -58,12 +106,15 @@ const EditIndicator = ({ initialData }) => {
               rules={[{ required: true, message: 'Please select a department' }]}
             >
               <Select placeholder="Select Department">
-                <Option value="hr">HR</Option>
-                <Option value="it">IT</Option>
-                <Option value="finance">Finance</Option>
+                {departmentData.map((dept) => (
+                  <Option key={dept.id} value={dept.id}>
+                    {dept.department_name}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>
+
           <Col span={12}>
             <Form.Item
               name="designation"
@@ -71,9 +122,11 @@ const EditIndicator = ({ initialData }) => {
               rules={[{ required: true, message: 'Please select a designation' }]}
             >
               <Select placeholder="Select Designation">
-                <Option value="manager">Manager</Option>
-                <Option value="developer">Developer</Option>
-                <Option value="designer">Designer</Option>
+                {designationData.map((des) => (
+                  <Option key={des.id} value={des.id}>
+                    {des.designation_name}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>
@@ -134,11 +187,24 @@ const EditIndicator = ({ initialData }) => {
               <Rate />
             </Form.Item>
           </Col>
+          <Col span={12}>
+            <Form.Item
+              name="overallRating"
+              label="Overall Rating"
+              rules={[{ required: true, message: 'Please provide a rating for Overall Rating' }]}
+            >
+              <Rate />
+            </Form.Item>
+          </Col>
         </Row>
 
         <Form.Item>
           <div className="text-right">
-            <Button type="default" onClick={() => navigate('/app/hrm/indicator')} style={{ marginRight: '10px' }}>
+            <Button
+              type="default"
+              onClick={() => navigate('/app/hrm/indicator')}
+              style={{ marginRight: '10px' }}
+            >
               Cancel
             </Button>
             <Button type="primary" htmlType="submit">

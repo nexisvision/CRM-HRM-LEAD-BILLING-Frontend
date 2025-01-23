@@ -357,14 +357,14 @@ const extraNavvTree = [
             breadcrumb: false,
             submenu: []
           },
-          {
-            key: 'extra-hrm-permission',
-            path: `${APP_PREFIX_PATH}/hrm/permission`,
-            title: 'Permission',
-            icon: CheckSquareOutlined,
-            breadcrumb: false,
-            submenu: []   
-          },
+          // {
+          //   key: 'extra-hrm-permission',
+          //   path: `${APP_PREFIX_PATH}/hrm/permission`,
+          //   title: 'Permission',
+          //   icon: CheckSquareOutlined,
+          //   breadcrumb: false,
+          //   submenu: []   
+          // },
           {
             key: 'extra-hrm-designation',
             path: `${APP_PREFIX_PATH}/hrm/designation`,

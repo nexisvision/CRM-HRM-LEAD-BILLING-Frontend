@@ -8,7 +8,7 @@ import { AddBranchs, getBranch } from './BranchReducer/BranchSlice';
 
 const validationSchema = Yup.object().shape({
   branchName: Yup.string()
-    .required('Department Name is required')
+    .required('Branch Name is required')
     .min(2, 'Department name must be at least 2 characters')
     .max(50, 'Department name cannot exceed 50 characters'),
 });
@@ -21,7 +21,7 @@ const AddBranch = ({ onClose }) => {
     dispatch(AddBranchs(values))
       .then(() => {
         dispatch(getBranch());
-        message.success('Department added successfully!');
+        message.success('Branch added successfully!');
         resetForm();
         onClose();
       })

@@ -77,6 +77,87 @@ export const updateUser = createAsyncThunk(
   }
 );
 
+
+// Async thunk for adding user
+
+export const addRole = createAsyncThunk(
+  "users/AddRole",
+  async (values, thunkAPI) => {
+    try {
+      const response = await UserService.addRole(values);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// Async thunk for user login
+
+export const getRoles = createAsyncThunk(
+  "emp/getRoles",
+  async (thunkAPI) => {
+    try {
+      const response = await UserService.getRoles();
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// Async thunk for getting all users
+export const getAllRoles = createAsyncThunk(
+  "users/getAllRoles",
+  async (thunkAPI) => {
+    try {
+      const response = await UserService.getAllRoles();
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// Async thunk for getting user by id
+export const getRoleById = createAsyncThunk(
+  "users/getRoleById",
+  async (userId, thunkAPI) => {
+    try {
+      const response = await UserService.getRoleById(userId);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// Async thunk for deleting a user
+export const deleteRole = createAsyncThunk(
+  "users/deleteRole",
+  async (userId, thunkAPI) => {
+    try {
+      const response = await UserService.deleteRole(userId);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+export const editRole = createAsyncThunk(
+  "users/editRole",
+  async ({ id, values }, thunkAPI) => {
+    try {
+      const response = await UserService.editRole(id, values);
+      return response; // Return the updated data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Error updating Role"
+      );
+    }
+  }
+);
+
 // Async thunk for updating a user
 
 const initialUser = () => {
@@ -203,6 +284,85 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(updateUser.rejected, (state, action) => {
         state.isLoading = false;
+        toast.error(action.payload?.response?.data?.message);
+      })
+      .addCase(addRole.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(addRole.fulfilled, (state, action) => {
+        state.isLoading = false;
+        toast.success(action.payload?.data?.message);
+      })
+      .addCase(addRole.rejected, (state, action) => {
+        state.isLoading = false;
+        toast.error(action.payload?.message);
+      })
+
+      .addCase(getRoles.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getRoles.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.role = action?.payload;
+        toast.success(action.payload?.data?.message);
+      })
+      .addCase(getRoles.rejected, (state, action) => {
+        state.isLoading = false;
+        toast.error(action.payload?.message);
+      })
+
+      //getall
+      .addCase(getAllRoles.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getAllRoles.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.role = action.payload;
+        toast.success(`Roles fetched successfully`);
+      })
+      .addCase(getAllRoles.rejected, (state, action) => {
+        state.isLoading = false;
+        toast.error(action.payload?.response?.data?.message);
+      })
+
+      //getuserbyid
+      .addCase(getRoleById.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getRoleById.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.detailItem = action.payload?.role;
+        toast.success(action.payload.message);
+      })
+      .addCase(getRoleById.rejected, (state, action) => {
+        state.isLoading = false;
+        toast.error(action.payload?.response?.data?.message);
+      })
+      //delete
+      .addCase(deleteRole.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(deleteRole.fulfilled, (state, action) => {
+        state.isLoading = false;
+        toast.success(action.payload.message);
+      })
+      .addCase(deleteRole.rejected, (state, action) => {
+        state.isLoading = false;
+        toast.error(action.payload?.response?.data?.message);
+      })
+      //update
+      .addCase(editRole.pending, (state) => {
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(editRole.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.editItem = action.payload?.role; // Update the state with the updated employee data
+        toast.success(action.payload.message);
+      })
+      .addCase(editRole.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload || "Failed to update employee";
         toast.error(action.payload?.response?.data?.message);
       });
   },

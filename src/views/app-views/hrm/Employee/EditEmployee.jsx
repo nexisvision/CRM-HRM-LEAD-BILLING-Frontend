@@ -11,6 +11,7 @@ import {
   Col,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
+import { Field, ErrorMessage } from "formik";
 import { UploadOutlined } from "@ant-design/icons";
 import moment from "moment";
 import TextArea from "antd/es/input/TextArea";
@@ -18,34 +19,65 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import { empdata, updateEmp } from "./EmployeeReducers/EmployeeSlice";
+import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
+import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
 
-const { Option } = Select;
+const { Option } = Select;  
 
 const EditEmployee = ({ employeeIdd, onClose }) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+
+const departmentData = useSelector((state) => state.Department?.Department?.data || []);
+  const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
+
+
+
+
   const allempdata = useSelector((state) => state.emp);
   const [singleEmp, setSingleEmp] = useState(null);
+
+
+  useEffect(() => {
+    dispatch(getDept());
+  },[])
+  
+  useEffect(() => {
+    dispatch(getDes());
+  },[])
+  
+
 
   useEffect(() => {
     const empData = allempdata?.emp?.data || [];
     const data = empData.find((item) => item.id === employeeIdd);
     setSingleEmp(data || null);
-  }, [allempdata, employeeIdd]);
 
-  useEffect(() => {
-    if (singleEmp) {
+    // Update form fields with the employee's data once it's available
+    if (data) {
       form.setFieldsValue({
-        ...singleEmp,
-        joiningDate: singleEmp.joiningDate
-          ? moment(singleEmp.joiningDate)
-          : null,
-        leaveDate: singleEmp.leaveDate ? moment(singleEmp.leaveDate) : null,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        username: data.username,
+        // Add other fields as needed
       });
     }
-  }, [singleEmp, form]);
+  }, [allempdata, employeeIdd, form]);
+
+  // useEffect(() => {
+  //   if (singleEmp) {
+  //     form.setFieldsValue({
+  //       ...singleEmp,
+  //       joiningDate: singleEmp.joiningDate
+  //         ? moment(singleEmp.joiningDate)
+  //         : null,
+  //       leaveDate: singleEmp.leaveDate ? moment(singleEmp.leaveDate) : null,
+  //     });
+  //   }
+  // }, [singleEmp, form]);
+
 
   const onFinish = async (values) => {
     // try {
@@ -76,20 +108,46 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
     message.error("Please fill out all required fields.");
   };
 
-  if (!singleEmp) {
-    return <div>Loading...</div>;
-  }
+
+
+  const initialValues = {
+    firstName: singleEmp?.firstName || "",
+    lastName: singleEmp?.lastName || "",
+    username: singleEmp?.username || "",
+    password: "",
+    email: singleEmp?.email || "",
+    phone: singleEmp?.phone || "",
+    address: singleEmp?.address || "",
+    joiningDate: singleEmp?.joiningDate || null,
+    leaveDate: singleEmp?.leaveDate || null,
+    // employeeId: "",
+    department: singleEmp?.department || "",
+    designation: singleEmp?.designation || "",
+    salary: singleEmp?.salary || "",
+    accountholder: singleEmp?.accountholder || "",
+    accountnumber: singleEmp?.accountnumber || "",
+    bankname: singleEmp?.bankname || "",
+    banklocation: singleEmp?.banklocation || "",
+  };
+
+
+
+  // if (!singleEmp) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
     <div className="edit-employee">
       <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
-
+     
       <Form
         layout="vertical"
         form={form}
         name="edit-employee"
         onFinish={onFinish}
+        initialValues={initialValues}
         onFinishFailed={onFinishFailed}
+        
       >
         {/* User Information */}
         <h1 className="text-lg font-bold mb-3">Personal Information</h1>
@@ -193,54 +251,50 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
               <DatePicker style={{ width: "100%" }} />
             </Form.Item>
           </Col>
-          <Col span={12}>
-            <Form.Item
-              name="employeeId"
-              label="Employee ID"
-              rules={[{ required: true, message: "Employee ID is required" }]}
-            >
-              <Input placeholder="OE-012" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="department"
-              label="Department"
-              rules={[{ required: true, message: "Department is required" }]}
-            >
-              <Select placeholder="Select Department">
-                <Option value="Manager">Manager</Option>
-                <Option value="Developer">Developer</Option>
-                <Option value="Designer">Designer</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
+          <Col span={12} className="mt-2">
+  <Form.Item
+    name="department"
+    label="Department"
+    rules={[{ required: true, message: "Department is required" }]}
+  >
+    <Select
+      placeholder="Select Department"
+      onChange={(value) => form.setFieldsValue({ department: value })}
+    >
+      {departmentData.map((dept) => (
+        <Option key={dept.id} value={dept.id}>
+          {dept.department_name}
+        </Option>
+      ))}
+    </Select>
+  </Form.Item>
+</Col>
+                      </Row>
+          
+                      
+                       
+       
 
         {/* Designation, Salary, and CV Upload */}
         <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="designation"
-              label="Designation"
-              rules={[{ required: true, message: "Designation is required" }]}
-            >
-              <Select placeholder="Select Designation">
-                <Option value="Manager">Manager</Option>
-                <Option value="Developer">Developer</Option>
-                <Option value="Designer">Designer</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="salary"
-              label="Salary"
-              rules={[{ required: true, message: "Salary is required" }]}
-            >
-              <Input placeholder="$" type="number" />
-            </Form.Item>
-          </Col>
+        <Col span={12} className="mt-2">
+  <Form.Item
+    name="designation"
+    label="Designation"
+    rules={[{ required: true, message: "Designation is required" }]}
+  >
+    <Select
+      placeholder="Select Designation"
+      onChange={(value) => form.setFieldsValue({ designation: value })}
+    >
+      {designationData.map((des) => (
+        <Option key={des.id} value={des.id}>
+          {des.designation_name}
+        </Option>
+      ))}
+    </Select>
+  </Form.Item>
+</Col>
         </Row>
 
         <h1 className="text-lg font-bold mb-3">Bank Details</h1>
@@ -297,6 +351,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
           </Button>
         </Form.Item>
       </Form>
+        
     </div>
   );
 };

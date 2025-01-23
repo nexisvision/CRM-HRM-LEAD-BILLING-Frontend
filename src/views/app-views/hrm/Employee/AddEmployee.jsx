@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Modal,
   Input,
@@ -17,7 +17,9 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { addEmp, empdata } from "./EmployeeReducers/EmployeeSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
+import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
 
 const { Option } = Select;
 
@@ -28,6 +30,19 @@ const AddEmployee = ({ onClose, setSub }) => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpToken, setOtpToken] = useState(null);
   const [otp, setOtp] = useState("");
+
+  const departmentData = useSelector((state) => state.Department?.Department?.data || []);
+  const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
+
+
+useEffect(() => {
+  dispatch(getDept());
+},[])
+
+useEffect(() => {
+  dispatch(getDes());
+},[])
+
 
   const otpapi = async (otp) => {
     try {
@@ -105,7 +120,7 @@ const AddEmployee = ({ onClose, setSub }) => {
     address: "",
     joiningDate: null,
     leaveDate: null,
-    employeeId: "",
+    // employeeId: "",
     department: "",
     designation: "",
     salary: "",
@@ -132,7 +147,7 @@ const AddEmployee = ({ onClose, setSub }) => {
     address: Yup.string().required("Please enter a  Address."),
     joiningDate: Yup.date().nullable().required("Joining Date is required."),
     leaveDate: Yup.date().nullable().required("Leave Date is required."),
-    employeeId: Yup.string().required("Please enter a  Employee Id."),
+    // employeeId: Yup.string().required("Please enter a  Employee Id."),
     department: Yup.string().required("Please select a Department."),
     designation: Yup.string().required("Please select a Designation."),
     salary: Yup.string().required("Please enter a Salary."),
@@ -314,7 +329,7 @@ const AddEmployee = ({ onClose, setSub }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              {/* <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Employee ID</label>
                   <Field name="employeeId" as={Input} placeholder="OE-012" />
@@ -324,66 +339,68 @@ const AddEmployee = ({ onClose, setSub }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
 
               <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Department</label>
-                  <Field name="department">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full"
-                        placeholder="Select Department"
-                        onChange={(value) => setFieldValue("department", value)}
-                        value={values.department}
-                        onBlur={() => setFieldTouched("department", true)}
-                      >
-                        <Option value="Manager">Manager</Option>
-                        <Option value="Developer">Developer</Option>
-                        <Option value="Designer">Designer</Option>
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="department"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
+              <div className="form-item">
+            <label className="font-semibold">Department</label>
+            <Field name="department">
+              {({ field }) => (
+                <Select
+                  {...field}
+                  className="w-full"
+                  placeholder="Select Department"
+                  onChange={(value) => setFieldValue("department", value)}
+                  value={values.department}
+                  onBlur={() => setFieldTouched("department", true)}
+                >
+                  {departmentData.map((dept) => (
+                    <Option key={dept.id} value={dept.id}>
+                      {dept.department_name}
+                    </Option>
+                  ))}
+                </Select>
+              )}
+            </Field>
+            <ErrorMessage
+              name="department"
+              component="div"
+              className="error-message text-red-500 my-1"
+            />
+          </div>
               </Col>
             </Row>
 
-            <Row gutter={16} className="mt-2">
+            
               <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Designation</label>
-                  <Field name="designation">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full"
-                        placeholder="Select Designation"
-                        onChange={(value) =>
-                          setFieldValue("designation", value)
-                        }
-                        value={values.designation}
-                        onBlur={() => setFieldTouched("designation", true)}
-                      >
-                        <Option value="Manager">Manager</Option>
-                        <Option value="Developer">Developer</Option>
-                        <Option value="Designer">Designer</Option>
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="designation"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
+              <div className="form-item">
+            <label className="font-semibold">Designation</label>
+            <Field name="designation">
+              {({ field }) => (
+                <Select
+                  {...field}
+                  className="w-full"
+                  placeholder="Select Designation"
+                  onChange={(value) => setFieldValue("designation", value)}
+                  value={values.designation}
+                  onBlur={() => setFieldTouched("designation", true)}
+                >
+                  {designationData.map((des) => (
+                    <Option key={des.id} value={des.id}>
+                      {des.designation_name}
+                    </Option>
+                  ))}
+                </Select>
+              )}
+            </Field>
+            <ErrorMessage
+              name="designation"
+              component="div"
+              className="error-message text-red-500 my-1"
+            />
+          </div>
               </Col>
-
+              <Row gutter={16} className="mt-2">
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Salary</label>
@@ -491,7 +508,7 @@ const AddEmployee = ({ onClose, setSub }) => {
               </Col>
             </Row>
 
-            <h1 className="text-lg font-bold mb-3">Document</h1>
+            {/* <h1 className="text-lg font-bold mb-3">Document</h1> */}
 
             <div className="text-right">
               <Button

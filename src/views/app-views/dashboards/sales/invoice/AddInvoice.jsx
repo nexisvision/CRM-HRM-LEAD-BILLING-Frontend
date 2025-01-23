@@ -7,20 +7,32 @@ import {
   Input,
   message,
   Row,
+  Modal,
   Col,
 } from "antd";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form } from "antd";
 import { AddInvoices, getInvoice } from "./InvoiceReducer/InvoiceSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { ErrorMessage } from "formik";
+import { ErrorMessage, Field } from "formik";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
+import { AddLable,GetLable } from "../LableReducer/LableSlice";
 
 const { Option } = Select;
 
 const AddInvoice = ({ onClose }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
+  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
+  const [newTag, setNewTag] = useState("");
+
+  const [tags, setTags] = useState([]);
+  const AllLoggeddtaa = useSelector((state) => state.user);
+  const Tagsdetail = useSelector((state) => state.Lable);
+
+  // const { id } = useParams();
+
+
   const [rows, setRows] = useState([
     {
       id: Date.now(),
@@ -112,63 +124,203 @@ const AddInvoice = ({ onClose }) => {
     };
   };
 
+  // const handleSubmit = () => {
+  //   form
+  //     .validateFields()
+  //     .then((values) => {
+  //       const { subtotal, totalDiscount, totalTax, totalAmount } =
+  //         calculateTotals();
+
+  //       // Create items object with proper structure
+  //       const itemsData = {
+  //         items: {
+  //           item: rows[0].item,
+  //           quantity: Number(rows[0].quantity),
+  //           price: Number(rows[0].price),
+  //           discount: Number(rows[0].discount),
+  //           tax: Number(rows[0].tax),
+  //           amount: Number(rows[0].amount),
+  //           description: rows[0].description || "",
+  //           category: rows[0].category || "",
+  //           referenceNumber: rows[0].referenceNumber || "",
+  //         },
+  //       };
+
+  //       const invoiceData = {
+  //         customer: values.customer,
+  //         issueDate: values.issuedate?.format("YYYY-MM-DD"),
+  //         dueDate: values.duedate?.format("YYYY-MM-DD"),
+  //         category: values.category,
+  //         items: itemsData.items, // Match backend items field
+  //         discount: Number(totalDiscount), // Match backend discount field
+  //         tax: Number(totalTax), // Match backend tax field
+  //         total: Number(totalAmount), // Match backend total field
+  //       };
+
+  //       console.log("Prepared Invoice Data:", invoiceData);
+
+  //       dispatch(AddInvoices(invoiceData))
+  //         .then(() => {
+  //           message.success("Invoice added successfully!");
+  //           dispatch(getInvoice());
+  //           onClose();
+  //         })
+  //         .catch((error) => {
+  //           message.error("Failed to add invoice. Please try again.");
+  //           console.error("Error during invoice submission:", error);
+  //         });
+  //     })
+  //     .catch((error) => {
+  //       console.error("Validation failed:", error);
+  //     });
+  // };
+
+  const lid = AllLoggeddtaa.loggedInUser.id;
+
+
+
   const handleSubmit = () => {
     form
       .validateFields()
       .then((values) => {
-        const { subtotal, totalDiscount, totalTax, totalAmount } =
-          calculateTotals();
-
-        // Create items object with proper structure
-        const itemsData = {
-          items: {
-            item: rows[0].item,
-            quantity: Number(rows[0].quantity),
-            price: Number(rows[0].price),
-            discount: Number(rows[0].discount),
-            tax: Number(rows[0].tax),
-            amount: Number(rows[0].amount),
-            description: rows[0].description || "",
-            category: rows[0].category || "",
-            referenceNumber: rows[0].referenceNumber || "",
-          },
+        const { subtotal, totalDiscount, totalTax, totalAmount } = calculateTotals();
+  
+        // Check if the selected tag (category) is new or existing
+        const selectedTag = tags.find((tag) => tag.name === values.category);
+  
+        const prepareInvoiceData = () => {
+          // Prepare the invoice data
+          const itemsData = {
+            items: {
+              item: rows[0].item,
+              quantity: Number(rows[0].quantity),
+              price: Number(rows[0].price),
+              discount: Number(rows[0].discount),
+              tax: Number(rows[0].tax),
+              amount: Number(rows[0].amount),
+              description: rows[0].description || "",
+              category: rows[0].category || "",
+              referenceNumber: rows[0].referenceNumber || "",
+            },
+          };
+  
+          return {
+            customer: values.customer,
+            issueDate: values.issuedate?.format("YYYY-MM-DD"),
+            dueDate: values.duedate?.format("YYYY-MM-DD"),
+            category: values.category,
+            items: itemsData.items, // Match backend items field
+            discount: Number(totalDiscount), // Match backend discount field
+            tax: Number(totalTax), // Match backend tax field
+            total: Number(totalAmount), // Match backend total field
+          };
         };
-
-        const invoiceData = {
-          customer: values.customer,
-          issueDate: values.issuedate?.format("YYYY-MM-DD"),
-          dueDate: values.duedate?.format("YYYY-MM-DD"),
-          category: values.category,
-          items: itemsData.items, // Match backend items field
-          discount: Number(totalDiscount), // Match backend discount field
-          tax: Number(totalTax), // Match backend tax field
-          total: Number(totalAmount), // Match backend total field
-        };
-
-        console.log("Prepared Invoice Data:", invoiceData);
-
-        dispatch(AddInvoices(invoiceData))
-          .then(() => {
-            message.success("Invoice added successfully!");
-            dispatch(getInvoice());
-            onClose();
-          })
-          .catch((error) => {
-            message.error("Failed to add invoice. Please try again.");
-            console.error("Error during invoice submission:", error);
-          });
+  
+        if (!selectedTag) {
+          // If tag (category) doesn't exist, add it first
+          const newTagPayload = { name: values.category.trim() };
+  
+          dispatch(AddLable({ lid, payload: newTagPayload }))
+            .then(() => {
+              // After adding the tag, submit the invoice
+              const invoiceData = prepareInvoiceData();
+  
+              dispatch(AddInvoices(invoiceData))
+                .then(() => {
+                  message.success("Invoice added successfully!");
+                  dispatch(getInvoice());
+                  onClose();
+                })
+                .catch((error) => {
+                  message.error("Failed to add invoice. Please try again.");
+                  console.error("Error during invoice submission:", error);
+                });
+            })
+            .catch((error) => {
+              message.error("Failed to add tag.");
+              console.error("Add Tag API error:", error);
+            });
+        } else {
+          // If tag exists, directly submit the invoice
+          const invoiceData = prepareInvoiceData();
+  
+          dispatch(AddInvoices(invoiceData))
+            .then(() => {
+              message.success("Invoice added successfully!");
+              dispatch(getInvoice());
+              onClose();
+            })
+            .catch((error) => {
+              message.error("Failed to add invoice. Please try again.");
+              console.error("Error during invoice submission:", error);
+            });
+        }
       })
       .catch((error) => {
         console.error("Validation failed:", error);
       });
   };
+  
+
+  const fetchTags = async () => {
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const response = await dispatch(GetLable(lid));
+
+      if (response.payload && response.payload.data) {
+        const uniqueTags = response.payload.data
+          .filter((label) => label && label.name) // Filter out invalid labels
+          .map((label) => ({
+            id: label.id,
+            name: label.name.trim(),
+          }))
+          .filter(
+            (label, index, self) =>
+              index === self.findIndex((t) => t.name === label.name)
+          ); // Remove duplicates
+
+        setTags(uniqueTags);
+      }
+    } catch (error) {
+      console.error("Failed to fetch tags:", error);
+      message.error("Failed to load tags");
+    }
+  };
+
+
+  const handleAddNewTag = async () => {
+    if (!newTag.trim()) {
+      message.error("Please enter a tag name");
+      return;
+    }
+
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const payload = {
+        name: newTag.trim(),
+        labelType: "status",
+      };
+
+      await dispatch(AddLable({ lid, payload }));
+      message.success("Status added successfully");
+      setNewTag("");
+      setIsTagModalVisible(false);
+
+      // Fetch updated tags
+      await fetchTags();
+    } catch (error) {
+      console.error("Failed to add Status:", error);
+      message.error("Failed to add Status");
+    }
+  };
+
 
   return (
     <div>
       <Form form={form} layout="vertical">
-        <Card className="border-0 mt-4">
+        <Card className="border-0">
           <Row gutter={16}>
-            <Col span={12} className="mt-4">
+            <Col span={24} className="mt-1">
               <Form.Item
                 label="Customer"
                 name="customer"
@@ -196,7 +348,7 @@ const AddInvoice = ({ onClose }) => {
               </Form.Item>
             </Col>
 
-            <Col span={8}>
+            <Col span={12}>
               <Form.Item
                 label="Issue Date"
                 name="issuedate"
@@ -208,7 +360,7 @@ const AddInvoice = ({ onClose }) => {
               </Form.Item>
             </Col>
 
-            <Col span={8}>
+            <Col span={12}>
               <Form.Item
                 label="Due Date"
                 name="duedate"
@@ -218,20 +370,44 @@ const AddInvoice = ({ onClose }) => {
               </Form.Item>
             </Col>
 
-            <Col span={8}>
-              <Form.Item
-                label="Category"
-                name="category"
-                rules={[{ required: true, message: "Please select category" }]}
-              >
-                <Select placeholder="Select Category">
-                  <Option value="xyz">XYZ</Option>
-                  <Option value="abc">ABC</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-
-            <Col span={8}>
+            <Col span={12} className="">
+  <Form.Item
+    label="Category"
+    name="category"
+    rules={[{ required: true, message: "Please select or add a category" }]}
+  >
+    <Select
+      placeholder="Select or add new category"
+      dropdownRender={(menu) => (
+        <div>
+          {menu}
+          <div
+            style={{
+              padding: "8px",
+              borderTop: "1px solid #e8e8e8",
+            }}
+          >
+            <Button
+              type="link"
+              onClick={() => setIsTagModalVisible(true)}
+              block
+            >
+              Add New Category
+            </Button>
+          </div>
+        </div>
+      )}
+    >
+      {tags &&
+        tags.map((tag) => (
+          <Option key={tag.id} value={tag.name}>
+            {tag.name}
+          </Option>
+        ))}
+    </Select>
+  </Form.Item>
+</Col>
+            <Col span={12}>
               <Form.Item
                 label="Reference Number"
                 name="refnumber"
@@ -243,17 +419,7 @@ const AddInvoice = ({ onClose }) => {
               </Form.Item>
             </Col>
 
-            <Col span={8}>
-              <Form.Item
-                label="Invoice Number"
-                name="invoicenub"
-                rules={[
-                  { required: true, message: "Please enter invoice number" },
-                ]}
-              >
-                <Input placeholder="Enter Invoice Number" />
-              </Form.Item>
-            </Col>
+            
           </Row>
         </Card>
 
@@ -421,6 +587,19 @@ const AddInvoice = ({ onClose }) => {
           </Button>
         </div>
       </Form>
+      <Modal
+            title="Add New Category"
+            open={isTagModalVisible}
+            onCancel={() => setIsTagModalVisible(false)}
+            onOk={handleAddNewTag}
+            okText="Add Category"
+          >
+            <Input
+              placeholder="Enter new Category"
+              value={newTag}
+              onChange={(e) => setNewTag(e.target.value)}
+            />
+          </Modal>
     </div>
   );
 };

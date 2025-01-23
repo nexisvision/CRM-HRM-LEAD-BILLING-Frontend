@@ -19,15 +19,25 @@ import { useDispatch, useSelector } from "react-redux";
 import moment from "moment/moment";
 import { editInvoice, getInvoice } from "./InvoiceReducer/InvoiceSlice";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
+import { AddLable, GetLable } from "../LableReducer/LableSlice";
 
 const { Option } = Select;
+
 
 const EditInvoice = ({ idd, onClose }) => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [newTag, setNewTag] = useState("");
+  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
+
   const alladatas = useSelector((state) => state?.salesInvoices);
   const fnddata = alladatas?.salesInvoices?.data;
   const fnd = fnddata.find((item) => item.id === idd);
+
+  const customerdata = useSelector((state) => state.customers);
+  const fnddatas = customerdata.customers.data;
+  const AllLoggeddtaa = useSelector((state) => state.user);
 
   const [initialValues, setInitialValues] = useState({
     customer: "",
@@ -40,19 +50,37 @@ const EditInvoice = ({ idd, onClose }) => {
 
   useEffect(() => {
     dispatch(getInvoice());
-  }, []);
-
-  useEffect(() => {
     dispatch(Getcus());
+    fetchTags();
   }, []);
 
-  const customerdata = useSelector((state) => state.customers);
-  const fnddatas = customerdata.customers.data;
+  const fetchTags = async () => {
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+
+      const response = await dispatch(GetLable(lid));
+      if (response.payload?.data) {
+        const uniqueTags = response.payload.data
+          .filter((label) => label && label.name)
+          .map((label) => ({
+            id: label.id,
+            name: label.name.trim(),
+          }))
+          .filter(
+            (label, index, self) =>
+              index === self.findIndex((t) => t.name === label.name)
+          );
+        setTags(uniqueTags);
+      }
+    } catch (error) {
+      console.error("Failed to fetch tags:", error);
+      message.error("Failed to load tags");
+    }
+  };
 
   useEffect(() => {
     if (fnd) {
       const parsedItems = JSON.parse(fnd.items || "{}");
-
       setInitialValues({
         customer: fnd.customer,
         issueDate: fnd.issueDate ? moment(fnd.issueDate, "YYYY-MM-DD") : null,
@@ -61,7 +89,6 @@ const EditInvoice = ({ idd, onClose }) => {
         invoicenub: fnd.salesInvoiceNumber,
         items: parsedItems,
       });
-
       setRows([
         {
           id: Date.now(),
@@ -102,31 +129,6 @@ const EditInvoice = ({ idd, onClose }) => {
     setRows(updatedRows);
     alert("Are you sure you want to delete this element?");
   };
-
-  const navigate = useNavigate();
-
-  const onSubmit = (values) => {
-    const invoiceData = {
-      ...values,
-      items: {
-        itemsArray: rows,
-      },
-    };
-
-    dispatch(editInvoice({ idd, values: invoiceData })).then(() => {
-      dispatch(getInvoice());
-      onClose();
-      message.success("Invoice updated successfully!");
-    });
-  };
-
-  const validationSchema = Yup.object({
-    customer: Yup.string().required("Please select customer."),
-    issueDate: Yup.date().nullable().required("Date is required."),
-    dueDate: Yup.date().nullable().required("Date is required."),
-    invoicenub: Yup.string().required("Please enter invoicenub."),
-    category: Yup.string().required("Please select category."),
-  });
 
   const handleFieldChange = (id, field, value) => {
     const updatedRows = rows.map((row) =>
@@ -172,13 +174,94 @@ const EditInvoice = ({ idd, onClose }) => {
     };
   };
 
+  const handleAddNewTag = async () => {
+    if (!newTag.trim()) {
+      message.error("Please enter a tag name");
+      return;
+    }
+
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+
+      const payload = {
+        name: newTag.trim(),
+        labelType: "status",
+      };
+
+      await dispatch(AddLable({ lid, payload }));
+      message.success("Status added successfully");
+      setNewTag("");
+      setIsTagModalVisible(false);
+
+      // Fetch updated tags
+      await fetchTags();
+    } catch (error) {
+      console.error("Failed to add Status:", error);
+      message.error("Failed to add Status");
+    }
+  };
+
+  const onSubmit = (values) => {
+    const { subtotal, totalDiscount, totalTax, totalAmount } = calculateTotals();
+
+    const prepareInvoiceData = () => ({
+      customer: values.customer,
+      issueDate: values.issueDate.format("YYYY-MM-DD"),
+      dueDate: values.dueDate.format("YYYY-MM-DD"),
+      category: values.category,
+      items: { itemsArray: rows },
+      discount: Number(totalDiscount),
+      tax: Number(totalTax),
+      total: Number(totalAmount),
+    });
+
+    const selectedTag = tags.find((tag) => tag.name === values.category);
+
+    if (!selectedTag) {
+      const newTagPayload = { name: values.category.trim() };
+      const lid = AllLoggeddtaa.loggedInUser.id;
+
+      dispatch(AddLable({ lid, payload: newTagPayload }))
+        .then(() => {
+          const invoiceData = prepareInvoiceData();
+          dispatch(editInvoice({ idd, values: invoiceData }))
+            .then(() => {
+              dispatch(getInvoice());
+              onClose();
+              message.success("Invoice updated successfully!");
+            })
+            .catch((error) => {
+              console.error("Failed to edit invoice:", error);
+              message.error("Failed to update invoice. Please try again.");
+            });
+        })
+        .catch((error) => {
+          console.error("Failed to add tag:", error);
+          message.error("Failed to add category.");
+        });
+    } else {
+      const invoiceData = prepareInvoiceData();
+      dispatch(editInvoice({ idd, values: invoiceData }))
+        .then(() => {
+          dispatch(getInvoice());
+          onClose();
+          message.success("Invoice updated successfully!");
+        })
+        .catch((error) => {
+          console.error("Failed to edit invoice:", error);
+          message.error("Failed to update invoice. Please try again.");
+        });
+    }
+  };
+
+
   return (
     <div>
       <Card className="border-0 mt-4">
         <Formik
           initialValues={initialValues}
           enableReinitialize={true}
-          validationSchema={validationSchema}
+          // validationSchema={validationSchema}
           onSubmit={onSubmit}
         >
           {({
@@ -268,29 +351,43 @@ const EditInvoice = ({ idd, onClose }) => {
                   />
                 </Col>
 
-                <Col span={8} className="mt-2">
-                  <label className="font-semibold">Category</label>
-                  <Field name="category">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full"
-                        placeholder="Select Category"
-                        onChange={(value) => setFieldValue("category", value)}
-                        value={values.category}
-                        onBlur={() => setFieldTouched("category", true)}
-                      >
-                        <Option value="xyz">XYZ</Option>
-                        <Option value="abc">ABC</Option>
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="category"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </Col>
+                <Col span={12} className="">
+  <Form.Item
+    label="Category"
+    name="category"
+    rules={[{ required: true, message: "Please select or add a category" }]}
+  >
+    <Select
+      placeholder="Select or add new category"
+      dropdownRender={(menu) => (
+        <div>
+          {menu}
+          <div
+            style={{
+              padding: "8px",
+              borderTop: "1px solid #e8e8e8",
+            }}
+          >
+            <Button
+              type="link"
+              onClick={() => setIsTagModalVisible(true)}
+              block
+            >
+              Add New Category
+            </Button>
+          </div>
+        </div>
+      )}
+    >
+      {tags &&
+        tags.map((tag) => (
+          <Option key={tag.id} value={tag.name}>
+            {tag.name}
+          </Option>
+        ))}
+    </Select>
+  </Form.Item>
+</Col>
               </Row>
 
               {/* Product table rendering */}
@@ -428,9 +525,24 @@ const EditInvoice = ({ idd, onClose }) => {
             </Form>
           )}
         </Formik>
+
+         <Modal
+                    title="Add New Category"
+                    open={isTagModalVisible}
+                    onCancel={() => setIsTagModalVisible(false)}
+                    onOk={handleAddNewTag}
+                    okText="Add Category"
+                  >
+                    <Input
+                      placeholder="Enter new Category"
+                      value={newTag}
+                      onChange={(e) => setNewTag(e.target.value)}
+                    />
+                  </Modal>
       </Card>
     </div>
   );
 };
+
 
 export default EditInvoice;
