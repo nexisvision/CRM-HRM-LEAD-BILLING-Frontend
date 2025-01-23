@@ -33,6 +33,9 @@ import { useDispatch } from "react-redux";
 import AddProposal from "./AddProposal";
 import EditProposal from "./EditProposal";
 import { delpropos, getpropos } from "./proposalReducers/proposalSlice";
+import { GetLeads } from "../leads/LeadReducers/LeadSlice";
+import { GetDeals } from "../deals/DealReducers/DealSlice";
+import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 
 const { Option } = Select;
 
@@ -51,11 +54,12 @@ const ProposalList = () => {
   //   const [isViewTrainingSetupModalVisible, setIsViewTrainingSetupModalVisible] =
   //     useState(false);
 
-  const [idd, setIdd] = useState("");
+  const [id, setId] = useState("");
+   const { data: Leads } = useSelector((state) => state.Leads.Leads);
+    const { data: Deals } = useSelector((state) => state.Deals.Deals);
+    // const { data: Currencies } = useSelector((state) => state.currencies.currencies);
+    
 
-  useEffect(() => {
-    dispatch(getpropos());
-  }, [dispatch]);
 
   const allproposal = useSelector((state) => state?.proposal);
   const fnddatas = allproposal?.proposal?.data;
@@ -66,6 +70,21 @@ const ProposalList = () => {
 
   const allempdata = useSelector((state) => state.Training);
   const fnddata = allempdata.Training.data;
+
+
+
+  useEffect(() => {
+    dispatch(getpropos());
+  }, [dispatch]);
+
+    useEffect(() => {
+      dispatch(GetLeads());
+      dispatch(GetDeals());
+    }, [dispatch]);
+  
+      useEffect(() => {
+        dispatch(getallcurrencies());
+      }, [dispatch]);
 
   const openAddProposalModal = () => {
     setIsAddProposalSetupModalVisible(true);
@@ -90,6 +109,25 @@ const ProposalList = () => {
   //   const closeViewTrainingSetupModal = () => {
   //     setIsViewTrainingSetupModalVisible(false);
   //   };
+
+  useEffect(() => {
+    if (fnddatas?.length && Leads?.length && Deals?.length) {
+      const enrichedData = fnddatas.map((proposal) => {
+        const lead = Leads.find((l) => l.id === proposal.lead_title); // Match lead by ID
+        const deal = Deals.find((d) => d.id === proposal.deal_title);
+        // 
+  
+        return {
+          ...proposal,
+          lead_title: lead?.leadTitle || "N/A", // Use `title` from Leads or fallback to "N/A"
+          deal_title: deal?.dealName || "N/A",
+          // Use `title` from Deals or fallback to "N/A"
+        };
+      });
+  
+      setUsers(enrichedData); // Set enriched data for the table
+    }
+  }, [fnddatas, Leads, Deals]);
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
@@ -157,9 +195,9 @@ const ProposalList = () => {
     }
   };
 
-  const editfun = (idd) => {
+  const editfun = (id) => {
     openEditProposalModal();
-    setIdd(idd);
+    setId(id);
   };
   //   const viewfun = (idd) => {
   //     openviewTrainingSetupModal();
@@ -214,25 +252,22 @@ const ProposalList = () => {
 
   const tableColumns = [
     {
+      title: "Lead title",
+      dataIndex: "lead_title",
+      sorter: (a, b) => a.lead_title.length - b.lead_title.length,
+    },
+    {
+      title: "Deal title",
+      dataIndex: "deal_title",
+      sorter: (a, b) => a.deal_title.length - b.deal_title.length,
+    },
+    {
       title: "calculatedTax",
       dataIndex: "calculatedTax",
       sorter: (a, b) => a.calculatedTax.length - b.calculatedTax.length,
     },
-    {
-      title: "created_by ",
-      dataIndex: "created_by",
-      sorter: (a, b) => a.created_by.length - b.created_by.length,
-    },
-    {
-      title: "description",
-      dataIndex: "description",
-      sorter: (a, b) => a.description.length - b.description.length,
-    },
-    {
-      title: "discount",
-      dataIndex: "discount",
-      sorter: (a, b) => a.discount.length - b.discount.length,
-    },
+   
+  
     {
       title: "tax",
       dataIndex: "tax",
@@ -246,7 +281,13 @@ const ProposalList = () => {
     {
       title: "valid_till",
       dataIndex: "valid_till",
+      render: (date) => (date ? dayjs(date).format("DD-MM-YYYY") : "N/A"), 
       sorter: (a, b) => a.valid_till.length - b.valid_till.length,
+    },
+    {
+      title: "created_by ",
+      dataIndex: "created_by",
+      sorter: (a, b) => a.created_by.length - b.created_by.length,
     },
 
     {
@@ -329,7 +370,7 @@ const ProposalList = () => {
         width={1000}
         className="mt-[-70px]"
       >
-        <EditProposal onClose={closeEditProposalModal} idd={idd} />
+        <EditProposal onClose={closeEditProposalModal} id={id} />
       </Modal>
 
       {/* <Modal

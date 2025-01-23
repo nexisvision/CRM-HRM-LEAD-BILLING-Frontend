@@ -958,7 +958,7 @@ const dashBoardNavTree = [{
           {
             key: 'dashboards-systemsetup',
             path: `${APP_PREFIX_PATH}/dashboards/systemsetup`,
-            title: 'System Setup',
+            title: 'CRM System Setup',
             icon: BugOutlined,
             breadcrumb: false,
             submenu: []

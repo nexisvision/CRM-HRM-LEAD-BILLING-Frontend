@@ -68,9 +68,9 @@ export const delpropos = createAsyncThunk(
 );
 export const edpropos = createAsyncThunk(
   "users/edpropos",
-  async ({ idd, values }, thunkAPI) => {
+  async ({ id, proposalData }, thunkAPI) => {
     try {
-      const response = await UserService.editpropo(idd, values);
+      const response = await UserService.editpropo(id, proposalData);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(

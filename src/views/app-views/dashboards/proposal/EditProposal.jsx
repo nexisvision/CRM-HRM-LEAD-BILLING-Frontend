@@ -11,12 +11,16 @@ import { useSelector, useDispatch } from 'react-redux';
 // import { Formik, Form, Field, ErrorMessage } from 'formik';
 // import { createInvoice } from '../../../dashboards/project/invoice/invoicereducer/InvoiceSlice';
 import * as Yup from 'yup';
+import { getallcurrencies } from 'views/app-views/setting/currencies/currenciesreducer/currenciesSlice';
+import { GetLeads } from '../leads/LeadReducers/LeadSlice';
+import { GetDeals } from '../deals/DealReducers/DealSlice';
+import { edpropos, getpropos } from './proposalReducers/proposalSlice';
 
 const { Option } = Select;
 
-const EditProposal = ({ onClose }) => {
+const EditProposal = ({id, onClose }) => {
 
-    const { id } = useParams();
+    // const { id } = useParams();
     const [discountType, setDiscountType] = useState("%");
     const [loading, setLoading] = useState(false);
     const [discountValue, setDiscountValue] = useState(0);
@@ -24,8 +28,9 @@ const EditProposal = ({ onClose }) => {
     const [list, setList] = useState(OrderListData)
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [selectedMilestone, setSelectedMilestone] = useState(null);
-    const [showFields, setShowFields] = useState(false);
-    const { data: milestones } = useSelector((state) => state.Milestone.Milestone);
+    // const [showFields, setShowFields] = useState(false);
+    // const { data: milestones } = useSelector((state) => state.Milestone.Milestone);
+  const [singleEmp, setSingleEmp] = useState(null);
 
 
     // const [selectedProject, setSelectedProject] = useState(null);
@@ -36,16 +41,10 @@ const EditProposal = ({ onClose }) => {
     const dispatch = useDispatch();
 
 
-    const subClients = useSelector((state) => state.SubClient);
-    const sub = subClients?.SubClient?.data;
+  const alldept = useSelector((state) => state.proposal);
 
-    const allproject = useSelector((state) => state.Project);
-    const fndrewduxxdaa = allproject.Project.data
-    const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
-
-    const client = fnddata?.client;
-
-    const subClientData = sub?.find((subClient) => subClient?.id === client);
+    const { data: Leads } = useSelector((state) => state.Leads.Leads);
+      const { data: Deals } = useSelector((state) => state.Deals.Deals);
 
 
     // console.log("SubClient Data:", subClientData.username);
@@ -61,6 +60,29 @@ const EditProposal = ({ onClose }) => {
     });
 
 
+
+     useEffect(() => {
+        // Find the specific indicator data by ID
+        const empData = alldept?.proposal?.data || [];
+        const data = empData.find((item) => item.id === id);
+        setSingleEmp(data || null);
+    
+        // Update form values when singleEmp is set
+        if (data) {
+          form.setFieldsValue({
+            lead_title: data.lead_title,
+            deal_title: data.deal_title,
+            // valid_till: data.valid_till,
+            currency: data.currency,
+            calculatedTax: data.calculatedTax,
+            description: data.description,
+            items: data.items,
+            discount: data.discount,
+            tax:data.tax,
+            total:data.total,
+          });
+        }
+      }, [id, alldept, form]);
 
 
     //   const handleProjectChange = (projectId) => {
@@ -101,6 +123,16 @@ const EditProposal = ({ onClose }) => {
     // }, [dispatch]);
 
 
+  useEffect(() => {
+    dispatch(getallcurrencies());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(GetLeads());
+    dispatch(GetDeals());
+  }, [dispatch]);
+
+
     // Handle product selection
     const handleProductChange = (value) => {
         setSelectedProduct(value);
@@ -115,26 +147,7 @@ const EditProposal = ({ onClose }) => {
             description: "",
         }]);
     };
-    // Handle milestone selection
-    const handleMilestoneChange = (value) => {
-        const selectedMile = milestones?.find(m => m.id === value);
-        setSelectedMilestone(value);
 
-        if (selectedMile) {
-            // Update table data with milestone information
-            setTableData([
-                {
-                    id: Date.now(),
-                    item: selectedMile.milestone_title,
-                    quantity: 1,
-                    price: selectedMile.milestone_cost,
-                    tax: 0,
-                    amount: selectedMile.milestone_cost.toString(),
-                    description: selectedMile.milestone_summary
-                }
-            ]);
-        }
-    };
 
 
     const handleFinish = async (values) => {
@@ -149,41 +162,44 @@ const EditProposal = ({ onClose }) => {
             const totalAmount = subTotal - discount + totalTax; // Final total calculation
 
             const proposalData = {
-                leadtitle: values.leadtitle,
-                dealtitle: values.dealtitle,
-                date: values.date.format('YYYY-MM-DD'),
+                lead_title: values.lead_title,
+                deal_title: values.deal_title,
+                valid_till: values.valid_till.format("YYYY-MM-DD"),
                 currency: values.currency,
-                calculatedtax:values.calculatedtax,
-                items: tableData.map(item => ({
-                    description: item.item,
-                    quantity: parseFloat(item.quantity),
-                    price: parseFloat(item.price),
-                    tax: parseFloat(item.tax),
-                    amount: parseFloat(item.amount),
-                    description: item.description
+                calculatedTax: totalTax, // Changed from calculatedtax to calculatedTax
+                description: "", // Add description field
+                items: tableData.map((item) => ({
+                  item: item.item,
+                  quantity: parseFloat(item.quantity),
+                  price: parseFloat(item.price),
+                  tax: parseFloat(item.tax),
+                  amount: parseFloat(item.amount),
+                  description: item.description,
                 })),
-                sub_total: subTotal.toFixed(2),
-                discount: discount.toFixed(2),
-                total_tax: totalTax.toFixed(2),
-                total: totalAmount.toFixed(2),
-                status: 'pending'
+                discount: parseFloat(discount.toFixed(2)),
+                tax: totalTax, // Added separate tax field
+                total: parseFloat(totalAmount.toFixed(2)),
+
+
+               
             };
 
             console.log('Proposal Data:', proposalData);
-
-            // Dispatch create invoice action
-            // const result = await dispatch(createInvoice({ id, invoiceData })).unwrap();
-
-            // if (result) {
-            //     message.success('Invoice created successfully');
-            //     form.resetFields();
-            //     onClose();
-            // }
-        } catch (error) {
-            message.error('Failed to create invoice: ' + error.message);
-        } finally {
-            setLoading(false);
-        }
+ dispatch(edpropos( { id, proposalData }))
+        .then(() => {
+          message.success("Proposal updated successfully!");
+          dispatch(getpropos());
+          onClose();
+        })
+        .catch((error) => {
+          message.error("Failed to add proposal. Please try again.");
+          console.error("Error during proposal submission:", error);
+        });
+    } catch (error) {
+      message.error("Failed to create proposal: " + error.message);
+    } finally {
+      setLoading(false);
+    }
     };
 
     const [rows, setRows] = useState([
@@ -291,12 +307,12 @@ const EditProposal = ({ onClose }) => {
     };
 
     const validationSchema = Yup.object({
-        leadtitle: Yup.date().nullable().required('Please select Lead Title .'),
-        dealtitle: Yup.date().nullable().required('Please select Deal Title .'),
-        currency: Yup.string().required('Please select crrency.'),
-        date: Yup.string().required('Date is require'),
-        calculatedtax: Yup.string().required('Please select calculatedtax.'),
-    });
+       lead_title: Yup.date().nullable().required("Please select Lead Title ."),
+       deal_title: Yup.date().nullable().required("Please select Deal Title ."),
+       currency: Yup.string().required("Please select crrency."),
+       valid_till: Yup.string().required("Date is require"),
+       calculatedTax: Yup.string().required("Please select calculatedtax."),
+     });
 
 
     return (
@@ -310,7 +326,7 @@ const EditProposal = ({ onClose }) => {
                         onFinish={handleFinish}
                         validationSchema={validationSchema}
 
-                        initialValues={initialValues}
+                        // initialValues={initialValues}
 
                     // initialValues={{
                     //     loginEnabled: true,
@@ -326,48 +342,97 @@ const EditProposal = ({ onClose }) => {
                                 <Row gutter={16}>
 
                                 <Col span={12}>
-                                        <Form.Item
-                                            name="leadtitle"
-                                            label="Lead Title"
-                                            rules={[{ required: true, message: "Please enter the Lead Title" }]}
-                                        >
-                                            <Input placeholder="Enter Lead Title"  />
-                                        </Form.Item>
-                                       
-                                    </Col>
-                                    <Col span={12}>
-                                        <Form.Item
-                                            name="dealtitle"
-                                            label="Deal Title"
-                                            rules={[{ required: true, message: "Please enter the Deal Title" }]}
-                                        >
-                                            <Input placeholder="Enter Deal Title"  />
-                                        </Form.Item>
-                                    </Col>
+                                                   <Form.Item
+                                                     name="lead_title"
+                                                     label="Lead Title"
+                                                     rules={[
+                                                       {
+                                                         required: true,
+                                                         message: "Please select a Lead Title",
+                                                       },
+                                                     ]} // Validation rule
+                                                   >
+                                                     <Select placeholder="Select Lead Title">
+                                                       {/* Populate dropdown options from Leads */}
+                                                       {Array.isArray(Leads) && Leads.length > 0 ? (
+                                                         Leads.map((lead) => (
+                                                           <Option key={lead.id} value={lead.id}>
+                                                             {lead.leadTitle}
+                                                           </Option>
+                                                         ))
+                                                       ) : (
+                                                         <Option disabled>No Leads Available</Option>
+                                                       )}
+                                                     </Select>
+                                                   </Form.Item>
+                                                 </Col>
+                                                 <Col span={12}>
+                                                   <Form.Item
+                                                     name="deal_title"
+                                                     label="Deal Title"
+                                                     rules={[
+                                                       {
+                                                         required: true,
+                                                         message: "Please select a Deal Title",
+                                                       },
+                                                     ]} // Validation rule
+                                                   >
+                                                     <Select placeholder="Select Deal Title">
+                                                       {/* Populate dropdown options from Deals */}
+                                                       {Array.isArray(Deals) && Deals.length > 0 ? (
+                                                         Deals.map((deal) => (
+                                                           <Option key={deal.id} value={deal.id}>
+                                                             {deal.dealName}
+                                                           </Option>
+                                                         ))
+                                                       ) : (
+                                                         <Option disabled>No Deals Available</Option>
+                                                       )}
+                                                     </Select>
+                                                   </Form.Item>
+                                                 </Col>
+                               
+                                                 <Col span={12}>
+                                                   <Form.Item
+                                                     name="valid_till"
+                                                     label=" Date"
+                                                     rules={[
+                                                       { required: true, message: "Please select the Date" },
+                                                     ]}
+                                                   >
+                                                     <DatePicker className="w-full" format="DD-MM-YYYY" />
+                                                   </Form.Item>
+                                                 </Col>
+                               
+                                                 <Col span={12}>
+                                                   <Form.Item
+                                                     name="currency"
+                                                     label="Currency"
+                                                     rules={[
+                                                       {
+                                                         required: true,
+                                                         message: "Please select a Currency",
+                                                       },
+                                                     ]} // Validation rule
+                                                   >
+                                                     <Select placeholder="Select Lead Title">
+                                                       {/* Populate dropdown options from Leads */}
+                                                       {Array.isArray(currencies) && currencies.length > 0 ? (
+                                                         currencies.map((currency) => (
+                                                           <Option key={currency.id} value={currency.id}>
+                                                             {currency.currencyName}
+                                                           </Option>
+                                                         ))
+                                                       ) : (
+                                                         <Option disabled>No Currencies Available</Option>
+                                                       )}
+                                                     </Select>
+                                                   </Form.Item>
+                                                 </Col>
+                                    
 
-                                    <Col span={12}>
-                                        <Form.Item
-                                            name="date"
-                                            label=" Date"
-                                            rules={[{ required: true, message: "Please select the Date" }]}
-                                        >
-                                            <DatePicker className="w-full" format="DD-MM-YYYY" />
-                                        </Form.Item>
-                                    </Col>
 
-
-
-                                    <Col span={12}>
-                                        <Form.Item
-                                            name="currency"
-                                            label="Currency"
-                                            rules={[{ required: true, message: 'Currency is required' }]} >
-                                            <Select placeholder="Select Currency ">
-                                                <Option value="ABC">ABC</Option>
-                                                <Option value="XYZ">XYZ</Option>
-                                            </Select>
-                                        </Form.Item>
-                                    </Col>
+                                   
 
                                     <Col span={12}>
                                         <Form.Item

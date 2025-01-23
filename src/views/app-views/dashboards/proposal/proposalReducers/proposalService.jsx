@@ -63,12 +63,12 @@ const delpropo = async (id) => {
   }
 };
 
-const editpropo = async (idd, values) => {
+const editpropo = async (id, proposalData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/proposals/${idd}`,
-      values,
+      `http://localhost:5353/api/v1/proposals/${id}`,
+      proposalData,
       {
         headers: {
           Authorization: `Bearer ${token}`,

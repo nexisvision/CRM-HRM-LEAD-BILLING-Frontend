@@ -390,7 +390,7 @@ const AddProposal = ({ onClose }) => {
                         {Array.isArray(Deals) && Deals.length > 0 ? (
                           Deals.map((deal) => (
                             <Option key={deal.id} value={deal.id}>
-                              {deal.dealTitle}
+                              {deal.dealName}
                             </Option>
                           ))
                         ) : (
@@ -417,12 +417,23 @@ const AddProposal = ({ onClose }) => {
                       name="currency"
                       label="Currency"
                       rules={[
-                        { required: true, message: "Currency is required" },
-                      ]}
+                        {
+                          required: true,
+                          message: "Please select a Currency",
+                        },
+                      ]} // Validation rule
                     >
-                      <Select placeholder="Select Currency ">
-                        <Option value="ABC">ABC</Option>
-                        <Option value="XYZ">XYZ</Option>
+                      <Select placeholder="Select Lead Title">
+                        {/* Populate dropdown options from Leads */}
+                        {Array.isArray(currencies) && currencies.length > 0 ? (
+                          currencies.map((currency) => (
+                            <Option key={currency.id} value={currency.id}>
+                              {currency.currencyName}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option disabled>No Currencies Available</Option>
+                        )}
                       </Select>
                     </Form.Item>
                   </Col>
