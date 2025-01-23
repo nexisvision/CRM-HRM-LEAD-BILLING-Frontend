@@ -78,7 +78,7 @@ const SidebarEvents = ({ events, onDeleteEvent }) => {
 					<div key={event.id} className="event-card-wrapper">
 						<div 
 							className="event-card mb-3" 
-							style={{ borderLeft: `4px solid ${event.color}` }}
+							style={{ borderLeft: `4px solid ${event.color}`,paddingLeft:"12px" }}
 						>
 							<h5 className="event-card-title">{event.name}</h5>
 							<div className="event-card-time">

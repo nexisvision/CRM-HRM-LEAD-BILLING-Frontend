@@ -7,14 +7,17 @@ import axios from "axios";
 //     return res
 // };
 
-const ClientData = async () => {
+const getsubplan = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/clients/", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await axios.get(
+      "http://localhost:5353/api/v1/subscriptions/assign/",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -22,12 +25,12 @@ const ClientData = async () => {
   }
 };
 
-const createClient = async (payload) => {
+const addpolicy = async (payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/clients/",
+      "http://localhost:5353/api/v1/policies/",
       payload,
       {
         headers: {
@@ -43,12 +46,12 @@ const createClient = async (payload) => {
   }
 };
 
-const DeleteClient = async (id) => {
+const deletepolicy = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/clients/${id}`,
+      `http://localhost:5353/api/v1/policies/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -63,11 +66,11 @@ const DeleteClient = async (id) => {
   }
 };
 
-const EditClient = async (comnyid, values) => {
+const editpolicy = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/clients/${comnyid}`,
+      `http://localhost:5353/api/v1/policies/${idd}`,
       values,
       {
         headers: {
@@ -78,27 +81,6 @@ const EditClient = async (comnyid, values) => {
     return res.data;
   } catch (error) {
     console.error("Error updating employee data:", error);
-    throw error;
-  }
-};
-
-const assignplan = async (payload) => {
-  const token = localStorage.getItem("auth_token");
-
-  try {
-    const res = await axios.post(
-      "http://localhost:5353/api/v1/subscriptions/assign",
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    //    dispatch(empdata());
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
     throw error;
   }
 };
@@ -125,11 +107,10 @@ const assignplan = async (payload) => {
 
 const UserService = {
   // addUser,
-  ClientData,
-  createClient,
-  DeleteClient,
-  EditClient,
-  assignplan,
+  getsubplan,
+  addpolicy,
+  deletepolicy,
+  editpolicy,
   // getAllUsers,
   // getUserById,
   // deleteUser,

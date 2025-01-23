@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
+import React, { useEffect, useState } from "react";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Card,
@@ -12,7 +12,7 @@ import {
   Button,
   Modal,
   Select,
-} from 'antd';
+} from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
@@ -23,24 +23,29 @@ import {
   LoginOutlined,
   FileExcelOutlined,
   EditOutlined,
-} from '@ant-design/icons';
-import EditCompany from './EditCompany';
-import { ClientData, deleteClient } from './CompanyReducers/CompanySlice';
-
+} from "@ant-design/icons";
+import EditCompany from "./EditCompany";
+import { ClientData, deleteClient } from "./CompanyReducers/CompanySlice";
+import AddUpgradePlan from "./AddUpgradePlan";
 const CompanyCard = ({ company }) => {
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [isEditCompanyCardModalVisible, setIsEditCompanyCardModalVisible] = useState(false);
-  const [comnyid, setCompnyid] = useState('');
+  const [isEditCompanyCardModalVisible, setIsEditCompanyCardModalVisible] =
+    useState(false);
+  const [isAddUpgradePlanModalVisible, setIsAddUpgradePlanModalVisible] =
+    useState(false);
+  const [comnyid, setCompnyid] = useState("");
   const dispatch = useDispatch();
-
   const showUserProfile = (userInfo) => {
     setUserProfileVisible(true);
     setSelectedUser(userInfo);
   };
-
   const eidtfun = (idd) => {
     setIsEditCompanyCardModalVisible(true);
+    setCompnyid(idd);
+  };
+  const addfun = (idd) => {
+    setIsAddUpgradePlanModalVisible(true);
     setCompnyid(idd);
   };
   const deleteUser = (elmId) => {
@@ -48,11 +53,9 @@ const CompanyCard = ({ company }) => {
     message.success(`Deleted user ${elmId}`);
   };
 
-  
   useEffect(() => {
     dispatch(ClientData());
   }, [dispatch]);
-
   const dropdownMenu = (elm) => (
     <Menu>
       <Menu.Item>
@@ -110,34 +113,56 @@ const CompanyCard = ({ company }) => {
       </Menu.Item>
     </Menu>
   );
-
   return (
     <div className="border rounded-lg p-4 hover:shadow-lg cursor-pointer">
       <div className="text-end">
         <EllipsisDropdown menu={dropdownMenu(company)} />
       </div>
       <div className="flex flex-col items-center">
-        <img src={company.image} alt={company.name} className="rounded-full w-24 h-24 mb-2" />
+        <img
+          src={company.image}
+          alt={company.name}
+          className="rounded-full w-24 h-24 mb-2"
+        />
         <h3 className="font-semibold text-lg">{company.name}</h3>
         <p className="text-gray-500">{company.email}</p>
         <p className="text-gray-400">{company.plan}</p>
         <p className="text-gray-400">Plan Expired: {company.expiryDate}</p>
       </div>
       <div className="flex justify-between mt-4">
-        <Button className="bg-blue-600 text-white py-2 px-4 rounded">Upgrade Plan</Button>
-        <Button className="bg-blue-600 text-white py-2 px-4 rounded">AdminHub</Button>
+        <Button
+          className="bg-blue-600 text-white py-2 px-4 rounded"
+          onClick={() => addfun(company.id)}
+        >
+          Upgrade Plan
+        </Button>
+        <Button className="bg-blue-600 text-white py-2 px-4 rounded">
+          AdminHub
+        </Button>
       </div>
-
+      <Modal
+        title="Add Upgrade Plan"
+        visible={isAddUpgradePlanModalVisible}
+        onCancel={() => setIsAddUpgradePlanModalVisible(false)}
+        footer={null}
+      >
+        <AddUpgradePlan
+          onClose={() => setIsAddUpgradePlanModalVisible(false)}
+          comnyid={comnyid}
+        />
+      </Modal>
       <Modal
         title="Edit Company Card"
         visible={isEditCompanyCardModalVisible}
         onCancel={() => setIsEditCompanyCardModalVisible(false)}
         footer={null}
       >
-        <EditCompany onClose={() => setIsEditCompanyCardModalVisible(false)} comnyid={comnyid} />
+        <EditCompany
+          onClose={() => setIsEditCompanyCardModalVisible(false)}
+          comnyid={comnyid}
+        />
       </Modal>
     </div>
   );
 };
-
 export default CompanyCard;

@@ -1,44 +1,66 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Tag, Input, message, Button, Modal, DatePicker } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
-import UserView from '../../Users/user-list/UserView';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import AddAttendance from './AddAttendance';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Tag,
+  Input,
+  message,
+  Button,
+  Modal,
+  DatePicker,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  MailOutlined,
+  PlusOutlined,
+  PushpinOutlined,
+  FileExcelOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+import UserView from "../../Users/user-list/UserView";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import AvatarStatus from "components/shared-components/AvatarStatus";
+import AddAttendance from "./AddAttendance";
 import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
-import utils from 'utils';
-import { deleteAttendance, getAttendances } from './AttendanceReducer/AttendanceSlice';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import utils from "utils";
+import {
+  deleteAttendance,
+  getAttendances,
+} from "./AttendanceReducer/AttendanceSlice";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const AttendanceList = () => {
   const [users, setUsers] = useState(userData);
   const [list, setList] = useState();
-const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const navigate = useNavigate();
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [isAddAttendanceModalVisible, setIsAddAttendanceModalVisible] = useState(false);
+  const [isAddAttendanceModalVisible, setIsAddAttendanceModalVisible] =
+    useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
- const tabledata = useSelector((state) => state.attendance);
- const employeeData = useSelector((state) => state.employee?.employee?.data || []);
+  const tabledata = useSelector((state) => state.attendance);
+  const employeeData = useSelector(
+    (state) => state.employee?.employee?.data || []
+  );
 
- console.log(tabledata,"sdfdfdfsdfxdvx");
+  const fnddat = tabledata.Attendances.data;
 
- const fnddat = tabledata.Attendances.data;
-
- useEffect(()=>{
-  if(fnddat){
-    setList(fnddat);
-  }
- },[fnddat])
+  useEffect(() => {
+    if (fnddat) {
+      setList(fnddat);
+    }
+  }, [fnddat]);
 
   // Open Add Attendance Modal
   const openAddAttendanceModal = () => {
@@ -54,26 +76,22 @@ const dispatch = useDispatch();
     dispatch(getAttendances());
   }, [dispatch]);
 
+  useEffect(() => {
+    if (tabledata?.Attendances?.data) {
+      const mappedData = tabledata.Attendances.data.map((attendance) => {
+        const employee =
+          employeeData.find((e) => e.id === mappedData.employee)?.username ||
+          "N/A";
 
-  
-  
-useEffect(() => {
-  if (tabledata?.Attendances?.data) {
-    const mappedData = tabledata.Attendances.data.map((attendance) => {
-      const employee = employeeData.find((e) => e.id === attendance.employee)?.username || 'N/A';
-    
-      return {
-        ...attendance,
-        employee,
-      };
-    });
-    setUsers(mappedData);
-console.log(mappedData,"users");
-
-  }
-}, [tabledata]);
-
-
+        return {
+          ...attendance,
+          employee,
+        };
+      });
+      setUsers(mappedData);
+      console.log(mappedData, "users");
+    }
+  }, [tabledata]);
 
   // Handle Search functionality
   const onSearch = (e) => {
@@ -83,27 +101,24 @@ console.log(mappedData,"users");
     setSelectedRowKeys([]);
   };
 
-
-
   // Handle Date Range Filtering
   const onDateChange = (dates) => {
-    setStartDate(dates ? dates[0] : null);  // Set the start date
-    setEndDate(dates ? dates[1] : null);    // Set the end date
+    setStartDate(dates ? dates[0] : null); // Set the start date
+    setEndDate(dates ? dates[1] : null); // Set the end date
   };
-  
+
   // Filter based on Date Range
   const filterByDate = (data) => {
     if (startDate && endDate) {
-      return data.filter(item => {
+      return data.filter((item) => {
         const itemDate = dayjs(item.intime);
-        return itemDate.isBetween(startDate, endDate, 'day', '[]'); // inclusive
+        return itemDate.isBetween(startDate, endDate, "day", "[]"); // inclusive
       });
     }
-    return data;  // Return original data if no date range is selected
+    return data; // Return original data if no date range is selected
   };
 
   // Delete User
-  
 
   // Show User Profile
   const showUserProfile = (userInfo) => {
@@ -117,48 +132,69 @@ console.log(mappedData,"users");
     setSelectedUser(null);
   };
 
+  const deleteAttendances = (userId) => {
+    // setUsers(users.filter(item => item.id !== userId));
+    // dispatch(DeleteDes(userId));
+    // dispatch(getDes())
+    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
 
-  
-     const deleteAttendances = (userId) => {
-        // setUsers(users.filter(item => item.id !== userId));
-        // dispatch(DeleteDes(userId));
-        // dispatch(getDes())
-        // message.success({ content: `Deleted user ${userId}`, duration: 2 });
-  
-          dispatch(deleteAttendance( userId )) 
-                    .then(() => {
-                      dispatch(getAttendances());
-                      message.success('Appraisal Deleted successfully!');
-                      setUsers(users.filter(item => item.id !== userId));
-               
-                    })
-                    .catch((error) => {
-                      // message.error('Failed to delete Indicator.');
-                      console.error('Edit API error:', error);
-                    });
-      };
+    dispatch(deleteAttendance(userId))
+      .then(() => {
+        dispatch(getAttendances());
+        message.success("Appraisal Deleted successfully!");
+        setUsers(users.filter((item) => item.id !== userId));
+      })
+      .catch((error) => {
+        // message.error('Failed to delete Indicator.');
+        console.error("Edit API error:", error);
+      });
+  };
 
   // Dropdown Menu
   const dropdownMenu = (elm) => (
     <Menu>
       <Menu.Item>
         <Flex alignItems="center">
-          <Button type="" className="" icon={<EyeOutlined />} onClick={() => { showUserProfile(elm) }} size="small">
+          <Button
+            type=""
+            className=""
+            icon={<EyeOutlined />}
+            onClick={() => {
+              showUserProfile(elm);
+            }}
+            size="small"
+          >
             <span className="">View Details</span>
           </Button>
         </Flex>
       </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-          <Button type="" className="" icon={<MailOutlined />} onClick={() => { showUserProfile(elm) }} size="small">
+          <Button
+            type=""
+            className=""
+            icon={<MailOutlined />}
+            onClick={() => {
+              showUserProfile(elm);
+            }}
+            size="small"
+          >
             <span className="">Send Mail</span>
           </Button>
         </Flex>
       </Menu.Item>
-      
+
       <Menu.Item>
         <Flex alignItems="center">
-          <Button type="" className="" icon={<DeleteOutlined />} onClick={() => { deleteAttendances(elm.id) }} size="small">
+          <Button
+            type=""
+            className=""
+            icon={<DeleteOutlined />}
+            onClick={() => {
+              deleteAttendances(elm.id);
+            }}
+            size="small"
+          >
             <span className="">Delete</span>
           </Button>
         </Flex>
@@ -168,36 +204,38 @@ console.log(mappedData,"users");
 
   const tableColumns = [
     {
-      title: 'Employee',
-      dataIndex: 'employee',
+      title: "Employee",
+      dataIndex: "employee",
 
       sorter: {
-        compare: (a, b) => a.employee.toLowerCase().localeCompare(b.employee.toLowerCase()),
+        compare: (a, b) =>
+          a.employee.toLowerCase().localeCompare(b.employee.toLowerCase()),
       },
     },
     {
-      title: 'In Time',
-      dataIndex: 'startTime',
+      title: "In Time",
+      dataIndex: "startTime",
       sorter: (a, b) => dayjs(a.startTime).unix() - dayjs(b.startTime).unix(),
     },
     {
-      title: 'Out Time',
-      dataIndex: 'endTime',
+      title: "Out Time",
+      dataIndex: "endTime",
       render: (date) => <span>{dayjs.unix(date).format("MM/DD/YYYY")}</span>,
       sorter: (a, b) => dayjs(a.endTime).unix() - dayjs(b.endTime).unix(),
-    },  
+    },
     {
-      title: 'Half Day',
-      dataIndex: 'halfDay',
+      title: "Half Day",
+      dataIndex: "halfDay",
 
       sorter: {
-        compare: (a, b) => a.halfDay.toLowerCase().localeCompare(b.halfDay.toLowerCase()),
+        compare: (a, b) =>
+          a.halfDay.toLowerCase().localeCompare(b.halfDay.toLowerCase()),
       },
     },
-   
+
     {
-      title: 'Action',
-      dataIndex: 'actions',
+      title: "Action",
+      dataIndex: "actions",
       render: (_, elm) => (
         <div className="text-center">
           <EllipsisDropdown menu={dropdownMenu(elm)} />
@@ -210,11 +248,19 @@ console.log(mappedData,"users");
   const filteredList = filterByDate(list);
 
   return (
-    <Card bodyStyle={{ padding: '-3px' }}>
-      <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+    <Card bodyStyle={{ padding: "-3px" }}>
+      <Flex
+        alignItems="center"
+        justifyContent="space-between"
+        mobileFlex={false}
+      >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={onSearch} />
+            <Input
+              placeholder="Search"
+              prefix={<SearchOutlined />}
+              onChange={onSearch}
+            />
           </div>
         </Flex>
 
@@ -224,9 +270,13 @@ console.log(mappedData,"users");
             onChange={onDateChange}
             format="YYYY-MM-DD"
             style={{ marginRight: 10 }}
-            className='w-[250px]'
+            className="w-[250px]"
           />
-          <Button type="primary" className="ml-2" onClick={openAddAttendanceModal}>
+          <Button
+            type="primary"
+            className="ml-2"
+            onClick={openAddAttendanceModal}
+          >
             <PlusOutlined />
             <span>New</span>
           </Button>
@@ -237,10 +287,19 @@ console.log(mappedData,"users");
       </Flex>
 
       <div className="table-responsive mt-2">
-        <Table columns={tableColumns} dataSource={filteredList} rowKey="id" scroll={{ x: 1200 }} />
+        <Table
+          columns={tableColumns}
+          dataSource={filteredList}
+          rowKey="id"
+          scroll={{ x: 1200 }}
+        />
       </div>
 
-      <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+      <UserView
+        data={selectedUser}
+        visible={userProfileVisible}
+        close={closeUserProfile}
+      />
 
       <Modal
         title="Add Attendance"
@@ -256,15 +315,6 @@ console.log(mappedData,"users");
 };
 
 export default AttendanceList;
-
-
-
-
-
-
-
-
-
 
 // import React, { Component } from 'react';
 // import { Card, Table, Menu, Tag, Input, message, Button, Modal } from 'antd';
@@ -331,15 +381,14 @@ export default AttendanceList;
 //   render() {
 //     const { users, userProfileVisible, selectedUser, isAddAttendanceModalVisible } = this.state;
 
-
 //     const dropdownMenu = elm => (
 //         <Menu>
-            
+
 //             <Menu.Item>
 //                 <Flex alignItems="center">
 //                     {/* <EyeOutlined />
 //                     <span className="ml-2">View Details</span> */}
-                 
+
 //                 <Button type="" className="" icon={<EyeOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
 //                 <span className="">View Details</span>
 //                 </Button>
@@ -349,7 +398,7 @@ export default AttendanceList;
 //                 <Flex alignItems="center">
 //                     {/* <EyeOutlined />
 //                     <span className="ml-2">View Details</span> */}
-                 
+
 //                  <Button type="" className="" icon={<MailOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
 //                 <span className="">Send Mail</span>
 //                 </Button>
@@ -359,7 +408,7 @@ export default AttendanceList;
 //                 <Flex alignItems="center">
 //                     {/* <EyeOutlined />
 //                     <span className="ml-2">View Details</span> */}
-                 
+
 //                  <Button type="" className="" icon={<PushpinOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
 //                 <span className="ml-2">Pin</span>
 //                 </Button>
@@ -369,17 +418,15 @@ export default AttendanceList;
 //                 <Flex alignItems="center">
 //                     {/* <DeleteOutlined />
 //                     <span className="ml-2">Delete</span> */}
-                
-//     <Button type="" className="" icon={<DeleteOutlined />} onClick={() => {this.deleteUser(elm.id)}} size="small"> 
+
+//     <Button type="" className="" icon={<DeleteOutlined />} onClick={() => {this.deleteUser(elm.id)}} size="small">
 //     <span className="">Delete</span>
 //     </Button>
-    
-    
+
 //                 </Flex>
-//             </Menu.Item>	
+//             </Menu.Item>
 //         </Menu>
 //     );
-
 
 //     const tableColumns = [
 //       {
@@ -432,7 +479,7 @@ export default AttendanceList;
 //           compare: (a, b) => a.totalhour.length - b.totalhour.length,
 //         },
 //       },
-   
+
 //     {
 //         title: 'Punch By',
 //         dataIndex: 'punchby',
@@ -510,12 +557,3 @@ export default AttendanceList;
 // }
 
 // export default AttendanceList;
-
-
-
-
-
-
-
-
-

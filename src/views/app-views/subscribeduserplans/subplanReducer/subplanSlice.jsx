@@ -1,27 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./CompanyService";
+import UserService from "./subplanService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
 
-export const addassignplan = createAsyncThunk(
-  "users/addassignplan",
+export const Addpolicys = createAsyncThunk(
+  "users/Addpolicys",
   async (userData, thunkAPI) => {
     try {
-      const response = await UserService.assignplan(userData);
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
-
-export const addClient = createAsyncThunk(
-  "users/addUser",
-  async (userData, thunkAPI) => {
-    try {
-      const response = await UserService.createClient(userData);
+      const response = await UserService.addpolicy(userData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -31,11 +19,11 @@ export const addClient = createAsyncThunk(
 
 // Async thunk for user login
 
-export const ClientData = createAsyncThunk(
-  "emp/getClient",
+export const getsubplandata = createAsyncThunk(
+  "emp/getsubplandata",
   async (thunkAPI) => {
     try {
-      const response = await UserService.ClientData();
+      const response = await UserService.getsubplan();
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -70,22 +58,22 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const deleteClient = createAsyncThunk(
-  "users/deleteUser",
+export const deletepolicys = createAsyncThunk(
+  "users/deletepolicys",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.DeleteClient(userId);
+      const response = await UserService.deletepolicy(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const Editclient = createAsyncThunk(
-  "users/updateEmployee",
-  async ({ comnyid, values }, thunkAPI) => {
+export const editpolicys = createAsyncThunk(
+  "users/editpolicys",
+  async ({ idd, values }, thunkAPI) => {
     try {
-      const response = await UserService.EditClient(comnyid, values);
+      const response = await UserService.editpolicy(idd, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -94,8 +82,6 @@ export const Editclient = createAsyncThunk(
     }
   }
 );
-
-// Async thunk for updating a user
 
 const initialUser = () => {
   const item = window.localStorage.getItem("USER");
@@ -108,9 +94,9 @@ const initialIsAuth = () => {
 };
 
 const RoleAndPermissionSlice = createSlice({
-  name: "ClientData",
+  name: "subplan",
   initialState: {
-    ClientData: [],
+    subplan: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -147,38 +133,27 @@ const RoleAndPermissionSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(addassignplan.pending, (state) => {
+      .addCase(Addpolicys.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(addassignplan.fulfilled, (state, action) => {
+      .addCase(Addpolicys.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(addassignplan.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.message);
-      })
-      .addCase(addClient.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(addClient.fulfilled, (state, action) => {
-        state.isLoading = false;
-        toast.success(action.payload?.data?.message);
-      })
-      .addCase(addClient.rejected, (state, action) => {
+      .addCase(Addpolicys.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      .addCase(ClientData.pending, (state) => {
+      .addCase(getsubplandata.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(ClientData.fulfilled, (state, action) => {
+      .addCase(getsubplandata.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.ClientData = action?.payload;
+        state.subplan = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(ClientData.rejected, (state, action) => {
+      .addCase(getsubplandata.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
@@ -211,27 +186,27 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
       //delete
-      .addCase(deleteClient.pending, (state) => {
+      .addCase(deletepolicys.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(deleteClient.fulfilled, (state, action) => {
+      .addCase(deletepolicys.fulfilled, (state, action) => {
         state.isLoading = false;
         toast.success(action.payload.message);
       })
-      .addCase(deleteClient.rejected, (state, action) => {
+      .addCase(deletepolicys.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(Editclient.pending, (state) => {
+      .addCase(editpolicys.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(Editclient.fulfilled, (state, action) => {
+      .addCase(editpolicys.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload;
+        state.editItem = action.payload; // Update the state with the updated employee data
       })
-      .addCase(Editclient.rejected, (state, action) => {
+      .addCase(editpolicys.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
       });

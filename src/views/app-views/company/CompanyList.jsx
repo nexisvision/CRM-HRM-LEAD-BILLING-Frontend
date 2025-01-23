@@ -1,29 +1,57 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteClient, ClientData } from "./CompanyReducers/CompanySlice";
-import { EyeOutlined, DeleteOutlined, EditOutlined, PushpinOutlined, RocketOutlined, PlusOutlined, FileExcelOutlined, AppstoreOutlined, UnorderedListOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, Input, Select, Modal, message, Radio, Row, Col, Dropdown, Tag, Menu, Table } from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  PushpinOutlined,
+  RocketOutlined,
+  PlusOutlined,
+  FileExcelOutlined,
+  AppstoreOutlined,
+  UnorderedListOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+import {
+  Button,
+  Input,
+  Select,
+  Modal,
+  message,
+  Radio,
+  Row,
+  Col,
+  Dropdown,
+  Tag,
+  Menu,
+  Table,
+} from "antd";
 import AddCompany from "./AddCompany";
 import EditCompany from "./EditCompany";
 import ResetPassword from "./ResetPassword";
 import utils from "utils";
 import PlanUpgrade from "./PlanUpgrade";
-import CompanyCard from './CompanyCard'; // Import the CompanyCard component
+import CompanyCard from "./CompanyCard"; // Import the CompanyCard component
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
 
 const { Option } = Select;
-const VIEW_LIST = 'LIST';
-const VIEW_GRID = 'GRID';
+const VIEW_LIST = "LIST";
+const VIEW_GRID = "GRID";
 
 const CompanyList = () => {
   const [users, setUsers] = useState([]);
-  const [view, setView] = useState(VIEW_GRID);  // Default to grid view
-  const [isAddCompanyModalVisible, setIsAddCompanyModalVisible] = useState(false);
-  const [isEditCompanyModalVisible, setIsEditCompanyModalVisible] = useState(false);
-  const [isResetPasswordModalVisible, setIsResetPasswordModalVisible] = useState(false);
-  const [isUpgradePlanModalVisible, setIsUpgradePlanModalVisible] = useState(false);
+  const [view, setView] = useState(VIEW_GRID); // Default to grid view
+  const [isAddCompanyModalVisible, setIsAddCompanyModalVisible] =
+    useState(false);
+  const [isEditCompanyModalVisible, setIsEditCompanyModalVisible] =
+    useState(false);
+  const [isResetPasswordModalVisible, setIsResetPasswordModalVisible] =
+    useState(false);
+  const [isUpgradePlanModalVisible, setIsUpgradePlanModalVisible] =
+    useState(false);
   const [comnyid, setCompnyid] = useState("");
 
   // New state for editing company card modal
@@ -44,7 +72,8 @@ const CompanyList = () => {
   }, [tableData]);
 
   const handleShowStatus = (value) => {
-    const filteredUsers = value !== 'All' ? users.filter(user => user.status === value) : users;
+    const filteredUsers =
+      value !== "All" ? users.filter((user) => user.status === value) : users;
     setUsers(filteredUsers);
   };
 
@@ -54,7 +83,11 @@ const CompanyList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchResults = value ? users.filter(user => user.name.toLowerCase().includes(value.toLowerCase())) : users;
+    const searchResults = value
+      ? users.filter((user) =>
+          user.name.toLowerCase().includes(value.toLowerCase())
+        )
+      : users;
     setUsers(searchResults);
   };
 
@@ -79,7 +112,10 @@ const CompanyList = () => {
             type=""
             className=""
             icon={<EditOutlined />}
-            onClick={() => { setIsEditCompanyModalVisible(true); setCompnyid(user.id); }}
+            onClick={() => {
+              setIsEditCompanyModalVisible(true);
+              setCompnyid(user.id);
+            }}
             size="small"
           >
             <span>Edit</span>
@@ -121,7 +157,7 @@ const CompanyList = () => {
             type=""
             className=""
             icon={<DeleteOutlined />}
-            onClick={() => deleteUser(user.id)} 
+            onClick={() => deleteUser(user.id)}
             size="small"
           >
             <span>Delete</span>
@@ -208,10 +244,16 @@ const CompanyList = () => {
 
         <div className="flex gap-4 ">
           <Radio.Group value={view} onChange={onChangeCompanyView}>
-            <Radio.Button value={VIEW_GRID} className="border-2 px-3 py-2 rounded-md">
+            <Radio.Button
+              value={VIEW_GRID}
+              className="border-2 px-3 py-2 rounded-md"
+            >
               <AppstoreOutlined />
             </Radio.Button>
-            <Radio.Button value={VIEW_LIST} className="border-2 px-3 py-2 rounded-md">
+            <Radio.Button
+              value={VIEW_LIST}
+              className="border-2 px-3 py-2 rounded-md"
+            >
               <UnorderedListOutlined />
             </Radio.Button>
           </Radio.Group>
@@ -222,10 +264,7 @@ const CompanyList = () => {
           >
             New
           </Button>
-          <Button
-            type="primary"
-            icon={<FileExcelOutlined />}
-          >
+          <Button type="primary" icon={<FileExcelOutlined />}>
             Export
           </Button>
         </div>
@@ -256,7 +295,8 @@ const CompanyList = () => {
         title="Create Company"
         visible={isAddCompanyModalVisible}
         onCancel={() => setIsAddCompanyModalVisible(false)}
-        footer={null}>
+        footer={null}
+      >
         <AddCompany onClose={() => setIsAddCompanyModalVisible(false)} />
       </Modal>
 
@@ -264,8 +304,12 @@ const CompanyList = () => {
         title="Edit Company"
         visible={isEditCompanyModalVisible}
         onCancel={() => setIsEditCompanyModalVisible(false)}
-        footer={null} >
-        <EditCompany onClose={() => setIsEditCompanyModalVisible(false)} comnyid={comnyid} />
+        footer={null}
+      >
+        <EditCompany
+          onClose={() => setIsEditCompanyModalVisible(false)}
+          comnyid={comnyid}
+        />
       </Modal>
 
       {/* <Modal
@@ -280,7 +324,8 @@ const CompanyList = () => {
         title="Reset Password"
         visible={isResetPasswordModalVisible}
         onCancel={() => setIsResetPasswordModalVisible(false)}
-        footer={null}>
+        footer={null}
+      >
         <ResetPassword onClose={() => setIsResetPasswordModalVisible(false)} />
       </Modal>
 
@@ -288,10 +333,10 @@ const CompanyList = () => {
         title="Upgrade Plan"
         visible={isUpgradePlanModalVisible}
         onCancel={() => setIsUpgradePlanModalVisible(false)}
-        footer={null} >
+        footer={null}
+      >
         <PlanUpgrade onClose={() => setIsUpgradePlanModalVisible(false)} />
       </Modal>
-
     </div>
   );
 };
