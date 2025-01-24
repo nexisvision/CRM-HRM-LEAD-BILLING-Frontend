@@ -154,27 +154,6 @@ const AddTask = ({ onClose }) => {
                   <label className="font-semibold">AssignTo</label>
                   <Field name="assignTo">
                     {({ field }) => (
-                      // <Select
-                      //   {...field}
-                      //   mode="multiple"
-                      //   placeholder="Select assignTo"
-                      //   className="w-full mt-2"
-                      //   onChange={(value) => {
-                      //     const assignToObjects = value.map((id) => ({
-                      //       id,
-                      //       name:
-                      //         id === "xyz" ? "XYZ" : id === "abc" ? "ABC" : "",
-                      //     }));
-                      //     setFieldValue("assignTo", assignToObjects);
-                      //   }}
-                      //   value={values.assignTo.map((item) => item.id)}
-                      //   onBlur={() => setFieldTouched("assignTo", true)}
-                      //   allowClear={false}
-                      // >
-                      //   <Option value="xyz">XYZ</Option>
-                      //   <Option value="abc">ABC</Option>
-                      // </Select>
-
                       <Select
                         {...field}
                         className="w-full mt-2"

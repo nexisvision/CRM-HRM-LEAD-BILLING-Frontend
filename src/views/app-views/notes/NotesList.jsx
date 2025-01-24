@@ -1,18 +1,40 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined,EditOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import StatisticWidget from 'components/shared-components/StatisticWidget';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Table,
+  Menu,
+  Row,
+  Col,
+  Tag,
+  Input,
+  message,
+  Button,
+  Modal,
+} from "antd";
+import {
+  EyeOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+  MailOutlined,
+  PlusOutlined,
+  PushpinOutlined,
+  FileExcelOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
+import dayjs from "dayjs";
+import Flex from "components/shared-components/Flex";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import StatisticWidget from "components/shared-components/StatisticWidget";
 // import { DealStatisticData } from '../../dashboards/default/DefaultDashboardData';
 // import AvatarStatus from 'components/shared-components/AvatarStatus';
-import userData from 'assets/data/user-list.data.json';
-import OrderListData from 'assets/data/order-list.data.json';
-import utils from 'utils';
-import AddNotes from "../notes/AddNotes"
-import EditNotes from "../notes/EditNotes"
-import ViewNotes from './ViewNotes';
+import userData from "assets/data/user-list.data.json";
+import OrderListData from "assets/data/order-list.data.json";
+import utils from "utils";
+import AddNotes from "../notes/AddNotes";
+import EditNotes from "../notes/EditNotes";
+import ViewNotes from "./ViewNotes";
+import { useDispatch, useSelector } from "react-redux";
+import { getnotess } from "./notesReducer/notesSlice";
 
 const NotesList = () => {
   const [users, setUsers] = useState(userData);
@@ -22,7 +44,24 @@ const NotesList = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddNotesModalVisible, setIsAddNotesModalVisible] = useState(false);
   const [isEditNotesModalVisible, setIsEditNotesModalVisible] = useState(false);
-//   const [dealStatisticData] = useState(DealStatisticData);
+  //   const [dealStatisticData] = useState(DealStatisticData);
+
+  const dispatch = useDispatch();
+
+  const alllogeddata = useSelector((state) => state.user);
+  const id = alllogeddata.loggedInUser.id;
+
+  useEffect(() => {
+    dispatch(getnotess(id));
+  }, []);
+
+  const allnotedata = useSelector((state) => state.notes);
+  const fnddata = allnotedata.notes.data;
+
+  useEffect(() => {
+    if (fnddata) {
+    }
+  }, []);
 
   // Open Add Job Modal
   const openAddNotesModal = () => {
@@ -34,8 +73,8 @@ const NotesList = () => {
     setIsAddNotesModalVisible(false);
   };
 
-   // Open Add Job Modal
-   const openEditNotesModal = () => {
+  // Open Add Job Modal
+  const openEditNotesModal = () => {
     setIsEditNotesModalVisible(true);
   };
 
@@ -45,25 +84,18 @@ const NotesList = () => {
   };
 
   // Search functionality
-//   const onSearch = (e) => {
-//     const value = e.currentTarget.value;
-//     const searchArray = value ? list : OrderListData;
-//     const data = utils.wildCardSearch(searchArray, value);
-//     setList(data);
-//     setSelectedRowKeys([]);
-//   };
-
- 
-
-
-
+  //   const onSearch = (e) => {
+  //     const value = e.currentTarget.value;
+  //     const searchArray = value ? list : OrderListData;
+  //     const data = utils.wildCardSearch(searchArray, value);
+  //     setList(data);
+  //     setSelectedRowKeys([]);
+  //   };
 
   return (
     <>
-    
-    
-    {/* // <Card bodyStyle={{ padding: '-3px' }}> */}
-      <Flex alignItems="center" mobileFlex={false} className='justify-end'>  
+      {/* // <Card bodyStyle={{ padding: '-3px' }}> */}
+      <Flex alignItems="center" mobileFlex={false} className="justify-end">
         <Flex gap="7px" alignItems="center">
           <Button type="primary" className="ml-2" onClick={openAddNotesModal}>
             <PlusOutlined />
@@ -72,7 +104,7 @@ const NotesList = () => {
         </Flex>
       </Flex>
 
-      <ViewNotes/>
+      <ViewNotes />
 
       {/* <Card>
         <div>
@@ -82,32 +114,31 @@ const NotesList = () => {
 
       {/* <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} /> */}
 
-       {/* Add Job Modal */}
-       <Modal
+      {/* Add Job Modal */}
+      <Modal
         title="Add Notes"
         visible={isAddNotesModalVisible}
         onCancel={closeAddNotesModal}
         footer={null}
         width={800}
-        className='mt-[-70px]'
+        className="mt-[-70px]"
       >
         <AddNotes onClose={closeAddNotesModal} />
       </Modal>
-       <Modal
+      <Modal
         title="Edit Notes"
         visible={isEditNotesModalVisible}
         onCancel={closeEditNotesModal}
         footer={null}
         width={1000}
         divider={true}
-        className='mt-[-70px]'
+        className="mt-[-70px]"
       >
         <EditNotes onClose={closeEditNotesModal} />
       </Modal>
-    {/* // </Card> */}
+      {/* // </Card> */}
     </>
   );
 };
 
 export default NotesList;
-

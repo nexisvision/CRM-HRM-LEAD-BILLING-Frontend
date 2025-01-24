@@ -178,8 +178,6 @@ const AddProposal = ({ onClose }) => {
         total: parseFloat(totalAmount.toFixed(2)),
       };
 
-      console.log("Proposal Data:", proposalData);
-
       // Dispatch create proposal action
       dispatch(addpropos(proposalData))
         .then(() => {

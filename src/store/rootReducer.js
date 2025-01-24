@@ -64,6 +64,7 @@ import inquiry from "../views/app-views/inquiry/inquiryReducer/inquirySlice"
 import calendar from "../views/app-views/dashboards/calendar/calanderReducer/calanderSlice"
 import attendance from "../views/app-views/hrm/Attendance/AttendanceReducer/AttendanceSlice"
 import subplan from "../views/app-views/subscribeduserplans/subplanReducer/subplanSlice"
+import notes from "../views/app-views/notes/notesReducer/notesSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -132,6 +133,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
         calendar,
         attendance,
         subplan,
+        notes,
         // employee,
         // department,
         ...asyncReducers,

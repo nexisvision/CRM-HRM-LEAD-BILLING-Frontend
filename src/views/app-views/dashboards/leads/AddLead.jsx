@@ -24,7 +24,7 @@ import { GetLeads, LeadsAdd } from "./LeadReducers/LeadSlice";
 import { getallcurrencies } from "../../setting/currencies/currenciesreducer/currenciesSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { GetLable } from "../project/milestone/LableReducer/LableSlice";
-
+import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 
 const { Option } = Select;
 
@@ -41,10 +41,14 @@ const AddLead = ({ onClose }) => {
   const datas = alltagdata.Lable.data || [];
   const user = useSelector((state) => state.user.loggedInUser);
   const lid = user?.id;
-
-
-
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getstages());
+  }, []);
+
+  const allstagedata = useSelector((state) => state.StagesLeadsDeals);
+  const fndata = allstagedata?.StagesLeadsDeals?.data || [];
 
   const initialValues = {
     leadTitle: "",
@@ -88,9 +92,7 @@ const AddLead = ({ onClose }) => {
       .matches(/^\d{10}$/, "telephone number must be exactly 10 digits")
       .nullable(),
     email: Yup.string().email("Please enter a valid email address").nullable(),
-    leadValue: Yup.number()
-      .typeError('Lead Value must be a number')
-      .nullable(),
+    leadValue: Yup.number().typeError("Lead Value must be a number").nullable(),
     currencyIcon: Yup.string().nullable(),
     employee: Yup.string().required("Employee is required"),
     status: Yup.string().required("Status is required"),
@@ -124,8 +126,6 @@ const AddLead = ({ onClose }) => {
       is: true,
       then: Yup.string().required("Brand name is required"),
     }),
-
-
   });
 
   const onSubmit = (values, { resetForm }) => {
@@ -147,7 +147,6 @@ const AddLead = ({ onClose }) => {
       });
   };
 
-
   const LeadValueField = ({ field, form }) => (
     <Col span={24} className="mt-2">
       <div className="form-item">
@@ -168,10 +167,7 @@ const AddLead = ({ onClose }) => {
                 onChange={(value) => form.setFieldValue("currencyId", value)}
               >
                 {currencies?.map((currency) => (
-                  <Option
-                    key={currency.id}
-                    value={currency.id}
-                  >
+                  <Option key={currency.id} value={currency.id}>
                     {currency.currencyCode} ({currency.currencyIcon})
                   </Option>
                 ))}
@@ -273,6 +269,54 @@ const AddLead = ({ onClose }) => {
                 </div>
               </Col>
 
+              <Col span={24} className="mt-2">
+                <div className="form-item">
+                  <label
+                    htmlFor="leadStage"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Lead Stage
+                  </label>
+                  <div className="flex gap-2">
+                    {fndata ? (
+                      <Field name="leadStage">
+                        {({ field, form }) => (
+                          <Select
+                            {...field}
+                            id="leadStage"
+                            className="w-full"
+                            placeholder="Select Lead Stage"
+                            onChange={(value) =>
+                              form.setFieldValue("leadStage", value)
+                            }
+                          >
+                            {fndata.map((currency) => (
+                              <Option key={currency.id} value={currency.id}>
+                                {currency.stageName}
+                              </Option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
+                    ) : (
+                      <Field
+                        name="leadStage"
+                        type="string"
+                        as={Input}
+                        id="leadStage"
+                        placeholder="Enter Lead Value"
+                        className="w-full"
+                      />
+                    )}
+                  </div>
+                  <ErrorMessage
+                    name="leadStage"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Email Address</label>
@@ -288,7 +332,6 @@ const AddLead = ({ onClose }) => {
                   />
                 </div>
               </Col>
-
 
               <Col span={12} className="">
                 <div className="form-item">
@@ -306,8 +349,6 @@ const AddLead = ({ onClose }) => {
                   />
                 </div>
               </Col>
-
-
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
@@ -667,14 +708,6 @@ const AddLead = ({ onClose }) => {
 
 export default AddLead;
 
-
-
-
-
-
-
-
-
 // // import React, { useState,useEffect } from "react";
 // // import {
 // //   Input,
@@ -700,7 +733,6 @@ export default AddLead;
 // // import { GetLeads, LeadsAdd } from "./LeadReducers/LeadSlice";
 // // import { getallcurrencies } from "../../setting/currencies/currenciesreducer/currenciesSlice";
 
-
 // // const { Option } = Select;
 
 // // const AddLead = ({ onClose }) => {
@@ -708,12 +740,11 @@ export default AddLead;
 // //   const [details, setDetails] = useState(false);
 // //   const [info, setInfo] = useState(false);
 // //   const [organisation, setorganisation] = useState(false);
-  
+
 // //   const { currencies } = useSelector((state) => state.currencies);
-  
+
 // //   // Add state for lead value and currency
 // //   const [selectedCurrency, setSelectedCurrency] = useState(null);
-
 
 // //   const dispatch = useDispatch();
 
@@ -724,7 +755,7 @@ export default AddLead;
 // //     telephone: "",
 // //     email: "",
 // //     leadValue: "",
-// //     currencyIcon: "", 
+// //     currencyIcon: "",
 // //     assigned: "",
 // //     status: "",
 // //     notes: "",
@@ -786,7 +817,6 @@ export default AddLead;
 // //       then: Yup.string().required("Brand name is required"),
 // //     }),
 
-   
 // //   });
 
 // //   const onSubmit = (values, { resetForm }) => {
@@ -832,8 +862,8 @@ export default AddLead;
 // //                 }}
 // //               >
 // //                 {currencies?.map((currency) => (
-// //                   <Option 
-// //                     key={currency.id} 
+// //                   <Option
+// //                     key={currency.id}
 // //                     value={currency.id}
 // //                   >
 // //                     {currency.currencyCode} ({currency.currencyIcon})
@@ -873,8 +903,8 @@ export default AddLead;
 // //   //               onChange={(value) => form.setFieldValue("currencyId", value)}
 // //   //             >
 // //   //               {currencies?.map((currency) => (
-// //   //                 <Option 
-// //   //                   key={currency.id} 
+// //   //                 <Option
+// //   //                   key={currency.id}
 // //   //                   value={currency.id}
 // //   //                 >
 // //   //                   {currency.currencyCode} ({currency.currencyIcon})
@@ -993,7 +1023,6 @@ export default AddLead;
 // //                   />
 // //                 </div>
 // //               </Col>
-
 
 // //               <Col span={12} className="">
 // //               <div className="form-item">
@@ -1361,8 +1390,6 @@ export default AddLead;
 // //                   </>
 // //                 )}
 // //               </Col>
-
-             
 
 // //               <Col className="mt-2">
 // //                 <h5 className="flex">
