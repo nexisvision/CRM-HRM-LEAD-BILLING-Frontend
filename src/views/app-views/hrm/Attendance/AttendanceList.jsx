@@ -9,6 +9,7 @@ import {
   Button,
   Modal,
   DatePicker,
+  Select,
 } from "antd";
 import {
   EyeOutlined,
@@ -16,7 +17,6 @@ import {
   SearchOutlined,
   MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
   FileExcelOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -32,20 +32,24 @@ import {
   deleteAttendance,
   getAttendances,
 } from "./AttendanceReducer/AttendanceSlice";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+
+const { Option } = Select;
 
 const AttendanceList = () => {
   const [users, setUsers] = useState(userData);
-  const [list, setList] = useState();
   const dispatch = useDispatch();
+  const [list, setList] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState(dayjs().format('MMM YYYY'));
+  const [selectedDepartment, setSelectedDepartment] = useState('All Department');
+  const [selectedLocation, setSelectedLocation] = useState('All Location');
+  const [selectedEmployee, setSelectedEmployee] = useState('All Employee');
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const navigate = useNavigate();
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [isAddAttendanceModalVisible, setIsAddAttendanceModalVisible] =
-    useState(false);
+  const [isAddAttendanceModalVisible, setIsAddAttendanceModalVisible] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
@@ -61,16 +65,6 @@ const AttendanceList = () => {
       setList(fnddat);
     }
   }, [fnddat]);
-
-  // Open Add Attendance Modal
-  const openAddAttendanceModal = () => {
-    setIsAddAttendanceModalVisible(true);
-  };
-
-  // Close Add Attendance Modal
-  const closeAddAttendanceModal = () => {
-    setIsAddAttendanceModalVisible(false);
-  };
 
   useEffect(() => {
     dispatch(getAttendances());
@@ -92,6 +86,16 @@ const AttendanceList = () => {
       console.log(mappedData, "users");
     }
   }, [tabledata]);
+
+  // Open Add Attendance Modal
+  const openAddAttendanceModal = () => {
+    setIsAddAttendanceModalVisible(true);
+  };
+
+  // Close Add Attendance Modal
+  const closeAddAttendanceModal = () => {
+    setIsAddAttendanceModalVisible(false);
+  };
 
   // Handle Search functionality
   const onSearch = (e) => {
@@ -118,8 +122,6 @@ const AttendanceList = () => {
     return data; // Return original data if no date range is selected
   };
 
-  // Delete User
-
   // Show User Profile
   const showUserProfile = (userInfo) => {
     setUserProfileVisible(true);
@@ -133,11 +135,6 @@ const AttendanceList = () => {
   };
 
   const deleteAttendances = (userId) => {
-    // setUsers(users.filter(item => item.id !== userId));
-    // dispatch(DeleteDes(userId));
-    // dispatch(getDes())
-    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
-
     dispatch(deleteAttendance(userId))
       .then(() => {
         dispatch(getAttendances());
@@ -145,7 +142,6 @@ const AttendanceList = () => {
         setUsers(users.filter((item) => item.id !== userId));
       })
       .catch((error) => {
-        // message.error('Failed to delete Indicator.');
         console.error("Edit API error:", error);
       });
   };
@@ -202,98 +198,133 @@ const AttendanceList = () => {
     </Menu>
   );
 
+  // Calendar header with dates
+  const generateDateColumns = () => {
+    const daysInMonth = dayjs().daysInMonth();
+    const columns = [];
+
+    for (let i = 1; i <= daysInMonth; i++) {
+      const date = dayjs().date(i);
+      columns.push({
+        title: (
+          <div className="text-center">
+            <div>{i}</div>
+            <div>{date.format('ddd')}</div>
+          </div>
+        ),
+        dataIndex: `day${i}`,
+        width: 60,
+        align: 'center',
+        render: (status) => renderAttendanceStatus(status),
+      });
+    }
+    return columns;
+  };
+
+  const renderAttendanceStatus = (status) => {
+    if (!status) return null;
+
+    const statusColors = {
+      P: 'green',
+      A: 'red',
+      L: 'orange',
+      WK: 'blue',
+      HL: 'purple'
+    };
+
+    return (
+      <Tag color={statusColors[status]} className="m-0">
+        {status}
+      </Tag>
+    );
+  };
+
   const tableColumns = [
     {
-      title: "Employee",
-      dataIndex: "employee",
-
-      sorter: {
-        compare: (a, b) =>
-          a.employee.toLowerCase().localeCompare(b.employee.toLowerCase()),
-      },
+      title: 'Employee Name',
+      dataIndex: 'name',
+      fixed: 'left',
+      width: 200,
     },
-    {
-      title: "In Time",
-      dataIndex: "startTime",
-      sorter: (a, b) => dayjs(a.startTime).unix() - dayjs(b.startTime).unix(),
-    },
-    {
-      title: "Out Time",
-      dataIndex: "endTime",
-      render: (date) => <span>{dayjs.unix(date).format("MM/DD/YYYY")}</span>,
-      sorter: (a, b) => dayjs(a.endTime).unix() - dayjs(b.endTime).unix(),
-    },
-    {
-      title: "Half Day",
-      dataIndex: "halfDay",
-
-      sorter: {
-        compare: (a, b) =>
-          a.halfDay.toLowerCase().localeCompare(b.halfDay.toLowerCase()),
-      },
-    },
-
-    {
-      title: "Action",
-      dataIndex: "actions",
-      render: (_, elm) => (
-        <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
-        </div>
-      ),
-    },
+    ...generateDateColumns()
   ];
 
-  // Apply date range filter
-  const filteredList = filterByDate(list);
+  // Mock data structure
+  const generateMockData = () => {
+    return list.map(employee => {
+      const attendanceRecord = {
+        id: employee.id,
+        name: employee.name,
+      };
+
+      // Generate random attendance status for each day
+      for (let i = 1; i <= dayjs().daysInMonth(); i++) {
+        const statuses = ['P', 'A', 'L', 'WK', 'HL'];
+        attendanceRecord[`day${i}`] = statuses[Math.floor(Math.random() * statuses.length)];
+      }
+
+      return attendanceRecord;
+    });
+  };
 
   return (
-    <Card bodyStyle={{ padding: "-3px" }}>
-      <Flex
-        alignItems="center"
-        justifyContent="space-between"
-        mobileFlex={false}
-      >
-        <Flex className="mb-1" mobileFlex={false}>
-          <div className="mr-md-3 mb-3">
-            <Input
-              placeholder="Search"
-              prefix={<SearchOutlined />}
-              onChange={onSearch}
+    <Card>
+      <div className="mb-4">
+        <h2>Employee Attendance</h2>
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex gap-4">
+            <DatePicker.MonthPicker
+              defaultValue={dayjs()}
+              format="MMM YYYY"
+              onChange={(date) => setSelectedMonth(date.format('MMM YYYY'))}
             />
+            <Select
+              defaultValue="All Department"
+              style={{ width: 150 }}
+              onChange={(value) => setSelectedDepartment(value)}
+            >
+              <Option value="All Department">All Department</Option>
+              {/* Add department options */}
+            </Select>
+            <Select
+              defaultValue="All Location"
+              style={{ width: 150 }}
+              onChange={(value) => setSelectedLocation(value)}
+            >
+              <Option value="All Location">All Location</Option>
+              {/* Add location options */}
+            </Select>
+            <Select
+              defaultValue="All Employee"
+              style={{ width: 150 }}
+              onChange={(value) => setSelectedEmployee(value)}
+            >
+              <Option value="All Employee">All Employee</Option>
+              {/* Add employee options */}
+            </Select>
           </div>
-        </Flex>
-
-        <Flex gap="7px">
-          <DatePicker.RangePicker
-            value={[startDate, endDate]}
-            onChange={onDateChange}
-            format="YYYY-MM-DD"
-            style={{ marginRight: 10 }}
-            className="w-[250px]"
-          />
-          <Button
-            type="primary"
-            className="ml-2"
-            onClick={openAddAttendanceModal}
-          >
-            <PlusOutlined />
-            <span>New</span>
-          </Button>
-          {/* <Button className='w-[150px]' type="primary" icon={<FileExcelOutlined />} block>
-            Export All
-          </Button> */}
-        </Flex>
-      </Flex>
-
-      <div className="table-responsive mt-2">
-        <Table
-          columns={tableColumns}
-          dataSource={filteredList}
-          rowKey="id"
-          scroll={{ x: 1200 }}
-        />
+          <div className="flex gap-2">
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={openAddAttendanceModal}
+            >
+              Add Attendance
+            </Button>
+            <Button icon={<FileExcelOutlined />}>
+              Export
+            </Button>
+          </div>
+        </div>
       </div>
+
+      <Table
+        columns={tableColumns}
+        dataSource={generateMockData()}
+        scroll={{ x: 2000 }}
+        pagination={false}
+        rowKey="id"
+      />
 
       <UserView
         data={selectedUser}
@@ -315,245 +346,3 @@ const AttendanceList = () => {
 };
 
 export default AttendanceList;
-
-// import React, { Component } from 'react';
-// import { Card, Table, Menu, Tag, Input, message, Button, Modal } from 'antd';
-// import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
-// import dayjs from 'dayjs';
-// import UserView from '../../Users/user-list/UserView';
-// import Flex from 'components/shared-components/Flex';
-// import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-// import AvatarStatus from 'components/shared-components/AvatarStatus';
-// import AddAttendance from './AddAttendance';
-// import userData from "assets/data/user-list.data.json";
-// import OrderListData from "assets/data/order-list.data.json";
-// import utils from 'utils';
-
-// export class AttendanceList extends Component {
-//   state = {
-//     users: userData,
-//     userProfileVisible: false,
-//     selectedUser: null,
-//     list: OrderListData, // Initialize with OrderListData
-//     selectedRowKeys: [],
-//     isAddAttendanceModalVisible: false, // State to toggle Add Employee Modal
-//   };
-
-//   // Open Add Employee Modal
-//   openAddAttendanceModal = () => {
-//     this.setState({ isAddAttendanceModalVisible: true });
-//   };
-
-//   // Close Add Employee Modal
-//   closeAddAttendanceModal = () => {
-//     this.setState({ isAddAttendanceModalVisible: false });
-//   };
-
-//   onSearch = (e) => {
-//     const { list } = this.state;
-//     const value = e.currentTarget.value;
-//     const searchArray = value ? list : OrderListData;
-//     const data = utils.wildCardSearch(searchArray, value);
-//     this.setState({ list: data, selectedRowKeys: [] });
-//   };
-
-//   deleteUser = (userId) => {
-//     this.setState({
-//       users: this.state.users.filter(item => item.id !== userId),
-//     });
-//     message.success({ content: `Deleted user ${userId}`, duration: 2 });
-//   };
-
-//   showUserProfile = (userInfo) => {
-//     this.setState({
-//       userProfileVisible: true,
-//       selectedUser: userInfo,
-//     });
-//   };
-
-//   closeUserProfile = () => {
-//     this.setState({
-//       userProfileVisible: false,
-//       selectedUser: null,
-//     });
-//   };
-
-//   render() {
-//     const { users, userProfileVisible, selectedUser, isAddAttendanceModalVisible } = this.state;
-
-//     const dropdownMenu = elm => (
-//         <Menu>
-
-//             <Menu.Item>
-//                 <Flex alignItems="center">
-//                     {/* <EyeOutlined />
-//                     <span className="ml-2">View Details</span> */}
-
-//                 <Button type="" className="" icon={<EyeOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
-//                 <span className="">View Details</span>
-//                 </Button>
-//                 </Flex>
-//             </Menu.Item>
-//             <Menu.Item>
-//                 <Flex alignItems="center">
-//                     {/* <EyeOutlined />
-//                     <span className="ml-2">View Details</span> */}
-
-//                  <Button type="" className="" icon={<MailOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
-//                 <span className="">Send Mail</span>
-//                 </Button>
-//                 </Flex>
-//             </Menu.Item>
-//             <Menu.Item>
-//                 <Flex alignItems="center">
-//                     {/* <EyeOutlined />
-//                     <span className="ml-2">View Details</span> */}
-
-//                  <Button type="" className="" icon={<PushpinOutlined />} onClick={() => {this.showUserProfile(elm)}} size="small">
-//                 <span className="ml-2">Pin</span>
-//                 </Button>
-//                 </Flex>
-//             </Menu.Item>
-//             <Menu.Item>
-//                 <Flex alignItems="center">
-//                     {/* <DeleteOutlined />
-//                     <span className="ml-2">Delete</span> */}
-
-//     <Button type="" className="" icon={<DeleteOutlined />} onClick={() => {this.deleteUser(elm.id)}} size="small">
-//     <span className="">Delete</span>
-//     </Button>
-
-//                 </Flex>
-//             </Menu.Item>
-//         </Menu>
-//     );
-
-//     const tableColumns = [
-//       {
-//         title: 'User',
-//         dataIndex: 'name',
-//         render: (_, record) => (
-//           <div className="d-flex">
-//             <AvatarStatus src={record.img} name={record.name} subTitle={record.email} />
-//           </div>
-//         ),
-//         sorter: {
-//           compare: (a, b) => {
-//             a = a.name.toLowerCase();
-//             b = b.name.toLowerCase();
-//             return a > b ? -1 : b > a ? 1 : 0;
-//           },
-//         },
-//       },
-//       {
-//         title: 'In Time',
-//         dataIndex: 'intime',
-//         sorter: {
-//           compare: (a, b) => a.intime.length - b.intime.length,
-//         },
-//       },
-//       {
-//         title: 'Out Time',
-//         dataIndex: 'outtime',
-//         render: (date) => <span>{dayjs.unix(date).format("MM/DD/YYYY")}</span>,
-//         sorter: (a, b) => dayjs(a.outtime).unix() - dayjs(b.outtime).unix(),
-//       },
-//       {
-//         title: 'In Status',
-//         dataIndex: 'instatus',
-//         sorter: {
-//           compare: (a, b) => a.intime.length - b.intime.length,
-//         },
-//       },
-//       {
-//         title: 'Out Status',
-//         dataIndex: 'outStatus',
-//         sorter: {
-//           compare: (a, b) => a.outtime.length - b.outtime.length,
-//         },
-//       },
-//       {
-//         title: 'Total Hour',
-//         dataIndex: 'totalhour',
-//         sorter: {
-//           compare: (a, b) => a.totalhour.length - b.totalhour.length,
-//         },
-//       },
-
-//     {
-//         title: 'Punch By',
-//         dataIndex: 'punchby',
-//         sorter: {
-//           compare: (a, b) => a.punchby.length - b.punchby.length,
-//         },
-//       },
-//       {
-//         title: 'Action',
-//         dataIndex: 'actions',
-//         render: (_, elm) => (
-//             <div className="text-center">
-//                 <EllipsisDropdown menu={dropdownMenu(elm)}/>
-//             </div>
-//         )
-//     },
-//     //   {
-//     //     title: 'Action',
-//     //     dataIndex: 'actions',
-//     //     render: (_, elm) => (
-//     //       <div className="text-right d-flex justify-content-center">
-//     //         <Tooltip title="View">
-//     //           <Button
-//     //             type="primary"
-//     //             className="mr-2"
-//     //             icon={<EyeOutlined />}
-//     //             onClick={() => this.showUserProfile(elm)}
-//     //             size="small"
-//     //           />
-//     //         </Tooltip>
-//     //         <Tooltip title="Delete">
-//     //           <Button danger icon={<DeleteOutlined />} onClick={() => this.deleteUser(elm.id)} size="small" />
-//     //         </Tooltip>
-//     //       </div>
-//     //     ),
-//     //   },
-//     ];
-
-//     return (
-//       <Card bodyStyle={{ padding: '-3px' }}>
-//         <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
-//           <Flex className="mb-1" mobileFlex={false}>
-//             <div className="mr-md-3 mb-3">
-//               <Input placeholder="Search" prefix={<SearchOutlined />} onChange={(e) => this.onSearch(e)} />
-//             </div>
-//           </Flex>
-//           <Flex gap="7px">
-//             <Button type="primary" className="ml-2" onClick={this.openAddAttendanceModal}>
-//               <PlusOutlined />
-//               <span>New</span>
-//             </Button>
-//             <Button type="primary" icon={<FileExcelOutlined />} block>
-//               Export All
-//             </Button>
-//           </Flex>
-//         </Flex>
-//         <div className="table-responsive mt-2">
-//           <Table columns={tableColumns} dataSource={users} rowKey="id"  scroll={{ x: 1200 }} />
-//         </div>
-//         <UserView data={selectedUser} visible={userProfileVisible} close={() => this.closeUserProfile()} />
-
-//         {/* Add Employee Modal */}
-//         <Modal
-//           title="Add Attendance"
-//           visible={isAddAttendanceModalVisible}
-//           onCancel={this.closeAddAttendanceModal}
-//           footer={null}
-//           width={800}
-//         >
-//           <AddAttendance onClose={this.closeAddAttendanceModal} />
-//         </Modal>
-//       </Card>
-//     );
-//   }
-// }
-
-// export default AttendanceList;
