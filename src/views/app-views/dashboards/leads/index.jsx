@@ -1,10 +1,10 @@
-// import React from 'react';
-// import LeadList from './LeadList';
+import React from 'react';
+import LeadList from './LeadList';
 
-// const Leads = () => (
-//   <div className="mail">
-//     <LeadList />
-//   </div>
-// );
+const Leads = () => (
+  <div className="mail">
+    <LeadList />
+  </div>
+);
 
-// export default Leads;
+export default Leads;

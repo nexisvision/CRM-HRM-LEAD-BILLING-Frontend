@@ -3,7 +3,7 @@ import { Input, Button } from "antd";
 import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { GetLeads } from "../LeadReducers/LeadSlice"; // Adjust the import path as necessary
-import LeadCards from "./LeadCards";
+
 
 const LeadCardsList = () => {
   const dispatch = useDispatch();
