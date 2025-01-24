@@ -207,8 +207,8 @@ const AddRole = () => {
   };
   const onFinish = (values) => {
     // Logging the selected module and permissions for debugging
-    console.log("Selected Module:", selectedModule);
-    console.log("Module Permissions:", modulePermissions);
+    // console.log("Selected Module:", selectedModule);
+    
   
     // Constructing the payload
     const payload = {
@@ -219,12 +219,10 @@ const AddRole = () => {
         if (selectedSubmodules.length > 0) {
           // Create a permissions object for the module
           acc[module.name.toLowerCase()] = selectedSubmodules.reduce((subAcc, submodule) => {
-            subAcc[submodule.name.toLowerCase().replace(/\s+/g, '_')] =
-              module.permissions.reduce((permAcc, permission) => {
-                permAcc[permission.name.toLowerCase()] =
-                  modulePermissions?.[submodule.name]?.[permission.name] || false;
-                return permAcc;
-              }, {});
+            subAcc[submodule.name.toLowerCase().replace(/\s+/g, '_')] = module.permissions.reduce((permAcc, permission) => {
+              permAcc[permission.name.toLowerCase()] = true; // Set all permissions to true
+              return permAcc;
+            }, {});
             return subAcc;
           }, {});
         }
@@ -232,8 +230,8 @@ const AddRole = () => {
       }, {}),
     };
   
-    // Log the generated payload
-    console.log("Generated Payload:", payload);
+    console.log("Module Permissions:", modulePermissions);
+    // console.log("Generated Payload:", payload);
   
     // Display success message
     message.success("Role added successfully!");
@@ -241,7 +239,6 @@ const AddRole = () => {
     // Navigate to the roles page after successful submission
     navigate("/app/hrm/role");
   };
-
   const areAllChecked = () => {
     return selectedModule.modual.every((mod) => mod.checked) &&
       Object.values(modulePermissions).every((modPerms) => 
