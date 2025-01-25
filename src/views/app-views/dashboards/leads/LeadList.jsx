@@ -67,8 +67,10 @@ const LeadList = () => {
   };
 
   const openViewLeadModal = () => {
-    navigate('/app/dashboards/project/lead/viewLead', { state: { user: selectedUser } }); // Pass user data as state if needed
-  };    
+    navigate("/app/dashboards/project/lead/viewLead", {
+      state: { user: selectedUser },
+    }); // Pass user data as state if needed
+  };
 
   // Open file manager
   const openFileManager = () => {
@@ -190,6 +192,13 @@ const LeadList = () => {
 
   const tableColumns = [
     {
+      title: "leadTitle",
+      dataIndex: "leadTitle",
+      sorter: {
+        compare: (a, b) => a.leadTitle.length - b.leadTitle.length,
+      },
+    },
+    {
       title: "Name",
       dataIndex: "firstName",
       sorter: {
@@ -197,17 +206,24 @@ const LeadList = () => {
       },
     },
     {
-      title: "category",
-      dataIndex: "category",
+      title: "email",
+      dataIndex: "email",
       sorter: {
-        compare: (a, b) => a.title.length - b.title.length,
+        compare: (a, b) => a.email.length - b.email.length,
       },
     },
     {
-      title: "companyName",
-      dataIndex: "companyName",
-      sorter: (a, b) => dayjs(a.startdate).unix() - dayjs(b.startdate).unix(),
+      title: "leadTitle",
+      dataIndex: "leadTitle",
+      sorter: {
+        compare: (a, b) => a.leadTitle.length - b.leadTitle.length,
+      },
     },
+    // {
+    //   title: "leadTitle",
+    //   dataIndex: "leadTitle",
+    //   sorter: (a, b) => dayjs(a.leadTitle).unix() - dayjs(b.startdate).unix(),
+    // },
     {
       title: "Task",
       dataIndex: "status",
@@ -224,15 +240,22 @@ const LeadList = () => {
       },
     },
     {
-      title: "User",
-      dataIndex: "name",
-      render: (_, record) => (
-        <div className="d-flex">
-          <AvatarStatus size={30} src={record.image} name={record.name} />
-        </div>
-      ),
-      sorter: (a, b) => utils.antdTableSorter(a, b, "name"),
+      title: "telephone",
+      dataIndex: "telephone",
+      sorter: {
+        compare: (a, b) => a.telephone.length - b.telephone.length,
+      },
     },
+    // {
+    //   title: "User",
+    //   dataIndex: "name",
+    //   render: (_, record) => (
+    //     <div className="d-flex">
+    //       <AvatarStatus size={30} src={record.image} name={record.name} />
+    //     </div>
+    //   ),
+    //   sorter: (a, b) => utils.antdTableSorter(a, b, "name"),
+    // },
     {
       title: "Action",
       dataIndex: "actions",

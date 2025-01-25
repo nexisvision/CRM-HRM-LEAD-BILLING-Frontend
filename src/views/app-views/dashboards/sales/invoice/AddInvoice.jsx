@@ -16,7 +16,7 @@ import { AddInvoices, getInvoice } from "./InvoiceReducer/InvoiceSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ErrorMessage, Field } from "formik";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
-import { AddLable,GetLable } from "../LableReducer/LableSlice";
+import { AddLable, GetLable } from "../LableReducer/LableSlice";
 
 const { Option } = Select;
 
@@ -31,7 +31,6 @@ const AddInvoice = ({ onClose }) => {
   const Tagsdetail = useSelector((state) => state.Lable);
 
   // const { id } = useParams();
-
 
   const [rows, setRows] = useState([
     {
@@ -177,17 +176,16 @@ const AddInvoice = ({ onClose }) => {
 
   const lid = AllLoggeddtaa.loggedInUser.id;
 
-
-
   const handleSubmit = () => {
     form
       .validateFields()
       .then((values) => {
-        const { subtotal, totalDiscount, totalTax, totalAmount } = calculateTotals();
-  
+        const { subtotal, totalDiscount, totalTax, totalAmount } =
+          calculateTotals();
+
         // Check if the selected tag (category) is new or existing
         const selectedTag = tags.find((tag) => tag.name === values.category);
-  
+
         const prepareInvoiceData = () => {
           // Prepare the invoice data
           const itemsData = {
@@ -203,7 +201,7 @@ const AddInvoice = ({ onClose }) => {
               referenceNumber: rows[0].referenceNumber || "",
             },
           };
-  
+
           return {
             customer: values.customer,
             issueDate: values.issuedate?.format("YYYY-MM-DD"),
@@ -215,16 +213,16 @@ const AddInvoice = ({ onClose }) => {
             total: Number(totalAmount), // Match backend total field
           };
         };
-  
+
         if (!selectedTag) {
           // If tag (category) doesn't exist, add it first
           const newTagPayload = { name: values.category.trim() };
-  
+
           dispatch(AddLable({ lid, payload: newTagPayload }))
             .then(() => {
               // After adding the tag, submit the invoice
               const invoiceData = prepareInvoiceData();
-  
+
               dispatch(AddInvoices(invoiceData))
                 .then(() => {
                   message.success("Invoice added successfully!");
@@ -243,7 +241,7 @@ const AddInvoice = ({ onClose }) => {
         } else {
           // If tag exists, directly submit the invoice
           const invoiceData = prepareInvoiceData();
-  
+
           dispatch(AddInvoices(invoiceData))
             .then(() => {
               message.success("Invoice added successfully!");
@@ -260,7 +258,6 @@ const AddInvoice = ({ onClose }) => {
         console.error("Validation failed:", error);
       });
   };
-  
 
   const fetchTags = async () => {
     try {
@@ -287,7 +284,6 @@ const AddInvoice = ({ onClose }) => {
     }
   };
 
-
   const handleAddNewTag = async () => {
     if (!newTag.trim()) {
       message.error("Please enter a tag name");
@@ -313,7 +309,6 @@ const AddInvoice = ({ onClose }) => {
       message.error("Failed to add Status");
     }
   };
-
 
   return (
     <div>
@@ -371,42 +366,47 @@ const AddInvoice = ({ onClose }) => {
             </Col>
 
             <Col span={12} className="">
-  <Form.Item
-    label="Category"
-    name="category"
-    rules={[{ required: true, message: "Please select or add a category" }]}
-  >
-    <Select
-      placeholder="Select or add new category"
-      dropdownRender={(menu) => (
-        <div>
-          {menu}
-          <div
-            style={{
-              padding: "8px",
-              borderTop: "1px solid #e8e8e8",
-            }}
-          >
-            <Button
-              type="link"
-              onClick={() => setIsTagModalVisible(true)}
-              block
-            >
-              Add New Category
-            </Button>
-          </div>
-        </div>
-      )}
-    >
-      {tags &&
-        tags.map((tag) => (
-          <Option key={tag.id} value={tag.name}>
-            {tag.name}
-          </Option>
-        ))}
-    </Select>
-  </Form.Item>
-</Col>
+              <Form.Item
+                label="Category"
+                name="category"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please select or add a category",
+                  },
+                ]}
+              >
+                <Select
+                  placeholder="Select or add new category"
+                  dropdownRender={(menu) => (
+                    <div>
+                      {menu}
+                      <div
+                        style={{
+                          padding: "8px",
+                          borderTop: "1px solid #e8e8e8",
+                        }}
+                      >
+                        <Button
+                          type="link"
+                          onClick={() => setIsTagModalVisible(true)}
+                          block
+                        >
+                          Add New Category
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                >
+                  {tags &&
+                    tags.map((tag) => (
+                      <Option key={tag.id} value={tag.name}>
+                        {tag.name}
+                      </Option>
+                    ))}
+                </Select>
+              </Form.Item>
+            </Col>
             <Col span={12}>
               <Form.Item
                 label="Reference Number"
@@ -418,8 +418,6 @@ const AddInvoice = ({ onClose }) => {
                 <Input placeholder="Enter Reference Number" />
               </Form.Item>
             </Col>
-
-            
           </Row>
         </Card>
 
@@ -588,18 +586,18 @@ const AddInvoice = ({ onClose }) => {
         </div>
       </Form>
       <Modal
-            title="Add New Category"
-            open={isTagModalVisible}
-            onCancel={() => setIsTagModalVisible(false)}
-            onOk={handleAddNewTag}
-            okText="Add Category"
-          >
-            <Input
-              placeholder="Enter new Category"
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-            />
-          </Modal>
+        title="Add New Category"
+        open={isTagModalVisible}
+        onCancel={() => setIsTagModalVisible(false)}
+        onOk={handleAddNewTag}
+        okText="Add Category"
+      >
+        <Input
+          placeholder="Enter new Category"
+          value={newTag}
+          onChange={(e) => setNewTag(e.target.value)}
+        />
+      </Modal>
     </div>
   );
 };

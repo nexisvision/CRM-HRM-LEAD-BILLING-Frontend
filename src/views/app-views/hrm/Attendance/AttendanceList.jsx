@@ -41,15 +41,19 @@ const AttendanceList = () => {
   const [users, setUsers] = useState(userData);
   const dispatch = useDispatch();
   const [list, setList] = useState([]);
-  const [selectedMonth, setSelectedMonth] = useState(dayjs().format('MMM YYYY'));
-  const [selectedDepartment, setSelectedDepartment] = useState('All Department');
-  const [selectedLocation, setSelectedLocation] = useState('All Location');
-  const [selectedEmployee, setSelectedEmployee] = useState('All Employee');
+  const [selectedMonth, setSelectedMonth] = useState(
+    dayjs().format("MMM YYYY")
+  );
+  const [selectedDepartment, setSelectedDepartment] =
+    useState("All Department");
+  const [selectedLocation, setSelectedLocation] = useState("All Location");
+  const [selectedEmployee, setSelectedEmployee] = useState("All Employee");
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const navigate = useNavigate();
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [isAddAttendanceModalVisible, setIsAddAttendanceModalVisible] = useState(false);
+  const [isAddAttendanceModalVisible, setIsAddAttendanceModalVisible] =
+    useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
@@ -209,12 +213,12 @@ const AttendanceList = () => {
         title: (
           <div className="text-center">
             <div>{i}</div>
-            <div>{date.format('ddd')}</div>
+            <div>{date.format("ddd")}</div>
           </div>
         ),
         dataIndex: `day${i}`,
         width: 60,
-        align: 'center',
+        align: "center",
         render: (status) => renderAttendanceStatus(status),
       });
     }
@@ -225,11 +229,11 @@ const AttendanceList = () => {
     if (!status) return null;
 
     const statusColors = {
-      P: 'green',
-      A: 'red',
-      L: 'orange',
-      WK: 'blue',
-      HL: 'purple'
+      P: "green",
+      A: "red",
+      L: "orange",
+      WK: "blue",
+      HL: "purple",
     };
 
     return (
@@ -241,17 +245,17 @@ const AttendanceList = () => {
 
   const tableColumns = [
     {
-      title: 'Employee Name',
-      dataIndex: 'name',
-      fixed: 'left',
+      title: "Employee Name",
+      dataIndex: "name",
+      fixed: "left",
       width: 200,
     },
-    ...generateDateColumns()
+    ...generateDateColumns(),
   ];
 
   // Mock data structure
   const generateMockData = () => {
-    return list.map(employee => {
+    return list.map((employee) => {
       const attendanceRecord = {
         id: employee.id,
         name: employee.name,
@@ -259,8 +263,9 @@ const AttendanceList = () => {
 
       // Generate random attendance status for each day
       for (let i = 1; i <= dayjs().daysInMonth(); i++) {
-        const statuses = ['P', 'A', 'L', 'WK', 'HL'];
-        attendanceRecord[`day${i}`] = statuses[Math.floor(Math.random() * statuses.length)];
+        const statuses = ["P", "A", "L", "WK", "HL"];
+        attendanceRecord[`day${i}`] =
+          statuses[Math.floor(Math.random() * statuses.length)];
       }
 
       return attendanceRecord;
@@ -276,7 +281,7 @@ const AttendanceList = () => {
             <DatePicker.MonthPicker
               defaultValue={dayjs()}
               format="MMM YYYY"
-              onChange={(date) => setSelectedMonth(date.format('MMM YYYY'))}
+              onChange={(date) => setSelectedMonth(date.format("MMM YYYY"))}
             />
             <Select
               defaultValue="All Department"
@@ -311,9 +316,7 @@ const AttendanceList = () => {
             >
               Add Attendance
             </Button>
-            <Button icon={<FileExcelOutlined />}>
-              Export
-            </Button>
+            <Button icon={<FileExcelOutlined />}>Export</Button>
           </div>
         </div>
       </div>

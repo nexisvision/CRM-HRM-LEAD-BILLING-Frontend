@@ -1,159 +1,206 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal, Select, DatePicker } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
-// import { Card, Table,  Badge, Menu, Tag,Modal } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import 'react-quill/dist/quill.snow.css';
-
-import userData from 'assets/data/user-list.data.json';
-
-import { Formik, Field, ErrorMessage } from 'formik';
+import React, { useEffect, useState } from "react";
+import {
+  Card,
+  Button,
+  Select,
+  DatePicker,
+  Input,
+  message,
+  Row,
+  Modal,
+  Col,
+} from "antd";
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form } from "antd";
-
-import * as Yup from 'yup';
-import { useSelector } from 'react-redux';
-import { AddLable,GetLable } from "../LableReducer/LableSlice";
-import { createBilling, getAllBillings } from './billingReducers/billingSlice';
-import { useDispatch } from 'react-redux';
-
+import { useDispatch, useSelector } from "react-redux";
+import { ErrorMessage, Field } from "formik";
+import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
+import { AddLable, GetLable } from "../LableReducer/LableSlice";
+import { addbil, getbil } from "./billing2Reducer/billing2Slice";
 
 const { Option } = Select;
 
-const AddBilling = ({ onClose}) => {
-    const [users, setUsers] = useState(userData);
-    const [form] = Form.useForm();
+const AddBilling = ({ onClose }) => {
+  const dispatch = useDispatch();
+  const [form] = Form.useForm();
+  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
+  const [newTag, setNewTag] = useState("");
 
-     const [isTagModalVisible, setIsTagModalVisible] = useState(false);
-      const [newTag, setNewTag] = useState("");
-    const dispatch = useDispatch();
-      const [tags, setTags] = useState([]);
-      const AllLoggeddtaa = useSelector((state) => state.user);
+  const [tags, setTags] = useState([]);
+  const AllLoggeddtaa = useSelector((state) => state.user);
+  const Tagsdetail = useSelector((state) => state.Lable);
 
-      const allinvoicedata = useSelector((state)=>state.salesInvoices);
-      const dfnddadat = allinvoicedata.salesInvoices.data; 
+  const [rows, setRows] = useState([
+    {
+      id: Date.now(),
+      item: "",
+      quantity: 1,
+      price: 0,
+      discount: 0,
+      tax: 0,
+      amount: 0,
+      description: "",
+      category: "",
+      referenceNumber: "",
+      isNew: true,
+    },
+  ]);
 
+  useEffect(() => {
+    dispatch(Getcus());
+  }, []);
 
-    // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-    // const [list, setList] = useState(OrderListData);
+  const customerdata = useSelector((state) => state.customers);
+  const fnddata = customerdata.customers.data;
 
-
-
- 
-
-    const [rows, setRows] = useState([
-        {
-            id: Date.now(),
-            item: "",
-            quantity: "",
-            price: "",
-            discount: "",
-            tax: "",
-            amount: "0",
-            description: "",
-            isNew: false,
-        },
+  const handleAddRow = () => {
+    setRows([
+      ...rows,
+      {
+        id: Date.now(),
+        item: "",
+        quantity: 1,
+        price: 0,
+        discount: 0,
+        tax: 0,
+        amount: 0,
+        description: "",
+        category: "",
+        referenceNumber: "",
+        isNew: true,
+      },
     ]);
+  };
 
-    // Function to handle adding a new row
-    const handleAddRow = () => {
-        setRows([
-            ...rows,
-            {
-                id: Date.now(),
-                item: "",
-                quantity: "",
-                price: "",
-                discount: "",
-                tax: "",
-                amount: "0",
-                description: "",
-                isNew: true,
-            },
-        ]);
+  const handleDeleteRow = (id) => {
+    const updatedRows = rows.filter((row) => row.id !== id);
+    setRows(updatedRows);
+  };
+
+  const handleFieldChange = (id, field, value) => {
+    const updatedRows = rows.map((row) =>
+      row.id === id
+        ? { ...row, [field]: value, amount: calculateAmount(row) }
+        : row
+    );
+    setRows(updatedRows);
+  };
+
+  const calculateAmount = (row) => {
+    const { quantity, price, discount, tax } = row;
+    const discountAmount = (price * discount) / 100;
+    const priceAfterDiscount = price - discountAmount;
+    const taxAmount = (priceAfterDiscount * tax) / 100;
+    const totalAmount = (priceAfterDiscount + taxAmount) * quantity;
+    return totalAmount.toFixed(2);
+  };
+
+  const calculateTotals = () => {
+    let subtotal = 0;
+    let totalDiscount = 0;
+    let totalTax = 0;
+
+    rows.forEach((row) => {
+      const { quantity, price, discount, tax } = row;
+      const discountAmount = (price * discount) / 100;
+      const priceAfterDiscount = price - discountAmount;
+      const taxAmount = (priceAfterDiscount * tax) / 100;
+
+      subtotal += priceAfterDiscount * quantity;
+      totalDiscount += discountAmount * quantity;
+      totalTax += taxAmount * quantity;
+    });
+
+    const totalAmount = subtotal + totalTax - totalDiscount;
+
+    return {
+      subtotal: subtotal.toFixed(2),
+      totalDiscount: totalDiscount.toFixed(2),
+      totalTax: totalTax.toFixed(2),
+      totalAmount: totalAmount.toFixed(2),
     };
+  };
 
-    // Function to handle deleting a row
-    const handleDeleteRow = (id) => {
-        const updatedRows = rows.filter((row) => row.id !== id);
-        setRows(updatedRows);
-        alert("Are you sure you want to delete this element?")
-        // calculateTotals(updatedRows);
-    };
-    const navigate = useNavigate();
+  const lid = AllLoggeddtaa.loggedInUser.id;
 
+  const handleSubmit = () => {
+    form
+      .validateFields()
+      .then((values) => {
+        const { subtotal, totalDiscount, totalTax, totalAmount } =
+          calculateTotals();
 
-    const lid = AllLoggeddtaa.loggedInUser.id;
+        const selectedTag = tags.find((tag) => tag.name === values.status);
 
-    // const onSubmit = (values) => {
-    //     console.log('Submitted values:', values);
-    //     message.success('Job added successfully!');
-    //     navigate('/apps/sales/billing/');
-    // };0
+        // Modify prepareInvoiceData to structure discription as an object
+        const prepareInvoiceData = () => {
+          const itemsData = rows.map((row) => ({
+            item: row.item,
+            quantity: Number(row.quantity),
+            price: Number(row.price),
+            discount: Number(row.discount),
+            tax: Number(row.tax),
+            amount: Number(row.amount),
+            description: row.description || "",
+            category: row.category || "",
+            referenceNumber: row.referenceNumber || "",
+          }));
 
+          // Construct the discription as an object
+          let discription = {
+            product: "", // Default or some value based on your requirement
+            service: "", // Default or some value based on your requirement
+          };
 
+          // Check if itemsData has a specific structure to fill product and service fields
+          if (itemsData.length > 0) {
+            // For example, you could concatenate all item names as "product" and "service" based on some logic
+            discription.product = itemsData.map((item) => item.item).join(", ");
+            discription.service = itemsData
+              .map((item) => item.description)
+              .join(", ");
+          }
 
-    const handleSubmit = () => {
-        form
-          .validateFields()
-          .then((values) => {
-            const selectedTag = tags.find((tag) => tag.name === values.category);
-      
-            const prepareBillingData = () => {
-              return {
-                vendor: values.vendor,
-                billDate: values.billdate?.format("YYYY-MM-DD"),
-                dueDate: values.duedate?.format("YYYY-MM-DD"),
-                invoiceNumber: values.invoicenum,
-                category: values.category,
-                orderNumber: values.ordernumber,
-               
-              };
-            };
-      
+          return {
+            vendor: values.vendor,
+            billDate: values.billDate?.format("YYYY-MM-DD"),
+            discription, // Pass the structured discription object
+            status: values.status,
+            discount: Number(totalDiscount),
+            tax: Number(totalTax),
+            total: Number(totalAmount),
+            note: values.note || "",
+          };
+        };
+
+        const sendData = async () => {
+          try {
             if (!selectedTag) {
-              // Add the new category
-              const newTagPayload = { name: values.category };
-      
-              dispatch(AddLable({ lid, payload: newTagPayload }))
-                .then(() => {
-                  const billingData = prepareBillingData();
-                //   console.log("dsfdfsd",billingData);
-                  dispatch(createBilling({lid,billingData}))
-                    .then(() => {
-                      message.success("Billing added successfully!");
-                      dispatch(getAllBillings(lid));
-                      onClose();
-                    })
-                    .catch((error) => {
-                      message.error("Failed to add invoice. Please try again.");
-                      console.error("Error during invoice submission:", error);
-                    });
-                })
-                .catch((error) => {
-                  message.error("Failed to add tag.");
-                  console.error("Add Tag API error:", error);
-                });
-            } else {
-              // If tag exists, directly submit the invoice
-              const billingData = prepareBillingData();
-      
-              dispatch(createBilling( lid,billingData))
-                .then(() => {
-                  message.success("Billing added successfully!");
-                  dispatch(getAllBillings(lid));
-                  onClose();
-                })
-                .catch((error) => {
-                  message.error("Failed to add invoice. Please try again.");
-                  console.error("Error during invoice submission:", error);
-                });
+              const newTagPayload = { name: values.status.trim() };
+              await dispatch(AddLable({ lid, payload: newTagPayload }));
             }
-          })
-          .catch((error) => {
-            console.error("Validation failed:", error);
-          });
-      };
-  
+
+            const invoiceData = prepareInvoiceData();
+
+            const payload = { lid, invoiceData };
+
+            await dispatch(addbil(payload)).then(() => {
+              dispatch(getbil(lid));
+              message.success("Bill added successfully!");
+              onClose();
+            });
+          } catch (error) {
+            console.error("Error during Bill submission:", error);
+            message.error("Failed to add Bill. Please try again.");
+          }
+        };
+
+        sendData();
+      })
+      .catch((error) => {
+        console.error("Validation failed:", error);
+      });
+  };
 
   const fetchTags = async () => {
     try {
@@ -162,7 +209,7 @@ const AddBilling = ({ onClose}) => {
 
       if (response.payload && response.payload.data) {
         const uniqueTags = response.payload.data
-          .filter((label) => label && label.name) // Filter out invalid labels
+          .filter((label) => label && label.name)
           .map((label) => ({
             id: label.id,
             name: label.name.trim(),
@@ -170,7 +217,7 @@ const AddBilling = ({ onClose}) => {
           .filter(
             (label, index, self) =>
               index === self.findIndex((t) => t.name === label.name)
-          ); // Remove duplicates
+          );
 
         setTags(uniqueTags);
       }
@@ -180,14 +227,9 @@ const AddBilling = ({ onClose}) => {
     }
   };
 
-
-
-
-
-  
   const handleAddNewTag = async () => {
     if (!newTag.trim()) {
-      message.error("Please enter a tag name");
+      message.error("Please enter a category name");
       return;
     }
 
@@ -199,378 +241,306 @@ const AddBilling = ({ onClose}) => {
       };
 
       await dispatch(AddLable({ lid, payload }));
-      message.success("Status added successfully");
+      message.success("Category added successfully");
       setNewTag("");
       setIsTagModalVisible(false);
 
-      // Fetch updated tags
       await fetchTags();
     } catch (error) {
-      console.error("Failed to add Status:", error);
-      message.error("Failed to add Status");
+      console.error("Failed to add category:", error);
+      message.error("Failed to add category");
     }
   };
 
+  return (
+    <div>
+      <Form form={form} layout="vertical">
+        <Card className="border-0">
+          <Row gutter={16}>
+            <Col span={24} className="mt-1">
+              <Form.Item
+                label="Vendor"
+                name="vendor"
+                rules={[{ required: true, message: "Please select vendor" }]}
+              >
+                <Select placeholder="Select Vendor">
+                  <Option value="vendor1">Vendor 1</Option>
+                  <Option value="vendor2">Vendor 2</Option>
+                  <Option value="vendor3">Vendor 3</Option>
+                </Select>
+              </Form.Item>
+            </Col>
 
-    const initialValues = {
-        vendor: '',
-        billdate: null,
-        duedate: null,
-        invoicenum: '',
-        category: '',
-        ordernumber: '',
-    };
+            <Col span={12}>
+              <Form.Item
+                label="Bill Date"
+                name="billDate"
+                rules={[{ required: true, message: "Please select bill date" }]}
+              >
+                <DatePicker className="w-full" format="DD-MM-YYYY" />
+              </Form.Item>
+            </Col>
 
-    const validationSchema = Yup.object({
-        vendor: Yup.string().required('Please select vendor.'),
-        billdate: Yup.date().nullable().required('Date is required.'),
-        duedate: Yup.date().nullable().required('Date is required.'),
-        invoicenum: Yup.string().required('Please enter invoicenum.'),
-        category: Yup.string().required('Please select category.'),
-        ordernumber: Yup.string().required('Please enter a order number.'),
-    });
-
-    return (
-        <>
-            <div>
-                <div className='bg-gray-50 ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4'>
-                    <h2 className="mb-4 border-b pb-[30px] font-medium"></h2>
-                    <Card className="border-0 mt-4">
-                        <div className="">
-                            <div className=" p-2">
-                                <Formik
-                                    initialValues={initialValues}
-                                    validationSchema={validationSchema}
-                                    onSubmit={handleSubmit}
-                                >
-                                    {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
-                                        <Form className="formik-form " onSubmit={handleSubmit}>
-                                            <Row gutter={16}>
-                                                <Col span={24} className='mt-2'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold'>Vendor</label>
-                                                        <Field name="vendor">
-                                                            {({ field }) => (
-                                                                <Select
-                                                                    {...field}
-                                                                    className="w-full"
-                                                                    placeholder="Select Vendor"
-                                                                    onChange={(value) => setFieldValue('vendor', value)}
-                                                                    value={values.vendor}
-                                                                    onBlur={() => setFieldTouched("vendor", true)}
-                                                                >
-                                                                    <Option value="xyz">XYZ</Option>
-                                                                    <Option value="abc">ABC</Option>
-                                                                </Select>
-                                                            )}
-                                                        </Field>
-                                                        <ErrorMessage name="vendor" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
-                                                </Col>
-
-                                                <Col span={12} className='mt-2'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold'>Bill Date</label>
-                                                        <DatePicker
-                                                            className="w-full"
-                                                            format="DD-MM-YYYY"
-                                                            value={values.billdate}
-                                                            onChange={(billdate) => setFieldValue('billdate', billdate)}
-                                                            onBlur={() => setFieldTouched("billdate", true)}
-                                                        />
-                                                        <ErrorMessage name="billdate" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
-                                                </Col>
-
-                                                <Col span={12} className='mt-2'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold'>Due Date</label>
-                                                        <DatePicker
-                                                            className="w-full"
-                                                            format="DD-MM-YYYY"
-                                                            value={values.duedate}
-                                                            onChange={(duedate) => setFieldValue('duedate', duedate)}
-                                                            onBlur={() => setFieldTouched("duedate", true)}
-                                                        />
-                                                        <ErrorMessage name="duedate" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
-                                                </Col>
-
-                                               
-
-
-                                                {/* <Col span={12} className='mt-2'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold'>Invoice Number</label>
-                                                        <Field name="invoicenum" as={Input} placeholder="Enter Invoice Number" />
-                                                        <ErrorMessage name="invoicenum" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
-                                                </Col> */}
-<Col span={12} className="mt-4">
-  <Form.Item
-    label="Invoice"
-    name="salesInvoiceNumber"
-    rules={[{ required: true, message: "Please select an invoice" }]}
-  >
-    <Select
-      style={{ width: "100%" }}
-      placeholder="Select Invoice"
-      value={values.salesInvoiceNumber}
-      onChange={(value) => setFieldValue("salesInvoiceNumber", value)}
-    >
-      {Array.isArray(dfnddadat) && dfnddadat.length > 0 ? (
-        dfnddadat.map((invoice) => (
-          <Select.Option key={invoice.id} value={invoice.id}>
-            {invoice.salesInvoiceNumber} {/* Adjust property name as needed */}
-          </Select.Option>
-        ))
-      ) : (
-        <Select.Option value="" disabled>
-          No invoices available
-        </Select.Option>
-      )}
-    </Select>
-  </Form.Item>
-</Col>
-
-
-
-                                                    <Col span={12} className="">
-                                                 {/* <Form.Item
-                                                   label="Category"
-                                                   name="category"
-                                                   rules={[{ required: true, message: "Please select or add a category" }]}
-                                                 > */}
-
-                                                 <div className="form-item">
-                                                    <label className='font-semibold'>Category</label>
-                                                   <Select
-                                                     placeholder="Select or add new category"
-                                                     dropdownRender={(menu) => (
-                                                       <div>
-                                                         {menu}
-                                                         <div
-                                                           style={{
-                                                             padding: "8px",
-                                                             borderTop: "1px solid #e8e8e8",
-                                                           }}
-                                                         >
-                                                           <Button
-                                                             type="link"
-                                                             onClick={() => setIsTagModalVisible(true)}
-                                                             block
-                                                           >
-                                                             Add New Category
-                                                           </Button>
-                                                         </div>
-                                                       </div>
-                                                     )}
-                                                   >
-                                                     {tags &&
-                                                       tags.map((tag) => (
-                                                         <Option key={tag.id} value={tag.name}>
-                                                           {tag.name}
-                                                         </Option>
-                                                       ))}
-                                                   </Select>
-                                                   </div>
-                                                 {/* </Form.Item> */}
-                                               </Col>
-
-                                                
-
-                                                <Col span={8} className='mt-2'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold'>Order Number</label>
-                                                        <Field name="ordernumber" as={Input} placeholder="Enter Order Number" />
-                                                        <ErrorMessage name="ordernumber" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
-                                                </Col>
-
-                                                <Col span={8} className='mt-2 hidden md:block lg:block'>
-                                                </Col>
-                                            </Row>
-                                        </Form>
-                                    )}
-                                </Formik>
-                            </div>
-                        </div>
-                    </Card>
-
-                    <Col span={24}>
-                        <h4 className='ms-4 font-semibold text-lg mb-3'>Product & Services</h4>
-                    </Col>
-
-                    <Card>
-                        <div>
-                            <div className="overflow-x-auto">
-                                <div className="form-buttons text-right mb-2">
-                                    <Button type="primary" onClick={handleAddRow}>
-                                        <PlusOutlined />  Add Items
-                                    </Button>
-                                </div>
-                                <table className="w-full border border-gray-200 bg-white">
-                                    <thead className="bg-gray-100">
-                                        <tr>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                                ITEMS<span className="text-red-500">*</span>
-                                            </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                                QUANTITY<span className="text-red-500">*</span>
-                                            </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                                PRICE<span className="text-red-500">*</span>
-                                            </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                                DISCOUNT<span className="text-red-500">*</span>
-                                            </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                                TAX (%)
-                                            </th>
-                                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 border-b">
-                                                AMOUNT
-                                                <br />
-                                                <span className="text-red-500 text-[10px]">AFTER TAX & DISCOUNT</span>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {rows.map((row, index) => (
-                                            <React.Fragment key={row.id}>
-                                                <tr>
-                                                    <td className="px-4 py-2 border-b">
-                                                        <select className="w-full p-2 border rounded">
-                                                            <option value="">--</option>
-                                                            <option value="item1">Item 1</option>
-                                                            <option value="item2">Item 2</option>
-                                                        </select>
-                                                    </td>
-                                                    <td className="px-4 py-2 border-b">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Qty"
-                                                            className="w-full p-2 border rounded"
-                                                        />
-                                                    </td>
-                                                    <td className="px-4 py-2 border-b">
-                                                        <div className="flex items-center">
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Price"
-                                                                className="w-full p-2 border rounded-s"
-                                                            />
-                                                            <span className="text-gray-500 border border-s rounded-e px-3 py-2">
-                                                                $
-                                                            </span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-4 py-2 border-b">
-                                                        <div className="flex items-center">
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Discount"
-                                                                className="w-full p-2 border rounded-s"
-                                                            />
-                                                            <span className=" text-gray-500 border border-s rounded-e py-2 px-3">
-                                                                $
-                                                            </span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-4 py-2 border-b">
-                                                        {/* <input
-                                                    type="text"
-                                                    placeholder="Tax (%)"
-                                                    className="w-full p-2 border rounded"
-                                                /> */}
-                                                    </td>
-                                                    <td className="px-4 py-2 border-b text-center">0</td>
-                                                    <td className="px-2 py-1 border-b text-center">
-                                                        {row.isNew && (
-                                                            <Button
-                                                                danger
-                                                                onClick={() => handleDeleteRow(row.id)}
-                                                            >
-                                                                <DeleteOutlined />
-                                                            </Button>
-                                                        )}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                <td className="px-4 py-2 border-b">
-                                                        <select className="w-full p-2 border rounded">
-                                                            <option value="">Select Account</option>
-                                                            <option value="Account1">Account 1</option>
-                                                            <option value="Account2">Account 2</option>
-                                                        </select>
-                                                    </td>
-                                                    <td className="px-4 py-2 border-b">
-                                                        <div className="flex items-center">
-                                                            <input
-                                                                type="text"
-                                                                placeholder="Amount"
-                                                                className="w-full p-2 border rounded-s"
-                                                            />
-                                                            <span className="text-gray-500 border border-s rounded-e px-3 py-2">
-                                                                $
-                                                            </span>
-                                                        </div>
-                                                    </td>
-                                                    <td colSpan={3} className="px-4 py-2 border-b w-14 overflow-y-auto">
-                                                        <textarea
-                                                            rows={1}
-                                                            placeholder="Description"
-                                                            className="w-[70%] p-2 border rounded"
-                                                        ></textarea>
-                                                    </td>
-                                                </tr>
-                                            </React.Fragment>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            {/* Summary Section */}
-                            <div className="mt-3 flex flex-col items-end space-y-2">
-                                <div className="flex justify-between w-full sm:w-1/2 border-b pb-2">
-                                    <span className="text-gray-700">Sub Total ($):</span>
-                                    <span className="text-gray-700">NaN</span>
-                                </div>
-                                <div className="flex justify-between w-full sm:w-1/2 border-b pb-2">
-                                    <span className="text-gray-700">Discount ($):</span>
-                                    <span className="text-gray-700">NaN</span>
-                                </div>
-                                <div className="flex justify-between w-full sm:w-1/2 border-b pb-2">
-                                    <span className="text-gray-700">Tax ($):</span>
-                                    <span className="text-gray-700">0.00</span>
-                                </div>
-                                <div className="flex justify-between w-full sm:w-1/2">
-                                    <span className="font-semibold text-gray-700">Total Amount ($):</span>
-                                    <span className="font-semibold text-gray-700">0.00</span>
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
-
-                    <div className="form-buttons text-right">
-                        <Button type="default" className="mr-2" onClick={() => navigate('/apps/sales/estimates')}>Cancel</Button>
-                        <Button type="primary" onClick={handleSubmit}>Create</Button>
+            <Col span={12}>
+              <Form.Item
+                label="Status"
+                name="status"
+                rules={[{ required: true, message: "Please select status" }]}
+              >
+                <Select
+                  placeholder="Select or add new status"
+                  dropdownRender={(menu) => (
+                    <div>
+                      {menu}
+                      <div
+                        style={{
+                          padding: "8px",
+                          borderTop: "1px solid #e8e8e8",
+                        }}
+                      >
+                        <Button
+                          type="link"
+                          onClick={() => setIsTagModalVisible(true)}
+                          block
+                        >
+                          Add New Status
+                        </Button>
+                      </div>
                     </div>
-                </div>
-                <Modal
-                            title="Add New Category"
-                            open={isTagModalVisible}
-                            onCancel={() => setIsTagModalVisible(false)}
-                            onOk={handleAddNewTag}
-                            okText="Add Category"
-                          >
-                            <Input
-                              placeholder="Enter new Category"
-                              value={newTag}
-                              onChange={(e) => setNewTag(e.target.value)}
-                            />
-                          </Modal>
+                  )}
+                >
+                  {tags &&
+                    tags.map((tag) => (
+                      <Option key={tag.id} value={tag.name}>
+                        {tag.name}
+                      </Option>
+                    ))}
+                </Select>
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                label="Bill Number"
+                name="billNumber"
+                rules={[
+                  { required: true, message: "Please enter bill number" },
+                ]}
+              >
+                <Input placeholder="Enter Bill Number" />
+              </Form.Item>
+            </Col>
+
+            <Col span={24}>
+              <Form.Item label="Description" name="description">
+                <Input.TextArea placeholder="Enter Description" />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item label="Discount" name="discount">
+                <Input
+                  type="number"
+                  placeholder="Enter Discount"
+                  min={0}
+                  max={100}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item label="Tax" name="tax">
+                <Input
+                  type="number"
+                  placeholder="Enter Tax"
+                  min={0}
+                  max={100}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item label="Note" name="note">
+                <Input placeholder="Enter Note (Optional)" />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Card>
+
+        <Card>
+          <h4 className="font-semibold text-lg mb-3">Product & Services</h4>
+          <div>
+            <div className="form-buttons text-right mb-2">
+              <Button type="primary" onClick={handleAddRow}>
+                <PlusOutlined /> Add Items
+              </Button>
             </div>
-        </>
-    );
+            <table className="w-full border border-gray-200 bg-white">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    ITEMS
+                  </th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    QUANTITY
+                  </th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    PRICE
+                  </th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    DISCOUNT
+                  </th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    TAX (%)
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 border-b">
+                    AMOUNT
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 border-b">
+                    ACTIONS
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.id}>
+                    <td className="px-4 py-2 border-b">
+                      <select
+                        className="w-full p-2 border rounded"
+                        value={row.item}
+                        onChange={(e) =>
+                          handleFieldChange(row.id, "item", e.target.value)
+                        }
+                      >
+                        <option value="">--</option>
+                        <option value="item1">Item 1</option>
+                        <option value="item2">Item 2</option>
+                      </select>
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      <input
+                        type="number"
+                        value={row.quantity}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            row.id,
+                            "quantity",
+                            Number(e.target.value)
+                          )
+                        }
+                        className="w-full p-2 border rounded"
+                      />
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      <div className="flex items-center">
+                        <input
+                          type="number"
+                          value={row.price}
+                          onChange={(e) =>
+                            handleFieldChange(
+                              row.id,
+                              "price",
+                              Number(e.target.value)
+                            )
+                          }
+                          className="w-full p-2 border rounded-s"
+                        />
+                        <span className="text-gray-500 border border-s rounded-e px-3 py-2">
+                          $
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      <input
+                        type="number"
+                        value={row.discount}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            row.id,
+                            "discount",
+                            Number(e.target.value)
+                          )
+                        }
+                        className="w-full p-2 border rounded"
+                      />
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      <input
+                        type="number"
+                        value={row.tax}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            row.id,
+                            "tax",
+                            Number(e.target.value)
+                          )
+                        }
+                        className="w-full p-2 border rounded"
+                      />
+                    </td>
+                    <td className="px-4 py-2 border-b text-center">
+                      {row.amount}
+                    </td>
+                    <td className="px-2 py-1 border-b text-center">
+                      <Button danger onClick={() => handleDeleteRow(row.id)}>
+                        <DeleteOutlined />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-3 flex flex-col items-end space-y-2">
+            <div className="flex justify-between w-full sm:w-1/2">
+              <span className="text-sm">Subtotal:</span>
+              <span className="text-sm">${calculateTotals().subtotal}</span>
+            </div>
+            <div className="flex justify-between w-full sm:w-1/2">
+              <span className="text-sm">Discount:</span>
+              <span className="text-sm">
+                ${calculateTotals().totalDiscount}
+              </span>
+            </div>
+            <div className="flex justify-between w-full sm:w-1/2">
+              <span className="text-sm">Tax:</span>
+              <span className="text-sm">${calculateTotals().totalTax}</span>
+            </div>
+            <div className="flex justify-between w-full sm:w-1/2">
+              <span className="font-bold">Total:</span>
+              <span className="font-bold">
+                ${calculateTotals().totalAmount}
+              </span>
+            </div>
+          </div>
+        </Card>
+
+        <div className="mt-3 flex justify-between">
+          <Button type="primary" onClick={handleSubmit}>
+            Submit Bill
+          </Button>
+          <Button type="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+        </div>
+      </Form>
+
+      <Modal
+        title="Add New Category"
+        visible={isTagModalVisible}
+        onOk={handleAddNewTag}
+        onCancel={() => setIsTagModalVisible(false)}
+        okText="Add"
+      >
+        <Input
+          value={newTag}
+          onChange={(e) => setNewTag(e.target.value)}
+          placeholder="Enter new category name"
+        />
+      </Modal>
+    </div>
+  );
 };
 
 export default AddBilling;
