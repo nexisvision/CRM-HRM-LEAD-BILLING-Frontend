@@ -1,167 +1,160 @@
-import React, { useState } from "react";
-import { Form, Input, Button, message, Row, Col } from "antd";
-import { useNavigate } from "react-router-dom";
-const modules = [
-  {
-    name: 'Staff',
-    modual: [
-      { name: 'User', checked: false },
-      { name: 'Role', checked: false },
-      { name: 'Client', checked: false },
-      { name: 'Permission', checked: false },
-      { name: 'Product & service', checked: false },
-      { name: 'Constant tax', checked: false },
-      { name: 'Zoom meeting', checked: false },
-    ],
-    permissions: [
-      { name: 'Manage', checked: false },
-      { name: 'Create', checked: false }, 
-      { name: 'Edit', checked: false },
-      { name: 'Delete', checked: false },
-    ],
-  },
-  {
-    name: 'CRM',
-    modual: [
-      { name: 'Lead', checked: false },
-      { name: 'Crm dashboard', checked: false },
-      { name: 'Pipeline', checked: false },
-      { name: 'Lead stage', checked: false },
-      { name: 'Source', checked: false },
-      { name: 'Label', checked: false },
-      { name: 'Deal', checked: false },
-      { name: 'Stage', checked: false },
-      { name: 'Task', checked: false },
-      { name: 'Contract', checked: false },
-    ],
-    permissions: [
-      { name: 'Manage', checked: false },
-      { name: 'Create', checked: false },
-      { name: 'Edit', checked: false },
-      { name: 'Delete', checked: false },
-    ],
-  },
-  {
-    name: 'Project',
-    modual: [
-      { name: 'Project Overview', checked: false },
-      { name: 'Project', checked: false },
-      { name: 'Milestone', checked: false },
-      // { name: 'Grant chart', checked: false },
-      { name: 'Project stage', checked: false },
-      // { name: 'Timesheet', checked: false },
-      { name: 'Project task', checked: false },
-      { name: 'Activity', checked: false },
-      { name: 'CRM activity', checked: false },
-      // { name: 'Project task', checked: false },
-      // { name: 'Bug report', checked: false },
-      // { name: 'Bug status', checked: false },
-    ],
-    permissions: [
-      { name: 'Manage', checked: false },
-      { name: 'Create', checked: false },
-      { name: 'Edit', checked: false },
-      { name: 'Delete', checked: false },
-    ],
-  },
-  {
-    name: 'HRM',
-    modual: [
-      // { name: 'Hrm dashboard', checked: false },
-      { name: 'Employee', checked: false },
-      // { name: 'Employee profile', checked: false },
-      { name: 'Department', checked: false },
-      { name: 'Designation', checked: false },
-      { name: 'Branch', checked: false },
-      // { name: 'Document type', checked: false },
-      { name: 'Document', checked: false },
-      { name: 'Allowance', checked: false },
-      { name: 'Commission', checked: false },
-      // { name: 'Allowance option', checked: false },
-      // { name: 'Loan option', checked: false },
-      { name: 'Loan', checked: false },
-      // { name: 'Overtime', checked: false },
-      { name: 'Set salary', checked: false },
-    ],
-    permissions: [
-      { name: 'Manage', checked: false },
-      { name: 'Create', checked: false },
-      { name: 'Edit', checked: false },
-      { name: 'Delete', checked: false },
-    ],
-  },
-  {
-    name: 'Sales',
-    modual: [
-      // { name: 'Account dashboard', checked: false },
-      { name: 'Proposal', checked: false },
-      { name: 'Invoice', checked: false },
-      { name: 'Bill', checked: false },
-      { name: 'Revenue', checked: false },
-      { name: 'Payment', checked: false },
-      { name: 'Product', checked: false },
-      // { name: 'Goal', checked: false },
-      { name: 'Credit note', checked: false },
-      // { name: 'Debit note', checked: false },
-      // { name: 'Bank account', checked: false },
-      // { name: 'Transaction', checked: false },
-      { name: 'Customer', checked: false },
-      // { name: 'Vender', checked: false },
-      // { name: 'Constant custom field', checked: false },
-      // { name: 'Assets', checked: false },
-      // { name: 'Report', checked: false },
-    ],
-    permissions: [
-      { name: 'Manage', checked: false },
-      { name: 'Create', checked: false },
-      { name: 'Edit', checked: false },
-      { name: 'Delete', checked: false },
-    ],
-  },
-  // {
-  //   name: 'POS',
-  //   modual: [
-  //     { name: 'Warehouse', checked: false },
-  //     { name: 'Quotation', checked: false },
-  //     { name: 'Purchase', checked: false },
-  //     { name: 'Pos', checked: false },
-  //     { name: 'Barcode', checked: false },
-  //   ],
-  //   permissions: [
-  //     { name: 'Manage', checked: false },
-  //     { name: 'Create', checked: false },
-  //     { name: 'Edit', checked: false },
-  //     { name: 'Delete', checked: false },
-  //   ],
-  // },
-];
-const AddRole = () => {
+import React, { useState } from 'react';
+import { Form, Input, Button, Row, Col, message } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { addRole, getRoles } from '../RoleAndPermissionReducers/RoleAndPermissionSlice';
+
+const AddRole = ( { onClose }) => {
+  // Define the modules constant
+  const modules = [
+    {
+      name: 'Staff',
+      modual: [
+        { name: 'User', checked: false },
+        { name: 'Role', checked: false },
+        { name: 'Client', checked: false },
+        { name: 'Permission', checked: false },
+        { name: 'Product & service', checked: false },
+        { name: 'Constant tax', checked: false },
+        { name: 'Zoom meeting', checked: false },
+      ],
+      permissions: [
+        { name: 'Manage', checked: false },
+        { name: 'Create', checked: false },
+        { name: 'Edit', checked: false },
+        { name: 'Delete', checked: false },
+      ],
+    },
+    {
+      name: 'CRM',
+      modual: [
+        { name: 'Lead', checked: false },
+        { name: 'Crm dashboard', checked: false },
+        { name: 'Pipeline', checked: false },
+        { name: 'Lead stage', checked: false },
+        { name: 'Source', checked: false },
+        { name: 'Label', checked: false },
+        { name: 'Deal', checked: false },
+        { name: 'Stage', checked: false },
+        { name: 'Task', checked: false },
+        { name: 'Contract', checked: false },
+      ],
+      permissions: [
+        { name: 'Manage', checked: false },
+        { name: 'Create', checked: false },
+        { name: 'Edit', checked: false },
+        { name: 'Delete', checked: false },
+      ],
+    },
+    {
+      name: 'Project',
+      modual: [
+        { name: 'Project Overview', checked: false },
+        { name: 'Project', checked: false },
+        { name: 'Milestone', checked: false },
+        { name: 'Project stage', checked: false },
+        { name: 'Project task', checked: false },
+        { name: 'Activity', checked: false },
+        { name: 'CRM activity', checked: false },
+      ],
+      permissions: [
+        { name: 'Manage', checked: false },
+        { name: 'Create', checked: false },
+        { name: 'Edit', checked: false },
+        { name: 'Delete', checked: false },
+      ],
+    },
+    {
+      name: 'HRM',
+      modual: [
+        { name: 'Employee', checked: false },
+        { name: 'Department', checked: false },
+        { name: 'Designation', checked: false },
+        { name: 'Branch', checked: false },
+        { name: 'Document', checked: false },
+        { name: 'Allowance', checked: false },
+        { name: 'Commission', checked: false },
+        { name: 'Loan', checked: false },
+        { name: 'Set salary', checked: false },
+      ],
+      permissions: [
+        { name: 'Manage', checked: false },
+        { name: 'Create', checked: false },
+        { name: 'Edit', checked: false },
+        { name: 'Delete', checked: false },
+      ],
+    },
+    {
+      name: 'Sales',
+      modual: [
+        { name: 'Proposal', checked: false },
+        { name: 'Invoice', checked: false },
+        { name: 'Bill', checked: false },
+        { name: 'Revenue', checked: false },
+        { name: 'Payment', checked: false },
+        { name: 'Product', checked: false },
+        { name: 'Credit note', checked: false },
+        { name: 'Customer', checked: false },
+      ],
+      permissions: [
+        { name: 'Manage', checked: false },
+        { name: 'Create', checked: false },
+        { name: 'Edit', checked: false },
+        { name: 'Delete', checked: false },
+      ],
+    },
+  ];
+
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [selectedModule, setSelectedModule] = useState(modules[0]); // Default to first module
   const [moduleStates, setModuleStates] = useState({}); // Store states of each module
   const [modulePermissions, setModulePermissions] = useState({});
+  const dispatch = useDispatch();
+
+  // const handleModuleChange = (module) => {
+  //   saveModuleState(selectedModule.name); // Save current module state
+  //   setSelectedModule(module);
+  //   loadModuleState(module.name); // Load the state of the new module
+  // };
+
+
+
+
   const handleModuleChange = (module) => {
-    saveModuleState(selectedModule.name); // Save current module state
-    setSelectedModule(module);
-    loadModuleState(module.name); // Load the state of the new module
+    // Prevent form submission when changing modules
+    if (form) {
+      form.validateFields().then(() => {
+        saveModuleState(selectedModule.name); // Save current module state
+        setSelectedModule(module);
+        loadModuleState(module.name); // Load the state of the new module
+      }).catch((error) => {
+        // Ignore validation errors when switching modules
+        saveModuleState(selectedModule.name);
+        setSelectedModule(module);
+        loadModuleState(module.name);
+      });
+    }
   };
+  
+
+
+
   const saveModuleState = (moduleName) => {
-    // Save the current module's state
     setModuleStates((prev) => ({
       ...prev,
       [moduleName]: selectedModule,
     }));
   };
+
   const loadModuleState = (moduleName) => {
-    // Load the saved state for the selected module
     const savedState = moduleStates[moduleName];
     if (savedState) {
       setSelectedModule(savedState);
     }
   };
+
   const toggleAll = (checked) => {
-    // Toggle all modules and permissions for the selected module
     const updatedModules = selectedModule.modual.map((mod) => ({
       ...mod,
       checked,
@@ -176,79 +169,116 @@ const AddRole = () => {
       permissions: updatedPermissions,
     });
   };
-  const togglePermission = (moduleName, permissionName) => {
-    setModulePermissions(prev => ({
-      ...prev,
-      [moduleName]: {
-        ...prev[moduleName],
-        [permissionName]: !prev?.[moduleName]?.[permissionName]
-      }
-    }));
-  };
+
+
   const toggleModule = (module) => {
-    // When module is checked/unchecked, update both module and its permissions
     const updatedModules = selectedModule.modual.map((mod) =>
       mod.name === module.name ? { ...mod, checked: !mod.checked } : mod
     );
-    // If module is being checked, set all its permissions to checked
     const isChecking = !module.checked;
-    const updatedPermissions = {
-      ...modulePermissions,
-      [module.name]: selectedModule.permissions.reduce((acc, permission) => {
-        acc[permission.name] = isChecking;
-        return acc;
-      }, {})
-    };
-    setSelectedModule({ ...selectedModule, modual: updatedModules });
-    setModulePermissions(updatedPermissions);
+    
+    // Initialize all permissions for this module when checked
+    const updatedPermissions = selectedModule.permissions.reduce((acc, permission) => ({
+      ...acc,
+      [permission.name.toLowerCase()]: isChecking
+    }), {});
+  
+    setSelectedModule({
+      ...selectedModule,
+      modual: updatedModules,
+    });
+    
+    setModulePermissions((prev) => ({
+      ...prev,
+      [module.name]: updatedPermissions
+    }));
   };
+
   const isPermissionChecked = (moduleName, permissionName) => {
     return modulePermissions?.[moduleName]?.[permissionName] || false;
   };
-  const onFinish = (values) => {
-    // Logging the selected module and permissions for debugging
-    // console.log("Selected Module:", selectedModule);
-    
+
+  const togglePermission = (moduleName, permissionName) => {
+    setModulePermissions((prev) => ({
+      ...prev,
+      [moduleName]: {
+        ...prev[moduleName],
+        [permissionName]: !prev?.[moduleName]?.[permissionName],
+      },
+    }));
+  };
+
   
-    // Constructing the payload
+const onFinish = (values) => {
+  const generatePayload = () => {
     const payload = {
-      role_name: values.role, // Role name from the input form
-      permissions: modules.reduce((acc, module) => {
-        // Filter selected submodules
-        const selectedSubmodules = module.modual.filter((mod) => mod.checked);
-        if (selectedSubmodules.length > 0) {
-          // Create a permissions object for the module
-          acc[module.name.toLowerCase()] = selectedSubmodules.reduce((subAcc, submodule) => {
-            subAcc[submodule.name.toLowerCase().replace(/\s+/g, '_')] = module.permissions.reduce((permAcc, permission) => {
-              permAcc[permission.name.toLowerCase()] = true; // Set all permissions to true
-              return permAcc;
-            }, {});
-            return subAcc;
-          }, {});
-        }
-        return acc;
-      }, {}),
+      role_name: values.role_name,
+      permissions: {},
     };
-  
-    console.log("Module Permissions:", modulePermissions);
-    // console.log("Generated Payload:", payload);
-  
-    // Display success message
-    message.success("Role added successfully!");
-  
-    // Navigate to the roles page after successful submission
-    navigate("/app/hrm/role");
+
+    let permissionsFound = false;
+
+    // Get the saved states for all modules
+    const allModuleStates = { ...moduleStates, [selectedModule.name]: selectedModule };
+
+    // Loop through each module using the saved states
+    modules.forEach((moduleTemplate) => {
+      const moduleState = allModuleStates[moduleTemplate.name] || moduleTemplate;
+      const selectedSubmodules = moduleState.modual.filter((mod) => mod.checked);
+
+      if (selectedSubmodules.length > 0) {
+        const moduleKey = moduleTemplate.name.toLowerCase();
+        payload.permissions[moduleKey] = {};
+
+        selectedSubmodules.forEach((submodule) => {
+          const submoduleKey = submodule.name.toLowerCase().replace(/\s+/g, "_");
+          payload.permissions[moduleKey][submoduleKey] = {};
+
+          // Get permissions for this submodule
+          const submodulePermissions = modulePermissions[submodule.name] || {};
+          
+          moduleTemplate.permissions.forEach((permission) => {
+            const permissionKey = permission.name.toLowerCase();
+            const permissionValue = submodulePermissions[permissionKey] || false;
+            
+            payload.permissions[moduleKey][submoduleKey][permissionKey] = permissionValue;
+            
+            if (permissionValue) {
+              permissionsFound = true;
+            }
+          });
+        });
+      }
+    });
+
+    if (!permissionsFound) {
+      message.error("No permissions selected for the role!");
+      return null;
+    }
+
+    return payload;
   };
-  const areAllChecked = () => {
-    return selectedModule.modual.every((mod) => mod.checked) &&
-      Object.values(modulePermissions).every((modPerms) => 
-        Object.values(modPerms).every((perm) => perm)
-      );
-  };
-  const onFinishFailed = (errorInfo) => {
-    console.error("Form submission failed:", errorInfo);
-    message.error("Please fill out all required fields.");
-  };
+
+  const payload = generatePayload();
+  
+  if (!payload) return;
+
+  console.log("Final Payload:", payload);
+dispatch(addRole(payload)) // Fixed naming
+      .then(() => {
+        dispatch(getRoles());
+        message.success('Role added successfully!');
+        onClose(); // Optional if provided
+         navigate("/app/hrm/role");
+        // navigate('/app/hrm/performance/appraisal');
+      })
+      .catch((error) => {
+        message.error('Failed to add appraisal.');
+        console.error('Add API error:', error);
+      });
+};
+  
+
   return (
     <div className="add-employee">
       <Form
@@ -256,12 +286,11 @@ const AddRole = () => {
         form={form}
         name="add-employee"
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
       >
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              name="role"
+              name="role_name"
               label="Role"
               rules={[{ required: true, message: "Role is required" }]}
             >
@@ -269,21 +298,28 @@ const AddRole = () => {
             </Form.Item>
           </Col>
         </Row>
+
+        {/* Module Selection */}
         <div className="container mx-auto p-4">
-          <div className="flex space-x-2 mb-4">
-            {modules.map((module) => (
-              <button
-                key={module.name}
-                className={`text-gray-400 font-bold rounded-md px-4 py-2 ${selectedModule.name === module.name
-                    ? "bg-blue-500 text-white"
-                    : ""
-                  }`}
-                onClick={() => handleModuleChange(module)}
-              >
-                {module.name}
-              </button>
-            ))}
-          </div>
+        <div className="flex space-x-2 mb-4">
+  {modules.map((module) => (
+    <button
+      key={module.name}
+      type="button" // Add this to prevent form submission
+      className={`text-gray-400 font-bold rounded-md px-4 py-2 ${
+        selectedModule.name === module.name ? "bg-blue-500 text-white" : ""
+      }`}
+      onClick={(e) => {
+        e.preventDefault(); // Prevent default form submission
+        handleModuleChange(module);
+      }}
+    >
+      {module.name}
+    </button>
+  ))}
+</div>
+
+          {/* Module and Permission Table */}
           <table className="min-w-full table-auto border">
             <thead>
               <tr>
@@ -302,34 +338,36 @@ const AddRole = () => {
               </tr>
             </thead>
             <tbody>
-          {selectedModule.modual.map((mod) => (
-            <tr key={mod.name}>
-              <td className="border px-4 py-2">
-              <input
+              {selectedModule.modual.map((mod) => (
+                <tr key={mod.name}>
+                  <td className="border px-4 py-2">
+                    <input
                       type="checkbox"
                       checked={mod.checked}
                       onChange={() => toggleModule(mod)}
                     />
-                <span className="ms-2">{mod.name}</span>
-              </td>
-              <td className="border px-4 py-2 flex space-x-4">
-                {selectedModule.permissions.map((permission) => (
-                  <div key={permission.name} className="flex items-center">
-                    <input
-                      type="checkbox"
-                      className="mr-2"
-                      checked={isPermissionChecked(mod.name, permission.name)}
-                      onChange={() => togglePermission(mod.name, permission.name)}
-                    />
-                    <span>{permission.name}</span>
-                  </div>
-                ))}
-              </td>
-            </tr>
-          ))}
-        </tbody>
+                    <span className="ms-2">{mod.name}</span>
+                  </td>
+                  <td className="border px-4 py-2 flex space-x-4">
+                    {selectedModule.permissions.map((permission) => (
+                      <div key={permission.name} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          className="mr-2"
+                          checked={isPermissionChecked(mod.name, permission.name)}
+                          onChange={() => togglePermission(mod.name, permission.name)}
+                        />
+                        <span>{permission.name}</span>
+                      </div>
+                    ))}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
+
+        {/* Submit Buttons */}
         <Form.Item>
           <div className="text-right">
             <Button
@@ -348,7 +386,430 @@ const AddRole = () => {
     </div>
   );
 };
+
 export default AddRole;
+
+
+
+
+
+
+
+
+
+
+
+
+
+// =-=-=-==-=-=-=working code some issue  =-=-=-==-=-=-=-=
+// import React, { useState } from "react";
+// import { Form, Input, Button, message, Row, Col } from "antd";
+// import { useNavigate } from "react-router-dom";
+// const modules = [
+//   {
+//     name: 'Staff',
+//     modual: [
+//       { name: 'User', checked: false },
+//       { name: 'Role', checked: false },
+//       { name: 'Client', checked: false },
+//       { name: 'Permission', checked: false },
+//       { name: 'Product & service', checked: false },
+//       { name: 'Constant tax', checked: false },
+//       { name: 'Zoom meeting', checked: false },
+//     ],
+//     permissions: [
+//       { name: 'Manage', checked: false },
+//       { name: 'Create', checked: false }, 
+//       { name: 'Edit', checked: false },
+//       { name: 'Delete', checked: false },
+//     ],
+//   },
+//   {
+//     name: 'CRM',
+//     modual: [
+//       { name: 'Lead', checked: false },
+//       { name: 'Crm dashboard', checked: false },
+//       { name: 'Pipeline', checked: false },
+//       { name: 'Lead stage', checked: false },
+//       { name: 'Source', checked: false },
+//       { name: 'Label', checked: false },
+//       { name: 'Deal', checked: false },
+//       { name: 'Stage', checked: false },
+//       { name: 'Task', checked: false },
+//       { name: 'Contract', checked: false },
+//     ],
+//     permissions: [
+//       { name: 'Manage', checked: false },
+//       { name: 'Create', checked: false },
+//       { name: 'Edit', checked: false },
+//       { name: 'Delete', checked: false },
+//     ],
+//   },
+//   {
+//     name: 'Project',
+//     modual: [
+//       { name: 'Project Overview', checked: false },
+//       { name: 'Project', checked: false },
+//       { name: 'Milestone', checked: false },
+//       // { name: 'Grant chart', checked: false },
+//       { name: 'Project stage', checked: false },
+//       // { name: 'Timesheet', checked: false },
+//       { name: 'Project task', checked: false },
+//       { name: 'Activity', checked: false },
+//       { name: 'CRM activity', checked: false },
+//       // { name: 'Project task', checked: false },
+//       // { name: 'Bug report', checked: false },
+//       // { name: 'Bug status', checked: false },
+//     ],
+//     permissions: [
+//       { name: 'Manage', checked: false },
+//       { name: 'Create', checked: false },
+//       { name: 'Edit', checked: false },
+//       { name: 'Delete', checked: false },
+//     ],
+//   },
+//   {
+//     name: 'HRM',
+//     modual: [
+//       // { name: 'Hrm dashboard', checked: false },
+//       { name: 'Employee', checked: false },
+//       // { name: 'Employee profile', checked: false },
+//       { name: 'Department', checked: false },
+//       { name: 'Designation', checked: false },
+//       { name: 'Branch', checked: false },
+//       // { name: 'Document type', checked: false },
+//       { name: 'Document', checked: false },
+//       { name: 'Allowance', checked: false },
+//       { name: 'Commission', checked: false },
+//       // { name: 'Allowance option', checked: false },
+//       // { name: 'Loan option', checked: false },
+//       { name: 'Loan', checked: false },
+//       // { name: 'Overtime', checked: false },
+//       { name: 'Set salary', checked: false },
+//     ],
+//     permissions: [
+//       { name: 'Manage', checked: false },
+//       { name: 'Create', checked: false },
+//       { name: 'Edit', checked: false },
+//       { name: 'Delete', checked: false },
+//     ],
+//   },
+//   {
+//     name: 'Sales',
+//     modual: [
+//       // { name: 'Account dashboard', checked: false },
+//       { name: 'Proposal', checked: false },
+//       { name: 'Invoice', checked: false },
+//       { name: 'Bill', checked: false },
+//       { name: 'Revenue', checked: false },
+//       { name: 'Payment', checked: false },
+//       { name: 'Product', checked: false },
+//       // { name: 'Goal', checked: false },
+//       { name: 'Credit note', checked: false },
+//       // { name: 'Debit note', checked: false },
+//       // { name: 'Bank account', checked: false },
+//       // { name: 'Transaction', checked: false },
+//       { name: 'Customer', checked: false },
+//       // { name: 'Vender', checked: false },
+//       // { name: 'Constant custom field', checked: false },
+//       // { name: 'Assets', checked: false },
+//       // { name: 'Report', checked: false },
+//     ],
+//     permissions: [
+//       { name: 'Manage', checked: false },
+//       { name: 'Create', checked: false },
+//       { name: 'Edit', checked: false },
+//       { name: 'Delete', checked: false },
+//     ],
+//   },
+//   // {
+//   //   name: 'POS',
+//   //   modual: [
+//   //     { name: 'Warehouse', checked: false },
+//   //     { name: 'Quotation', checked: false },
+//   //     { name: 'Purchase', checked: false },
+//   //     { name: 'Pos', checked: false },
+//   //     { name: 'Barcode', checked: false },
+//   //   ],
+//   //   permissions: [
+//   //     { name: 'Manage', checked: false },
+//   //     { name: 'Create', checked: false },
+//   //     { name: 'Edit', checked: false },
+//   //     { name: 'Delete', checked: false },
+//   //   ],
+//   // },
+// ];
+// const AddRole = () => {
+//   const [form] = Form.useForm();
+//   const navigate = useNavigate();
+//   const [selectedModule, setSelectedModule] = useState(modules[0]); // Default to first module
+//   const [moduleStates, setModuleStates] = useState({}); // Store states of each module
+//   const [modulePermissions, setModulePermissions] = useState({});
+//   const handleModuleChange = (module) => {
+//     saveModuleState(selectedModule.name); // Save current module state
+//     setSelectedModule(module);
+//     loadModuleState(module.name); // Load the state of the new module
+//   };
+//   // const saveModuleState = (moduleName) => {
+//   //   // Save the current module's state
+//   //   setModuleStates((prev) => ({
+//   //     ...prev,
+//   //     [moduleName]: selectedModule,
+//   //   }));
+//   // };
+
+
+//   const saveModuleState = (moduleName) => {
+//     // Save the current module's state (this now saves all selected modules, not just the current one)
+//     setModuleStates((prev) => {
+//       const updatedStates = { ...prev };
+//       updatedStates[moduleName] = selectedModule;
+//       return updatedStates;
+//     });
+//   };
+
+//   const loadModuleState = (moduleName) => {
+//     // Load the saved state for the selected module
+//     const savedState = moduleStates[moduleName];
+//     if (savedState) {
+//       setSelectedModule(savedState);
+//     }
+//   };
+//   const toggleAll = (checked) => {
+//     // Toggle all modules and permissions for the selected module
+//     const updatedModules = selectedModule.modual.map((mod) => ({
+//       ...mod,
+//       checked,
+//     }));
+//     const updatedPermissions = selectedModule.permissions.map((perm) => ({
+//       ...perm,
+//       checked,
+//     }));
+//     setSelectedModule({
+//       ...selectedModule,
+//       modual: updatedModules,
+//       permissions: updatedPermissions,
+//     });
+//   };
+//   const togglePermission = (moduleName, permissionName) => {
+//     setModulePermissions(prev => ({
+//       ...prev,
+//       [moduleName]: {
+//         ...prev[moduleName],
+//         [permissionName]: !prev?.[moduleName]?.[permissionName]
+//       }
+//     }));
+//   };
+//   // const toggleModule = (module) => {
+//   //   // When module is checked/unchecked, update both module and its permissions
+//   //   const updatedModules = selectedModule.modual.map((mod) =>
+//   //     mod.name === module.name ? { ...mod, checked: !mod.checked } : mod
+//   //   );
+//   //   // If module is being checked, set all its permissions to checked
+//   //   const isChecking = !module.checked;
+//   //   const updatedPermissions = {
+//   //     ...modulePermissions,
+//   //     [module.name]: selectedModule.permissions.reduce((acc, permission) => {
+//   //       acc[permission.name] = isChecking;
+//   //       return acc;
+//   //     }, {})
+//   //   };
+//   //   setSelectedModule({ ...selectedModule, modual: updatedModules });
+//   //   setModulePermissions(updatedPermissions);
+//   // };
+//   const toggleModule = (module) => {
+//     // When module is checked/unchecked, update the module and its permissions
+//     const updatedModules = selectedModule.modual.map((mod) =>
+//       mod.name === module.name ? { ...mod, checked: !mod.checked } : mod
+//     );
+  
+//     const isChecking = !module.checked;
+//     const updatedPermissions = {
+//       ...modulePermissions,
+//       [module.name]: selectedModule.permissions.reduce((acc, permission) => {
+//         acc[permission.name] = isChecking;
+//         return acc;
+//       }, {}),
+//     };
+  
+//     setSelectedModule({
+//       ...selectedModule,
+//       modual: updatedModules,
+//     });
+//     setModulePermissions(updatedPermissions);
+//   };
+  
+
+
+//   const isPermissionChecked = (moduleName, permissionName) => {
+//     return modulePermissions?.[moduleName]?.[permissionName] || false;
+//   };
+
+
+
+//   const onFinish = (values) => {
+//     console.log("Selected Modules:", moduleStates);
+//     console.log("Module Permissions:", modulePermissions);
+  
+  
+//     // Constructing the payload
+//     const payload = {
+//       role_name: values.role, // Role name from the input form
+//       permissions: {
+//         [selectedModule.name.toLowerCase()]: modulePermissions
+//       }, // Initialize permissions object
+//     };
+  
+//   // Loop through each module
+//   modules.forEach((module) => {
+//     // Filter selected submodules from the current module
+//     const selectedSubmodules = module.modual.filter((mod) => mod.checked);
+
+//     // If there are any selected submodules in the current module, build its permissions
+//     if (selectedSubmodules.length > 0) {
+//       const moduleKey = module.name.toLowerCase(); // Use module name for key (like crm, staff)
+
+//       // Initialize the module in the permissions object if not already present
+//       payload.permissions[moduleKey] = {};
+
+//       // Loop through each selected submodule in the current module
+//       selectedSubmodules.forEach((submodule) => {
+//         const submoduleKey = submodule.name.toLowerCase().replace(/\s+/g, "_");
+
+//         // Initialize the submodule in the permissions object
+//         payload.permissions[moduleKey][submoduleKey] = {};
+
+//         // Loop through each permission for the current submodule
+//         module.permissions.forEach((permission) => {
+//           const permissionKey = permission.name.toLowerCase();
+
+//           // Check if the permission is selected in modulePermissions
+//           payload.permissions[moduleKey][submoduleKey][permissionKey] =
+//             modulePermissions?.[submodule.name]?.[permission.name.toLowerCase()] || false;
+//         });
+//       });
+//     }
+//   });
+
+//   console.log("Generated Payload:", payload);
+
+//   // Display success message
+//   message.success("Role added successfully!");
+
+//   // Navigate to the roles page after successful submission
+//   navigate("/app/hrm/role");
+// };
+
+//   const areAllChecked = () => {
+//     return selectedModule.modual.every((mod) => mod.checked) &&
+//       Object.values(modulePermissions).every((modPerms) => 
+//         Object.values(modPerms).every((perm) => perm)
+//       );
+//   };
+//   const onFinishFailed = (errorInfo) => {
+//     console.error("Form submission failed:", errorInfo);
+//     message.error("Please fill out all required fields.");
+//   };
+//   return (
+//     <div className="add-employee">
+//       <Form
+//         layout="vertical"
+//         form={form}
+//         name="add-employee"
+//         onFinish={onFinish}
+//         onFinishFailed={onFinishFailed}
+//       >
+//         <Row gutter={16}>
+//           <Col span={24}>
+//             <Form.Item
+//               name="role"
+//               label="Role"
+//               rules={[{ required: true, message: "Role is required" }]}
+//             >
+//               <Input placeholder="Enter Role Name" />
+//             </Form.Item>
+//           </Col>
+//         </Row>
+//         <div className="container mx-auto p-4">
+//           <div className="flex space-x-2 mb-4">
+//             {modules.map((module) => (
+//               <button
+//                 key={module.name}
+//                 className={`text-gray-400 font-bold rounded-md px-4 py-2 ${selectedModule.name === module.name
+//                     ? "bg-blue-500 text-white"
+//                     : ""
+//                   }`}
+//                 onClick={() => handleModuleChange(module)}
+//               >
+//                 {module.name}
+//               </button>
+//             ))}
+//           </div>
+//           <table className="min-w-full table-auto border">
+//             <thead>
+//               <tr>
+//                 <th className="px-4 py-2 border-r-2">
+//                   <input
+//                     type="checkbox"
+//                     onChange={(e) => toggleAll(e.target.checked)}
+//                     checked={
+//                       selectedModule.modual.every((mod) => mod.checked) &&
+//                       selectedModule.permissions.every((perm) => perm.checked)
+//                     }
+//                   />
+//                   <span className="ms-2">Module</span>
+//                 </th>
+//                 <th className="px-4 py-2">Permissions</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//           {selectedModule.modual.map((mod) => (
+//             <tr key={mod.name}>
+//               <td className="border px-4 py-2">
+//               <input
+//                       type="checkbox"
+//                       checked={mod.checked}
+//                       onChange={() => toggleModule(mod)}
+//                     />
+//                 <span className="ms-2">{mod.name}</span>
+//               </td>
+//               <td className="border px-4 py-2 flex space-x-4">
+//                 {selectedModule.permissions.map((permission) => (
+//                   <div key={permission.name} className="flex items-center">
+//                     <input
+//                       type="checkbox"
+//                       className="mr-2"
+//                       checked={isPermissionChecked(mod.name, permission.name)}
+//                       onChange={() => togglePermission(mod.name, permission.name)}
+//                     />
+//                     <span>{permission.name}</span>
+//                   </div>
+//                 ))}
+//               </td>
+//             </tr>
+//           ))}
+//         </tbody>
+//           </table>
+//         </div>
+//         <Form.Item>
+//           <div className="text-right">
+//             <Button
+//               type="default"
+//               className="mr-2"
+//               onClick={() => navigate("/app/hrm/employee")}
+//             >
+//               Cancel
+//             </Button>
+//             <Button type="primary" htmlType="submit">
+//               Submit
+//             </Button>
+//           </div>
+//         </Form.Item>
+//       </Form>
+//     </div>
+//   );
+// };
+// export default AddRole;
 
 
 

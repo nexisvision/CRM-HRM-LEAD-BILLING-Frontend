@@ -31,38 +31,40 @@ const OverViewList = () => {
   console.log("iuiuiuiuiui", filterdata);
 
   useEffect(() => {
-    let datestart = new Date(filterdata[0].startdate); // Convert startdate string to Date object
-    let dateend = new Date(filterdata[0].enddate); // Convert enddate string to Date object
+    if (filterdata.length > 0) { // Check if filterdata has elements
+      let datestart = new Date(filterdata[0].startdate); // Convert startdate string to Date object
+      let dateend = new Date(filterdata[0].enddate); // Convert enddate string to Date object
 
-    let currentTime = new Date(); // Current time
+      let currentTime = new Date(); // Current time
 
-    if (isNaN(datestart) || isNaN(dateend)) {
-      console.error("Invalid dates detected.");
-    } else {
-      let totalDuration = dateend - datestart;
-
-      let elapsedTime = currentTime - datestart;
-
-      if (totalDuration > 0 && elapsedTime >= 0) {
-        let percentageElapsed = (elapsedTime / totalDuration) * 100;
-
-        if (percentageElapsed > 100) {
-          percentageElapsed = 55;
-        }
-
-        const pro = percentageElapsed.toFixed(2);
-        setProo(pro);
-
-        console.log("Percentage of time passed: ", pro + "%");
+      if (isNaN(datestart) || isNaN(dateend)) {
+        console.error("Invalid dates detected.");
       } else {
-        console.error("Invalid total duration or elapsed time.");
+        let totalDuration = dateend - datestart;
+
+        let elapsedTime = currentTime - datestart;
+
+        if (totalDuration > 0 && elapsedTime >= 0) {
+          let percentageElapsed = (elapsedTime / totalDuration) * 100;
+
+          if (percentageElapsed > 100) {
+            percentageElapsed = 55;
+          }
+
+          const pro = percentageElapsed.toFixed(2);
+          setProo(pro);
+
+          console.log("Percentage of time passed: ", pro + "%");
+        } else {
+          console.error("Invalid total duration or elapsed time.");
+        }
       }
     }
-  }, []);
+  }, [filterdata]);
 
   const Allclientdata = useSelector((state) => state.SubClient);
 
-  const dataclient = Allclientdata.SubClient.data;
+  const dataclient = Allclientdata.SubClient?.data || [];
 
   const updatedList = dataclient?.filter(
     (item) => item.id == filterdata[0]?.client
@@ -77,10 +79,11 @@ const OverViewList = () => {
   }, [dispatch]);
 
   // Sample data for charts
-  const hoursData = [{ name: "Planned", value: filterdata[0]?.estimatedhours }];
+  const hoursData = filterdata.length > 0 ? [{ name: "Planned", value: filterdata[0]?.estimatedhours }] : [];
 
-  const budgetData = [{ name: "Planned", value: filterdata[0]?.budget }];
-
+  const budgetData = filterdata.length > 0 ? [{ name: "Planned", value: filterdata[0]?.budget }] : [];
+  
+  
   const progress = 50;
   const startDate = "Wed 24 Jul 2024";
   const deadline = "Sun 24 Nov 2024";

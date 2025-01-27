@@ -45,6 +45,8 @@ import utils from "utils";
 import AddInvoice from "./AddInvoice";
 import EditInvoice from "./EditInvoice";
 import InvoiceView from "./InvoiceView";
+import Invoice from "views/app-views/pages/invoice";
+// import InvoiceView from "./InvoiceView";
 // import AddInvoice from './AddInvoice';
 // import ViewInvoice from './ViewInvoice';
 
@@ -78,6 +80,8 @@ const getShippingStatus = (status) => {
 const paymentStatusList = ["Paid", "Pending", "Expired"];
 
 export const InvoiceList = () => {
+
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [annualStatisticData] = useState(AnnualStatisticData);
   const [list, setList] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -117,11 +121,17 @@ export const InvoiceList = () => {
     openEditInvoiceModal();
     setIdd(id);
   };
-  console.log(idd, "idddd");
+
+
+  const Viewfunc = (id) => {
+    openViewInvoiceModal();
+    setIdd(id);
+  };
+
+
+  //   console.log(idd, "idddd");
 
 	
-
-
 
 	const handleDelete = async (id) => {
 		try {
@@ -167,10 +177,18 @@ export const InvoiceList = () => {
     setIsEditInvoiceModalVisible(false);
   };
 
-  // Open Add Job Modal
+
   const openViewInvoiceModal = () => {
+    // setSelectedInvoice(invoice);
     setViewInvoiceModalVisible(true);
-  };
+};
+
+
+
+  // Open Add Job Modal
+  // const openViewInvoiceModal = () => {
+  //   setViewInvoiceModalVisible(true);
+  // };
 
   // Close Add Job Modal
   const closeViewInvoiceModal = () => {
@@ -188,10 +206,11 @@ export const InvoiceList = () => {
   const dropdownMenu = (row) => (
     <Menu>
       <Menu.Item>
-        <Flex alignItems="center" onClick={openViewInvoiceModal}>
+        <Flex alignItems="center" onClick={() => Viewfunc(row.id)}>
           <EyeOutlined />
           {/* <EyeOutlined /> */}
-          <span className="ml-2">View Details</span>
+          <span className="ml-2">View Invoice
+          </span>
         </Flex>
       </Menu.Item>
       <Menu.Item>
@@ -216,16 +235,7 @@ export const InvoiceList = () => {
       dataIndex: "invoiceNumber",
       sorter: (a, b) => a.invoiceNumber.localeCompare(b.invoiceNumber),
     },
-      // {
-      //   title: "Project",
-      //   dataIndex: "project",
-      //   sorter: (a, b) => a.project.localeCompare(b.project),
-      // },
-      // {
-      //   title: "Client",
-      //   dataIndex: "client",
-      //   sorter: (a, b) => a.client.localeCompare(b.client),
-      // },
+     
     {
       title: "Issue Date",
       dataIndex: "issueDate",
@@ -260,48 +270,6 @@ export const InvoiceList = () => {
     },
   ];
 
-  // const handleDelete = (record) => {
-  //     Modal.confirm({
-  //         title: 'Delete Invoice',
-  //         content: 'Are you sure you want to delete this invoice?',
-  //         okText: 'Yes',
-  //         okType: 'danger',
-  //         cancelText: 'No',
-  //         onOk: () => {
-  //             // Add delete logic here
-  //             message.success('Invoice deleted successfully');
-  //         }
-  //     });
-  // };
-
-
-  // const onSearch = e => {
-  // 	const value = e.currentTarget.value
-  // 	const searchArray = e.currentTarget.value ? list : OrderListData
-  // 	const data = utils.wildCardSearch(searchArray, value)
-  // 	setList(data)
-  // 	setSelectedRowKeys([])
-  // }
-
-	// Close Add Job Modal
-	
-	
-	
-		
-
-	// const handleDelete = (record) => {
-	//     Modal.confirm({
-	//         title: 'Delete Invoice',
-	//         content: 'Are you sure you want to delete this invoice?',
-	//         okText: 'Yes',
-	//         okType: 'danger',
-	//         cancelText: 'No',
-	//         onOk: () => {
-	//             // Add delete logic here
-	//             message.success('Invoice deleted successfully');
-	//         }
-	//     });
-	// };
 
 
 	const rowSelection = {
@@ -389,16 +357,14 @@ export const InvoiceList = () => {
 					>
 						<EditInvoice onClose={closeEditInvoiceModal} idd={idd} />
 					</Modal>
-					<Modal
-						title="Invoice"
-						visible={ViewInvoiceModalVisible}
-						onCancel={closeViewInvoiceModal}
-						footer={null}
-						width={1000}
-						className='mt-[-70px]'
-					>
-						<InvoiceView onClose={closeViewInvoiceModal} />
-					</Modal>
+          <Modal
+            visible={ViewInvoiceModalVisible}
+            onCancel={closeViewInvoiceModal}
+            footer={null}
+            width={800}
+        >
+     <InvoiceView onClose={closeViewInvoiceModal} idd={idd} />
+        </Modal>
 				</Card>
 			</div>
 		</>

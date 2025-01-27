@@ -120,6 +120,15 @@ export const protectedRoutes = [
         path: `${APP_PREFIX_PATH}/dashboards/project/view/:id`,
         component: React.lazy(() => import('views/app-views/dashboards/project/ViewProject')),
     },
+
+
+    {
+        key: 'dashboard.project.scrumboard',
+        path: `${APP_PREFIX_PATH}/dashboards/project/scrumboard`,
+        component: React.lazy(() => import('views/app-views/dashboards/project/scrumboard')),
+    },
+
+
     {
         key: 'dashboard.leadcards',
         path: `${APP_PREFIX_PATH}/dashboards/leadcards`,

@@ -19,6 +19,10 @@ import {
   getAttendances,
 } from "./AttendanceReducer/AttendanceSlice";
 
+import moment from "moment";
+// import moment from "moment";
+
+
 const { Option } = Select;
 
 const AddAttendance = ({ onClose }) => {
@@ -50,6 +54,14 @@ const AddAttendance = ({ onClose }) => {
       values.halfDay = false;
     }
 
+    const formattedValues = {
+      ...values,
+      startTime: values.startTime.format("HH:mm:ss"),
+      endTime: values.endTime.format("HH:mm:ss"),
+      halfDay: values.halfDay === "yes",
+    };
+
+
     dispatch(addAttendance(values))
       .then(() => {
         dispatch(getAttendances());
@@ -71,8 +83,8 @@ const AddAttendance = ({ onClose }) => {
         initialValues={{
           employee: "",
           date: "",
-          startTime: "",
-          endTime: "",
+          startTime: moment("9:00", "HH:mm"), // Default start time
+          endTime: moment("18:00", "HH:mm"), // Default end time
           late: "",
           halfDay: "",
           comment: "",
@@ -129,6 +141,7 @@ const AddAttendance = ({ onClose }) => {
                   <TimePicker
                     style={{ width: "100%" }}
                     placeholder="Select time"
+                    defaultValue={moment("09:00", "HH:mm")}
                     onChange={(time) => setFieldValue("startTime", time)}
                   />
                   {errors.startTime && touched.startTime && (
@@ -146,6 +159,7 @@ const AddAttendance = ({ onClose }) => {
                   <TimePicker
                     style={{ width: "100%" }}
                     placeholder="Select time"
+                    defaultValue={moment("18:00", "HH:mm")}
                     onChange={(time) => setFieldValue("endTime", time)}
                   />
                   {errors.endTime && touched.endTime && (

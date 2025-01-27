@@ -25,13 +25,13 @@ const getRoles = async () => {
   }
 };
 
-const addRole = async (values) => {
+const addRole = async (payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
       "http://localhost:5353/api/v1/roles/",
-      values,
+      payload,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -66,12 +66,12 @@ const deleteRole = async (id) => {
   }
 };
 
-const editRole = async (id, values) => {
+const editRole = async (id, payload) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
       `http://localhost:5353/api/v1/roles/${id}`,
-      values,
+      payload,
       {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -82,9 +82,9 @@ export const updateUser = createAsyncThunk(
 
 export const addRole = createAsyncThunk(
   "users/AddRole",
-  async (values, thunkAPI) => {
+  async (payload, thunkAPI) => {
     try {
-      const response = await UserService.addRole(values);
+      const response = await UserService.addRole(payload);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -146,9 +146,9 @@ export const deleteRole = createAsyncThunk(
 );
 export const editRole = createAsyncThunk(
   "users/editRole",
-  async ({ id, values }, thunkAPI) => {
+  async ({ id, payload }, thunkAPI) => {
     try {
-      const response = await UserService.editRole(id, values);
+      const response = await UserService.editRole(id, payload);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(

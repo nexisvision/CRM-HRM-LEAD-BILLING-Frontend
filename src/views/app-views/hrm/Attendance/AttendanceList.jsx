@@ -10,6 +10,7 @@ import {
   Modal,
   DatePicker,
   Select,
+  Tooltip
 } from "antd";
 import {
   EyeOutlined,
@@ -34,6 +35,7 @@ import {
 } from "./AttendanceReducer/AttendanceSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
 
 const { Option } = Select;
 
@@ -58,38 +60,103 @@ const AttendanceList = () => {
   const [endDate, setEndDate] = useState(null);
 
   const tabledata = useSelector((state) => state.attendance);
+
+  const fnddat = tabledata.Attendances.data;
+
   const employeeData = useSelector(
     (state) => state.employee?.employee?.data || []
   );
 
-  const fnddat = tabledata.Attendances.data;
+
+  // useEffect(() => {
+  //   if (fnddat) {
+  //     setList(fnddat);
+  //   }
+  // }, [fnddat]);
+
+
+
+
 
   useEffect(() => {
     if (fnddat) {
-      setList(fnddat);
+      const employeeAttendanceMap = {};
+  
+      fnddat.forEach((attendance) => {
+        const employeeName =
+          employeeData.find((e) => e.id === attendance.employee)?.username || "N/A";
+  
+        if (!employeeAttendanceMap[attendance.employee]) {
+          employeeAttendanceMap[attendance.employee] = {
+            employee: employeeName,
+            id: attendance.employee,
+            attendanceByDay: {},
+          };
+        }
+  
+        const day = dayjs(attendance.date).date();
+        employeeAttendanceMap[attendance.employee].attendanceByDay[day] = {
+          status: 'P',
+          startTime: attendance.startTime,
+          endTime: attendance.endTime,
+        };
+      });
+  
+      const aggregatedData = Object.values(employeeAttendanceMap);
+      setUsers(aggregatedData);
+      console.log(aggregatedData, "users");
     }
-  }, [fnddat]);
+  }, [fnddat, employeeData]);
+
+
+
+
+  // useEffect(() => {
+  //   if (fnddat) {
+  //     const mappedData = fnddat.map((attendance) => {
+  //       const employeeName =
+  //         employeeData.find((e) => e.id === attendance.employee)?.username || "N/A";
+  
+  //       return {
+  //         ...attendance,
+  //         employee: employeeName, // Replace 'employee' with the employee's name
+  //       };
+  //     });
+  //     setUsers(mappedData);
+  //     console.log(mappedData, "users");
+  //   }
+  // }, [fnddat, employeeData]);
+
 
   useEffect(() => {
     dispatch(getAttendances());
   }, [dispatch]);
 
   useEffect(() => {
-    if (tabledata?.Attendances?.data) {
-      const mappedData = tabledata.Attendances.data.map((attendance) => {
-        const employee =
-          employeeData.find((e) => e.id === mappedData.employee)?.username ||
-          "N/A";
+    dispatch(empdata());
+  }, [dispatch]);
 
-        return {
-          ...attendance,
-          employee,
-        };
-      });
-      setUsers(mappedData);
-      console.log(mappedData, "users");
-    }
-  }, [tabledata]);
+  // useEffect(() => {
+  //   if (tabledata?.Attendances?.data) {
+  //     const mappedData = tabledata.Attendances.data.map((attendance) => {
+  //       const employee =
+  //         employeeData.find((e) => e.id === mappedData.employee)?.username ||
+  //         "N/A";
+
+  //       return {
+  //         ...attendance,
+  //         employee,
+  //       };
+  //     });
+  //     setUsers(mappedData);
+  //     console.log(mappedData, "users");
+  //   }
+  // }, [tabledata]);
+
+
+
+
+
 
   // Open Add Attendance Modal
   const openAddAttendanceModal = () => {
@@ -203,52 +270,151 @@ const AttendanceList = () => {
   );
 
   // Calendar header with dates
+  // const generateDateColumns = () => {
+  //   const daysInMonth = dayjs().daysInMonth();
+  //   const columns = [];
+
+  //   for (let i = 1; i <= daysInMonth; i++) {
+  //     const date = dayjs().date(i);
+  //     columns.push({
+  //       title: (
+  //         <div className="text-center">
+  //           <div>{i}</div>
+  //           <div>{date.format('ddd')}</div>
+  //         </div>
+  //       ),
+  //       dataIndex: `day${i}`,
+  //       width: 60,
+  //       align: 'center',
+  //       render: (status) => renderAttendanceStatus(status),
+  //     });
+  //   }
+  //   return columns;
+  // };
+
+
+
+
+
   const generateDateColumns = () => {
     const daysInMonth = dayjs().daysInMonth();
     const columns = [];
-
+  
     for (let i = 1; i <= daysInMonth; i++) {
-      const date = dayjs().date(i);
       columns.push({
         title: (
           <div className="text-center">
             <div>{i}</div>
-            <div>{date.format("ddd")}</div>
+            <div>{dayjs().date(i).format('ddd')}</div>
           </div>
         ),
-        dataIndex: `day${i}`,
+        dataIndex: 'attendanceByDay',
         width: 60,
-        align: "center",
-        render: (status) => renderAttendanceStatus(status),
+        align: 'center',
+        render: (attendanceByDay) => renderAttendanceStatus(attendanceByDay, i),
       });
     }
     return columns;
   };
 
-  const renderAttendanceStatus = (status) => {
-    if (!status) return null;
 
+
+
+  // const renderAttendanceStatus = (status) => {
+  //   if (!status) return null;
+
+  //   const statusColors = {
+  //     P: 'green',
+  //     A: 'red',
+  //     L: 'orange',
+  //     WK: 'blue',
+  //     HL: 'purple'
+  //   };
+
+  //   return (
+  //     <Tag color={statusColors[status]} className="m-0">
+  //       {status}
+  //     </Tag>
+  //   );
+  // };
+
+
+
+
+  const renderAttendanceStatus = (attendanceByDay, day) => {
+    if (!attendanceByDay) return null;
+  
+    const attendance = attendanceByDay[day];
+    const status = attendance ? 'P' : 'A'; // 'P' for present, 'A' for absent
     const statusColors = {
-      P: "green",
-      A: "red",
-      L: "orange",
-      WK: "blue",
-      HL: "purple",
+      P: 'green',
+      A: 'red',
     };
-
+  
+    if (!attendance) {
+      return (
+        <Tag color={statusColors[status]} className="m-0">
+          {status}
+        </Tag>
+      );
+    }
+  
+    const startTime = dayjs(attendance.startTime, "HH:mm:ss");
+    const endTime = dayjs(attendance.endTime, "HH:mm:ss");
+    const totalHours = endTime.diff(startTime, 'hour');
+    const totalMinutes = endTime.diff(startTime, 'minute') % 60;
+    const earlyOutHours = 17 - endTime.hour(); // Assuming 5 PM is the standard end time
+    const earlyOutMinutes = (60 - endTime.minute()) % 60;
+  
+    const tooltipContent = (
+      <div>
+        <div>IN - {startTime.format("hh:mm A")}</div>
+        <div>OUT - {endTime.format("hh:mm A")}</div>
+        <div>Total Working Hours: {totalHours}H : {totalMinutes}M</div>
+        <div>Early OUT: {earlyOutHours}H : {earlyOutMinutes}M</div>
+      </div>
+    );
+  
     return (
-      <Tag color={statusColors[status]} className="m-0">
-        {status}
-      </Tag>
+      <Tooltip title={tooltipContent}>
+        <Tag color={statusColors[status]} className="m-0">
+          {status}
+        </Tag>
+      </Tooltip>
     );
   };
+  
+
+
+  // const renderAttendanceStatus = (attendance, day) => {
+  //   if (!attendance) return null;
+  
+  //   // Check if the attendance record has a date for the specific day
+  //   const isPresent = attendance.date && dayjs(attendance.date).date() === day;
+  //   const status = isPresent ? 'P' : 'A'; // 'P' for present, 'A' for absent
+  //   const statusColors = {
+  //     P: 'green',
+  //     A: 'red',
+  //   };
+  
+  //   return (
+  //     <Tag
+  //       color={statusColors[status]}
+  //       className="m-0"
+  //       title={isPresent ? `Start: ${attendance.startTime}, End: ${attendance.endTime}` : ''}
+  //     >
+  //       {status}
+  //     </Tag>
+  //   );
+  // };
+
 
   const tableColumns = [
     {
-      title: "Employee Name",
-      dataIndex: "name",
-      fixed: "left",
-      width: 200,
+      title: 'Employee Name',
+      dataIndex: 'employee',
+      fixed: 'left',
+      width: 200, 
     },
     ...generateDateColumns(),
   ];
@@ -258,7 +424,7 @@ const AttendanceList = () => {
     return list.map((employee) => {
       const attendanceRecord = {
         id: employee.id,
-        name: employee.name,
+        name: employee.username,
       };
 
       // Generate random attendance status for each day
@@ -291,14 +457,14 @@ const AttendanceList = () => {
               <Option value="All Department">All Department</Option>
               {/* Add department options */}
             </Select>
-            <Select
+            {/* <Select
               defaultValue="All Location"
               style={{ width: 150 }}
               onChange={(value) => setSelectedLocation(value)}
             >
               <Option value="All Location">All Location</Option>
               {/* Add location options */}
-            </Select>
+            {/* </Select> */} 
             <Select
               defaultValue="All Employee"
               style={{ width: 150 }}
@@ -320,10 +486,11 @@ const AttendanceList = () => {
           </div>
         </div>
       </div>
+      
 
       <Table
         columns={tableColumns}
-        dataSource={generateMockData()}
+        dataSource={users}
         scroll={{ x: 2000 }}
         pagination={false}
         rowKey="id"

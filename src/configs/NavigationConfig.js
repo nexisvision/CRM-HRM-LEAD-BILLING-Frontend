@@ -899,14 +899,15 @@ const dashBoardNavTree = [{
               },
             ]
           },
-          // {
-          //   key: 'dashboards-scrumboard',
-          //   path: `${APP_PREFIX_PATH}/dashboards/scrumboard`,
-          //   title: 'Leads',
-          //   icon: RiseOutlined,
-          //   breadcrumb: false,
-          //   submenu: []
-          // },
+          {
+            key: 'dashboards-project-scrumboard',
+            path: `${APP_PREFIX_PATH}/dashboards/project/scrumboard`,
+         
+            title: 'Leads',
+            icon: RiseOutlined,
+            breadcrumb: false,
+            submenu: []
+          },
           {
             key: 'dashboards-leadcards',
             path: `${APP_PREFIX_PATH}/dashboards/leadcards`,

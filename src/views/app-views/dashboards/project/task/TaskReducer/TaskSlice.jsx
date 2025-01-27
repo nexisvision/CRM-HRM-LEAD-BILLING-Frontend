@@ -7,9 +7,9 @@ import { navigate } from "react-big-calendar/lib/utils/constants";
 
 export const AddTasks = createAsyncThunk(
   "users/AddTasks",
-  async ({ idd, values }, thunkAPI) => {
+  async ({ id, values }, thunkAPI) => {
     try {
-      const response = await UserService.Addtask(idd, values);
+      const response = await UserService.Addtask(id, values);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);

@@ -80,8 +80,7 @@ useEffect(() => {
       const branch = branchData.find((b) => b.id === appraisal.branch)?.branchName || 'N/A';
       const employee = employeeData.find((e) => e.id === appraisal.employee)?.username || 'N/A';
       
-      
-
+  
       return {
         ...appraisal,
         branch,
@@ -137,7 +136,7 @@ useEffect(() => {
                     dispatch(getAppraisals());
                     message.success('Appraisal Deleted successfully!');
                     setUsers(users.filter(item => item.id !== userId));
-                    navigate('/app/hrm/performance/appraisal');
+                    
                   })
                   .catch((error) => {
                     // message.error('Failed to delete Indicator.');
