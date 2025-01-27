@@ -1,0 +1,10 @@
+/* PlanList.css */
+.plan-list-container {
+  font-family: 'Arial', sans-serif;
+}
+
+.plan-card:hover {
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
+  transform: scale(1.01);
+}

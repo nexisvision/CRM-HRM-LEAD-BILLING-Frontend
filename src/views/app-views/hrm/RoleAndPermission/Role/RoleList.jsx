@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Table, Menu, Button, Input, message, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined,EditOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
+import { EyeOutlined, DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
 import UserView from '../../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
@@ -9,49 +9,47 @@ import utils from 'utils';
 import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
 import AddRole from './AddRole';
-// import { getAllRoles } from 'redux/actions/RoleAndPermissionActions';
-import { useEffect } from 'react';
 import { deleteRole, getRoles } from '../RoleAndPermissionReducers/RoleAndPermissionSlice';
 import EditRole from './EditRole';
-// import { getRoles } from '@testing-library/react';
-// import { useDispatch, useSelector } from 'react-redux';
 
 const RoleList = () => {
   const [users, setUsers] = useState(userData);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
-    const [isEditRoleModalVisible, setIsEditRoleModalVisible] = useState(false);
-      const [id, setId] = useState(null);
-  
+  const [isEditRoleModalVisible, setIsEditRoleModalVisible] = useState(false);
+  const [id, setId] = useState(null);
+
   const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState(OrderListData); // Initialize with OrderListData
+  const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddRoleModalVisible, setIsAddRoleModalVisible] = useState(false);
-    const dispatch = useDispatch();
-  
-    const tabledata = useSelector((state) => state.role.role.data);
+  const dispatch = useDispatch();
 
-    const openEditRoleModal = () => {
-      setIsEditRoleModalVisible(true);
-    };
-  
-    const closeEditRoleModal = () => {
-      setIsEditRoleModalVisible(false);
-    };
-  
+  const loginUser = useSelector((state) => state.user.loggedInUser);
+  const tabledata = useSelector((state) => state.role.role.data);
 
-  // Open Add Role Modal
+  const filteredData = Array.isArray(tabledata) && loginUser ?
+    tabledata.filter((item) => item.created_by === loginUser.username) : [];
+
+
+  const openEditRoleModal = () => {
+    setIsEditRoleModalVisible(true);
+  };
+
+  const closeEditRoleModal = () => {
+    setIsEditRoleModalVisible(false);
+  };
+
   const openAddRoleModal = () => {
     setIsAddRoleModalVisible(true);
   };
 
-  // Close Add Role Modal
   const closeAddRoleModal = () => {
     setIsAddRoleModalVisible(false);
   };
 
-useEffect(() => { 
-  dispatch(getRoles());
-}, [dispatch]);
+  useEffect(() => {
+    dispatch(getRoles());
+  }, [dispatch]);
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
@@ -61,88 +59,84 @@ useEffect(() => {
     setSelectedRowKeys([]);
   };
 
-
   useEffect(() => {
-      if (tabledata) {
-        setUsers(tabledata);
-      }
-    }, [tabledata]);
+    if (filteredData) {
+      setUsers(filteredData);
+    }
+  }, [filteredData]);
 
-  const deleteUser = (userId) => {
-    const updatedUsers = users.filter(item => item.id !== userId);
-    setUsers(updatedUsers);
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
-  };
 
-  const showUserProfile = (userInfo) => {
-    setUserProfileVisible(true);
-    setSelectedUser(userInfo);
-  };
 
-  const closeUserProfile = () => {
-    setUserProfileVisible(false);
-    setSelectedUser(null);
-  };
-
-   const editfun = (id) =>{
+  const editfun = (id) => {
     openEditRoleModal();
-    setId(id)
-  } 
+    setId(id);
+  }
+  const deleteRoles = (userId) => {
+    dispatch(deleteRole(userId))
+      .then(() => {
+        dispatch(getRoles());
+        message.success('Appraisal Deleted successfully!');
+        setUsers(users.filter(item => item.id !== userId));
 
-
-  
-     const deleteRoles = (userId) => {
-        // setUsers(users.filter(item => item.id !== userId));
-        // dispatch(DeleteDes(userId));
-        // dispatch(getDes())
-        // message.success({ content: `Deleted user ${userId}`, duration: 2 });
-  
-          dispatch(deleteRole( userId )) 
-                    .then(() => {
-                      dispatch(getRoles());
-                      message.success('Appraisal Deleted successfully!');
-                      setUsers(users.filter(item => item.id !== userId));
-                      
-                    })
-                    .catch((error) => {
-                      // message.error('Failed to delete Indicator.');
-                      console.error('Edit API error:', error);
-                    });
-      };
-  
+      })
+      .catch((error) => {
+        console.error('Edit API error:', error);
+      });
+  };
 
 
   const dropdownMenu = (elm) => (
     <Menu>
       <Menu.Item>
         <Flex alignItems="center">
-          <Button type="" icon={<EyeOutlined />} onClick={() => { showUserProfile(elm) }} size="small">
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
           <Button
             type=""
             icon={<EditOutlined />}
-            onClick={()=>{editfun(elm.id)}}
+            onClick={() => {
+              editfun(elm.id);
+            }}
             size="small"
           >
-           Edit
+            Edit
           </Button>
         </Flex>
-      </Menu.Item> */}
-     
+      </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
-          <Button type="" icon={<DeleteOutlined />}  onClick={() => { deleteRoles(elm.id) }} size="small">
+          <Button type="" icon={<DeleteOutlined />} onClick={() => { deleteRoles(elm.id) }} size="small">
             <span className="">Delete</span>
           </Button>
         </Flex>
       </Menu.Item>
     </Menu>
   );
+
+  const renderPermissions = (permissions) => {
+    try {
+      const parsedPermissions =
+        permissions && typeof permissions === "string" ? JSON.parse(permissions) : {};
+      return Object.keys(parsedPermissions).map(moduleKey => (
+        <div key={moduleKey}>
+          {Object.keys(parsedPermissions[moduleKey]).map(permissionKey => (
+            <div key={permissionKey} style={{ marginBottom: '5px' }}>
+
+              {Object.keys(parsedPermissions[moduleKey][permissionKey]).map(actionKey => (
+                parsedPermissions[moduleKey][permissionKey][actionKey] && (
+                  <Button key={actionKey} size="small" style={{ margin: '2px', backgroundColor: '#3e79f7', color: 'white' }}>
+                    {`${permissionKey}  ${actionKey}`}
+                  </Button>
+                )
+              ))}
+            </div>
+          ))}
+        </div>
+      ));
+    } catch (error) {
+      console.error("Error parsing permissions:", error);
+      return "Invalid Permissions";
+    }
+  };
+
 
   const tableColumns = [
     {
@@ -153,11 +147,13 @@ useEffect(() => {
       },
     },
     {
-      title: 'Permission',
+      title: 'Permissions',
       dataIndex: 'permissions',
-      sorter: {
-        compare: (a, b) => a.permissions.length - b.permissions.length,
-      },
+      render: (permissions) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+          {renderPermissions(permissions)}
+        </div>
+      ),
     },
     {
       title: 'Action',
@@ -191,9 +187,7 @@ useEffect(() => {
       <div className="table-responsive mt-2">
         <Table columns={tableColumns} dataSource={users} rowKey="id" />
       </div>
-      <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
 
-      {/* Add Role Modal */}
       <Modal
         title="Add Role"
         visible={isAddRoleModalVisible}

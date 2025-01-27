@@ -1,73 +1,47 @@
 import React, { useEffect, useState } from "react";
-import { Card, Button, Modal, message, Switch } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { Card, Button, Modal, message, Switch, Tag, Row, Col, Typography, Empty, Dropdown } from "antd";
+import { EditOutlined, DeleteOutlined, PlusOutlined, UserOutlined, CloudUploadOutlined, TeamOutlined, CalendarOutlined, CrownOutlined, MoreOutlined } from "@ant-design/icons";
 import AddPlan from "./AddPlan";
 import EditPlan from "./EditPlan";
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteP, GetPlan } from "./PlanReducers/PlanSlice";
+import './PlanList.css'; // Import the CSS file
+
+const { Title, Text } = Typography;
 
 const PlanList = () => {
   const [plans, setPlans] = useState([]);
   const [isAddPlanModalVisible, setIsAddPlanModalVisible] = useState(false);
   const [isEditPlanModalVisible, setIsEditPlanModalVisible] = useState(false);
-  const [idd,setIdd]= useState("")
-
+  const [idd, setIdd] = useState("");
   const dispatch = useDispatch();
-
-  // Fetching data from Redux
   const Plandata = useSelector((state) => state.Plan);
   const allPlans = Plandata.Plan?.data || [];
 
-  
-  console.log("mmmmm",allPlans)
-
   useEffect(() => {
-    // Dispatch the action to get plans
     dispatch(GetPlan());
   }, [dispatch]);
 
   useEffect(() => {
-    // Set the plans from Redux store to local state
-    setPlans(allPlans)
+    setPlans(allPlans);
   }, [allPlans]);
 
-  // const deletePlan = (planId) => {
-  //   setPlans(plans.filter((plan) => plan.id !== planId));
-  //   message.success({ content: `Deleted plan ${planId}`, duration: 2 });
-  // };
-
-   const deletePlan = async (planId) => {
-      try {
-  
-        await dispatch(DeleteP(planId)); 
-    
-        const updatedData = await dispatch(GetPlan());
-    
-        setPlans(plans.filter((plan) => plan.id !== planId));
-    
-        message.success({ content: 'Deleted user successfully', duration: 2 });
-      } catch (error) {
-        // message.error({ content: 'Failed to delete user', duration: 2 });
-        console.error('Error deleting user:', error);
-      }
-    };
-  
-
-  const openAddPlanModal = () => {
-    setIsAddPlanModalVisible(true);
+  const deletePlan = async (planId) => {
+    try {
+      await dispatch(DeleteP(planId));
+      await dispatch(GetPlan());
+      setPlans(plans.filter((plan) => plan.id !== planId));
+      message.success({ content: 'Plan deleted successfully', duration: 2 });
+    } catch (error) {
+      message.error({ content: 'Failed to delete plan', duration: 2 });
+      console.error('Error deleting plan:', error);
+    }
   };
 
-  const closeAddPlanModal = () => {
-    setIsAddPlanModalVisible(false);
-  };
-
-  const openEditPlanModal = () => {
-    setIsEditPlanModalVisible(true);
-  };
-
-  const closeEditPlanModal = () => {
-    setIsEditPlanModalVisible(false);
-  };
+  const openAddPlanModal = () => setIsAddPlanModalVisible(true);
+  const closeAddPlanModal = () => setIsAddPlanModalVisible(false);
+  const openEditPlanModal = () => setIsEditPlanModalVisible(true);
+  const closeEditPlanModal = () => setIsEditPlanModalVisible(false);
 
   const togglePlan = (id) => {
     setPlans((prevPlans) =>
@@ -75,263 +49,169 @@ const PlanList = () => {
         plan.id === id ? { ...plan, status: !plan.status } : plan
       )
     );
-    message.success({ content: `Toggled plan ${id}`, duration: 2 });
+    message.success({ content: `Plan status updated`, duration: 2 });
   };
 
-
-  const EditP = (id) =>{
+  const EditP = (id) => {
     openEditPlanModal();
     setIdd(id);
-  }
+  };
 
+  const getMenuItems = (planId) => [
+    {
+      key: '1',
+      icon: <EditOutlined />,
+      label: 'Edit',
+      onClick: () => EditP(planId)
+    },
+    {
+      key: '2',
+      icon: <DeleteOutlined />,
+      label: 'Delete',
+      danger: true,
+      onClick: () => deletePlan(planId)
+    }
+  ];
 
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "end", marginBottom: "20px" }}>
-        <Button type="primary" onClick={openAddPlanModal} icon={<PlusOutlined />}></Button>
+    <div className="plan-list-container p-6 bg-gray-50 min-h-screen">
+      <div className="mx-auto">
+        <Row justify="space-between" align="middle" className="mb-8">
+          <Col>
+            <Title level={2} className="!mb-0">
+              <CrownOutlined className="mr-2 text-yellow-500" />
+              Subscription Plans
+            </Title>
+            <Text type="secondary">Manage your subscription plans</Text>
+          </Col>
+          <Col>
+            <Button
+              type="primary"
+              size="large"
+              onClick={openAddPlanModal}
+              icon={<PlusOutlined />}
+              className="hover:shadow-lg transition-shadow duration-300"
+            >
+              Add New Plan
+            </Button>
+          </Col>
+        </Row>
+
+        {plans.length === 0 ? (
+          <Empty description="No plans found" className="my-12" />
+        ) : (
+          <Row gutter={[24, 24]}>
+            {plans.map((plan) => (
+              <Col xs={24} sm={24} md={12} lg={8} xl={6} key={plan.id}>
+                <Card
+                  className="plan-card h-full  rounded-xl"
+                  hoverable
+                  title={
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-xl font-bold text-gray-800">{plan.name}</span>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={plan.status === 'active'}
+                          onChange={() => togglePlan(plan.id)}
+                          checkedChildren="Active"
+                          unCheckedChildren="Inactive"
+                        />
+                        <Dropdown
+                          menu={{ items: getMenuItems(plan.id) }}
+                          placement="bottomRight"
+                          trigger={['click']}
+                        >
+                          <Button type="text" icon={<MoreOutlined />} />
+                        </Dropdown>
+                      </div>
+                    </div>
+                  }
+                >
+                  <div className="space-y-6">
+                    <div className="text-center bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg">
+                      <div className="text-4xl font-bold text-indigo-600">
+                        <span className="text-xl">{plan.currency}</span>
+                        {plan.price}
+                      </div>
+                      <div className="text-gray-600 font-medium">per {plan.duration.toLowerCase()}</div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3 bg-gray-50 p-2 rounded">
+                        <CalendarOutlined className="text-blue-500" />
+                        <span className="font-medium">{plan.duration}</span>
+                      </div>
+
+                      <div className="flex items-center gap-3 bg-gray-50 p-2 rounded">
+                        <UserOutlined className="text-green-500" />
+                        <span className="font-medium">Max Users: {plan.max_users}</span>
+                      </div>
+
+                      <div className="flex items-center gap-3 bg-gray-50 p-2 rounded">
+                        <TeamOutlined className="text-purple-500" />
+                        <span className="font-medium">Max Clients: {plan.max_clients}</span>
+                      </div>
+
+                      <div className="flex items-center gap-3 bg-gray-50 p-2 rounded">
+                        <CloudUploadOutlined className="text-cyan-500" />
+                        <span className="font-medium">Storage: {plan.storage_limit} GB</span>
+                      </div>
+                    </div>
+
+                    <div className="pt-2">
+                      <Tag color="blue" className="px-3 py-1 rounded-full">
+                        Trial Period: {plan.trial_period} days
+                      </Tag>
+                    </div>
+
+                    {plan.features && (
+                      <div className="border-t pt-4">
+                        <Text strong className="block mb-3">Features:</Text>
+                        <div className="flex flex-wrap gap-2">
+                          {Object.entries(JSON.parse(plan.features)).map(([key, value]) => (
+                            <Tag
+                              key={key}
+                              color={value ? 'success' : 'error'}
+                              className="px-3 py-1 rounded-full"
+                            >
+                              {key}: {value ? 'Enabled' : 'Disabled'}
+                            </Tag>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        )}
+
+
+        <Modal
+          title={<Title level={4}>Add New Plan</Title>}
+          visible={isAddPlanModalVisible}
+          onCancel={closeAddPlanModal}
+          footer={null}
+          width={1000}
+          className="mt-[-60px]"
+        >
+          <AddPlan onClose={closeAddPlanModal} />
+        </Modal>
+
+        <Modal
+          title={<Title level={4}>Edit Plan</Title>}
+          visible={isEditPlanModalVisible}
+          onCancel={closeEditPlanModal}
+          footer={null}
+          width={1000}
+          className="mt-[-60px]"
+        >
+          <EditPlan onClose={closeEditPlanModal} id={idd} />
+        </Modal>
       </div>
-
-      <div style={{ display: "flex", justifyContent: "space-around", flexWrap: "wrap", gap: "20px" }}>
-        {plans.map((plan) => (
-          <Card
-            key={plan.id}
-            title={
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span>{plan.name}</span>
-                <Switch
-                  checked={plan.status}
-                  onChange={() => togglePlan(plan.id)}
-                  style={{ backgroundColor: plan.status ? "limegreen" : "red" }}
-                />
-              </div>
-            }
-            bordered
-            style={{ width: 300, textAlign: "center" }}
-            actions={[
-              <Button icon={<EditOutlined />} onClick={() => EditP(plan.id)} />,
-              <Button icon={<DeleteOutlined />} danger onClick={() => deletePlan(plan.id)} />,
-            ]}
-          >
-            <h2 className="text-lg font-bold">{plan.price}</h2>
-            <p>{plan.duration}</p>
-            <p>Free Trial Days: {plan.trial}</p>
-            {/* <ul style={{ textAlign: "left" }}>
-            {plan?.features &&
-  JSON.parse(plan.features).map((feature, index) => (
-    <li key={index}>{feature}</li>
-  ))}
-
-            </ul> */}
-          </Card>
-        ))}
-      </div>
-
-      <Modal
-        title="Add New Plan"
-        visible={isAddPlanModalVisible}
-        onCancel={closeAddPlanModal}
-        footer={null}
-        width={1000}
-        className="mt-[-60px]"
-      >
-        <AddPlan onClose={closeAddPlanModal} />
-      </Modal>
-
-      <Modal
-        title="Edit Plan"
-        visible={isEditPlanModalVisible}
-        onCancel={closeEditPlanModal}
-        footer={null}
-        width={1000}
-        className="mt-[-60px]"
-      >
-        <EditPlan onClose={closeEditPlanModal} id={idd}/>
-      </Modal>
     </div>
   );
 };
 
 export default PlanList;
-
-
-
-
-
-
-
-
-
-// import React, { useState } from "react";
-// import { Card, Button, Modal, message } from "antd";
-// import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-// import AddPlan from "./AddPlan";
-// import EditPlan from "./EditPlan";
-
-// const initialPlans = [
-//   {
-//     id: 1,
-//     name: "Free Plan",
-//     price: "$0",
-//     duration: "Lifetime",
-//     trial: "0",
-//     features: [
-//       "5 Users",
-//       "5 Customers",
-//       "5 Vendors",
-//       "5 Clients",
-//       "1024 MB Storage",
-//       "Enable Account",
-//       "Enable CRM",
-//       "Enable HRM",
-//       "Enable Project",
-//       "Enable POS",
-//       "Enable Chat GPT",
-//     ],
-//   },
-//   {
-//     id: 2,
-//     name: "Platinum",
-//     price: "$500",
-//     duration: "Per Year",
-//     trial: "5",
-//     features: [
-//       "25 Users",
-//       "50 Customers",
-//       "50 Vendors",
-//       "25 Clients",
-//       "1200 MB Storage",
-//       "Enable Account",
-//       "Enable CRM",
-//       "Enable HRM",
-//       "Enable Project",
-//       "Enable POS",
-//       "Enable Chat GPT",
-//     ],
-//   },
-//   {
-//     id: 3,
-//     name: "Gold",
-//     price: "$400",
-//     duration: "Per Year",
-//     trial: "7",
-//     features: [
-//       "15 Users",
-//       "40 Customers",
-//       "40 Vendors",
-//       "10 Clients",
-//       "2000 MB Storage",
-//       "Enable Account",
-//       "Enable CRM",
-//       "Enable HRM",
-//       "Enable Project",
-//       "Enable POS",
-//       "Enable Chat GPT",
-//     ],
-//   },
-//   {
-//     id: 4,
-//     name: "Silver",
-//     price: "$300",
-//     duration: "Per Year",
-//     trial: "10",
-//     features: [
-//       "15 Users",
-//       "50 Customers",
-//       "50 Vendors",
-//       "15 Clients",
-//       "3000 MB Storage",
-//       "Enable Account",
-//       "Enable CRM",
-//       "Enable HRM",
-//       "Enable Project",
-//       "Enable POS",
-//       "Enable Chat GPT",
-//     ],
-//   },
-// ];
-
-// const PlanList = () => {
-//   const [plans, setPlans] = useState(initialPlans);
-//   const [isAddPlanModalVisible, setIsAddPlanModalVisible] = useState(false);
-//   const [isEditPlanModalVisible, setIsEditPlanModalVisible] = useState(false);
-
-
-//   const deletePlan = (planId) => {
-//     setPlans(plans.filter((plan) => plan.id !== planId));
-//     message.success({ content: `Deleted plan ${planId}`, duration: 2 });
-//   };
-
-//   const openAddPlanModal = () => {
-//     setIsAddPlanModalVisible(true);
-//   };
-
-//   const closeAddPlanModal = () => {
-//     setIsAddPlanModalVisible(false);
-//   };
-
-//   const openEditPlanModal = () => {
-//     setIsEditPlanModalVisible(true);
-//   };
-
-//   const closeEditPlanModal = () => {
-//     setIsEditPlanModalVisible(false);
-//   };
-
-//   return (
-//     <div>
-//       <div style={{ display: "flex", justifyContent: "space-end", marginBottom: "20px" }}>
-//         <Button type="primary" onClick={openAddPlanModal} icon={<PlusOutlined />}>
-        
-//         </Button>
-//       </div>
-
-//       <div style={{ display: "flex", justifyContent: "space-around", flexWrap: "wrap", gap: "20px" }}>
-//         {plans.map((plan) => (
-//           <Card
-//             key={plan.id}
-//             title={plan.name}
-//             bordered
-//             style={{ width: 300, textAlign: "center" }}
-//             actions={[
-//               <Button icon={<EditOutlined />} onClick={openEditPlanModal} />,
-//               <Button icon={<DeleteOutlined />} danger  onClick={() => deletePlan(plan.id)} />,
-//             ]}
-//           >
-//             <h2>{plan.price}</h2>
-//             <p>{plan.duration}</p>
-//             <p>Free Trial Days: {plan.trial}</p>
-//             <ul style={{ textAlign: "left" }}>
-//               {plan.features.map((feature, index) => (
-//                 <li key={index}>{feature}</li>
-//               ))}
-//             </ul>
-//           </Card>
-//         ))}
-//       </div>
-
-//       <Modal
-//         title="Add New Plan"
-//         visible={isAddPlanModalVisible}
-//         onCancel={closeAddPlanModal}
-//         footer={null}
-//         width={1000}
-//       >
-
-//         <AddPlan onClose={closeAddPlanModal} />
-//         {/* <p>Form to add a new plan will go here.</p> */}
-//       </Modal>
-
-//       <Modal
-//         title="Edit Plan"
-//         visible={isEditPlanModalVisible}
-//         onCancel={closeEditPlanModal}
-//         footer={null}
-//         width={1000}
-//       >
-//         <EditPlan onClose={closeEditPlanModal} />
-//       </Modal>
-//     </div>
-//   );
-// };
-
-// export default PlanList;
