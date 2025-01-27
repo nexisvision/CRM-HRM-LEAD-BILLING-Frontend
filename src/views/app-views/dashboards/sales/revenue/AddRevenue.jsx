@@ -34,7 +34,7 @@ const AddRevenue = ({ onClose }) => {
   const onSubmit = (values, { resetForm }) => {
     dispatch(AddRevenues(values)).then(() => {
       dispatch(getRevenue());
-      message.success("Job added successfully!");
+      message.success("Revenue added successfully!");
       onClose();
       resetForm();
     });
@@ -230,7 +230,7 @@ const AddRevenue = ({ onClose }) => {
                     </div>
                   </Col>
                   <Col span={12}>
-                    <div className="form-item">
+                    <div className="form-item mt-2">
                       <label className="font-semibold">Reference</label>
                       <Field
                         name="reference"

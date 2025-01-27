@@ -33,6 +33,7 @@ const AddDeal = ({ onClose }) => {
     price: "",
     leadTitle: "",
     currency: "",
+    category:"",
     pipeline: "",
     stage: "",
     closedDate: null,
@@ -46,6 +47,7 @@ const AddDeal = ({ onClose }) => {
     price: Yup.string().required("Please enter a Price."),
     leadTitle: Yup.string().required("Please select a Lead Title."),
     currency: Yup.string().required("Please select a Currency."),
+    category: Yup.string().required("Please select a Category."),
     pipeline: Yup.string().required("Please select a Pipeline."),
     stage: Yup.string().required("Please select a Stage."),
     closedDate: Yup.date().required("Please select a Closed Date."),
@@ -214,6 +216,24 @@ const AddDeal = ({ onClose }) => {
                   />
                 </div>
               </Col>
+
+              <Col span={12} className="mt-4 mb-4">
+                <div className="form-item">
+                  <label className="font-semibold">Category</label>
+                  <Field
+                    name="category"
+                    as={Input}
+                    className="mt-2"
+                    placeholder="Enter Category"
+                  />
+                  <ErrorMessage
+                    name="category"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+              
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Lead Title</label>
@@ -292,7 +312,7 @@ const AddDeal = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-4">
+              <Col span={12} className="">
                 <div className="form-item">
                   <label className="font-semibold">Stage</label>
                   <div className="flex gap-2">

@@ -231,44 +231,44 @@ const AddJob = ({ onClose }) => {
                 <div className="form-item mt-2">
                   <label className="font-semibold">Skill</label>
                   <Field name="skill">
-                      {({ field, form }) => (
-                        <Select
-                          {...field}
-                          className="w-full mt-2"
-                          placeholder="Select or add new skill"
-                          onChange={(value) => {
-                            form.setFieldValue("skill", value);
-                          }}
-                          onBlur={() => form.setFieldTouched("skill", true)}
-                          dropdownRender={(menu) => (
-                            <div>
-                              {menu}
-                              <div
-                                style={{
-                                  padding: "8px",
-                                  borderTop: "1px solid #e8e8e8",
-                                }}
+                    {({ field, form }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-2"
+                        placeholder="Select or add new skill"
+                        onChange={(value) => {
+                          form.setFieldValue("skill", value);
+                        }}
+                        onBlur={() => form.setFieldTouched("skill", true)}
+                        dropdownRender={(menu) => (
+                          <div>
+                            {menu}
+                            <div
+                              style={{
+                                padding: "8px",
+                                borderTop: "1px solid #e8e8e8",
+                              }}
+                            >
+                              <Button
+                                type="link"
+                                //   icon={<PlusOutlined />}
+                                onClick={() => setIsTagModalVisible(true)}
+                                block
                               >
-                                <Button
-                                  type="link"
-                                  //   icon={<PlusOutlined />}
-                                  onClick={() => setIsTagModalVisible(true)}
-                                  block
-                                >
-                                  Add New Skill
-                                </Button>
-                              </div>
+                                Add New Skill
+                              </Button>
                             </div>
-                          )}
-                        >
-                          {tags.map((tag) => (
-                            <Option key={tag.id} value={tag.name}>
-                              {tag.name}
-                            </Option>
-                          ))}
-                        </Select>
-                      )}
-                    </Field>
+                          </div>
+                        )}
+                      >
+                        {tags.map((tag) => (
+                          <Option key={tag.id} value={tag.name}>
+                            {tag.name}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
                   <ErrorMessage
                     name="skill"
                     component="div"
@@ -285,7 +285,7 @@ const AddJob = ({ onClose }) => {
                     as={Input}
                     placeholder="Enter location"
                   />
-                  
+
                   <ErrorMessage
                     name="invoiceDate"
                     component="div"
@@ -420,11 +420,11 @@ const AddJob = ({ onClose }) => {
                   <div className="form-item">
                     <label className="font-semibold">Work Experence</label>
                     <Field
-                    className="mt-2"
-                    name="work experence"
-                    as={Input}
-                    placeholder="Enter work experence"
-                  />
+                      className="mt-2"
+                      name="workExperience"
+                      as={Input}
+                      placeholder="Enter work experence"
+                    />
                     <ErrorMessage
                       name="workExperience"
                       component="div"
@@ -463,7 +463,7 @@ const AddJob = ({ onClose }) => {
                 </div>
               </Col>
 
-         
+
 
               <div className="mt-2 w-full">
                 <Col span={24} className="mt-2">
@@ -535,21 +535,19 @@ const AddJob = ({ onClose }) => {
                   </div>
                 </Col>
               </div>
-
               <div className="mt-2 w-full">
                 <Col span={24} className="mt-2">
                   <div className="form-item">
-                    <label className="font-semibold">Job Discription</label>
+                    <label className="font-semibold">Description</label>
                     <ReactQuill
-                      value={values.discription}
+                      value={values.description}
                       onChange={(value) => setFieldValue("description", value)}
-                      placeholder="Enter discription"
+                      placeholder="Enter description"
                       onBlur={() => setFieldTouched("description", true)}
-                      className="mt-2"
                     />
                     <ErrorMessage
                       name="description"
-                      component="div"
+                      component="div mt-2"
                       className="error-message text-red-500 my-1"
                     />
                   </div>

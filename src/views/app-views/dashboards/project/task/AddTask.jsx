@@ -189,7 +189,7 @@ const AddTask = ({ onClose }) => {
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
             <Row gutter={16}>
-              <Col span={12}>
+              <Col span={24}>
                 <div className="form-item">
                   <label className="font-semibold">Task Name</label>
                   <Field
@@ -235,7 +235,7 @@ const AddTask = ({ onClose }) => {
 
 
 <Col span={24}>
-                <div className="form-item">
+                <div className="form-item mt-2">
                   <label className="font-semibold">Category</label>
                   <Select
                     style={{ width: "100%" }}
@@ -249,6 +249,7 @@ const AddTask = ({ onClose }) => {
                           <Button
                             type="link"
                             icon={<PlusOutlined />}
+                             className="w-full mt-2"
                             onClick={() => setIsCategoryModalVisible(true)}
                           >
                             Add New Category
@@ -274,26 +275,28 @@ const AddTask = ({ onClose }) => {
 
 
 
-              <Col span={24} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Project</label>
-                  <Field
-                    value={fnddata?.project_name || ''}
-                    name="project"
-                    as={Input}
-                    // placeholder="Enter projectName"
-                    className="mt-2"
-                    disabled
-                  />
-                  <ErrorMessage
-                    name="project"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+              {fnddata?.project_name && (
+                <Col span={24} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Project</label>
+                    <Field
+                      value={fnddata.project_name}
+                      name="project"
+                      as={Input}
+                      placeholder="Enter projectName"
+                      className="mt-2"
+                      disabled
+                    />
+                    <ErrorMessage
+                      name="project"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+              )}
 
-              <Col span={8} className="mt-4">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold ">StartDate</label>
                   <DatePicker
@@ -312,7 +315,7 @@ const AddTask = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={8} className="mt-4">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold ">DueDate</label>
                   <DatePicker
@@ -390,25 +393,9 @@ const AddTask = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Description</label>
-                  <ReactQuill
-                    value={values.description}
-                    onChange={(value) => setFieldValue("description", value)}
-                    placeholder="Enter description"
-                    onBlur={() => setFieldTouched("description", true)}
-                  />
-                  <ErrorMessage
-                    name="description"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
 
               <Col span={24}>
-                <div className="form-item">
+                <div className="form-item mt-2">
                   <label className="font-semibold">Status</label>
                   <Select
                     style={{ width: "100%" }}
@@ -422,6 +409,7 @@ const AddTask = ({ onClose }) => {
                           <Button
                             type="link"
                             icon={<PlusOutlined />}
+                             className="w-full mt-2"
                             onClick={() => setIsStatusModalVisible(true)}
                           >
                             Add New Status
@@ -445,7 +433,7 @@ const AddTask = ({ onClose }) => {
               </Col>
 
               <Col span={24}>
-                <div className="form-item">
+                <div className="form-item mt-2">
                   <label className="font-semibold">Priority</label>
                   <Select
                     style={{ width: "100%" }}
@@ -459,6 +447,7 @@ const AddTask = ({ onClose }) => {
                           <Button
                             type="link"
                             icon={<PlusOutlined />}
+                             className="w-full mt-2"
                             onClick={() => setIsPriorityModalVisible(true)}
                           >
                             Add New priority
@@ -474,6 +463,24 @@ const AddTask = ({ onClose }) => {
                     ))}
                   </Select>
                   <ErrorMessage name="tag" component="div" className="error-message text-red-500 my-1" />
+                </div>
+              </Col>
+
+              
+              <Col span={24} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Description</label>
+                  <ReactQuill
+                    value={values.description}
+                    onChange={(value) => setFieldValue("description", value)}
+                    placeholder="Enter description"
+                    onBlur={() => setFieldTouched("description", true)}
+                  />
+                  <ErrorMessage
+                    name="description"
+                    component="div mt-2"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 

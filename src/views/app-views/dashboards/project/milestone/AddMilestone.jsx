@@ -14,6 +14,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import { PlusOutlined } from "@ant-design/icons";
+
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { AddMins, Getmins } from "./minestoneReducer/minestoneSlice";
@@ -27,34 +29,28 @@ const AddMilestone = ({ onClose }) => {
   const dispatch = useDispatch();
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [newTag, setNewTag] = useState("");
+  const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
+  const [newStatus, setNewStatus] = useState("");
+  const [statuses, setStatuses] = useState([]);
 
   const [tags, setTags] = useState([]);
   const { currencies } = useSelector((state) => state.currencies);
 
-const { id } = useParams();
+  const { id } = useParams();
+  console.log("Milestone ID:", id);
 
   useEffect(() => {
-    dispatch(getallcurrencies());
-  }, [dispatch]);
+    if (id) {
+      dispatch(getallcurrencies());
+    } else {
+      message.error("Milestone ID is not defined.");
+    }
+  }, [dispatch, id]);
 
   const Tagsdetail = useSelector((state) => state.Lable);
 
   const AllLoggeddtaa = useSelector((state) => state.user);
   const AllTags = Tagsdetail?.Lable?.data;
-
-  // const onSubmit = (values, { resetForm }) => {
-  //   dispatch(AddLable({ id, values }))
-  //     .then(() => {
-  //       dispatch(Getmins(id));
-  //       message.success("Milestone added successfully!");
-  //       resetForm();
-  //       onClose();
-  //     })
-  //     .catch((error) => {
-  //       message.error("Failed to add Leads.");
-  //       console.error("Add API error:", error);
-  //     });
-  // };
 
   const onSubmit = (values, { resetForm }) => {
     // Check if the selected tag is new or existing
@@ -162,17 +158,26 @@ const { id } = useParams();
     }
   };
 
+  const handleAddNewStatus = () => {
+    if (newStatus.trim() === "") {
+      message.error("Status cannot be empty.");
+      return;
+    }
+    const newStatusObj = { id: Date.now(), name: newStatus.trim() }; // Create a new status object
+    setStatuses((prevStatuses) => [...prevStatuses, newStatusObj]); // Update statuses
+    setNewStatus(""); // Clear input
+    setIsStatusModalVisible(false); // Close modal
+    message.success("New status added successfully!");
+  };
+
   return (
     <div>
-      {/* <div className="ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4"> */}
       <div className="add-expenses-form">
-      <hr style={{ marginBottom: "10px", border: "1px solid #E8E8E8" }} />
+        <hr style={{ marginBottom: "10px", border: "1px solid #E8E8E8" }} />
 
-        {/* <h2 className="border-b pb-[30px] font-medium">Add Milestone</h2> */}
         <div className="p-2">
           <Formik
             initialValues={initialValues} 
-            // validationSchema={validationSchema}
             onSubmit={onSubmit}
           >
             {({ values, setFieldValue, setFieldTouched, resetForm }) => (
@@ -187,7 +192,7 @@ const { id } = useParams();
                         name="milestone_title"
                         as={Input}
                         placeholder="Enter Milestone Title"
-                        className="rounded-e-lg rounded-s-none"
+                         className="w-full mt-2"
                       />
                       <ErrorMessage
                         name="milestone_title"
@@ -197,7 +202,7 @@ const { id } = useParams();
                     </div>
                   </Col>
 
-                  <Col span={12} className="mt-4">
+                  <Col span={12} className="">
                     <div className="form-item">
                       <label className="font-semibold mb-2">Currency</label>
                       <div className="flex gap-2">
@@ -234,7 +239,7 @@ const { id } = useParams();
                     </div>
                   </Col>
                   <Col span={12}>
-                    <div className="form-item">
+                    <div className="form-item mt-2">
                       <label className="font-semibold mb-2">
                         Milestone Cost
                       </label>
@@ -242,65 +247,10 @@ const { id } = useParams();
                         name="milestone_cost"
                         as={Input}
                         placeholder="Enter Milestone Cost"
-                        className="rounded-e-lg rounded-s-none"
+                        className="w-full mt-2"
                       />
                       <ErrorMessage
                         name="milestone_cost"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
-                    </div>
-                  </Col>
-
-                  <Col span={24} className="mt-4">
-                    <div className="form-item">
-                      <label className="font-semibold">Status</label>
-                      <div className="flex gap-2">
-                        <Field name="milestone_status">
-                          {({ field, form }) => (
-                            <Select
-                              {...field}
-                              className="w-full"
-                              placeholder="Select or add new tag"
-                              onChange={(value) =>
-                                form.setFieldValue("milestone_status", value)
-                              }
-                              onBlur={() =>
-                                form.setFieldTouched("milestone_status", true)
-                              }
-                              dropdownRender={(menu) => (
-                                <div>
-                                  {menu}
-                                  <div
-                                    style={{
-                                      padding: "8px",
-                                      borderTop: "1px solid #e8e8e8",
-                                    }}
-                                  >
-                                    <Button
-                                      type="link"
-                                      // icon={<PlusOutlined />}
-                                      onClick={() => setIsTagModalVisible(true)}
-                                      block
-                                    >
-                                      Add New Status
-                                    </Button>
-                                  </div>
-                                </div>
-                              )}
-                            >
-                              {tags &&
-                                tags.map((tag) => (
-                                  <Option key={tag.id} value={tag.name}>
-                                    {tag.name}
-                                  </Option>
-                                ))}
-                            </Select>
-                          )}
-                        </Field>
-                      </div>
-                      <ErrorMessage
-                        name="milestone_status"
                         component="div"
                         className="error-message text-red-500 my-1"
                       />
@@ -320,7 +270,7 @@ const { id } = useParams();
                         onBlur={() =>
                           setFieldTouched("add_cost_to_project_budget", true)
                         }
-                        className="w-full"
+                        className="w-full mt-2"
                         placeholder="Select Option"
                       >
                         <Option value="no">No</Option>
@@ -333,23 +283,7 @@ const { id } = useParams();
                       />
                     </div>
                   </Col>
-                  <Col span={24} className="mt-2">
-                    <div className="form-item">
-                      <label className="font-semibold">Milestone Summary</label>
-                      <ReactQuill
-                        value={values.milestone_summary}
-                        onChange={(value) =>
-                          setFieldValue("milestone_summary", value)
-                        }
-                        placeholder="Enter Milestone Summary"
-                      />
-                      <ErrorMessage
-                        name="milestone_summary"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
-                    </div>
-                  </Col>
+                  
                   <Col span={12} className="mt-2">
                     <div className="form-item">
                       <label className="font-semibold mb-2">Start Date</label>
@@ -392,6 +326,60 @@ const { id } = useParams();
                       />
                     </div>
                   </Col>
+                  <Col span={24}>
+                    <div className="form-item">
+                      <label className="font-semibold">Status</label>
+                      <Select
+                        style={{ width: "100%" }}
+                        placeholder="Select or add new status"
+                        value={values.milestone_status}
+                        onChange={(value) => setFieldValue("milestone_status", value)}
+                        dropdownRender={(menu) => (
+                          <div>
+                            {menu}
+                            <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                              <Button
+                                type="link"
+                                icon={<PlusOutlined />}
+                                onClick={() => setIsStatusModalVisible(true)}
+                              >
+                                Add New Status
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      >
+                        {statuses.map((status) => (
+                          <Option key={status.id} value={status.name}>
+                            {status.name}
+                          </Option>
+                        ))}
+                      </Select>
+                      <ErrorMessage
+                        name="milestone_status"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+
+                  <Col span={24} className="mt-2">
+                    <div className="form-item">
+                      <label className="font-semibold">Milestone Summary</label>
+                      <ReactQuill
+                        value={values.milestone_summary}
+                        onChange={(value) =>
+                          setFieldValue("milestone_summary", value)
+                        }
+                        placeholder="Enter Milestone Summary"
+                      />
+                      <ErrorMessage
+                        name="milestone_summary"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
                 </Row>
                 <div className="form-buttons text-right py-2">
                   <Button type="default" className="mr-2" onClick={onClose}>
@@ -407,15 +395,14 @@ const { id } = useParams();
 
           <Modal
             title="Add New Status"
-            open={isTagModalVisible}
-            onCancel={() => setIsTagModalVisible(false)}
-            onOk={handleAddNewTag}
-            okText="Add Status"
+            open={isStatusModalVisible}
+            onCancel={() => setIsStatusModalVisible(false)}
+            onOk={handleAddNewStatus}
           >
             <Input
-              placeholder="Enter new Status"
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
+              placeholder="Enter new status name"
+              value={newStatus}
+              onChange={(e) => setNewStatus(e.target.value)}
             />
           </Modal>
         </div>
@@ -425,7 +412,6 @@ const { id } = useParams();
 };
 
 export default AddMilestone;
-
 
 
 
@@ -863,3 +849,4 @@ export default AddMilestone;
 // };
 
 // export default AddMilestone;
+

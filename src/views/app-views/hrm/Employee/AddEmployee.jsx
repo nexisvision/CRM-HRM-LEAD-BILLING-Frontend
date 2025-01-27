@@ -34,15 +34,10 @@ const AddEmployee = ({ onClose, setSub }) => {
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
 
-
-useEffect(() => {
-  dispatch(getDept());
-},[])
-
-useEffect(() => {
-  dispatch(getDes());
-},[])
-
+  useEffect(() => {
+    dispatch(getDept());
+    dispatch(getDes());
+  }, [dispatch]);
 
   const otpapi = async (otp) => {
     try {
@@ -120,7 +115,6 @@ useEffect(() => {
     address: "",
     joiningDate: null,
     leaveDate: null,
-    // employeeId: "",
     department: "",
     designation: "",
     salary: "",
@@ -131,36 +125,34 @@ useEffect(() => {
   };
 
   const validationSchema = Yup.object({
-    firstName: Yup.string().required("Please enter a firstName."),
-    lastName: Yup.string().required("Please enter a lastName."),
-    username: Yup.string().required("Please enter a userName."),
+    firstName: Yup.string().required("Please enter a first name."),
+    lastName: Yup.string().required("Please enter a last name."),
+    username: Yup.string().required("Please enter a username."),
     password: Yup.string()
       .min(8, "Password must be at least 8 characters")
       .matches(/\d/, "Password must have at least one number")
       .required("Password is required"),
     email: Yup.string()
-      .email("Please enter a valid email address with @.")
-      .required("please enter a email"),
+      .email("Please enter a valid email address.")
+      .required("Please enter an email"),
     phone: Yup.string()
-      .matches(/^\d{10}$/, "phone number must be 10 digits.")
-      .required("Please enter a phone Number."),
-    address: Yup.string().required("Please enter a  Address."),
-    joiningDate: Yup.date().nullable().required("Joining Date is required."),
-    leaveDate: Yup.date().nullable().required("Leave Date is required."),
-    // employeeId: Yup.string().required("Please enter a  Employee Id."),
-    department: Yup.string().required("Please select a Department."),
-    designation: Yup.string().required("Please select a Designation."),
-    salary: Yup.string().required("Please enter a Salary."),
-    accountholder: Yup.string().required("please enter a Accountholder"),
-    accountnumber: Yup.string().required("Please enter a Account Number"),
-    bankname: Yup.string().required("Please enter a Bank Name"),
-    ifsc: Yup.string().required("Please enter a Ifsc"),
-    banklocation: Yup.string().required("Please enter a Bank Location"),
+      .matches(/^\d{10}$/, "Phone number must be 10 digits.")
+      .required("Please enter a phone number."),
+    address: Yup.string().required("Please enter an address."),
+    joiningDate: Yup.date().nullable().required("Joining date is required."),
+    leaveDate: Yup.date().nullable().required("Leave date is required."),
+    department: Yup.string().required("Please select a department."),
+    designation: Yup.string().required("Please select a designation."),
+    salary: Yup.string().required("Please enter a salary."),
+    accountholder: Yup.string().required("Please enter an account holder name."),
+    accountnumber: Yup.string().required("Please enter an account number."),
+    bankname: Yup.string().required("Please enter a bank name."),
+    ifsc: Yup.string().required("Please enter an IFSC code."),
+    banklocation: Yup.string().required("Please enter a bank location."),
   });
 
   return (
-    <div className="add-employee">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+    <div className="add-employee p-6">
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -175,354 +167,203 @@ useEffect(() => {
           setFieldTouched,
         }) => (
           <Form
-            className="formik-form"
+            className="space-y-4"
             onSubmit={handleSubmit}
             onFinishFailed={onFinishFailed}
           >
-            <h1 className="text-lg font-bold mb-1">Personal Information</h1>
+            <h1 className="text-lg font-bold mb-4">Personal Details</h1>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">First Name</label>
-                  <Field name="firstName" as={Input} placeholder="John" />
-                  <ErrorMessage
-                    name="firstName"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <Field name="firstName" as={Input} placeholder="John" className="mt-1" />
+                  <ErrorMessage name="firstName" component="div" className="text-red-500" />
                 </div>
               </Col>
-
               <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Last Name</label>
-                  <Field name="lastName" as={Input} placeholder="Doe" />
-                  <ErrorMessage
-                    name="lastName"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">User Name</label>
-                  <Field name="username" as={Input} placeholder="john_doe" />
-                  <ErrorMessage
-                    name="username"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Password</label>
-                  <Field
-                    name="password"
-                    as={Input}
-                    placeholder="Strong Password"
-                    type="password"
-                  />
-                  <ErrorMessage
-                    name="password"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Email</label>
-                  <Field
-                    name="email"
-                    as={Input}
-                    placeholder="johndoe@example.com"
-                    type="email"
-                  />
-                  <ErrorMessage
-                    name="email"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Phone</label>
-                  <Field name="phone" as={Input} placeholder="1234567890" />
-                  <ErrorMessage
-                    name="phone"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <Field name="lastName" as={Input} placeholder="Doe" className="mt-1" />
+                  <ErrorMessage name="lastName" component="div" className="text-red-500" />
                 </div>
               </Col>
             </Row>
-
             <Row gutter={16}>
-              <Col span={24} className="mt-2">
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">Username</label>
+                  <Field name="username" as={Input} placeholder="john_doe" className="mt-1" />
+                  <ErrorMessage name="username" component="div" className="text-red-500" />
+                </div>
+              </Col>
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">Password</label>
+                  <Field name="password" as={Input.Password} placeholder="Strong Password" className="mt-1" />
+                  <ErrorMessage name="password" component="div" className="text-red-500" />
+                </div>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">Email</label>
+                  <Field name="email" as={Input} placeholder="johndoe@example.com" className="mt-1" />
+                  <ErrorMessage name="email" component="div" className="text-red-500" />
+                </div>
+              </Col>
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">Phone</label>
+                  <Field name="phone" as={Input} placeholder="1234567890" className="mt-1" />
+                  <ErrorMessage name="phone" component="div" className="text-red-500" />
+                </div>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Address</label>
-                  <Field name="address">
+                  <Field name="address" as={Input} placeholder="Enter Address" className="mt-1" />
+                  <ErrorMessage name="address" component="div" className="text-red-500" />
+                </div>
+              </Col>
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">Joining Date</label>
+                  <Field name="joiningDate">
                     {({ field }) => (
-                      <ReactQuill
-                        {...field}
-                        value={values.address}
-                        onChange={(value) => setFieldValue("address", value)}
-                        onBlur={() => setFieldTouched("address", true)}
-                        placeholder="Los Angeles"
+                      <DatePicker
+                        className="w-full mt-1"
+                        format="DD-MM-YYYY"
+                        onChange={(date) => setFieldValue("joiningDate", date)}
                       />
                     )}
                   </Field>
-                  <ErrorMessage
-                    name="address"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <ErrorMessage name="joiningDate" component="div" className="text-red-500" />
                 </div>
               </Col>
             </Row>
-
             <Row gutter={16}>
-              <Col span={12} className="mt-2">
+              <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold"> Joining Date</label>
-                  <DatePicker
-                    className="w-full"
-                    format="DD-MM-YYYY"
-                    value={values.joiningDate}
-                    onChange={(joiningDate) =>
-                      setFieldValue("joiningDate", joiningDate)
-                    }
-                    onBlur={() => setFieldTouched("joiningDate", true)}
-                  />
-                  <ErrorMessage
-                    name="joiningDate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <label className="font-semibold">Leave Date</label>
+                  <Field name="leaveDate">
+                    {({ field }) => (
+                      <DatePicker
+                        className="w-full mt-1"
+                        format="DD-MM-YYYY"
+                        onChange={(date) => setFieldValue("leaveDate", date)}
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage name="leaveDate" component="div" className="text-red-500" />
                 </div>
               </Col>
-
-              <Col span={12} className="mt-2">
+              <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold"> Leave Date</label>
-                  <DatePicker
-                    className="w-full"
-                    format="DD-MM-YYYY"
-                    value={values.leaveDate}
-                    onChange={(leaveDate) =>
-                      setFieldValue("leaveDate", leaveDate)
-                    }
-                    onBlur={() => setFieldTouched("leaveDate", true)}
-                  />
-                  <ErrorMessage
-                    name="leaveDate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <label className="font-semibold">Department</label>
+                  <Field name="department">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-1"
+                        placeholder="Select Department"
+                        onChange={(value) => setFieldValue("department", value)}
+                      >
+                        {departmentData.map((dept) => (
+                          <Option key={dept.id} value={dept.id}>
+                            {dept.department_name}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage name="department" component="div" className="text-red-500" />
                 </div>
-              </Col>
-
-              {/* <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Employee ID</label>
-                  <Field name="employeeId" as={Input} placeholder="OE-012" />
-                  <ErrorMessage
-                    name="employeeId"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
-
-              <Col span={12} className="mt-2">
-              <div className="form-item">
-            <label className="font-semibold">Department</label>
-            <Field name="department">
-              {({ field }) => (
-                <Select
-                  {...field}
-                  className="w-full"
-                  placeholder="Select Department"
-                  onChange={(value) => setFieldValue("department", value)}
-                  value={values.department}
-                  onBlur={() => setFieldTouched("department", true)}
-                >
-                  {departmentData.map((dept) => (
-                    <Option key={dept.id} value={dept.id}>
-                      {dept.department_name}
-                    </Option>
-                  ))}
-                </Select>
-              )}
-            </Field>
-            <ErrorMessage
-              name="department"
-              component="div"
-              className="error-message text-red-500 my-1"
-            />
-          </div>
               </Col>
             </Row>
-
-            
-              <Col span={12} className="mt-2">
-              <div className="form-item">
-            <label className="font-semibold">Designation</label>
-            <Field name="designation">
-              {({ field }) => (
-                <Select
-                  {...field}
-                  className="w-full"
-                  placeholder="Select Designation"
-                  onChange={(value) => setFieldValue("designation", value)}
-                  value={values.designation}
-                  onBlur={() => setFieldTouched("designation", true)}
-                >
-                  {designationData.map((des) => (
-                    <Option key={des.id} value={des.id}>
-                      {des.designation_name}
-                    </Option>
-                  ))}
-                </Select>
-              )}
-            </Field>
-            <ErrorMessage
-              name="designation"
-              component="div"
-              className="error-message text-red-500 my-1"
-            />
-          </div>
+            <Row gutter={16}>
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">Designation</label>
+                  <Field name="designation">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-1"
+                        placeholder="Select Designation"
+                        onChange={(value) => setFieldValue("designation", value)}
+                      >
+                        {designationData.map((des) => (
+                          <Option key={des.id} value={des.id}>
+                            {des.designation_name}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage name="designation" component="div" className="text-red-500" />
+                </div>
               </Col>
-              <Row gutter={16} className="mt-2">
-              <Col span={12} className="mt-2">
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Salary</label>
-                  <Field
-                    name="salary"
-                    as={Input}
-                    placeholder="$"
-                    type="number"
-                  />
-                  <ErrorMessage
-                    name="salary"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <Field name="salary" as={Input} placeholder="$" type="number" className="mt-1" />
+                  <ErrorMessage name="salary" component="div" className="text-red-500" />
                 </div>
               </Col>
             </Row>
-
-            <h1 className="text-lg font-bold mb-3 mt-2">Bank Details</h1>
-
+            <h1 className="text-lg font-bold mb-3 mt-4">Bank Details</h1>
             <Row gutter={16}>
-              <Col span={12} className="mt-2">
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Account Holder Name</label>
-                  <Field
-                    name="accountholder"
-                    as={Input}
-                    placeholder="John Doe"
-                    type="string"
-                  />
-                  <ErrorMessage
-                    name="accountholder"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <Field name="accountholder" as={Input} placeholder="John Doe" className="mt-1" />
+                  <ErrorMessage name="accountholder" component="div" className="text-red-500" />
                 </div>
               </Col>
-
-              <Col span={12} className="mt-2">
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Account Number</label>
-                  <Field
-                    name="accountnumber"
-                    as={Input}
-                    placeholder="123456789"
-                    type="number"
-                  />
-                  <ErrorMessage
-                    name="accountnumber"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Bank Name</label>
-                  <Field
-                    name="bankname"
-                    as={Input}
-                    placeholder="Bank Name"
-                    type="string"
-                  />
-                  <ErrorMessage
-                    name="bankname"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">IFSC</label>
-                  <Field
-                    name="ifsc"
-                    as={Input}
-                    placeholder="IFSC"
-                    type="number"
-                  />
-                  <ErrorMessage
-                    name="ifsc"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Bank Location</label>
-                  <Field
-                    name="banklocation"
-                    as={Input}
-                    placeholder="Bank Location"
-                    type="string"
-                  />
-                  <ErrorMessage
-                    name="banklocation"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <Field name="accountnumber" as={Input} placeholder="123456789" type="number" className="mt-1" />
+                  <ErrorMessage name="accountnumber" component="div" className="text-red-500" />
                 </div>
               </Col>
             </Row>
-
-            {/* <h1 className="text-lg font-bold mb-3">Document</h1> */}
-
-            <div className="text-right">
-              <Button
-                type="default"
-                className="mr-2"
-                onClick={() => onClose()} // Clear all fields
-              >
+            <Row gutter={16}>
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">Bank Name</label>
+                  <Field name="bankname" as={Input} placeholder="Bank Name" className="mt-1" />
+                  <ErrorMessage name="bankname" component="div" className="text-red-500" />
+                </div>
+              </Col>
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">IFSC</label>
+                  <Field name="ifsc" as={Input} placeholder="IFSC" className="mt-1" />
+                  <ErrorMessage name="ifsc" component="div" className="text-red-500" />
+                </div>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">Bank Location</label>
+                  <Field name="banklocation" as={Input} placeholder="Bank Location" className="mt-1" />
+                  <ErrorMessage name="banklocation" component="div" className="text-red-500" />
+                </div>
+              </Col>
+            </Row>
+            <div className="text-right mt-4">
+              <Button type="default" className="mr-2" onClick={() => onClose()}>
                 Cancel
               </Button>
               <Button type="primary" htmlType="submit" onClick={onOpenOtpModal}>
                 <button type="submit" disabled={isSubmitting}>
                   {isSubmitting ? "Submitting..." : "Submit"}
                 </button>
-                {/* Submit */}
               </Button>
             </div>
           </Form>
@@ -530,9 +371,9 @@ useEffect(() => {
       </Formik>
       <Modal
         title="Verify OTP"
-        visible={showOtpModal} // Control visibility based on showOtpModal state
-        onCancel={onCloseOtpModal} // Close OTP modal
-        footer={null} // Remove footer buttons
+        visible={showOtpModal}
+        onCancel={onCloseOtpModal}
+        footer={null}
         centered
       >
         <div className="p-4 rounded-lg bg-white">
@@ -546,7 +387,7 @@ useEffect(() => {
             placeholder="Enter OTP"
             className="mt-4 p-3 border border-gray-300 rounded-md"
             style={{ width: "100%" }}
-            onChange={(e) => setOtp(e.target.value)} // Update OTP in state
+            onChange={(e) => setOtp(e.target.value)}
           />
           <div className="mt-4">
             <Button type="primary" className="w-full" onClick={handleOtpVerify}>

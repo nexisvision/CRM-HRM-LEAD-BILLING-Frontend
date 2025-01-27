@@ -35,12 +35,12 @@ const AddJobOnBoarding = ({ onClose }) => {
 
       dispatch(AddJobonBoarding(data)).then(() => {
         dispatch(getJobonBoarding());
-        message.success("Job Candidate added successfully!");
+        message.success("Job Boarding added successfully!");
         resetForm();
         onClose();
       });
     } catch (error) {
-      message.error("Failed to add job candidate. Please try again.");
+      message.error("Failed to add job boarding. Please try again.");
       console.error(error);
     }
   };

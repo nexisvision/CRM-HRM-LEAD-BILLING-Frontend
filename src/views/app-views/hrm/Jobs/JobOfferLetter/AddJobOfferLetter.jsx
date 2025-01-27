@@ -122,7 +122,7 @@ const AddJobOfferLetter = ({ onClose }) => {
 
   return (
     <div>
-      <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+      <hr style={{  border: "1px solid #E8E8E8" }} />
 
       <Formik
         initialValues={initialValues}
@@ -152,7 +152,7 @@ const AddJobOfferLetter = ({ onClose }) => {
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-2"
                         placeholder="Select job"
                         loading={!fnddatass}
                         onChange={(value) => setFieldValue("job", value)}
@@ -188,7 +188,7 @@ const AddJobOfferLetter = ({ onClose }) => {
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-2"
                         placeholder="Select job application"
                         loading={!fnddata}
                         onChange={(value) =>
@@ -221,7 +221,7 @@ const AddJobOfferLetter = ({ onClose }) => {
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label >Offer Expire On</label>
+                  <label className="font-semibold">Offer Expire On</label>
                   <DatePicker
                     className="w-full mt-2"
                     format="DD-MM-YYYY"
@@ -239,7 +239,7 @@ const AddJobOfferLetter = ({ onClose }) => {
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label >Expected Joining Date</label>
+                  <label className="font-semibold" >Expected Joining Date</label>
                  
                   <DatePicker
                     className="w-full mt-2"
@@ -262,7 +262,7 @@ const AddJobOfferLetter = ({ onClose }) => {
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label >Salary</label>
+                  <label className="font-semibold" >Salary</label>
                   <Field
                   className="mt-2"
                     name="salary"
@@ -279,9 +279,9 @@ const AddJobOfferLetter = ({ onClose }) => {
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label>Rate</label>
+                  <label className="font-semibold">Rate</label>
                   <Field
-                  className="mt-2"
+                  className="mt-2 w-full"
                     name="rate"
                     as={Input}
                     placeholder="Enter Rate"
@@ -296,9 +296,9 @@ const AddJobOfferLetter = ({ onClose }) => {
 
               <Col span={24}>
                 <div className="form-item mt-2">
-                  <label >Description</label>
+                  <label className="font-semibold">Description</label>
                   <ReactQuill
-                    className="mt-2"
+                    className="mt-2 w-full" 
                     value={values.description}
                     onChange={(value) => setFieldValue("description", value)}
                     onBlur={() => setFieldTouched("description", true)}
@@ -314,7 +314,7 @@ const AddJobOfferLetter = ({ onClose }) => {
               </Col>
 
               <div className="mt-2 w-full">
-                <span className="block p-2">Add File</span>
+                <span className="block p-2 font-semibold">Add File</span>
                 <Col span={24}>
                   <Upload
                     listType="picture"

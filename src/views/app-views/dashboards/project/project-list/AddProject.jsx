@@ -94,7 +94,7 @@ const AddProject = ({ onClose }) => {
     startDate: Yup.date().nullable().required("Start date is required."),
     endDate: Yup.date().nullable().required("End date is required."),
     // projectimage: Yup.mixed().required("Please upload a Project Image."),
-    // client: Yup.string().required("Please select Client."),
+    client: Yup.string().required("Please select Client."),
     user: Yup.string().required("Please select User."),
     budget: Yup.number()
       .required("Please enter a Project Budget.")

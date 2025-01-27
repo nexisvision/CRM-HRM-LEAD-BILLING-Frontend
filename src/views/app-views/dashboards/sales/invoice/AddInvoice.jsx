@@ -576,7 +576,7 @@ const AddInvoice = ({ onClose }) => {
           </div>
         </Card>
 
-        <div className="form-buttons text-right">
+        <div className="form-buttons text-right mt-4">
           <Button type="default" className="mr-2" onClick={onClose}>
             Cancel
           </Button>

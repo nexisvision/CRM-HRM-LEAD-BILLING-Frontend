@@ -36,7 +36,7 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
     ? [...tasks].sort((a, b) => moment(a.taskDate).valueOf() - moment(b.taskDate).valueOf())
     : [];
 
-  console.log("Sorted Tasks: ", sortedTasks);  // Debugging task data
+  console.log("Sorted Tasks: ", sortedTasks);
 
   const handleDelete = (task) => {
     Modal.confirm({
@@ -54,8 +54,8 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(GetTaskdata())
-  }, [])
+    dispatch(GetTaskdata());
+  }, []);
 
   const allTaskData = useSelector((state) => state.TaskCalander);
   const taskData = allTaskData?.TaskCalander.data || [];
@@ -64,31 +64,30 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
 
   return (
     <div className="sidebar-tasks">
-    <h4 className="mb-3">Upcoming Tasks</h4>
-    {taskData.length === 0 ? (
-      <div className="text-muted">No tasks scheduled</div>
-    ) : (
-      taskData.map((task) => (
-        <div key={task.id} className="task-card-wrapper">
-          <div className="task-card mb-3" style={{ borderLeft: `4px solid ${task.color || '#007bff'}`, paddingLeft: '12px' }}>
-            <h5 className="task-card-title">{task.taskName}</h5>
-            <div className="task-card-time">
-              <div>{moment(task.taskDate).format('MMM DD, YYYY')}</div>
-              <div className="text-muted">
-                {moment(task.taskDate).format('HH:mm')} - {moment(task.taskTime, 'HH:mm').format('HH:mm')}
+      <h4 className="mb-3">Upcoming Tasks</h4>
+      {taskData.length === 0 ? (
+        <div className="text-muted">No tasks scheduled</div>
+      ) : (
+        taskData.map((task) => (
+          <div key={task.id} className="task-card-wrapper">
+            <div className="task-card mb-3" style={{ borderLeft: `4px solid ${task.color || '#007bff'}`, paddingLeft: '12px' }}>
+              <h5 className="task-card-title">{task.taskName}</h5>
+              <div className="task-card-time">
+                <div>{moment(task.taskDate).format('MMM DD, YYYY')}</div>
+                <div className="text-muted">
+                  {moment(task.taskDate).format('HH:mm')} - {moment(task.taskTime, 'HH:mm').format('HH:mm')}
+                </div>
+              </div>
+              <div className="task-card-actions">
+                <Tooltip title="Delete task">
+                  <DeleteOutlined onClick={() => handleDelete(task)} className="delete-icon" />
+                </Tooltip>
               </div>
             </div>
-            <div className="task-card-actions">
-              <Tooltip title="Delete task">
-                <DeleteOutlined onClick={() => handleDelete(task)} className="delete-icon" />
-              </Tooltip>
-            </div>
           </div>
-        </div>
-      ))
-    )}
-  </div>
-  
+        ))
+      )}
+    </div>
   );
 };
 
@@ -111,17 +110,17 @@ const TaskModal = ({ open, addTask, cancel }) => {
       onCancel={cancel}
     >
       <Form form={form} layout="vertical" name="new-task" preserve={false} onFinish={onSubmit}>
-        <Form.Item name="title" label="Title">
+        <Form.Item name="title" label="Title" rules={[{ required: true, message: 'Please input the task title!' }]}>
           <Input autoComplete="off" />
         </Form.Item>
         <Row gutter="16">
           <Col span={12}>
-            <Form.Item name="start" label="Start">
+            <Form.Item name="start" label="Start" rules={[{ required: true, message: 'Please select start time!' }]}>
               <TimePicker className="w-100" />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item name="end" label="End">
+            <Form.Item name="end" label="End" rules={[{ required: true, message: 'Please select end time!' }]}>
               <TimePicker className="w-100" />
             </Form.Item>
           </Col>
@@ -152,8 +151,8 @@ const TaskModal = ({ open, addTask, cancel }) => {
 
 const TaskCalendarApp = () => {
   const dispatch = useDispatch();
-  const allTaskData = useSelector((state) => state.task);
-  const taskData = allTaskData?.tasks || [];
+  const allTaskData = useSelector((state) => state.TaskCalander);
+  const taskData = allTaskData?.TaskCalander.data || [];
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [form] = Form.useForm();
@@ -162,62 +161,63 @@ const TaskCalendarApp = () => {
     dispatch(GetTaskdata());
   }, [dispatch]);
 
+  const cellRender = (value) => {
+    const currentDate = value.format('YYYY-MM-DD');
+    const listData = taskData.filter(task => moment(task.taskDate).format('YYYY-MM-DD') === currentDate);
+
+    return (
+      <ul className="calendar-task">
+        {listData.length > 0 ? (
+          listData.map((task) => (
+            <li key={task.id}>
+              <Badge color={task.color} text={task.taskName} />
+              <Tooltip title="Delete task">
+                <DeleteOutlined onClick={() => onDeleteTask(task.id)} className="delete-icon" />
+              </Tooltip>
+            </li>
+          ))
+        ) : (
+          <li>No tasks</li>
+        )}
+      </ul>
+    );
+  };
+
   const onDeleteTask = async (taskId) => {
     try {
       await dispatch(DeleteTask(taskId));
-      await dispatch(GetTaskdata());
       message.success('Task deleted successfully');
+      dispatch(GetTaskdata());
     } catch (error) {
       message.error('Failed to delete task');
-      console.error('Delete error:', error);
     }
+  };
+
+  const handleDateSelect = (date) => {
+    setSelectedDate(date.format('YYYY-MM-DD'));
+    setModalVisible(true);
   };
 
   const onAddTask = async (values) => {
     try {
       const taskData = {
         taskName: values.title,
-        taskDate: moment(selectedDate).format('M/D/YYYY'),  // Format as "1/12/2025"
+        taskDate: selectedDate,
         taskTime: moment(selectedDate).set({
           hour: values.start.hour(),
           minute: values.start.minute(),
-        }).format('H:mm'),  // Format as "2:10"
+        }).format('H:mm'),
         taskDescription: values.taskDescription,
       };
 
       await dispatch(AddTask(taskData));
-      await dispatch(GetTaskdata());
+      dispatch(GetTaskdata());
       setModalVisible(false);
       form.resetFields();
       message.success('Task added successfully');
     } catch (error) {
       message.error('Failed to add task');
-      console.error('Add task error:', error);
     }
-  };
-
-  // Adjusted cellRender to show task names under each date
-  const cellRender = (value) => {
-    const currentDate = value.format('YYYY-MM-DD');
-    const listData = taskData.filter((task) => {
-      const taskDate = moment(task.taskDate).format('YYYY-MM-DD');
-      return taskDate === currentDate;
-    });
-
-    return (
-      <ul className="calendar-task">
-        {listData.map((task) => (
-          <li key={task.id}>
-            <Badge color={task.color} text={task.taskName} />
-          </li>
-        ))}
-      </ul>
-    );
-  };
-
-  const handleDateSelect = (date) => {
-    setSelectedDate(date.format('YYYY-MM-DD'));
-    setModalVisible(true);
   };
 
   return (
@@ -228,13 +228,15 @@ const TaskCalendarApp = () => {
       </div>
       <div className="calendar-container">
         <Card className="mb-4">
-          <Calendar cellRender={cellRender} onSelect={handleDateSelect} />
+          <Calendar
+            cellRender={cellRender}
+            onSelect={handleDateSelect}
+          />
         </Card>
       </div>
     </div>
   );
 };
-
 
 const styles = `
   .task-calendar-container {

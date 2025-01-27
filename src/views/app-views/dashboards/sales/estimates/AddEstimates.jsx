@@ -605,7 +605,7 @@ const AddEstimates = ({ onClose }) => {
               </div>
             </div>
 
-            <Form.Item className="mt-4">
+            <Form.Item className="mt-2">
               <Row justify="end" gutter={16}>
                 <Col>
                   <Button

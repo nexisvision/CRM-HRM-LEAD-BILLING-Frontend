@@ -34,10 +34,10 @@ const AddProjectMember = ({ onClose }) => {
   const [showReceiptUpload, setShowReceiptUpload] = useState(false);
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const initialValues = {
-    project_members: "",
+    project_members: [],
   };
   const validationSchema = Yup.object({
-    project_members: Yup.string().required(
+    project_members: Yup.array().required(
       "Please enter AddProjectMember name."
     ),
   });

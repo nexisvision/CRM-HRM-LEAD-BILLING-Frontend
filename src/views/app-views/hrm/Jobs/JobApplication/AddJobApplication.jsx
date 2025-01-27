@@ -26,7 +26,7 @@ const AddJobApplication = ({ onClose }) => {
       dispatch(Addjobapplication(values)).then(() => {
         dispatch(getjobapplication());
         onClose();
-        message.success("Form submitted successfully");
+        // message.success("Form submitted successfully");
       });
       message.success("Job application added successfully!");
     } catch (error) {
@@ -87,14 +87,14 @@ const AddJobApplication = ({ onClose }) => {
             <Row gutter={16}>
               {/* Job */}
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="">
                 <div className="form-item">
                   <label className="font-semibold">job</label>
                   <Field name="job">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-2"
                         placeholder="Select job"
                         loading={!fnddata} // Loading state
                         onChange={(value) => setFieldValue("job", value)}
@@ -126,7 +126,7 @@ const AddJobApplication = ({ onClose }) => {
               <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Name</label>
-                  <Field name="name" as={Input} placeholder="Enter Name" />
+                  <Field name="name" as={Input} placeholder="Enter Name"  className="w-full mt-2"/>
                   <ErrorMessage
                     name="name"
                     component="div"
@@ -136,9 +136,9 @@ const AddJobApplication = ({ onClose }) => {
               </Col>
               {/* Email */}
               <Col span={12}>
-                <div className="form-item">
+                <div className="form-item mt-2">
                   <label className="font-semibold">Email</label>
-                  <Field name="email" as={Input} placeholder="Enter Email" />
+                  <Field name="email" as={Input} placeholder="Enter Email"  className="w-full mt-2"/>
                   <ErrorMessage
                     name="email"
                     component="div"
@@ -148,9 +148,9 @@ const AddJobApplication = ({ onClose }) => {
               </Col>
               {/* Phone */}
               <Col span={12}>
-                <div className="form-item">
+                <div className="form-item mt-2">
                   <label className="font-semibold">Phone</label>
-                  <Field name="phone" as={Input} placeholder="Enter Phone" />
+                  <Field name="phone" as={Input} placeholder="Enter Phone"  className="w-full mt-2" />
                   <ErrorMessage
                     name="phone"
                     component="div"
@@ -160,9 +160,10 @@ const AddJobApplication = ({ onClose }) => {
               </Col>
               {/* Location */}
               <Col span={12}>
-                <div className="form-item">
+                <div className="form-item mt-2">
                   <label className="font-semibold">Location</label>
                   <Field
+                   className="w-full mt-2"
                     name="location"
                     as={Input}
                     placeholder="Enter Location"
@@ -176,15 +177,16 @@ const AddJobApplication = ({ onClose }) => {
               </Col>
               {/* Total Experience */}
               <Col span={12}>
-                <div className="form-item">
+                <div className="form-item mt-2">
                   <label className="font-semibold">Total Experience</label>
                   <Select
+                   className="w-full mt-2"
                     placeholder="Select Total Experience"
                     value={values.total_experience}
                     onChange={(value) =>
                       setFieldValue("total_experience", value)
                     }
-                    className="w-full"
+                  
                   >
                     <Option value="0-1">0-1 Years</Option>
                     <Option value="1-3">1-3 Years</Option>
@@ -200,9 +202,10 @@ const AddJobApplication = ({ onClose }) => {
               </Col>
               {/* Current Location */}
               <Col span={12}>
-                <div className="form-item">
+                <div className="form-item mt-2">
                   <label className="font-semibold">Current Location</label>
                   <Field
+                   className="w-full mt-2"
                     name="current_location"
                     as={Input}
                     placeholder="Enter Current Location"
@@ -216,13 +219,13 @@ const AddJobApplication = ({ onClose }) => {
               </Col>
               {/* Notice Period */}
               <Col span={12}>
-                <div className="form-item">
+                <div className="form-item mt-2">
                   <label className="font-semibold">Notice Period</label>
                   <Select
                     placeholder="Select Notice Period"
                     value={values.notice_period}
                     onChange={(value) => setFieldValue("notice_period", value)}
-                    className="w-full"
+                     className="w-full mt-2"
                   >
                     <Option value="immediate">Immediate</Option>
                     <Option value="15 days">15 Days</Option>
@@ -238,9 +241,10 @@ const AddJobApplication = ({ onClose }) => {
               </Col>
               {/* Status */}
               <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Status</label>
+                <div className="form-item mt-2">
+                  <label className="font-semibold grid grid-cols-1">Status</label>
                   <Radio.Group
+                   className="w-full mt-2"
                     value={values.status}
                     onChange={(e) => setFieldValue("status", e.target.value)}
                   >
@@ -256,9 +260,10 @@ const AddJobApplication = ({ onClose }) => {
               </Col>
               {/* Applied Source */}
               <Col span={12}>
-                <div className="form-item">
+                <div className="form-item mt-2">
                   <label className="font-semibold">Applied Sources</label>
                   <Field
+                   className="w-full mt-2"
                     name="applied_source"
                     as={Input}
                     placeholder="Enter Applied Sources"
@@ -272,9 +277,10 @@ const AddJobApplication = ({ onClose }) => {
               </Col>
               {/* Cover Letter */}
               <Col span={24}>
-                <div className="form-item">
+                <div className="form-item mt-2">
                   <label className="font-semibold">Cover Letter</label>
                   <ReactQuill
+                   className="w-full mt-2"
                     value={values.cover_letter}
                     onChange={(value) => setFieldValue("cover_letter", value)}
                     onBlur={() => setFieldTouched("cover_letter", true)}
