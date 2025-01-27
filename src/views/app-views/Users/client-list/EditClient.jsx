@@ -1,36 +1,30 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Input,
   Button,
-  DatePicker,
-  Select,
   message,
   Row,
   Col,
-  TimePicker,
 } from "antd";
 import { useNavigate } from "react-router-dom";
-import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
-// import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
-// import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
-// import { AddMeet, MeetData } from "./MeetingReducer/MeetingSlice";
+import { ClientData, Editclient } from "./CompanyReducers/CompanySlice";
+import { getDept } from "views/app-views/hrm/Department/DepartmentReducers/DepartmentSlice";
+import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 
-const { Option } = Select;
-
-const EditClient = ({ onClose }) => {
+const EditClient = ({ comnyid, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // useEffect(() => {
-  //   dispatch(empdata());
-  // }, [dispatch]);
+  useEffect(() => {
+    dispatch(empdata());
+  }, [dispatch]);
 
-  // useEffect(() => {
-  //   dispatch(getDept());
-  // }, [dispatch]);
+  useEffect(() => {
+    dispatch(getDept());
+  }, [dispatch]);
 
   const AllDepart = useSelector((state) => state.Department);
   const datadept = AllDepart.Department.data;
@@ -38,14 +32,53 @@ const EditClient = ({ onClose }) => {
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data;
 
-  const onSubmit = (values, { resetForm }) => {
+  useEffect(() => {
+    dispatch(ClientData());
+  }, []);
 
+  const AllSubClient = useSelector((state) => state.SubClient);
+  const fnddatas = AllSubClient.SubClient.data;
+
+  useEffect(() => {
+    const clientData = fnddatas.find((item) => item.id === comnyid);
+
+    if (clientData) {
+      setInitialValues({
+        firstName: clientData.firstName || "",
+        lastName: clientData.lastName || "",
+        bankname: clientData.bankname || "",
+        ifsc: clientData.ifsc || "",
+        banklocation: clientData.banklocation || "",
+        accountholder: clientData.accountholder || "",
+        accountnumber: clientData.accountnumber || "",
+        e_signature: clientData.e_signature || "",
+        gstIn: clientData.gstIn || "",
+        city: clientData.City || "",
+        state: clientData.State || "",
+        country: clientData.Country || "",
+        zipcode: clientData.Zipcode || "",
+        address: clientData.address || "",
+      });
+    }
+  }, [fnddatas]);
+
+  const onSubmit = async (values, { resetForm }) => {
+    try {
+      console.log("Form values:", values); // Debugging
+      await dispatch(Editclient({ comnyid, values }));
+      dispatch(ClientData());
+      message.success("Client edited successfully");
+      resetForm();
+      onClose();
+    } catch (error) {
+      console.error("Error during submit:", error);
+      message.error("Failed to edit client");
+    }
   };
 
-  const initialValues = {
+  const [initialValues,setInitialValues] =  useState({
     firstName: "",
     lastName: "",
-    profilePic: "",
     bankname: "",
     ifsc: "",
     banklocation: "",
@@ -58,32 +91,23 @@ const EditClient = ({ onClose }) => {
     country: "",
     zipcode: "",
     address: "",
-
-
-
-
-  };
+  })
 
   const validationSchema = Yup.object({
-    firstName: Yup.string().required("Please Select a FirstName."),
-    lastName: Yup.string().required("Please select an LastName."),
-    profilePic: Yup.string().required("Please enter a ProfilePic."),
-    bankname: Yup.string().required("Please enter a Bankname."),
-    ifsc: Yup.string().required("Please enter a Ifsc."),
-    banklocation: Yup.string().required("Please enter a Banklocation."),
-    accountholder: Yup.string().required("Please enter a Accountholder."),
-    accountnumber: Yup.string().required("Please enter a Accountnumber."),
+    firstName: Yup.string().required("Please enter a First Name."),
+    lastName: Yup.string().required("Please enter a Last Name."),
+    bankname: Yup.string().required("Please enter a Bank Name."),
+    ifsc: Yup.string().required("Please enter an IFSC."),
+    banklocation: Yup.string().required("Please enter a Bank Location."),
+    accountholder: Yup.string().required("Please enter an Account Holder."),
+    accountnumber: Yup.string().required("Please enter an Account Number."),
     e_signature: Yup.string().required("Please enter a Signature."),
-    gstIn: Yup.string().required("Please enter a GstIn."),
+    gstIn: Yup.string().required("Please enter a GSTIN."),
     city: Yup.string().required("Please enter a City."),
     state: Yup.string().required("Please enter a State."),
     country: Yup.string().required("Please enter a Country."),
     zipcode: Yup.string().required("Please enter a Zipcode."),
-    address: Yup.string().required("Please enter a Address."),
-
-
-
-
+    address: Yup.string().required("Please enter an Address."),
   });
 
   return (
@@ -92,26 +116,27 @@ const EditClient = ({ onClose }) => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
-        validateOnSubmit={true} // Ensure validation on submit
+        enableReinitialize
+        validateOnSubmit={true}
       >
         {({
           values,
-          setFieldValue,
           handleSubmit,
-          setFieldTouched,
           isSubmitting,
           isValid,
           dirty,
         }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
             <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
-
             <Row gutter={16}>
-
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">First Name</label>
-                  <Field name="firstName" as={Input} placeholder="Enter First Name" />
+                  <Field
+                    name="firstName"
+                    as={Input}
+                    placeholder="Enter First Name"
+                  />
                   <ErrorMessage
                     name="firstName"
                     component="div"
@@ -123,7 +148,11 @@ const EditClient = ({ onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Last Name</label>
-                  <Field name="lastName" as={Input} placeholder="Enter Last Name" />
+                  <Field
+                    name="lastName"
+                    as={Input}
+                    placeholder="Enter Last Name"
+                  />
                   <ErrorMessage
                     name="lastName"
                     component="div"
@@ -132,23 +161,14 @@ const EditClient = ({ onClose }) => {
                 </div>
               </Col>
 
-
-              {/* <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Profile Pic</label>
-                  <Field name="profilePic" as={Input} placeholder="Enter  Profile Pic" />
-                  <ErrorMessage
-                    name="profilePic"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
-
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Bank Name</label>
-                  <Field name="bankname" as={Input} placeholder="Enter  Bank Name" />
+                  <Field
+                    name="bankname"
+                    as={Input}
+                    placeholder="Enter Bank Name"
+                  />
                   <ErrorMessage
                     name="bankname"
                     component="div"
@@ -159,8 +179,13 @@ const EditClient = ({ onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Ifsc</label>
-                  <Field name="ifsc" as={Input} placeholder="Enter  Ifsc" type="number" />
+                  <label className="font-semibold">IFSC</label>
+                  <Field
+                    name="ifsc"
+                    as={Input}
+                    placeholder="Enter IFSC"
+                    type="string"
+                  />
                   <ErrorMessage
                     name="ifsc"
                     component="div"
@@ -172,7 +197,11 @@ const EditClient = ({ onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Bank Location</label>
-                  <Field name="banklocation" as={Input} placeholder="Enter  Bank Location" />
+                  <Field
+                    name="banklocation"
+                    as={Input}
+                    placeholder="Enter Bank Location"
+                  />
                   <ErrorMessage
                     name="banklocation"
                     component="div"
@@ -184,7 +213,11 @@ const EditClient = ({ onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Account Holder</label>
-                  <Field name="accountholder" as={Input} placeholder="Enter  Account Holder" />
+                  <Field
+                    name="accountholder"
+                    as={Input}
+                    placeholder="Enter Account Holder"
+                  />
                   <ErrorMessage
                     name="accountholder"
                     component="div"
@@ -196,7 +229,12 @@ const EditClient = ({ onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Account Number</label>
-                  <Field name="accountnumber" as={Input} placeholder="Enter  Account Number" type="number" />
+                  <Field
+                    name="accountnumber"
+                    as={Input}
+                    placeholder="Enter Account Number"
+                    type="number"
+                  />
                   <ErrorMessage
                     name="accountnumber"
                     component="div"
@@ -208,7 +246,11 @@ const EditClient = ({ onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Signature</label>
-                  <Field name="e_signature" as={Input} placeholder="Enter  Signature" />
+                  <Field
+                    name="e_signature"
+                    as={Input}
+                    placeholder="Enter Signature"
+                  />
                   <ErrorMessage
                     name="e_signature"
                     component="div"
@@ -219,8 +261,12 @@ const EditClient = ({ onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">GstIn</label>
-                  <Field name="gstIn" as={Input} placeholder="Enter  GstIn" />
+                  <label className="font-semibold">GSTIN</label>
+                  <Field
+                    name="gstIn"
+                    as={Input}
+                    placeholder="Enter GSTIN"
+                  />
                   <ErrorMessage
                     name="gstIn"
                     component="div"
@@ -232,7 +278,11 @@ const EditClient = ({ onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">City</label>
-                  <Field name="city" as={Input} placeholder="Enter  City" />
+                  <Field
+                    name="city"
+                    as={Input}
+                    placeholder="Enter City"
+                  />
                   <ErrorMessage
                     name="city"
                     component="div"
@@ -244,7 +294,11 @@ const EditClient = ({ onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">State</label>
-                  <Field name="state" as={Input} placeholder="Enter  State" />
+                  <Field
+                    name="state"
+                    as={Input}
+                    placeholder="Enter State"
+                  />
                   <ErrorMessage
                     name="state"
                     component="div"
@@ -256,7 +310,11 @@ const EditClient = ({ onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Country</label>
-                  <Field name="country" as={Input} placeholder="Enter  Country" />
+                  <Field
+                    name="country"
+                    as={Input}
+                    placeholder="Enter Country"
+                  />
                   <ErrorMessage
                     name="country"
                     component="div"
@@ -268,7 +326,12 @@ const EditClient = ({ onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Zipcode</label>
-                  <Field name="zipcode" as={Input} placeholder="Enter  Zipcode" type="number" />
+                  <Field
+                    name="zipcode"
+                    as={Input}
+                    placeholder="Enter Zipcode"
+                    type="string"
+                  />
                   <ErrorMessage
                     name="zipcode"
                     component="div"
@@ -280,7 +343,11 @@ const EditClient = ({ onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Address</label>
-                  <Field name="address" as={Input} placeholder="Enter  address" />
+                  <Field
+                    name="address"
+                    as={Input}
+                    placeholder="Enter Address"
+                  />
                   <ErrorMessage
                     name="address"
                     component="div"
@@ -294,8 +361,12 @@ const EditClient = ({ onClose }) => {
               <Button type="default" className="mr-2" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit">
-                Create
+              <Button
+                type="primary"
+                htmlType="submit"
+                disabled={!isValid || !dirty}
+              >
+                Save Changes
               </Button>
             </div>
           </Form>

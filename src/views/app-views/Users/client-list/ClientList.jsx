@@ -102,11 +102,7 @@ const ClientList = () => {
     }
   }, [tabledata, loggedInUser]);
 
-  // useEffect(() => {
-  //   if (tabledata && tabledata.ClientData && tabledata.ClientData.data) {
-  //     setUsers(tabledata.ClientData.data);
-  //   }
-  // }, [tabledata]);
+
 
   const companyStatusList = ["active", "blocked"];
 
@@ -263,9 +259,9 @@ const ClientList = () => {
 
   const tableColumns = [
     {
-      title: "Company",
-      dataIndex: "company",
-      sorter: (a, b) => a.company.length - b.company.length,
+      title: "username",
+      dataIndex: "username",
+      sorter: (a, b) => a.username.length - b.username.length,
     },
     {
       title: "Client",
@@ -282,40 +278,16 @@ const ClientList = () => {
       sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
-      title: "Pending Project",
-      dataIndex: "pendingprojects",
-      sorter: (a, b) => a.pendingprojects.length - b.pendingprojects.length,
+      title: "created_by",
+      dataIndex: "created_by",
+      sorter: (a, b) => a.created_by.length - b.created_by.length,
     },
     {
-      title: "Tags",
-      dataIndex: "tags",
-      sorter: (a, b) => a.tags.length - b.tags.length,
+      title: "createdAt",
+      dataIndex: "createdAt",
+      sorter: (a, b) => a.createdAt.length - b.createdAt.length,
     },
-    {
-      title: "Invoices",
-      dataIndex: "invoices",
-      sorter: (a, b) => a.invoices.length - b.invoices.length,
-    },
-    {
-      title: "Category",
-      dataIndex: "category",
-      sorter: (a, b) => a.category.length - b.category.length,
-    },
-    {
-      title: "Last online",
-      dataIndex: "lastOnline",
-      sorter: (a, b) => dayjs(a.lastOnline).unix() - dayjs(b.lastOnline).unix(),
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      render: (_, record) => (
-        <>
-          <Tag color={getCompanyStatus(record.status)}>{record.status}</Tag>
-        </>
-      ),
-      sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
-    },
+  
     {
       title: "Action",
       dataIndex: "actions",

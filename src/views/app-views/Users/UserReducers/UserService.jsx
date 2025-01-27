@@ -10,7 +10,7 @@ import axios from "axios";
 const GetUsers = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/users/", {
+    const res = await axios.get("http://localhost:5353/api/v1/auth/", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -47,7 +47,7 @@ const DeleteUser = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
-    const res = await axios.delete(`http://localhost:5353/api/v1/users/${id}`, {
+    const res = await axios.delete(`http://localhost:5353/api/v1/auth/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -64,7 +64,7 @@ const Editusers = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/users/${idd}`,
+      `http://localhost:5353/api/v1/auth/${idd}`,
       values,
       {
         headers: {
