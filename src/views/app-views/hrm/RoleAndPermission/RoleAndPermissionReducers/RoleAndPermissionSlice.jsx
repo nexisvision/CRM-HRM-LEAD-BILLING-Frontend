@@ -77,7 +77,6 @@ export const updateUser = createAsyncThunk(
   }
 );
 
-
 // Async thunk for adding user
 
 export const addRole = createAsyncThunk(
@@ -94,17 +93,14 @@ export const addRole = createAsyncThunk(
 
 // Async thunk for user login
 
-export const getRoles = createAsyncThunk(
-  "emp/getRoles",
-  async (thunkAPI) => {
-    try {
-      const response = await UserService.getRoles();
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
+export const getRoles = createAsyncThunk("emp/getRoles", async (thunkAPI) => {
+  try {
+    const response = await UserService.getRoles();
+    return response;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response.data);
   }
-);
+});
 
 // Async thunk for getting all users
 export const getAllRoles = createAsyncThunk(

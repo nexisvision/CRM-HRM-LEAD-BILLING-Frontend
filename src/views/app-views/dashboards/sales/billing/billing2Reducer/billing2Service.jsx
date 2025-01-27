@@ -60,12 +60,12 @@ const deltedbillsss = async (id) => {
   }
 };
 
-const editbillsss = async (idd, values) => {
+const editbillsss = async (idd, invoiceData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
       `http://localhost:5353/api/v1/bills/${idd}`,
-      values,
+      invoiceData,
       {
         headers: {
           Authorization: `Bearer ${token}`,

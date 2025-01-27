@@ -68,9 +68,9 @@ export const deltebil = createAsyncThunk(
 );
 export const eidtebil = createAsyncThunk(
   "users/eidtebil",
-  async ({ idd, values }, thunkAPI) => {
+  async ({ idd, invoiceData }, thunkAPI) => {
     try {
-      const response = await UserService.editbillsss(idd, values);
+      const response = await UserService.editbillsss(idd, invoiceData);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
