@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./UserService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
+import axios from "axios";
 
 // Async thunk for adding user
 
@@ -20,13 +21,18 @@ export const AddUserss = createAsyncThunk(
 // Async thunk for user login
 
 export const GetUsers = createAsyncThunk(
-  "emp/getnu",
+  "emp/getUsers", // action type
   async (loginData, thunkAPI) => {
+    const token = localStorage.getItem("auth_token");
     try {
-      const response = await UserService.GetUsers(loginData);
-      return response;
+      const response = await axios.get("http://localhost:5353/api/v1/userss/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data; // This will be available in the reducer as `action.payload`
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
     }
   }
 );

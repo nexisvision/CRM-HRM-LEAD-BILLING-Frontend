@@ -1,139 +1,207 @@
-
 import React, { useState } from "react";
-import { Form, Input, Switch, Button, Row, Col, Modal } from "antd";
+import {
+  Modal,
+  Input,
+  Button,
+  Row,
+  Col,
+  message,
+} from "antd";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { addClient, ClientData } from "./CompanyReducers/CompanySlice";
+import { addClient, ClientData } from "./CompanyReducers/CompanySlice"; // Adjust this import according to your file structure
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import axios from "axios";
 
-const AddCompany = ({ visible, onClose, onCreate }) => {
-  const [form] = Form.useForm();
-  const [loginEnabled, setLoginEnabled] = useState(true);
-  const [showOtpModal, setShowOtpModal] = useState(false); // State for OTP modal visibility
+const AddCompany = ({ onClose }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleFinish = async (values) => {
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpToken, setOtpToken] = useState(null);
+  const [otp, setOtp] = useState("");
+
+  // Submit handler for OTP
+  const otpapi = async (otp) => {
     try {
-      // Dispatch the addClient action and wait for it to complete
-      await dispatch(addClient(values)).unwrap();
-      console.log("Client Data Added Successfully:", values);
-
-      // Fetch the latest client data
-      await dispatch(ClientData());
-
-      // Close the Add Company modal
-      onClose();
-
-      // Call the onCreate callback (if any)
-      onCreate(values);
-
-      // Reset the form fields
-      form.resetFields();
-
-      // Open the OTP Modal after successfully adding the client
-      setShowOtpModal(true);
+      const res = await axios.post(
+        "http://localhost:5353/api/v1/auth/verify-signup",
+        { otp },
+        {
+          headers: {
+            Authorization: `Bearer ${otpToken}`,
+          },
+        }
+      );
+      return res.data;
     } catch (error) {
-      console.error("Error Adding Client:", error);
+      console.error("Error verifying OTP:", error);
+      throw error;
     }
   };
 
-  
+  const handleOtpVerify = async () => {
+    if (!otp || otp.length !== 6) {
+      message.error("Please enter a valid 6-digit OTP.");
+      return;
+    }
 
-  const handleOtpVerify = () => {
-    // Handle OTP verification logic here
-    console.log("OTP Verified");
-
-    // Close OTP modal after verification
-    setShowOtpModal(false);
+    try {
+      const response = await otpapi(otp);
+      if (response.success) {
+        message.success("OTP Verified Successfully");
+        setShowOtpModal(false);
+        dispatch(ClientData())
+      } else {
+        message.error("Invalid OTP. Please try again.");
+      }
+    } catch (error) {
+      message.error("Failed to verify OTP. Please try again.");
+    }
   };
 
-  const onOpenOtpModal = () => {
-    setShowOtpModal(true);
+  // Form submit handler
+  const onSubmit = async (values, { resetForm, setSubmitting }) => {
+    try {
+      const response = await dispatch(addClient(values)); // Dispatching the addClient action
+      if (response.payload?.data?.sessionToken) {
+        setOtpToken(response.payload?.data?.sessionToken);
+        message.success("Employee added successfully! Please verify OTP.");
+        setShowOtpModal(true);
+      }
+      resetForm();
+      onClose();
+    } catch (error) {
+      message.error("Failed to add employee. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
-  const onCloseOtpModal = () => {
-    setShowOtpModal(false);
+
+  // Initial form values
+  const initialValues = {
+    username: "",
+    password: "",
+    email: "",
   };
-  
+
+  // Validation schema using Yup
+  const validationSchema = Yup.object({
+    username: Yup.string().required("Please enter a username."),
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .matches(/\d/, "Password must have at least one number")
+      .required("Password is required"),
+    email: Yup.string()
+      .email("Please enter a valid email address.")
+      .required("Please enter an email"),
+  });
 
   return (
-    <div>
-      {/* Add Company Form */}
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleFinish}
-        initialValues={{
-          loginEnabled: true,
-        }}
+    <div className="add-employee p-6">
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={onSubmit}
       >
-        <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+        {({ isSubmitting }) => (
+          <Form className="space-y-4">
+            <Row gutter={16}>
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">Username</label>
+                  <Field
+                    name="username"
+                    as={Input}
+                    placeholder="john_doe"
+                    className="mt-1"
+                  />
+                  <ErrorMessage
+                    name="username"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+              </Col>
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">Password</label>
+                  <Field
+                    name="password"
+                    as={Input.Password}
+                    placeholder="Strong Password"
+                    className="mt-1"
+                  />
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+              </Col>
 
-        <Form.Item
-          name="username"
-          label="Name"
-          rules={[{ required: true, message: "Please enter the client name" }]}
-        >
-          <Input placeholder="Enter client Name" />
-        </Form.Item>
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">Email</label>
+                  <Field
+                    name="email"
+                    as={Input}
+                    placeholder="johndoe@example.com"
+                    className="mt-1"
+                  />
+                  <ErrorMessage
+                    name="email"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+              </Col>
+            </Row>
 
-        <Form.Item
-          name="email"
-          label="E-Mail Address"
-          rules={[
-            { required: true, message: "Please enter the client email" },
-            { type: "email", message: "Please enter a valid email address" },
-          ]}
-        >
-          <Input placeholder="Enter Client Email" />
-        </Form.Item>
-
-        
-
-        {/* Conditionally render password field based on loginEnabled state */}
-        
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[{ required: loginEnabled, message: "Please enter the client password" }]}
-          >
-            <Input.Password placeholder="Enter Client Password" />
-          </Form.Item>
-       
-
-        <Form.Item>
-          <Row justify="end" gutter={16}>
-            <Col>
-              <Button onClick={onClose}>Cancel</Button>
-            </Col>
-            <Col>
-              <Button type="primary" htmlType="submit" onClick={onOpenOtpModal}>
-                Create
+            <div className="text-right mt-4">
+              <Button type="default" className="mr-2" onClick={onClose}>
+                Cancel
               </Button>
-            </Col>
-            
-          </Row>
-        </Form.Item>
-      </Form>
+              <Button
+                type="primary"
+                htmlType="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Submitting..." : "Submit"}
+              </Button>
+            </div>
+          </Form>
+        )}
+      </Formik>
 
       {/* OTP Modal */}
       <Modal
         title="Verify OTP"
-        visible={showOtpModal} // Control visibility based on showOtpModal state
-        onCancel={onCloseOtpModal} // Close OTP modal
-        footer={null} // Remove footer buttons
+        visible={showOtpModal}
+        onCancel={() => setShowOtpModal(false)}
+        footer={null}
         centered
       >
         <div className="p-4 rounded-lg bg-white">
           <h2 className="text-xl font-semibold mb-4">OTP Page</h2>
           <p>
-            An OTP has been sent to your registered email. Please enter the OTP below to verify your account.
+            An OTP has been sent to your registered email. Please enter the OTP
+            below to verify your account.
           </p>
           <Input
             type="number"
             placeholder="Enter OTP"
             className="mt-4 p-3 border border-gray-300 rounded-md"
             style={{ width: "100%" }}
+            onChange={(e) => setOtp(e.target.value)}
           />
           <div className="mt-4">
-            <Button type="primary" className="w-full" onClick={handleOtpVerify}>
+            <Button
+              type="primary"
+              className="w-full"
+              onClick={handleOtpVerify}
+            >
               Verify OTP
             </Button>
           </div>
@@ -144,8 +212,3 @@ const AddCompany = ({ visible, onClose, onCreate }) => {
 };
 
 export default AddCompany;
-
-
-
-
-

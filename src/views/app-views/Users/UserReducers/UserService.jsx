@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -9,8 +10,9 @@ import axios from "axios";
 
 const GetUsers = async () => {
   const token = localStorage.getItem("auth_token");
+  const id = useSelector((state)=>state.user.loggedInUser.id)
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/auth/", {
+    const res = await axios.get(`http://localhost:5353/api/v1/userss/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

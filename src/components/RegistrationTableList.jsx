@@ -28,6 +28,7 @@ import utils from "utils";
 // import { DeleteTicket, getAllTicket } from "./TicketReducer/TicketSlice";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
+import { ClientData } from "views/app-views/company/CompanyReducers/CompanySlice";
 
 const { Column } = Table;
 
@@ -73,6 +74,19 @@ export const TicketList = () => {
 
   const dispatch = useDispatch();
 
+  useEffect(()=>{
+    dispatch(ClientData())
+  },[])
+
+  const allclientdata = useSelector((state)=>state.ClientData)
+const fndata = allclientdata.ClientData.data;
+
+useEffect(()=>{
+  if(fndata){
+      setList(fndata)
+  }
+},[fndata])
+
   const alldatat = useSelector((state) => state?.Ticket);
   const fnddata = alldatat?.Ticket?.data || [];
   console.log(",mm,,m,m", fnddata);
@@ -112,11 +126,11 @@ export const TicketList = () => {
   //   dispatch(getAllTicket());
   // }, [dispatch]);
 
-  useEffect(() => {
-    if (fnddata) {
-      setList(fnddata);
-    }
-  }, [fnddata]);
+  // useEffect(() => {
+  //   if (fnddata) {
+  //     setList(fnddata);
+  //   }
+  // }, [fnddata]);
 
   const deletfun = (userId) => {
     // dispatch(DeleteTicket(userId));
@@ -134,38 +148,32 @@ export const TicketList = () => {
 
   const tableColumns = [
     {
-      title: "Name",
-      dataIndex: "Name",
+      title: "username",
+      dataIndex: "username",
       sorter: {
-        compare: (a, b) => a.Name.length - b.Name.length,
+        compare: (a, b) => a.username.length - b.username.length,
       },
     },
 
     {
-      title: "Email",
-      dataIndex: "Email",
+      title: "email",
+      dataIndex: "email",
       sorter: {
-        compare: (a, b) => a.Email.length - b.Email.length,
+        compare: (a, b) => a.email.length - b.email.length,
       },
     },
 
     
     {
-      title: "Contact No",
-      dataIndex: "Contact No",
+      title: "created_by",
+      dataIndex: "created_by",
       sorter: {
-        compare: (a, b) => a.ContactNo.length - b.ContactNo.length,
+        compare: (a, b) => a.created_by.length - b.created_by.length,
       },
      
     },
 
-    {
-      title: "Registered On",
-      dataIndex: "Registered On",
-      sorter: {
-        compare: (a, b) => a.RegisteredOn.length - b.RegisteredOn.length,
-      },
-    },
+   
    
   ];
 

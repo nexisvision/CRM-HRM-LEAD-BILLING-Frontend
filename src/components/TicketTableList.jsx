@@ -134,10 +134,10 @@ export const TicketList = () => {
 
   const tableColumns = [
     {
-      title: "Ticket#",
-      dataIndex: "ticket",
+      title: "priority",
+      dataIndex: "priority",
       sorter: {
-        compare: (a, b) => a.ticket.length - b.ticket.length,
+        compare: (a, b) => a.priority.length - b.priority.length,
       },
     },
 
@@ -149,21 +149,29 @@ export const TicketList = () => {
       },
     },
 
+    {
+      title: "created_by",
+      dataIndex: "created_by",
+      sorter: {
+        compare: (a, b) => a.created_by.length - b.created_by.length,
+      },
+    },
+
     
     {
-      title: "Status",
-      dataIndex: "Status",
+      title: "status",
+      dataIndex: "status",
       sorter: {
-        compare: (a, b) => a.Status.length - b.Status.length,
+        compare: (a, b) => a.status.length - b.status.length,
       },
      
     },
 
     {
-      title: "Requested On",
-      dataIndex: "Requested On",
+      title: "description",
+      dataIndex: "description",
       sorter: {
-        compare: (a, b) => a.RequestedOn.length - b.RequestedOn.length,
+        compare: (a, b) => a.description.length - b.description.length,
       },
     },
    
