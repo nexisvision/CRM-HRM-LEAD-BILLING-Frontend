@@ -36,7 +36,7 @@ const LeaveList = () => {
   const [isEditLeaveModalVisible, setIsEditLeaveModalVisible] = useState(false); // State to toggle Add Employee Modal
   const [editid, setEditid] = useState(null);
   const dispatch = useDispatch();
-  console.log("xiiiii", editid);
+  // console.log("xiiiii", editid);
   const tabledata = useSelector((state) => state.Leave);
   // State to toggle Add Employee Modal
   // Open Add Employee Modal

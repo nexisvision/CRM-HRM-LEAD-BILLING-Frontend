@@ -18,8 +18,7 @@ import {
   addAttendance,
   getAttendances,
 } from "./AttendanceReducer/AttendanceSlice";
-
-import moment from "moment";
+import moment from "moment-timezone"; 
 // import moment from "moment";
 
 
@@ -60,9 +59,10 @@ const AddAttendance = ({ onClose }) => {
       endTime: values.endTime.format("HH:mm:ss"),
       halfDay: values.halfDay === "yes",
     };
+  
 
 
-    dispatch(addAttendance(values))
+    dispatch(addAttendance(formattedValues))
       .then(() => {
         dispatch(getAttendances());
         message.success("Attendance added successfully!");

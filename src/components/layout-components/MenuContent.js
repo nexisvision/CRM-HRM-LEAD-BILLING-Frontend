@@ -36,7 +36,7 @@ const MenuItem = ({title, icon, path}) => {
 
 	const closeMobileNav = () => {
 		if (isMobile) {
-			dispatch(onMobileNavToggle(false))
+			dispatch(onMobileNavToggle(false))	 
 		}
 	}
 
