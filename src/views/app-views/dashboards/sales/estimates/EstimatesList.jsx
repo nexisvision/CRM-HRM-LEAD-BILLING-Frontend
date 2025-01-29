@@ -39,7 +39,7 @@ import NumberFormat from "react-number-format";
 import dayjs from "dayjs";
 import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import { getallquotations, getquotationsById, deletequotations } from "../estimates/estimatesReducer/EstimatesSlice";
-import utils from "utils";
+import { utils, writeFile } from "xlsx";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import AddEstimates from "./AddEstimates";
@@ -135,6 +135,21 @@ const EstimatesList = () => {
       setList(data);
     } else {
       setList(OrderListData);
+    }
+  };
+
+  const exportToExcel = () => {
+    try {
+      const ws = utils.json_to_sheet(list);
+      const wb = utils.book_new(); // Create a new workbook
+      utils.book_append_sheet(wb, ws, "Estimates"); // Append the worksheet to the workbook
+
+      // Write the workbook to a file
+      writeFile(wb, "EstimatesData.xlsx");
+      message.success("Data exported successfully!");
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      message.error("Failed to export data. Please try again.");
     }
   };
   const DeleteFun = async (id) => {
@@ -363,9 +378,14 @@ const EstimatesList = () => {
               <PlusOutlined />
               <span className="ml-2">New</span>
             </Button>
-            <Button type="primary" icon={<FileExcelOutlined />} block>
-              Export All
-            </Button>
+            <Button
+                type="primary"
+                icon={<FileExcelOutlined />}
+                onClick={exportToExcel} // Call export function when the button is clicked
+                block
+              >
+                Export All
+              </Button>
           </Flex>
         </Flex>
         <div className="table-responsive">

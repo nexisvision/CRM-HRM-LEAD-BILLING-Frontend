@@ -31,10 +31,9 @@ import { AnnualStatisticData } from "../../dashboards/default/DefaultDashboardDa
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddJob from "./AddJob";
 import { useNavigate } from "react-router-dom";
-
+import { utils, writeFile } from "xlsx";
 import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
-import utils from "utils";
 import EditJob from "./EditJob";
 import { Deletejobs, GetJobdata } from "./JobReducer/JobSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -44,7 +43,6 @@ const { Option } = Select;
 const JobList = () => {
   const [users, setUsers] = useState(userData);
   const [list, setList] = useState(OrderListData);
-
   const dispatch = useDispatch();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
@@ -99,6 +97,20 @@ const JobList = () => {
     dispatch(GetJobdata());
     setUsers(list.filter((item) => item.id !== userId));
     message.success({ content: `Deleted user ${userId}`, duration: 2 });
+  };
+
+  const exportToExcel = () => {
+    try {
+      const ws = utils.json_to_sheet(list); // Convert JSON data to a sheet
+      const wb = utils.book_new(); // Create a new workbook
+      utils.book_append_sheet(wb, ws, "Job"); // Append the sheet to the workbook
+
+      writeFile(wb, "JobData.xlsx"); // Save the file as ProposalData.xlsx
+      message.success("Data exported successfully!"); // Show success message
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      message.error("Failed to export data. Please try again."); // Show error message
+    }
   };
 
   // Show user profile
@@ -297,9 +309,14 @@ const JobList = () => {
             <PlusOutlined />
             <span>New</span>
           </Button>
-          <Button type="primary" icon={<FileExcelOutlined />} block>
-            Export All
-          </Button>
+          <Button
+                type="primary"
+                icon={<FileExcelOutlined />}
+                onClick={exportToExcel} // Call export function when the button is clicked
+                block
+              >
+                Export All
+              </Button>
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">

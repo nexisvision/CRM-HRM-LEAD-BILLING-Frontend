@@ -179,29 +179,7 @@ const AddRevenue = ({ onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={24} className="mt-2">
-                    <div className="form-item">
-                      <label className="font-semibold">Description</label>
-                      <Field name="description">
-                        {({ field }) => (
-                          <ReactQuill
-                            {...field}
-                            placeholder="Enter Description"
-                            value={values.description}
-                            onChange={(value) =>
-                              setFieldValue("description", value)
-                            }
-                            onBlur={() => setFieldTouched("description", true)}
-                          />
-                        )}
-                      </Field>
-                      <ErrorMessage
-                        name="description"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
-                    </div>
-                  </Col>
+
                   <Col span={12} className="mt-2">
                     <div className="form-item">
                       <label className="font-semibold">Category</label>
@@ -224,6 +202,33 @@ const AddRevenue = ({ onClose }) => {
                       </Field>
                       <ErrorMessage
                         name="category"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+                  <Col span={12} className="mt-2">
+                    <div className="form-item">
+                      <label className="font-semibold">Currency</label>
+                      <Field name="currency">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            className="w-full"
+                            placeholder="Select Currency"
+                            onChange={(value) =>
+                              setFieldValue("currency", value)
+                            }
+                            value={values.currency}
+                            onBlur={() => setFieldTouched("currency", true)}
+                          >
+                            <Option value="xyz">XYZ</Option>
+                            <Option value="abc">ABC</Option>
+                          </Select>
+                        )}
+                      </Field>
+                      <ErrorMessage
+                        name="currency"
                         component="div"
                         className="error-message text-red-500 my-1"
                       />
@@ -256,6 +261,29 @@ const AddRevenue = ({ onClose }) => {
                       />
                       <ErrorMessage
                         name="paymentreceipt"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+                  <Col span={24} className="mt-2">
+                    <div className="form-item">
+                      <label className="font-semibold">Description</label>
+                      <Field name="description">
+                        {({ field }) => (
+                          <ReactQuill
+                            {...field}
+                            placeholder="Enter Description"
+                            value={values.description}
+                            onChange={(value) =>
+                              setFieldValue("description", value)
+                            }
+                            onBlur={() => setFieldTouched("description", true)}
+                          />
+                        )}
+                      </Field>
+                      <ErrorMessage
+                        name="description"
                         component="div"
                         className="error-message text-red-500 my-1"
                       />

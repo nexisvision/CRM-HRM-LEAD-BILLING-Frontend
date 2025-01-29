@@ -33,7 +33,7 @@ import AddTrainingSetup from "./AddTrainingSetup";
 import EditTrainingSetup from "./EditTrainingSetup";
 import userData from "../../../../assets/data/user-list.data.json";
 import OrderListData from "../../../../assets/data/order-list.data.json";
-import utils from "utils";
+import { utils, writeFile } from "xlsx";
 import { Deletetrainng, GetallTrainng } from "./TrainingReducer/TrainingSlice";
 import useSelection from "antd/es/table/hooks/useSelection";
 import { useSelector } from "react-redux";
@@ -95,6 +95,19 @@ const TrainingSetupList = () => {
     setSelectedRowKeys([]);
   };
 
+  const exportToExcel = () => {
+    try {
+      const ws = utils.json_to_sheet(users); // Convert JSON data to a sheet
+      const wb = utils.book_new(); // Create a new workbook
+      utils.book_append_sheet(wb, ws, "TrainingSetup"); // Append the sheet to the workbook
+
+      writeFile(wb, "TrainingSetupData.xlsx"); // Save the file as ProposalData.xlsx
+      message.success("Data exported successfully!"); // Show success message
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      message.error("Failed to export data. Please try again."); // Show error message
+    }
+  };
   const deleteUser = (userId) => {
     dispatch(Deletetrainng(userId));
     dispatch(GetallTrainng());
@@ -288,9 +301,14 @@ const TrainingSetupList = () => {
             <PlusOutlined />
             <span>New</span>
           </Button>
-          <Button type="primary" icon={<FileExcelOutlined />} block>
-            Export All
-          </Button>
+          <Button
+                type="primary"
+                icon={<FileExcelOutlined />}
+                onClick={exportToExcel} // Call export function when the button is clicked
+                block
+              >
+                Export All
+              </Button>
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">

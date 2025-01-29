@@ -35,7 +35,7 @@ import userData from "../../../../../assets/data/user-list.data.json";
 // import userData from 'assets/data/user-list.data.json';
 import OrderListData from "../../../../../assets/data/order-list.data.json";
 import { IoCopyOutline } from "react-icons/io5";
-import utils from "utils";
+import { utils, writeFile } from "xlsx";
 import EditCustomer from "./EditCustomer";
 import { delcus, Getcus } from "./CustomerReducer/CustomerSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -116,6 +116,39 @@ const CustomerList = () => {
     dispatch(Getcus());
     setUsers(users.filter((item) => item.id !== userId));
     message.success({ content: `Deleted user ${userId}`, duration: 2 });
+  };
+  const exportToExcel = () => {
+    try {
+      // Format the data for Excel
+      // const formattedData = list.map(row => ({
+      //   ID: row.id,
+      //   RelatedID: row.related_id,
+      //   TaskName: row.taskName,
+      //   Category: row.category,
+      //   Project: row.project,
+      //   StartDate: row.startDate,
+      //   DueDate: row.dueDate,
+      //   AssignedTo: JSON.parse(row.assignTo).join(", "), // Assuming assignTo is a JSON string
+      //   Status: row.status,
+      //   Priority: row.priority,
+      //   Description: row.description.replace(/<[^>]+>/g, ''), // Remove HTML tags from description
+      //   CreatedBy: row.created_by,
+      //   CreatedAt: row.createdAt,
+      //   UpdatedAt: row.updatedAt,
+      // }));
+
+      // Create a worksheet from the formatted data
+      const ws = utils.json_to_sheet(list);
+      const wb = utils.book_new(); // Create a new workbook
+      utils.book_append_sheet(wb, ws, "Customer"); // Append the worksheet to the workbook
+
+      // Write the workbook to a file
+      writeFile(wb, "CoustomerData.xlsx");
+      message.success("Data exported successfully!");
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      message.error("Failed to export data. Please try again.");
+    }
   };
 
   // Show user profile
@@ -269,9 +302,14 @@ const CustomerList = () => {
             <PlusOutlined />
             <span className="ml-2">New</span>
           </Button>
-          <Button type="primary" icon={<FileExcelOutlined />} block>
-            Export All
-          </Button>
+          <Button
+                type="primary"
+                icon={<FileExcelOutlined />}
+                onClick={exportToExcel} // Call export function when the button is clicked
+                block
+              >
+                Export All
+              </Button>
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">

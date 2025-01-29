@@ -81,11 +81,11 @@ export const deleteClient = createAsyncThunk(
     }
   }
 );
-export const Editclient = createAsyncThunk(
+export const Editclients = createAsyncThunk(
   "users/updateEmployee",
   async ({ comnyid, values }, thunkAPI) => {
     try {
-      const response = await UserService.EditClient(comnyid, values);
+      const response = await UserService.EditClientss(comnyid, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -223,15 +223,15 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
       //update
-      .addCase(Editclient.pending, (state) => {
+      .addCase(Editclients.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(Editclient.fulfilled, (state, action) => {
+      .addCase(Editclients.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload;
       })
-      .addCase(Editclient.rejected, (state, action) => {
+      .addCase(Editclients.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload || "Failed to update employee";
       });

@@ -127,6 +127,7 @@ const DashboardList = () => {
                   console.log('Selected range:', range);
                 }} /> */}
       </div>
+    
       <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6 mb-6">
         <div class="bg-white p-6 rounded-lg shadow flex justify-between items-center">
           <div class="flex space-x-4 items-center">
@@ -182,6 +183,7 @@ const DashboardList = () => {
           </div>
         </div>
       </div>
+      
       <Row gutter={[24, 32]}>
         <Col xs={24} sm={24} md={8} lg={8} xl={8}>
           <div

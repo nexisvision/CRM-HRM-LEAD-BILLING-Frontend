@@ -26,7 +26,7 @@ import Flex from "components/shared-components/Flex";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import userData from "../../../../assets/data/user-list.data.json";
 import OrderListData from "../../../../assets/data/order-list.data.json";
-import utils from "utils";
+import { utils, writeFile } from "xlsx";
 import useSelection from "antd/es/table/hooks/useSelection";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
@@ -55,10 +55,10 @@ const ProposalList = () => {
   //     useState(false);
 
   const [id, setId] = useState("");
-   const { data: Leads } = useSelector((state) => state.Leads.Leads);
-    const { data: Deals } = useSelector((state) => state.Deals.Deals);
-    // const { data: Currencies } = useSelector((state) => state.currencies.currencies);
-    
+  const { data: Leads } = useSelector((state) => state.Leads.Leads);
+  const { data: Deals } = useSelector((state) => state.Deals.Deals);
+  // const { data: Currencies } = useSelector((state) => state.currencies.currencies);
+
 
 
   const allproposal = useSelector((state) => state?.proposal);
@@ -77,14 +77,14 @@ const ProposalList = () => {
     dispatch(getpropos());
   }, [dispatch]);
 
-    useEffect(() => {
-      dispatch(GetLeads());
-      dispatch(GetDeals());
-    }, [dispatch]);
-  
-      useEffect(() => {
-        dispatch(getallcurrencies());
-      }, [dispatch]);
+  useEffect(() => {
+    dispatch(GetLeads());
+    dispatch(GetDeals());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getallcurrencies());
+  }, [dispatch]);
 
   const openAddProposalModal = () => {
     setIsAddProposalSetupModalVisible(true);
@@ -116,7 +116,7 @@ const ProposalList = () => {
         const lead = Leads.find((l) => l.id === proposal.lead_title); // Match lead by ID
         const deal = Deals.find((d) => d.id === proposal.deal_title);
         // 
-  
+
         return {
           ...proposal,
           lead_title: lead?.leadTitle || "N/A", // Use `title` from Leads or fallback to "N/A"
@@ -124,7 +124,7 @@ const ProposalList = () => {
           // Use `title` from Deals or fallback to "N/A"
         };
       });
-  
+
       setUsers(enrichedData); // Set enriched data for the table
     }
   }, [fnddatas, Leads, Deals]);
@@ -143,6 +143,20 @@ const ProposalList = () => {
       setUsers(users.filter((item) => item.id !== userId));
       message.success({ content: `Deleted user ${userId}`, duration: 2 });
     });
+  };
+
+  const exportToExcel = () => {
+    try {
+      const ws = utils.json_to_sheet(users); // Convert JSON data to a sheet
+      const wb = utils.book_new(); // Create a new workbook
+      utils.book_append_sheet(wb, ws, "Proposal"); // Append the sheet to the workbook
+
+      writeFile(wb, "ProposalData.xlsx"); // Save the file as ProposalData.xlsx
+      message.success("Data exported successfully!"); // Show success message
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      message.error("Failed to export data. Please try again."); // Show error message
+    }
   };
 
   const showUserProfile = (userInfo) => {
@@ -215,7 +229,7 @@ const ProposalList = () => {
             className=""
             icon={<EyeOutlined />}
             size="small"
-            // onClick={() => viewfun(elm.id)}
+          // onClick={() => viewfun(elm.id)}
           >
             <span>View Details</span>
           </Button>
@@ -266,8 +280,8 @@ const ProposalList = () => {
       dataIndex: "calculatedTax",
       sorter: (a, b) => a.calculatedTax.length - b.calculatedTax.length,
     },
-   
-  
+
+
     {
       title: "tax",
       dataIndex: "tax",
@@ -281,7 +295,7 @@ const ProposalList = () => {
     {
       title: "valid_till",
       dataIndex: "valid_till",
-      render: (date) => (date ? dayjs(date).format("DD-MM-YYYY") : "N/A"), 
+      render: (date) => (date ? dayjs(date).format("DD-MM-YYYY") : "N/A"),
       sorter: (a, b) => a.valid_till.length - b.valid_till.length,
     },
     {
@@ -334,7 +348,12 @@ const ProposalList = () => {
             <PlusOutlined />
             <span>New</span>
           </Button>
-          <Button type="primary" icon={<FileExcelOutlined />} block>
+          <Button
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel} // Call export function when the button is clicked
+            block
+          >
             Export All
           </Button>
         </Flex>

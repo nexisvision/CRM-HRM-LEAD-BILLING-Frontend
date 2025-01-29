@@ -31,7 +31,7 @@ import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddDeal from "./AddDeal";
 import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
-import utils from "utils";
+import { utils, writeFile } from "xlsx";
 import EditDeal from "./EditDeal";
 import ViewDeal from "./ViewDeal";
 import { useDispatch, useSelector } from "react-redux";
@@ -84,6 +84,20 @@ const DealList = () => {
     navigate("/app/dashboards/project/deal/viewDeal", {
       state: { user: selectedUser },
     }); // Pass user data as state if needed
+  };
+  const exportToExcel = () => {
+    try {
+      const ws = utils.json_to_sheet(users);
+      const wb = utils.book_new(); // Create a new workbook
+      utils.book_append_sheet(wb, ws, "Deal"); // Append the worksheet to the workbook
+
+      // Write the workbook to a file
+      writeFile(wb, "DealData.xlsx");
+      message.success("Data exported successfully!");
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      message.error("Failed to export data. Please try again.");
+    }
   };
 
   // const openViewDealModal = () => {
@@ -295,9 +309,14 @@ const DealList = () => {
             <PlusOutlined />
             <span>New</span>
           </Button>
-          <Button type="primary" icon={<FileExcelOutlined />} block>
-            Export All
-          </Button>
+          <Button
+                type="primary"
+                icon={<FileExcelOutlined />}
+                onClick={exportToExcel} // Call export function when the button is clicked
+                block
+              >
+                Export All
+              </Button>
           <Button type="primary" icon={<FileAddOutlined />} block>
             Import All
           </Button>

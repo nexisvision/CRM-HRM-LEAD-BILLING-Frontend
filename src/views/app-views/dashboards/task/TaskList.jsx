@@ -36,16 +36,13 @@ import Flex from "components/shared-components/Flex";
 import NumberFormat from "react-number-format";
 import dayjs from "dayjs";
 import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
-import utils from "utils";
+import { utils, writeFile } from "xlsx";
 import ViewTask from "./ViewTask";
 import { useNavigate } from "react-router-dom";
 import AddTask from "./AddTask";
 import EditTask from "./EditTask";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { DeleteTasks, GetTasks } from "../project/task/TaskReducer/TaskSlice";
-import { useDispatch } from "react-redux";
-// import EditExpenses from "./EditExpenses"
-// import ViewExpenses from './ViewExpenses';
 
 const { Option } = Select;
 
@@ -82,9 +79,11 @@ const TaskList = () => {
   const alldatas = useSelector((state) => state.Tasks);
   const fnddata = alldatas.Tasks.data;
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     dispatch(GetTasks(idd));
-  }, []);
+  }, [dispatch, idd]);
 
   useEffect(() => {
     if (fnddata) {
@@ -92,7 +91,6 @@ const TaskList = () => {
     }
   }, [fnddata]);
 
-  const navigate = useNavigate();
   // Open Add Job Modal
   const openAddTaskModal = () => {
     setIsAddTaskModalVisible(true);
@@ -284,6 +282,20 @@ const TaskList = () => {
     setSelectedRowKeys([]);
   };
 
+  // const exportToExcel = () => {
+  //   const ws = utils.json_to_sheet(list); // Convert the list to a worksheet
+  //   const wb = utils.book_new(); // Create a new workbook
+  //   utils.book_append_sheet(wb, ws, "Tasks"); // Append the worksheet to the workbook
+  //   utils.writeFile(wb, "Tasks.xlsx"); // Write the workbook to a file
+  // };
+
+  const exportToExcel = () => {
+    const ws = utils.json_to_sheet(list);
+    const wb = utils.book_new();
+    utils.book_append_sheet(wb, ws, "Tasks");
+    writeFile(wb, "TaskData.xlsx");
+  };
+
   return (
     <>
       <Card>
@@ -345,7 +357,12 @@ const TaskList = () => {
               <PlusOutlined />
               <span className="ml-2">New</span>
             </Button>
-            <Button type="primary" icon={<FileExcelOutlined />} block>
+            <Button
+              type="primary"
+              icon={<FileExcelOutlined />}
+              onClick={exportToExcel} // Call export function when the button is clicked
+              block
+            >
               Export All
             </Button>
           </Flex>

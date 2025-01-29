@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Row, Col, Button } from "antd";
+import { Card, Row, Col, Button, Modal, Input, Form, Select } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import {
   DndContext,
@@ -18,14 +18,14 @@ import {
 } from "@dnd-kit/sortable";
 import { useDispatch, useSelector } from "react-redux";
 import { getstages } from "../../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
-import { GetLeads, LeadsEdit } from "../LeadReducers/LeadSlice";
+import { GetLeads, LeadsEdit } from "../LeadReducers/LeadSlice"; 
+import AddLeadCards from "./AddleadCards"; // Assuming AddLead is an action
 
 const DraggableItem = ({ lead, id }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useDraggable({
       id,
     });
-
   const style = {
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
@@ -49,6 +49,10 @@ const DroppableColumn = ({ status, leads }) => {
   const { setNodeRef } = useDroppable({
     id: status,
   });
+  const [isAddLeadVisible, setIsAddLeadVisible] = useState(false); 
+  const handleAddLeadClick = () => {
+    setIsAddLeadVisible(true);
+  };
 
   return (
     <div
@@ -68,16 +72,18 @@ const DroppableColumn = ({ status, leads }) => {
           <DraggableItem key={lead?.id} lead={lead} id={lead?.id} />
         ))}
       </SortableContext>
-      <Button className="mt-2 w-full">
+      {/* <Button className="mt-2 w-full"  onClick={handleAddLeadClick}>
         Add task
         <PlusOutlined />
-      </Button>
+      </Button> */}
     </div>
   );
 };
 
 const LeadCards = () => {
   const [leadData, setLeadData] = useState([]);
+  const [isAddLeadCardsVisible, setIsAddLeadCardsVisible] = useState(false); // State for toggling the add lead form
+  const [newLead, setNewLead] = useState({}); // State for form inputs
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -177,8 +183,39 @@ const LeadCards = () => {
     setLeadData(updatedLeadData);
   };
 
+  // Handle showing the add lead form
+  const handleAddLeadCardsClick = () => {
+    setIsAddLeadCardsVisible(true);
+  };
+
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewLead((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+ 
+  const handleAddLeadCardsSubmit = () => {
+    dispatch(AddLeadCards(newLead));
+    setIsAddLeadCardsVisible(false); // Close the form after submission
+    // setNewLead({leadtitle:"", firstName: "", lastName: "",telephone:"", leadstage: "",  emailadress: "",leadvalue:"",currency:"",assigned:"",status:"" }); // Reset form fields
+  };
+
   return (
     <div className="p-4">
+      {/* Add Lead Button */}
+      <Button
+        type="primary"
+        icon={<PlusOutlined />}
+        onClick={handleAddLeadCardsClick}
+        style={{ marginBottom: "16px" }}
+      >
+        Add Lead
+      </Button>
+
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -200,6 +237,68 @@ const LeadCards = () => {
             <p>No stages or leads available</p>
           )}
         </Row>
+
+        {/* Add Lead Modal */}
+        <Modal
+          title="Add Lead"
+          visible={isAddLeadCardsVisible}
+          onCancel={() => setIsAddLeadCardsVisible(false)}
+          footer={null} // Remove the footer since AddLeadCards will have its own buttons
+        >
+          <AddLeadCards
+            visible={isAddLeadCardsVisible}
+            onCancel={() => setIsAddLeadCardsVisible(false)}
+          />
+        </Modal>
+          {/* <Form layout="vertical">
+          <Form.Item label="Lead Title">
+              <Input
+                name="leadtitle"
+                value={newLead.leadtitle}
+                onChange={handleInputChange}
+              />
+            </Form.Item>
+            <Form.Item label="First Name">
+              <Input
+                name="firstName"
+                value={newLead.firstName}
+                onChange={handleInputChange}
+              />
+            </Form.Item>
+            <Form.Item label="Last Name">
+              <Input
+                name="lastName"
+                value={newLead.lastName}
+                onChange={handleInputChange}
+              />
+            </Form.Item>
+            <Form.Item label="TelePhone">
+              <Input
+                name="telephone"
+                value={newLead.telephone}
+                onChange={handleInputChange}
+              />
+            </Form.Item>
+            <Form.Item label="Email Adrees">
+              <Input
+                name="emailadress"
+                value={newLead.emailadress}
+                onChange={handleInputChange}
+              />
+            </Form.Item>
+            <Form.Item
+            label="Lead Value"
+            name="leadvalue"
+          >
+            <Select placeholder="Select Lead Value">
+              {fndata.map((value) => (
+                <Select.Option key={value.id} value={value.id}>
+                  {value.valueName}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          </Form> */}
       </DndContext>
     </div>
   );

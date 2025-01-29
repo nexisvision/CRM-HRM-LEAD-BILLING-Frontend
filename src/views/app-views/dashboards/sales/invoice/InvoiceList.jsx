@@ -15,6 +15,7 @@ import {
   Menu,
   Modal,
   Tag,
+  message,
 } from "antd";
 // import { invoiceData } from '../../../pages/invoice/invoiceData';
 // import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
@@ -30,6 +31,7 @@ import {
   EditOutlined,
   PlusOutlined,
   DeleteOutlined,
+  TagsOutlined,
 } from "@ant-design/icons";
 import { TiPinOutline } from "react-icons/ti";
 import AvatarStatus from "components/shared-components/AvatarStatus";
@@ -38,12 +40,13 @@ import Flex from "components/shared-components/Flex";
 // import NumberFormat from 'react-number-format';
 import dayjs from "dayjs";
 import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
-import utils from "utils";
+import { utils, writeFile } from "xlsx";
 import AddInvoice from "./AddInvoice";
 import EditInvoice from "./EditInvoice";
 import ViewInvoice from "./ViewInvoice";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteInvoice, getInvoice } from "./InvoiceReducer/InvoiceSlice";
+import InvoiceDetails from "./InvoiceDetails";
 
 const { Column } = Table;
 
@@ -70,6 +73,8 @@ export const InvoiceList = () => {
   const [isEditInvoiceModalVisible, setIsEditInvoiceModalVisible] =
     useState(false);
   const [isViewInvoiceModalVisible, setIsViewInvoiceModalVisible] =
+    useState(false);
+    const [isViewInvoiceDetailsModalVisible, setIsViewInvoiceDetailsModalVisible] =
     useState(false);
 
   const [idd, setIdd] = useState("");
@@ -126,6 +131,14 @@ export const InvoiceList = () => {
     setIsViewInvoiceModalVisible(true);
   };
 
+  const openViewInvoiceDetailsModal = () => {
+    setIsViewInvoiceDetailsModalVisible(true);
+  };
+
+  const closeViewInvoiceDetailsModal = () => {
+    setIsViewInvoiceDetailsModalVisible(false);
+  };
+
   // Close Add Job Modal
   const closeViewInvoiceModal = () => {
     setIsViewInvoiceModalVisible(false);
@@ -141,6 +154,19 @@ export const InvoiceList = () => {
     openEditInvoiceModal();
     setIdd(idd);
   };
+  const exportToExcel = () => {
+    try {
+      const ws = utils.json_to_sheet(list); // Convert JSON data to a sheet
+      const wb = utils.book_new(); // Create a new workbook
+      utils.book_append_sheet(wb, ws, "Invoice"); // Append the sheet to the workbook
+
+      writeFile(wb, "InvoiceData.xlsx"); // Save the file as ProposalData.xlsx
+      message.success("Data exported successfully!"); // Show success message
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      message.error("Failed to export data. Please try again."); // Show error message
+    }
+  };
 
   const dropdownMenu = (row) => (
     <Menu>
@@ -149,6 +175,13 @@ export const InvoiceList = () => {
           <EyeOutlined />
           {/* <EyeOutlined /> */}
           <span className="ml-2">View Details</span>
+        </Flex>
+      </Menu.Item>
+      <Menu.Item>
+        <Flex alignItems="center" onClick={openViewInvoiceDetailsModal}>
+        <TagsOutlined />
+          {/* <EyeOutlined /> */}
+          <span className="ml-2">View Invoice</span>
         </Flex>
       </Menu.Item>
       <Menu.Item>
@@ -342,9 +375,14 @@ export const InvoiceList = () => {
               <PlusOutlined />
               <span className="ml-2">New</span>
             </Button>
-            <Button type="primary" icon={<FileExcelOutlined />} block>
-              Export All
-            </Button>
+            <Button
+                type="primary"
+                icon={<FileExcelOutlined />}
+                onClick={exportToExcel} // Call export function when the button is clicked
+                block
+              >
+                Export All
+              </Button>
           </Flex>
         </Flex>
         <div className="table-responsive">
@@ -391,6 +429,16 @@ export const InvoiceList = () => {
           className="mt-[-70px]"
         >
           <ViewInvoice onClose={closeViewInvoiceModal} />
+        </Modal>
+        <Modal
+          title="View Invoice "
+          visible={isViewInvoiceDetailsModalVisible}
+          onCancel={closeViewInvoiceDetailsModal}
+          footer={null}
+          width={1000}
+          className="mt-[-70px]"
+        >
+          <InvoiceDetails onClose={closeViewInvoiceDetailsModal} />
         </Modal>
       </Card>
     </div>

@@ -63,7 +63,7 @@ const DeleteClient = async (id) => {
   }
 };
 
-const EditClient = async (comnyid, values) => {
+const EditClientss = async (comnyid, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
@@ -95,10 +95,9 @@ const assignplan = async (payload) => {
         },
       }
     );
-    //    dispatch(empdata());
     return res.data;
   } catch (error) {
-    console.error("Error fetching data:", error);
+    console.error("Error assigning plan:", error);
     throw error;
   }
 };
@@ -128,7 +127,7 @@ const UserService = {
   ClientData,
   createClient,
   DeleteClient,
-  EditClient,
+  EditClientss,
   assignplan,
   // getAllUsers,
   // getUserById,

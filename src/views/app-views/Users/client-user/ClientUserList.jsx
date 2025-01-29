@@ -3,7 +3,7 @@ import { Card, Menu, Table, Tag, Button,Modal,Select,Input } from 'antd';
 import { EyeOutlined, DeleteOutlined, MailOutlined,FileExcelOutlined,PlusOutlined,SearchOutlined } from '@ant-design/icons';
 import { RiLockPasswordLine } from "react-icons/ri";
 import OrderListData from 'assets/data/order-list.data.json';
-import utils from 'utils';
+import { utils, writeFile } from "xlsx";
 import userData from "assets/data/user-list.data.json";
 import Flex from 'components/shared-components/Flex';
 import UserView from './UserView';
@@ -26,6 +26,19 @@ const ClientUserList = () => {
     message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
 
+  const exportToExcel = () => {
+    try {
+      const ws = utils.json_to_sheet(users); // Convert JSON data to a sheet
+      const wb = utils.book_new(); // Create a new workbook
+      utils.book_append_sheet(wb, ws, "User"); // Append the sheet to the workbook
+
+      writeFile(wb, "UserData.xlsx"); // Save the file as ProposalData.xlsx
+      message.success("Data exported successfully!"); // Show success message
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      message.error("Failed to export data. Please try again."); // Show error message
+    }
+  };
 
 
 
@@ -242,9 +255,14 @@ const ClientUserList = () => {
             <PlusOutlined />
             New
           </Button>
-          <Button type="primary" icon={<FileExcelOutlined />} block>
-            Export All
-          </Button>
+          <Button
+                type="primary"
+                icon={<FileExcelOutlined />}
+                onClick={exportToExcel} // Call export function when the button is clicked
+                block
+              >
+                Export All
+              </Button>
         </Flex>
       </Flex>
       <div className="table-responsive">

@@ -27,8 +27,26 @@ const GetAllCountries = async () => {
         throw error;
     }
 };
+
+const updateCountries = async () => {
+    const token = localStorage.getItem("auth_token");
+    try {
+        const res = await axios.get(`http://localhost:5353/api/v1/countries/{$id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return res.data;
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        throw error;
+    }
+};
+
+
 const UserAddCountries ={
     GetAllCountries,
     AddCountries,
+    updateCountries,
 }
 export default UserAddCountries;

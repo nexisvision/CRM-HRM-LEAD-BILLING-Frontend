@@ -27,6 +27,7 @@ const AddContract = ({ onClose }) => {
     client: "",
     project: "",
     type: "",
+    currency: "",
     startDate: null,
     endDate: null,
     value: "",
@@ -38,6 +39,8 @@ const AddContract = ({ onClose }) => {
     client: Yup.string().required("Please select a Client."),
     project: Yup.string().required("Please select a Project."),
     type: Yup.string().required("Please enter Contract Type."),
+    type: Yup.string().required("Please enter Contract Type."),
+    currency: Yup.string().required("Please enter Contract currency."),
     startDate: Yup.date().nullable().required("Start date is required."),
     endDate: Yup.date().nullable().required("End date is required."),
     value: Yup.number()
@@ -62,9 +65,10 @@ const AddContract = ({ onClose }) => {
 
   const Clientdata = useSelector((state) => state.SubClient);
   const filtersubclient = Clientdata.SubClient.data;
-
+  const { currencies } = useSelector((state) => state.currencies);
   const Projectdtaa = useSelector((state) => state.Project);
   const filterprojectdata = Projectdtaa.Project.data;
+  // const [form] = Form.useForm();
 
   useEffect(() => {
     dispatch(GetProject());
@@ -81,7 +85,7 @@ const AddContract = ({ onClose }) => {
         {({ handleSubmit, setFieldValue, values }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
             <Row gutter={16}>
-              <Col span={24}>
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Subject</label>
                   <Field
@@ -97,7 +101,7 @@ const AddContract = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              <Col span={12} className="">
                 <div className="form-item">
                   <label className="font-semibold">Client</label>
                   <Field name="client">
@@ -131,14 +135,44 @@ const AddContract = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              <Col span={12}>
+                <div className="form-item mt-2">
+                  <label className="font-semibold">Currency</label>
+                  <Field name="currency">
+                    {({ field, form }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-2"
+                        placeholder="Select Currency"
+                        onChange={(value) => {
+                          const selectedCurrency = currencies.find(c => c.id === value);
+                          form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
+                        }}
+                      >
+                        {currencies?.map((currency) => (
+                          <Option key={currency.id} value={currency.id}>
+                            {currency.currencyCode}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="currency"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Projects</label>
                   <Field name="project">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-2"
                         placeholder="Select Projects"
                         onChange={(value) => setFieldValue("project", value)}
                         value={values.project}

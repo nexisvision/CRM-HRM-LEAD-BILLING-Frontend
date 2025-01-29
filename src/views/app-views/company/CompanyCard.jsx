@@ -12,6 +12,7 @@ import {
   Button,
   Modal,
   Select,
+  Form,
 } from "antd";
 import {
   EyeOutlined,
@@ -27,6 +28,7 @@ import {
 import EditCompany from "./EditCompany";
 import { ClientData, deleteClient } from "./CompanyReducers/CompanySlice";
 import AddUpgradePlan from "./AddUpgradePlan";
+
 const CompanyCard = ({ company }) => {
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -36,18 +38,24 @@ const CompanyCard = ({ company }) => {
     useState(false);
   const [comnyid, setCompnyid] = useState("");
   const dispatch = useDispatch();
+
   const showUserProfile = (userInfo) => {
     setUserProfileVisible(true);
     setSelectedUser(userInfo);
   };
-  const eidtfun = (idd) => {
+
+
+  const editfun = (company) => {
     setIsEditCompanyCardModalVisible(true);
-    setCompnyid(idd);
+    setSelectedUser(company);
+    setCompnyid(company.id);
   };
+
   const addfun = (idd) => {
     setIsAddUpgradePlanModalVisible(true);
     setCompnyid(idd);
   };
+
   const deleteUser = (elmId) => {
     dispatch(deleteClient(elmId));
     message.success(`Deleted user ${elmId}`);
@@ -56,6 +64,7 @@ const CompanyCard = ({ company }) => {
   useEffect(() => {
     dispatch(ClientData());
   }, [dispatch]);
+
   const dropdownMenu = (elm) => (
     <Menu>
       <Menu.Item>
@@ -63,8 +72,8 @@ const CompanyCard = ({ company }) => {
           <Button
             type=""
             className=""
-            icon={<PushpinOutlined />}
-            onClick={() => eidtfun(elm)}
+            icon={<EditOutlined />}
+            onClick={() => editfun(elm)} // Pass full company object
             size="small"
           >
             <span className="">Edit</span>
@@ -113,6 +122,7 @@ const CompanyCard = ({ company }) => {
       </Menu.Item>
     </Menu>
   );
+
   return (
     <div className="border rounded-lg p-4 hover:shadow-lg cursor-pointer">
       <div className="text-end">
@@ -160,9 +170,11 @@ const CompanyCard = ({ company }) => {
         <EditCompany
           onClose={() => setIsEditCompanyCardModalVisible(false)}
           comnyid={comnyid}
+          companyData={selectedUser} // Pass the correct company data to the modal
         />
       </Modal>
     </div>
   );
 };
+
 export default CompanyCard;

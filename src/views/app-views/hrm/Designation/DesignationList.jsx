@@ -8,7 +8,7 @@ import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import AddDesignation from './AddDesignation';
 import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
-import utils from 'utils';
+import { utils, writeFile } from "xlsx";
 import ParticularDesignation from './ParticularDesignation';
 import EditDesignation from './EditDesignation';
 import { useDispatch, useSelector } from 'react-redux';
@@ -98,6 +98,19 @@ const DesignationList = () => {
                 });
   };
 
+  const exportToExcel = () => {
+    try {
+      const ws = utils.json_to_sheet(users); // Convert JSON data to a sheet
+      const wb = utils.book_new(); // Create a new workbook
+      utils.book_append_sheet(wb, ws, "Designation"); // Append the sheet to the workbook
+
+      writeFile(wb, "DesignationData.xlsx"); // Save the file as ProposalData.xlsx
+      message.success("Data exported successfully!"); // Show success message
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      message.error("Failed to export data. Please try again."); // Show error message
+    }
+  };
   const showUserProfile = (userInfo) => {
     setUserProfileVisible(true);
     setSelectedUser(userInfo);
@@ -178,9 +191,14 @@ const DesignationList = () => {
             <PlusOutlined />
             <span>New</span>
           </Button>
-          <Button type="primary" icon={<FileExcelOutlined />} block>
-            Export All
-          </Button>
+          <Button
+                type="primary"
+                icon={<FileExcelOutlined />}
+                onClick={exportToExcel} // Call export function when the button is clicked
+                block
+              >
+                Export All
+              </Button>
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">

@@ -23,6 +23,17 @@ export const getallcountries = createAsyncThunk(
         }
     }
 );
+export const updatecountries = createAsyncThunk(
+    "countries/updateCountries",
+    async (_, thunkAPI) => {
+        try {
+            const response = await UserAddCountries.updateCountries();
+            return response.data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response.data);
+        }
+    }
+);
 const countriesSlice = createSlice({
     name: "countries",
     initialState: {
@@ -63,6 +74,17 @@ const countriesSlice = createSlice({
             state.isLoading = false;
         })
         .addCase(getallcountries.rejected, (state, action) => {
+            state.isLoading = false;
+            toast.error(action.payload?.message);
+        })
+        .addCase(updatecountries.pending, (state, action) => {
+            state.isLoading = true;
+        })
+        .addCase(updatecountries.fulfilled, (state, action) => {
+            state.countries = action.payload;
+            state.isLoading = false;
+        })
+        .addCase(updatecountries.rejected, (state, action) => {
             state.isLoading = false;
             toast.error(action.payload?.message);
         })

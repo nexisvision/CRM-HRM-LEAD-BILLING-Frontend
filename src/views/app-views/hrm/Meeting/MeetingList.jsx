@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined,EditOutlined } from '@ant-design/icons';
+import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from '../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
@@ -11,7 +11,7 @@ import AvatarStatus from 'components/shared-components/AvatarStatus';
 import AddMeeting from './AddMeeting';
 import userData from 'assets/data/user-list.data.json';
 import OrderListData from 'assets/data/order-list.data.json';
-import utils from 'utils';
+import { utils, writeFile } from "xlsx";
 import EditMeeting from './EditMeeting';
 import { deleteM, MeetData } from './MeetingReducer/MeetingSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -25,15 +25,15 @@ const MeetingList = () => {
   const [isAddMeetingModalVisible, setIsAddMeetingModalVisible] = useState(false);
   const [isEditMeetingModalVisible, setIsEditMeetingModalVisible] = useState(false);
 
-  const [meetid,setMeetid] = useState("");
+  const [meetid, setMeetid] = useState("");
 
   const dispatch = useDispatch();
 
 
-     const tabledata = useSelector((state) => state.Meeting);
+  const tabledata = useSelector((state) => state.Meeting);
 
 
-//   const [dealStatisticData] = useState(DealStatisticData);
+  //   const [dealStatisticData] = useState(DealStatisticData);
 
   // Open Add Job Modal
   const openAddMeetingModal = () => {
@@ -45,7 +45,7 @@ const MeetingList = () => {
     setIsAddMeetingModalVisible(false);
   };
 
-  
+
   // Open Add Job Modal
   const openEditMeetingModal = () => {
     setIsEditMeetingModalVisible(true);
@@ -67,20 +67,20 @@ const MeetingList = () => {
   };
 
 
-    const deleteUser = async (userId) => {
-      try {
-        await dispatch(deleteM(userId)); 
-    
-        const updatedData = await dispatch(MeetData());
-    
-        setUsers(users.filter((item) => item.id !== userId));
-    
-        message.success({ content: 'Deleted user successfully.', duration: 2 });
-      } catch (error) {
-        // message.error({ content: 'Failed to delete user', duration: 2 });
-        console.error('Error deleting user:', error);
-      }
-    };
+  const deleteUser = async (userId) => {
+    try {
+      await dispatch(deleteM(userId));
+
+      const updatedData = await dispatch(MeetData());
+
+      setUsers(users.filter((item) => item.id !== userId));
+
+      message.success({ content: 'Deleted user successfully.', duration: 2 });
+    } catch (error) {
+      // message.error({ content: 'Failed to delete user', duration: 2 });
+      console.error('Error deleting user:', error);
+    }
+  };
 
   // Show user profile
   const showUserProfile = (userInfo) => {
@@ -94,17 +94,31 @@ const MeetingList = () => {
     setUserProfileVisible(false);
   };
 
+  const exportToExcel = () => {
+    try {
+      const ws = utils.json_to_sheet(users); // Convert JSON data to a sheet
+      const wb = utils.book_new(); // Create a new workbook
+      utils.book_append_sheet(wb, ws, "Meeting"); // Append the sheet to the workbook
+
+      writeFile(wb, "MeetingData.xlsx"); // Save the file as ProposalData.xlsx
+      message.success("Data exported successfully!"); // Show success message
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      message.error("Failed to export data. Please try again."); // Show error message
+    }
+  };
+
   useEffect(() => {
     dispatch(MeetData());
   }, [dispatch]);
-  
+
   useEffect(() => {
     if (tabledata && tabledata.Meeting) {
       setUsers(tabledata.Meeting.data);
     }
   }, [tabledata]);
 
-  const EditMeet = (id) =>{
+  const EditMeet = (id) => {
     openEditMeetingModal();
     setMeetid(id)
   }
@@ -154,11 +168,11 @@ const MeetingList = () => {
       dataIndex: 'date',
       sorter: (a, b) => dayjs(a.startdate).unix() - dayjs(b.startdate).unix(),
     },
-    
+
     {
-        title: 'Meeting Time',
-        dataIndex: 'startTime',
-        sorter: (a, b) => utils.antdTableSorter(a, b, 'name')
+      title: 'Meeting Time',
+      dataIndex: 'startTime',
+      sorter: (a, b) => utils.antdTableSorter(a, b, 'name')
     },
     {
       title: 'Action',
@@ -173,7 +187,7 @@ const MeetingList = () => {
 
   return (
     <Card bodyStyle={{ padding: '-3px' }}>
-    
+
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
@@ -185,7 +199,12 @@ const MeetingList = () => {
             <PlusOutlined />
             <span>New</span>
           </Button>
-          <Button type="primary" icon={<FileExcelOutlined />} block>
+          <Button
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel} // Call export function when the button is clicked
+            block
+          >
             Export All
           </Button>
         </Flex>
@@ -217,7 +236,7 @@ const MeetingList = () => {
         footer={null}
         width={1000}
       >
-        <EditMeeting onClose={closeEditMeetingModal} meetid={meetid}/>
+        <EditMeeting onClose={closeEditMeetingModal} meetid={meetid} />
       </Modal>
     </Card>
   );
