@@ -20,6 +20,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { getstages } from "../../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { GetLeads, LeadsEdit } from "../LeadReducers/LeadSlice"; 
 import AddLeadCards from "./AddleadCards"; // Assuming AddLead is an action
+import { GetPip } from "../../systemsetup/Pipeline/PiplineReducer/piplineSlice";
+import { Option } from "antd/es/mentions";
 
 const DraggableItem = ({ lead, id }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -51,7 +53,7 @@ const DroppableColumn = ({ status, leads }) => {
   });
   const [isAddLeadVisible, setIsAddLeadVisible] = useState(false); 
   const handleAddLeadClick = () => {
-    setIsAddLeadVisible(true);
+    setIsAddLeadVisible(false);
   };
 
   return (
@@ -85,6 +87,8 @@ const LeadCards = () => {
   const [isAddLeadCardsVisible, setIsAddLeadCardsVisible] = useState(false); // State for toggling the add lead form
   const [newLead, setNewLead] = useState({}); // State for form inputs
   const dispatch = useDispatch();
+   const [selectedPipeline, setSelectedPipeline] = useState("all");
+     const [leadadatafilter, setLeadadatafilter] = useState([]);
 
   useEffect(() => {
     dispatch(getstages());
@@ -96,6 +100,14 @@ const LeadCards = () => {
 
   const allleaddata = useSelector((state) => state.Leads);
   const fndleadadat = allleaddata?.Leads?.data || [];
+
+
+  useEffect(()=>{
+   dispatch(GetPip());
+  },[])
+  
+    const Allpipline = useSelector((state) => state.Piplines);
+    const Filterpipline = Allpipline?.Piplines?.data || [];
 
   useEffect(() => {
     if (fndata.length > 0) {
@@ -204,9 +216,45 @@ const LeadCards = () => {
     // setNewLead({leadtitle:"", firstName: "", lastName: "",telephone:"", leadstage: "",  emailadress: "",leadvalue:"",currency:"",assigned:"",status:"" }); // Reset form fields
   };
 
+  const handlePipelineChange = (value) => {
+    setSelectedPipeline(value);
+    if (value === "all") {
+      const leadsGroupedByStage = fndata.map((stage) => ({
+        status: stage.stageName,
+        stageId: stage.id,
+        leads: fndleadadat.filter((lead) => lead.leadStage === stage.id),
+      }));
+      setLeadData(leadsGroupedByStage);
+    } else {
+      const filteredStages = fndata.filter((pipeline) => pipeline.pipeline === value); 
+      const leadsGroupedByStage = filteredStages.map((stage) => ({
+        status: stage.stageName,
+        stageId: stage.id,
+        leads: fndleadadat.filter((lead) => lead.leadStage === stage.id),
+      }));
+      setLeadData(leadsGroupedByStage);
+    }
+  };
+  
+
   return (
     <div className="p-4">
       {/* Add Lead Button */}
+      <div className="mb-4">
+              <Select
+                placeholder="Select Pipeline"
+                style={{ width: 200 }}
+                onChange={handlePipelineChange}
+                value={selectedPipeline}
+              >
+                <Option value="all">All Pipelines</Option>
+                {Filterpipline.map((pipeline) => (
+                  <Option key={pipeline.id} value={pipeline.id}>
+                    {pipeline.pipeline_name}
+                  </Option>
+                ))}
+              </Select>
+            </div>
       <Button
         type="primary"
         icon={<PlusOutlined />}
@@ -247,58 +295,10 @@ const LeadCards = () => {
         >
           <AddLeadCards
             visible={isAddLeadCardsVisible}
-            onCancel={() => setIsAddLeadCardsVisible(false)}
+            onClose={() => setIsAddLeadCardsVisible(false)}
           />
         </Modal>
-          {/* <Form layout="vertical">
-          <Form.Item label="Lead Title">
-              <Input
-                name="leadtitle"
-                value={newLead.leadtitle}
-                onChange={handleInputChange}
-              />
-            </Form.Item>
-            <Form.Item label="First Name">
-              <Input
-                name="firstName"
-                value={newLead.firstName}
-                onChange={handleInputChange}
-              />
-            </Form.Item>
-            <Form.Item label="Last Name">
-              <Input
-                name="lastName"
-                value={newLead.lastName}
-                onChange={handleInputChange}
-              />
-            </Form.Item>
-            <Form.Item label="TelePhone">
-              <Input
-                name="telephone"
-                value={newLead.telephone}
-                onChange={handleInputChange}
-              />
-            </Form.Item>
-            <Form.Item label="Email Adrees">
-              <Input
-                name="emailadress"
-                value={newLead.emailadress}
-                onChange={handleInputChange}
-              />
-            </Form.Item>
-            <Form.Item
-            label="Lead Value"
-            name="leadvalue"
-          >
-            <Select placeholder="Select Lead Value">
-              {fndata.map((value) => (
-                <Select.Option key={value.id} value={value.id}>
-                  {value.valueName}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          </Form> */}
+         
       </DndContext>
     </div>
   );

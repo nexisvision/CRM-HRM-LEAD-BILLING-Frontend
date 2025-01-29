@@ -28,7 +28,7 @@ import {
 import EditCompany from "./EditCompany";
 import { ClientData, deleteClient } from "./CompanyReducers/CompanySlice";
 import AddUpgradePlan from "./AddUpgradePlan";
-
+import { useNavigate } from "react-router-dom";
 const CompanyCard = ({ company }) => {
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -38,14 +38,28 @@ const CompanyCard = ({ company }) => {
     useState(false);
   const [comnyid, setCompnyid] = useState("");
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const[idd,setIdd]= useState("");
 
-  const showUserProfile = (userInfo) => {
-    setUserProfileVisible(true);
-    setSelectedUser(userInfo);
+
+  const showUserProfile = (idd) => {
+    // setUserProfileVisible(true);
+    // setSelectedUser(userInfo);
+    setIdd(idd);
+    navigate("/app/users/client-list", {
+      state: {
+        idd,
+      },
+    });
+  };
+
+  const ClickFun = (idd) => {
+    // console.log("dsfvysdvf", idd);
+   
   };
 
 
-  const editfun = (company) => {
+  const eidtfun = (idd) => {
     setIsEditCompanyCardModalVisible(true);
     setSelectedUser(company);
     setCompnyid(company.id);
@@ -73,7 +87,7 @@ const CompanyCard = ({ company }) => {
             type=""
             className=""
             icon={<EditOutlined />}
-            onClick={() => editfun(elm)} // Pass full company object
+            onClick={() => showUserProfile(elm)} // Pass full company object
             size="small"
           >
             <span className="">Edit</span>
@@ -99,10 +113,10 @@ const CompanyCard = ({ company }) => {
             type=""
             className=""
             icon={<MailOutlined />}
-            onClick={() => showUserProfile(elm)}
+            onClick={() => showUserProfile(elm.username)}
             size="small"
           >
-            <span>Login As Company</span>
+            <span>Show Sub-client</span>
           </Button>
         </Flex>
       </Menu.Item>

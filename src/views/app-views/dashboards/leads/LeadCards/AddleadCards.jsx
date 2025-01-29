@@ -695,7 +695,7 @@ const AddLeadCards = ({ onClose }) => {
                 type="default"
                 htmlType="submit"
                 className="mr-2"
-                onClick={() => navigate("/app/apps/project/lead")}
+                onClick={onClose}
               >
                 Cancel
               </Button>
