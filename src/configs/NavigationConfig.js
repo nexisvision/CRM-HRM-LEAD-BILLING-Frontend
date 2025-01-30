@@ -222,7 +222,7 @@ const extraNavvTree = [
             submenu: []
           },
           {
-            key: 'extra-hrm-jobs',
+            key: 'extra-hrm-jobs',  
             path: `${APP_PREFIX_PATH}/hrm/jobs`,
             title: 'Job',
             icon:  CalendarOutlined,
@@ -546,15 +546,15 @@ const dashBoardNavTree = [{
               },
             ]
           },
-          {
-            key: 'dashboards-project-scrumboard',
-            path: `${APP_PREFIX_PATH}/dashboards/project/scrumboard`,
+          // {
+          //   key: 'dashboards-project-scrumboard',
+          //   path: `${APP_PREFIX_PATH}/dashboards/project/scrumboard`,
          
-            title: 'Leads',
-            icon: RiseOutlined,
-            breadcrumb: false,
-            submenu: []
-          },
+          //   title: 'Leads',
+          //   icon: RiseOutlined,
+          //   breadcrumb: false,
+          //   submenu: []
+          // },
           {
             key: 'dashboards-leadcards',
             path: `${APP_PREFIX_PATH}/dashboards/leadcards`,
@@ -566,7 +566,7 @@ const dashBoardNavTree = [{
           {
             key: 'dashboards-lead',
             path: `${APP_PREFIX_PATH}/dashboards/lead`,
-            title: 'Leadss',
+            title: 'Leads',
             icon: RiseOutlined,
             breadcrumb: false,
             submenu: []
@@ -615,7 +615,7 @@ const dashBoardNavTree = [{
           {
             key: 'dashboards-mail',
             path: `${APP_PREFIX_PATH}/dashboards/mail/inbox`,
-            title: 'mail',
+            title: 'Mail',
             icon: MailOutlined,
             breadcrumb: false,
             submenu: []
@@ -716,7 +716,7 @@ const navigationConfig = [
   ...extraNavvTree,
   ...extraNavvvTree,
   // ...componentsNavTree,
-  
+
   // ...docsNavTree
 ]
 

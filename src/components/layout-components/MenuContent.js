@@ -66,11 +66,89 @@ const getTopNavMenuItem = (navItem) => navItem.map(nav => {
 	}
 })
 
+
+
 const SideNavContent = (props) => {
-
 	const { routeInfo, hideGroupTitle, sideNavTheme = SIDE_NAV_LIGHT } = props;
+	const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+	const roles = useSelector((state) => state.role?.role?.data);
+	const roleData = roles?.find(role => role.id === roleId);
+	const isSuperAdmin = roleData?.role_name === 'super-admin' || roleData?.role_name === 'client';
 
-	const menuItems = useMemo(() => getSideNavMenuItem(navigationConfig), []);
+	// Filter navigation items based on permissions
+	const menuItems = useMemo(() => {
+		// Parse permissions if it's a string
+		const parsedPermissions = typeof roleData?.permissions === 'string' 
+			? JSON.parse(roleData?.permissions) 
+			: roleData?.permissions;
+
+		console.log('Parsed Permissions:', parsedPermissions);
+
+		if (isSuperAdmin) {
+			console.log('Super Admin detected - showing all menu items');
+			return getSideNavMenuItem(navigationConfig);
+		}
+
+		if (!parsedPermissions) {
+			console.warn('No permissions found for role ID:', roleId);
+			return [];
+		}
+
+		// Function to check if a nav item is allowed based on permissions
+		const isNavItemAllowed = (navItem) => {
+			// For group titles (like 'HRM'), always allow
+			if (navItem.isGroupTitle) {
+				console.log('Allowing group title:', navItem.key);
+				return true;
+			}
+
+			// Check permissions in each section
+			for (const section in parsedPermissions) {
+				const sectionPerms = parsedPermissions[section];
+				if (Array.isArray(sectionPerms)) {
+					const matchingPerm = sectionPerms.find(p => p.key === navItem.key);
+					if (matchingPerm && matchingPerm.permissions.includes('view')) {
+						console.log('Permission granted for:', navItem.key);
+						return true;
+					}
+				}
+			}
+			console.log('Permission denied for:', navItem.key);
+			return false;
+		};
+
+		// Recursively filter navigation items
+		const filterNavItems = (items) => {
+			return items.reduce((acc, item) => {
+				// Always include parent items that have allowed children
+				if (item.submenu && item.submenu.length > 0) {
+					const filteredSubmenu = filterNavItems(item.submenu);
+					if (filteredSubmenu.length > 0 || isNavItemAllowed(item)) {
+						acc.push({
+							...item,
+							submenu: filteredSubmenu
+						});
+					}
+				} else if (isNavItemAllowed(item)) {
+					acc.push(item);
+				}
+				return acc;
+			}, []);
+		};
+
+		const filteredNavigation = filterNavItems(navigationConfig);
+		
+		console.log('Final Filtered Navigation:', {
+			itemCount: filteredNavigation.length,
+			items: filteredNavigation.map(item => ({
+				key: item.key,
+				title: item.title,
+				submenuCount: item.submenu?.length || 0
+			}))
+		});
+
+		return getSideNavMenuItem(filteredNavigation);
+	}, [isSuperAdmin, roleId, roleData]);
 
 	return (
 		<Menu
@@ -84,6 +162,27 @@ const SideNavContent = (props) => {
 		/>
 	);
 };
+
+
+
+// const SideNavContent = (props) => {
+
+// 	const { routeInfo, hideGroupTitle, sideNavTheme = SIDE_NAV_LIGHT } = props;
+
+// 	const menuItems = useMemo(() => getSideNavMenuItem(navigationConfig), []);
+
+// 	return (
+// 		<Menu
+// 			mode="inline"
+// 			theme={sideNavTheme === SIDE_NAV_LIGHT ? "light" : "dark"}
+// 			style={{ height: "100%", borderInlineEnd: 0 }}
+// 			defaultSelectedKeys={[routeInfo?.key]}
+// 			defaultOpenKeys={setDefaultOpen(routeInfo?.key)}
+// 			className={hideGroupTitle ? "hide-group-title" : ""}
+// 			items={menuItems}
+// 		/>
+// 	);
+// };
 
 const TopNavContent = () => {
 
