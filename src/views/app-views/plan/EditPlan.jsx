@@ -4,6 +4,7 @@ import { Editplan, GetPlan } from './PlanReducers/PlanSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
+import { getallcurrencies } from '../setting/currencies/currenciesreducer/currenciesSlice';
 
 const { Option } = Select;
 
@@ -17,6 +18,13 @@ const EditPlan = ({ planData, onUpdate,id,onClose }) => {
   useEffect(() => {
     form.setFieldsValue(planData);
   }, [planData, form]);
+
+  useEffect(() => {
+    dispatch(getallcurrencies());
+  }, [dispatch]);
+
+  const allempdatass = useSelector((state) => state.currencies);
+  const fnddatass = allempdatass?.currencies;
 
   const handleSubmit = (values) => {
 
@@ -159,6 +167,31 @@ const EditPlan = ({ planData, onUpdate,id,onClose }) => {
               rules={[{ required: true, message: 'Please enter the storage limit!' }]}
             >
               <Input placeholder="Maximum Storage Limit" suffix="MB" />
+            </Form.Item>
+          </Col>
+
+          <Col span={24} className="mt-4">
+            <Form.Item
+              name="currency"
+              label="Currency"
+              rules={[{ required: true, message: 'Please select a currency!' }]}
+            >
+              <Select
+                className="w-full"
+                placeholder="Select Currency"
+              >
+                {fnddatass && fnddatass?.length > 0 ? (
+                  fnddatass?.map((client) => (
+                    <Option key={client.id} value={client?.id}>
+                      {client?.currencyIcon || client?.currencyCode || "Unnamed currency"}
+                    </Option>
+                  ))
+                ) : (
+                  <Option value="" disabled>
+                    No Currencies Available
+                  </Option>
+                )}
+              </Select>
             </Form.Item>
           </Col>
         </Row>

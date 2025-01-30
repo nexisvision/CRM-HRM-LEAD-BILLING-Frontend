@@ -35,6 +35,28 @@ export const userLogin = createAsyncThunk(
   }
 );
 
+
+export const autol = createAsyncThunk(
+  "users/autolog",
+  async ({localemail, localtoken}, thunkAPI) => {
+    try {
+      const response = await UserService.autologin(localemail, localtoken);
+      if (response) {
+        localStorage.setItem("isAuth", JSON.stringify(true));
+        localStorage.setItem("USER", JSON.stringify(response.data.user));
+        localStorage.setItem("auth_token", JSON.stringify(response.data.token));
+      }
+      return response;
+    } catch (error) {
+      console.error("Autologin error:", error);
+      return thunkAPI.rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
+
+
+
 // Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
@@ -166,6 +188,23 @@ const usersSlice = createSlice({
         state.isLoading = false;
         toast.error(action.payload?.error);
       })
+
+
+      .addCase(autol.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(autol.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isAuth = true;
+        state.loggedInUser = action.payload.user;
+        toast.success(action.payload.message);
+      })
+      .addCase(autol.rejected, (state, action) => {
+        state.isLoading = false;
+        toast.error(action.payload?.error);
+      })
+
+
       //getall
       .addCase(getAllUsers.pending, (state) => {
         state.isLoading = true;

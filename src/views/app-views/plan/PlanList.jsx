@@ -6,6 +6,7 @@ import EditPlan from "./EditPlan";
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteP, GetPlan } from "./PlanReducers/PlanSlice";
 import './PlanList.css'; // Import the CSS file
+import { getallcurrencies } from "../setting/currencies/currenciesreducer/currenciesSlice";
 
 const { Title, Text } = Typography;
 
@@ -73,6 +74,15 @@ const PlanList = () => {
     }
   ];
 
+  useEffect(()=>{
+    dispatch(getallcurrencies())
+  },[])
+
+    const allempdatass = useSelector((state) => state.currencies);
+    const fnddatass = allempdatass?.currencies;
+
+  
+
   return (
     <div className="plan-list-container p-6 bg-gray-50 min-h-screen">
       <div className="mx-auto">
@@ -128,14 +138,20 @@ const PlanList = () => {
                   }
                 >
                   <div className="space-y-6">
-                    <div className="text-center bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg">
-                      <div className="text-4xl font-bold text-indigo-600">
-                        <span className="text-xl">{plan.currency}</span>
-                        {plan.price}
-                      </div>
-                      <div className="text-gray-600 font-medium">per {plan.duration.toLowerCase()}</div>
-                    </div>
-
+                  <div className="text-center bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg">
+  {(() => {
+    const fnd = fnddatass.find((item) => item.id === plan.currency);
+    return (
+      <>
+        <div className="text-4xl font-bold text-indigo-600">
+          <span className="text-xl">{fnd ? fnd.currencyIcon : ''}</span>
+          {plan.price}
+        </div>
+        <div className="text-gray-600 font-medium">per {plan.duration.toLowerCase()}</div>
+      </>
+    );
+  })()}
+</div>
                     <div className="space-y-3">
                       <div className="flex items-center gap-3 bg-gray-50 p-2 rounded">
                         <CalendarOutlined className="text-blue-500" />

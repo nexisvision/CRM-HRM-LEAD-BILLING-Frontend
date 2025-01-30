@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from "framer-motion"
 import UserService from '../auth-reducers/UserService';
 import { useDispatch } from 'react-redux';
-import { userLogin } from '../auth-reducers/UserSlice';
+import { autol, userLogin } from '../auth-reducers/UserSlice';
 
 export const LoginForm = props => {
 
@@ -48,22 +48,63 @@ export const LoginForm = props => {
 		password: '2005ipo'
 	}
 
+	useEffect(() => {
+		const checkAndAutoLogin = async () => {
+			const localemail = localStorage.getItem('email');
+			const localtoken = localStorage.getItem('autologintoken');
+			console.log('Checking for email:', localemail); // Debug log
+
+			if (localemail) {
+				try {
+					console.log('Attempting auto login with:', localemail); // Debug log
+					const response = await dispatch(autol({localemail,localtoken}));
+					console.log('Auto login response:', response); // Debug log
+
+					if (response.meta.requestStatus === 'fulfilled') { 
+						localStorage.removeItem('email');
+						localStorage.removeItem("autologintoken");
+						navigate('/dashboard/default');
+						window.location.reload();
+					}
+				} catch (error) {
+					console.error('Auto login failed:', error);
+					localStorage.removeItem('email');
+				}
+			}
+		};
+
+		// Execute immediately
+		checkAndAutoLogin();
+		
+		// Also set up an interval to check a few times in case of timing issues
+		const intervalId = setInterval(checkAndAutoLogin, 1000); // Check every second
+		
+		// Clean up after 5 seconds
+		setTimeout(() => {
+			clearInterval(intervalId);
+		}, 5000);
+
+		return () => clearInterval(intervalId);
+	}, [dispatch, navigate]); // Add necessary dependencies
+
 	const onLogin = values => {
 		showLoading()
-
-		dispatch(userLogin(values))
-		.then((response) => {
-			if (response.meta.requestStatus === 'fulfilled') {
-				navigate('/dashboard/default');
-				window.location.reload();
-			}
-		})
-		.catch((error) => {
-			console.error('Login failed:', error);
-		})
-		.finally(() => {
-			// hideLoading();
-		});
+		
+	
+			dispatch(userLogin(values))
+			.then((response) => {
+				if (response.meta.requestStatus === 'fulfilled') { 
+					navigate('/dashboard/default');
+					window.location.reload();
+				}
+			})
+			.catch((error) => {
+				console.error('Login failed:', error);
+			})
+			.finally(() => {
+				// hideLoading();
+			});
+	
 
 		// signIn(values);
 
@@ -91,6 +132,8 @@ export const LoginForm = props => {
 		}
 	}, []);
 	
+
+
 	const renderOtherSignIn = (
 		<div>
 			<Divider>

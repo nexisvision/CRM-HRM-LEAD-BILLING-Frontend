@@ -40,6 +40,7 @@ const CompanyCard = ({ company }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const[idd,setIdd]= useState("");
+  const[emails,setEmail]= useState("");
 
 
   const showUserProfile = (idd) => {
@@ -78,6 +79,32 @@ const CompanyCard = ({ company }) => {
   useEffect(() => {
     dispatch(ClientData());
   }, [dispatch]);
+
+
+  const Loginfunctioan =  (data) => {
+    try {
+      console.log("data",data);
+      const tokens = localStorage.getItem("auth_token")
+      setTimeout(()=>{
+        localStorage.setItem('autologintoken',tokens);
+         localStorage.removeItem('auth_token');
+         localStorage.removeItem('USER');
+         localStorage.removeItem('isAuth');
+         setEmail(data.email);
+         localStorage.setItem('email',data.email);
+         navigate(`/app/auth/login?email=${encodeURIComponent(data.email)}`);
+         window.location.reload();
+      },1000)
+
+      setTimeout(()=>{
+        setEmail(data.email);
+        navigate(`/app/auth/login?email=${encodeURIComponent(data.email)}`);
+     },1100)
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
 
   const dropdownMenu = (elm) => (
     <Menu>
@@ -120,6 +147,22 @@ const CompanyCard = ({ company }) => {
           </Button>
         </Flex>
       </Menu.Item>
+
+      <Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className=""
+            icon={<MailOutlined />}
+            onClick={() => Loginfunctioan(elm)}
+            size="small"
+          >
+            <span>Login As Company</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
+
+
       <Menu.Item>
         <Flex alignItems="center">
           <Button type="" className="" icon={<EyeOutlined />} size="small">

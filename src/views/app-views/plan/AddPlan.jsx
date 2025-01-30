@@ -1,13 +1,31 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Select, Switch, Row, Col, message, Menu, Dropdown } from 'antd';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { Input, Button, Switch, Row, Col, message, Menu, Dropdown, Select } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
 import { CreatePlan, GetPlan } from './PlanReducers/PlanSlice';
 import { useNavigate } from 'react-router-dom';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
+import { getallcurrencies } from '../setting/currencies/currenciesreducer/currenciesSlice';
 
 const { Option } = Select;
 
+const validationSchema = Yup.object().shape({
+  name: Yup.string().required('Please enter the plan name!'),
+  price: Yup.string().required('Please enter the plan price!'),
+  duration: Yup.string().required('Please select a duration!'),
+  max_users: Yup.string().required('Please enter the maximum users!'),
+  max_customers: Yup.string().required('Please enter the maximum customers!'),
+  max_vendors: Yup.string().required('Please enter the maximum vendors!'),
+  max_clients: Yup.string().required('Please enter the maximum clients!'),
+  storage_limit: Yup.string().required('Please enter the storage limit!'),
+  description: Yup.string().required('Please enter a description!'),
+  trial_period: Yup.string().when('trial', {
+    is: true,
+    then: Yup.string().required('Please enter trial period!')
+  })
+});
+
 const AddPlan = ({ onClose }) => {
-  const [form] = Form.useForm();
   const [isTrialEnabled, setIsTrialEnabled] = useState(false);
 
   const [featureStates, setFeatureStates] = useState({
@@ -23,72 +41,49 @@ const AddPlan = ({ onClose }) => {
   const dispatch = useDispatch();
 
   const [durationType, setDurationType] = useState(null);
-const [selectedMonth, setSelectedMonth] = useState(null);
-const [selectedYear, setSelectedYear] = useState(null);
-
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(null);
 
   const handleMenuClick = (e) => {
     console.log('Selected:', e.key);
   };
 
+  useEffect(() => {
+    dispatch(getallcurrencies());
+  }, []);
 
-  // Nested menus for Yearly and Monthly options
-  // Update handlers
-const handleMonthlySelect = ({ key }) => {
-  setDurationType('Monthly');
-  setSelectedMonth(key);
-  form.setFieldsValue({ 
-    durationType: 'Monthly',
-    monthCount: key 
-  });
-};
+  const allempdatass = useSelector((state) => state.currencies);
+  const fnddatass = allempdatass?.currencies;
 
-const handleYearlyInputChange = ({ key }) => {
-  setDurationType('Yearly');
-  setSelectedYear(key);
-  form.setFieldsValue({ 
-    durationType: 'Yearly',
-    monthCount: key 
-  });
-  // setYearlyValue(e.target.value);
-  // form.setFieldsValue({ 
-  //   durationType: 'Yearly',
-  //   yearCount: e.target.value 
-  // });
-};
+  const yearlyMenu = (
+    <Menu onClick={({ key }) => {
+      setDurationType('Yearly');
+      setSelectedYear(key);
+    }}>
+      <Menu.Item className='w-full'>
+        <Input 
+          placeholder="Enter years"
+          type="number"
+          onChange={(e) => {
+            const value = e.target.value;
+            setSelectedYear(value);
+          }}
+        />
+      </Menu.Item>
+    </Menu>
+  );
 
-// Update the menus
-const yearlyMenu = (
-  <Menu onClick={handleYearlyInputChange}>
-    <Menu.Item className='w-full'>
-      <Input 
-        placeholder="Enter years"
-        type="number"
-        // min={1}
-        // max={10}
-        onChange={(e) => {
-          const value = e.target.value;
-          setSelectedYear(value);
-          form.setFieldsValue({ 
-            durationType: 'Yearly',
-            yearCount: value 
-          });
-        }}
-        // onClick={(e) => e.stopPropagation()}
-      />
-    </Menu.Item>
-  </Menu>
-);
+  const monthlyMenu = (
+    <Menu onClick={({ key }) => {
+      setDurationType('Monthly');
+      setSelectedMonth(key);
+    }}>
+      {Array.from({ length: 12 }, (_, i) => (
+        <Menu.Item key={i + 1}>{`${i + 1} Month${i + 1 > 1 ? 's' : ''}`}</Menu.Item>
+      ))}
+    </Menu>
+  );
 
-const monthlyMenu = (
-  <Menu onClick={handleMonthlySelect} >
-    {Array.from({ length: 12 }, (_, i) => (
-      <Menu.Item key={i + 1}>{`${i + 1} Month${i + 1 > 1 ? 's' : ''}`}</Menu.Item>
-    ))}
-  </Menu>
-);
-
-  // Main menu
   const mainMenu = (
     <Menu>
       <Menu.Item key="Lifetime">Lifetime</Menu.Item>
@@ -101,18 +96,31 @@ const monthlyMenu = (
     </Menu>
   );
 
-  const handleSubmit = (values) => {
-    // Include the featureStates as part of the payload
+  const initialValues = {
+    name: '',
+    price: '',
+    duration: 'Lifetime',
+    max_users: '',
+    max_customers: '',
+    max_vendors: '',
+    max_clients: '',
+    storage_limit: '',
+    description: '',
+    trial: false,
+    trial_period: ''
+  };
+
+  const handleSubmit = (values, { resetForm }) => {
     const payload = { ...values, features: featureStates };
 
     dispatch(CreatePlan(payload))
       .then(() => {
-        dispatch(GetPlan()); // Refresh leave data
+        dispatch(GetPlan());
         onClose();
         setIsTrialEnabled(false);
         message.success('Plan added successfully!');
-        form.resetFields(); // Reset form fields
-        navigate('/app/superadmin/plan'); // Redirect to leave page
+        resetForm();
+        navigate('/app/superadmin/plan');
       })
       .catch((error) => {
         message.error('Failed to add plan.');
@@ -128,179 +136,275 @@ const monthlyMenu = (
     setFeatureStates((prev) => ({ ...prev, [feature]: checked }));
   };
 
-  const cancel = () => {
-    form.resetFields();
-    onClose();
-    setIsTrialEnabled(false);
-  };
-
   return (
     <div>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        initialValues={{ duration: 'Lifetime', trial: false }}
-        onValuesChange={(changedValues) => {
-          if ('trial' in changedValues) {
-            handleTrialToggle(changedValues.trial);
-          }
-        }}
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
       >
-        <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+        {({ values, errors, touched, setFieldValue, handleChange }) => {
+          const handleMonthlySelect = ({ key }) => {
+            setDurationType('Monthly');
+            setSelectedMonth(key);
+            setFieldValue('duration', 'Monthly');
+            setFieldValue('monthCount', key);
+          };
 
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="name"
-              label="Name"
-              rules={[{ required: true, message: 'Please enter the plan name!' }]}
-            >
-              <Input placeholder="Enter Plan Name" />
-            </Form.Item>
-          </Col>
+          const handleYearlyInputChange = ({ key }) => {
+            setDurationType('Yearly');
+            setSelectedYear(key);
+            setFieldValue('duration', 'Yearly');
+            setFieldValue('yearCount', key);
+          };
 
-          <Col span={12}>
-            <Form.Item
-              name="price"
-              label="Price"
-              rules={[{ required: true, message: 'Please enter the plan price!' }]}
-            >
-              <Input placeholder="Enter Plan Price" />
-            </Form.Item>
-          </Col>
+          return (
+            <Form>
+              <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
 
-          <Col span={12}>
-            <Form.Item
-              name="duration"
-              label="Duration"
-              rules={[{ required: true, message: 'Please select a duration!' }]}
-            >
-              <Dropdown overlay={mainMenu} trigger={['click']} className='w-full'>
-                <Button>
-                  {durationType === 'Monthly' && selectedMonth
-                    ? `${selectedMonth} Month${selectedMonth > 1 ? 's' : ''}`
-                    : durationType === 'Yearly' && selectedYear
-                      ? `${selectedYear} Year${selectedYear > 1 ? 's' : ''}`
-                      : 'Select Duration'}
+              <Row gutter={16}>
+                <Col span={12}>
+                  <div className="form-group">
+                    <label>Name</label>
+                    <Field name="name">
+                      {({ field }) => (
+                        <Input 
+                          {...field} 
+                          placeholder="Enter Plan Name" 
+                        />
+                      )}
+                    </Field>
+                    {errors.name && touched.name && (
+                      <div className="error-message">{errors.name}</div>
+                    )}
+                  </div>
+                </Col>
+
+                <Col span={12}>
+                  <div className="form-group">
+                    <label>Price</label>
+                    <Field name="price">
+                      {({ field }) => (
+                        <Input 
+                          {...field} 
+                          placeholder="Enter Plan Price" 
+                        />
+                      )}
+                    </Field>
+                    {errors.price && touched.price && (
+                      <div className="error-message">{errors.price}</div>
+                    )}
+                  </div>
+                </Col>
+
+                <Col span={12}>
+                  <div className="form-group">
+                    <label>Duration</label>
+                    <Dropdown 
+                      overlay={mainMenu} 
+                      trigger={['click']} 
+                      className='w-full'
+                    >
+                      <Button>
+                        {durationType === 'Monthly' && selectedMonth
+                          ? `${selectedMonth} Month${selectedMonth > 1 ? 's' : ''}`
+                          : durationType === 'Yearly' && selectedYear
+                            ? `${selectedYear} Year${selectedYear > 1 ? 's' : ''}`
+                            : 'Select Duration'}
+                      </Button>
+                    </Dropdown>
+                    {errors.duration && touched.duration && (
+                      <div className="error-message">{errors.duration}</div>
+                    )}
+                  </div>
+                </Col>
+
+                <Col span={12}>
+                  <div className="form-group">
+                    <label>Maximum Users</label>
+                    <Field name="max_users">
+                      {({ field }) => (
+                        <Input 
+                          {...field} 
+                          placeholder="Enter Maximum Users" 
+                        />
+                      )}
+                    </Field>
+                    {errors.max_users && touched.max_users && (
+                      <div className="error-message">{errors.max_users}</div>
+                    )}
+                  </div>
+                </Col>
+
+                <Col span={12}>
+                  <div className="form-group">
+                    <label>Maximum Customers</label>
+                    <Field name="max_customers">
+                      {({ field }) => (
+                        <Input 
+                          {...field} 
+                          placeholder="Enter Maximum Customers" 
+                        />
+                      )}
+                    </Field>
+                    {errors.max_customers && touched.max_customers && (
+                      <div className="error-message">{errors.max_customers}</div>
+                    )}
+                  </div>
+                </Col>
+
+                <Col span={12}>
+                  <div className="form-group">
+                    <label>Maximum Vendors</label>
+                    <Field name="max_vendors">
+                      {({ field }) => (
+                        <Input 
+                          {...field} 
+                          placeholder="Enter Maximum Vendors" 
+                        />
+                      )}
+                    </Field>
+                    {errors.max_vendors && touched.max_vendors && (
+                      <div className="error-message">{errors.max_vendors}</div>
+                    )}
+                  </div>
+                </Col>
+
+                <Col span={12}>
+                  <div className="form-group">
+                    <label>Maximum Clients</label>
+                    <Field name="max_clients">
+                      {({ field }) => (
+                        <Input 
+                          {...field} 
+                          placeholder="Enter Maximum Clients" 
+                        />
+                      )}
+                    </Field>
+                    {errors.max_clients && touched.max_clients && (
+                      <div className="error-message">{errors.max_clients}</div>
+                    )}
+                  </div>
+                </Col>
+
+                <Col span={12}>
+                  <div className="form-group">
+                    <label>Storage Limit (MB)</label>
+                    <Field name="storage_limit">
+                      {({ field }) => (
+                        <Input 
+                          {...field} 
+                          placeholder="Maximum Storage Limit" 
+                          suffix="MB" 
+                        />
+                      )}
+                    </Field>
+                    {errors.storage_limit && touched.storage_limit && (
+                      <div className="error-message">{errors.storage_limit}</div>
+                    )}
+                  </div>
+                </Col>
+
+                <Col span={24} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">currency</label>
+                    <Field name="currency">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-2"
+                          placeholder="Select AddProjectMember"
+                          onChange={(value) => setFieldValue("currency", value)}
+                          value={values.currency}
+                        >
+                          {fnddatass && fnddatass?.length > 0 ? (
+                            fnddatass?.map((client) => (
+                              <Option key={client.id} value={client?.id}>
+                                {client?.currencyIcon ||
+                                  client?.currencyCode ||
+                                  "Unnamed currency"}
+                              </Option>
+                            ))
+                          ) : (
+                            <Option value="" disabled>
+                              No Clients Available
+                            </Option>
+                          )}
+                        </Select>
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="currency"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+              </Row>
+
+              <div className="form-group">
+                <label>Description</label>
+                <Field name="description">
+                  {({ field }) => (
+                    <Input.TextArea 
+                      {...field} 
+                      placeholder="Enter Description" 
+                      rows={4} 
+                    />
+                  )}
+                </Field>
+                {errors.description && touched.description && (
+                  <div className="error-message">{errors.description}</div>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>Trial is enabled (on/off)</label>
+                <Field name="trial">
+                  {({ field }) => (
+                    <Switch 
+                      checked={field.value}
+                      onChange={(checked) => {
+                        setFieldValue('trial', checked);
+                        handleTrialToggle(checked);
+                      }}
+                    />
+                  )}
+                </Field>
+              </div>
+
+              {isTrialEnabled && (
+                <div className="form-group">
+                  <label>Trial Days</label>
+                  <Field name="trial_period">
+                    {({ field }) => (
+                      <Input 
+                        {...field} 
+                        placeholder="Enter Number of Trial Days" 
+                      />
+                    )}
+                  </Field>
+                  {errors.trial_period && touched.trial_period && (
+                    <div className="error-message">{errors.trial_period}</div>
+                  )}
+                </div>
+              )}
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button style={{ marginRight: '8px' }} onClick={() => {
+                  onClose();
+                  setIsTrialEnabled(false);
+                }}>
+                  Cancel
                 </Button>
-              </Dropdown>
-            </Form.Item>
-          </Col>
-          
-
-          {/* <Col span={12}>
-            <Form.Item
-              name="duration"
-              label="Duration"
-              rules={[{ required: true, message: 'Please select a duration!' }]}
-            >
-              <Select>
-                <Option value="Lifetime">Lifetime</Option>
-                <Option value="Yearly">Yearly</Option>
-                <Option value="Monthly">Monthly</Option>
-              </Select>
-            </Form.Item>
-          </Col> */}
-
-          <Col span={12}>
-            <Form.Item
-              name="max_users"
-              label="Maximum Users"
-              rules={[{ required: true, message: 'Please enter the maximum users!' }]}
-            >
-              <Input placeholder="Enter Maximum Users" />
-            </Form.Item>
-          </Col>
-
-          <Col span={12}>
-            <Form.Item
-              name="max_customers"
-              label="Maximum Customers"
-              rules={[{ required: true, message: 'Please enter the maximum customers!' }]}
-            >
-              <Input placeholder="Enter Maximum Customers" />
-            </Form.Item>
-          </Col>
-
-          <Col span={12}>
-            <Form.Item
-              name="max_vendors"
-              label="Maximum Vendors"
-              rules={[{ required: true, message: 'Please enter the maximum vendors!' }]}
-            >
-              <Input placeholder="Enter Maximum Vendors" />
-            </Form.Item>
-          </Col>
-
-          <Col span={12}>
-            <Form.Item
-              name="max_clients"
-              label="Maximum Clients"
-              rules={[{ required: true, message: 'Please enter the maximum clients!' }]}
-            >
-              <Input placeholder="Enter Maximum Clients" />
-            </Form.Item>
-          </Col>
-
-          <Col span={12}>
-            <Form.Item
-              name="storage_limit"
-              label="Storage Limit (MB)"
-              rules={[{ required: true, message: 'Please enter the storage limit!' }]}
-            >
-              <Input placeholder="Maximum Storage Limit" suffix="MB" />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Form.Item
-          name="description"
-          label="Description"
-          rules={[{ required: true, message: 'Please enter a description!' }]}
-        >
-          <Input.TextArea placeholder="Enter Description" rows={4} />
-        </Form.Item>
-
-        <Form.Item name="trial" label="Trial is enabled (on/off)" valuePropName="checked">
-          <Switch />
-        </Form.Item>
-
-        {isTrialEnabled && (
-          <Form.Item
-            name="trial_period"
-            label="Trial Days"
-            rules={[{ required: false }]}
-          >
-            <Input placeholder="Enter Number of Trial Days" />
-          </Form.Item>
-        )}
-
-        {/* <Form.Item label="Features"> */}
-        {/* <Row gutter={16}>
-            {Object.keys(featureStates).map((feature) => (
-              <Col span={4} key={feature}>
-                <Switch
-                  checked={featureStates[feature]}
-                  onChange={(checked) => handleFeatureToggle(feature, checked)}
-                />
-                {feature}
-              </Col>
-            ))}
-          </Row> */}
-        {/* </Form.Item> */}
-
-        <Form.Item>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button style={{ marginRight: '8px' }} onClick={() => cancel()}>
-              Cancel
-            </Button>
-            <Button type="primary" htmlType="submit">
-              Create
-            </Button>
-          </div>
-        </Form.Item>
-      </Form>
+                <Button type="primary" htmlType="submit">
+                  Create
+                </Button>
+              </div>
+            </Form>
+          );
+        }}
+      </Formik>
     </div>
   );
 };

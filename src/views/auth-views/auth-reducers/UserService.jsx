@@ -13,6 +13,24 @@ const userLoginapi = async (data) => {
     return res.data
 }
 
+const autologin = async (localemail, localtoken) => {
+    try {
+      const res = await axios.post(
+        "http://localhost:5353/api/v1/super-admin/alllogin",
+        { login: localemail },
+        {
+          headers: {
+            Authorization: `Bearer ${localtoken}`,
+          },
+        }
+      );
+      return res.data;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      throw error;
+    }
+};
+
 // const getAllUsers = async () => {
 //     const res = await axios.get(`${baseUrl}users/all`, getToken());
 //     return res.data
@@ -39,6 +57,7 @@ const userLoginapi = async (data) => {
 const UserService = {
     // addUser,
     userLoginapi,
+    autologin,
     // getAllUsers,    
     // getUserById,
     // deleteUser,
