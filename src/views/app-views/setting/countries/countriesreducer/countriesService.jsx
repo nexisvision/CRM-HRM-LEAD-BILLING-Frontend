@@ -28,10 +28,11 @@ const GetAllCountries = async () => {
     }
 };
 
-const updateCountries = async (id) => {
+const updateCountries = async (id,values) => {
     const token = localStorage.getItem("auth_token");
     try {
-        const res = await axios.put(`http://localhost:5353/api/v1/countries/${id}`, {
+        const res = await axios.put(`http://localhost:5353/api/v1/countries/${id}`,
+         values,{
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -43,20 +44,26 @@ const updateCountries = async (id) => {
     }
 };
 
+
 const deleteCountries = async (id) => {
     const token = localStorage.getItem("auth_token");
+  
     try {
-        const res = await axios.delete(`http://localhost:5353/api/v1/countries/${id}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return res.data;
+      const res = await axios.delete(
+        `http://localhost:5353/api/v1/countries/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      //   dispatch(empdata());
+      return res.data;
     } catch (error) {
-        console.error("Error fetching data:", error);
-        throw error;
+      console.error("Error fetching data:", error);
+      throw error;
     }
-};
+  };
 
 
 const UserAddCountries ={

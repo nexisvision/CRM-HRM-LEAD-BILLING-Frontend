@@ -1,17 +1,29 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserAddCountries from "./countriesService";
 import { toast } from "react-toastify";
+import axios from 'axios';
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 export const addCountry = createAsyncThunk(
     "countries/AddCountry",
-    async (data, thunkAPI) => {
+    async (data, { rejectWithValue }) => {
         try {
-            const response = await UserAddCountries.AddCountries(data);
-            return response;
+            const response = await axios.post(`http://localhost:5353/api/v1/countries/`, data, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+                },
+            });
+            return response.data;
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data);
+            return rejectWithValue(
+                error.response?.data?.message || 'Something went wrong'
+            );
         }
     }
 );
+
 export const getallcountries = createAsyncThunk(
     "countries/GetAllCountries",
     async (_, thunkAPI) => {
@@ -23,28 +35,33 @@ export const getallcountries = createAsyncThunk(
         }
     }
 );
+
 export const updatecountries = createAsyncThunk(
     "countries/updateCountries",
-    async (id, thunkAPI) => {
+    async ({idd,values}, thunkAPI) => {
         try {
-            const response = await UserAddCountries.updateCountries(id);
+            const response = await UserAddCountries.updateCountries(idd,values);
             return response.data;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
         }
     }
 );
-export const deleteCountries = createAsyncThunk(
-    "countries/deleteCountries",
-    async (id, thunkAPI) => {
+
+export const DeletePs = createAsyncThunk(
+    "countries/deleteCountry",
+    async (id, { rejectWithValue, dispatch }) => {
         try {
             const response = await UserAddCountries.deleteCountries(id);
-            return response.data;
+            dispatch(getallcountries());
+            return { id, ...response };
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data);
+            console.error('Delete Thunk Error:', error);
+            return rejectWithValue(error.message || 'Failed to delete country');
         }
     }
 );
+
 const countriesSlice = createSlice({
     name: "countries",
     initialState: {
@@ -52,6 +69,7 @@ const countriesSlice = createSlice({
         editItem: {},
         message: "",
         isLoading: false,
+        error: null,
         addModel: false,
         editModal: false,
     },
@@ -76,16 +94,17 @@ const countriesSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-        .addCase(addCountry.pending, (state, action) => {
+        .addCase(addCountry.pending, (state) => {
             state.isLoading = true;
+            state.error = null;
         })
         .addCase(addCountry.fulfilled, (state, action) => {
-            state.countries = action.payload;
+            state.countries.push(action.payload);
             state.isLoading = false;
         })
         .addCase(addCountry.rejected, (state, action) => {
             state.isLoading = false;
-            toast.error(action.payload?.message);
+            state.error = action.payload;
         })
         .addCase(getallcountries.pending, (state, action) => {
             state.isLoading = true;
@@ -109,18 +128,25 @@ const countriesSlice = createSlice({
             state.isLoading = false;
             toast.error(action.payload?.message);
         })
-        .addCase(deleteCountries.pending, (state, action) => {
+
+
+
+
+        .addCase(DeletePs.pending, (state) => {
             state.isLoading = true;
+            state.error = null;
         })
-        .addCase(deleteCountries.fulfilled, (state, action) => {
-          state.editItem = action.payload;
+        .addCase(DeletePs.fulfilled, (state, action) => {
             state.isLoading = false;
+            state.countries = state.countries.filter(country => country.id !== action.payload.id);
+            state.message = "Country deleted successfully";
         })
-        .addCase(deleteCountries.rejected, (state, action) => {
+        .addCase(DeletePs.rejected, (state, action) => {
             state.isLoading = false;
-            toast.error(action.payload?.message);
+            state.error = action.payload;
         })
     }
 });
+
 export const { setSelectedCountries, clearCountriesState } = countriesSlice.actions;
 export default countriesSlice.reducer;

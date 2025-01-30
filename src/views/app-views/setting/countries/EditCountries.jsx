@@ -1,22 +1,48 @@
-import React, { useEffect, useState,} from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Col, Input, message, Row } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updatecountries, getallcountries } from './countriesreducer/countriesSlice';
 
-const EditCountries = ({id, onClose }) => {
+const EditCountries = ({ idd, onClose }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    // const { id } = useParams(); // Get id from URL parameters
 
-    const [countryData, setCountryData] = useState(null);
+    const [initialValues, setInitialValues] = useState({
+        countryName: '',
+        shortcode: '',
+        phonecode: '',
+    });
+
+    const alladats = useSelector((state) => state.countries.countries);
+
+    console.log("ppp",alladats)
+    console.log("ppp",idd)
+
+    useEffect(() => {
+        dispatch(getallcountries());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (alladats && idd) {
+            const data = alladats.find((x) => x.id === idd);
+            console.log("ppsssp",data)
+            if (data) {
+                setInitialValues({
+                    countryName: data.countryName || '',
+                    shortcode: data.countryCode || '',
+                    phonecode: data.phoneCode || '',
+                });
+            }
+        }
+    }, [alladats, idd]);
+
     const onSubmit = (values) => {
         console.log('Submitted values:', values);
 
-        // Dispatch API call to update the country
-        dispatch(updatecountries({ id, values }))
+        dispatch(updatecountries({ idd, values }))
             .then(() => {
                 dispatch(getallcountries()); // Refresh country data
                 message.success('Country updated successfully!');
@@ -28,14 +54,8 @@ const EditCountries = ({id, onClose }) => {
             });
     };
 
-    const initialValues = {
-        name: '',
-        shortcode: '',
-        phonecode: '',
-    };
-
     const validationSchema = Yup.object({
-        name: Yup.string().required('Please enter name.'),
+        countryName: Yup.string().required('Please enter name.'),
         shortcode: Yup.string().required('Please enter a short code.'),
         phonecode: Yup.string().required('Please enter a phone code.'),
     });
@@ -49,20 +69,21 @@ const EditCountries = ({id, onClose }) => {
                     initialValues={initialValues}
                     validationSchema={validationSchema}
                     onSubmit={onSubmit}
+                    enableReinitialize
                 >
-                    {({ values, handleSubmit, setFieldValue, setFieldTouched }) => (
+                    {({ values, handleSubmit }) => (
                         <Form className="formik-form" onSubmit={handleSubmit}>
                             <Row gutter={16}>
-                                <Col span={24} className="mt-2">
+                                <Col span={24} className="mt-2"> 
                                     <div className="form-item">
                                         <label className="font-semibold">Name</label>
                                         <Field
-                                            name="name"
+                                            name="countryName"
                                             as={Input}
                                             placeholder="Enter Name"
                                         />
                                         <ErrorMessage
-                                            name="name"
+                                            name="countryName"
                                             component="div"
                                             className="error-message text-red-500 my-1"
                                         />
