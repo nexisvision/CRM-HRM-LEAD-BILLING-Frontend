@@ -25,9 +25,20 @@ export const getallcountries = createAsyncThunk(
 );
 export const updatecountries = createAsyncThunk(
     "countries/updateCountries",
-    async (_, thunkAPI) => {
+    async (id, thunkAPI) => {
         try {
-            const response = await UserAddCountries.updateCountries();
+            const response = await UserAddCountries.updateCountries(id);
+            return response.data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response.data);
+        }
+    }
+);
+export const deleteCountries = createAsyncThunk(
+    "countries/deleteCountries",
+    async (id, thunkAPI) => {
+        try {
+            const response = await UserAddCountries.deleteCountries(id);
             return response.data;
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
@@ -38,6 +49,7 @@ const countriesSlice = createSlice({
     name: "countries",
     initialState: {
         countries: [],
+        editItem: {},
         message: "",
         isLoading: false,
         addModel: false,
@@ -51,7 +63,16 @@ const countriesSlice = createSlice({
             state.error = null;
             state.success = false;
             state.message = '';
-        }
+        },
+        toggleEditModal: (state, action) => {
+            state.editModal = action.payload;
+            state.editItem = {};
+          },
+          editUserData: (state, action) => {
+            state.editItem = action.payload;
+            state.editModal = !state.editModal;
+          },
+
     },
     extraReducers: (builder) => {
         builder
@@ -81,10 +102,21 @@ const countriesSlice = createSlice({
             state.isLoading = true;
         })
         .addCase(updatecountries.fulfilled, (state, action) => {
-            state.countries = action.payload;
+          state.editItem = action.payload.data;
             state.isLoading = false;
         })
         .addCase(updatecountries.rejected, (state, action) => {
+            state.isLoading = false;
+            toast.error(action.payload?.message);
+        })
+        .addCase(deleteCountries.pending, (state, action) => {
+            state.isLoading = true;
+        })
+        .addCase(deleteCountries.fulfilled, (state, action) => {
+          state.editItem = action.payload;
+            state.isLoading = false;
+        })
+        .addCase(deleteCountries.rejected, (state, action) => {
             state.isLoading = false;
             toast.error(action.payload?.message);
         })

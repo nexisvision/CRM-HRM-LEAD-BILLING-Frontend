@@ -177,7 +177,7 @@ import utils from 'utils'
 import axios from 'axios';
 import { useDispatch,useSelector } from 'react-redux';
 import { getallcountries } from './countriesreducer/countriesSlice';
-
+import { deleteCountries } from './countriesreducer/countriesSlice';
 import userData from 'assets/data/user-list.data.json';
 import AddCountries from './AddCountries';
 import EditCountries from './EditCountries';
@@ -248,6 +248,16 @@ export const CountriesList = () => {
         
         setFilteredData(filtered);
     };
+    const handleDeleteCountry = async (countryId) => {
+        try {
+            await dispatch(deleteCountries(countryId)).unwrap();
+            message.success('Country deleted successfully');
+            // Refresh the countries list
+            dispatch(getallcountries());
+        } catch (error) {
+            message.error('Failed to delete country: ' + (error.message || 'Unknown error'));
+        }
+    };
 
     const dropdownMenu = (elm) => (
         <Menu>
@@ -259,10 +269,10 @@ export const CountriesList = () => {
                 </Flex>
             </Menu.Item>
             <Menu.Item>
-                {/* <Flex alignItems="center"  onClick={() => deleteUser(elm.id)}>
+                <Flex alignItems="center"  onClick={() => handleDeleteCountry(elm.id)}>
                     <DeleteOutlined />
                     <span className="ml-2">Delete</span>
-                </Flex> */}
+                </Flex>
             </Menu.Item>
         </Menu>
     );

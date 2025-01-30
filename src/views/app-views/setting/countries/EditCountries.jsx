@@ -1,31 +1,31 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal, Select, DatePicker } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
-// import { Card, Table,  Badge, Menu, Tag,Modal } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import 'react-quill/dist/quill.snow.css';
-import ReactQuill from 'react-quill';
-import OrderListData from 'assets/data/order-list.data.json';
-import Flex from 'components/shared-components/Flex'
-import utils from 'utils';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import userData from 'assets/data/user-list.data.json';
-import dayjs from 'dayjs';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
+import React, { useEffect, useState,} from 'react';
+import { Button, Col, Input, message, Row } from 'antd';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { useDispatch } from 'react-redux';
+import { updatecountries, getallcountries } from './countriesreducer/countriesSlice';
 
-const { Option } = Select;
-
-const EditCountries = () => {
-    const [users, setUsers] = useState(userData);
-
+const EditCountries = ({id, onClose }) => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
+    // const { id } = useParams(); // Get id from URL parameters
 
+    const [countryData, setCountryData] = useState(null);
     const onSubmit = (values) => {
         console.log('Submitted values:', values);
-        message.success('Country added successfully!');
-        navigate('/app/setting/countries/');
+
+        // Dispatch API call to update the country
+        dispatch(updatecountries({ id, values }))
+            .then(() => {
+                dispatch(getallcountries()); // Refresh country data
+                message.success('Country updated successfully!');
+                onClose(); // Close modal or perform any other action
+            })
+            .catch((error) => {
+                message.error('Failed to update country.');
+                console.error('Edit API error:', error);
+            });
     };
 
     const initialValues = {
@@ -41,61 +41,88 @@ const EditCountries = () => {
     });
 
     return (
-        <>
-            <div>
-                <div className=''>
-                    <h2 className="mb-1 border-b font-medium"></h2>
-                   
-                        <div className="">
-                            <div className=" p-2">
-                                <Formik
-                                    initialValues={initialValues}
-                                    validationSchema={validationSchema}
-                                    onSubmit={onSubmit}
+        <div>
+            <h2 className="mb-1 border-b font-medium"></h2>
+
+            <div className="p-2">
+                <Formik
+                    initialValues={initialValues}
+                    validationSchema={validationSchema}
+                    onSubmit={onSubmit}
+                >
+                    {({ values, handleSubmit, setFieldValue, setFieldTouched }) => (
+                        <Form className="formik-form" onSubmit={handleSubmit}>
+                            <Row gutter={16}>
+                                <Col span={24} className="mt-2">
+                                    <div className="form-item">
+                                        <label className="font-semibold">Name</label>
+                                        <Field
+                                            name="name"
+                                            as={Input}
+                                            placeholder="Enter Name"
+                                        />
+                                        <ErrorMessage
+                                            name="name"
+                                            component="div"
+                                            className="error-message text-red-500 my-1"
+                                        />
+                                    </div>
+                                </Col>
+
+                                <Col span={24} className="mt-2">
+                                    <div className="form-item">
+                                        <label className="font-semibold">Short Code</label>
+                                        <Field
+                                            name="shortcode"
+                                            as={Input}
+                                            placeholder="Enter Short Code"
+                                        />
+                                        <ErrorMessage
+                                            name="shortcode"
+                                            component="div"
+                                            className="error-message text-red-500 my-1"
+                                        />
+                                    </div>
+                                </Col>
+
+                                <Col span={24} className="mt-2">
+                                    <div className="form-item">
+                                        <label className="font-semibold">Phone Code</label>
+                                        <Field
+                                            name="phonecode"
+                                            as={Input}
+                                            placeholder="Enter Phone Code"
+                                        />
+                                        <ErrorMessage
+                                            name="phonecode"
+                                            component="div"
+                                            className="error-message text-red-500 my-1"
+                                        />
+                                    </div>
+                                </Col>
+                            </Row>
+
+                            {/* Buttons */}
+                            <div className="form-buttons text-right">
+                                <Button
+                                    type="default"
+                                    className="mr-2"
+                                    onClick={() => navigate('/app/setting/countries')}
                                 >
-                                    {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
-                                        <Form className="formik-form" onSubmit={handleSubmit}>
-                                            <Row gutter={16}>
-                    
-                                                <Col span={24} className='mt-2'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold'>Name</label>
-                                                        <Field name="name" as={Input} placeholder="Enter Name" />
-                                                        <ErrorMessage name="name" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
-                                                </Col>
-
-                                                <Col span={24} className='mt-2'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold'>Short Code</label>
-                                                        <Field name="shortcode" as={Input} placeholder="Enter Short Code" />
-                                                        <ErrorMessage name="shortcode" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
-                                                </Col>
-
-                                                <Col span={24} className='mt-2'>
-                                                    <div className="form-item">
-                                                        <label className='font-semibold'>Phone Code</label>
-                                                        <Field name="phonecode" as={Input} placeholder="Enter Phone Code" />
-                                                        <ErrorMessage name="phonecode" component="div" className="error-message text-red-500 my-1" />
-                                                    </div>
-                                                </Col>
-
-                                            </Row>
-                                        </Form>
-                                    )}
-                                </Formik>
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                >
+                                    Update Country
+                                </Button>
                             </div>
-                        </div>
-
-
-                    <div className="form-buttons text-right">
-                        <Button type="default" className="mr-2">Cancel</Button>
-                        <Button type="primary" htmlType="submit">Edit</Button>
-                    </div>
-                </div>
+                        </Form>
+                    )}
+                </Formik>
             </div>
-        </>
+        </div>
     );
 };
 
