@@ -26,7 +26,7 @@ function App() {
             <Layouts />
           </ThemeSwitcherProvider>
         </BrowserRouter>  
-      </Provider>
+      </Provider> 
     </div>
   );
 }

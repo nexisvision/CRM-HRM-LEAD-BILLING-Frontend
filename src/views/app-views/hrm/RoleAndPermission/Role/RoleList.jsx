@@ -115,17 +115,15 @@ const RoleList = () => {
     try {
       const parsedPermissions =
         permissions && typeof permissions === "string" ? JSON.parse(permissions) : {};
+  
       return Object.keys(parsedPermissions).map(moduleKey => (
         <div key={moduleKey}>
-          {Object.keys(parsedPermissions[moduleKey]).map(permissionKey => (
-            <div key={permissionKey} style={{ marginBottom: '5px' }}>
-
-              {Object.keys(parsedPermissions[moduleKey][permissionKey]).map(actionKey => (
-                parsedPermissions[moduleKey][permissionKey][actionKey] && (
-                  <Button key={actionKey} size="small" style={{ margin: '2px', backgroundColor: '#3e79f7', color: 'white' }}>
-                    {`${permissionKey}  ${actionKey}`}
-                  </Button>
-                )
+          {parsedPermissions[moduleKey].map(permission => (
+            <div key={permission.key} style={{ marginBottom: '5px' }}>
+              {permission.permissions.map(action => (
+                <Button key={`${permission.key}-${action}`} size="small" style={{ margin: '2px', backgroundColor: '#3e79f7', color: 'white' }}>
+                  {`${permission.key.replace('extra-hrm-', '')}  ${action}`} {/* Remove prefix for cleaner display */}
+                </Button>
               ))}
             </div>
           ))}

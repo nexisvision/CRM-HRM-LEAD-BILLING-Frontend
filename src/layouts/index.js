@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, memo } from 'react'
+import React, { lazy, Suspense, memo, useEffect } from 'react'
 import { useSelector } from 'react-redux';
 import { ConfigProvider } from 'antd';
 import Loading from 'components/shared-components/Loading';
@@ -6,11 +6,19 @@ import { lightTheme, darkTheme } from 'configs/ThemeConfig';
 import { resources } from 'lang';
 import useBodyClass from 'utils/hooks/useBodyClass';
 import Routes from 'routes'
+import { getRoles } from 'views/app-views/hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice';
+import { useDispatch } from 'react-redux';
 
 const AppLayout = lazy(() => import('./AppLayout'));
 const AuthLayout = lazy(() => import('./AuthLayout'));
 
 const Layouts = () => {
+const dispatch = useDispatch();
+
+	
+	useEffect(() => {
+		dispatch(getRoles());
+	  }, [dispatch]);
 
 	const token = useSelector(state => state.auth.token);
 	const blankLayout = useSelector(state => state.theme.blankLayout);
