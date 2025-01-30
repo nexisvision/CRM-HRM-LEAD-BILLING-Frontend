@@ -63,7 +63,7 @@ const RoleList = () => {
     if (filteredData) {
       setUsers(filteredData);
     }
-  }, [filteredData]);
+  }, []);
 
 
 

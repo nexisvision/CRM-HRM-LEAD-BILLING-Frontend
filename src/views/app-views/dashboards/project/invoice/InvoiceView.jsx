@@ -1,32 +1,95 @@
 import React, { useEffect, useState } from 'react';
 import { PrinterOutlined, DownloadOutlined } from '@ant-design/icons';
 import { Card, Table, Button, Select } from 'antd';
-import { invoiceData } from '../../../pages/invoice/invoiceData';
-// import Qr from '../../../../assets/svg/Qr.png';
+import dayjs from 'dayjs';
+// import { invoiceData } from '../../../pages/invoice/invoiceData'; // Remove this as we fetch data from Redux
+import { getAllInvoices } from "../invoice/invoicereducer/InvoiceSlice";
 import NumberFormat from 'react-number-format';
 import html2pdf from 'html2pdf.js';
 import { useDispatch, useSelector } from 'react-redux';
+import { getAllUsers } from "views/auth-views/auth-reducers/UserSlice"
+import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice"
+// import { SubClient } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice"
 
 import { useParams } from 'react-router-dom';
 
 const { Column } = Table;
 const { Option } = Select;
 
-const InvoiceView = ({idd, onClose}) => {
-    
+const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
+
+    const dispatch = useDispatch();
     const [template, setTemplate] = useState('rendertemplate');
+    const { id } = useParams(); // Get project ID from route
+    const { invoices, loading, error } = useSelector((state) => state.invoice);
+    const invoiceDataa = invoices.find(invoice => invoice.id === idd);
+    // const invoiceDataa = Array.isArray(invoices) ? invoices.find(invoice => invoice.id === idd) : null;
 
-    const { id } = useParams();
-    // const [idd, setIdd] = useState("");
+    const [parsedInvoice, setParsedInvoice] = useState(null);
 
-  const { invoices } = useSelector((state) => state.invoice);
-  const invoiceDataa = invoices.find(invoice => invoice.id === idd);
 
-    
-    //  useEffect(() => {
-    //     console.log("Fetching invoices for ID:", id);
-    //     dispatch(getAllInvoices(id));
-    //   }, [dispatch]);
+    console.log("ssssssssss", invoiceDataa, "invoiceDataa");
+
+    const allloggeduser = useSelector((state) => state.user.loggedInUser)
+    console.log(allloggeduser, "allloggeduser");
+
+    // Get the client data for the selected ID
+    const allclient = useSelector((state) => state.SubClient.SubClient.data);
+    const clientDataa = allclient.find((SubClient) => SubClient.id === invoiceDataa?.client);
+
+    console.log("ppppppppppppp", clientDataa, "clientDataa");
+    // const clientDataa = allclient.find((SubClient) => SubClient.id === id);
+
+    // UseEffect to fetch client data
+    useEffect(() => {
+        dispatch(ClientData()); // Fetch all client data when the component mounts
+    }, [dispatch]);
+
+
+    useEffect(() => {
+        dispatch(getAllInvoices(id)); // Fetch all invoices for invoice ID
+    }, [dispatch, id]);
+
+
+
+    useEffect(() => {
+        if (invoiceData && invoiceData.items) {
+            try {
+                const parsedItems = invoiceData.items && invoiceData.items !== "undefined" && invoiceData.items !== ""
+                    ? JSON.parse(invoiceData.items)
+                    : [];
+
+                setParsedInvoice({
+                    ...invoiceData,
+                    items: parsedItems,
+                });
+            } catch (error) {
+                console.error('Error parsing items:', error);
+            }
+        }
+    }, [invoiceData]);
+
+
+
+    //error handleing
+    useEffect(() => {
+        if (error) {
+            console.error("Error fetching invoices: ", error)
+        }
+    }, [error])
+
+
+    if (loading) {
+        return <div>Loading invoices...</div>;
+    }
+
+    if (error) {
+        return <div>Error loading invoices. Please try again later.</div>;
+    }
+
+    if (!invoiceDataa) {
+        return <div>Invoice not found</div>;
+    }
 
     const handlePrint = () => {
         const printContent = document.getElementById('printable-content');
@@ -91,30 +154,41 @@ const InvoiceView = ({idd, onClose}) => {
             margin: 1,
             filename: 'invoice.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { 
+            html2canvas: {
                 scale: 2,
                 useCORS: true,
                 logging: false
             },
-            jsPDF: { 
-                unit: 'mm', 
-                format: 'a4', 
-                orientation: 'portrait' 
+            jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
             }
         };
 
         html2pdf().set(opt).from(element).save();
     };
 
-    const total = () => {
-        let total = 0;
-        invoiceData.forEach((elm) => {
-            total += elm.price;
-        });
-        return total;
+
+    const calculateSubtotal = (items) => {
+        return items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    };
+
+    // Function to calculate VAT (10%)
+    const calculateVAT = (subtotal) => {
+        return (subtotal / 100) * 10;
+    };
+
+    // Function to calculate Grand Total
+    const calculateFinalTotal = (subtotal, vat) => {
+        return subtotal - vat;
     };
 
     const renderModernTemplate = () => {
+        console.log(invoiceDataa, "invoiceDataa");
+        console.log(allclient, "allclient");
+        console.log(allloggeduser, "allloggeduser");
+
         return (
             <div className="bg-white p-6">
                 {/* Header with gradient background */}
@@ -128,140 +202,157 @@ const InvoiceView = ({idd, onClose}) => {
                 </div>
 
                 {/* Company & Invoice Details */}
-                <div className="flex justify-between mb-8">
-                    <div>
+                <div className="flex justify-end mb-8">
+                    {/* <div>
                         <h2 className="font-bold text-lg mb-1">Dreamguys Technologies PVT Ltd</h2>
                         <p className="text-gray-600">Address: 15 Hodges Mews,High Wycomb HP123JL,United Kingdom</p>
-                    </div>
-                    <div className="text-right">
-                            <p>Invoice Num: {invoiceDataa?.invoiceNumber}</p>
-                        <p>Invoice Date: {invoiceDataa?.issueDate}</p>
+                    </div> */}
+                    <div>
+                        <div className='flex'>
+                            <span className="mb-1 me-2 font-weight-semibold">Invoice Num:</span>
+                            <p className='text-right'>{invoiceDataa?.invoiceNumber}</p>
+                        </div>
+                        <div className='flex'>
+                            <span className="mb-1 me-2 font-weight-semibold">Issue Date:</span>
+                            <p>{invoiceDataa?.issueDate ? dayjs(invoiceDataa.issueDate).format('DD MMMM, YYYY') : ''}</p>
+                        </div>
+                        <div className='flex'>
+                            <span className="mb-1 me-2 font-weight-semibold">Due Date:</span>
+                            <p>{invoiceDataa?.dueDate ? dayjs(invoiceDataa.dueDate).format('DD MMMM, YYYY') : ''}</p>
+                        </div>
                     </div>
                 </div>
 
                 {/* Customer Info Section */}
                 <div className="mb-8">
-                    <div className="bg-gray-50 p-2 mb-4">
-                        <h3 className="text-gray-700">Customer Info</h3>
-                    </div>
 
-                    <div className="grid grid-cols-3 gap-x-20 gap-y-4">
+                    <div className="grid grid-cols-2 gap-x-20 gap-y-4">
+                        <div className='text-left'>
+                            <address>
+                                <p>
+                                    <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
+                                    {allloggeduser ? (
+                                        <>
+                                            <span>created_by:{allloggeduser?.created_by}</span><br />
+                                            <span>username:{allloggeduser?.username}</span><br />
+                                            <p>Email: {allloggeduser?.email}</p>
+                                            <p>Phone: {allloggeduser?.phone}</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>Address not found</span><br />
+                                            <span>City not found</span><br />
+                                            <p>Email: Email not found</p>
+                                            <p>Phone: Phone not found</p>
+                                        </>
+                                    )}
+                                </p>
+                            </address>
+                        </div>
+
+                        {/* Company Details Section */}
                         <div>
-                            <p className="text-gray-600 mb-2">Invoice To :</p>
-                            <p>Walter Roberson</p>
-                            <p>299 Star Trek Drive, Panama City,</p>
-                            <p>Florida, 32405,</p>
-                            <p>USA.</p>
+                            <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />
+                            {clientDataa ? (
+                                <address>
+                                    <p>
+                                        <span>Created By: {clientDataa.created_by}</span><br />
+                                        <span>Username: {clientDataa.username}</span><br />
+                                        <p>Email: {clientDataa.email}</p>
+                                        <p>Phone: {clientDataa.phone}</p>
+
+
+                                    </p>
+                                </address>
+                            ) : (
+                                <p>Loading client data...</p>
+                            )}
                         </div>
-                        <div>
-                            <p className="text-gray-600 mb-2">Pay To :</p>
-                            <p>Walter Roberson</p>
-                            <p>299 Star Trek Drive, Panama City,</p>
-                            <p>Florida, 32405,</p>
-                            <p>USA.</p>
-                        </div>
-                        <div className="text-left bg-gray-100 p-3">
-                            <p className="text-gray-600">Due Date</p>
-                            <p>{invoiceDataa?.dueDate}</p>
-                            {/* <div className="text-left">
-                                <p className="text-gray-600">Payment Status</p>
-                                <p className="text-blue-500">NOT PAID</p>
-                            </div> */}
-                        </div>
+                
                     </div>
                 </div>
 
                 {/* Items Table */}
                 <div className="mt-4">
-                    <Table dataSource={invoiceData} pagination={false} className="mb-5">
-                        <Column title="No." dataIndex="key" key="key" />
-                        <Column title="Product" dataIndex="product" key="product" />
-                        <Column title="Quantity" dataIndex="quantity" key="quantity" />
-                        <Column title="Price"
-                            render={(text) => (
-                                <NumberFormat
-                                    displayType={'text'}
-                                    value={(Math.round(text.price * 100) / 100).toFixed(2)}
-                                    prefix={'$'}
-                                    thousandSeparator={true}
+                    {parsedInvoice && (
+                        <div key={parsedInvoice.id}>
+                            {/* Table for Invoice Items */}
+                            <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
+                                <Table.Column
+                                    title="No."
+                                    key="key"
+                                    render={(text, record, index) => index + 1}
                                 />
-                            )}
-                            key="price"
-                        />
-                        <Column
-                            title="Total"
-                            render={(text) => (
-                                <NumberFormat
-                                    displayType={'text'}
-                                    value={(Math.round((text.price * text.quantity) * 100) / 100).toFixed(2)}
-                                    prefix={'$'}
-                                    thousandSeparator={true}
+                                <Table.Column
+                                    title="Product"
+                                    dataIndex="product"
+                                    key="product"
+                                    render={(text) => (
+                                        <div dangerouslySetInnerHTML={{ __html: text }} />
+                                    )}
                                 />
-                            )}
-                            key="total"
-                        />
+                                <Table.Column
+                                    title="Quantity"
+                                    dataIndex="quantity"
+                                    key="quantity"
+                                />
+                                <Table.Column
+                                    title="Price"
+                                    render={(record) => (
+                                        <NumberFormat
+                                            displayType="text"
+                                            value={Math.round(record.price * 100) / 100}
+                                            prefix="$"
+                                            thousandSeparator={true}
+                                        />
+                                    )}
+                                    key="price"
+                                />
+                                <Table.Column
+                                    title="Amount"
+                                    render={(record) => (
+                                        <NumberFormat
+                                            displayType="text"
+                                            value={Math.round(record.price * record.quantity * 100) / 100}
+                                            prefix="$"
+                                            thousandSeparator={true}
+                                        />
+                                    )}
+                                    key="amount"
+                                />
+                            </Table>
 
-{/* 
-<Table dataSource={invoiceData.items} pagination={false} className="mb-5">
-    <Column title="No." dataIndex="key" key="key" />
-    <Column title="Product" dataIndex="description" key="description" />
-    <Column title="Quantity" dataIndex="quantity" key="quantity" />
-    <Column 
-        title="Price"
-        render={(text) => (
-            <NumberFormat
-                displayType={'text'}
-                value={invoiceData.total}
-                prefix={`${invoiceData.currency}: `}
-                thousandSeparator={true}
-            />
-        )}
-        key="price"
-    />
-    <Column
-        title="Total"
-        render={(text) => (
-            <NumberFormat
-                displayType={'text'}
-                value={text.amount.toFixed(2)}
-                prefix={'$'}
-                thousandSeparator={true}
-            />
-        )}
-        key="total"
-    />
-</Table> */}
-
-
-
-
-                        
-                    </Table>
-                    <div className="d-flex justify-content-end">
-                        <div className="text-center">
-                            <div className="border-bottom">
-                                <p className="mb-2">
-                                    <span>Sub - Total amount: </span>
-                                    <NumberFormat
-                                        displayType={'text'}
-                                        value={(Math.round((total()) * 100) / 100).toFixed(2)}
-                                        prefix={'$'}
-                                        thousandSeparator={true}
-                                    />
-                                </p>
-                                <p>vat (10%) : {(Math.round(((total() / 100) * 10) * 100) / 100).toFixed(2)}</p>
+                            {/* Invoice Summary */}
+                            <div className="d-flex justify-content-end mb-3">
+                                <div className="text-center">
+                                    <div className="border-bottom">
+                                        <p className="mb-2">
+                                            <span>Sub-Total : </span>
+                                            <NumberFormat
+                                                displayType="text"
+                                                value={Math.round(calculateSubtotal(parsedInvoice.items) * 100) / 100}
+                                                prefix="$"
+                                                thousandSeparator={true}
+                                            />
+                                        </p>
+                                        <p>
+                                            VAT :{" "}
+                                            {Math.round(calculateVAT(calculateSubtotal(parsedInvoice.items)) * 100) / 100}
+                                        </p>
+                                    </div>
+                                    <h2 className="font-weight-semibold mt-3">
+                                        <span className="mr-1">Final Total: </span>
+                                        <NumberFormat
+                                            displayType="text"
+                                            value={Math.round(calculateFinalTotal(calculateSubtotal(parsedInvoice.items), calculateVAT(calculateSubtotal(parsedInvoice.items))) * 100) / 100}
+                                            prefix="$"
+                                            thousandSeparator={true}
+                                        />
+                                    </h2>
+                                </div>
                             </div>
-                            <h2 className="font-weight-semibold mt-3">
-                                <span className="mr-1">Grand Total: </span>
-                                <NumberFormat
-                                    displayType={'text'}
-                                    value={((Math.round((total()) * 100) / 100) - (total() / 100) * 10).toFixed(2)}
-                                    prefix={'$'}
-                                    thousandSeparator={true}
-                                />
-                            </h2>
                         </div>
-                    </div>
+                    )}
                 </div>
 
                 {/* Footer Section */}
@@ -272,9 +363,29 @@ const InvoiceView = ({idd, onClose}) => {
                         </div>
                         <div>
                             <h4 className="font-medium mb-2">Payment Info:</h4>
-                            <p>Debit Card : 465 ************645</p>
-                            <p>Amount : $1,815</p>
-                            <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p>
+                            <div className='flex gap-2'>
+                                <p className='font-normal text-black'>Account Holder Name : </p>
+                                <p>{clientDataa.accountholder}</p>
+                            </div>
+                            <div className='flex gap-2'>
+
+                                <p className='font-normal text-black'>Account Number : </p>
+                                <p> {clientDataa.accountnumber}</p>
+                            </div>
+                            <div className='flex gap-2'>
+                                <p className='font-normal text-black'>IFSC : </p>
+                                <p> {clientDataa.ifsc}</p>
+                            </div>
+                            <div className='flex gap-2'>
+                                <p className='font-normal text-black'>Account Type : </p>
+                                <p> {clientDataa.branch}</p>
+                            </div>
+                            <div className='flex gap-2'>
+                                <p className='font-normal text-black'>Bank Name : </p>
+                                <p>{clientDataa.bankname}</p>
+                            </div>
+                            {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
+
                         </div>
                     </div>
                     <div>
@@ -294,110 +405,201 @@ const InvoiceView = ({idd, onClose}) => {
     };
 
     const renderTemplate = () => {
+        if (!parsedInvoice) return null;
+
+        const subtotal = calculateSubtotal(parsedInvoice.items);
+        const vat = calculateVAT(subtotal);
+        const finalTotal = calculateFinalTotal(subtotal, vat);
+
         return (
             <div className="bg-white rounded-lg shadow-lg p-8">
+                <span className="text-2xl font-bold text-indigo-600">Nexis Vision</span>
                 <div className="d-md-flex justify-content-md-between">
+                    {/* Company Details Section */}
                     <div className='text-left'>
-                        <span className="text-2xl font-bold text-indigo-600">Nexis Vision</span>
                         <address>
                             <p>
-                                <span>9498 Harvard Street</span><br />
-                                <span>Fairfield, Chicago Town 06824</span><br />
-                                <abbr className="text-dark" title="Phone">Phone:</abbr>
-                                <span>(123) 456-7890</span>
+
+                                <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
+                                {allloggeduser ? (
+                                    <>
+                                        <span>created_by:{allloggeduser?.created_by}</span><br />
+                                        <span>username:{allloggeduser?.username}</span><br />
+                                        <p>Email: {allloggeduser?.email}</p>
+                                        <p>Phone: {allloggeduser?.phone}</p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <span>Address not found</span><br />
+                                        <span>City not found</span><br />
+                                        <p>Email: Email not found</p>
+                                        <p>Phone: Phone not found</p>
+                                    </>
+                                )}
                             </p>
                         </address>
                     </div>
-                    <div className="mt-3 text-left">
-                        <h2 className="mb-1 font-weight-semibold">Invoice Num: {invoiceDataa?.invoiceNumber}</h2>
-                        <p>{invoiceDataa?.issueDate}</p>
-                        <address>
-                            <p>
-                                <span className="font-weight-semibold text-dark font-size-md">Genting Holdings.</span><br />
-                                <span>8626 Maiden Dr. </span><br />
-                                <span>Niagara Falls, New York 14304</span>
-                            </p>
-                        </address>
+                    {/* Client Details Section */}
+                    <div>
+                        <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />
+                        {clientDataa ? (
+                            <address>
+                                <p>
+                                    <span>Created By: {clientDataa.created_by}</span><br />
+                                    <span>Username: {clientDataa.username}</span><br />
+                                    <p>Email: {clientDataa.email}</p>
+                                    <p>Phone: {clientDataa.phone}</p>
+
+
+                                </p>
+                            </address>
+                        ) : (
+                            <p>Loading client data...</p>
+                        )}
+                    </div>
+
+                    {/* Invoice Details Section */}
+                    <div>
+                        <div className='flex'>
+                            <span className="mb-1 me-2 font-weight-semibold">Invoice Num:</span>
+                            <p className='text-right'>{invoiceDataa?.invoiceNumber}</p>
+                        </div>
+                        <div className='flex'>
+                            <span className="mb-1 me-2 font-weight-semibold">Issue Date:</span>
+                            <p>{invoiceDataa?.issueDate ? dayjs(invoiceDataa.issueDate).format('DD MMMM, YYYY') : ''}</p>
+                        </div>
+                        <div className='flex'>
+                            <span className="mb-1 me-2 font-weight-semibold">Due Date:</span>
+                            <p>{invoiceDataa?.dueDate ? dayjs(invoiceDataa.dueDate).format('DD MMMM, YYYY') : ''}</p>
+                        </div>
                     </div>
                 </div>
-                <div className="mt-4">
-                    <Table dataSource={invoiceData} pagination={false} className="mb-5">
-                        <Column title="No." dataIndex="key" key="key" />
-                        <Column title="Product" dataIndex="product" key="product" />
-                        <Column title="Quantity" dataIndex="quantity" key="quantity" />
-                        <Column title="Price"
+
+                <div className="">
+                    <Table 
+                        dataSource={parsedInvoice.items} 
+                        pagination={false} 
+                        className="mb-2"
+                    >
+                        <Table.Column
+                            title="No."
+                            key="key"
+                            render={(text, record, index) => index + 1}
+                        />
+                        <Table.Column
+                            title="Product"
+                            dataIndex="product"
+                            key="product"
                             render={(text) => (
+                                <div dangerouslySetInnerHTML={{ __html: text }} />
+                            )}
+                        />
+                        <Table.Column
+                            title="Quantity"
+                            dataIndex="quantity"
+                            key="quantity"
+                        />
+                        <Table.Column
+                            title="Price"
+                            render={(record) => (
                                 <NumberFormat
-                                    displayType={'text'}
-                                    value={(Math.round(text.price * 100) / 100).toFixed(2)}
-                                    prefix={'$'}
+                                    displayType="text"
+                                    value={Math.round(record.price * 100) / 100}
+                                    prefix="$"
                                     thousandSeparator={true}
                                 />
                             )}
                             key="price"
                         />
-                        <Column
-                            title="Total"
-                            render={(text) => (
+                        <Table.Column
+                            title="Amount"
+                            render={(record) => (
                                 <NumberFormat
-                                    displayType={'text'}
-                                    value={(Math.round((text.price * text.quantity) * 100) / 100).toFixed(2)}
-                                    prefix={'$'}
+                                    displayType="text"
+                                    value={Math.round(record.price * record.quantity * 100) / 100}
+                                    prefix="$"
                                     thousandSeparator={true}
                                 />
                             )}
-                            key="total"
+                            key="amount"
                         />
                     </Table>
-                    <div className="d-flex justify-content-end">
+
+                    {/* Invoice Summary */}
+                    <div className="d-flex justify-content-end mb-3">
                         <div className="text-center">
                             <div className="border-bottom">
                                 <p className="mb-2">
-                                    <span>Sub - Total amount: </span>
+                                    <span>Sub-Total : </span>
                                     <NumberFormat
-                                        displayType={'text'}
-                                        value={(Math.round((total()) * 100) / 100).toFixed(2)}
-                                        prefix={'$'}
+                                        displayType="text"
+                                        value={Math.round(subtotal * 100) / 100}
+                                        prefix="$"
                                         thousandSeparator={true}
                                     />
                                 </p>
-                                <p>vat (10%) : {(Math.round(((total() / 100) * 10) * 100) / 100).toFixed(2)}</p>
+                                <p>
+                                    VAT :{" "}
+                                    {Math.round(vat * 100) / 100}
+                                </p>
                             </div>
                             <h2 className="font-weight-semibold mt-3">
-                                <span className="mr-1">Grand Total: </span>
+                                <span className="mr-1">Final Total: </span>
                                 <NumberFormat
-                                    displayType={'text'}
-                                    value={((Math.round((total()) * 100) / 100) - (total() / 100) * 10).toFixed(2)}
-                                    prefix={'$'}
+                                    displayType="text"
+                                    value={Math.round(finalTotal * 100) / 100}
+                                    prefix="$"
                                     thousandSeparator={true}
                                 />
                             </h2>
                         </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-8">
-                        <div className="flex gap-4">
-                            <div className='flex'>
-                                {/* <img src={Qr} alt="Image not show" className='w-28 h-28' /> */}
-                            </div>
-                            <div>
-                                <h4 className="font-medium mb-2">Payment Info:</h4>
-                                <p>Debit Card : 465 ************645</p>
-                                <p>Amount : $1,815</p>
-                                <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p>
-                            </div>
+                </div>
+
+                {/* Payment Information & Terms */}
+                <div className="grid grid-cols-2 gap-8">
+                    <div className="flex gap-4">
+                        <div className='flex'>
+                            {/* <img src={Qr} alt="Image not show" className='w-28 h-28' /> */}
                         </div>
                         <div>
-                            <h4 className="font-medium mb-2">Terms & Conditions:</h4>
-                            <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
-                                <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
-                                <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
-                            </ol>
+                            <h4 className="font-medium mb-2">Payment Info:</h4>
+                            <div className='flex gap-2'>
+                                <p className='font-normal text-black'>Account Holder Name : </p>
+                                <p>{clientDataa.accountholder}</p>
+                            </div>
+                            <div className='flex gap-2'>
+
+                                <p className='font-normal text-black'>Account Number : </p>
+                                <p> {clientDataa.accountnumber}</p>
+                            </div>
+                            <div className='flex gap-2'>
+                                <p className='font-normal text-black'>IFSC : </p>
+                                <p> {clientDataa.ifsc}</p>
+                            </div>
+                            <div className='flex gap-2'>
+                                <p className='font-normal text-black'>Account Type : </p>
+                                <p> {clientDataa.branch}</p>
+                            </div>
+                            <div className='flex gap-2'>
+                                <p className='font-normal text-black'>Bank Name : </p>
+                                <p>{clientDataa.bankname}</p>
+                            </div>
+                            {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
+
                         </div>
                     </div>
-
-                    <div className="text-center mt-8">
-                        <p>Thanks for your Business</p>
+                    <div>
+                        <h4 className="font-medium mb-2">Terms & Conditions:</h4>
+                        <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
+                            <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
+                            <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
+                        </ol>
                     </div>
+                </div>
+
+                <div className="text-center font-semibold mt-8">
+                    <p>Thanks for your Business</p>
                 </div>
             </div>
         );
@@ -410,88 +612,152 @@ const InvoiceView = ({idd, onClose}) => {
                 <div className="flex flex-col items-center mb-8 text-center">
                     <span className="text-2xl font-bold text-indigo-600">Nexis Vision</span>
                     <div className="text-gray-600 mt-2">
-                        <p>Invoice Num: {invoiceDataa?.invoiceNumber}</p>
-                        <p>Invoice Date: {invoiceDataa?.issueDate}</p>
-                        <p>Due Date: 07-12-2023</p>
+                        <div className='flex'>
+                            <span className="mb-1 me-2 font-weight-semibold">Invoice Number :</span>
+                            <p>{invoiceDataa?.invoiceNumber}</p>
+                        </div>
+                        <div className='flex'>
+                            <span className="mb-1 me-2 font-weight-semibold">Issue Date:</span>
+                            <p>{invoiceDataa?.issueDate ? dayjs(invoiceDataa.issueDate).format('DD MMMM, YYYY') : ''}</p>
+                        </div>
+                        <div className='flex'>
+                            <span className="mb-1 me-2 font-weight-semibold">Due Date:</span>
+                            <p>{invoiceDataa?.dueDate ? dayjs(invoiceDataa.dueDate).format('DD MMMM, YYYY') : ''}</p>
+                        </div>
                     </div>
                 </div>
+
 
                 {/* Address Grid */}
                 <div className="grid grid-cols-2 gap-8 mb-8">
                     <div className="border-r pr-8 text-left">
-                        <h3 className="text-lg font-serif mb-2">From:</h3>
-                        <div className="text-gray-600">
-                            <p className="font-semibold">Dreamguys Technologies Pvt Ltd</p>
-                            <p>15 Hodges Mews</p>
-                            <p>High Wycombe HP12 3JL</p>
-                            <p>United Kingdom</p>
+                        <div className='text-left'>
+                            <address>
+                                <p>
+                                    <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
+                                    {allloggeduser ? (
+                                        <>
+                                            <span>created_by:{allloggeduser?.created_by}</span><br />
+                                            <span>username:{allloggeduser?.username}</span><br />
+                                            <p>Email: {allloggeduser?.email}</p>
+                                            <p>Phone: {allloggeduser?.phone}</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>Address not found</span><br />
+                                            <span>City not found</span><br />
+                                            <p>Email: Email not found</p>
+                                            <p>Phone: Phone not found</p>
+                                        </>
+                                    )}
+                                </p>
+                            </address>
                         </div>
+
+
                     </div>
                     <div className="text-left">
-                        <h3 className="text-lg font-serif mb-2">Bill To:</h3>
-                        <div className="text-gray-600">
-                            <p className="font-semibold">John Williams</p>
-                            <p>Star Trek Drive</p>
-                            <p>Panama City 299</p>
-                            <p>Florida, 32405, USA</p>
+                        {/* Company Details Section */}
+                        <div>
+                            <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />
+                            {clientDataa ? (
+                                <address>
+                                    <p>
+                                        <span>Created By: {clientDataa.created_by}</span><br />
+                                        <span>Username: {clientDataa.username}</span><br />
+                                        <p>Email: {clientDataa.email}</p>
+                                        <p>Phone: {clientDataa.phone}</p>
+
+
+                                    </p>
+                                </address>
+                            ) : (
+                                <p>Loading client data...</p>
+                            )}
                         </div>
                     </div>
                 </div>
 
                 <div className="mt-4">
-                    <Table dataSource={invoiceData} pagination={false} className="mb-5">
-                        <Column title="No." dataIndex="key" key="key" />
-                        <Column title="Product" dataIndex="product" key="product" />
-                        <Column title="Quantity" dataIndex="quantity" key="quantity" />
-                        <Column title="Price"
-                            render={(text) => (
-                                <NumberFormat
-                                    displayType={'text'}
-                                    value={(Math.round(text.price * 100) / 100).toFixed(2)}
-                                    prefix={'$'}
-                                    thousandSeparator={true}
+                    {parsedInvoice && (
+                        <div key={parsedInvoice.id}>
+                            {/* Table for Invoice Items */}
+                            <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
+                                <Table.Column
+                                    title="No."
+                                    key="key"
+                                    render={(text, record, index) => index + 1}
                                 />
-                            )}
-                            key="price"
-                        />
-                        <Column
-                            title="Total"
-                            render={(text) => (
-                                <NumberFormat
-                                    displayType={'text'}
-                                    value={(Math.round((text.price * text.quantity) * 100) / 100).toFixed(2)}
-                                    prefix={'$'}
-                                    thousandSeparator={true}
+                                <Table.Column
+                                    title="Product"
+                                    dataIndex="product"
+                                    key="product"
+                                    render={(text) => (
+                                        <div dangerouslySetInnerHTML={{ __html: text }} />
+                                    )}
                                 />
-                            )}
-                            key="total"
-                        />
-                    </Table>
-                    <div className="d-flex justify-content-end">
-                        <div className="text-center">
-                            <div className="border-bottom">
-                                <p className="mb-2">
-                                    <span>Sub - Total amount: </span>
-                                    <NumberFormat
-                                        displayType={'text'}
-                                        value={(Math.round((total()) * 100) / 100).toFixed(2)}
-                                        prefix={'$'}
-                                        thousandSeparator={true}
-                                    />
-                                </p>
-                                <p>vat (10%) : {(Math.round(((total() / 100) * 10) * 100) / 100).toFixed(2)}</p>
+                                <Table.Column
+                                    title="Quantity"
+                                    dataIndex="quantity"
+                                    key="quantity"
+                                />
+                                <Table.Column
+                                    title="Price"
+                                    render={(record) => (
+                                        <NumberFormat
+                                            displayType="text"
+                                            value={Math.round(record.price * 100) / 100}
+                                            prefix="$"
+                                            thousandSeparator={true}
+                                        />
+                                    )}
+                                    key="price"
+                                />
+                                <Table.Column
+                                    title="Amount"
+                                    render={(record) => (
+                                        <NumberFormat
+                                            displayType="text"
+                                            value={Math.round(record.price * record.quantity * 100) / 100}
+                                            prefix="$"
+                                            thousandSeparator={true}
+                                        />
+                                    )}
+                                    key="amount"
+                                />
+                            </Table>
+
+                            {/* Invoice Summary */}
+                            <div className="d-flex justify-content-end mb-3">
+                                <div className="text-center">
+                                    <div className="border-bottom">
+                                        <p className="mb-2">
+                                            <span>Sub-Total : </span>
+                                            <NumberFormat
+                                                displayType="text"
+                                                value={Math.round(calculateSubtotal(parsedInvoice.items) * 100) / 100}
+                                                prefix="$"
+                                                thousandSeparator={true}
+                                            />
+                                        </p>
+                                        <p>
+                                            VAT :{" "}
+                                            {Math.round(calculateVAT(calculateSubtotal(parsedInvoice.items)) * 100) / 100}
+                                        </p>
+                                    </div>
+                                    <h2 className="font-weight-semibold mt-3">
+                                        <span className="mr-1">Final Total: </span>
+                                        <NumberFormat
+                                            displayType="text"
+                                            value={Math.round(calculateFinalTotal(calculateSubtotal(parsedInvoice.items), calculateVAT(calculateSubtotal(parsedInvoice.items))) * 100) / 100}
+                                            prefix="$"
+                                            thousandSeparator={true}
+                                        />
+                                    </h2>
+                                </div>
                             </div>
-                            <h2 className="font-weight-semibold mt-3">
-                                <span className="mr-1">Grand Total: </span>
-                                <NumberFormat
-                                    displayType={'text'}
-                                    value={((Math.round((total()) * 100) / 100) - (total() / 100) * 10).toFixed(2)}
-                                    prefix={'$'}
-                                    thousandSeparator={true}
-                                />
-                            </h2>
                         </div>
-                    </div>
+                    )}
                     <div className="grid grid-cols-2 gap-8">
                         <div className="flex gap-4">
                             <div className='flex'>
@@ -499,9 +765,29 @@ const InvoiceView = ({idd, onClose}) => {
                             </div>
                             <div>
                                 <h4 className="font-medium mb-2">Payment Info:</h4>
-                                <p>Debit Card : 465 ************645</p>
-                                <p>Amount : $1,815</p>
-                                <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p>
+                                <div className='flex gap-2'>
+                                    <p className='font-normal text-black'>Account Holder Name : </p>
+                                    <p>{clientDataa.accountholder}</p>
+                                </div>
+                                <div className='flex gap-2'>
+
+                                    <p className='font-normal text-black'>Account Number : </p>
+                                    <p> {clientDataa.accountnumber}</p>
+                                </div>
+                                <div className='flex gap-2'>
+                                    <p className='font-normal text-black'>IFSC : </p>
+                                    <p> {clientDataa.ifsc}</p>
+                                </div>
+                                <div className='flex gap-2'>
+                                    <p className='font-normal text-black'>Account Type : </p>
+                                    <p> {clientDataa.branch}</p>
+                                </div>
+                                <div className='flex gap-2'>
+                                    <p className='font-normal text-black'>Bank Name : </p>
+                                    <p>{clientDataa.bankname}</p>
+                                </div>
+                                {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
+
                             </div>
                         </div>
                         <div>
@@ -527,81 +813,151 @@ const InvoiceView = ({idd, onClose}) => {
                 {/* Header */}
                 <div className="flex justify-between items-center mb-12">
                     <div className='text-left'>
-                        <h1 className="text-4xl font-light text-gray-700">INVOICE</h1>
-                        <p className="text-gray-500 mt-1">{invoiceDataa?.invoiceNumber}</p>
+                        <h1 className="text-3xl font-light text-gray-700">INVOICE</h1>
+                        <div className="text-gray-600 mt-2">
+                            <div className='flex'>
+                                <span className="mb-1 me-2 font-weight-semibold">Invoice Number:</span>
+                                <p>{invoiceDataa?.invoiceNumber}</p>
+                            </div>
+                            <div className='flex'>
+                            <span className="mb-1 me-2 font-weight-semibold">Issue Date:</span>
+                            <p>{invoiceDataa?.issueDate ? dayjs(invoiceDataa.issueDate).format('DD MMMM, YYYY') : ''}</p>
+                        </div>
+                        <div className='flex'>
+                            <span className="mb-1 me-2 font-weight-semibold">Due Date:</span>
+                            <p>{invoiceDataa?.dueDate ? dayjs(invoiceDataa.dueDate).format('DD MMMM, YYYY') : ''}</p>
+                        </div>
+                        </div>
                     </div>
                 </div>
 
                 {/* Dates & Addresses */}
                 <div className="grid grid-cols-2 gap-12 mb-12">
-                    <div className='text-left'>
-                        <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-4 font-semibold">From</h3>
-                        <p className="font-medium">Dreamguys Technologies Pvt Ltd</p>
-                        <p className="text-gray-600">15 Hodges Mews</p>
-                        <p className="text-gray-600">High Wycombe HP12 3JL, UK</p>
+                    <div className="border-r pr-8 text-left">
+                        <div className='text-left'>
+                            <address>
+                                <p>
+                                    <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
+                                    {allloggeduser ? (
+                                        <>
+                                            <span>created_by:{allloggeduser?.created_by}</span><br />
+                                            <span>username:{allloggeduser?.username}</span><br />
+                                            <p>Email: {allloggeduser?.email}</p>
+                                            <p>Phone: {allloggeduser?.phone}</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>Address not found</span><br />
+                                            <span>City not found</span><br />
+                                            <p>Email: Email not found</p>
+                                            <p>Phone: Phone not found</p>
+                                        </>
+                                    )}
+                                </p>
+                            </address>
+                        </div>
+
                     </div>
-                    <div className='text-left'>
-                        <h3 className="text-sm uppercase tracking-wider text-gray-500 mb-4 font-semibold">Bill To</h3>
-                        <p className="font-medium">John Williams</p>
-                        <p className="text-gray-600">Star Trek Drive</p>
-                        <p className="text-gray-600">Panama City 299, Florida</p>
+                    <div className="text-left">
+                        {/* Client Details Section */}
+                        <div>
+                            <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />
+                            {clientDataa ? (
+                                <address>
+                                    <p>
+                                        <span>Created By: {clientDataa.created_by}</span><br />
+                                        <span>Username: {clientDataa.username}</span><br />
+                                        <p>Email: {clientDataa.email}</p>
+                                        <p>Phone: {clientDataa.phone}</p>
+                                    </p>
+                                </address>
+                            ) : (
+                                <p>Loading client data...</p>
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 <div className="mt-4">
-                    <Table dataSource={invoiceData} pagination={false} className="mb-5">
-                        <Column title="No." dataIndex="key" key="key" />
-                        <Column title="Product" dataIndex="product" key="product" />
-                        <Column title="Quantity" dataIndex="quantity" key="quantity" />
-                        <Column title="Price"
-                            render={(text) => (
-                                <NumberFormat
-                                    displayType={'text'}
-                                    value={(Math.round(text.price * 100) / 100).toFixed(2)}
-                                    prefix={'$'}
-                                    thousandSeparator={true}
+                    {parsedInvoice && (
+                        <div key={parsedInvoice.id}>
+                            {/* Table for Invoice Items */}
+                            <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
+                                <Table.Column
+                                    title="No."
+                                    key="key"
+                                    render={(text, record, index) => index + 1}
                                 />
-                            )}
-                            key="price"
-                        />
-                        <Column
-                            title="Total"
-                            render={(text) => (
-                                <NumberFormat
-                                    displayType={'text'}
-                                    value={(Math.round((text.price * text.quantity) * 100) / 100).toFixed(2)}
-                                    prefix={'$'}
-                                    thousandSeparator={true}
+                                <Table.Column
+                                    title="Product"
+                                    dataIndex="product"
+                                    key="product"
+                                    render={(text) => (
+                                        <div dangerouslySetInnerHTML={{ __html: text }} />
+                                    )}
                                 />
-                            )}
-                            key="total"
-                        />
-                    </Table>
-                    <div className="d-flex justify-content-end">
-                        <div className="text-center">
-                            <div className="border-bottom">
-                                <p className="mb-2">
-                                    <span>Sub - Total amount: </span>
-                                    <NumberFormat
-                                        displayType={'text'}
-                                        value={(Math.round((total()) * 100) / 100).toFixed(2)}
-                                        prefix={'$'}
-                                        thousandSeparator={true}
-                                    />
-                                </p>
-                                <p>vat (10%) : {(Math.round(((total() / 100) * 10) * 100) / 100).toFixed(2)}</p>
+                                <Table.Column
+                                    title="Quantity"
+                                    dataIndex="quantity"
+                                    key="quantity"
+                                />
+                                <Table.Column
+                                    title="Price"
+                                    render={(record) => (
+                                        <NumberFormat
+                                            displayType="text"
+                                            value={Math.round(record.price * 100) / 100}
+                                            prefix="$"
+                                            thousandSeparator={true}
+                                        />
+                                    )}
+                                    key="price"
+                                />
+                                <Table.Column
+                                    title="Amount"
+                                    render={(record) => (
+                                        <NumberFormat
+                                            displayType="text"
+                                            value={Math.round(record.price * record.quantity * 100) / 100}
+                                            prefix="$"
+                                            thousandSeparator={true}
+                                        />
+                                    )}
+                                    key="amount"
+                                />
+                            </Table>
+
+                            {/* Invoice Summary */}
+                            <div className="d-flex justify-content-end mb-3">
+                                <div className="text-center">
+                                    <div className="border-bottom">
+                                        <p className="mb-2">
+                                            <span>Sub-Total : </span>
+                                            <NumberFormat
+                                                displayType="text"
+                                                value={Math.round(calculateSubtotal(parsedInvoice.items) * 100) / 100}
+                                                prefix="$"
+                                                thousandSeparator={true}
+                                            />
+                                        </p>
+                                        <p>
+                                            VAT :{" "}
+                                            {Math.round(calculateVAT(calculateSubtotal(parsedInvoice.items)) * 100) / 100}
+                                        </p>
+                                    </div>
+                                    <h2 className="font-weight-semibold mt-3">
+                                        <span className="mr-1">Final Total: </span>
+                                        <NumberFormat
+                                            displayType="text"
+                                            value={Math.round(calculateFinalTotal(calculateSubtotal(parsedInvoice.items), calculateVAT(calculateSubtotal(parsedInvoice.items))) * 100) / 100}
+                                            prefix="$"
+                                            thousandSeparator={true}
+                                        />
+                                    </h2>
+                                </div>
                             </div>
-                            <h2 className="font-weight-semibold mt-3">
-                                <span className="mr-1">Grand Total: </span>
-                                <NumberFormat
-                                    displayType={'text'}
-                                    value={((Math.round((total()) * 100) / 100) - (total() / 100) * 10).toFixed(2)}
-                                    prefix={'$'}
-                                    thousandSeparator={true}
-                                />
-                            </h2>
                         </div>
-                    </div>
+                    )}
                     <div className="grid grid-cols-2 gap-8">
                         <div className="flex gap-4">
                             <div className='flex'>
@@ -609,9 +965,29 @@ const InvoiceView = ({idd, onClose}) => {
                             </div>
                             <div>
                                 <h4 className="font-medium mb-2">Payment Info:</h4>
-                                <p>Debit Card : 465 ************645</p>
-                                <p>Amount : $1,815</p>
-                                <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p>
+                                <div className='flex gap-2'>
+                                    <p className='font-normal text-black'>Account Holder Name : </p>
+                                    <p>{clientDataa.accountholder}</p>
+                                </div>
+                                <div className='flex gap-2'>
+
+                                    <p className='font-normal text-black'>Account Number : </p>
+                                    <p> {clientDataa.accountnumber}</p>
+                                </div>
+                                <div className='flex gap-2'>
+                                    <p className='font-normal text-black'>IFSC : </p>
+                                    <p> {clientDataa.ifsc}</p>
+                                </div>
+                                <div className='flex gap-2'>
+                                    <p className='font-normal text-black'>Account Type : </p>
+                                    <p> {clientDataa.branch}</p>
+                                </div>
+                                <div className='flex gap-2'>
+                                    <p className='font-normal text-black'>Bank Name : </p>
+                                    <p>{clientDataa.bankname}</p>
+                                </div>
+                                {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
+
                             </div>
                         </div>
                         <div>
@@ -670,7 +1046,6 @@ const InvoiceView = ({idd, onClose}) => {
 };
 
 export default InvoiceView;
-
 
 
 

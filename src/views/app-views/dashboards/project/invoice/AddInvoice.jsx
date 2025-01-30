@@ -157,7 +157,7 @@ const sub = subClients?.SubClient?.data;
                 project: values.project,
                 tax_calculation: values.calctax,
                 items: tableData.map(item => ({
-                    description: item.item,
+                    item: item.item,
                     quantity: parseFloat(item.quantity),
                     price: parseFloat(item.price),
                     tax: parseFloat(item.tax),
