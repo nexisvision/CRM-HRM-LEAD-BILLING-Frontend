@@ -142,38 +142,81 @@ const AddRole = ({ onClose }) => {
     return permissions.every(perm => modulePermissions[submodule]?.[perm]);
   };
 
+
+
+
   const onFinish = (values) => {
     const payload = {
-      role_name: values.role_name,
-      permissions: {
-        hrm: []
-      }
+        role_name: values.role_name,
+        permissions: {} // Initialize permissions as an empty object
     };
 
     // Format permissions for API
     Object.entries(modulePermissions).forEach(([submoduleKey, perms]) => {
-      const selectedPermissions = Object.entries(perms)
-        .filter(([perm, isSelected]) => isSelected)
-        .map(([perm]) => perm.toLowerCase());
+        const selectedPermissions = Object.entries(perms)
+            .filter(([perm, isSelected]) => isSelected)
+            .map(([perm]) => perm.toLowerCase());
 
-      if (selectedPermissions.length > 0) {
-        payload.permissions.hrm.push({
-          key: submoduleKey,
-          permissions: selectedPermissions
-        });
-      }
+        if (selectedPermissions.length > 0) {
+            // Use the submodule key as the module name in the permissions object
+            const moduleName = submoduleKey.toLowerCase(); // Convert to lowercase for consistency
+            if (!payload.permissions[moduleName]) {
+                payload.permissions[moduleName] = []; // Initialize if it doesn't exist
+            }
+            payload.permissions[moduleName].push({
+                key: submoduleKey,
+                permissions: selectedPermissions
+            });
+        }
     });
 
     dispatch(addRole(payload))
-      .then(() => {
-        dispatch(getRoles());
-        message.success('Role added successfully!');
-        onClose();
-      })
-      .catch((error) => {
-        message.error('Failed to add role.');
-      });
-  };
+        .then(() => {
+            dispatch(getRoles());
+            message.success('Role added successfully!');
+            onClose();
+        })
+        .catch((error) => {
+            message.error('Failed to add role.');
+        });
+};
+
+
+
+
+//final code \=\=-=\\=-=\\=-=\-\=-\=-=
+  // const onFinish = (values) => {
+  //   const payload = {
+  //     role_name: values.role_name,
+  //     permissions: {
+  //       hrm: []
+  //     }
+  //   };
+
+  //   // Format permissions for API
+  //   Object.entries(modulePermissions).forEach(([submoduleKey, perms]) => {
+  //     const selectedPermissions = Object.entries(perms)
+  //       .filter(([perm, isSelected]) => isSelected)
+  //       .map(([perm]) => perm.toLowerCase());
+
+  //     if (selectedPermissions.length > 0) {
+  //       payload.permissions.hrm.push({
+  //         key: submoduleKey,
+  //         permissions: selectedPermissions
+  //       });
+  //     }
+  //   });
+
+  //   dispatch(addRole(payload))
+  //     .then(() => {
+  //       dispatch(getRoles());
+  //       message.success('Role added successfully!');
+  //       onClose();
+  //     })
+  //     .catch((error) => {
+  //       message.error('Failed to add role.');
+  //     });
+  // };
 
   return (
     <div className="p-4">

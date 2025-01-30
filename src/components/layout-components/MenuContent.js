@@ -147,8 +147,39 @@ const SideNavContent = (props) => {
 			}))
 		});
 
-		return getSideNavMenuItem(filteredNavigation);
+		const relevantNavigation = filteredNavigation.filter(navItem => {
+			// Check if the navItem key starts with 'extra-hrm' or 'dashboards'
+			return navItem.key.startsWith('extra-hrm') || navItem.key.startsWith('dashboards') || 
+				navItem.submenu.some(sub => sub.key.startsWith('extra-hrm') || sub.key.startsWith('dashboards'));
+		});
+	
+		// Create an array of titles for the relevant navigation items
+		const relevantTitles = relevantNavigation.map(navItem => navItem.title);
+	
+		// Include titles from submenus that start with 'extra-hrm' and check permissions
+		relevantNavigation.forEach(navItem => {
+			if (navItem.submenu) {
+				navItem.submenu.forEach(sub => {
+					if (sub.key.startsWith('extra-hrm') || sub.key.startsWith('dashboards')) {
+						// Check if the user has permission for this submenu item
+						const hasPermission = roleData?.permissions?.[sub.key]?.some(permission => permission.permissions.includes('view'));
+						if (hasPermission) {
+							relevantTitles.push(sub.title);
+						}
+					}
+				});
+			}
+		});
+	
+		console.log('Relevant HRM Titles:', relevantTitles);
+		return getSideNavMenuItem(relevantNavigation);
+	
+
 	}, [isSuperAdmin, roleId, roleData]);
+
+	
+	
+
 
 	return (
 		<Menu
