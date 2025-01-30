@@ -111,15 +111,17 @@ const LeadCards = () => {
 
   useEffect(() => {
     if (fndata.length > 0) {
-      const leadsGroupedByStage = fndata.map((stage) => ({
-        status: stage.stageName,
-        stageId: stage.id,
-        leads: fndleadadat.filter((lead) => lead.leadStage === stage.id),
-      }));
+      const leadsGroupedByStage = fndata
+        .filter((stage) => !selectedPipeline || stage.pipelineId === selectedPipeline)
+        .map((stage) => ({
+          status: stage.stageName,
+          stageId: stage.id,
+          leads: fndleadadat.filter((lead) => lead.leadStage === stage.id),
+        }));
 
       setLeadData(leadsGroupedByStage);
     }
-  }, [fndata, fndleadadat]);
+  }, [fndata, fndleadadat, selectedPipeline]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -264,6 +266,17 @@ const LeadCards = () => {
         Add Lead
       </Button>
 
+      {/* <Select
+        placeholder="Select a pipeline"
+        onChange={(value) => setSelectedPipeline(value)}
+        style={{ marginBottom: "16px", width: "100%" }}
+      >
+        {[...new Set(fndata.map((stage) => stage.pipelineId))].map((pipelineId) => (
+          <Select.Option key={pipelineId} value={pipelineId}>
+            {fndata.find((stage) => stage.pipelineId === pipelineId)?.pipelineName || `Pipeline ${pipelineId}`}
+          </Select.Option>
+        ))}
+      </Select> */}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
