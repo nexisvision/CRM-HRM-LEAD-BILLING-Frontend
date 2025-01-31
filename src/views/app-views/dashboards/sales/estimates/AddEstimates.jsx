@@ -28,7 +28,6 @@ import {
 } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
-import { getallcurrencies } from "../../../setting/currencies/currenciesreducer/currenciesSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { createquotations } from "./estimatesReducer/EstimatesSlice";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";

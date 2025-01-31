@@ -19,8 +19,7 @@ import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Addexp, Getexp } from "./Expencereducer/ExpenseSlice";
-import { getallcurrencies } from "../../../setting/currencies/currenciesreducer/currenciesSlice";
-
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 const { Option } = Select;
 
 const AddExpenses = ({ onClose }) => {
@@ -38,7 +37,7 @@ const AddExpenses = ({ onClose }) => {
         
 
     useEffect(() => {
-        dispatch(getallcurrencies());
+        dispatch(getcurren());
     }, [dispatch]);
     const [showReceiptUpload, setShowReceiptUpload] = useState(false);
     // const [uploadModalVisible, setUploadModalVisible] = useState(false);

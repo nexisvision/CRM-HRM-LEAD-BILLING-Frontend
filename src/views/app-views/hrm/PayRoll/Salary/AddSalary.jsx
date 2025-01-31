@@ -17,7 +17,8 @@ import * as Yup from "yup";
 import { AddSalaryss, getSalaryss } from "./SalaryReducers/SalarySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "../../Employee/EmployeeReducers/EmployeeSlice";
-import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 
 const { Option } = Select;
 
@@ -33,7 +34,7 @@ const AddSalary = ({ onClose }) => {
   const fnddata = allempdata.employee.data;
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, []);
 
   const allempdatass = useSelector((state) => state.currencies);

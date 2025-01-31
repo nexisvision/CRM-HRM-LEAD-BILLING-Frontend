@@ -3,12 +3,13 @@ import { Input, Button, Col, Select, message } from "antd";
 import { ErrorMessage, Field, Formik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
-import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
+// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 import { Option } from "antd/es/mentions";
 import {
   addotherpay,
   getotherpay,
 } from "./otherpaymentReducer/otherpaymentSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const AddOtherPayment = ({ onClose }) => {
   const dispatch = useDispatch();
@@ -21,7 +22,7 @@ const AddOtherPayment = ({ onClose }) => {
   const fnddata = alldataemp.employee.data;
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, [dispatch]);
 
   const allempdatass = useSelector((state) => state.currencies);

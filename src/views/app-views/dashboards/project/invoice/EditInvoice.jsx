@@ -29,7 +29,6 @@ import {
 } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
-import { getallcurrencies } from "../../../setting/currencies/currenciesreducer/currenciesSlice";
 import OrderListData from "assets/data/order-list.data.json";
 import Flex from "components/shared-components/Flex";
 import { Getmins } from "../../../dashboards/project/milestone/minestoneReducer/minestoneSlice";
@@ -41,6 +40,7 @@ import { useSelector, useDispatch } from "react-redux";
 // import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { createInvoice } from "../../../dashboards/project/invoice/invoicereducer/InvoiceSlice";
 import * as Yup from "yup";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
 
@@ -101,7 +101,7 @@ const sub = subClients?.SubClient?.data;
 
   // Fetch currencies
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, [dispatch]);
 
   // Fetch milestones when product changes

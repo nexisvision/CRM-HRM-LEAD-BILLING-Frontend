@@ -5,8 +5,9 @@ import { Select, Button, message, Col } from "antd";
 import axios from "axios";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
+// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 import { addallowan, getallowan } from "./AllowancwReducer/AllowanceSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
 
@@ -34,7 +35,7 @@ const AddAllowance = ({ onClose }) => {
   const fnddata = alldataemp.employee.data;
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, []);
 
   const allempdatass = useSelector((state) => state.currencies);

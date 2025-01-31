@@ -19,9 +19,9 @@ import moment from "moment";
 import { useSelector } from "react-redux";
 import { GetLeads, LeadsEdit } from "./LeadReducers/LeadSlice";
 import { useDispatch } from "react-redux";
-import { getallcurrencies } from "../../setting/currencies/currenciesreducer/currenciesSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { GetLable } from "../project/milestone/LableReducer/LableSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
 
@@ -181,7 +181,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
   });
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, [dispatch]);
 
   useEffect(() => {

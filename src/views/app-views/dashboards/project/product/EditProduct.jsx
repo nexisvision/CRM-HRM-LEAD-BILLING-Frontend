@@ -254,8 +254,8 @@ import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
-import { getallcurrencies } from "../../../setting/currencies/currenciesreducer/currenciesSlice";
 import { EditProdu, GetProdu } from "./ProductReducer/ProductsSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
 
@@ -269,7 +269,7 @@ const EditProduct = ({ idd, onClose }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, [dispatch]);
 
   // Declare state for initial values

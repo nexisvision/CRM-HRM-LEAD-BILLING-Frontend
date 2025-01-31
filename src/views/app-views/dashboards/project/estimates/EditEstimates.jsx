@@ -3,12 +3,12 @@ import { Card, Form, Menu, Row, Col, Tag, Input, message, Button, Upload, Select
 import {  DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
-import { getallcurrencies } from '../../../setting/currencies/currenciesreducer/currenciesSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import dayjs from 'dayjs';
 import { getestimateById } from './estimatesReducer/EstimatesSlice';
 import { updateestimate } from './estimatesReducer/EstimatesSlice';
 import * as Yup from 'yup';
+import { getcurren } from 'views/app-views/setting/currencies/currenciesSlice/currenciesSlice';
 
 const { Option } = Select;
 
@@ -47,7 +47,7 @@ const EditEstimates = ({ onClose }) => {
 
     // Fetch currencies
     useEffect(() => {
-        dispatch(getallcurrencies());
+        dispatch(getcurren());
     }, [dispatch]);
 
     // useEffect(() => {

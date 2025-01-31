@@ -5,7 +5,8 @@ import { CreatePlan, GetPlan } from './PlanReducers/PlanSlice';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { getallcurrencies } from '../setting/currencies/currenciesreducer/currenciesSlice';
+import { getcurren } from '../setting/currencies/currenciesSlice/currenciesSlice';
+// import { getallcurrencies } from '../setting/currencies/currenciesreducer/currenciesSlice';
 
 const { Option } = Select;
 
@@ -49,7 +50,7 @@ const AddPlan = ({ onClose }) => {
   };
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, []);
 
   const allempdatass = useSelector((state) => state.currencies);

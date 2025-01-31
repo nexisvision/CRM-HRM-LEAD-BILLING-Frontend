@@ -11,10 +11,10 @@ import { useSelector, useDispatch } from 'react-redux';
 // import { Formik, Form, Field, ErrorMessage } from 'formik';
 // import { createInvoice } from '../../../dashboards/project/invoice/invoicereducer/InvoiceSlice';
 import * as Yup from 'yup';
-import { getallcurrencies } from 'views/app-views/setting/currencies/currenciesreducer/currenciesSlice';
 import { GetLeads } from '../leads/LeadReducers/LeadSlice';
 import { GetDeals } from '../deals/DealReducers/DealSlice';
 import { edpropos, getpropos } from './proposalReducers/proposalSlice';
+import { getcurren } from 'views/app-views/setting/currencies/currenciesSlice/currenciesSlice';
 
 const { Option } = Select;
 
@@ -124,7 +124,7 @@ const EditProposal = ({id, onClose }) => {
 
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, [dispatch]);
 
   useEffect(() => {

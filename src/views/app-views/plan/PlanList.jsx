@@ -6,7 +6,8 @@ import EditPlan from "./EditPlan";
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteP, GetPlan } from "./PlanReducers/PlanSlice";
 import './PlanList.css'; // Import the CSS file
-import { getallcurrencies } from "../setting/currencies/currenciesreducer/currenciesSlice";
+import { getcurren } from "../setting/currencies/currenciesSlice/currenciesSlice";
+// import { getallcurrencies } from "../setting/currencies/currenciesreducer/currenciesSlice";
 
 const { Title, Text } = Typography;
 
@@ -75,7 +76,7 @@ const PlanList = () => {
   ];
 
   useEffect(()=>{
-    dispatch(getallcurrencies())
+    dispatch(getcurren())
   },[])
 
     const allempdatass = useSelector((state) => state.currencies);

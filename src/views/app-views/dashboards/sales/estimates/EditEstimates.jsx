@@ -3,7 +3,6 @@ import { Card, Form, Menu, Row, Col, Tag, Input, message, Button, Upload, Select
 import { DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
-import { getallcurrencies } from '../../../setting/currencies/currenciesreducer/currenciesSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import { updatequotation, getquotationsById, getallquotations } from './estimatesReducer/EstimatesSlice';
 import dayjs from 'dayjs';

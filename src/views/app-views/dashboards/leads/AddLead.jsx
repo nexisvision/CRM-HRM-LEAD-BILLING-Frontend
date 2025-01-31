@@ -21,10 +21,10 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { GetLeads, LeadsAdd } from "./LeadReducers/LeadSlice";
-import { getallcurrencies } from "../../setting/currencies/currenciesreducer/currenciesSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { GetLable } from "../project/milestone/LableReducer/LableSlice";
 import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
 
@@ -71,7 +71,7 @@ const AddLead = ({ onClose }) => {
   };
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, [dispatch]);
 
   useEffect(() => {

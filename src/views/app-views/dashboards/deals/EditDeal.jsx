@@ -7,11 +7,11 @@ import * as Yup from "yup";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { EditDeals, GetDeals } from "./DealReducers/DealSlice";
-import { getallcurrencies } from "../../setting/currencies/currenciesreducer/currenciesSlice";
 import { GetPip } from "../../dashboards/systemsetup/Pipeline/PiplineReducer/piplineSlice"
 import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { GetLeads } from "../leads/LeadReducers/LeadSlice";
 import { GetProject } from "../project/project-list/projectReducer/ProjectSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 const { Option } = Select;
 const EditDeal = ({ onClose, id }) => {
   const navigate = useNavigate();
@@ -85,7 +85,7 @@ const EditDeal = ({ onClose, id }) => {
     dispatch(GetLeads());
   }, [dispatch]);
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, [dispatch]);
   useEffect(() => {
     dispatch(GetPip());

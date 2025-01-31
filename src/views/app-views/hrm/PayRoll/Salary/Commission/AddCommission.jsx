@@ -3,9 +3,10 @@ import { Button, Col, Form, Input, Select } from "antd";
 import { ErrorMessage, Field, Formik } from "formik";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { useSelector } from "react-redux";
-import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
+// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 import { useDispatch } from "react-redux";
 import { addcommi, getcommi } from "./commistionReducer/commitionSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 const { Option } = Select;
 const AddCommission = ({ onClose }) => {
   const dispatch = useDispatch();
@@ -17,7 +18,7 @@ const AddCommission = ({ onClose }) => {
   const fnddata = alldataemp.employee.data;
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, []);
 
   const allempdatass = useSelector((state) => state.currencies);

@@ -35,7 +35,8 @@ import EditProposal from "./EditProposal";
 import { delpropos, getpropos } from "./proposalReducers/proposalSlice";
 import { GetLeads } from "../leads/LeadReducers/LeadSlice";
 import { GetDeals } from "../deals/DealReducers/DealSlice";
-import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 
 const { Option } = Select;
 
@@ -83,7 +84,7 @@ const ProposalList = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, [dispatch]);
 
   const openAddProposalModal = () => {

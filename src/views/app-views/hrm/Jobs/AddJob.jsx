@@ -18,12 +18,13 @@ import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
-import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
+// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 import {
   AddLable,
   GetLable,
 } from "views/app-views/dashboards/project/milestone/LableReducer/LableSlice";
 import { AddJobs, GetJobdata } from "./JobReducer/JobSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
 
@@ -41,7 +42,7 @@ const AddJob = ({ onClose }) => {
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, [dispatch]);
   const initialValues = {
     title: "",

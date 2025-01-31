@@ -24,11 +24,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { GetLeads } from "../LeadReducers/LeadSlice";
 import { LeadsAdd } from "../LeadReducers/LeadSlice";
 // import { getallcurrencies } from "../../setting/currencies/currenciesreducer/currenciesSlice";
-import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 // import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { getstages } from "../../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { GetLable } from "../../project/milestone/LableReducer/LableSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
 
@@ -75,7 +75,7 @@ const AddLeadCards = ({ onClose }) => {
   };
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, [dispatch]);
 
   useEffect(() => {

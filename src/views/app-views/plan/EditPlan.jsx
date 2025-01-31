@@ -4,7 +4,8 @@ import { Editplan, GetPlan } from './PlanReducers/PlanSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
-import { getallcurrencies } from '../setting/currencies/currenciesreducer/currenciesSlice';
+import { getcurren } from '../setting/currencies/currenciesSlice/currenciesSlice';
+// import { getallcurrencies } from '../setting/currencies/currenciesreducer/currenciesSlice';
 
 const { Option } = Select;
 
@@ -20,7 +21,7 @@ const EditPlan = ({ planData, onUpdate,id,onClose }) => {
   }, [planData, form]);
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, [dispatch]);
 
   const allempdatass = useSelector((state) => state.currencies);

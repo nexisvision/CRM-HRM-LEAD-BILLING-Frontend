@@ -20,7 +20,7 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { AddMins, Getmins } from "./minestoneReducer/minestoneSlice";
 import { AddLable, GetLable } from "./LableReducer/LableSlice";
-import { getallcurrencies } from "../../../setting/currencies/currenciesreducer/currenciesSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
 
@@ -41,7 +41,7 @@ const AddMilestone = ({ onClose }) => {
 
   useEffect(() => {
     if (id) {
-      dispatch(getallcurrencies());
+      dispatch(getcurren());
     } else {
       message.error("Milestone ID is not defined.");
     }

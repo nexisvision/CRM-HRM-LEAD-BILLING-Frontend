@@ -3,9 +3,10 @@ import { Input, Button, Col, message, Select } from "antd";
 import { ErrorMessage, Field, Formik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
-import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
+// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 import { Option } from "antd/es/mentions";
 import { adddeducati, getdeducati } from "./deducationReducer/deducationSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 const AddSaturationDeduction = ({ onClose }) => {
   const dispatch = useDispatch();
 
@@ -17,7 +18,7 @@ const AddSaturationDeduction = ({ onClose }) => {
   const fnddata = alldataemp.employee.data;
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, [dispatch]);
 
   const allempdatass = useSelector((state) => state.currencies);

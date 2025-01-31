@@ -11,7 +11,8 @@ import {
   EditTraing,
   GetallTrainng,
 } from "./TrainingReducer/TrainingSlice";
-import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 
 const EditTrainingSetup = ({ idd, onClose }) => {
   const [form] = Form.useForm();
@@ -49,7 +50,7 @@ const EditTrainingSetup = ({ idd, onClose }) => {
   }, [idd, Expensedata]);
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, [dispatch]);
 
   useEffect(() => {

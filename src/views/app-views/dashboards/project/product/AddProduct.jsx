@@ -18,8 +18,8 @@ import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
-import { getallcurrencies } from "../../../setting/currencies/currenciesreducer/currenciesSlice";
 import { AddProdu, GetProdu } from "./ProductReducer/ProductsSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
 
@@ -33,7 +33,7 @@ const AddProduct = ({ idd, onClose }) => {
   const { currencies } = useSelector((state) => state.currencies);
 
   useEffect(() => {
-    dispatch(getallcurrencies());
+    dispatch(getcurren());
   }, [dispatch]);
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const initialValues = {

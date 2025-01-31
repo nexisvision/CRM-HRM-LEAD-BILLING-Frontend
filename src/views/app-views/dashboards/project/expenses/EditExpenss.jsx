@@ -12,11 +12,11 @@ import {
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { getallcurrencies } from "../../../setting/currencies/currenciesreducer/currenciesSlice";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { EditExp, Getexp } from "./Expencereducer/ExpenseSlice";
 import dayjs from "dayjs"; // Import dayjs for date handling
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
 
@@ -30,7 +30,7 @@ const EditExpenses = ({ idd, onClose }) => {
     const { currencies } = useSelector((state) => state.currencies);
 
     useEffect(() => {
-        dispatch(getallcurrencies());
+        dispatch(getcurren());
     }, [dispatch]);
 
   const [initialValues, setInitialValues] = useState({
