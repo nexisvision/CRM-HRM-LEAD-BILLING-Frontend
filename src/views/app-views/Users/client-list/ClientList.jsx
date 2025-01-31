@@ -75,6 +75,9 @@ const ClientList = () => {
 	const roles = useSelector((state) => state.role?.role?.data);
 	const roleData = roles?.find(role => role.id === roleId);
 
+  
+  const whorole = roleData.role_name;
+
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === 'string'
@@ -85,12 +88,11 @@ const ClientList = () => {
 
     const allpermisson = parsedPermissions["extra-users-client-list"][0].permissions;
 
-    // console.log('allpermisson:', allpermisson);
-
 
     const canCreateClient = allpermisson.includes('create');
     const canEditClient = allpermisson.includes('edit');
     const canDeleteClient = allpermisson.includes('delete');
+    const canViewClient = allpermisson.includes('view');
 
   const deleteUser = (userId) => {
     if (!canDeleteClient) {
@@ -391,12 +393,11 @@ const ClientList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-          {canCreateClient && (
-            <Button type="primary" className="ml-2" onClick={openAddCompanyModal}>
-              <PlusOutlined />
-              New
+          {whorole === "super-admin" || (canCreateClient && whorole !== "super-admin") ? (
+            <Button type="primary" icon={<PlusOutlined />} onClick={openAddCompanyModal} className="flex items-center">
+                New Client
             </Button>
-          )}
+          ) : null}
           <Button
                 type="primary"
                 icon={<FileExcelOutlined />}
@@ -408,7 +409,9 @@ const ClientList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive">
-        <Table columns={tableColumns} dataSource={users} rowKey="id" />
+        {canViewClient && (
+          <Table columns={tableColumns} dataSource={users} rowKey="id" />
+        )}
       </div>
       {userProfileVisible && (
         <UserView

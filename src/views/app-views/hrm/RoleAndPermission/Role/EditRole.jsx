@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, message, Checkbox } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { editRole, getRoles } from '../RoleAndPermissionReducers/RoleAndPermissionSlice';
+import { editRole, getRoles, roledata } from '../RoleAndPermissionReducers/RoleAndPermissionSlice';
 
 const EditRole = ({ id, onClose }) => {
   const navigate = useNavigate();
@@ -87,6 +87,10 @@ const EditRole = ({ id, onClose }) => {
   
   const permissions = ['view', 'create', 'update', 'delete'];
 
+  useEffect(()=>{
+    dispatch(roledata())
+  },[dispatch])
+
   useEffect(() => {
     if (id && alldept?.role?.data) {
         if (role) {
@@ -101,14 +105,14 @@ const EditRole = ({ id, onClose }) => {
             console.log("Role permissions:", rolePermissions); // Log the role permissions for debugging
             
             // Iterate over the keys of role.permissions
-            Object.keys(rolePermissions).forEach(moduleKey => {
+            Object?.keys(rolePermissions)?.forEach(moduleKey => {
                 const subModules = rolePermissions[moduleKey]; // Get the submodules for the current module key
-                if (Array.isArray(subModules)) { // Ensure it's an array
-                    subModules.forEach(subModule => {
+                if (Array?.isArray(subModules)) { // Ensure it's an array
+                    subModules?.forEach(subModule => {
                         // Check if subModule has a key and permissions
-                        if (subModule.key && subModule.permissions) {
-                            initialPermissions[subModule.key] = {};
-                            subModule.permissions.forEach(permission => {
+                        if (subModule?.key && subModule?.permissions) {
+                            initialPermissions[subModule?.key] = {};
+                            subModule?.permissions?.forEach(permission => {
                                 initialPermissions[subModule.key][permission] = true; // Set to true if permission exists
                             });
                         }

@@ -26,6 +26,45 @@ const ProjectList = () => {
 	const [clientid,setClientId] = useState("");
 
 	const [idd,setIdd]= useState("");
+	
+	// const allloggeddata = useSelector((state)=>state.user.loggedInUser.role_id);`
+	// const roledata = useSelector((state)=>state.role.role.data)
+
+	// const fndidd = roledata.find((item)=>item.id == allloggeddata)
+
+
+	//permission
+
+	
+	  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+		const roles = useSelector((state) => state.role?.role?.data);
+		const roleData = roles?.find(role => role.id === roleId);
+
+		const whorole = roleData.role_name;
+
+	  const parsedPermissions = Array.isArray(roleData?.permissions)
+		? roleData.permissions
+		: typeof roleData?.permissions === 'string'
+		? JSON.parse(roleData.permissions)
+		: [];
+	
+	
+		let allpermisson;  
+
+		if (parsedPermissions["dashboards-project-list"] && parsedPermissions["dashboards-project-list"][0]?.permissions) {
+			allpermisson = parsedPermissions["dashboards-project-list"][0].permissions;
+			console.log('Parsed Permissions:', allpermisson);
+		
+		} else {
+			console.log('dashboards-project-list is not available');
+		}
+		
+		const canCreateClient = allpermisson?.includes('create');
+		const canEditClient = allpermisson?.includes('edit');
+		const canDeleteClient = allpermisson?.includes('delete');
+		const canViewClient = allpermisson?.includes('view');
+
+		//endpermisstion 
 
 	  const AllProject = useSelector((state) => state.Project);
 	  const properdata = AllProject.Project.data;
@@ -103,7 +142,7 @@ const ProjectList = () => {
 			  };
 			});
 			setList(formattedData);
-		}, [clientid, properdata, username, matchingClients]);
+		}, [clientid]);
 
 
 	  
@@ -138,12 +177,22 @@ const ProjectList = () => {
 	// Generate Action Menu for Dropdown
 	const dropdownMenu = (id) => (
 		<Menu>
-			<Menu.Item key="edit"  onClick={() => editp(id)}>
-				<EditOutlined /> Edit
-			</Menu.Item>
-			<Menu.Item key="delete" onClick={() => deleteItem(id)}>
-				<DeleteOutlined /> Delete
-			</Menu.Item>
+		
+
+
+{(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
+								<Menu.Item key="edit"  onClick={() => editp(id)}>
+								<EditOutlined /> Edit
+							</Menu.Item>
+							) : null}
+
+
+{(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+								<Menu.Item key="delete" onClick={() => deleteItem(id)}>
+								<DeleteOutlined /> Delete
+							</Menu.Item>
+							) : null}
+
 		</Menu>
 	);
 
@@ -251,16 +300,18 @@ const ProjectList = () => {
 									<UnorderedListOutlined />
 								</Radio.Button>
 							</Radio.Group>
-							<Button type="primary" icon={<PlusOutlined />} onClick={openAddProjectModal} className='flex items-center'>
-								New Project
-							</Button>
+							{(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+								<Button type="primary" icon={<PlusOutlined />} onClick={openAddProjectModal} className="flex items-center">
+									New Project
+								</Button>
+							) : null}
 						</div>
 					</Flex>
 				</div>
 			</PageHeaderAlt>
 
 			<div className="my-4 container-fluid">
-				{view === VIEW_LIST ? (
+				{view === VIEW_LIST && (whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
 					<Table
 						columns={tableColumns}
 						dataSource={list}
@@ -270,7 +321,6 @@ const ProjectList = () => {
 				) : (
 					<Row gutter={16}>
 						{list?.map((item) => {
-							// Determine the color dynamically based on the days left
 							let statusColor = '';				
 							if (item.dayleft > 10) {
 								statusColor = 'green'; // Safe status
@@ -281,75 +331,83 @@ const ProjectList = () => {
 							}
 
 							return (
-								<Col xs={24} sm={24} lg={8} xl={8} xxl={6} key={item.id}>
-									<Card>
-										<div className='flex items-center justify-between'>
-											<div className='' onClick={() => handleProjectClick(item.id)}>
-												<p className='font-medium'>{item.name}</p>
-											</div>
-											<div>
-												<p>{item.category}</p>
-											</div>
-											<div className="flex items-center gap-2">
-												{item.tag && (
-													<Tag 
-														color="blue" 
-														className="m-0"
-													>
-														{item.tag}
-													</Tag>
-												)}
-												<Dropdown
-													overlay={dropdownMenu(item.id)}
-													trigger={['click']}
-													placement="bottomRight"
-													key="dropdown"
-												>
-													<Button type="text" icon={<EllipsisDropdown />} />
-												</Dropdown>
-											</div>
-										</div>
+									<Col xs={24} sm={24} lg={8} xl={8} xxl={6} key={item.id}>
+										
+									
 
-										<p className="flex gap-4 mt-1">
-											<span>{item.member}</span>
-										</p>
 
-										<p className="flex gap-4 mt-1">
-											<span>
-												<PaperClipOutlined />
-												{item.totalTask}
-											</span>
-											<span>
-												<CheckCircleOutlined />
-												{item.completedTask}
-											</span>
-											<span
-												style={{
-													color: statusColor,
-													display: 'flex',
-													alignItems: 'center',
-													gap: '4px',
-												}}
-											>
-												<ClockCircleOutlined />
-												{item.dayleft} days left
-											</span>
-										</p>
-										<p>
-											<Progress
-												percent={item.dayleft}
-												strokeColor={
-													item.dayleft >= 80
-														? 'green'
-														: item.dayleft >= 60
-															? 'orange'
-															: 'red'
-												}
-												size="small"
-											/>
-										</p>
-									</Card>
+										{(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+							<Card>
+							<div className='flex items-center justify-between'>
+								<div className='' onClick={() => handleProjectClick(item.id)}>
+									<p className='font-medium'>{item.name}</p>
+								</div>
+								<div>
+									<p>{item.category}</p>
+								</div>
+								<div className="flex items-center gap-2">
+									{item.tag && (
+										<Tag 
+											color="blue" 
+											className="m-0"
+										>
+											{item.tag}
+										</Tag>
+									)}
+									<Dropdown
+										overlay={dropdownMenu(item.id)}
+										trigger={['click']}
+										placement="bottomRight"
+										key="dropdown"
+									>
+										<Button type="text" icon={<EllipsisDropdown />} />
+									</Dropdown>
+								</div>
+							</div>
+
+							<p className="flex gap-4 mt-1">
+								<span>{item.member}</span>
+							</p>
+
+							<p className="flex gap-4 mt-1">
+								<span>
+									<PaperClipOutlined />
+									{item.totalTask}
+								</span>
+								<span>
+									<CheckCircleOutlined />
+									{item.completedTask}
+								</span>
+								<span
+									style={{
+										color: statusColor,
+										display: 'flex',
+										alignItems: 'center',
+										gap: '4px',
+									}}
+								>
+									<ClockCircleOutlined />
+									{item.dayleft} days left
+								</span>
+							</p>
+							<p>
+								<Progress
+									percent={item.dayleft}
+									strokeColor={
+										item.dayleft >= 80
+											? 'green'
+											: item.dayleft >= 60
+												? 'orange'
+												: 'red'
+									}
+									size="small"
+								/>
+							</p>
+						</Card>
+							) : null}
+
 								</Col>
+								
 							);
 						})}
 					</Row>
