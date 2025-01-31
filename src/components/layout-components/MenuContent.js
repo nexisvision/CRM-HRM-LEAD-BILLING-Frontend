@@ -85,7 +85,7 @@ const SideNavContent = (props) => {
 		console.log('Parsed Permissions:', parsedPermissions);
 
 		if (isSuperAdmin) {
-			console.log('Super Admin detected - showing all menu items');
+			// console.log('Super Admin detected - showing all menu items');
 			return getSideNavMenuItem(navigationConfig);
 		}
 
@@ -98,7 +98,7 @@ const SideNavContent = (props) => {
 		const isNavItemAllowed = (navItem) => {
 			// For group titles (like 'HRM'), always allow
 			if (navItem.isGroupTitle) {
-				console.log('Allowing group title:', navItem.key);
+				// console.log('Allowing group title:', navItem.key);
 				return true;
 			}
 
@@ -108,12 +108,12 @@ const SideNavContent = (props) => {
 				if (Array.isArray(sectionPerms)) {
 					const matchingPerm = sectionPerms.find(p => p.key === navItem.key);
 					if (matchingPerm && matchingPerm.permissions.includes('view')) {
-						console.log('Permission granted for:', navItem.key);
+						// console.log('Permission granted for:', navItem.key);
 						return true;
 					}
 				}
 			}
-			console.log('Permission denied for:', navItem.key);
+			// console.log('Permission denied for:', navItem.key);
 			return false;
 		};
 
@@ -138,14 +138,14 @@ const SideNavContent = (props) => {
 
 		const filteredNavigation = filterNavItems(navigationConfig);
 		
-		console.log('Final Filtered Navigation:', {
-			itemCount: filteredNavigation.length,
-			items: filteredNavigation.map(item => ({
-				key: item.key,
-				title: item.title,
-				submenuCount: item.submenu?.length || 0
-			}))
-		});
+		// console.log('Final Filtered Navigation:', {
+		// 	itemCount: filteredNavigation.length,
+		// 	items: filteredNavigation.map(item => ({
+		// 		key: item.key,
+		// 		title: item.title,
+		// 		submenuCount: item.submenu?.length || 0
+		// 	}))
+		// });
 
 		const relevantNavigation = filteredNavigation.filter(navItem => {
 			// Check if the navItem key starts with 'extra-hrm' or 'dashboards'
