@@ -91,6 +91,40 @@ const TaskList = () => {
     }
   }, [fnddata]);
 
+   //// permission
+                
+                          const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+                          const roles = useSelector((state) => state.role?.role?.data);
+                          const roleData = roles?.find(role => role.id === roleId);
+                      
+                          const whorole = roleData.role_name;
+                      
+                          const parsedPermissions = Array.isArray(roleData?.permissions)
+                          ? roleData.permissions
+                          : typeof roleData?.permissions === 'string'
+                          ? JSON.parse(roleData.permissions)
+                          : [];
+                        
+                        
+                          let allpermisson;  
+                      
+                          if (parsedPermissions["dashboards-Task"] && parsedPermissions["dashboards-Task"][0]?.permissions) {
+                            allpermisson = parsedPermissions["dashboards-Task"][0].permissions;
+                            console.log('Parsed Permissions:', allpermisson);
+                          
+                          } else {
+                            console.log('dashboards-Task is not available');
+                          }
+                          
+                          const canCreateClient = allpermisson?.includes('create');
+                          const canEditClient = allpermisson?.includes('edit');
+                          const canDeleteClient = allpermisson?.includes('delete');
+                          const canViewClient = allpermisson?.includes('view');
+                
+                          ///endpermission
+
+
+
   // Open Add Job Modal
   const openAddTaskModal = () => {
     setIsAddTaskModalVisible(true);
@@ -152,24 +186,34 @@ const TaskList = () => {
           <span className="ml-2">Add to remark</span>
         </Flex>
       </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => editfubn(row.id)}>
-          <EditOutlined />
-          <span className="ml-2">Edit</span>
-        </Flex>
-      </Menu.Item>
+    
       <Menu.Item>
         <Flex alignItems="center">
           <TiPinOutline />
           <span className="ml-2">Pin</span>
         </Flex>
       </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => deleytfun(row.id)}>
-          <DeleteOutlined />
-          <span className="ml-2">Delete</span>
-        </Flex>
-      </Menu.Item>
+      
+
+      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                              <Menu.Item>
+                              <Flex alignItems="center" onClick={() => editfubn(row.id)}>
+                                <EditOutlined />
+                                <span className="ml-2">Edit</span>
+                              </Flex>
+                            </Menu.Item>
+                    ) : null}
+      
+      
+      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                      <Menu.Item>
+                      <Flex alignItems="center" onClick={() => deleytfun(row.id)}>
+                        <DeleteOutlined />
+                        <span className="ml-2">Delete</span>
+                      </Flex>
+                    </Menu.Item>
+                    ) : null}
+
     </Menu>
   );
 
@@ -349,14 +393,21 @@ const TaskList = () => {
             </div>
           </Flex>
           <Flex gap="7px" className="flex">
-            <Button
-              type="primary"
-              className="flex items-center"
-              onClick={openAddTaskModal}
-            >
-              <PlusOutlined />
-              <span className="ml-2">New</span>
-            </Button>
+          
+
+            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                                                                                                                              <Button
+                                                                                                                                              type="primary"
+                                                                                                                                              className="flex items-center"
+                                                                                                                                              onClick={openAddTaskModal}
+                                                                                                                                            >
+                                                                                                                                              <PlusOutlined />
+                                                                                                                                              <span className="ml-2">New</span>
+                                                                                                                                            </Button>
+                                                                                                                            
+                                                                                                                                ) : null}
+
+
             <Button
               type="primary"
               icon={<FileExcelOutlined />}
@@ -368,18 +419,21 @@ const TaskList = () => {
           </Flex>
         </Flex>
         <div className="table-responsive">
-          <Table
-            columns={tableColumns}
-            dataSource={list}
-            rowKey="id"
-            scroll={{ x: 1200 }}
-            rowSelection={{
-              selectedRowKeys: selectedRowKeys,
-              type: "checkbox",
-              preserveSelectedRowKeys: false,
-              ...rowSelection,
-            }}
-          />
+
+          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                                                                                             <Table
+                                                                                                             columns={tableColumns}
+                                                                                                             dataSource={list}
+                                                                                                             rowKey="id"
+                                                                                                             scroll={{ x: 1200 }}
+                                                                                                             rowSelection={{
+                                                                                                               selectedRowKeys: selectedRowKeys,
+                                                                                                               type: "checkbox",
+                                                                                                               preserveSelectedRowKeys: false,
+                                                                                                               ...rowSelection,
+                                                                                                             }}
+                                                                                                           />
+                                                                                                            ) : null}
         </div>
       </Card>
 

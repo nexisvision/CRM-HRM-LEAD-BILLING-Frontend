@@ -28,8 +28,9 @@ const EditExpenses = ({ idd, onClose }) => {
   const Expensedata = allempdata?.Expense?.data || [];
 
   const { data: employee } = useSelector((state) => state.employee.employee);
+  const {  currencies } = useSelector((state) => state.currencies.currencies);
 
-  const currencies = useSelector((state) => state.currencies.currencies);
+  // const currencies = useSelector((state) => state.currencies.currencies);
 
     useEffect(() => {
         dispatch(getcurren());
@@ -264,10 +265,10 @@ const EditExpenses = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={8} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">PurchasedFrom</label>
-                  <Field
+               <Col span={8} className="mt-2">
+                 <div className="form-item">
+                   <label className="font-semibold">PurchasedFrom</label>
+                   <Field
                     name="PurchasedFrom"
                     as={Input}
                     placeholder="Enter PurchasedFrom"

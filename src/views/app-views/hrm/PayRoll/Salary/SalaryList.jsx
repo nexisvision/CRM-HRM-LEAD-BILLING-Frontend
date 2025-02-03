@@ -46,6 +46,38 @@ const SalaryList = () => {
     }
   }, [dfnddata]);
 
+   //// permission
+                 
+   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+   const roles = useSelector((state) => state.role?.role?.data);
+   const roleData = roles?.find(role => role.id === roleId);
+
+   const whorole = roleData.role_name;
+
+   const parsedPermissions = Array.isArray(roleData?.permissions)
+   ? roleData.permissions
+   : typeof roleData?.permissions === 'string'
+   ? JSON.parse(roleData.permissions)
+   : [];
+ 
+ 
+   let allpermisson;  
+
+   if (parsedPermissions["extra-hrm-payroll-salary"] && parsedPermissions["extra-hrm-payroll-salary"][0]?.permissions) {
+     allpermisson = parsedPermissions["extra-hrm-payroll-salary"][0].permissions;
+     console.log('Parsed Permissions:', allpermisson);
+   
+   } else {
+     console.log('extra-hrm-payroll-salary is not available');
+   }
+   
+   const canCreateClient = allpermisson?.includes('create');
+   const canEditClient = allpermisson?.includes('edit');
+   const canDeleteClient = allpermisson?.includes('delete');
+   const canViewClient = allpermisson?.includes('view');
+
+   ///endpermission
+
   // Open Add Salary Modal
   const openAddSalaryModal = () => {
     setIsAddSalaryModalVisible(true);
@@ -107,20 +139,29 @@ const SalaryList = () => {
         </Button>
       </Menu.Item> */}
 
-      <Menu.Item>
-        <Button type="text" icon={<EyeOutlined />} onClick={handleSetSalary}>
-          Set Salary
-        </Button>
-      </Menu.Item>
-      <Menu.Item>
-        <Button
-          type="text"
-          icon={<DeleteOutlined />}
-          onClick={() => deleteUser(user.id)}
-        >
-          Delete
-        </Button>
-      </Menu.Item>
+     
+     
+
+      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                            <Menu.Item>
+                            <Button type="text" icon={<EyeOutlined />} onClick={handleSetSalary}>
+                              Set Salary
+                            </Button>
+                          </Menu.Item>
+                    ) : null}
+      
+      
+      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                      <Menu.Item>
+                      <Button
+                        type="text"
+                        icon={<DeleteOutlined />}
+                        onClick={() => deleteUser(user.id)}
+                      >
+                        Delete
+                      </Button>
+                    </Menu.Item>
+                    ) : null}
     </Menu>
   );
 
@@ -170,11 +211,22 @@ const SalaryList = () => {
           prefix={<SearchOutlined />}
           onChange={onSearch}
         />
-        <Button type="primary" className="ml-2" onClick={openAddSalaryModal}>
-          <PlusOutlined /> Add Salary
-        </Button>
+   
+
+        {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                                                                                                                                                        <Button type="primary" className="ml-2" onClick={openAddSalaryModal}>
+                                                                                                                                                                        <PlusOutlined /> Add Salary
+                                                                                                                                                                      </Button>
+                                                                                                                                                      
+                                                                                                                                                          ) : null}
       </Flex>
-      <Table columns={tableColumns} dataSource={list} rowKey="id" />
+
+       {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                                                                                                                           <Table columns={tableColumns} dataSource={list} rowKey="id" />
+
+      
+                                                                                                                                ) : null}
+
       <Modal
         title="Add Salary"
         visible={isAddSalaryModalVisible}

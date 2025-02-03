@@ -112,6 +112,37 @@ const JobCandidateList = () => {
     setUserProfileVisible(false);
   };
 
+   //// permission
+                                    
+                      const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+                      const roles = useSelector((state) => state.role?.role?.data);
+                      const roleData = roles?.find(role => role.id === roleId);
+                   
+                      const whorole = roleData.role_name;
+                   
+                      const parsedPermissions = Array.isArray(roleData?.permissions)
+                      ? roleData.permissions
+                      : typeof roleData?.permissions === 'string'
+                      ? JSON.parse(roleData.permissions)
+                      : [];
+                    
+                      let allpermisson;  
+                   
+                      if (parsedPermissions["extra-hrm-jobs-jobcandidate"] && parsedPermissions["extra-hrm-jobs-jobcandidate"][0]?.permissions) {
+                        allpermisson = parsedPermissions["extra-hrm-jobs-jobcandidate"][0].permissions;
+                        console.log('Parsed Permissions:', allpermisson);
+                      
+                      } else {
+                        console.log('extra-hrm-jobs-jobcandidate is not available');
+                      }
+                      
+                      const canCreateClient = allpermisson?.includes('create');
+                      const canEditClient = allpermisson?.includes('edit');
+                      const canDeleteClient = allpermisson?.includes('delete');
+                      const canViewClient = allpermisson?.includes('view');
+                   
+                      ///endpermission
+
   const dropdownMenu = (elm) => (
     <Menu>
       <Menu.Item>
@@ -265,12 +296,16 @@ const JobCandidateList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-        <Table
-          columns={tableColumns}
-          dataSource={users}
-          rowKey="id"
-          scroll={{ x: 1200 }}
-        />
+         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                                   <Table
+                                                   columns={tableColumns}
+                                                   dataSource={users}
+                                                   rowKey="id"
+                                                   scroll={{ x: 1200 }}
+                                                 />
+                                                     ) : null}
+
+       
       </div>
       <UserView
         data={selectedUser}

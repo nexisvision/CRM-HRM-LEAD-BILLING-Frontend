@@ -56,6 +56,39 @@ const MeetingList = () => {
     setIsEditMeetingModalVisible(false);
   };
 
+  //// permission
+                                
+                  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+                  const roles = useSelector((state) => state.role?.role?.data);
+                  const roleData = roles?.find(role => role.id === roleId);
+               
+                  const whorole = roleData.role_name;
+               
+                  const parsedPermissions = Array.isArray(roleData?.permissions)
+                  ? roleData.permissions
+                  : typeof roleData?.permissions === 'string'
+                  ? JSON.parse(roleData.permissions)
+                  : [];
+                
+                  let allpermisson;  
+               
+                  if (parsedPermissions["extra-hrm-meeting"] && parsedPermissions["extra-hrm-meeting"][0]?.permissions) {
+                    allpermisson = parsedPermissions["extra-hrm-meeting"][0].permissions;
+                    console.log('Parsed Permissions:', allpermisson);
+                  
+                  } else {
+                    console.log('extra-hrm-meeting is not available');
+                  }
+                  
+                  const canCreateClient = allpermisson?.includes('create');
+                  const canEditClient = allpermisson?.includes('edit');
+                  const canDeleteClient = allpermisson?.includes('delete');
+                  const canViewClient = allpermisson?.includes('view');
+               
+                  ///endpermission
+
+
+
 
   // Search functionality
   const onSearch = (e) => {
@@ -125,32 +158,41 @@ const MeetingList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EditOutlined />}
-            onClick={() => EditMeet(elm.id)}
-            size="small"
-          >
-            <span className="">Edit</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<DeleteOutlined />}
-            onClick={() => deleteUser(elm.id)}
-            size="small"
-          >
-            <span className="">Delete</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
+      
+     
+
+      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                   <Menu.Item>
+                                   <Flex alignItems="center">
+                                     <Button
+                                       type=""
+                                       className=""
+                                       icon={<EditOutlined />}
+                                       onClick={() => EditMeet(elm.id)}
+                                       size="small"
+                                     >
+                                       <span className="">Edit</span>
+                                     </Button>
+                                   </Flex>
+                                 </Menu.Item>
+                                ) : null}
+                  
+                  
+                  {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                  <Menu.Item>
+                                  <Flex alignItems="center">
+                                    <Button
+                                      type=""
+                                      className=""
+                                      icon={<DeleteOutlined />}
+                                      onClick={() => deleteUser(elm.id)}
+                                      size="small"
+                                    >
+                                      <span className="">Delete</span>
+                                    </Button>
+                                  </Flex>
+                                </Menu.Item>
+                                ) : null}
     </Menu>
   );
 
@@ -195,10 +237,15 @@ const MeetingList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-          <Button type="primary" className="ml-2" onClick={openAddMeetingModal}>
-            <PlusOutlined />
-            <span>New</span>
-          </Button>
+         
+
+             {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                                                                   <Button type="primary" className="ml-2" onClick={openAddMeetingModal}>
+                                                                                   <PlusOutlined />
+                                                                                   <span>New</span>
+                                                                                 </Button>                                                                                                                                   
+                                                                                                                                                                                                                  
+                                                                                                ) : null}
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
@@ -210,12 +257,18 @@ const MeetingList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-        <Table
-          columns={tableColumns}
-          dataSource={users}
-          rowKey="id"
-          scroll={{ x: 1200 }}
-        />
+
+         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                   <Table
+                                   columns={tableColumns}
+                                   dataSource={users}
+                                   rowKey="id"
+                                   scroll={{ x: 1200 }}
+                                 />
+                                     ) : null}
+
+
+       
       </div>
       <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
 

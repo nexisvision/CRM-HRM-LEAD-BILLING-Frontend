@@ -85,6 +85,38 @@ const InterviewList = () => {
     setIdd(idd);
   };
 
+    //// permission
+                                          
+                            const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+                            const roles = useSelector((state) => state.role?.role?.data);
+                            const roleData = roles?.find(role => role.id === roleId);
+                         
+                            const whorole = roleData.role_name;
+                         
+                            const parsedPermissions = Array.isArray(roleData?.permissions)
+                            ? roleData.permissions
+                            : typeof roleData?.permissions === 'string'
+                            ? JSON.parse(roleData.permissions)
+                            : [];
+                          
+                            let allpermisson;  
+                         
+                            if (parsedPermissions["extra-hrm-jobs-jobonbording"] && parsedPermissions["extra-hrm-jobs-jobonbording"][0]?.permissions) {
+                              allpermisson = parsedPermissions["extra-hrm-jobs-jobonbording"][0].permissions;
+                              console.log('Parsed Permissions:', allpermisson);
+                            
+                            } else {
+                              console.log('extra-hrm-jobs-jobonbording is not available');
+                            }
+                            
+                            const canCreateClient = allpermisson?.includes('create');
+                            const canEditClient = allpermisson?.includes('edit');
+                            const canDeleteClient = allpermisson?.includes('delete');
+                            const canViewClient = allpermisson?.includes('view');
+                         
+                            ///endpermission
+                            
+
   return (
     <div style={{ display: "flex", gap: "20px", padding: "20px" }}>
       {/* Calendar Section */}
@@ -125,26 +157,36 @@ const InterviewList = () => {
           dataSource={interviewSchedules}
           renderItem={(item) => (
             <Card style={{ marginBottom: "16px" }}>
-              <div>
-                <h4 style={{ color: "#34C759", margin: 0 }}>{item.title}</h4>
-                <p style={{ margin: "8px 0 4px" }}>{item.interviewer}</p>
-                <p style={{ margin: 0 }}>
-                  {moment(item.date).format("MMM DD, YYYY hh:mm A")}
-                </p>
-              </div>
+                 {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                                                                               <div>
+                                                                                               <h4 style={{ color: "#34C759", margin: 0 }}>{item.title}</h4>
+                                                                                               <p style={{ margin: "8px 0 4px" }}>{item.interviewer}</p>
+                                                                                               <p style={{ margin: 0 }}>
+                                                                                                 {moment(item.date).format("MMM DD, YYYY hh:mm A")}
+                                                                                               </p>
+                                                                                             </div>
+                                                                                                   ) : null}
+           
               <div style={{ textAlign: "right", marginTop: "10px" }}>
-                <Button
-                  type="default"
-                  icon={<EditOutlined />}
-                  style={{ marginRight: "10px" }}
-                  onClick={() => editfun(item.id)}
-                />
-                <Button
-                  type="default"
-                  danger
-                  icon={<DeleteOutlined />}
-                  onClick={() => delefun(item.id)}
-                />
+                
+{(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                               <Button
+                               type="default"
+                               icon={<EditOutlined />}
+                               style={{ marginRight: "10px" }}
+                               onClick={() => editfun(item.id)}
+                             />
+                                ) : null}
+                  
+                  
+                  {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                        <Button
+                                        type="default"
+                                        danger
+                                        icon={<DeleteOutlined />}
+                                        onClick={() => delefun(item.id)}
+                                      />
+                                ) : null}
               </div>
             </Card>
           )}
@@ -155,15 +197,19 @@ const InterviewList = () => {
       </div>
 
       {/* Add Interview Modal */}
-      <Modal
-        title="Add Interview"
-        visible={isAddInterviewModalVisible}
-        onCancel={closeAddInterviewModal}
-        footer={null}
-        width={1000}
-      >
-        <AddInterview onAddInterview={addInterview} />
-      </Modal>
+      {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                                                                             <Modal
+                                                                                             title="Add Interview"
+                                                                                             visible={isAddInterviewModalVisible}
+                                                                                             onCancel={closeAddInterviewModal}
+                                                                                             footer={null}
+                                                                                             width={1000}
+                                                                                           >
+                                                                                             <AddInterview onAddInterview={addInterview} />
+                                                                                           </Modal>
+                                                                                                   ) : null}
+
+    
       <Modal
         title="Edit Interview"
         visible={isEditInterviewModalVisible}

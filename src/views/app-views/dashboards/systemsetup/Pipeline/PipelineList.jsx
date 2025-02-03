@@ -64,6 +64,37 @@ const PipelineList = () => {
     });
   };
 
+   //// permission
+                                              
+   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+   const roles = useSelector((state) => state.role?.role?.data);
+   const roleData = roles?.find(role => role.id === roleId);
+
+   const whorole = roleData.role_name;
+
+   const parsedPermissions = Array.isArray(roleData?.permissions)
+   ? roleData.permissions
+   : typeof roleData?.permissions === 'string'
+   ? JSON.parse(roleData.permissions)
+   : [];
+ 
+   let allpermisson;  
+
+   if (parsedPermissions["extra-hrm-trainingSetup"] && parsedPermissions["extra-hrm-trainingSetup"][0]?.permissions) {
+     allpermisson = parsedPermissions["extra-hrm-trainingSetup"][0].permissions;
+     console.log('Parsed Permissions:', allpermisson);
+   
+   } else {
+     console.log('extra-hrm-trainingSetup is not available');
+   }
+   
+   const canCreateClient = allpermisson?.includes('create');
+   const canEditClient = allpermisson?.includes('edit');
+   const canDeleteClient = allpermisson?.includes('delete');
+   const canViewClient = allpermisson?.includes('view');
+
+   ///endpermission
+
   const tableColumns = [
     {
       title: "Pipeline",
@@ -119,6 +150,7 @@ const PipelineList = () => {
             <Button type="primary" onClick={openAddPipeLineModal}>
               <PlusOutlined />
             </Button>
+            
           </div>
         </Flex>
       </div>

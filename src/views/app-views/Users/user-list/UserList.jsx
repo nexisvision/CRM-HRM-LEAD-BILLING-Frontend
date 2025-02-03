@@ -65,6 +65,39 @@ const UserList = () => {
     }
   }, [fndfdata]);
 
+
+   //// permission
+              
+   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+   const roles = useSelector((state) => state.role?.role?.data);
+   const roleData = roles?.find(role => role.id === roleId);
+
+   const whorole = roleData.role_name;
+
+   const parsedPermissions = Array.isArray(roleData?.permissions)
+   ? roleData.permissions
+   : typeof roleData?.permissions === 'string'
+   ? JSON.parse(roleData.permissions)
+   : [];
+ 
+ 
+   let allpermisson;  
+
+   if (parsedPermissions["extra-users-list"] && parsedPermissions["extra-users-list"][0]?.permissions) {
+     allpermisson = parsedPermissions["extra-users-list"][0].permissions;
+     console.log('Parsed Permissions:', allpermisson);
+   
+   } else {
+     console.log('extra-users-list is not available');
+   }
+   
+   const canCreateClient = allpermisson?.includes('create');
+   const canEditClient = allpermisson?.includes('edit');
+   const canDeleteClient = allpermisson?.includes('delete');
+   const canViewClient = allpermisson?.includes('view');
+
+   ///endpermission
+
   const handleShowStatus = (value) => {
     if (value !== "All") {
       const key = "status";
@@ -143,18 +176,7 @@ const UserList = () => {
           </Button>
         </Flex>
       </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            icon={<EditOutlined />}
-            onClick={() => Editfun(elm.id)}
-            size="small"
-          >
-            Edit
-          </Button>
-        </Flex>
-      </Menu.Item>
+     
       <Menu.Item>
         <Flex alignItems="center">
           <Button
@@ -167,18 +189,40 @@ const UserList = () => {
           </Button>
         </Flex>
       </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            icon={<DeleteOutlined />}
-            onClick={() => deleteUser(elm.id)}
-            size="small"
-          >
-            Delete
-          </Button>
-        </Flex>
-      </Menu.Item>
+    
+
+      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                             <Menu.Item>
+                             <Flex alignItems="center">
+                               <Button
+                                 type=""
+                                 icon={<EditOutlined />}
+                                 onClick={() => Editfun(elm.id)}
+                                 size="small"
+                               >
+                                 Edit
+                               </Button>
+                             </Flex>
+                           </Menu.Item>
+                    ) : null}
+      
+      
+      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                       <Menu.Item>
+                       <Flex alignItems="center">
+                         <Button
+                           type=""
+                           icon={<DeleteOutlined />}
+                           onClick={() => deleteUser(elm.id)}
+                           size="small"
+                         >
+                           Delete
+                         </Button>
+                       </Flex>
+                     </Menu.Item>
+                    ) : null}
+
+
     </Menu>
   );
 
@@ -264,17 +308,30 @@ const UserList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-          <Button type="primary" className="ml-2" onClick={openAddUserModal}>
-            <PlusOutlined />
-            New
-          </Button>
+        
+
+           {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                                                                                                                           <Button type="primary" className="ml-2" onClick={openAddUserModal}>
+                                                                                                                                           <PlusOutlined />
+                                                                                                                                           New
+                                                                                                                                         </Button>
+                                                                                                                          
+                                                                                                                              ) : null}
+
+
           <Button type="primary" icon={<FileExcelOutlined />} block>
             Export All
           </Button>
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-        <Table columns={tableColumns} dataSource={users} rowKey="id" />
+
+         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                                                                                         <Table columns={tableColumns} dataSource={users} rowKey="id" />
+                                                                                                          ) : null}
+
+
+       
       </div>
       <UserView
         data={selectedUser}

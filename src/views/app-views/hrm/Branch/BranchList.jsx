@@ -55,6 +55,37 @@ const BranchList = () => {
     }
   }, [fnddata]);
 
+   //// permission
+                            
+              const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+              const roles = useSelector((state) => state.role?.role?.data);
+              const roleData = roles?.find(role => role.id === roleId);
+           
+              const whorole = roleData.role_name;
+           
+              const parsedPermissions = Array.isArray(roleData?.permissions)
+              ? roleData.permissions
+              : typeof roleData?.permissions === 'string'
+              ? JSON.parse(roleData.permissions)
+              : [];
+            
+              let allpermisson;  
+           
+              if (parsedPermissions["extra-hrm-branch"] && parsedPermissions["extra-hrm-branch"][0]?.permissions) {
+                allpermisson = parsedPermissions["extra-hrm-branch"][0].permissions;
+                console.log('Parsed Permissions:', allpermisson);
+              
+              } else {
+                console.log('extra-hrm-branch is not available');
+              }
+              
+              const canCreateClient = allpermisson?.includes('create');
+              const canEditClient = allpermisson?.includes('edit');
+              const canDeleteClient = allpermisson?.includes('delete');
+              const canViewClient = allpermisson?.includes('view');
+           
+              ///endpermission
+
   // const navigate = useNavigate();
 
   const openAddBranchModal = () => {
@@ -146,16 +177,7 @@ const BranchList = () => {
           <span>View Details</span>
         </Button>
       </Menu.Item>
-      <Menu.Item>
-        <Button
-          type=""
-          icon={<EditOutlined />}
-          onClick={() => editDept(elm.id)}
-          size="small"
-        >
-          <span>Edit</span>
-        </Button>
-      </Menu.Item>
+      
       <Menu.Item>
         <Button
           type=""
@@ -166,16 +188,36 @@ const BranchList = () => {
           <span>Pin</span>
         </Button>
       </Menu.Item>
-      <Menu.Item>
-        <Button
-          type=""
-          icon={<DeleteOutlined />}
-          onClick={() => deleteUser(elm.id)}
-          size="small"
-        >
-          <span>Delete</span>
-        </Button>
-      </Menu.Item>
+   
+
+        {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                   <Menu.Item>
+                                   <Button
+                                     type=""
+                                     icon={<EditOutlined />}
+                                     onClick={() => editDept(elm.id)}
+                                     size="small"
+                                   >
+                                     <span>Edit</span>
+                                   </Button>
+                                 </Menu.Item>
+                                ) : null}
+                  
+                  
+                  {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                   <Menu.Item>
+                                   <Button
+                                     type=""
+                                     icon={<DeleteOutlined />}
+                                     onClick={() => deleteUser(elm.id)}
+                                     size="small"
+                                   >
+                                     <span>Delete</span>
+                                   </Button>
+                                 </Menu.Item>
+                                ) : null}
+
+
     </Menu>
   );
 
@@ -213,10 +255,16 @@ const BranchList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-          <Button type="primary" className="ml-2" onClick={openAddBranchModal}>
-            <PlusOutlined />
-            <span>New</span>
-          </Button>
+         
+
+            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                                                          <Button type="primary" className="ml-2" onClick={openAddBranchModal}>
+                                                                          <PlusOutlined />
+                                                                          <span>New</span>
+                                                                        </Button>                                                                                                                                      
+                                                                                      ) : null}
+
+
           <Button
                 type="primary"
                 icon={<FileExcelOutlined />}
@@ -228,7 +276,13 @@ const BranchList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-        <Table columns={tableColumns} dataSource={users} rowKey="id" />
+
+         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                                                                                                                                                                  
+                    <Table columns={tableColumns} dataSource={users} rowKey="id" />
+                       ) : null}
+
+
       </div>
       <UserView
         data={selectedUser}

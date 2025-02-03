@@ -156,6 +156,38 @@ const AttendanceList = () => {
     setIsAddAttendanceModalVisible(false);
   };
 
+   //// permission
+                                                  
+                                    const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+                                    const roles = useSelector((state) => state.role?.role?.data);
+                                    const roleData = roles?.find(role => role.id === roleId);
+                                 
+                                    const whorole = roleData.role_name;
+                                 
+                                    const parsedPermissions = Array.isArray(roleData?.permissions)
+                                    ? roleData.permissions
+                                    : typeof roleData?.permissions === 'string'
+                                    ? JSON.parse(roleData.permissions)
+                                    : [];
+                                  
+                                    let allpermisson;  
+                                 
+                                    if (parsedPermissions["extra-hrm-role"] && parsedPermissions["extra-hrm-role"][0]?.permissions) {
+                                      allpermisson = parsedPermissions["extra-hrm-role"][0].permissions;
+                                      console.log('Parsed Permissions:', allpermisson);
+                                    
+                                    } else {
+                                      console.log('extra-hrm-role is not available');
+                                    }
+                                    
+                                    const canCreateClient = allpermisson?.includes('create');
+                                    const canEditClient = allpermisson?.includes('edit');
+                                    const canDeleteClient = allpermisson?.includes('delete');
+                                    const canViewClient = allpermisson?.includes('view');
+                                 
+                                    ///endpermission
+
+
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     const filteredList = value ? utils.wildCardSearch(list, value) : tabledata;
@@ -233,21 +265,43 @@ const AttendanceList = () => {
         </Flex>
       </Menu.Item>
 
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<DeleteOutlined />}
-            onClick={() => {
-              deleteAttendances(elm.id);
-            }}
-            size="small"
-          >
-            <span className="">Delete</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
+    
+
+      {/* {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                <Menu.Item>
+                                <Flex alignItems="center">
+                                  <Button
+                                    type=""
+                                    icon={<EditOutlined />}
+                                    onClick={() => {
+                                      editfun(elm.id);
+                                    }}
+                                    size="small"
+                                  >
+                                    Edit
+                                  </Button>
+                                </Flex>
+                              </Menu.Item>
+                                ) : null} */}
+                  
+                  
+                  {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                      <Menu.Item>
+                                      <Flex alignItems="center">
+                                        <Button
+                                          type=""
+                                          className=""
+                                          icon={<DeleteOutlined />}
+                                          onClick={() => {
+                                            deleteAttendances(elm.id);
+                                          }}
+                                          size="small"
+                                        >
+                                          <span className="">Delete</span>
+                                        </Button>
+                                      </Flex>
+                                    </Menu.Item>
+                                ) : null}
     </Menu>
   );
 
@@ -378,26 +432,33 @@ const AttendanceList = () => {
             </Select>
           </div>
           <div className="flex gap-2">
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={openAddAttendanceModal}
-            >
-              Add Attendance
-            </Button>
+          
+
+             {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={openAddAttendanceModal}
+              >
+                Add Attendance
+              </Button>                                                               ) : null}
             <Button icon={<FileExcelOutlined />}>Export</Button>
           </div>
         </div>
       </div>
-      
-      <Table
-        columns={tableColumns}
-        dataSource={users}
-        scroll={{ x: 2000 }}
-        pagination={false}
-        rowKey="id"
-      />
 
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                                                                             <Table
+                                                                                             columns={tableColumns}
+                                                                                             dataSource={users}
+                                                                                             scroll={{ x: 2000 }}
+                                                                                             pagination={false}
+                                                                                             rowKey="id"
+                                                                                           />
+                                                                                     
+                                                                                                   ) : null}
+      
+     
       <UserView
         data={selectedUser}
         visible={userProfileVisible}
