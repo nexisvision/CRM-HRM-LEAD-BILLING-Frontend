@@ -465,18 +465,18 @@ const AddBilling = ({ onClose }) => {
                       />
                     </td>
                     <td className="px-4 py-2 border-b">
-                      <input
-                        type="number"
+                      <select
                         value={row.tax}
-                        onChange={(e) =>
-                          handleFieldChange(
-                            row.id,
-                            "tax",
-                            Number(e.target.value)
-                          )
-                        }
-                        className="w-full p-2 border rounded"
-                      />
+                        onChange={(e) => handleFieldChange(row.id, 'tax', e.target.value)}
+                        className="w-full p-2 border"
+                      >
+                        <option value="0">Nothing Selected</option>
+                        <option value="10">GST:10%</option>
+                        <option value="18">CGST:18%</option>
+                        <option value="10">VAT:10%</option>
+                        <option value="10">IGST:10%</option>
+                        <option value="10">UTGST:10%</option>
+                      </select>
                     </td>
                     <td className="px-4 py-2 border-b text-center">
                       {row.amount}
@@ -516,7 +516,7 @@ const AddBilling = ({ onClose }) => {
           </div>
         </Card>
 
-        <div className="mt-3 flex justify-between">
+        <div className="mt-3 flex justify-end">
           <Button type="primary" onClick={handleSubmit}>
             Submit Bill
           </Button>

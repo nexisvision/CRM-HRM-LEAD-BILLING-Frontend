@@ -36,7 +36,7 @@ const EditProposal = ({id, onClose }) => {
     // const [selectedProject, setSelectedProject] = useState(null);
     // const [clientOptions, setClientOptions] = useState([]);
 
-    const { currencies } = useSelector((state) => state.currencies);
+    const currencies = useSelector((state) => state.currencies?.currencies?.data || []);
     const [discountRate, setDiscountRate] = useState(10);
     const dispatch = useDispatch();
 
@@ -124,7 +124,16 @@ const EditProposal = ({id, onClose }) => {
 
 
   useEffect(() => {
-    dispatch(getcurren());
+    const fetchCurrencies = async () => {
+      try {
+        await dispatch(getcurren());
+      } catch (error) {
+        console.error('Error fetching currencies:', error);
+        message.error('Failed to fetch currencies');
+      }
+    };
+
+    fetchCurrencies();
   }, [dispatch]);
 
   useEffect(() => {
@@ -413,14 +422,16 @@ const EditProposal = ({id, onClose }) => {
                                                          required: true,
                                                          message: "Please select a Currency",
                                                        },
-                                                     ]} // Validation rule
+                                                     ]}
                                                    >
-                                                     <Select placeholder="Select Lead Title">
-                                                       {/* Populate dropdown options from Leads */}
+                                                     <Select
+                                                       placeholder="Select Currency"
+                                                       loading={!Array.isArray(currencies)}
+                                                     >
                                                        {Array.isArray(currencies) && currencies.length > 0 ? (
                                                          currencies.map((currency) => (
                                                            <Option key={currency.id} value={currency.id}>
-                                                             {currency.currencyName}
+                                                             {currency.currencyCode}
                                                            </Option>
                                                          ))
                                                        ) : (
@@ -555,26 +566,19 @@ const EditProposal = ({id, onClose }) => {
                                                         />
                                                     </td>
                                                     <td className="px-4 py-2 border-b">
-                                                        {/* <select
-                                                            value={row.tax}
-                                                            onChange={(e) => handleTableDataChange(row.id, 'tax', e.target.value)}
-                                                            className="w-full p-2 border"
-                                                        >
-                                                            <option value="0">Nothing Selected</option>
-                                                            <option value="10">GST:10%</option>
-                                                            <option value="18">CGST:18%</option>
-                                                            <option value="10">VAT:10%</option>
-                                                            <option value="10">IGST:10%</option>
-                                                            <option value="10">UTGST:10%</option>
-                                                        </select> */}
-                                                        <input
-                                                            type="number"
-                                                            value={row.tax}
-                                                            onChange={(e) => handleTableDataChange(row.id, 'tax', e.target.value)}
-                                                            placeholder="tax"
-                                                            className="w-full p-2 border rounded-s"
-                                                        />
-                                                    </td>
+                      <select
+                        value={row.tax}
+                        onChange={(e) => handleTableDataChange(row.id, 'tax', e.target.value)}
+                        className="w-full p-2 border"
+                      >
+                        <option value="0">Nothing Selected</option>
+                        <option value="10">GST:10%</option>
+                        <option value="18">CGST:18%</option>
+                        <option value="10">VAT:10%</option>
+                        <option value="10">IGST:10%</option>
+                        <option value="10">UTGST:10%</option>
+                      </select>
+                    </td>
                                                     <td className="px-4 py-2 border-b">
                                                         <span>{row.amount}</span>
                                                     </td>
@@ -655,7 +659,7 @@ const EditProposal = ({id, onClose }) => {
                                 </Col>
                                 <Col>
                                     <Button type="primary" htmlType="submit">
-                                        Create
+                                        Update
                                     </Button>
                                 </Col>
                             </Row>

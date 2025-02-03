@@ -9,6 +9,8 @@ import {
   getjobapplication,
 } from "./JobapplicationReducer/JobapplicationSlice";
 import { GetJobdata } from "../JobReducer/JobSlice";
+import { getallcountries } from "../../../setting/countries/countriesreducer/countriesSlice";
+
 const { Option } = Select;
 const AddJobApplication = ({ onClose }) => {
   const dispatch = useDispatch();
@@ -19,6 +21,12 @@ const AddJobApplication = ({ onClose }) => {
 
   const customerdata = useSelector((state) => state.Jobs);
   const fnddata = customerdata.Jobs.data;
+
+  const countries = useSelector((state) => state.countries.countries);
+
+  useEffect(() => {
+    dispatch(getallcountries());
+  }, [dispatch]);
 
   const onSubmit = async (values) => {
     console.log("Form submitted:", values);
@@ -147,17 +155,36 @@ const AddJobApplication = ({ onClose }) => {
                 </div>
               </Col>
               {/* Phone */}
-              <Col span={12}>
-                <div className="form-item mt-2">
-                  <label className="font-semibold">Phone</label>
-                  <Field name="phone" as={Input} placeholder="Enter Phone"  className="w-full mt-2" />
-                  <ErrorMessage
-                    name="phone"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+              <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Phone</label>
+                    <div className="flex">
+                      <Select
+                        style={{ width: '30%', marginRight: '8px' }}
+                        placeholder="Code"
+                        name="phone"
+                        onChange={(value) => setFieldValue('phone', value)}
+                      >
+                        {countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            (+{country.phoneCode})
+                          </Option>
+                        ))}
+                      </Select>
+                      <Field
+                        name="phone"
+                        as={Input}
+                        style={{ width: '70%' }}
+                        placeholder="Enter Phone"
+                      />
+                    </div>
+                    <ErrorMessage
+                      name="phone"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
               {/* Location */}
               <Col span={12}>
                 <div className="form-item mt-2">

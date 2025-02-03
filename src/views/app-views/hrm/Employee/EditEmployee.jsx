@@ -21,8 +21,9 @@ import axios from "axios";
 import { empdata, updateEmp } from "./EmployeeReducers/EmployeeSlice";
 import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
+import { getallcountries } from "../../setting/countries/countriesreducer/countriesSlice";
 
-const { Option } = Select;  
+const { Option } = Select;
 
 const EditEmployee = ({ employeeIdd, onClose }) => {
   const [form] = Form.useForm();
@@ -30,10 +31,14 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
   const dispatch = useDispatch();
 
 
-const departmentData = useSelector((state) => state.Department?.Department?.data || []);
+  const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
 
+  const countries = useSelector((state) => state.countries.countries);
 
+  useEffect(() => {
+    dispatch(getallcountries());
+  }, [dispatch]);
 
 
   const allempdata = useSelector((state) => state.emp);
@@ -42,12 +47,12 @@ const departmentData = useSelector((state) => state.Department?.Department?.data
 
   useEffect(() => {
     dispatch(getDept());
-  },[])
-  
+  }, [])
+
   useEffect(() => {
     dispatch(getDes());
-  },[])
-  
+  }, [])
+
 
 
   useEffect(() => {
@@ -139,7 +144,7 @@ const departmentData = useSelector((state) => state.Department?.Department?.data
   return (
     <div className="edit-employee">
       <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
-     
+
       <Form
         layout="vertical"
         form={form}
@@ -147,7 +152,7 @@ const departmentData = useSelector((state) => state.Department?.Department?.data
         onFinish={onFinish}
         initialValues={initialValues}
         onFinishFailed={onFinishFailed}
-        
+
       >
         {/* User Information */}
         <h1 className="text-lg font-bold mb-3">Personal Information</h1>
@@ -209,15 +214,36 @@ const departmentData = useSelector((state) => state.Department?.Department?.data
             <Form.Item
               name="phone"
               label="Phone"
-              rules={[
-                { required: true, message: "Phone number is required" },
-                {
-                  pattern: /^[0-9]{10}$/,
-                  message: "Phone number must be exactly 10 digits",
-                },
-              ]}
+              rules={[{ required: true, message: "Phone number is required" }]}
             >
-              <Input placeholder="1234567890" maxLength={10} />
+              <Input.Group compact>
+                <Form.Item
+                  name={['phone', 'code']}
+                  noStyle
+                  rules={[{ required: true, message: 'Code is required' }]}
+                >
+                  <Select
+                    style={{ width: '30%' }}
+                    placeholder="Code"
+                  >
+                    {countries.map((country) => (
+                      <Option key={country.id} value={country.phoneCode}>
+                        (+{country.phoneCode})
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+                <Form.Item
+                  name={['phone', 'number']}
+                  noStyle
+                  rules={[{ required: true, message: 'Phone number is required' }]}
+                >
+                  <Input 
+                    style={{ width: '70%' }} 
+                    placeholder="Enter Phone"
+                  />
+                </Form.Item>
+              </Input.Group>
             </Form.Item>
           </Col>
         </Row>
@@ -252,49 +278,49 @@ const departmentData = useSelector((state) => state.Department?.Department?.data
             </Form.Item>
           </Col>
           <Col span={12} className="mt-2">
-  <Form.Item
-    name="department"
-    label="Department"
-    rules={[{ required: true, message: "Department is required" }]}
-  >
-    <Select
-      placeholder="Select Department"
-      onChange={(value) => form.setFieldsValue({ department: value })}
-    >
-      {departmentData.map((dept) => (
-        <Option key={dept.id} value={dept.id}>
-          {dept.department_name}
-        </Option>
-      ))}
-    </Select>
-  </Form.Item>
-</Col>
-                      </Row>
-          
-                      
-                       
-       
+            <Form.Item
+              name="department"
+              label="Department"
+              rules={[{ required: true, message: "Department is required" }]}
+            >
+              <Select
+                placeholder="Select Department"
+                onChange={(value) => form.setFieldsValue({ department: value })}
+              >
+                {departmentData.map((dept) => (
+                  <Option key={dept.id} value={dept.id}>
+                    {dept.department_name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+
+
+
+
 
         {/* Designation, Salary, and CV Upload */}
         <Row gutter={16}>
-        <Col span={12} className="mt-2">
-  <Form.Item
-    name="designation"
-    label="Designation"
-    rules={[{ required: true, message: "Designation is required" }]}
-  >
-    <Select
-      placeholder="Select Designation"
-      onChange={(value) => form.setFieldsValue({ designation: value })}
-    >
-      {designationData.map((des) => (
-        <Option key={des.id} value={des.id}>
-          {des.designation_name}
-        </Option>
-      ))}
-    </Select>
-  </Form.Item>
-</Col>
+          <Col span={12} className="mt-2">
+            <Form.Item
+              name="designation"
+              label="Designation"
+              rules={[{ required: true, message: "Designation is required" }]}
+            >
+              <Select
+                placeholder="Select Designation"
+                onChange={(value) => form.setFieldsValue({ designation: value })}
+              >
+                {designationData.map((des) => (
+                  <Option key={des.id} value={des.id}>
+                    {des.designation_name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
         </Row>
 
         <h1 className="text-lg font-bold mb-3">Bank Details</h1>
@@ -351,7 +377,7 @@ const departmentData = useSelector((state) => state.Department?.Department?.data
           </Button>
         </Form.Item>
       </Form>
-        
+
     </div>
   );
 };

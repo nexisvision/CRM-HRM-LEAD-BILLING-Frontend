@@ -40,6 +40,8 @@ import { deletePay, Getpay } from "./PaymentReducer/paymentSlice";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
+import { GetProject } from '../project-list/projectReducer/ProjectSlice';
+import { getAllInvoices } from '../invoice/invoicereducer/InvoiceSlice';
 
 const { Option } = Select;
 
@@ -73,6 +75,15 @@ const PaymentList = () => {
   const filtermin = allempdata.Payment.data;
 
   const [paymentStatisticData] = useState(PaymentStatisticData);
+
+  // Add new states for projects and invoices
+  const [projectsList, setProjectsList] = useState([]);
+  const [invoicesList, setInvoicesList] = useState([]);
+  
+  // Get data from redux store
+  const projectsData = useSelector((state) => state.Project.Project.data || []);
+  const invoicesData = useSelector((state) => state.invoice);
+  const tabledata = useSelector((state) => state.Payment);
 
   // Open Add Job Modal
   const openAddPaymentModal = () => {
@@ -115,14 +126,35 @@ const PaymentList = () => {
   };
 
   useEffect(() => {
+    // Fetch payments, projects and invoices data
     dispatch(Getpay(id));
-  }, []);
+    dispatch(GetProject());
+    dispatch(getAllInvoices(id));
+  }, [dispatch, id]);
 
   useEffect(() => {
-    if (filtermin) {
-      setList(filtermin);
+    if (projectsData && projectsData.length > 0) {
+      setProjectsList(projectsData);
     }
-  }, [filtermin]);
+  }, [projectsData]);
+
+  useEffect(() => {
+    if (invoicesData && invoicesData.invoices) {
+      setInvoicesList(invoicesData.invoices);
+    }
+  }, [invoicesData]);
+
+  // Function to get project name by ID
+  const getProjectName = (projectId) => {
+    const project = projectsData.find(project => project.id === projectId);
+    return project ? project.project_name : 'N/A';
+  };
+
+  // Function to get invoice number by ID
+  const getInvoiceNumber = (invoiceId) => {
+    const invoice = invoicesList.find(invoice => invoice.id === invoiceId);
+    return invoice ? invoice.invoiceNumber : 'N/A';
+  };
 
   const DeleteFun = async (exid) => {
     try {
@@ -158,26 +190,26 @@ const PaymentList = () => {
   );
 
   const tableColumns = [
-    // {
-    //   title: "ID",
-    //   dataIndex: "id",
-    // },
     {
       title: "Project",
-      dataIndex: "project",
-      sorter: (a, b) => utils.antdTableSorter(a, b, "project"),
+      dataIndex: "project_name",
+      render: (_, record) => getProjectName(record.project_name),
+      sorter: (a, b) => {
+        const nameA = getProjectName(a.project_name);
+        const nameB = getProjectName(b.project_name);
+        return nameA.localeCompare(nameB);
+      },
     },
     {
       title: "Invoice",
       dataIndex: "invoice",
-      sorter: (a, b) => utils.antdTableSorter(a, b, "invoice"),
+      render: (invoiceId) => getInvoiceNumber(invoiceId),
+      sorter: (a, b) => {
+        const invoiceNumA = getInvoiceNumber(a.invoice);
+        const invoiceNumB = getInvoiceNumber(b.invoice);
+        return invoiceNumA.localeCompare(invoiceNumB);
+      },
     },
-
-    // {
-    //   title: "Client",
-    //   dataIndex: "client",
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "client"),
-    // },
     {
       title: "Order",
       dataIndex: "paidOn",
@@ -248,6 +280,13 @@ const PaymentList = () => {
     setList(data);
     setSelectedRowKeys([]);
   };
+
+  // Update the list when payment data changes
+  useEffect(() => {
+    if (tabledata && tabledata.Payment && tabledata.Payment.data) {
+      setList(tabledata.Payment.data);
+    }
+  }, [tabledata]);
 
   return (
     <>

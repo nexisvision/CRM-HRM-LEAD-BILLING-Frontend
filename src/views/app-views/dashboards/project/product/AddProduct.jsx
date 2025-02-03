@@ -11,7 +11,7 @@ import {
   Upload,
   Modal,
 } from "antd";
-import { CloudUploadOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { CloudUploadOutlined, QuestionCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -20,6 +20,7 @@ import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import { AddProdu, GetProdu } from "./ProductReducer/ProductsSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import { AddLable, GetLable } from "../../sales/LableReducer/LableSlice";
 
 const { Option } = Select;
 
@@ -28,6 +29,73 @@ const AddProduct = ({ idd, onClose }) => {
   const dispatch = useDispatch();
 
   const { id } = useParams();
+
+  // category start
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [categories, setCategories] = useState([]);
+
+  const AllLoggedData = useSelector((state) => state.user);
+
+  const lid = AllLoggedData.loggedInUser.id;
+
+  const fetchLables = async (lableType, setter) => {
+    try {
+      const lid = AllLoggedData.loggedInUser.id;
+      const response = await dispatch(GetLable(lid));
+
+      if (response.payload && response.payload.data) {
+        const uniqueCategories = response.payload.data
+          .filter((label) => label && label.name) // Filter out invalid labels
+          .map((label) => ({
+            id: label.id,
+            name: label.name.trim(),
+          }))
+          .filter(
+            (label, index, self) =>
+              index === self.findIndex((t) => t.name === label.name)
+          ); // Remove duplicates
+
+        setCategories(uniqueCategories);
+      }
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+      message.error("Failed to load categories");
+    }
+  };
+
+  useEffect(() => {
+    fetchLables("category", setCategories);
+  }, []);
+
+  const handleAddNewCategory = async () => {
+    if (!newCategory.trim()) {
+      message.error("Please enter a category name");
+      return;
+    }
+
+    try {
+      const lid = AllLoggedData.loggedInUser.id;
+      const payload = {
+        name: newCategory.trim(),
+        labelType: "status",
+      };
+
+      await dispatch(AddLable({ lid, payload }));
+      message.success("Category added successfully");
+      setNewCategory("");
+      setIsCategoryModalVisible(false);
+
+      // Fetch updated categories
+      await fetchLables();
+    } catch (error) {
+      console.error("Failed to add Category:", error);
+      message.error("Failed to add Category");
+    }
+  };
+
+  // category end
+
   const [showReceiptUpload, setShowReceiptUpload] = useState(false);
 
   const { currencies } = useSelector((state) => state.currencies);
@@ -118,26 +186,37 @@ const AddProduct = ({ idd, onClose }) => {
                 </div>
               </Col>
               <Col span={12} className="mt-4">
-                <div className="form-item">
+                <div className="form-item mt-2">
                   <label className="font-semibold">Category</label>
-                  <Field name="category">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        placeholder="Select Category"
-                        className="w-full mt-2"
-                        onChange={(value) => setFieldValue("category", value)}
-                        value={values.category}
-                        onBlur={() => setFieldTouched("category", true)}
-                        allowClear={false}
-                      >
-                        <Option value="xyz">XYZ</Option>
-                        <Option value="abc">ABC</Option>
-                      </Select>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new category"
+                    value={values.category}
+                    onChange={(value) => setFieldValue("category", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            className="w-full mt-2"
+                            onClick={() => setIsCategoryModalVisible(true)}
+                          >
+                            Add New Category
+                          </Button>
+                        </div>
+                      </div>
                     )}
-                  </Field>
+                  >
+                    {categories.map((category) => (
+                      <Option key={category.id} value={category.name}>
+                        {category.name}
+                      </Option>
+                    ))}
+                  </Select>
                   <ErrorMessage
-                    name="category"
+                    name="project_category"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -225,6 +304,21 @@ const AddProduct = ({ idd, onClose }) => {
           </Form>
         )}
       </Formik>
+
+      {/* Add Category Modal */}
+      <Modal
+        title="Add New Category"
+        open={isCategoryModalVisible}
+        onCancel={() => setIsCategoryModalVisible(false)}
+        onOk={() => handleAddNewCategory("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
+        okText="Add Category"
+      >
+        <Input
+          placeholder="Enter new category name"
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value)}
+        />
+      </Modal>
     </div>
   );
 };

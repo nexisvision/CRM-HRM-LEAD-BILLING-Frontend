@@ -75,14 +75,12 @@ const PlanList = () => {
     }
   ];
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(getcurren())
-  },[])
+  }, [])
 
-    const allempdatass = useSelector((state) => state.currencies);
-    const fnddatass = allempdatass?.currencies;
-
-  
+  const allempdatass = useSelector((state) => state.currencies);
+  const currencyData = allempdatass?.currencies?.data || [];
 
   return (
     <div className="plan-list-container p-6 bg-gray-50 min-h-screen">
@@ -139,20 +137,21 @@ const PlanList = () => {
                   }
                 >
                   <div className="space-y-6">
-                  <div className="text-center bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg">
-  {(() => {
-    const fnd = fnddatass.find((item) => item.id === plan.currency);
-    return (
-      <>
-        <div className="text-4xl font-bold text-indigo-600">
-          <span className="text-xl">{fnd ? fnd.currencyIcon : ''}</span>
-          {plan.price}
-        </div>
-        <div className="text-gray-600 font-medium">per {plan.duration.toLowerCase()}</div>
-      </>
-    );
-  })()}
-</div>
+                    <div className="text-center bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg">
+                      {(() => {
+                        const selectedCurrency = Array.isArray(currencyData) && 
+                          currencyData.find((item) => item.id === plan.currency);
+                        return (
+                          <>
+                            <div className="text-4xl font-bold text-indigo-600">
+                              <span className="text-xl">{selectedCurrency?.currencyIcon || ''}</span>
+                              {plan.price}
+                            </div>
+                            <div className="text-gray-600 font-medium">per {plan.duration.toLowerCase()}</div>
+                          </>
+                        );
+                      })()}
+                    </div>
                     <div className="space-y-3">
                       <div className="flex items-center gap-3 bg-gray-50 p-2 rounded">
                         <CalendarOutlined className="text-blue-500" />

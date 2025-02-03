@@ -315,7 +315,7 @@ const AddInvoice = ({ onClose }) => {
       <Form form={form} layout="vertical">
         <Card className="border-0">
           <Row gutter={16}>
-            <Col span={24} className="mt-1">
+            <Col span={12} className="mt-1">
               <Form.Item
                 label="Customer"
                 name="customer"
@@ -325,13 +325,13 @@ const AddInvoice = ({ onClose }) => {
               >
                 <Select
                   style={{ width: "100%" }}
-                  placeholder="Select Client"
+                  placeholder="Select Customer"
                   loading={!fnddata}
                 >
                   {fnddata && fnddata.length > 0 ? (
-                    fnddata.map((client) => (
-                      <Option key={client.id} value={client.id}>
-                        {client.name || "Unnamed Client"}
+                    fnddata.map((customer) => (
+                      <Option key={customer.id} value={customer.id}>
+                        {customer.name || "Unnamed Customer"}
                       </Option>
                     ))
                   ) : (
@@ -343,7 +343,7 @@ const AddInvoice = ({ onClose }) => {
               </Form.Item>
             </Col>
 
-            <Col span={12}>
+            <Col span={12} className="mt-1">
               <Form.Item
                 label="Issue Date"
                 name="issuedate"
@@ -486,23 +486,19 @@ const AddInvoice = ({ onClose }) => {
                       />
                     </td>
                     <td className="px-4 py-2 border-b">
-                      <div className="flex items-center">
-                        <input
-                          type="number"
-                          value={row.price}
-                          onChange={(e) =>
-                            handleFieldChange(
-                              row.id,
-                              "price",
-                              Number(e.target.value)
-                            )
-                          }
-                          className="w-full p-2 border rounded-s"
-                        />
-                        <span className="text-gray-500 border border-s rounded-e px-3 py-2">
-                          $
-                        </span>
-                      </div>
+                      <input
+                        type="number"
+                        value={row.price}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            row.id,
+                            "price",
+                            e.target.value
+                          )
+                        }
+                        placeholder="Price"
+                        className="w-full p-2 border rounded-s"
+                      />
                     </td>
                     <td className="px-4 py-2 border-b">
                       <input
@@ -518,7 +514,7 @@ const AddInvoice = ({ onClose }) => {
                         className="w-full p-2 border rounded"
                       />
                     </td>
-                    <td className="px-4 py-2 border-b">
+                    {/* <td className="px-4 py-2 border-b">
                       <input
                         type="number"
                         value={row.tax}
@@ -531,6 +527,20 @@ const AddInvoice = ({ onClose }) => {
                         }
                         className="w-full p-2 border rounded"
                       />
+                    </td> */}
+                    <td className="px-4 py-2 border-b">
+                      <select
+                        value={row.tax}
+                        onChange={(e) => handleFieldChange(row.id, 'tax', e.target.value)}
+                        className="w-full p-2 border"
+                      >
+                        <option value="0">Nothing Selected</option>
+                        <option value="10">GST:10%</option>
+                        <option value="18">CGST:18%</option>
+                        <option value="10">VAT:10%</option>
+                        <option value="10">IGST:10%</option>
+                        <option value="10">UTGST:10%</option>
+                      </select>
                     </td>
                     <td className="px-4 py-2 border-b text-center">
                       {row.amount}

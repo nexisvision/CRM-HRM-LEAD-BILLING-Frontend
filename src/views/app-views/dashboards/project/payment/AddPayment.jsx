@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Input,
   Button,
@@ -19,6 +19,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { AddPay, Getpay } from "./PaymentReducer/paymentSlice";
+import { getAllInvoices } from '../invoice/invoicereducer/InvoiceSlice';
 const { Option } = Select;
 const AddPayment = ({ onClose }) => {
   const navigate = useNavigate();
@@ -27,15 +28,23 @@ const AddPayment = ({ onClose }) => {
   const dispatch = useDispatch();
   const { id } = useParams();
 
+  const [invoices, setInvoices] = useState([]);
 
-    const allproject = useSelector((state) => state.Project);
-    const fndrewduxxdaa = allproject.Project.data
-    const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
-    
+  // Get invoices from Redux store
+  const invoiceData = useSelector((state) => state.invoice.invoices);
+
+  useEffect(() => {
+    dispatch(getAllInvoices(id));
+  }, [dispatch, id]);
+
+  const allproject = useSelector((state) => state.Project);
+  const fndrewduxxdaa = allproject.Project.data
+  const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
+
 
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const initialValues = {
-    project: fnddata?.id || "",
+    project_name: fnddata?.id || "",
     invoice: "",
     paidOn: "",
     amount: "",
@@ -48,7 +57,7 @@ const AddPayment = ({ onClose }) => {
     remark: "",
   };
   const validationSchema = Yup.object({
-    project: Yup.string().optional("Please enter Project."),
+    project_name: Yup.string().optional("Please enter Project."),
     invoice: Yup.string().optional("Please enter Invoice."),
     paidOn: Yup.string().optional("Please enter Paid On."),
     amount: Yup.string().optional("Please enter Amount."),
@@ -88,10 +97,10 @@ const AddPayment = ({ onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Project</label>
                   <Field
-                    name="project"
+                    name="project_name"
                     as={Input}
                     placeholder="Enter Project"
-                    className="mt-2"
+                    className=""
                     initialValue={fnddata?.project_name}
                     value={fnddata?.project_name}
                     disabled
@@ -112,8 +121,11 @@ const AddPayment = ({ onClose }) => {
                         onBlur={() => setFieldTouched("invoice", true)}
                         allowClear={false}
                       >
-                        <Option value="xyz">XYZ</Option>
-                        <Option value="abc">ABC</Option>
+                        {invoiceData?.map((invoice) => (
+                          <Option key={invoice.id} value={invoice.id}>
+                            {invoice.invoiceNumber}
+                          </Option>
+                        ))}
                       </Select>
                     )}
                   </Field>
@@ -193,7 +205,7 @@ const AddPayment = ({ onClose }) => {
                   />
                 </div>
               </Col> */}
-              <Col span={6}>
+              <Col span={6} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Transaction Id</label>
                   <Field

@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, message, Row, Col } from "antd";
+import { Input, Button, message, Row, Col, Select } from "antd";
 import { useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { editcus, Getcus } from "./CustomerReducer/CustomerSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { getallcountries } from "../../../setting/countries/countriesreducer/countriesSlice";
+
+const { Option } = Select;
 
 const EditCustomer = ({ idd, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const countries = useSelector((state) => state.countries.countries);
+
+  useEffect(() => {
+    dispatch(getallcountries());
+  }, [dispatch]);
 
   const alldat = useSelector((state) => state.customers);
   const fndata = alldat.customers.data;
@@ -21,6 +30,7 @@ const EditCustomer = ({ idd, onClose }) => {
     contact: "",
     email: "",
     taxnumber: "",
+    phoneCode: "",
     alternate_number: "",
     billing_name: "",
     billing_phone: "",
@@ -55,6 +65,7 @@ const EditCustomer = ({ idd, onClose }) => {
         contact: finddata.contact || "",
         email: finddata.email || "",
         taxnumber: finddata.tax_number || "",
+        phoneCode: finddata.phoneCode || "",
         alternate_number: finddata.alternate_number || "",
         billing_name: finddata.name || "",
         billing_phone: finddata.contact || "",
@@ -83,6 +94,7 @@ const EditCustomer = ({ idd, onClose }) => {
     email: Yup.string()
       .email("Please enter a valid email address with @.")
       .required("Please enter an email."),
+    phoneCode: Yup.string().required("Please enter a Phone Code."),
     taxnumber: Yup.string().required("Please enter a Tax Number."),
     alternate_number: Yup.string().matches(
       /^\d{10}$/,
@@ -116,6 +128,7 @@ const EditCustomer = ({ idd, onClose }) => {
       contact: values.contact,
       email: values.email,
       tax_number: values.taxnumber,
+      phoneCode: values.phoneCode,
       alternate_number: values.alternate_number,
       billing_address: {
         name: values.billing_name,
@@ -182,15 +195,30 @@ const EditCustomer = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={8} className="mt-2">
+                <Col span={12} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">Contact</label>
-                    <Field
-                      name="contact"
-                      as={Input}
-                      placeholder="Enter Contact"
-                    />
+                    <div className="flex">
+                      <Select
+                        style={{ width: '30%', marginRight: '8px' }}
+                        placeholder="Code"
+                        name="phoneCode"
+                        onChange={(value) => setFieldValue('phoneCode', value)}
+                      >
 
+                        {countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            (+{country.phoneCode})
+                          </Option>
+                        ))}
+                      </Select>
+                      <Field
+                        name="contact"
+                        as={Input}
+                        style={{ width: '70%' }}
+                        placeholder="Enter Contact"
+                      />
+                    </div>
                     <ErrorMessage
                       name="contact"
                       component="div"
@@ -229,20 +257,34 @@ const EditCustomer = ({ idd, onClose }) => {
 
                 <Col span={8} className="mt-2">
                   <div className="form-item">
-                    <label className="font-semibold">
-                      Alternate Mobile Number
-                    </label>
-                    <Field
-                      name="alternate_number"
-                      as={Input}
-                      placeholder="Enter Alternate Mobile Number"
-                    />
+                    <label className="font-semibold"> Alternate Mobile Number</label>
+                    <div className="flex">
+                      <Select
+                        style={{ width: '30%', marginRight: '8px' }}
+                        placeholder="Code"
+                        name="alternate_number"
+                        onChange={(value) => setFieldValue('alternate_number', value)}
+                      >
+                        {countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            (+{country.phoneCode})
+                          </Option>
+                        ))}
+                      </Select>
+                      <Field
+                        name="alternate_number"
+                        as={Input}
+                        style={{ width: '70%' }}
+                        placeholder="Enter Alternate Mobile Number"
 
+                      />
+                    </div>
                     <ErrorMessage
                       name="alternate_number"
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
+
                   </div>
                 </Col>
 
@@ -269,12 +311,26 @@ const EditCustomer = ({ idd, onClose }) => {
                 <Col span={12} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">Phone</label>
-                    <Field
-                      name="billing_phone"
-                      as={Input}
-                      placeholder="Enter phone"
-                    />
-
+                    <div className="flex">
+                      <Select
+                        style={{ width: '30%', marginRight: '8px' }}
+                        placeholder="Code"
+                        name="country_code"
+                        onChange={(value) => setFieldValue('country_code', value)}
+                      >
+                        {countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            (+{country.phoneCode})
+                          </Option>
+                        ))}
+                      </Select>
+                      <Field
+                        name="billing_phone"
+                        as={Input}
+                        style={{ width: '70%' }}
+                        placeholder="Enter phone"
+                      />
+                    </div>
                     <ErrorMessage
                       name="billing_phone"
                       component="div"
@@ -282,6 +338,7 @@ const EditCustomer = ({ idd, onClose }) => {
                     />
                   </div>
                 </Col>
+
 
                 <Col span={24} className="mt-2">
                   <div className="form-item">
@@ -344,12 +401,19 @@ const EditCustomer = ({ idd, onClose }) => {
                 <Col span={12} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">Country</label>
-                    <Field
+                    <Select
+                      className="w-full"
+                      placeholder="Select Country"
                       name="billing_country"
-                      as={Input}
-                      placeholder="Enter Country"
-                    />
-
+                      onChange={(value) => setFieldValue('billing_country', value)}
+                      value={values.billing_country}
+                    >
+                      {countries.map((country) => (
+                        <Option key={country.id} value={country.countryName}>
+                          {country.countryName}
+                        </Option>
+                      ))}
+                    </Select>
                     <ErrorMessage
                       name="billing_country"
                       component="div"
@@ -408,19 +472,34 @@ const EditCustomer = ({ idd, onClose }) => {
                 <Col span={12} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">Phone</label>
-                    <Field
-                      name="shipping_phone"
-                      as={Input}
-                      placeholder="Enter phone"
-                    />
-
+                    <div className="flex">
+                      <Select
+                        style={{ width: '30%', marginRight: '8px' }}
+                        placeholder="Code"
+                        name="billing_phone"
+                        onChange={(value) => setFieldValue('billing_phone', value)}
+                      >
+                        {countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            (+{country.phoneCode})
+                          </Option>
+                        ))}
+                      </Select>
+                      <Field
+                        name="billing_phone"
+                        as={Input}
+                        style={{ width: '70%' }}
+                        placeholder="Enter phone"
+                      />
+                    </div>
                     <ErrorMessage
-                      name="shipping_phone"
+                      name="billing_phone"
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
                   </div>
                 </Col>
+
 
                 <Col span={24} className="mt-2">
                   <div className="form-item">
@@ -484,12 +563,19 @@ const EditCustomer = ({ idd, onClose }) => {
                 <Col span={12} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">Country</label>
-                    <Field
+                    <Select
+                      className="w-full"
+                      placeholder="Select Country"
                       name="shipping_country"
-                      as={Input}
-                      placeholder="Enter Country"
-                    />
-
+                      onChange={(value) => setFieldValue('shipping_country', value)}
+                      value={values.shipping_country}
+                    >
+                      {countries.map((country) => (
+                        <Option key={country.id} value={country.countryName}>
+                          {country.countryName}
+                        </Option>
+                      ))}
+                    </Select>
                     <ErrorMessage
                       name="shipping_country"
                       component="div"

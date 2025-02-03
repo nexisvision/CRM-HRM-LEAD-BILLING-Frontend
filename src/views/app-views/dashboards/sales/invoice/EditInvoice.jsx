@@ -257,7 +257,7 @@ const EditInvoice = ({ idd, onClose }) => {
 
   return (
     <div>
-      <Card className="border-0 mt-4">
+      <Card className="border-0">
         <Formik
           initialValues={initialValues}
           enableReinitialize={true}
@@ -273,20 +273,16 @@ const EditInvoice = ({ idd, onClose }) => {
           }) => (
             <Form onSubmit={handleSubmit}>
               <Row gutter={16}>
-                <Col span={12} className="mt-4">
-                  <Form.Item
-                    label="Customer"
-                    name="customer"
-                    rules={[
-                      { required: true, message: "Please select a customer" },
-                    ]}
-                  >
+                <Col span={8} >
+                  <div className="form-item">
+                    <label className="font-semibold">Customer</label>
                     <Select
                       style={{ width: "100%" }}
                       placeholder="Select Client"
-                      value={values.customer} // Bind Formik's customer value to Select
-                      onChange={(value) => setFieldValue("customer", value)} // Update Formik state when a customer is selected
-                      loading={!fnddatas} // Show loading state if data is not fetched yet
+                      name="customer"
+                      value={values.customer}
+                      onChange={(value) => setFieldValue("customer", value)}
+                      loading={!fnddatas}
                     >
                       {fnddatas && fnddatas.length > 0 ? (
                         fnddatas.map((client) => (
@@ -300,10 +296,15 @@ const EditInvoice = ({ idd, onClose }) => {
                         </Option>
                       )}
                     </Select>
-                  </Form.Item>
+                    <ErrorMessage
+                      name="customer"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
                 </Col>
 
-                <Col span={8} className="mt-2">
+                <Col span={8} >
                   <label className="font-semibold">Issue Date</label>
                   <DatePicker
                     className="w-full"
@@ -321,7 +322,7 @@ const EditInvoice = ({ idd, onClose }) => {
                   />
                 </Col>
 
-                <Col span={8} className="mt-2">
+                <Col span={8} >
                   <label className="font-semibold">Due Date</label>
                   <DatePicker
                     className="w-full"
@@ -351,170 +352,215 @@ const EditInvoice = ({ idd, onClose }) => {
                   />
                 </Col>
 
-                <Col span={12} className="">
-  <Form.Item
-    label="Category"
-    name="category"
-    rules={[{ required: true, message: "Please select or add a category" }]}
-  >
-    <Select
-      placeholder="Select or add new category"
-      dropdownRender={(menu) => (
-        <div>
-          {menu}
-          <div
-            style={{
-              padding: "8px",
-              borderTop: "1px solid #e8e8e8",
-            }}
-          >
-            <Button
-              type="link"
-              onClick={() => setIsTagModalVisible(true)}
-              block
-            >
-              Add New Category
-            </Button>
-          </div>
-        </div>
-      )}
-    >
-      {tags &&
-        tags.map((tag) => (
-          <Option key={tag.id} value={tag.name}>
-            {tag.name}
-          </Option>
-        ))}
-    </Select>
-  </Form.Item>
-</Col>
+                <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Category</label>
+                    <Select
+                      style={{ width: "100%" }}
+                      placeholder="Select or add new category"
+                      name="category"
+                      value={values.category}
+                      onChange={(value) => setFieldValue("category", value)}
+                      dropdownRender={(menu) => (
+                        <div>
+                          {menu}
+                          <div
+                            style={{
+                              padding: "8px",
+                              borderTop: "1px solid #e8e8e8",
+                            }}
+                          >
+                            <Button
+                              type="link"
+                              onClick={() => setIsTagModalVisible(true)}
+                              block
+                            >
+                              Add New Category
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    >
+                      {tags && tags.map((tag) => (
+                        <Option key={tag.id} value={tag.name}>
+                          {tag.name}
+                        </Option>
+                      ))}
+                    </Select>
+                    <ErrorMessage
+                      name="category"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
               </Row>
 
-              {/* Product table rendering */}
-              <div>
-                <Button type="primary" onClick={handleAddRow}>
-                  <PlusOutlined /> Add Items
-                </Button>
-                <table className="w-full border border-gray-200 bg-white">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      <th>ITEMS</th>
-                      <th>QUANTITY</th>
-                      <th>PRICE</th>
-                      <th>DISCOUNT</th>
-                      <th>TAX (%)</th>
-                      <th>AMOUNT</th>
-                      <th>ACTIONS</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((row) => (
-                      <tr key={row.id}>
-                        <td>
-                          <select
-                            className="w-full p-2 border rounded"
-                            value={row.item}
-                            onChange={(e) =>
-                              handleFieldChange(row.id, "item", e.target.value)
-                            }
-                          >
-                            <option value="">--</option>
-                            <option value="item1">Item 1</option>
-                            <option value="item2">Item 2</option>
-                          </select>
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            value={row.quantity}
-                            onChange={(e) =>
-                              handleFieldChange(
-                                row.id,
-                                "quantity",
-                                Number(e.target.value)
-                              )
-                            }
-                            className="w-full p-2 border rounded"
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            value={row.price}
-                            onChange={(e) =>
-                              handleFieldChange(
-                                row.id,
-                                "price",
-                                Number(e.target.value)
-                              )
-                            }
-                            className="w-full p-2 border rounded"
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            value={row.discount}
-                            onChange={(e) =>
-                              handleFieldChange(
-                                row.id,
-                                "discount",
-                                Number(e.target.value)
-                              )
-                            }
-                            className="w-full p-2 border rounded"
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            value={row.tax}
-                            onChange={(e) =>
-                              handleFieldChange(
-                                row.id,
-                                "tax",
-                                Number(e.target.value)
-                              )
-                            }
-                            className="w-full p-2 border rounded"
-                          />
-                        </td>
-                        <td>{row.amount}</td>
-                        <td>
-                          <Button
-                            danger
-                            onClick={() => handleDeleteRow(row.id)}
-                          >
-                            <DeleteOutlined />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+         
+          <div className="mt-4">
+            <div className="form-buttons text-right mb-2">
+              <Button type="primary" onClick={handleAddRow}>
+                <PlusOutlined /> Add Items
+              </Button>
+            </div>
+            <table className="w-full border border-gray-200 bg-white">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    ITEMS
+                  </th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    QUANTITY
+                  </th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    PRICE
+                  </th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    DISCOUNT
+                  </th>
+                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    TAX (%)
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 border-b">
+                    AMOUNT
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 border-b">
+                    ACTIONS
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.id}>
+                    <td className="px-4 py-2 border-b">
+                      <select
+                        className="w-full p-2 border rounded"
+                        value={row.item}
+                        onChange={(e) =>
+                          handleFieldChange(row.id, "item", e.target.value)
+                        }
+                      >
+                        <option value="">--</option>
+                        <option value="item1">Item 1</option>
+                        <option value="item2">Item 2</option>
+                      </select>
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      <input
+                        type="number"
+                        value={row.quantity}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            row.id,
+                            "quantity",
+                            Number(e.target.value)
+                          )
+                        }
+                        className="w-full p-2 border rounded"
+                      />
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      <input
+                        type="number"
+                        value={row.price}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            row.id,
+                            "price",
+                            e.target.value
+                          )
+                        }
+                        placeholder="Price"
+                        className="w-full p-2 border rounded-s"
+                      />
+                    </td>
+                    <td className="px-4 py-2 border-b">
+                      <input
+                        type="number"
+                        value={row.discount}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            row.id,
+                            "discount",
+                            Number(e.target.value)
+                          )
+                        }
+                        className="w-full p-2 border rounded"
+                      />
+                    </td>
+                    {/* <td className="px-4 py-2 border-b">
+                      <input
+                        type="number"
+                        value={row.tax}
+                        onChange={(e) =>
+                          handleFieldChange(
+                            row.id,
+                            "tax",
+                            Number(e.target.value)
+                          )
+                        }
+                        className="w-full p-2 border rounded"
+                      />
+                    </td> */}
+                    <td className="px-4 py-2 border-b">
+                      <select
+                        value={row.tax}
+                        onChange={(e) => handleFieldChange(row.id, 'tax', e.target.value)}
+                        className="w-full p-2 border"
+                      >
+                        <option value="0">Nothing Selected</option>
+                        <option value="10">GST:10%</option>
+                        <option value="18">CGST:18%</option>
+                        <option value="10">VAT:10%</option>
+                        <option value="10">IGST:10%</option>
+                        <option value="10">UTGST:10%</option>
+                      </select>
+                    </td>
+                    <td className="px-4 py-2 border-b text-center">
+                      {row.amount}
+                    </td>
+                    <td className="px-2 py-1 border-b text-center">
+                      <Button danger onClick={() => handleDeleteRow(row.id)}>
+                        <DeleteOutlined />
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-              {/* Totals Calculation */}
-              <div className="mt-3 flex flex-col items-end space-y-2">
-                <div className="flex justify-between w-full sm:w-1/2 border-b pb-2">
-                  <span>Sub Total ($):</span>
-                  <span>{calculateTotals().subtotal}</span>
-                </div>
-                <div className="flex justify-between w-full sm:w-1/2 border-b pb-2">
-                  <span>Discount ($):</span>
-                  <span>{calculateTotals().totalDiscount}</span>
-                </div>
-                <div className="flex justify-between w-full sm:w-1/2 border-b pb-2">
-                  <span>Tax ($):</span>
-                  <span>{calculateTotals().totalTax}</span>
-                </div>
-                <div className="flex justify-between w-full sm:w-1/2">
-                  <span>Total Amount ($):</span>
-                  <span>{calculateTotals().totalAmount}</span>
-                </div>
-              </div>
+          <div className="mt-3 flex flex-col items-end space-y-2">
+            <div className="flex justify-between w-full sm:w-1/2 border-b pb-2">
+              <span className="text-gray-700">Sub Total ($):</span>
+              <span className="text-gray-700">
+                {calculateTotals().subtotal}
+              </span>
+            </div>
+            <div className="flex justify-between w-full sm:w-1/2 border-b pb-2">
+              <span className="text-gray-700">Discount ($):</span>
+              <span className="text-gray-700">
+                {calculateTotals().totalDiscount}
+              </span>
+            </div>
+            <div className="flex justify-between w-full sm:w-1/2 border-b pb-2">
+              <span className="text-gray-700">Tax ($):</span>
+              <span className="text-gray-700">
+                {calculateTotals().totalTax}
+              </span>
+            </div>
+            <div className="flex justify-between w-full sm:w-1/2">
+              <span className="font-semibold text-gray-700">
+                Total Amount ($):
+              </span>
+              <span className="font-semibold text-gray-700">
+                {calculateTotals().totalAmount}
+              </span>
+            </div>
+          </div>
+       
 
-              <div className="form-buttons text-right">
+              <div className="form-buttons text-right mt-4">
                 <Button type="default" onClick={onClose} className="mr-2">
                   Cancel
                 </Button>
@@ -526,19 +572,19 @@ const EditInvoice = ({ idd, onClose }) => {
           )}
         </Formik>
 
-         <Modal
-                    title="Add New Category"
-                    open={isTagModalVisible}
-                    onCancel={() => setIsTagModalVisible(false)}
-                    onOk={handleAddNewTag}
-                    okText="Add Category"
-                  >
-                    <Input
-                      placeholder="Enter new Category"
-                      value={newTag}
-                      onChange={(e) => setNewTag(e.target.value)}
-                    />
-                  </Modal>
+        <Modal
+          title="Add New Category"
+          open={isTagModalVisible}
+          onCancel={() => setIsTagModalVisible(false)}
+          onOk={handleAddNewTag}
+          okText="Add Category"
+        >
+          <Input
+            placeholder="Enter new Category"
+            value={newTag}
+            onChange={(e) => setNewTag(e.target.value)}
+          />
+        </Modal>
       </Card>
     </div>
   );

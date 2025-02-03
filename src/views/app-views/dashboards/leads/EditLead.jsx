@@ -8,19 +8,20 @@ import {
   Col,
   message,
   Card,
+  Modal,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import "react-quill/dist/quill.snow.css";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import { GetLeads, LeadsEdit } from "./LeadReducers/LeadSlice";
 import { useDispatch } from "react-redux";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
-import { GetLable } from "../project/milestone/LableReducer/LableSlice";
+import { GetLable,AddLable } from "../project/milestone/LableReducer/LableSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
@@ -30,6 +31,15 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
   const [details, setDetails] = useState(false);
   const [info, setInfo] = useState(false);
   const [organisation, setorganisation] = useState(false);
+  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
+  const [newTag, setNewTag] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [newStatus, setNewStatus] = useState("");
+  const [tags, setTags] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [statuses, setStatuses] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -39,7 +49,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
   const project = datleads.find((item) => item.id === id);
   const { currencies } = useSelector((state) => state.currencies);
   const { data: employee } = useSelector((state) => state.employee.employee);
-  // const { data: Lable } = useSelector((state) => state.Lable.Lable);
+  const countries = useSelector((state) => state.countries.countries);
   const alltagdata = useSelector((state) => state.Lable);
   const datas = alltagdata.Lable.data || [];
   const user = useSelector((state) => state.user.loggedInUser);
@@ -48,6 +58,8 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
   // Add state for lead value and currency
   const [selectedCurrency, setSelectedCurrency] = useState(null);
 
+  const AllLoggedData = useSelector((state) => state.user);
+  const loggedInUserId = AllLoggedData?.loggedInUser?.id;
 
   useEffect(() => {
     if (project) {
@@ -72,6 +84,10 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
     }
   }, [project]);
 
+  useEffect(() => {
+    dispatch(getcurren());
+  }, [dispatch]);
+
   // Set initial values
   const initialValues = {
     leadTitle: project?.leadTitle || "",
@@ -92,19 +108,6 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
     targetDate: project?.targetDate ? moment(project.targetDate) : null,
     contentType: project?.contentType || "",
     brandName: project?.brandName || "",
-    // companyName: project?.companyName || "",
-    // street: project?.street || "",
-    // city: project?.city || "",
-    // state: project?.state || "",
-    // zipCode: project?.zipCode || "",
-    // country: project?.country || "",
-    // website: project?.website || "",
-    // users: project?.users || [],
-    // pipeline: project?.pipeline || "",
-    // stage: project?.stage || "",
-    // sources: project?.sources || [],
-    // products: project?.products || [],
-    // tags: project?.tags || [],
   };
 
   const validationSchema = Yup.object({
@@ -194,6 +197,14 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
     }
   }, [dispatch, lid]);
 
+  useEffect(() => {
+    if (loggedInUserId) {
+      fetchLables("tag", setTags);
+      fetchLables("category", setCategories);
+      fetchLables("status", setStatuses);
+    }
+  }, [loggedInUserId]);
+
   const onSubmit = (values) => {
     const formData = {
       ...values,
@@ -256,6 +267,44 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
       </div>
     </Col>
   );
+
+  const fetchLables = async (lableType, setter) => {
+    try {
+      const response = await dispatch(GetLable(loggedInUserId));
+      if (response.payload && response.payload.data) {
+        const filteredLables = response.payload.data
+          .filter((lable) => lable.lableType === lableType)
+          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+        setter(filteredLables);
+      }
+    } catch (error) {
+      console.error(`Failed to fetch ${lableType}:`, error);
+      message.error(`Failed to load ${lableType}`);
+    }
+  };
+
+  const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
+    if (!newValue.trim()) {
+      message.error(`Please enter a ${lableType} name.`);
+      return;
+    }
+
+    try {
+      const payload = {
+        name: newValue.trim(),
+        lableType,
+        userId: loggedInUserId,
+      };
+      await dispatch(AddLable({ id: loggedInUserId, payload }));
+      message.success(`${lableType} added successfully.`);
+      setter("");
+      modalSetter(false);
+      await fetchLables(lableType, lableType === "tag" ? setTags : lableType === "category" ? setCategories : setStatuses);
+    } catch (error) {
+      console.error(`Failed to add ${lableType}:`, error);
+      message.error(`Failed to add ${lableType}.`);
+    }
+  };
 
   return (
     <div className="edit-lead-form">
@@ -322,20 +371,35 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                 </div>
               </Col>
               <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">telephone</label>
-                  <Field
-                    name="telephone"
-                    as={Input}
-                    placeholder="Enter telephone"
-                  />
-                  <ErrorMessage
-                    name="telephone"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                  <div className="form-item">
+                    <label className="font-semibold">Telephone</label>
+                    <div className="flex">
+                      <Select
+                        style={{ width: '30%', marginRight: '8px' }}
+                        placeholder="Code"
+                        name="telephone"
+                        onChange={(value) => setFieldValue('telephone', value)}
+                      >
+                        {countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            (+{country.phoneCode})
+                          </Option>
+                        ))}
+                      </Select>
+                      <Field
+                        name="telephone"
+                        as={Input}
+                        style={{ width: '70%' }}
+                        placeholder="Enter Telephone"
+                      />
+                    </div>
+                    <ErrorMessage
+                      name="telephone"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
@@ -369,22 +433,6 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                   />
                 </div>
               </Col>
-
-              {/* <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Lead Value($)</label>
-                  <Field
-                    name="leadValue"
-                    as={Input}
-                    placeholder="Enter Lead Value"
-                  />
-                  <ErrorMessage
-                    name="leadValue"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
@@ -434,15 +482,31 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                       <Select
                         {...field}
                         className="w-full"
-                        placeholder="Select Status"
+                        placeholder="Select or add new status"
                         onChange={(value) => setFieldValue("status", value)}
                         value={values.status}
                         onBlur={() => setFieldTouched("status", true)}
+                        dropdownRender={(menu) => (
+                          <div>
+                            {menu}
+                            <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                              <Button
+                                type="link"
+                                icon={<PlusOutlined />}
+                                className="w-full mt-2"
+                                onClick={() => setIsStatusModalVisible(true)}
+                              >
+                                Add New Status
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       >
-                        <Option value="new">New</Option>
-                        <Option value="converted">Converted</Option>
-                        <Option value="qualified">Qualified</Option>
-                        <Option value="proposalsent">Proposal Sent</Option>
+                        {statuses.map((status) => (
+                          <Option key={status.id} value={status.id}>
+                            {status.name}
+                          </Option>
+                        ))}
                       </Select>
                     )}
                   </Field>
@@ -453,8 +517,6 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                   />
                 </div>
               </Col>
-
-              {/* Toggle button for Receipt Upload */}
 
               <Col span={24} className="mt-4 ">
                 <div className="flex justify-between items-center">
@@ -470,7 +532,6 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                   </label>
                 </div>
 
-                {/* Conditionally show Upload field */}
                 {details && (
                   <>
                     <Col span={24}>
@@ -495,7 +556,6 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                       <Select
                         placeholder="Select Source"
                         className="w-full"
-                        // loading={loading}
                         onChange={(value) => console.log("Selected:", value)}
                       >
                         {datas.map((source) => (
@@ -513,18 +573,33 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                             <Select
                               {...field}
                               className="w-full"
-                              placeholder="Select category"
+                              placeholder="Select or add new category"
                               onChange={(value) =>
                                 setFieldValue("category", value)
                               }
                               value={values.category}
                               onBlur={() => setFieldTouched("category", true)}
+                              dropdownRender={(menu) => (
+                                <div>
+                                  {menu}
+                                  <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                    <Button
+                                      type="link"
+                                      icon={<PlusOutlined />}
+                                      className="w-full mt-2"
+                                      onClick={() => setIsCategoryModalVisible(true)}
+                                    >
+                                      Add New Category
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
                             >
-                              <Option value="default">Default</Option>
-                              <Option value="appdev">
-                                Application Developer
-                              </Option>
-                              <Option value="graphic">Graphic Design</Option>
+                              {categories.map((category) => (
+                                <Option key={category.id} value={category.id}>
+                                  {category.name}
+                                </Option>
+                              ))}
                             </Select>
                           )}
                         </Field>
@@ -541,16 +616,34 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                         <Field name="tags">
                           {({ field }) => (
                             <Select
+                              mode="multiple"
                               {...field}
                               className="w-full"
-                              placeholder="Select Tags"
+                              placeholder="Select or add new tags"
                               onChange={(value) => setFieldValue("tags", value)}
-                              onBlur={() => setFieldTouched("tags", true)}
                               value={values.tags}
+                              onBlur={() => setFieldTouched("tags", true)}
+                              dropdownRender={(menu) => (
+                                <div>
+                                  {menu}
+                                  <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                    <Button
+                                      type="link"
+                                      icon={<PlusOutlined />}
+                                      className="w-full mt-2"
+                                      onClick={() => setIsTagModalVisible(true)}
+                                    >
+                                      Add New Tag
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
                             >
-                              <Option value="high">high</Option>
-                              <Option value="joomla">joomla</Option>
-                              <Option value="wordpress">Word Press</Option>
+                              {tags.map((tag) => (
+                                <Option key={tag.id} value={tag.id}>
+                                  {tag.name}
+                                </Option>
+                              ))}
                             </Select>
                           )}
                         </Field>
@@ -600,7 +693,6 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                   </label>
                 </div>
 
-                {/* Conditionally show Upload field */}
                 {info && (
                   <>
                     <div className="mt-2">
@@ -738,6 +830,48 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                 Update
               </Button>
             </div>
+
+            <Modal
+              title="Add New Tag"
+              open={isTagModalVisible}
+              onCancel={() => setIsTagModalVisible(false)}
+              onOk={() => handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible)}
+              okText="Add Tag"
+            >
+              <Input
+                placeholder="Enter new tag name"
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+              />
+            </Modal>
+
+            <Modal
+              title="Add New Category"
+              open={isCategoryModalVisible}
+              onCancel={() => setIsCategoryModalVisible(false)}
+              onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
+              okText="Add Category"
+            >
+              <Input
+                placeholder="Enter new category name"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+              />
+            </Modal>
+
+            <Modal
+              title="Add New Status"
+              open={isStatusModalVisible}
+              onCancel={() => setIsStatusModalVisible(false)}
+              onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible)}
+              okText="Add Status"
+            >
+              <Input
+                placeholder="Enter new status name"
+                value={newStatus}
+                onChange={(e) => setNewStatus(e.target.value)}
+              />
+            </Modal>
           </Form>
         )}
       </Formik>
@@ -746,7 +880,6 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
 };
 
 export default EditLead;
-
 
 
 
@@ -1493,3 +1626,4 @@ export default EditLead;
 // // };
 
 // // export default EditLead;
+

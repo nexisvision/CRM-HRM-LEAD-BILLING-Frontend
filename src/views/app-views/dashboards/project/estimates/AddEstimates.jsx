@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Form, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, DatePicker, Modal } from 'antd';
-import {  DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
+import { DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { createestimate } from './estimatesReducer/EstimatesSlice';
+import { GetLeads } from '../../leads/LeadReducers/LeadSlice';
 import * as Yup from 'yup';
 import { getcurren } from 'views/app-views/setting/currencies/currenciesSlice/currenciesSlice';
 
@@ -14,22 +15,24 @@ const AddEstimates = ({ onClose }) => {
 
     const { id } = useParams();
 
-    
+
     const [discountType, setDiscountType] = useState("%");
     const [loading, setLoading] = useState(false);
     const [discountValue, setDiscountValue] = useState(0);
     const { currencies } = useSelector((state) => state.currencies);
 
+    const { data: Leads } = useSelector((state) => state.Leads.Leads);
+    const [selectedLead, setSelectedLead] = useState(null);
 
     const subClients = useSelector((state) => state.SubClient);
-const sub = subClients?.SubClient?.data;
+    const sub = subClients?.SubClient?.data;
 
     const allproject = useSelector((state) => state.Project);
     const fndrewduxxdaa = allproject.Project.data
     const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
-    
+
     const client = fnddata?.client;
-    
+
     const subClientData = sub?.find((subClient) => subClient?.id === client);
 
     const [discountRate, setDiscountRate] = useState(10);
@@ -59,54 +62,67 @@ const sub = subClients?.SubClient?.data;
         dispatch(getcurren());
     }, [dispatch]);
 
- const initialValues = {
-                valid_till:"",
-                currency:"",
-                calculatedTax:"",
-                client: fnddata?.client || "",
-                project: fnddata?.id || "",
-                discount:"",
-                tax:"",
-                total:"",
-            };
+    useEffect(() => {
+        dispatch(GetLeads());
+    }, [dispatch]);
+
+    const initialValues = {
+        valid_till: "",
+        currency: "",
+        lead: "",
+        calculatedTax: "",
+        client: fnddata?.client || "",
+        project: fnddata?.id || "",
+        discount: "",
+        tax: "",
+        total: "",
+    };
 
 
 
     const handleFinish = async (values) => {
         try {
-            console.log("Form Values:", values);
             setLoading(true);
-            
+
             const subTotal = calculateSubTotal();
             const totalTax = calculateTotalTax();
             const discount = (subTotal * discountRate) / 100;
             const totalAmount = subTotal - discount + totalTax;
-    
-            
 
-
-            const estimateData = {
-                valid_till: values.valid_till.format('YYYY-MM-DD'), // Ensure date format
-                currency: values.currency,
-                project: values.project,
-                client: values.client,
-                calculatedTax: values.calculatedTax,
-                items: tableData.map(item => ({
-                    description: item.item,
+            // Format items according to backend expectation
+            const formattedItems = {
+                items: tableData.map((item, index) => ({
+                    id: index + 1,
+                    item: item.item || '',
                     quantity: parseFloat(item.quantity) || 0,
                     price: parseFloat(item.price) || 0,
                     tax: parseFloat(item.tax) || 0,
-                    amount: parseFloat(item.amount) || 0
-                })),
+                    amount: parseFloat(item.amount) || 0,
+                    itemDescription: item.description || ''
+                }))
+            };
+
+            // Ensure required fields are present
+            if (!values.lead || !values.currency || !values.valid_till) {
+                throw new Error('Please fill in all required fields');
+            }
+
+            const estimateData = {
+                valid_till: values.valid_till.format('YYYY-MM-DD'),
+                currency: values.currency,
+                lead: values.lead,
+                client: values.client,
+                calculatedTax: parseFloat(values.calculatedTax) || 0,
+                items: formattedItems,
                 discount: parseFloat(discount.toFixed(2)) || 0,
                 tax: parseFloat(totalTax.toFixed(2)) || 0,
                 total: parseFloat(totalAmount.toFixed(2)) || 0
             };
-    
+
             console.log("Estimate Data Prepared:", estimateData);
-    
+
             const result = await dispatch(createestimate({ id, estimateData }));
-    
+
             if (result.payload?.success) {
                 message.success('Estimate created successfully');
                 form.resetFields();
@@ -122,7 +138,7 @@ const sub = subClients?.SubClient?.data;
         }
     };
 
-    
+
 
     const [rows, setRows] = useState([
         {
@@ -249,38 +265,76 @@ const sub = subClients?.SubClient?.data;
                             <div className=" p-2">
 
                                 <Row gutter={16}>
-                               <Col span={12}>
-                                   <Form.Item
-                                       name="clientName"
-                                       label="Client Name"
-                                       initialValue={subClientData?.username}
-                                       rules={[{ required: true, message: "Please enter the client name" }]}
-                                   >
-                                       <Input placeholder="Enter client name" disabled />
-                                   </Form.Item>
-                                   {/* Hidden field to pass the client ID */}
-                                   <Form.Item name="client" initialValue={fnddata?.client} hidden>
-                                       <Input type="hidden" />
-                                   </Form.Item>
-                               </Col>
-                               
-                                                                       
-                               <Col span={12}>
-                                   {/* Display the project name */}
-                                   <Form.Item
-                                       name="projectName"
-                                       label="Project Name"
-                                       initialValue={fnddata?.project_name}
-                                       rules={[{ required: true, message: "Please enter the project name" }]}
-                                   >
-                                       <Input placeholder="Enter project name" disabled />
-                                   </Form.Item>
-                                   
-                                   {/* Hidden field to pass the project ID */}
-                                   <Form.Item name="project" initialValue={fnddata?.id} hidden>
-                                       <Input type="hidden" />
-                                   </Form.Item>
-                               </Col>
+                                    <Col span={12}>
+                                        <Form.Item
+                                            name="clientName"
+                                            label="Client Name"
+                                            initialValue={subClientData?.username}
+                                            rules={[{ required: true, message: "Please enter the client name" }]}
+                                        >
+                                            <Input placeholder="Enter client name" disabled />
+                                        </Form.Item>
+                                        {/* Hidden field to pass the client ID */}
+                                        <Form.Item name="client" initialValue={fnddata?.client} hidden>
+                                            <Input type="hidden" />
+                                        </Form.Item>
+                                    </Col>
+
+
+                                    <Col span={12}>
+                                        {/* Display the project name */}
+                                        <Form.Item
+                                            name="projectName"
+                                            label="Project Name"
+                                            initialValue={fnddata?.project_name}
+                                            rules={[{ required: true, message: "Please enter the project name" }]}
+                                        >
+                                            <Input placeholder="Enter project name" disabled />
+                                        </Form.Item>
+
+                                        {/* Hidden field to pass the project ID */}
+                                        <Form.Item name="project" initialValue={fnddata?.id} hidden>
+                                            <Input type="hidden" />
+                                        </Form.Item>
+                                    </Col>
+
+                                    <Col span={12}>
+                                        <Form.Item
+                                            name="lead"
+                                            label="Lead Title"
+                                            rules={[
+                                                { 
+                                                    required: true, 
+                                                    message: "Please select a Lead Title" 
+                                                }
+                                            ]}
+                                        >
+                                            <Select
+                                                className="w-full"
+                                                placeholder="Select Lead Title"
+                                                onChange={(value) => {
+                                                    if (value) {
+                                                        const selectedLead = Leads?.find(
+                                                            (lead) => lead.id === value
+                                                        );
+                                                        setSelectedLead(selectedLead);
+                                                        form.setFieldsValue({ 
+                                                            lead: value  // Set the form field value
+                                                        });
+                                                    }
+                                                }}
+                                            >
+                                                {Array.isArray(Leads) && Leads.map((lead) => (
+                                                    <Option 
+                                                        key={lead.id} 
+                                                        value={lead.id}
+                                                    >
+                                                        {lead.leadTitle}
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        </Form.Item>
+                                    </Col>
 
                                     <Col span={12}>
                                         <Form.Item

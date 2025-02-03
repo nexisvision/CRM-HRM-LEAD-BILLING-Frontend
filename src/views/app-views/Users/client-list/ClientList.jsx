@@ -84,7 +84,7 @@ const ClientList = () => {
     ? JSON.parse(roleData.permissions)
     : [];
 
-    console.log('Parsed Permissions:', parsedPermissions["extra-users-client-list"][0].permissions);
+    // console.log('Parsed Permissions:', parsedPermissions["extra-users-client-list"][0].permissions);
 
     const allpermisson = parsedPermissions["extra-users-client-list"][0].permissions;
 

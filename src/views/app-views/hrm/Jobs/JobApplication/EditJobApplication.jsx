@@ -9,6 +9,8 @@ import {
   getjobapplication,
 } from "./JobapplicationReducer/JobapplicationSlice";
 import { GetJobdata } from "../JobReducer/JobSlice";
+import { getallcountries } from "../../../setting/countries/countriesreducer/countriesSlice";
+
 const { Option } = Select;
 const EditJobApplication = ({ idd, onClose }) => {
   const dispatch = useDispatch();
@@ -21,6 +23,12 @@ const EditJobApplication = ({ idd, onClose }) => {
   useEffect(() => {
     dispatch(GetJobdata());
   }, []);
+
+  const countries = useSelector((state) => state.countries.countries);
+
+  useEffect(() => {
+    dispatch(getallcountries());
+  }, [dispatch]);
 
   const customerdata = useSelector((state) => state.Jobs);
   const fnddata = customerdata.Jobs.data;
@@ -161,10 +169,29 @@ const EditJobApplication = ({ idd, onClose }) => {
                 </div>
               </Col>
               {/* Phone */}
-              <Col span={12}>
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Phone</label>
-                  <Field name="phone" as={Input} placeholder="Enter Phone" />
+                  <div className="flex">
+                    <Select
+                      style={{ width: '30%', marginRight: '8px' }}
+                      placeholder="Code"
+                      name="phone"
+                      onChange={(value) => setFieldValue('phone', value)}
+                    >
+                      {countries.map((country) => (
+                        <Option key={country.id} value={country.phoneCode}>
+                          (+{country.phoneCode})
+                        </Option>
+                      ))}
+                    </Select>
+                    <Field
+                      name="phone"
+                      as={Input}
+                      style={{ width: '70%' }}
+                      placeholder="Enter Phone"
+                    />
+                  </div>
                   <ErrorMessage
                     name="phone"
                     component="div"

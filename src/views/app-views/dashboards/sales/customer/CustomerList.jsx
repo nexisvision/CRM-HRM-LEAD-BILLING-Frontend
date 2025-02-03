@@ -295,9 +295,10 @@ const CustomerList = () => {
     {
       title: "Contact",
       dataIndex: "contact",
-      sorter: {
-        compare: (a, b) => a.title.length - b.title.length,
-      },
+      render: (contact) => contact, // This will display the full contact number with country code
+    sorter: {
+      compare: (a, b) => a.title.length - b.title.length,
+    },
     },
     {
       title: "Email",

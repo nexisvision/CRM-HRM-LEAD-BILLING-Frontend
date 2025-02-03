@@ -323,37 +323,23 @@ const ContractList = () => {
       title: "Subject",
       dataIndex: "subject",
       sorter: {
-        compare: (a, b) => a.title.length - b.title.length,
+        compare: (a, b) => a.subject.length - b.subject.length,
       },
     },
     {
       title: "Client",
       dataIndex: "client",
-      sorter: (a, b) => dayjs(a.startdate).unix() - dayjs(b.startdate).unix(),
+      compare: (a, b) => a.client.length - b.client.length,
     },
     {
       title: "Project",
       dataIndex: "project",
-      //   render: (status) => (
-      //     <Tag className="text-capitalize" color={status === 'active' ? 'cyan' : 'red'}>
-      //       {status}
-      //     </Tag>
-      //   ),
-      sorter: {
-        compare: (a, b) => a.status.length - b.status.length,
-      },
+      compare: (a, b) => a.project.length - b.project.length,
     },
     {
       title: "Contract Type",
       dataIndex: "type",
-      // render: (_, record) => (
-      //     <div className="d-flex">
-      //         <AvatarStatus size={30} src={record.image} name={record.name}/>
-      //     </div>
-      // ),
-      sorter: {
-        compare: (a, b) => a.title.length - b.title.length,
-      },
+      compare: (a, b) => a.type.length - b.type.length,
     },
     {
       title: "Contract Value",
@@ -364,7 +350,7 @@ const ContractList = () => {
       //     </div>
       // ),
       sorter: {
-        compare: (a, b) => a.title.length - b.title.length,
+        compare: (a, b) => a.value.length - b.value.length,
       },
     },
     {
@@ -376,7 +362,7 @@ const ContractList = () => {
       //     </div>
       // ),
       sorter: {
-        compare: (a, b) => a.title.length - b.title.length,
+        compare: (a, b) => a.startDate.length - b.startDate.length,
       },
     },
     {
@@ -388,7 +374,7 @@ const ContractList = () => {
       //     </div>
       // ),
       sorter: {
-        compare: (a, b) => a.title.length - b.title.length,
+        compare: (a, b) => a.endDate.length - b.endDate.length,
       },
     },
     {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, Select, message, Row, Col,DatePicker } from "antd";
+import { Input, Button, Select, message, Row, Col, DatePicker } from "antd";
 import { useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -21,6 +21,12 @@ const EditDeal = ({ onClose, id }) => {
   const { data: StagesLeadsDeals } = useSelector((state) => state.StagesLeadsDeals.StagesLeadsDeals);
   const { data: Leads } = useSelector((state) => state.Leads.Leads);
   const { data: Project } = useSelector((state) => state.Project.Project);
+  const countries = useSelector((state) => state.countries.countries);
+
+  useEffect(() => {
+    dispatch(getcurren());
+  }, [dispatch]);
+
   const [initialValues, setInitialValues] = useState({
     dealName: "",
     phoneNumber: "",
@@ -115,14 +121,15 @@ const EditDeal = ({ onClose, id }) => {
                 placeholder="Currency"
                 onChange={(value) => form.setFieldValue("currencyId", value)}
               >
-                {currencies?.map((currency) => (
-                  <Option
-                    key={currency.id}
-                    value={currency.id}
-                  >
-                    {currency.currencyCode} ({currency.currencyIcon})
-                  </Option>
-                ))}
+                {Array.isArray(currencies) && currencies.length > 0 ? (
+                  currencies.map((currency) => (
+                    <Option key={currency.id} value={currency.id}>
+                      {currency.currencyCode} ({currency.currencyIcon})
+                    </Option>
+                  ))
+                ) : (
+                  <Option value="" disabled>No currencies available</Option>
+                )}
               </Select>
             )}
           </Field>
@@ -158,6 +165,7 @@ const EditDeal = ({ onClose, id }) => {
                   <label className="font-semibold">Deal Name</label>
                   <Field
                     name="dealName"
+                    className="mt-2"
                     as={Input}
                     placeholder="Enter Deal Name"
                     rules={[{ required: true }]}
@@ -169,14 +177,29 @@ const EditDeal = ({ onClose, id }) => {
                   />
                 </div>
               </Col>
-              <Col span={12}>
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Phone</label>
-                  <Field
-                    name="phoneNumber"
-                    as={Input}
-                    placeholder="Enter Phone Number"
-                  />
+                  <div className="flex">
+                    <Select
+                      style={{ width: '30%', marginRight: '8px' }}
+                      placeholder="Code"
+                      name="phoneCode"
+                      onChange={(value) => setFieldValue('phoneCode', value)}
+                    >
+                      {countries.map((country) => (
+                        <Option key={country.id} value={country.phoneCode}>
+                          (+{country.phoneCode})
+                        </Option>
+                      ))}
+                    </Select>
+                    <Field
+                      name="phoneNumber"
+                      as={Input}
+                      style={{ width: '70%' }}
+                      placeholder="Enter phone"
+                    />
+                  </div>
                   <ErrorMessage
                     name="phoneNumber"
                     component="div"
@@ -207,7 +230,7 @@ const EditDeal = ({ onClose, id }) => {
                     {({ field }) => (
                       <Select
                         {...field}
-                        style={{ width: "100%" }}
+                        className="w-full mt-2"
                         placeholder="Select User"
                         loading={!clientdata}
                         value={values.clients} // Ensure this matches the `clients` field
@@ -271,7 +294,7 @@ const EditDeal = ({ onClose, id }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="">
+              {/* <Col span={12} className="">
                 <div className="form-item">
                   <label className="font-semibold">Lead Value</label>
                   <Field name="leadValue"
@@ -287,7 +310,7 @@ const EditDeal = ({ onClose, id }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
               <Col span={12} className="">
                 <div className="form-item">
                   <label className="font-semibold">Pipeline</label>

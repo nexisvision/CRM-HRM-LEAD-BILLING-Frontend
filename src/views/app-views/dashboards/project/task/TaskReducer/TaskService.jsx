@@ -22,12 +22,12 @@ const GetTask = async (id) => {
   }
 };
 
-const Addtask = async (id, values) => {
+const Addtask = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/tasks/${id}`,
+      `http://localhost:5353/api/v1/tasks/${idd}`,
       values,
       {
         headers: {

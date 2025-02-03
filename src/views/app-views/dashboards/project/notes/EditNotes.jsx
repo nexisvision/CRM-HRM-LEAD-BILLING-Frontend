@@ -170,6 +170,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { EditeNotes, GetNote } from "./NotesReducer/NotesSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 
 const { Option } = Select;
 
@@ -178,11 +179,17 @@ const EditNotes = ({ idd, onClose }) => {
   const dispatch = useDispatch();
   const { id } = useParams();
 
+  const { data: employee } = useSelector((state) => state.employee.employee);
+
+  useEffect(() => {
+    dispatch(empdata());
+  }, []);
+
   const [initialValues, setInitialValues] = useState({
     note_title: "",
     notetype: "public",
     description: "",
-    employees: {},
+    employee: {},
   });
 
   const validationSchema = Yup.object({
@@ -209,9 +216,9 @@ const EditNotes = ({ idd, onClose }) => {
         note_title: noteData.note_title || "",
         notetype: noteData.notetype || "public",
         description: noteData.description || "",
-        employees:
-          typeof noteData.employees === "object" && noteData.employees !== null
-            ? Object.values(noteData.employees)[0] // Extract only the value without id
+        employee:
+          typeof noteData.employee === "object" && noteData.employee !== null
+            ? Object.values(noteData.employee)[0] // Extract only the value without id
             : {}, // Default empty object if not valid
       });
     } else {
@@ -222,9 +229,9 @@ const EditNotes = ({ idd, onClose }) => {
 
   const onSubmit = (values, { resetForm }) => {
     const employeeObject =
-      values.employees.length > 0 ? { id: values.employees[0] } : null;
+      values.employee.length > 0 ? { id: values.employee[0] } : null;
 
-    values.employees = employeeObject;
+    values.employee = employeeObject;
 
     console.log("va", values);
 
@@ -265,28 +272,45 @@ const EditNotes = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24}>
-                <div className="mt-4">
-                  <label className="font-semibold">Employees</label>
-                  <Select
-                    mode="multiple"
-                    placeholder="Select Employees"
-                    className="w-full mt-2"
-                    onChange={(value) => setFieldValue("employees", value)}
-                    value={values.employees}
-                  >
-                    <Option value="xyz">XYZ</Option>
-                    <Option value="abc">ABC</Option>
-                  </Select>
+              <Col span={12} className="">
+                <div className="form-item">
+                  <label className="font-semibold mb-2">Employee</label>
+                  <div className="flex gap-2">
+                    <Field name="employee">
+                      {({ field, form }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-2"
+                          placeholder="Select Employee"
+                          onChange={(value) => {
+                            const selectedEmployee =
+                              Array.isArray(employee) &&
+                              employee.find((e) => e.id === value);
+                            form.setFieldValue(
+                              "employee",
+                              selectedEmployee?.username || ""
+                            );
+                          }}
+                        >
+                          {Array.isArray(employee) &&
+                            employee.map((emp) => (
+                              <Option key={emp.id} value={emp.id}>
+                                {emp.username}
+                              </Option>
+                            ))}
+                        </Select>
+                      )}
+                    </Field>
+                  </div>
                   <ErrorMessage
-                    name="employees"
+                    name="employee"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
                 </div>
               </Col>
 
-              <Col span={24} className="mt-5">
+              <Col span={24} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Description</label>
                   <ReactQuill

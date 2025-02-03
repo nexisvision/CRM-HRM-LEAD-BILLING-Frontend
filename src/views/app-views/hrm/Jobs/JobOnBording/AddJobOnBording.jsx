@@ -1,6 +1,8 @@
-import React from "react";
-import { Input, Button, DatePicker, Select, message, Row, Col } from "antd";
+import React, { useEffect, useState } from "react";
+import { Input, Button, DatePicker, Select, message, Row, Col, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
+
+import { PlusOutlined } from "@ant-design/icons";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios"; // Import axios for API requests
@@ -8,13 +10,80 @@ import {
   AddJobonBoarding,
   getJobonBoarding,
 } from "./JobOnBoardingReducer/jobonboardingSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch , useSelector} from "react-redux";
+import { AddLable, GetLable } from "../../../dashboards/sales/LableReducer/LableSlice";
 
 const { Option } = Select;
 
 const AddJobOnBoarding = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  // status start
+  const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
+  const [newStatus, setNewStatus] = useState("");
+  const [statuses, setStatuses] = useState([]);
+
+  const AllLoggedData = useSelector((state) => state.user);
+
+  const lid = AllLoggedData.loggedInUser.id;
+
+  const fetchLables = async (lableType, setter) => {
+    try {
+      const lid = AllLoggedData.loggedInUser.id;
+      const response = await dispatch(GetLable(lid));
+
+      if (response.payload && response.payload.data) {
+        const uniqueStatuses = response.payload.data
+          .filter((label) => label && label.name) // Filter out invalid labels
+          .map((label) => ({
+            id: label.id,
+            name: label.name.trim(),
+          }))
+          .filter(
+            (label, index, self) =>
+              index === self.findIndex((t) => t.name === label.name)
+          ); // Remove duplicates
+
+        setStatuses(uniqueStatuses);
+      }
+    } catch (error) {
+      console.error("Failed to fetch statuses:", error);
+      message.error("Failed to load statuses");
+    }
+  };
+
+  useEffect(() => {
+    fetchLables("status", setStatuses);
+  }, []);
+
+  const handleAddNewStatus = async () => {
+    if (!newStatus.trim()) {
+      message.error("Please enter a status name");
+      return;
+    }
+
+    try {
+      const lid = AllLoggedData.loggedInUser.id;
+      const payload = {
+        name: newStatus.trim(),
+        labelType: "status",
+      };
+
+      await dispatch(AddLable({ lid, payload }));
+      message.success("Status added successfully");
+      setNewStatus("");
+      setIsStatusModalVisible(false);
+
+      // Fetch updated statuses
+      await fetchLables();
+    } catch (error) {
+      console.error("Failed to add Status:", error);
+      message.error("Failed to add Status");
+    }
+  };
+
+  // status end
 
   // Submit the form data
   const onSubmit = async (values, { resetForm }) => {
@@ -255,24 +324,36 @@ const AddJobOnBoarding = ({ onClose }) => {
               </Col>
 
               {/* Status */}
-              <Col span={12} className="mt-2">
-                <div className="form-item">
+              <Col span={12}>
+                <div className="form-item mt-2">
                   <label className="font-semibold">Status</label>
-                  <Field name="status">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full"
-                        placeholder="Select Status"
-                        onChange={(value) => setFieldValue("status", value)}
-                        value={values.status}
-                        onBlur={() => setFieldTouched("status", true)}
-                      >
-                        <Option value="active">Active</Option>
-                        <Option value="inactive">Inactive</Option>
-                      </Select>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new status"
+                    value={values.status}
+                    onChange={(value) => setFieldValue("status", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            className="w-full mt-2"
+                            onClick={() => setIsStatusModalVisible(true)}
+                          >
+                            Add New Status
+                          </Button>
+                        </div>
+                      </div>
                     )}
-                  </Field>
+                  >
+                    {statuses.map((status) => (
+                      <Option key={status.id} value={status.name}>
+                        {status.name}
+                      </Option>
+                    ))}
+                  </Select>
                   <ErrorMessage
                     name="status"
                     component="div"
@@ -293,6 +374,19 @@ const AddJobOnBoarding = ({ onClose }) => {
           </Form>
         )}
       </Formik>
+      <Modal
+        title="Add New Status"
+        open={isStatusModalVisible}
+        onCancel={() => setIsStatusModalVisible(false)}
+        onOk={() => handleAddNewStatus("status", newStatus, setNewStatus, setIsStatusModalVisible)}
+        okText="Add Status"
+      >
+        <Input
+          placeholder="Enter new status name"
+          value={newStatus}
+          onChange={(e) => setNewStatus(e.target.value)}
+        />
+      </Modal>
     </div>
   );
 };

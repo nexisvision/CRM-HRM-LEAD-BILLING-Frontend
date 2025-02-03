@@ -20,6 +20,7 @@ import { addEmp, empdata } from "./EmployeeReducers/EmployeeSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
+import { getallcountries } from "../../setting/countries/countriesreducer/countriesSlice";
 
 const { Option } = Select;
 
@@ -33,6 +34,12 @@ const AddEmployee = ({ onClose, setSub }) => {
 
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
+
+  const countries = useSelector((state) => state.countries.countries);
+
+  useEffect(() => {
+    dispatch(getallcountries());
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(getDept());
@@ -212,13 +219,36 @@ const AddEmployee = ({ onClose, setSub }) => {
                   <ErrorMessage name="email" component="div" className="text-red-500" />
                 </div>
               </Col>
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Phone</label>
-                  <Field name="phone" as={Input} placeholder="1234567890" className="mt-1" />
-                  <ErrorMessage name="phone" component="div" className="text-red-500" />
-                </div>
-              </Col>
+              <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Phone</label>
+                    <div className="flex">
+                      <Select
+                        style={{ width: '30%', marginRight: '8px' }}
+                        placeholder="Code"
+                        name="phone"
+                        onChange={(value) => setFieldValue('phone', value)}
+                      >
+                        {countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            (+{country.phoneCode})
+                          </Option>
+                        ))}
+                      </Select>
+                      <Field
+                        name="phone"
+                        as={Input}
+                        style={{ width: '70%' }}
+                        placeholder="Enter Phone"
+                      />
+                    </div>
+                    <ErrorMessage
+                      name="phone"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>

@@ -38,6 +38,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { DeleteDeals, GetDeals } from "./DealReducers/DealSlice";
 import { useNavigate } from "react-router-dom";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
+import { getstages } from '../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice';
 
 const DealList = () => {
   const [users, setUsers] = useState(userData);
@@ -60,6 +61,12 @@ const DealList = () => {
   const [dealStatisticData] = useState(DealStatisticData);
 
   const tabledata = useSelector((state) => state.Deals);
+
+  // Add new state for stages
+  const [stagesList, setStagesList] = useState([]);
+  
+  // Get stages data from redux store
+  const stagesData = useSelector((state) => state.StagesLeadsDeals);
 
   // Open Add Job Modal
   const openAddDealModal = () => {
@@ -145,7 +152,9 @@ const DealList = () => {
   };
 
   useEffect(() => {
+    // Fetch deals and stages data
     dispatch(GetDeals());
+    dispatch(getstages());
   }, []);
 
   useEffect(() => {
@@ -153,6 +162,12 @@ const DealList = () => {
       setUsers(tabledata.Deals.data);
     }
   }, [tabledata]);
+
+  useEffect(() => {
+    if (stagesData && stagesData.StagesLeadsDeals && stagesData.StagesLeadsDeals.data) {
+      setStagesList(stagesData.StagesLeadsDeals.data);
+    }
+  }, [stagesData]);
 
   const EditDelas = (id) => {
     openEditDealModal();
@@ -162,6 +177,12 @@ const DealList = () => {
   useEffect(() => {
     dispatch(ClientData());
   }, [dispatch]);
+
+  // Function to get stage name by ID
+  const getStageName = (stageId) => {
+    const stage = stagesList.find(stage => stage.id === stageId);
+    return stage ? stage.stageName : 'N/A';
+  };
 
   const dropdownMenu = (elm) => (
     <Menu>
@@ -223,7 +244,7 @@ const DealList = () => {
   const tableColumns = [
     {
       title: "Name",
-      dataIndex: "clients",
+      dataIndex: "dealName",
       sorter: {
         compare: (a, b) => a.branch.length - b.branch.length,
       },
@@ -237,8 +258,15 @@ const DealList = () => {
     },
     {
       title: "Stage",
-      dataIndex: "dealName",
-      sorter: (a, b) => dayjs(a.startdate).unix() - dayjs(b.startdate).unix(),
+      dataIndex: "stage",
+      render: (stageId) => getStageName(stageId), // Convert ID to name
+      sorter: {
+        compare: (a, b) => {
+          const stageNameA = getStageName(a.stage);
+          const stageNameB = getStageName(b.stage);
+          return stageNameA.localeCompare(stageNameB);
+        },
+      },
     },
     {
       title: "Task",
@@ -257,13 +285,13 @@ const DealList = () => {
     },
     {
       title: "User",
-      dataIndex: "name",
+      dataIndex: "client",
       render: (_, record) => (
         <div className="d-flex">
-          <AvatarStatus size={30} src={record.image} name={record.name} />
-        </div>
+        <AvatarStatus size={30} src={record.client?.avatar} name={record.client?.name} />
+      </div>
       ),
-      sorter: (a, b) => utils.antdTableSorter(a, b, "name"),
+      sorter: (a, b) => utils.antdTableSorter(a.client?.name, b.client?.name),
     },
     {
       title: "Action",

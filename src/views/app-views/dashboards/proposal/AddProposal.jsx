@@ -64,7 +64,7 @@ const AddProposal = ({ onClose }) => {
   // const [selectedProject, setSelectedProject] = useState(null);
   // const [clientOptions, setClientOptions] = useState([]);
 
-  const { currencies } = useSelector((state) => state.currencies);
+  const currencies = useSelector((state) => state.currencies?.currencies?.data || []);
   const [discountRate, setDiscountRate] = useState(10);
   const dispatch = useDispatch();
 
@@ -97,7 +97,16 @@ const AddProposal = ({ onClose }) => {
 
   // Fetch currencies
   useEffect(() => {
-    dispatch(getcurren());
+    const fetchCurrencies = async () => {
+      try {
+        await dispatch(getcurren());
+      } catch (error) {
+        console.error('Error fetching currencies:', error);
+        message.error('Failed to fetch currencies');
+      }
+    };
+
+    fetchCurrencies();
   }, [dispatch]);
 
   useEffect(() => {
@@ -296,12 +305,12 @@ const AddProposal = ({ onClose }) => {
     const updatedData = tableData.map((row) =>
       row.id === id
         ? {
-            ...row,
-            [field]:
-              field === "quantity" || field === "price" || field === "tax"
-                ? parseFloat(value) || 0
-                : value,
-          }
+          ...row,
+          [field]:
+            field === "quantity" || field === "price" || field === "tax"
+              ? parseFloat(value) || 0
+              : value,
+        }
         : row
     );
 
@@ -337,9 +346,9 @@ const AddProposal = ({ onClose }) => {
             validationSchema={validationSchema}
             initialValues={initialValues}
 
-            // initialValues={{
-            //     loginEnabled: true,
-            // }}
+          // initialValues={{
+          //     loginEnabled: true,
+          // }}
           >
             {/* <Card className="border-0 mt-2"> */}
             <div className="">
@@ -419,14 +428,16 @@ const AddProposal = ({ onClose }) => {
                           required: true,
                           message: "Please select a Currency",
                         },
-                      ]} // Validation rule
+                      ]}
                     >
-                      <Select placeholder="Select Lead Title">
-                        {/* Populate dropdown options from Leads */}
+                      <Select
+                        placeholder="Select Currency"
+                        loading={!Array.isArray(currencies)}
+                      >
                         {Array.isArray(currencies) && currencies.length > 0 ? (
                           currencies.map((currency) => (
                             <Option key={currency.id} value={currency.id}>
-                              {currency.currencyName}
+                              {currency.currencyCode}
                             </Option>
                           ))
                         ) : (
@@ -579,13 +590,7 @@ const AddProposal = ({ onClose }) => {
                           <td className="px-4 py-2 border-b">
                             <select
                               value={row.tax}
-                              onChange={(e) =>
-                                handleTableDataChange(
-                                  row.id,
-                                  "tax",
-                                  e.target.value
-                                )
-                              }
+                              onChange={(e) => handleTableDataChange(row.id, 'tax', e.target.value)}
                               className="w-full p-2 border"
                             >
                               <option value="0">Nothing Selected</option>
@@ -595,20 +600,16 @@ const AddProposal = ({ onClose }) => {
                               <option value="10">IGST:10%</option>
                               <option value="10">UTGST:10%</option>
                             </select>
-                            <input
-                              type="number"
-                              value={row.tax}
-                              onChange={(e) =>
-                                handleTableDataChange(
-                                  row.id,
-                                  "tax",
-                                  e.target.value
-                                )
-                              }
-                              placeholder="tax"
-                              className="w-full p-2 border rounded-s"
-                            />
                           </td>
+                    <td className="px-4 py-2 border-b text-center">
+                      {row.amount}
+                    </td>
+                    <td className="px-2 py-1 border-b text-center">
+                      <Button danger onClick={() => handleDeleteRow(row.id)}>
+                        <DeleteOutlined />
+                      </Button>
+                    </td>
+                
                           <td className="px-4 py-2 border-b">
                             <span>{row.amount}</span>
                           </td>

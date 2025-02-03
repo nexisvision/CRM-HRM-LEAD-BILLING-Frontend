@@ -14,6 +14,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { empdata } from "../../../hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { EditExp, Getexp } from "./Expencereducer/ExpenseSlice";
 import dayjs from "dayjs"; // Import dayjs for date handling
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
@@ -26,8 +27,7 @@ const EditExpenses = ({ idd, onClose }) => {
   const allempdata = useSelector((state) => state.Expense);
   const Expensedata = allempdata?.Expense?.data || [];
 
-  const { id } = useParams();
-    const { currencies } = useSelector((state) => state.currencies);
+  const { data: employee } = useSelector((state) => state.employee.employee);
 
     useEffect(() => {
         dispatch(getcurren());
@@ -54,6 +54,10 @@ const EditExpenses = ({ idd, onClose }) => {
       dispatch(Getexp());
     }
   }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(empdata());
+}, [dispatch]);
 
   useEffect(() => {
     if (Expensedata.length > 0 && idd) {
@@ -172,7 +176,6 @@ const EditExpenses = ({ idd, onClose }) => {
                                     />
                                 </div>
                             </Col>
-
               <Col span={8}>
                 <div className="form-item">
                   <label className="font-semibold">Price</label>
@@ -207,31 +210,42 @@ const EditExpenses = ({ idd, onClose }) => {
                 </div>
               </Col>
               <Col span={8} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Employee</label>
-                  <Field name="employee">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        placeholder="Select employee"
-                        className="w-full"
-                        onChange={(value) => setFieldValue("employee", value)}
-                        value={values.employee}
-                        onBlur={() => setFieldTouched("employee", true)}
-                        allowClear={false}
-                      >
-                        <Option value="xyz">XYZ</Option>
-                        <Option value="abc">ABC</Option>
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="Employee"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                                <div className="form-item">
+                                    <label className="font-semibold mb-2">Employee</label>
+                                    <div className="flex gap-2">
+                                        <Field name="employee">
+                                            {({ field, form }) => (
+                                                <Select
+                                                    {...field}
+                                                    className="w-full mt-2"
+                                                    placeholder="Select Employee"
+                                                    onChange={(value) => {
+                                                        const selectedEmployee =
+                                                            Array.isArray(employee) &&
+                                                            employee.find((e) => e.id === value);
+                                                        form.setFieldValue(
+                                                            "employee",
+                                                            selectedEmployee?.username || ""
+                                                        );
+                                                    }}
+                                                >
+                                                    {Array.isArray(employee) &&
+                                                        employee.map((emp) => (
+                                                            <Option key={emp.id} value={emp.id}>
+                                                                {emp.username}
+                                                            </Option>
+                                                        ))}
+                                                </Select>
+                                            )}
+                                        </Field>
+                                    </div>
+                                    <ErrorMessage
+                                        name="employee"
+                                        component="div"
+                                        className="error-message text-red-500 my-1"
+                                    />
+                                </div>
+                            </Col>
               <Col span={8} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Project</label>

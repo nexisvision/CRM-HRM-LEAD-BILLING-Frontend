@@ -23,6 +23,8 @@ const EditAppraisal = ({ id , onClose }) => {
    const employeeData = useSelector((state) => 
         (state.employee?.employee?.data || []).filter((employee) => employee.employeeId)
       );
+
+      const { data: employee } = useSelector((state) => state.employee.employee);
   
   const [singleEmp, setSingleEmp] = useState(null);
 
@@ -112,7 +114,7 @@ const EditAppraisal = ({ id , onClose }) => {
                           </Form.Item>
                         </Col>
               {/* Employee Dropdown */}
-              <Col span={12}>
+              {/* <Col span={12}>
                           <Form.Item
                           disabled
                             name="employee"
@@ -127,7 +129,36 @@ const EditAppraisal = ({ id , onClose }) => {
                               ))}
                             </Select>
                           </Form.Item>
-                        </Col>
+                        </Col> */}
+
+              <Col span={12}>
+                <Form.Item
+                  name="employee"
+                  label="Employee"
+                  rules={[{ required: true, message: 'Please select a employee' }]}
+                >
+                  <Select
+                    className="w-full"
+                    placeholder="Select Employee"
+                    onChange={(value) => {
+                      const selectedEmployee =
+                        Array.isArray(employee) &&
+                        employee.find((e) => e.id === value);
+                      form.setFieldValue(
+                        "employee",
+                        selectedEmployee?.username || ""
+                      );
+                    }}
+                  >
+                    {Array.isArray(employee) &&
+                      employee.map((emp) => (
+                        <Option key={emp.id} value={emp.id}>
+                          {emp.username}
+                        </Option>
+                      ))}
+                  </Select>
+                </Form.Item>
+              </Col>
 
               {/* Select Month */}
               {/* <Col span={12}>

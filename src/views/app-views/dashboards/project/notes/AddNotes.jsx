@@ -15,13 +15,15 @@ const AddNotes = ({ onClose }) => {
   const dispatch = useDispatch();
   const { id } = useParams();
 
-  const employeeData = useSelector((state) => 
-    (state.employee?.employee?.data || []).filter((employee) => employee.employeeId)
-  );
+  // const employeeData = useSelector((state) => 
+  //   (state.employee?.employee?.data || []).filter((employee) => employee.employeeId)
+  // );
+
+  const { data: employee } = useSelector((state) => state.employee.employee);
 
   const navigate = useNavigate();
 
-useEffect(() => {
+  useEffect(() => {
     dispatch(empdata());
   }, []);
 
@@ -29,7 +31,7 @@ useEffect(() => {
     note_title: "",
     notetype: "public",
     description: "",
-    employees: {},
+    employee: {},
   };
 
   const validationSchema = Yup.object({
@@ -90,35 +92,44 @@ useEffect(() => {
               </Col>
 
 
- <Col span={12} className="mt-2">
-              <div className="form-item">
-            <label className="font-semibold">Employees</label>
-            <Field name="employee">
-              {({ field }) => (
-                <Select
-                  {...field}
-                  className="w-full"
-                  placeholder="Select Employee"
-                  onChange={(value) => setFieldValue("employee", value)}
-                  value={values.employee}
-                  onBlur={() => setFieldTouched("employee", true)}
-                >
-                  {employeeData.map((emp) => (
-                    <Option key={emp.id} value={emp.id}>
-                      {emp.username}
-                    </Option>
-                  ))}
-                </Select>
-              )}
-            </Field>
-            <ErrorMessage
-              name="employee"
-              component="div"
-              className="error-message text-red-500 my-1"
-            />
-          </div>
-              </Col> 
-{/* <Col span={12} className="mt-2">
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold mb-2">Employee</label>
+                  <div className="flex gap-2">
+                    <Field name="employee">
+                      {({ field, form }) => (
+                        <Select
+                          {...field}
+                          className="w-full "
+                          placeholder="Select Employee"
+                          onChange={(value) => {
+                            const selectedEmployee =
+                              Array.isArray(employee) &&
+                              employee.find((e) => e.id === value);
+                            form.setFieldValue(
+                              "employee",
+                              selectedEmployee?.username || ""
+                            );
+                          }}
+                        >
+                          {Array.isArray(employee) &&
+                            employee.map((emp) => (
+                              <Option key={emp.id} value={emp.id}>
+                                {emp.username}
+                              </Option>
+                            ))}
+                        </Select>
+                      )}
+                    </Field>
+                  </div>
+                  <ErrorMessage
+                    name="employee"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+              {/* <Col span={12} className="mt-2">
   <div className="form-item">
     <label className="font-semibold">Employees</label>
     <Field name="employees">
@@ -149,7 +160,7 @@ useEffect(() => {
 </Col>   */}
 
 
-              <Col span={24} className="mt-5">
+              <Col span={24} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Description</label>
                   <ReactQuill

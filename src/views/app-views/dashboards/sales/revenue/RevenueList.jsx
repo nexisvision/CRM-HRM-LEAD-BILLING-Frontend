@@ -33,6 +33,7 @@ import { utils, writeFile } from "xlsx";
 import AddRevenue from "./AddRevenue";
 import EditRevenue from "./EditRevenue";
 import { deleteRevenue, getRevenue } from "./RevenueReducer/RevenueSlice";
+import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 const { Option } = Select;
@@ -74,12 +75,15 @@ const RevenueList = () => {
   const [idd, setIdd] = useState("");
 
   const dispatch = useDispatch();
+  const customerData = useSelector((state) => state.customers);
+  const fnddataCustomers = customerData.customers.data;
 
   const alldatas = useSelector((state) => state.Revenue);
   const fnddata = alldatas.Revenue.data;
 
   useEffect(() => {
     dispatch(getRevenue());
+    dispatch(Getcus());
   }, []);
 
   useEffect(() => {
@@ -261,7 +265,16 @@ const RevenueList = () => {
     {
       title: "Customer",
       dataIndex: "customer",
-      sorter: (a, b) => utils.antdTableSorter(a, b, "customer"),
+      render: (_, record) => {
+        // Find the customer from customers data
+        const customerData = fnddataCustomers?.find(cust => cust.id === record.customer);
+        return <span>{customerData?.name || "Unknown Customer"}</span>;
+      },
+      sorter: (a, b) => {
+        const customerA = fnddataCustomers?.find(cust => cust.id === a.customer)?.name || '';
+        const customerB = fnddataCustomers?.find(cust => cust.id === b.customer)?.name || '';
+        return customerA.localeCompare(customerB);
+      },
     },
     {
       title: "Category",

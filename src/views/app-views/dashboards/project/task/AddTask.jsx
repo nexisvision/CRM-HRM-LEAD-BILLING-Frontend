@@ -234,7 +234,7 @@ const AddTask = ({ onClose }) => {
               </Col> */}
 
 
-<Col span={24}>
+              <Col span={24}>
                 <div className="form-item mt-2">
                   <label className="font-semibold">Category</label>
                   <Select
@@ -249,7 +249,7 @@ const AddTask = ({ onClose }) => {
                           <Button
                             type="link"
                             icon={<PlusOutlined />}
-                             className="w-full mt-2"
+                            className="w-full mt-2"
                             onClick={() => setIsCategoryModalVisible(true)}
                           >
                             Add New Category

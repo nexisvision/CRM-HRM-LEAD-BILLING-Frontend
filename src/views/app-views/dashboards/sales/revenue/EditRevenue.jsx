@@ -7,17 +7,21 @@ import {
   message,
   Row,
   Col,
+  Modal,
   Checkbox,
 } from "antd";
 import { useNavigate } from "react-router-dom";
+import { PlusOutlined } from "@ant-design/icons";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { getcurren } from "../../../setting/currencies/currenciesSlice/currenciesSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { editRevenue, getRevenue } from "./RevenueReducer/RevenueSlice";
 import moment from "moment/moment";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
+import { AddLable, GetLable } from "../LableReducer/LableSlice";
 
 const { Option } = Select;
 
@@ -25,20 +29,104 @@ const EditRevenue = ({ idd, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // category start
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [categories, setCategories] = useState([]);
+
+  const AllLoggedData = useSelector((state) => state.user);
+
+  const lid = AllLoggedData.loggedInUser.id;
+
+  const fetchLables = async (lableType, setter) => {
+    try {
+      const lid = AllLoggedData.loggedInUser.id;
+      const response = await dispatch(GetLable(lid));
+
+      if (response.payload && response.payload.data) {
+        const uniqueCategories = response.payload.data
+          .filter((label) => label && label.name) // Filter out invalid labels
+          .map((label) => ({
+            id: label.id,
+            name: label.name.trim(),
+          }))
+          .filter(
+            (label, index, self) =>
+              index === self.findIndex((t) => t.name === label.name)
+          ); // Remove duplicates
+
+        setCategories(uniqueCategories);
+      }
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+      message.error("Failed to load categories");
+    }
+  };
+
+  useEffect(() => {
+    fetchLables("category", setCategories);
+  }, []);
+
+  const handleAddNewCategory = async () => {
+    if (!newCategory.trim()) {
+      message.error("Please enter a category name");
+      return;
+    }
+
+    try {
+      const lid = AllLoggedData.loggedInUser.id;
+      const payload = {
+        name: newCategory.trim(),
+        labelType: "status",
+      };
+
+      await dispatch(AddLable({ lid, payload }));
+      message.success("Category added successfully");
+      setNewCategory("");
+      setIsCategoryModalVisible(false);
+
+      // Fetch updated categories
+      await fetchLables();
+    } catch (error) {
+      console.error("Failed to add Category:", error);
+      message.error("Failed to add Category");
+    }
+  };
+
+  // category end
+
+
+
   const alldata = useSelector((state) => state.Revenue);
   const fnddata = alldata.Revenue.data;
 
   const fnd = fnddata.find((item) => item.id === idd);
+
+  const currencies = useSelector((state) => state.currencies?.currencies?.data || []);
+
+  useEffect(() => {
+    const fetchCurrencies = async () => {
+      try {
+        await dispatch(getcurren());
+      } catch (error) {
+        console.error('Error fetching currencies:', error);
+        message.error('Failed to fetch currencies');
+      }
+    };
+
+    fetchCurrencies();
+  }, [dispatch]);
 
   const [initialValues, setInitialValues] = useState({
     date: null,
     amount: "",
     account: "",
     customer: "",
+    currency: "",
     description: "",
     category: "",
     reference: "",
-    paymentreceipt: "",
+    paymentReceipt: "",
   });
 
   useEffect(() => {
@@ -63,8 +151,9 @@ const EditRevenue = ({ idd, onClose }) => {
         customer: fnd.customer || "",
         description: fnd.description || "",
         category: fnd.category || "",
-        reference: fnd.reference || "",
-        paymentreceipt: fnd.paymentreceipt || "",
+        currency: fnd.currency || "",
+        // reference: fnd.reference || "",
+        paymentReceipt: fnd.paymentReceipt || "",
       });
     }
   }, [fnd]);
@@ -84,13 +173,14 @@ const EditRevenue = ({ idd, onClose }) => {
     customer: Yup.string().required("Please select a customer."),
     description: Yup.string().required("Please enter a description."),
     category: Yup.string().required("Please select a category."),
-    reference: Yup.string().required("Please enter a reference."),
-    paymentreceipt: Yup.string().optional("Please enter a payment receipt."),
+    currency: Yup.string().required("Please select a currency."),
+    // reference: Yup.string().required("Please enter a reference."),
+    paymentReceipt: Yup.string().optional("Please enter a payment receipt."),
   });
 
   return (
     <div className="add-job-form">
-      <h2 className="mb-4 border-b pb-[5px] font-medium"></h2>
+      <h2 className="mb-2 border-b font-medium"></h2>
       <div className="">
         <div className=" p-2">
           <Formik
@@ -221,34 +311,86 @@ const EditRevenue = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-2">
-                    <div className="form-item">
+                  <Col span={24}>
+                    <div className="form-item mt-2">
                       <label className="font-semibold">Category</label>
-                      <Field name="category">
-                        {({ field }) => (
-                          <Select
-                            {...field}
-                            className="w-full"
-                            placeholder="Select Category"
-                            onChange={(value) =>
-                              setFieldValue("category", value)
-                            }
-                            value={values.category}
-                            onBlur={() => setFieldTouched("category", true)}
-                          >
-                            <Option value="xyz">XYZ</Option>
-                            <Option value="abc">ABC</Option>
-                          </Select>
+                      <Select
+                        style={{ width: "100%" }}
+                        placeholder="Select or add new category"
+                        value={values.category}
+                        onChange={(value) => setFieldValue("category", value)}
+                        dropdownRender={(menu) => (
+                          <div>
+                            {menu}
+                            <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                              <Button
+                                type="link"
+                                icon={<PlusOutlined />}
+                                className="w-full mt-2"
+                                onClick={() => setIsCategoryModalVisible(true)}
+                              >
+                                Add New Category
+                              </Button>
+                            </div>
+                          </div>
                         )}
-                      </Field>
+                      >
+                        {categories.map((category) => (
+                          <Option key={category.id} value={category.name}>
+                            {category.name}
+                          </Option>
+                        ))}
+                      </Select>
                       <ErrorMessage
-                        name="category"
+                        name="project_category"
                         component="div"
                         className="error-message text-red-500 my-1"
                       />
                     </div>
                   </Col>
-                  <Col span={12}>
+                  <Col span={12} className="mt-2">
+                    <div className="form-item">
+                      <label className="font-semibold">Currency</label>
+                      <div className="flex gap-2">
+                        <Field name="currency">
+                          {({ field, form }) => (
+                            <Select
+                              {...field}
+                              className="w-full"
+                              placeholder="Select Currency"
+                              loading={!Array.isArray(currencies)}
+                              onChange={(value) => {
+                                const selectedCurrency = Array.isArray(currencies) && currencies.find(
+                                  (c) => c.id === value
+                                );
+                                form.setFieldValue(
+                                  "currency",
+                                  selectedCurrency?.currencyCode || ""
+                                );
+                              }}
+                              value={values.currency}
+                            >
+                              {Array.isArray(currencies) && currencies.length > 0 ? (
+                                currencies.map((currency) => (
+                                  <Option key={currency.id} value={currency.id}>
+                                    {currency.currencyCode}
+                                  </Option>
+                                ))
+                              ) : (
+                                <Option disabled>No currencies available</Option>
+                              )}
+                            </Select>
+                          )}
+                        </Field>
+                      </div>
+                      <ErrorMessage
+                        name="currency"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+                  {/* <Col span={12}>
                     <div className="form-item">
                       <label className="font-semibold">Reference</label>
                       <Field
@@ -263,18 +405,18 @@ const EditRevenue = ({ idd, onClose }) => {
                         className="error-message text-red-500 my-1"
                       />
                     </div>
-                  </Col>
+                  </Col> */}
                   <Col span={12} className="mt-2">
                     <div className="form-item">
                       <label className="font-semibold">Payment Receipt</label>
                       <Field
-                        name="paymentreceipt"
+                        name="paymentReceipt"
                         type="file"
                         as={Input}
                         placeholder="Enter payment receipt"
                       />
                       <ErrorMessage
-                        name="paymentreceipt"
+                        name="paymentReceipt"
                         component="div"
                         className="error-message text-red-500 my-1"
                       />
@@ -291,7 +433,7 @@ const EditRevenue = ({ idd, onClose }) => {
                     Cancel
                   </Button>
                   <Button type="primary" htmlType="submit">
-                    Create
+                    Update
                   </Button>
                 </div>
               </Form>
@@ -299,6 +441,21 @@ const EditRevenue = ({ idd, onClose }) => {
           </Formik>
         </div>
       </div>
+       {/* Add Category Modal */}
+       <Modal
+        title="Add New Category"
+        open={isCategoryModalVisible}
+        onCancel={() => setIsCategoryModalVisible(false)}
+        onOk={() => handleAddNewCategory("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
+        okText="Add Category"
+      >
+        <Input
+          placeholder="Enter new category name"
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value)}
+        />
+      </Modal>
+
     </div>
   );
 };

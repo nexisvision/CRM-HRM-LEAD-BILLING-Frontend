@@ -25,6 +25,8 @@ const AddAppraisal = ({ onClose }) => {
       (state.employee?.employee?.data || []).filter((employee) => employee.employeeId)
     );
 
+  const { data: employee } = useSelector((state) => state.employee.employee);
+
 
   useEffect(() => {
     dispatch(getBranch());
@@ -104,12 +106,25 @@ const AddAppraisal = ({ onClose }) => {
               label="Employee"
               rules={[{ required: true, message: 'Please select a employee' }]}
             >
-              <Select placeholder="Select Employee">
-                {employeeData.map((emp) => (
-                  <Option key={emp.id} value={emp.id}>
-                    {emp.username}
-                  </Option>
-                ))}
+              <Select
+                className="w-full"
+                placeholder="Select Employee"
+                onChange={(value) => {
+                  const selectedEmployee =
+                    Array.isArray(employee) &&
+                    employee.find((e) => e.id === value);
+                  form.setFieldValue(
+                    "employee",
+                    selectedEmployee?.username || ""
+                  );
+                }}
+              >
+                {Array.isArray(employee) &&
+                  employee.map((emp) => (
+                    <Option key={emp.id} value={emp.id}>
+                      {emp.username}
+                    </Option>
+                  ))}
               </Select>
             </Form.Item>
           </Col>

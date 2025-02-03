@@ -299,7 +299,11 @@ export const BillingList = () => {
     {
       title: "billDate",
       dataIndex: "billDate",
-      render: (_, record) => <span>{record.billDate}</span>,
+      render: (_, record) => (
+        <span>
+          {record.billDate ? dayjs(record.billDate).format('DD-MM-YYYY') : ''}
+        </span>
+      ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "billDate"),
     },
 

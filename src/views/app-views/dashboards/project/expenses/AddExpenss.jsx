@@ -19,7 +19,9 @@ import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Addexp, Getexp } from "./Expencereducer/ExpenseSlice";
+import { empdata } from "../../../hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+
 const { Option } = Select;
 
 const AddExpenses = ({ onClose }) => {
@@ -30,15 +32,22 @@ const AddExpenses = ({ onClose }) => {
     const dispatch = useDispatch();
     const { currencies } = useSelector((state) => state.currencies);
 
-    
-        const allproject = useSelector((state) => state.Project);
-        const fndrewduxxdaa = allproject.Project.data
-        const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
-        
+    const { data: employee } = useSelector((state) => state.employee.employee);
+
+
+    const allproject = useSelector((state) => state.Project);
+    const fndrewduxxdaa = allproject.Project.data
+    const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
+
 
     useEffect(() => {
         dispatch(getcurren());
     }, [dispatch]);
+
+    useEffect(() => {
+        dispatch(empdata());
+    }, [dispatch]);
+
     const [showReceiptUpload, setShowReceiptUpload] = useState(false);
     // const [uploadModalVisible, setUploadModalVisible] = useState(false);
     const initialValues = {
@@ -181,7 +190,7 @@ const AddExpenses = ({ onClose }) => {
                                     />
                                 </div>
                             </Col>
-                            <Col span={8} className="mt-2">
+                            {/* <Col span={8} className="mt-2">
                                 <div className="form-item">
                                     <label className="font-semibold">Employee</label>
                                     <Field name="employee">
@@ -202,6 +211,43 @@ const AddExpenses = ({ onClose }) => {
                                     </Field>
                                     <ErrorMessage
                                         name="Employee"
+                                        component="div"
+                                        className="error-message text-red-500 my-1"
+                                    />
+                                </div>
+                            </Col> */}
+                            <Col span={8} className="mt-2">
+                                <div className="form-item">
+                                    <label className="font-semibold mb-2">Employee</label>
+                                    <div className="flex gap-2">
+                                        <Field name="employee">
+                                            {({ field, form }) => (
+                                                <Select
+                                                    {...field}
+                                                    className="w-full mt-2"
+                                                    placeholder="Select Employee"
+                                                    onChange={(value) => {
+                                                        const selectedEmployee =
+                                                            Array.isArray(employee) &&
+                                                            employee.find((e) => e.id === value);
+                                                        form.setFieldValue(
+                                                            "employee",
+                                                            selectedEmployee?.username || ""
+                                                        );
+                                                    }}
+                                                >
+                                                    {Array.isArray(employee) &&
+                                                        employee.map((emp) => (
+                                                            <Option key={emp.id} value={emp.id}>
+                                                                {emp.username}
+                                                            </Option>
+                                                        ))}
+                                                </Select>
+                                            )}
+                                        </Field>
+                                    </div>
+                                    <ErrorMessage
+                                        name="employee"
                                         component="div"
                                         className="error-message text-red-500 my-1"
                                     />
