@@ -64,6 +64,7 @@ const ContractList = () => {
   // Open Add Job Modal
 
   const tabledata = useSelector((state) => state.Contract);
+  
 
   const openAddContractModal = () => {
     setIsAddContractModalVisible(true);
@@ -356,26 +357,22 @@ const ContractList = () => {
     {
       title: "Start Date",
       dataIndex: "startDate",
-      // render: (_, record) => (
-      //     <div className="d-flex">
-      //         <AvatarStatus size={30} src={record.image} name={record.name}/>
-      //     </div>
-      // ),
-      sorter: {
-        compare: (a, b) => a.startDate.length - b.startDate.length,
-      },
+      render: (_, record) => (
+        <span>
+          {record.startDate ? dayjs(record.startDate).format('DD-MM-YYYY') : ''}
+        </span>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "startDate"),
     },
     {
       title: "End Date",
       dataIndex: "endDate",
-      // render: (_, record) => (
-      //     <div className="d-flex">
-      //         <AvatarStatus size={30} src={record.image} name={record.name}/>
-      //     </div>
-      // ),
-      sorter: {
-        compare: (a, b) => a.endDate.length - b.endDate.length,
-      },
+      render: (_, record) => (
+        <span>
+          {record.endDate ? dayjs(record.endDate).format('DD-MM-YYYY') : ''}
+        </span>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "endDate"),
     },
     {
       title: "Action",

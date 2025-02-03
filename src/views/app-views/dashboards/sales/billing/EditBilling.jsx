@@ -206,7 +206,7 @@ const EditBilling = ({ idd, onClose }) => {
           return {
             vendor: values.vendor,
             billDate: values.billDate?.format("YYYY-MM-DD"),
-            discription, // Pass the structured discription object
+            discription:values.description, // Pass the structured discription object
             status: values.status,
             discount: Number(totalDiscount),
             tax: Number(totalTax),

@@ -29,6 +29,8 @@ const EditExpenses = ({ idd, onClose }) => {
 
   const { data: employee } = useSelector((state) => state.employee.employee);
 
+  const currencies = useSelector((state) => state.currencies.currencies);
+
     useEffect(() => {
         dispatch(getcurren());
     }, [dispatch]);
@@ -94,7 +96,7 @@ const EditExpenses = ({ idd, onClose }) => {
   const onSubmit = async (values, { resetForm }) => {
     const updatedValues = {
       ...values,
-      price: parseFloat(values.price), // Convert price back to number
+      price: parseFloat(values.price),
       purchase_date: values.purchase_date
         ? values.purchase_date.format("YYYY-MM-DD")
         : null,
@@ -103,7 +105,7 @@ const EditExpenses = ({ idd, onClose }) => {
     try {
       await dispatch(EditExp({ id: idd, values: updatedValues })).unwrap();
       message.success("Expenses updated successfully!");
-      dispatch(Getexp(id));
+      dispatch(Getexp(idd));
       onClose();
       resetForm();
     } catch (error) {
@@ -143,39 +145,39 @@ const EditExpenses = ({ idd, onClose }) => {
                 </div>
               </Col>
               <Col span={8}>
-                                <div className="form-item">
-                                    <label className='font-semibold mb-2'>Currency</label>
-                                    <div className="flex gap-2">
-                                        <Field name="currency">
-                                            {({ field, form }) => (
-                                                <Select
-                                                    {...field}
-                                                    className="w-full"
-                                                    placeholder="Select Currency"
-                                                    onChange={(value) => {
-                                                        const selectedCurrency = currencies.find(c => c.id === value);
-                                                        form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
-                                                    }}
-                                                >
-                                                    {currencies?.map((currency) => (
-                                                        <Option
-                                                            key={currency.id}
-                                                            value={currency.id}
-                                                        >
-                                                            {currency.currencyCode}
-                                                        </Option>
-                                                    ))}
-                                                </Select>
-                                            )}
-                                        </Field>
-                                    </div>
-                                    <ErrorMessage
-                                        name="currency"
-                                        component="div"
-                                        className="error-message text-red-500 my-1"
-                                    />
-                                </div>
-                            </Col>
+                <div className="form-item">
+                  <label className='font-semibold mb-2'>Currency</label>
+                  <div className="flex gap-2">
+                    <Field name="currency">
+                      {({ field, form }) => (
+                        <Select
+                          {...field}
+                          className="w-full"
+                          placeholder="Select Currency"
+                          onChange={(value) => {
+                            const selectedCurrency = currencies.find(c => c.id === value);
+                            form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
+                          }}
+                        >
+                          {currencies?.map((currency) => (
+                            <Option
+                              key={currency.id}
+                              value={currency.id}
+                            >
+                              {currency.currencyCode}
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
+                  </div>
+                  <ErrorMessage
+                    name="currency"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
               <Col span={8}>
                 <div className="form-item">
                   <label className="font-semibold">Price</label>
