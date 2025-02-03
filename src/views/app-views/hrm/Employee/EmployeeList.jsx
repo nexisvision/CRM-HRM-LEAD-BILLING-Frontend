@@ -96,7 +96,7 @@ const EmployeeList = () => {
       const canViewClient = allpermisson?.includes('view');
    
       ///endpermission
-
+   
 
   // Search handler
   const onSearch = (e) => {
@@ -334,7 +334,7 @@ const EmployeeList = () => {
                                                                                                                                                              <PlusOutlined />
                                                                                                                                                              <span>New</span>
                                                                                                                                                            </Button>
-                                                                                                                                              
+                                                                                                                                                
                                                                                                                                                   ) : null}
 
 

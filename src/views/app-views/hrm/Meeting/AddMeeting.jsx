@@ -65,6 +65,8 @@ const AddMeeting = ({ onClose }) => {
     title: "",
     date: null,
     startTime: null,
+    endTime: null,
+    meetingLink:"",
     description: "",
   };
 
@@ -74,7 +76,9 @@ const AddMeeting = ({ onClose }) => {
     title: Yup.string().required("Please enter a meeting title."), // Required field
     date: Yup.date().nullable().required("Event Start Date is required."), // Required field (date)
     startTime: Yup.date().nullable().required("Meeting time is required."), // Required field (time)
+    endTime: Yup.date().nullable().required("Meeting time is required."), // Required field (time)
     description: Yup.string().required("Please enter a description."), // Required field
+    meetingLink: Yup.string().required("Please enter a description."), // Required field
   });
 
   return (
@@ -229,6 +233,26 @@ const AddMeeting = ({ onClose }) => {
                 </div>
               </Col>
 
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Meeting end Time</label>
+                  <TimePicker
+                    className="w-full"
+                    format="HH:mm"
+                    value={values.endTime}
+                    onChange={(endTime) =>
+                      setFieldValue("endTime", endTime)
+                    }
+                    onBlur={() => setFieldTouched("endTime", true)}
+                  />
+                  <ErrorMessage
+                    name="endTime"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
               {/* Meeting Notes Field */}
               <Col span={24} className="mt-2">
                 <div className="form-item">
@@ -248,6 +272,17 @@ const AddMeeting = ({ onClose }) => {
                   </Field>
                   <ErrorMessage
                     name="description"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+              <Col span={24} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">meetingLink Title</label>
+                  <Field name="meetingLink" as={Input} placeholder="Event meetingLink" />
+                  <ErrorMessage
+                    name="meetingLink"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
