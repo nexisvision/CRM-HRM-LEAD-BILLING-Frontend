@@ -21,7 +21,7 @@ const ViewInvoice = ({idd, onClose}) => {
     const dispatch = useDispatch();
     
     const [template, setTemplate] = useState('rendertemplate');
-    const [parsedInvoice, setParsedInvoice] = useState(null);
+    const [parsedInvoice, setParsedInvoice] = useState("");
 
     // const { id } = useParams();
     // const [idd, setIdd] = useState("");
@@ -35,12 +35,14 @@ const ViewInvoice = ({idd, onClose}) => {
     
 
   // Get invoice data
-  const allInvoices = useSelector((state) => state?.salesInvoices?.salesInvoices?.data || []);
+  const allInvoices = useSelector((state) => state?.salesInvoices?.salesInvoices?.data);
   const invoiceData = allInvoices.find(inv => inv.id === idd);
 
   // Get customer data
-  const allCustomers = useSelector((state) => state?.customers?.customers?.data || []);
-  const customerData = allCustomers.find(cust => cust.id === invoiceData?.customer);
+//   const allCustomers = useSelector((state) => state?.customers?.customers?.data);
+//   const customerData = allCustomers.find(customers => customers.id === invoiceData.customer);
+const allCustomers = useSelector((state) => state?.customers?.customers?.data);
+const customerData = allCustomers?.find(customer => customer.related_id === invoiceData.related_id) || {};
 
   console.log(customerData, "customerData");
 
@@ -68,21 +70,42 @@ const ViewInvoice = ({idd, onClose}) => {
     dispatch(Getcus());
   }, []);
 
-  useEffect(() => {
+//   useEffect(() => {
+//     if (invoiceData?.items) {
+//         try {
+//             const items = typeof invoiceData.items === 'string' 
+//                 ? JSON.parse(invoiceData.items) 
+//                 : invoiceData.items;
+//             setParsedInvoice({
+//                 ...invoiceData,
+//                 items: Array.isArray(items) ? items : [items]
+//             });
+//         } catch (error) {
+//             console.error('Error parsing items:', error);
+//         }
+//     }
+// }, [invoiceData]);
+
+useEffect(() => {
     if (invoiceData?.items) {
         try {
             const items = typeof invoiceData.items === 'string' 
                 ? JSON.parse(invoiceData.items) 
                 : invoiceData.items;
+            
+            // Convert object to array
+            const itemsArray = Object.values(items);
+
             setParsedInvoice({
                 ...invoiceData,
-                items: Array.isArray(items) ? items : [items]
+                items: itemsArray
             });
         } catch (error) {
             console.error('Error parsing items:', error);
         }
     }
 }, [invoiceData]);
+
 
     const handlePrint = () => {
         const printContent = document.getElementById('printable-content');
@@ -162,21 +185,50 @@ const ViewInvoice = ({idd, onClose}) => {
         html2pdf().set(opt).from(element).save();
     };
 
-    const calculateSubtotal = (items) => {
-        return items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    };
+    // const calculateSubtotal = (items) => {
+    //     return items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    // };
 
     // Function to calculate VAT (10%)
-    const calculateVAT = (subtotal) => {
-        return (subtotal / 100) * 10;
-    };
+    // const calculateVAT = (subtotal) => {
+    //     return (subtotal / 100) * 10;
+    // };
 
     // Function to calculate Grand Total
-    const calculateFinalTotal = (subtotal, vat) => {
-        return subtotal - vat;
-    };
+    // const calculateFinalTotal = (subtotal, vat) => {
+    //     return subtotal - vat;
+    // };
+
+    // Function to calculate discounted price for an item
+const calculateDiscountedPrice = (price, discount) => {
+    return price - (price * (discount / 100));
+};
+
+// Function to calculate subtotal (after discount)
+const calculateSubtotal = (items) => {
+    return items.reduce((acc, item) => {
+        const discountedPrice = calculateDiscountedPrice(item.price, item.discount || 0);
+        return acc + discountedPrice * item.quantity;
+    }, 0);
+};
+
+// Function to calculate VAT (10%) on subtotal
+const calculateVAT = (subtotal) => {
+    return (subtotal / 100) * 10;
+};
+
+// Function to calculate Final Total (subtotal + VAT)
+const calculateFinalTotal = (subtotal, vat) => {
+    return subtotal + vat;
+};
     // if (!invoiceData) return <div>Loading invoice data...</div>;
     // if (!parsedInvoice) return <div>Processing invoice details...</div>;
+
+    const billingAddress = customerData?.billing_address
+        ? JSON.parse(customerData.billing_address)
+        : {};
+
+    const cleanStreet = billingAddress.street ? billingAddress.street.replace(/<\/?p>/g, '') : '';
 
     const renderModernTemplate = () => {
         // console.log(invoiceDataa, "invoiceDataa");
@@ -210,7 +262,7 @@ const ViewInvoice = ({idd, onClose}) => {
                     <div>
                         <div className='flex'>
                             <span className="mb-1 me-2 font-weight-semibold">Invoice Num:</span>
-                            <p className='text-right'>{invoiceData?.invoiceNumber}</p>
+                            <p className='text-right'>{invoiceData?.salesInvoiceNumber}</p>
                         </div>
                         <div className='flex'>
                             <span className="mb-1 me-2 font-weight-semibold">Issue Date:</span>
@@ -230,7 +282,6 @@ const ViewInvoice = ({idd, onClose}) => {
                         <div className='text-left'>
                         <address>
                             <p>
-
                                 <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
                                         <span>created_by:{loggedInUser?.created_by}</span><br />
                                         <span>Name:{loggedInUser?.username}</span><br />
@@ -240,13 +291,20 @@ const ViewInvoice = ({idd, onClose}) => {
                         </address>
                         </div>
 
-                        {/* Company Details Section */}
+                        {/* Customer Details Section */}
                         <div>
                             <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />
                             <address>
                                 <p>
                                     <span>Name: {customerData.name}</span><br />
                                     <span>customerNumber: {customerData.customerNumber}</span><br />
+                                    <p>
+                                     Address: {cleanStreet}, <br />
+                                        City: {billingAddress.city}, <br />
+                                        State: {billingAddress.state}, <br />
+                                        Zip: {billingAddress.zip}, <br />
+                                        Country: {billingAddress.country}
+                                    </p>
                                     <p>Email: {customerData.email}</p>
                                     <p>Phone: {customerData.contact}</p>
                                 </p>
@@ -407,17 +465,25 @@ const ViewInvoice = ({idd, onClose}) => {
                                         <span>Name:{loggedInUser?.username}</span><br />
                                         <p>Email: {loggedInUser?.email}</p>
                                         <p>Phone: {loggedInUser?.phone}</p>
+                                        <p>GstNum: {loggedInUser?.gstIn}</p>
                             </p>
                         </address>
                     </div>
-                    {/* Client Details Section */}
+                    {/* Customer Details Section */}
                     <div>
-                        <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />
-                        
+                        <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />   
                             <address>
                                 <p>
                                     <span>Name: {customerData.name}</span><br/>
                                     <span>customerNumber: {customerData.customerNumber}</span><br />
+                                    {/* <p>Address: {customerData.billing_address}</p> */}
+                                    <p>
+                                     Address: {cleanStreet}, <br />
+                                        City: {billingAddress.city}, <br />
+                                        State: {billingAddress.state}, <br />
+                                        Zip: {billingAddress.zip}, <br />
+                                        Country: {billingAddress.country}
+                                    </p>
                                     <p>Email: {customerData.email}</p>
                                     <p>Phone: {customerData.contact}</p>
                                 </p>
@@ -428,7 +494,7 @@ const ViewInvoice = ({idd, onClose}) => {
                     <div>
                         <div className='flex'>
                             <span className="mb-1 me-2 font-weight-semibold">Invoice Num:</span>
-                            <p className='text-right'>{invoiceData?.invoiceNumber}</p>
+                            <p className='text-right'>{invoiceData?.salesInvoiceNumber}</p>
                         </div>
                         <div className='flex'>
                             <span className="mb-1 me-2 font-weight-semibold">Issue Date:</span>
@@ -442,7 +508,7 @@ const ViewInvoice = ({idd, onClose}) => {
                 </div>
 
                 <div className="">
-                    <Table
+                    {/* <Table
                         dataSource={parsedInvoice.items}
                         pagination={false}
                         className="mb-2"
@@ -490,7 +556,57 @@ const ViewInvoice = ({idd, onClose}) => {
                             )}
                             key="amount"
                         />
+                    </Table> */}
+
+                    <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
+                        <Table.Column title="No." key="key" render={(text, record, index) => index + 1} />
+
+                        <Table.Column title="Product" dataIndex="description" key="description" />
+
+                        <Table.Column title="Quantity" dataIndex="quantity" key="quantity" />
+
+                        <Table.Column title="Original Price"
+                            render={(record) => (
+                                <NumberFormat
+                                    displayType="text"
+                                    value={Math.round(record.price * 100) / 100}
+                                    prefix="$"
+                                    thousandSeparator={true}
+                                />
+                            )}
+                            key="price"
+                        />
+
+                        <Table.Column title="Discount (%)"
+                            render={(record) => `${record.discount || 0}%`}
+                            key="discount"
+                        />
+
+                        <Table.Column title="Price After Discount"
+                            render={(record) => (
+                                <NumberFormat
+                                    displayType="text"
+                                    value={Math.round(calculateDiscountedPrice(record.price, record.discount || 0) * 100) / 100}
+                                    prefix="$"
+                                    thousandSeparator={true}
+                                />
+                            )}
+                            key="discountedPrice"
+                        />
+
+                        <Table.Column title="Amount (After Discount)"
+                            render={(record) => (
+                                <NumberFormat
+                                    displayType="text"
+                                    value={Math.round(calculateDiscountedPrice(record.price, record.discount || 0) * record.quantity * 100) / 100}
+                                    prefix="$"
+                                    thousandSeparator={true}
+                                />
+                            )}
+                            key="amount"
+                        />
                     </Table>
+
 
                     {/* Invoice Summary */}
                     <div className="d-flex justify-content-end mb-3">
@@ -586,7 +702,7 @@ const ViewInvoice = ({idd, onClose}) => {
                     <div className="text-gray-600 mt-2">
                         <div className='flex'>
                             <span className="mb-1 me-2 font-weight-semibold">Invoice Number :</span>
-                            <p>{invoiceData?.invoiceNumber}</p>
+                            <p>{invoiceData?.salesInvoiceNumber}</p>
                         </div>
                         <div className='flex'>
                             <span className="mb-1 me-2 font-weight-semibold">Issue Date:</span>
@@ -626,6 +742,13 @@ const ViewInvoice = ({idd, onClose}) => {
                                 <p>
                                     <span>Name: {customerData.name}</span><br />
                                     <span>customerNumber: {customerData.customerNumber}</span><br />
+                                    <p>
+                                     Address: {cleanStreet}, <br />
+                                        City: {billingAddress.city}, <br />
+                                        State: {billingAddress.state}, <br />
+                                        Zip: {billingAddress.zip}, <br />
+                                        Country: {billingAddress.country}
+                                    </p>
                                     <p>Email: {customerData.email}</p>
                                     <p>Phone: {customerData.contact}</p>
                                 </p>
@@ -735,7 +858,7 @@ const ViewInvoice = ({idd, onClose}) => {
                         <div className="text-gray-600 mt-2">
                             <div className='flex'>
                                 <span className="mb-1 me-2 font-weight-semibold">Invoice Number:</span>
-                                <p>{invoiceData?.invoiceNumber}</p>
+                                <p>{invoiceData?.salesInvoiceNumber}</p>
                             </div>
                             <div className='flex'>
                                 <span className="mb-1 me-2 font-weight-semibold">Issue Date:</span>
@@ -774,6 +897,13 @@ const ViewInvoice = ({idd, onClose}) => {
                                 <p>
                                     <span>Name: {customerData.name}</span><br />
                                     <span>customerNumber: {customerData.customerNumber}</span><br />
+                                    <p>
+                                     Address: {cleanStreet}, <br />
+                                        City: {billingAddress.city}, <br />
+                                        State: {billingAddress.state}, <br />
+                                        Zip: {billingAddress.zip}, <br />
+                                        Country: {billingAddress.country}
+                                    </p>
                                     <p>Email: {customerData.email}</p>
                                     <p>Phone: {customerData.contact}</p>
                                 </p>

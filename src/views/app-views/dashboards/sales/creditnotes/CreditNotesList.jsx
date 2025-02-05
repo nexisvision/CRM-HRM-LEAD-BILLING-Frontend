@@ -49,6 +49,7 @@ import {
   getcreditnote,
 } from "./CustomerReducer/CreditnoteSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { getInvoice } from "../invoice/InvoiceReducer/InvoiceSlice";
 import useSelection from "antd/es/table/hooks/useSelection";
 // import  from './AddEstimates';
 // import EditEstimates from './EditEstimates';
@@ -60,11 +61,13 @@ const CreditNotesList = () => {
   const dispatch = useDispatch();
   // const [annualStatisticData] = useState(AnnualStatisticData);
 
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const alldata = useSelector((state) => state.creditnotes);
   const fnddata = alldata.creditnotes.data;
+
+  console.log('fnddata', fnddata);
 
   const [isAddCreditNotesModalVisible, setIsAddCreditNotesModalVisible] =
     useState(false);
@@ -74,6 +77,29 @@ const CreditNotesList = () => {
     useState(false);
 
   const [idd, setIdd] = useState("");
+
+  // Get both credit notes and invoices data
+  const creditNotesData = useSelector((state) => state.creditnotes.creditnotes.data);
+  const invoicesData = useSelector((state) => state.salesInvoices.salesInvoices.data);
+
+  useEffect(() => {
+    dispatch(getcreditnote());
+    dispatch(getInvoice());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (creditNotesData && invoicesData) {
+      // Combine credit notes with their corresponding invoice numbers
+      const combinedData = creditNotesData.map(creditNote => {
+        const matchingInvoice = invoicesData.find(invoice => invoice.id === creditNote.invoice);
+        return {
+          ...creditNote,
+          salesInvoiceNumber: matchingInvoice ? matchingInvoice.salesInvoiceNumber : 'N/A'
+        };
+      });
+      setList(combinedData);
+    }
+  }, [creditNotesData, invoicesData]);
 
   // Open Add Job Modal
   const openAddCreditNotesModal = () => {
@@ -104,22 +130,24 @@ const CreditNotesList = () => {
     setIsViewCreditNotesModalVisible(false);
   };
 
-  useEffect(() => {
-    dispatch(getcreditnote());
-  }, []);
-
-  useEffect(() => {
-    if (fnddata) {
-      setList(fnddata);
-    }
-  }, [fnddata]);
-
   const deletefun = (userId) => {
     dispatch(deletecreditnote(userId)).then(() => {
       dispatch(getcreditnote());
       setList(list.filter((item) => item.id !== userId));
       message.success("Credit Note deleted successfully.");
     });
+  };
+
+  const stripHtmlTags = (html) => {
+    if (!html) return '';
+    // First, decode any HTML entities
+    const decoded = html.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+    // Create a temporary element
+    const temp = document.createElement('div');
+    // Set the HTML content
+    temp.innerHTML = decoded;
+    // Get the text content
+    return temp.textContent || temp.innerText || '';
   };
 
   const edtfun = (idd) => {
@@ -202,25 +230,27 @@ const CreditNotesList = () => {
   );
 
   const tableColumns = [
-    // {
-    //   title: "Invoice",
-    //   dataIndex: "invoice",
-    // },
-
     {
-      title: "invoice",
-      dataIndex: "invoice",
+      title: "Invoice Number",
+      dataIndex: "salesInvoiceNumber",
       sorter: {
-        compare: (a, b) => a.customer.length - b.customer.length,
+        compare: (a, b) => {
+          const numA = a.salesInvoiceNumber || '';
+          const numB = b.salesInvoiceNumber || '';
+          return numA.localeCompare(numB);
+        },
       },
     },
     {
       title: "Date",
       dataIndex: "date",
       render: (_, record) => (
-        <span>{dayjs.unix(record.date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
+        <span>
+          {record.date ? dayjs(record.date).format('DD-MM-YYYY') : ''}
+        </span>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "date"),
+
     },
     {
       title: "Amount",
@@ -237,12 +267,19 @@ const CreditNotesList = () => {
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "amount"),
     },
-
     {
       title: "Description",
       dataIndex: "description",
+      render: (text) => {
+        const cleanText = stripHtmlTags(text);
+        return <span>{cleanText}</span>;
+      },
       sorter: {
-        compare: (a, b) => a.description.length - b.description.length,
+        compare: (a, b) => {
+          const textA = stripHtmlTags(a.description || '');
+          const textB = stripHtmlTags(b.description || '');
+          return textA.length - textB.length;
+        },
       },
     },
     {

@@ -39,6 +39,18 @@ const EditInvoice = ({ idd, onClose }) => {
   const fnddatas = customerdata.customers.data;
   const AllLoggeddtaa = useSelector((state) => state.user);
 
+   const [tableData, setTableData] = useState([
+    {
+      id: Date.now(),
+      item: "",
+      quantity: 1,
+      price: 0,
+      tax: 0,
+      amount: 0,
+      description: "",
+    },
+  ]);
+
   const [initialValues, setInitialValues] = useState({
     customer: "",
     issueDate: null,
@@ -106,6 +118,13 @@ const EditInvoice = ({ idd, onClose }) => {
   }, [fnd]);
 
   const [rows, setRows] = useState(initialValues.items);
+  const [discountRate, setDiscountRate] = useState(0);
+  const [totals, setTotals] = useState({
+    subtotal: "0.00",
+    discount: "0.00",
+    totalTax: "0.00",
+    finalTotal: "0.00",
+  });
 
   const handleAddRow = () => {
     setRows([
@@ -130,13 +149,58 @@ const EditInvoice = ({ idd, onClose }) => {
     alert("Are you sure you want to delete this element?");
   };
 
-  const handleFieldChange = (id, field, value) => {
-    const updatedRows = rows.map((row) =>
-      row.id === id
-        ? { ...row, [field]: value, amount: calculateAmount(row) }
-        : row
-    );
-    setRows(updatedRows);
+   const calculateTotal = (data, discountRate) => {
+    let subtotal = 0;
+    let totalTax = 0;
+
+    data.forEach((row) => {
+      const quantity = parseFloat(row.quantity) || 0;
+      const price = parseFloat(row.price) || 0;
+      const tax = parseFloat(row.tax) || 0;
+      
+      const baseAmount = quantity * price;
+      const taxAmount = (baseAmount * tax) / 100;
+      
+      subtotal += baseAmount;
+      totalTax += taxAmount;
+    });
+
+    const discount = (subtotal * discountRate) / 100;
+    const finalTotal = subtotal - discount + totalTax;
+
+    setTotals({
+      subtotal: subtotal.toFixed(2),
+      discount: discount.toFixed(2),
+      totalTax: totalTax.toFixed(2),
+      finalTotal: finalTotal.toFixed(2),
+    });
+  };
+
+  const handleTableDataChange = (id, field, value) => {
+    const updatedData = tableData.map((row) => {
+      if (row.id === id) {
+        const updatedRow = { ...row, [field]: value };
+        
+        // Recalculate amount when quantity, price, or tax changes
+        if (field === 'quantity' || field === 'price' || field === 'tax') {
+          const quantity = field === 'quantity' ? parseFloat(value) || 0 : parseFloat(row.quantity) || 0;
+          const price = field === 'price' ? parseFloat(value) || 0 : parseFloat(row.price) || 0;
+          const tax = field === 'tax' ? parseFloat(value) || 0 : parseFloat(row.tax) || 0;
+          
+          const baseAmount = quantity * price;
+          const taxAmount = (baseAmount * tax) / 100;
+          const totalAmount = baseAmount + taxAmount;
+          
+          updatedRow.amount = totalAmount.toFixed(2);
+        }
+        
+        return updatedRow;
+      }
+      return row;
+    });
+
+    setTableData(updatedData);
+    calculateTotal(updatedData, discountRate);
   };
 
   const calculateAmount = (row) => {
@@ -228,7 +292,7 @@ const EditInvoice = ({ idd, onClose }) => {
             .then(() => {
               dispatch(getInvoice());
               onClose();
-              message.success("Invoice updated successfully!");
+              // message.success("Invoice updated successfully!");
             })
             .catch((error) => {
               console.error("Failed to edit invoice:", error);
@@ -403,160 +467,146 @@ const EditInvoice = ({ idd, onClose }) => {
                 <PlusOutlined /> Add Items
               </Button>
             </div>
-            <table className="w-full border border-gray-200 bg-white">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                    ITEMS
-                  </th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                    QUANTITY
-                  </th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                    PRICE
-                  </th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                    DISCOUNT
-                  </th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                    TAX (%)
-                  </th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 border-b">
-                    AMOUNT
-                  </th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 border-b">
-                    ACTIONS
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row) => (
-                  <tr key={row.id}>
-                    <td className="px-4 py-2 border-b">
-                      <select
-                        className="w-full p-2 border rounded"
-                        value={row.item}
-                        onChange={(e) =>
-                          handleFieldChange(row.id, "item", e.target.value)
-                        }
-                      >
-                        <option value="">--</option>
-                        <option value="item1">Item 1</option>
-                        <option value="item2">Item 2</option>
-                      </select>
-                    </td>
-                    <td className="px-4 py-2 border-b">
-                      <input
-                        type="number"
-                        value={row.quantity}
-                        onChange={(e) =>
-                          handleFieldChange(
-                            row.id,
-                            "quantity",
-                            Number(e.target.value)
-                          )
-                        }
-                        className="w-full p-2 border rounded"
-                      />
-                    </td>
-                    <td className="px-4 py-2 border-b">
-                      <input
-                        type="number"
-                        value={row.price}
-                        onChange={(e) =>
-                          handleFieldChange(
-                            row.id,
-                            "price",
-                            e.target.value
-                          )
-                        }
-                        placeholder="Price"
-                        className="w-full p-2 border rounded-s"
-                      />
-                    </td>
-                    <td className="px-4 py-2 border-b">
-                      <input
-                        type="number"
-                        value={row.discount}
-                        onChange={(e) =>
-                          handleFieldChange(
-                            row.id,
-                            "discount",
-                            Number(e.target.value)
-                          )
-                        }
-                        className="w-full p-2 border rounded"
-                      />
-                    </td>
-                    {/* <td className="px-4 py-2 border-b">
-                      <input
-                        type="number"
-                        value={row.tax}
-                        onChange={(e) =>
-                          handleFieldChange(
-                            row.id,
-                            "tax",
-                            Number(e.target.value)
-                          )
-                        }
-                        className="w-full p-2 border rounded"
-                      />
-                    </td> */}
-                    <td className="px-4 py-2 border-b">
-                      <select
-                        value={row.tax}
-                        onChange={(e) => handleFieldChange(row.id, 'tax', e.target.value)}
-                        className="w-full p-2 border"
-                      >
-                        <option value="0">Nothing Selected</option>
-                        <option value="10">GST:10%</option>
-                        <option value="18">CGST:18%</option>
-                        <option value="10">VAT:10%</option>
-                        <option value="10">IGST:10%</option>
-                        <option value="10">UTGST:10%</option>
-                      </select>
-                    </td>
-                    <td className="px-4 py-2 border-b text-center">
-                      {row.amount}
-                    </td>
-                    <td className="px-2 py-1 border-b text-center">
-                      <Button danger onClick={() => handleDeleteRow(row.id)}>
-                        <DeleteOutlined />
-                      </Button>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full border border-gray-200 bg-white">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Description<span className="text-red-500">*</span>
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Quantity<span className="text-red-500">*</span>
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Unit Price<span className="text-red-500">*</span>
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      TAX (%)
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Amount
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {tableData.map((row) => (
+                    <React.Fragment key={row.id}>
+                      <tr>
+                        <td className="px-4 py-2 border-b">
+                          <input
+                            type="text"
+                            value={row.item}
+                            onChange={(e) => handleTableDataChange(row.id, "item", e.target.value)}
+                            placeholder="Item Name"
+                            className="w-full p-2 border rounded-s"
+                          />
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                          <input
+                            type="number"
+                            min="1"
+                            value={row.quantity}
+                            onChange={(e) => handleTableDataChange(row.id, "quantity", e.target.value)}
+                            placeholder="Qty"
+                            className="w-full p-2 border rounded"
+                          />
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                          <input
+                            type="number"
+                            min="0"
+                            value={row.price}
+                            onChange={(e) => handleTableDataChange(row.id, "price", e.target.value)}
+                            placeholder="Price"
+                            className="w-full p-2 border rounded-s"
+                          />
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                          <select
+                            value={row.tax}
+                            onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
+                            className="w-full p-2 border"
+                          >
+                            <option value="0">Nothing Selected</option>
+                            <option value="10">GST:10%</option>
+                            <option value="18">CGST:18%</option>
+                            <option value="10">VAT:10%</option>
+                            <option value="10">IGST:10%</option>
+                            <option value="10">UTGST:10%</option>
+                          </select>
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                          ₹{row.amount}
+                        </td>
+                        <td className="px-2 py-1 border-b text-center">
+                          <Button danger onClick={() => handleDeleteRow(row.id)}>
+                            <DeleteOutlined />
+                          </Button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan={6} className="px-4 py-2 border-b">
+                          <textarea
+                            rows={2}
+                            value={row.description}
+                            onChange={(e) => handleTableDataChange(row.id, "description", e.target.value)}
+                            placeholder="Description"
+                            className="w-[70%] p-2 border"
+                          />
+                        </td>
+                      </tr>
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
 
-          <div className="mt-3 flex flex-col items-end space-y-2">
-            <div className="flex justify-between w-full sm:w-1/2 border-b pb-2">
-              <span className="text-gray-700">Sub Total ($):</span>
-              <span className="text-gray-700">
-                {calculateTotals().subtotal}
-              </span>
-            </div>
-            <div className="flex justify-between w-full sm:w-1/2 border-b pb-2">
-              <span className="text-gray-700">Discount ($):</span>
-              <span className="text-gray-700">
-                {calculateTotals().totalDiscount}
-              </span>
-            </div>
-            <div className="flex justify-between w-full sm:w-1/2 border-b pb-2">
-              <span className="text-gray-700">Tax ($):</span>
-              <span className="text-gray-700">
-                {calculateTotals().totalTax}
-              </span>
-            </div>
-            <div className="flex justify-between w-full sm:w-1/2">
-              <span className="font-semibold text-gray-700">
-                Total Amount ($):
-              </span>
-              <span className="font-semibold text-gray-700">
-                {calculateTotals().totalAmount}
-              </span>
-            </div>
+          <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
+            <table className="w-full lg:w-[50%] p-2">
+              <tbody>
+                <tr className="flex justify-between px-2 py-2 border-x-2">
+                  <td className="font-medium">Sub Total</td>
+                  <td className="font-medium px-4 py-2">₹{totals.subtotal}</td>
+                </tr>
+
+                <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
+                  <td className="font-medium">Discount</td>
+                  <td className="flex items-center space-x-2">
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Discount Rate (%)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={discountRate}
+                        onChange={(e) => {
+                          const newRate = parseFloat(e.target.value) || 0;
+                          setDiscountRate(newRate);
+                          calculateTotal(tableData, newRate);
+                        }}
+                        className="mt-1 block w-full p-2 border rounded"
+                      />
+                    </div>
+                  </td>
+                </tr>
+
+                <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
+                  <td className="font-medium">Total Tax</td>
+                  <td className="font-medium px-4 py-2">₹{totals.totalTax}</td>
+                </tr>
+
+                <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
+                  <td className="font-bold text-lg">Total Amount</td>
+                  <td className="font-bold text-lg px-4">₹{totals.finalTotal}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
        
 

@@ -212,6 +212,10 @@ export const InvoiceList = () => {
   );
   const tableColumns = [
     {
+      title: "Invoice Number",
+      dataIndex: "salesInvoiceNumber",
+    },
+    {
       title: "Customer",
       dataIndex: "customer",
       render: (_, record) => {

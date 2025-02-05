@@ -18,17 +18,12 @@ const { Option } = Select;
 const AddCrediteNotes = ({ onClose }) => {
   const dispatch = useDispatch();
   
+  // Get invoices data
+  const invoicesData = useSelector((state) => state.salesInvoices.salesInvoices.data);
 
-  useEffect(()=>{
-    dispatch(getInvoice())
-  },[])
-
-  const allinvcoicedata = useSelector((state)=>state.salesInvoices);
-  const fnddata = allinvcoicedata.salesInvoices.data;
-
-
-
-
+  useEffect(() => {
+    dispatch(getInvoice());
+  }, [dispatch]);
 
   const [rows, setRows] = useState([
     {
@@ -73,12 +68,21 @@ const AddCrediteNotes = ({ onClose }) => {
   const navigate = useNavigate();
 
   const onSubmit = (values, { resetForm }) => {
-    dispatch(Addcreditnote(values))
+    // Find the matching invoice
+    const selectedInvoice = invoicesData.find(invoice => invoice.id === values.invoice);
+    
+    const submitData = {
+      ...values,
+      salesInvoiceNumber: selectedInvoice ? selectedInvoice.salesInvoiceNumber : null,
+      invoice: values.invoice // This is the invoice ID
+    };
+
+    dispatch(Addcreditnote(submitData))
       .then(() => {
         dispatch(getcreditnote());
         onClose();
         resetForm();
-        message.success("credit note added successfully!");
+        message.success("Credit note added successfully!");
       })
       .catch(() => {
         message.error("Failed to add credit note.");
@@ -133,15 +137,15 @@ const AddCrediteNotes = ({ onClose }) => {
                                 value={values.invoice}
                                 onBlur={() => setFieldTouched("invoice", true)}
                               >
-                                {fnddata && fnddata.length > 0 ? (
-                                  fnddata.map((client) => (
-                                    <Option key={client.id} value={client.id}>
-                                      {client.salesInvoiceNumber || "Unnamed Client"}
+                                {invoicesData && invoicesData.length > 0 ? (
+                                  invoicesData.map((invoice) => (
+                                    <Option key={invoice.id} value={invoice.id}>
+                                      {invoice.salesInvoiceNumber || "Unnamed Invoice"}
                                     </Option>
                                   ))
                                 ) : (
                                   <Option value="" disabled>
-                                    No invoice Available
+                                    No Invoices Available
                                   </Option>
                                 )}
                               </Select>

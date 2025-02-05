@@ -47,10 +47,36 @@ const ContractList = () => {
   const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
-
   const [idd, setIdd] = useState("");
-
   const dispatch = useDispatch();
+
+  // Move these selectors to the top of the component
+  const tabledata = useSelector((state) => state.Contract);
+  const clientData = useSelector((state) => state.SubClient?.SubClient?.data);
+  const projectData = useSelector((state) => state.Project?.Project?.data);
+
+  // First useEffect to fetch initial data
+  useEffect(() => {
+    dispatch(GetProject());
+    dispatch(ClientData());
+  }, [dispatch]);
+
+  // Second useEffect to fetch contract data
+  useEffect(() => {
+    dispatch(ContaractData());
+  }, [dispatch]);
+
+  // Third useEffect to process the data once we have everything
+  useEffect(() => {
+    if (tabledata?.Contract?.data) {
+      const contractsWithNames = tabledata.Contract.data.map(contract => ({
+        ...contract,
+        client: clientData?.find(client => client.id === contract.client)?.username || contract.client,
+        project: projectData?.find(project => project.id === contract.project)?.project_name || contract.project
+      }));
+      setUsers(contractsWithNames);
+    }
+  }, [tabledata, clientData, projectData]);
 
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddContractModalVisible, setIsAddContractModalVisible] =
@@ -62,9 +88,6 @@ const ContractList = () => {
     const navigate = useNavigate();
   //   const [dealStatisticData] = useState(DealStatisticData);
   // Open Add Job Modal
-
-  const tabledata = useSelector((state) => state.Contract);
-  
 
   const openAddContractModal = () => {
     setIsAddContractModalVisible(true);
@@ -171,23 +194,8 @@ const ContractList = () => {
     setUserProfileVisible(false);
   };
 
-  useEffect(() => {
-    dispatch(GetProject());
-    dispatch(ClientData());
-  }, []);
-
-  useEffect(() => {
-    dispatch(ContaractData());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (tabledata && tabledata.Contract && tabledata.Contract.data) {
-      setUsers(tabledata.Contract.data);
-    }
-  }, [tabledata]);
-
-
   //// permission
+
 
 
 
@@ -330,12 +338,34 @@ const ContractList = () => {
     {
       title: "Client",
       dataIndex: "client",
-      compare: (a, b) => a.client.length - b.client.length,
+      render: (_, record) => (
+        <span>
+          {clientData?.find(client => client.id === record.client)?.username || record.client}
+        </span>
+      ),
+      sorter: {
+        compare: (a, b) => {
+          const clientA = clientData?.find(client => client.id === a.client)?.username || a.client;
+          const clientB = clientData?.find(client => client.id === b.client)?.username || b.client;
+          return String(clientA).localeCompare(String(clientB));
+        }
+      }
     },
     {
       title: "Project",
       dataIndex: "project",
-      compare: (a, b) => a.project.length - b.project.length,
+      render: (_, record) => (
+        <span>
+          {projectData?.find(project => project.id === record.project)?.project_name || record.project}
+        </span>
+      ),
+      sorter: {
+        compare: (a, b) => {
+          const projectA = projectData?.find(project => project.id === a.project)?.project_name || a.project;
+          const projectB = projectData?.find(project => project.id === b.project)?.project_name || b.project;
+          return String(projectA).localeCompare(String(projectB));
+        }
+      }
     },
     {
       title: "Contract Type",

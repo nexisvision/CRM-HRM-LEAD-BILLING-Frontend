@@ -125,7 +125,6 @@ const EditRevenue = ({ idd, onClose }) => {
     currency: "",
     description: "",
     category: "",
-    reference: "",
     paymentReceipt: "",
   });
 
@@ -143,38 +142,43 @@ const EditRevenue = ({ idd, onClose }) => {
 
   useEffect(() => {
     if (fnd) {
-      console.log("popopop", fnd);
       setInitialValues({
         date: fnd.date ? moment(fnd.date, "YYYY-MM-DD") : null,
-        amount: fnd.amount || "",
+        amount: parseFloat(fnd.amount) || "",
         account: fnd.account || "",
         customer: fnd.customer || "",
         description: fnd.description || "",
         category: fnd.category || "",
         currency: fnd.currency || "",
-        // reference: fnd.reference || "",
         paymentReceipt: fnd.paymentReceipt || "",
       });
     }
   }, [fnd]);
 
   const onSubmit = (values) => {
-    dispatch(editRevenue({ idd, values })).then(() => {
+    const formattedValues = {
+      ...values,
+      amount: parseFloat(values.amount) || 0,
+    };
+
+    dispatch(editRevenue({ idd, values: formattedValues })).then(() => {
       dispatch(getRevenue());
       onClose();
-      message.success("Job added successfully!");
+      message.success("Revenue updated successfully!");
     });
   };
 
   const validationSchema = Yup.object({
     date: Yup.date().nullable().required("Date is required."),
-    amount: Yup.string().required("Please enter an amount."),
+    amount: Yup.number()
+      .typeError("Amount must be a number")
+      .positive("Amount must be positive")
+      .required("Please enter an amount."),
     account: Yup.string().required("Please select an account."),
     customer: Yup.string().required("Please select a customer."),
     description: Yup.string().required("Please enter a description."),
     category: Yup.string().required("Please select a category."),
     currency: Yup.string().required("Please select a currency."),
-    // reference: Yup.string().required("Please enter a reference."),
     paymentReceipt: Yup.string().optional("Please enter a payment receipt."),
   });
 
@@ -214,8 +218,17 @@ const EditRevenue = ({ idd, onClose }) => {
                       <label className="font-semibold">Amount</label>
                       <Field
                         name="amount"
+                        type="number"
+                        step="0.01"
+                        min="0"
                         as={Input}
                         placeholder="Enter Amount"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const numericValue = value.replace(/[^\d.]/g, '');
+                          const formattedValue = numericValue.replace(/(\..*)\./g, '$1');
+                          setFieldValue("amount", formattedValue);
+                        }}
                         onBlur={() => setFieldTouched("amount", true)}
                       />
                       <ErrorMessage
@@ -230,25 +243,25 @@ const EditRevenue = ({ idd, onClose }) => {
                       <label className="font-semibold">Account</label>
                       <Field name="account">
                         {({ field }) => (
-                          <Select
+                          <Input
                             {...field}
-                            className="w-full"
                             placeholder="Select Account"
-                            onChange={(value) =>
-                              setFieldValue("account", value)
-                            }
-                            value={values.account}
+                            maxLength={18}
+                            // onChange={(e) => {
+                            //   const value = e.target.value.replace(/\D/g, '');
+                            //   setFieldValue("accountNumber", value);
+                            // }}
                             onBlur={() => setFieldTouched("account", true)}
-                          >
-                            <Option value="xyz">XYZ</Option>
-                            <Option value="abc">ABC</Option>
-                          </Select>
+
+
+                          />
                         )}
                       </Field>
                       <ErrorMessage
                         name="account"
                         component="div"
                         className="error-message text-red-500 my-1"
+
                       />
                     </div>
                   </Col>
@@ -390,22 +403,6 @@ const EditRevenue = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  {/* <Col span={12}>
-                    <div className="form-item">
-                      <label className="font-semibold">Reference</label>
-                      <Field
-                        name="reference"
-                        as={Input}
-                        placeholder="Enter Reference"
-                        type="number"
-                      />
-                      <ErrorMessage
-                        name="reference"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
-                    </div>
-                  </Col> */}
                   <Col span={12} className="mt-2">
                     <div className="form-item">
                       <label className="font-semibold">Payment Receipt</label>

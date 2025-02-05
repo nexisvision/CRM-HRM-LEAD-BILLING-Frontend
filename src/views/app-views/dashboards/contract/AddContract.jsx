@@ -77,10 +77,10 @@ const AddContract = ({ onClose }) => {
   const onSubmit = (values, { resetForm }) => {
     dispatch(AddCon(values))
       .then(() => {
-        dispatch(ContaractData()); // Refresh contract data
+        dispatch(ContaractData());
         message.success("Contract added successfully!");
         resetForm();
-        onClose(); // Close modal
+        onClose();
       })
       .catch((error) => {
         message.error("Failed to add Contract.");
@@ -287,7 +287,7 @@ const AddContract = ({ onClose }) => {
                         {filtersubclient && filtersubclient.length > 0 ? (
                           filtersubclient.map((client) => (
                             <Option key={client.id} value={client.id}>
-                              {client.username || "Unnamed Client"}
+                              {client.username || client.name || "Unnamed Client"}
                             </Option>
                           ))
                         ) : (

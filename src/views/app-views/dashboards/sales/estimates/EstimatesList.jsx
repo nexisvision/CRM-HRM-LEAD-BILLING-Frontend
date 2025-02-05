@@ -45,6 +45,7 @@ import { useParams } from "react-router-dom";
 import AddEstimates from "./AddEstimates";
 import EditEstimates from "./EditEstimates";
 import ViewEstimates from "./ViewEstimates";
+import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 const { Option } = Select;
 const getShippingStatus = (orderStatus) => {
   if (orderStatus === "Ready") {
@@ -72,14 +73,21 @@ const EstimatesList = () => {
     useState(false);
   const dispatch = useDispatch();
   const [idd, setIdd] = useState("");
+
+  const customerData = useSelector((state) => state.customers);
+  const fnddataCustomers = customerData.customers.data;
+
+
   // Fetch estimate when component mounts
   useEffect(() => {
     dispatch(getallquotations());
-  }, [dispatch]);
+    dispatch(Getcus()); // Fetch customer data
+  }, []);
   console.log("salesquotations", salesquotations);
   // useEffect(() => {
   //   setList(salesquotations); // Update list when estimates change
   // }, [salesquotations]);
+
   useEffect(() => {
     setFilteredData(salesquotations);
   }, [salesquotations]);
@@ -157,10 +165,11 @@ const EstimatesList = () => {
       await dispatch(deletequotations(id));
       await dispatch(getallquotations());
       setList(list.filter((item) => item.id !== id));
-      message.success({ content: "Deleted user successfully", duration: 2 });
+      message.success("Deleted user successfully");
     } catch (error) {
       console.error("Error deleting user:", error);
     }
+
   };
 
 
@@ -259,15 +268,15 @@ const EstimatesList = () => {
   );
   const tableColumns = [
     {
-      title: "ID",
-      dataIndex: "id",
+      title: "Quotation Number",
+      dataIndex: "salesQuotationNumber",
     },
     {
-      title: "Date",
+      title: "Issue  Date",
       dataIndex: "issueDate",
       render: (_, record) => (
         <span>
-          {dayjs.unix(record.issueDate).format(DATE_FORMAT_DD_MM_YYYY)}
+          {record.issueDate ? dayjs(record.issueDate).format('DD-MM-YYYY') : ''}
         </span>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "issueDate"),
@@ -291,8 +300,16 @@ const EstimatesList = () => {
     {
       title: "Customer",
       dataIndex: "customer",
-      key: "customer",
-      sorter: (a, b) => utils.antdTableSorter(a, b, "customer"),
+      render: (_, record) => {
+        // Find the customer from customers data
+        const customerData = fnddataCustomers?.find(cust => cust.id === record.customer);
+        return <span>{customerData?.name || "Unknown Customer"}</span>;
+      },
+      sorter: (a, b) => {
+        const customerA = fnddataCustomers?.find(cust => cust.id === a.customer)?.name || '';
+        const customerB = fnddataCustomers?.find(cust => cust.id === b.customer)?.name || '';
+        return customerA.localeCompare(customerB);
+      },
     },
     // {
     //   title: "Currency",
@@ -334,18 +351,18 @@ const EstimatesList = () => {
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "total"),
     },
-    {
-      title: "Status",
-      dataIndex: "status",
-      render: (_, record) => (
-        <>
-          <Tag color={getShippingStatus(record.status)}>
-            {record.orderStatus}
-          </Tag>
-        </>
-      ),
-      sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
-    },
+    // {
+    //   title: "Status",
+    //   dataIndex: "status",
+    //   render: (_, record) => (
+    //     <>
+    //       <Tag color={getShippingStatus(record.status)}>
+    //         {record.orderStatus}
+    //       </Tag>
+    //     </>
+    //   ),
+    //   sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
+    // },
     {
       title: "Action",
       dataIndex: "actions",

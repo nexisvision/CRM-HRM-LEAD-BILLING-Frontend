@@ -29,6 +29,7 @@ import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeS
 import { getstages } from "../../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { GetLable } from "../../project/milestone/LableReducer/LableSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
 
 const { Option } = Select;
 
@@ -39,6 +40,7 @@ const AddLeadCards = ({ onClose }) => {
   const [organisation, setorganisation] = useState(false);
 
   const { currencies } = useSelector((state) => state.currencies);
+  const currenciesData = currencies?.data || [];
   const { data: employee } = useSelector((state) => state.employee.employee);
   // const { data: Lable } = useSelector((state) => state.Lable.Lable);
   const alltagdata = useSelector((state) => state.Lable);
@@ -46,6 +48,12 @@ const AddLeadCards = ({ onClose }) => {
   const user = useSelector((state) => state.user.loggedInUser);
   const lid = user?.id;
   const dispatch = useDispatch();
+
+  const countries = useSelector((state) => state.countries.countries);
+
+  useEffect(() => {
+    dispatch(getallcountries());
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(getstages());
@@ -87,6 +95,16 @@ const AddLeadCards = ({ onClose }) => {
       dispatch(GetLable(lid));
     }
   }, [dispatch, lid]);
+
+  useEffect(() => {
+    console.log('Currencies Data:', currenciesData);
+  }, [currenciesData]);
+
+  
+  const handlePhoneNumberChange = (e, setFieldValue, fieldName) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+    setFieldValue(fieldName, value);
+  };
 
   const validationSchema = Yup.object({
     leadTitle: Yup.string().required("Lead Title is required"),
@@ -170,11 +188,17 @@ const AddLeadCards = ({ onClose }) => {
                 placeholder="Currency"
                 onChange={(value) => form.setFieldValue("currencyId", value)}
               >
-                {currencies?.map((currency) => (
-                  <Option key={currency.id} value={currency.id}>
-                    {currency.currencyCode} ({currency.currencyIcon})
+                {Array.isArray(currenciesData) && currenciesData.length > 0 ? (
+                  currenciesData.map((currency) => (
+                    <Option key={currency.id} value={currency.id}>
+                      {currency.currencyCode} ({currency.currencyIcon})
+                    </Option>
+                  ))
+                ) : (
+                  <Option value="" disabled>
+                    No currencies available
                   </Option>
-                ))}
+                )}
               </Select>
             )}
           </Field>
@@ -258,20 +282,54 @@ const AddLeadCards = ({ onClose }) => {
                 </div>
               </Col>
               <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">telephone</label>
-                  <Field
-                    name="telephone"
-                    as={Input}
-                    placeholder="Enter telephone"
-                  />
-                  <ErrorMessage
-                    name="telephone"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                  <div className="form-item">
+                    <label className="font-semibold">Telephone</label>
+                    <div className="flex">
+                      <Select
+                        style={{ width: '30%', marginRight: '8px' }}
+                        placeholder="Code"
+                        name="phoneCode"
+                        onChange={(value) => setFieldValue('phoneCode', value)}
+                        value={values.phoneCode}
+                      >
+
+                        {countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            +{country.phoneCode}
+                          </Option>
+                        ))}
+                      </Select>
+                      <Field
+                        name="telephone"
+                        as={Input}
+                        type="number"
+                        maxLength={10}
+                        style={{ width: '70%' }}
+                        placeholder="Enter Contact"
+                        onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'telephone')}
+
+
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                    </div>
+                    <ErrorMessage
+                      name="phoneCode"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+
+                    />
+                    <ErrorMessage
+                      name="telephone"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+
+                    />
+                  </div>
+                </Col>
 
               <Col span={24} className="mt-2">
                 <div className="form-item">
@@ -337,7 +395,7 @@ const AddLeadCards = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="">
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Lead Value</label>
                   <Field name="leadValue" component={LeadValueField} />

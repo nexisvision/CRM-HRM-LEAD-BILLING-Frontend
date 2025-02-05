@@ -41,36 +41,41 @@ const AddCustomer = ({ onClose }) => {
     shipping_state: "",
     shipping_country: "",
     shipping_zipcode: "",
+    country_code: "",
+    billing_country_code: "",
+    shipping_country_code: "",
   };
 
   const validationSchema = Yup.object({
     name: Yup.string().required("Please enter a Name."),
+    country_code: Yup.string().required("Country code is required"),
     contact: Yup.string()
-      .matches(/^\d{10}$/, "Contact number must be 10 digits.")
-      .required("Please enter a Contact Number."),
+      .matches(/^\d{10}$/, "Contact number must be 10 digits")
+      .required("Please enter a Contact Number"),
     email: Yup.string()
       .email("Please enter a valid email address with @.")
       .required("please enter a email"),
     taxnumber: Yup.string().required("Please enter a Tax Number."),
-    alternatemobilenumber: Yup.string().matches(
-      /^\d{10}$/,
-      "Alternate number must be 10 digits."
-    ),
+    alternatemobilenumber: Yup.string()
+      .matches(/^\d{10}$/, "Alternate number must be 10 digits")
+      .nullable()
+      .transform((value) => (value === "" ? null : value))
+      .required("Please enter an Alternate Number"),
     billing_name: Yup.string().required("Please enter a Name."),
-    billing_phone: Yup.string().matches(
-      /^\d{10}$/,
-      "Phone number must be 10 digits."
-    ),
+    billing_country_code: Yup.string().required("Country code is required"),
+    billing_phone: Yup.string()
+      .matches(/^\d{10}$/, "Phone number must be 10 digits")
+      .required("Please enter a phone number"),
     billing_address: Yup.string().required("Please enter a Billing Address."),
     billing_city: Yup.string().required("Please enter a City."),
     billing_state: Yup.string().required("Please enter a State."),
     billing_country: Yup.string().required("Please enter a Country."),
     billing_zipcode: Yup.string().required("Please enter a Zip Code."),
     shipping_name: Yup.string().required("Please enter a Name."),
-    shipping_phone: Yup.string().matches(
-      /^\d{10}$/,
-      "Phone number must be 10 digits."
-    ),
+    shipping_country_code: Yup.string().required("Country code is required"),
+    shipping_phone: Yup.string()
+      .matches(/^\d{10}$/, "Phone number must be 10 digits")
+      .required("Please enter a phone number"),
     shipping_address: Yup.string().required("Please enter a Shipping Address."),
     shipping_city: Yup.string().required("Please enter a City."),
     shipping_state: Yup.string().required("Please enter a State."),
@@ -78,13 +83,18 @@ const AddCustomer = ({ onClose }) => {
     shipping_zipcode: Yup.string().required("Please enter a Zip Code."),
   });
 
+  const handlePhoneNumberChange = (e, setFieldValue, fieldName) => {
+    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+    setFieldValue(fieldName, value);
+  };
+
   const onSubmit = (values, { resetForm }) => {
     const payload = {
       name: values.name,
       contact: values.contact,
       email: values.email,
       tax_number: values.taxnumber,
-      alternate_number: values.alternatemobilenumber,
+      alternate_number: values.alternatemobilenumber.toString(),
       billing_address: {
         street: values.billing_address,
         city: values.billing_city,
@@ -101,14 +111,17 @@ const AddCustomer = ({ onClose }) => {
       },
     };
 
-    dispatch(addcus(payload));
-    dispatch(Getcus());
-    dispatch(Getcus());
-    onClose();
-    resetForm();
-
-    console.log("Submitted values:", payload);
-    message.success("Customer added successfully!");
+    dispatch(addcus(payload))
+      .then(() => {
+        dispatch(Getcus());
+        onClose();
+        resetForm();
+        // message.success("Customer added successfully!");
+      })
+      .catch((error) => {
+        console.error("Error adding customer:", error);
+        message.error("Failed to add customer. Please try again.");
+      });
   };
 
   return (
@@ -154,20 +167,35 @@ const AddCustomer = ({ onClose }) => {
                         placeholder="Code"
                         name="country_code"
                         onChange={(value) => setFieldValue('country_code', value)}
+                        value={values.country_code}
                       >
                         {countries.map((country) => (
                           <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
+                            +{country.phoneCode}
                           </Option>
                         ))}
                       </Select>
                       <Field
                         name="contact"
                         as={Input}
+                        type="number"
+                        maxLength={10}
                         style={{ width: '70%' }}
                         placeholder="Enter Contact"
+                        onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'contact')}
+
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
                       />
                     </div>
+                    <ErrorMessage
+                      name="country_code"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
                     <ErrorMessage
                       name="contact"
                       component="div"
@@ -206,26 +234,37 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={8} className="mt-2">
                   <div className="form-item">
-                    <label className="font-semibold"> Alternate Mobile Number</label>
+                    <label className="font-semibold">Alternate Mobile Number</label>
                     <div className="flex">
                       <Select
                         style={{ width: '30%', marginRight: '8px' }}
                         placeholder="Code"
-                        name="alternatemobilenumber"
-                        onChange={(value) => setFieldValue('alternatemobilenumber', value)}
+                        name="alternate_country_code"
+                        onChange={(value) => setFieldValue('alternate_country_code', value)}
                       >
                         {countries.map((country) => (
                           <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
+                            +{country.phoneCode}
                           </Option>
                         ))}
                       </Select>
-                      <Field
-                        name="alternatemobilenumber"
-                        as={Input}
-                        style={{ width: '70%' }}
-                        placeholder="Enter Alternate Mobile Number"
-                      />
+                      <Field name="alternatemobilenumber">
+                        {({ field }) => (
+                          <Input
+                            {...field}
+                            type="number"
+                            style={{ width: '70%' }}
+                            placeholder="Enter Alternate Mobile Number"
+                            maxLength={10}
+                            onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'alternatemobilenumber')}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          />
+                        )}
+                      </Field>
                     </div>
                     <ErrorMessage
                       name="alternatemobilenumber"
@@ -255,23 +294,6 @@ const AddCustomer = ({ onClose }) => {
                   </div>
                 </Col>
 
-                {/* <Col span={12} className="mt-2">
-                  <div className="form-item">
-                    <label className="font-semibold">Phone</label>
-                    <Field
-                      name="billing_phone"
-                      as={Input}
-                      placeholder="Enter phone"
-                    />
-
-                    <ErrorMessage
-                      name="billing_phone"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col> */}
-
                 <Col span={12} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">Phone</label>
@@ -279,20 +301,29 @@ const AddCustomer = ({ onClose }) => {
                       <Select
                         style={{ width: '30%', marginRight: '8px' }}
                         placeholder="Code"
-                        name="country_code"
-                        onChange={(value) => setFieldValue('country_code', value)}
+                        name="billing_country_code"
+                        onChange={(value) => setFieldValue('billing_country_code', value)}
+                        value={values.billing_country_code}
                       >
                         {countries.map((country) => (
                           <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
+                            +{country.phoneCode}
                           </Option>
                         ))}
                       </Select>
                       <Field
                         name="billing_phone"
                         as={Input}
+                        type="number"
+                        maxLength={10}
                         style={{ width: '70%' }}
                         placeholder="Enter phone"
+                        onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'billing_phone')}
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
                       />
                     </div>
                     <ErrorMessage
@@ -306,22 +337,10 @@ const AddCustomer = ({ onClose }) => {
                 <Col span={24} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">Address</label>
-                    <Field name="billing_address">
-                      {({ field }) => (
-                        <ReactQuill
-                          {...field}
-                          value={values.billing_address}
-                          onChange={(value) =>
-                            setFieldValue("billing_address", value)
-                          }
-                          onBlur={() =>
-                            setFieldTouched("billing_address", true)
-                          }
-                        />
-                      )}
-                    </Field>
+                    <Field name="billing_address" as={Input} placeholder="Enter Address" />
                     <ErrorMessage
                       name="billing_address"
+
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
@@ -402,14 +421,6 @@ const AddCustomer = ({ onClose }) => {
                   </div>
                 </Col>
 
-                {/* <Col span={24} className="mt-2">
-                  <div className="form-buttons text-right">
-                    <Button type="primary" htmlType="submit">
-                      Shipping Same As Billing
-                    </Button>
-                  </div>
-                </Col> */}
-
                 <Col span={24}>
                   <h1 className="font-semibold mb-2 text-lg">
                     Shipping Address
@@ -439,22 +450,37 @@ const AddCustomer = ({ onClose }) => {
                       <Select
                         style={{ width: '30%', marginRight: '8px' }}
                         placeholder="Code"
-                        name="country_code"
-                        onChange={(value) => setFieldValue('country_code', value)}
+                        name="shipping_country_code"
+                        onChange={(value) => setFieldValue('shipping_country_code', value)}
+                        value={values.shipping_country_code}
                       >
                         {countries.map((country) => (
                           <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
+                            +{country.phoneCode}
                           </Option>
                         ))}
                       </Select>
                       <Field
                         name="shipping_phone"
                         as={Input}
+                        type="number"
+                        maxLength={10}
                         style={{ width: '70%' }}
                         placeholder="Enter phone"
+                        onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'shipping_phone')}
+
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
                       />
                     </div>
+                    <ErrorMessage
+                      name="shipping_country_code"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
                     <ErrorMessage
                       name="shipping_phone"
                       component="div"
@@ -466,22 +492,11 @@ const AddCustomer = ({ onClose }) => {
                 <Col span={24} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">Address</label>
-                    <Field name="shipping_address">
-                      {({ field }) => (
-                        <ReactQuill
-                          {...field}
-                          value={values.shipping_address}
-                          onChange={(value) =>
-                            setFieldValue("shipping_address", value)
-                          }
-                          onBlur={() =>
-                            setFieldTouched("shipping_address", true)
-                          }
-                        />
-                      )}
-                    </Field>
+                    <Field name="shipping_address" as={Input} placeholder="Enter Address" />
                     <ErrorMessage
                       name="shipping_address"
+
+
                       component="div"
                       className="error-message text-red-500 my-1"
                     />

@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./CustomerService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
+import { message } from "antd";
 
 // Async thunk for adding user
 
@@ -109,6 +110,7 @@ const RoleAndPermissionSlice = createSlice({
     toggleEditModal: (state, action) => {
       state.editModal = action.payload;
       state.editItem = {};
+
     },
     editUserData: (state, action) => {
       state.editItem = action.payload;
@@ -138,7 +140,8 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(addcus.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload?.data?.message);
+        // toast.success(action.payload?.data?.message);
+        message.success(action.payload?.message);
       })
       .addCase(addcus.rejected, (state, action) => {
         state.isLoading = false;
@@ -191,7 +194,8 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(delcus.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload.message);
+        // toast.success(action.payload.message);
+        message.success(action.payload.message);
       })
       .addCase(delcus.rejected, (state, action) => {
         state.isLoading = false;

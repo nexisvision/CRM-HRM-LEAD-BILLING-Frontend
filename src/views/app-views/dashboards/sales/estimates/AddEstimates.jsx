@@ -47,7 +47,7 @@ const AddEstimates = ({ onClose }) => {
     
   const [loading, setLoading] = useState(false);
   const [discountValue, setDiscountValue] = useState(0);
-  const [discountRate, setDiscountRate] = useState(10);
+  const [discountRate, setDiscountRate] = useState();
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [totals, setTotals] = useState({
@@ -88,10 +88,9 @@ const AddEstimates = ({ onClose }) => {
   
       const subTotal = calculateSubTotal();
       const totalTax = calculateTotalTax();
-      const discount = (subTotal * discountRate) / 100;
-      const totalAmount = subTotal - discount + totalTax;
+      const discount = calculateDiscount();
+      const finalTotal = subTotal - discount + totalTax;
   
-      // Prepare the `items` field as an object
       const itemsObject = tableData.reduce((acc, item, index) => {
         acc[`item_${index + 1}`] = {
           description: item.item,
@@ -113,7 +112,7 @@ const AddEstimates = ({ onClose }) => {
         items: itemsObject,
         discount: parseFloat(discount.toFixed(2)) || 0,
         tax: parseFloat(totalTax.toFixed(2)) || 0,
-        total: parseFloat(totalAmount.toFixed(2)) || 0,
+        total: parseFloat(finalTotal.toFixed(2)) || 0,
       });
   
       if (!selectedTag) {
@@ -163,28 +162,26 @@ const AddEstimates = ({ onClose }) => {
 
   // Function to handle adding a new row
   const handleAddRow = () => {
-    setRows([
-      ...rows,
-      {
-        id: Date.now(),
-        item: "",
-        quantity: "",
-        price: "",
-        discount: "",
-        tax: "",
-        amount: "0",
-        description: "",
-        isNew: true,
-      },
-    ]);
+    const newRow = {
+      id: Date.now(),
+      item: "",
+      quantity: 1,
+      price: "",
+      tax: 0,
+      amount: "0",
+      description: "",
+    };
+    setTableData([...tableData, newRow]);
   };
 
-  // Delete row
+  // Function to handle deleting a row
   const handleDeleteRow = (id) => {
-    if (rows.length > 1) {
-      setRows(rows.filter((row) => row.id !== id));
+    if (tableData.length > 1) {
+      const updatedData = tableData.filter(row => row.id !== id);
+      setTableData(updatedData);
+      calculateTotal(updatedData, discountRate);
     } else {
-      message.warning("At least one item is required");
+      message.warning('At least one item is required');
     }
   };
 
@@ -201,69 +198,85 @@ const AddEstimates = ({ onClose }) => {
 
   // Calculate total tax
   const calculateTotalTax = () => {
-    const subTotal = calculateSubTotal();
-    const discount = calculateDiscount();
-    const taxableAmount =
-      form.getFieldValue("calctax") === "before"
-        ? subTotal
-        : subTotal - discount;
-
     return tableData.reduce((sum, row) => {
       const quantity = parseFloat(row.quantity) || 0;
       const price = parseFloat(row.price) || 0;
       const tax = parseFloat(row.tax) || 0;
-      const rowAmount = quantity * price;
-      return sum + rowAmount * (tax / 100);
+      const baseAmount = quantity * price;
+      return sum + ((baseAmount * tax) / 100);
     }, 0);
   };
 
   // Calculate subtotal (sum of all row amounts before discount)
   const calculateSubTotal = () => {
-    return rows.reduce((sum, row) => {
-      const quantity = parseFloat(row.quantity || 0);
-      const price = parseFloat(row.price || 0);
-      return sum + quantity * price;
+    return tableData.reduce((sum, row) => {
+      const quantity = parseFloat(row.quantity) || 0;
+      const price = parseFloat(row.price) || 0;
+      return sum + (quantity * price);
     }, 0);
   };
 
   const calculateTotal = (data, discountRate) => {
+    if (!Array.isArray(data)) {
+      console.error('Invalid data passed to calculateTotal');
+      return;
+    }
+
     let subtotal = 0;
     let totalTax = 0;
 
     data.forEach((row) => {
-      const amount = row.quantity * row.price;
-      const taxAmount = (amount * row.tax) / 100;
-
-      row.amount = amount; // Update the row's amount
-      subtotal += amount;
+      const quantity = parseFloat(row.quantity) || 0;
+      const price = parseFloat(row.price) || 0;
+      const tax = parseFloat(row.tax) || 0;
+      
+      const baseAmount = quantity * price;
+      const taxAmount = (baseAmount * tax) / 100;
+      
+      subtotal += baseAmount;
       totalTax += taxAmount;
     });
 
-    const discount = (subtotal * discountRate) / 100;
+    const discount = (subtotal * (parseFloat(discountRate) || 0)) / 100;
     const finalTotal = subtotal - discount + totalTax;
 
-    setTotals({ subtotal, discount, totalTax, finalTotal });
+    setTotals({
+      subtotal: parseFloat(subtotal.toFixed(2)),
+      discount: parseFloat(discount.toFixed(2)),
+      totalTax: parseFloat(totalTax.toFixed(2)),
+      finalTotal: parseFloat(finalTotal.toFixed(2))
+    });
   };
 
+  // Function to handle table data changes
   const handleTableDataChange = (id, field, value) => {
-    const updatedData = tableData.map((row) =>
-      row.id === id
-        ? {
-            ...row,
-            [field]:
-              field === "quantity" || field === "price" || field === "tax"
-                ? parseFloat(value) || 0
-                : value,
-          }
-        : row
-    );
+    const updatedData = tableData.map((row) => {
+      if (row.id === id) {
+        const updatedRow = { ...row, [field]: value };
+        
+        // Calculate amount if quantity, price, or tax changes
+        if (field === 'quantity' || field === 'price' || field === 'tax') {
+          const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
+          const price = parseFloat(field === 'price' ? value : row.price) || 0;
+          const tax = parseFloat(field === 'tax' ? value : row.tax) || 0;
+          
+          const baseAmount = quantity * price;
+          const taxAmount = (baseAmount * tax) / 100;
+          const totalAmount = baseAmount + taxAmount;
+          
+          updatedRow.amount = totalAmount.toFixed(2);
+        }
+        
+        return updatedRow;
+      }
+      return row;
+    });
 
     setTableData(updatedData);
-    calculateTotal(updatedData, discountRate); // Recalculate totals
+    calculateTotal(updatedData, discountRate);
   };
 
 
-  
   
     const fetchTags = async () => {
       try {
@@ -418,6 +431,16 @@ const AddEstimates = ({ onClose }) => {
             </div>
             <div>
               <div className="overflow-x-auto">
+                <div className="form-buttons text-left mb-2 justify-end flex">
+                  <Button 
+                    type="primary"
+                    onClick={handleAddRow}
+                    icon={<PlusOutlined />}
+                  >
+                    Add Items
+                  </Button>
+                </div>
+
                 <table className="w-full border border-gray-200 bg-white">
                   <thead className="bg-gray-100">
                     <tr>
@@ -428,13 +451,16 @@ const AddEstimates = ({ onClose }) => {
                         Quantity<span className="text-red-500">*</span>
                       </th>
                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                        Unit Price <span className="text-red-500">*</span>
+                        Unit Price<span className="text-red-500">*</span>
                       </th>
                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                         TAX (%)
                       </th>
                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                         Amount<span className="text-red-500">*</span>
+                      </th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Action
                       </th>
                     </tr>
                   </thead>
@@ -446,58 +472,36 @@ const AddEstimates = ({ onClose }) => {
                             <input
                               type="text"
                               value={row.item}
-                              onChange={(e) =>
-                                handleTableDataChange(
-                                  row.id,
-                                  "item",
-                                  e.target.value
-                                )
-                              }
+                              onChange={(e) => handleTableDataChange(row.id, 'item', e.target.value)}
                               placeholder="Item Name"
-                              className="w-full p-2 border rounded-s"
-                            />
-                          </td>
-                          <td className="px-4 py-2 border-b">
-                            <input
-                              type="number"
-                              value={row.quantity}
-                              onChange={(e) =>
-                                handleTableDataChange(
-                                  row.id,
-                                  "quantity",
-                                  e.target.value
-                                )
-                              }
-                              placeholder="Qty"
                               className="w-full p-2 border rounded"
                             />
                           </td>
                           <td className="px-4 py-2 border-b">
                             <input
                               type="number"
+                              value={row.quantity}
+                              onChange={(e) => handleTableDataChange(row.id, 'quantity', e.target.value)}
+                              placeholder="Qty"
+                              className="w-full p-2 border rounded"
+                              min="1"
+                            />
+                          </td>
+                          <td className="px-4 py-2 border-b">
+                            <input
+                              type="number"
                               value={row.price}
-                              onChange={(e) =>
-                                handleTableDataChange(
-                                  row.id,
-                                  "price",
-                                  e.target.value
-                                )
-                              }
+                              onChange={(e) => handleTableDataChange(row.id, 'price', e.target.value)}
                               placeholder="Price"
-                              className="w-full p-2 border rounded-s"
+                              className="w-full p-2 border rounded"
+                              min="0"
                             />
                           </td>
                           <td className="px-4 py-2 border-b">
                             <select
                               value={row.tax}
-                              onChange={(e) =>
-                                handleTableDataChange(
-                                  row.id,
-                                  "tax",
-                                  e.target.value
-                                )
-                              }
-                              className="w-full p-2 border"
+                              onChange={(e) => handleTableDataChange(row.id, 'tax', e.target.value)}
+                              className="w-full p-2 border rounded"
                             >
                               <option value="0">Nothing Selected</option>
                               <option value="10">GST:10%</option>
@@ -514,9 +518,8 @@ const AddEstimates = ({ onClose }) => {
                             <Button
                               danger
                               onClick={() => handleDeleteRow(row.id)}
-                            >
-                              <DeleteOutlined />
-                            </Button>
+                              icon={<DeleteOutlined />}
+                            />
                           </td>
                         </tr>
                         <tr>
@@ -524,15 +527,9 @@ const AddEstimates = ({ onClose }) => {
                             <textarea
                               rows={2}
                               value={row.description}
-                              onChange={(e) =>
-                                handleTableDataChange(
-                                  row.id,
-                                  "description",
-                                  e.target.value
-                                )
-                              }
+                              onChange={(e) => handleTableDataChange(row.id, 'description', e.target.value)}
                               placeholder="Description"
-                              className="w-[70%] p-2 border"
+                              className="w-[70%] p-2 border rounded"
                             />
                           </td>
                         </tr>
@@ -541,65 +538,52 @@ const AddEstimates = ({ onClose }) => {
                   </tbody>
                 </table>
               </div>
-              <div className="form-buttons text-left mt-2">
-                <Button
-                  className="border-0 text-blue-500"
-                  onClick={handleAddRow}
-                >
-                  <PlusOutlined /> Add Items
-                </Button>
-              </div>
 
               {/* Summary Section */}
               <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
-                <table className="w-full lg:w-[50%] p-2">
-                  {/* Sub Total */}
-                  <tr className="flex justify-between px-2 py-2 border-x-2">
-                    <td className="font-medium">Sub Total</td>
-                    <td className="font-medium px-4 py-2">
-                      ₹{totals.subtotal.toFixed(2)}
-                    </td>
-                  </tr>
-
-                  {/* Discount */}
-                  <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
-                    <td className="font-medium">Discount</td>
-                    <td className="flex items-center space-x-2">
-                      <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">
-                          Discount Rate (%)
-                        </label>
-                        <input
-                          type="number"
-                          value={discountRate}
-                          onChange={(e) => {
-                            setDiscountRate(parseFloat(e.target.value) || 0);
-                            calculateTotal(
-                              tableData,
-                              parseFloat(e.target.value) || 0
-                            ); // Recalculate with new discount rate
-                          }}
-                          className="mt-1 block w-full p-2 border rounded"
-                        />
-                      </div>
-                    </td>
-                  </tr>
-
-                  {/* Tax */}
-                  <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
-                    <td className="font-medium">Total Tax</td>
-                    <td className="font-medium px-4 py-2">
-                      ₹{totals.totalTax.toFixed(2)}
-                    </td>
-                  </tr>
-
-                  {/* Total */}
-                  <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
-                    <td className="font-bold text-lg">Total Amount</td>
-                    <td className="font-bold text-lg px-4">
-                      ₹{totals.finalTotal.toFixed(2)}
-                    </td>
-                  </tr>
+                <table className='w-full lg:w-[50%] p-2'>
+                  <tbody>
+                    <tr className="flex justify-between px-2 py-2 border-x-2">
+                      <td className="font-medium">Sub Total</td>
+                      <td className="font-medium px-4 py-2">
+                        ₹{totals.subtotal.toFixed(2)}
+                      </td>
+                    </tr>
+                    <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
+                  <td className="font-medium">Discount</td>
+                  <td className="flex items-center space-x-2">
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Discount Rate (%)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={discountRate}
+                        onChange={(e) => {
+                          const newRate = parseFloat(e.target.value) || 0;
+                          setDiscountRate(newRate);
+                          calculateTotal(tableData, newRate);
+                        }}
+                        className="mt-1 block w-full p-2 border rounded"
+                      />
+                    </div>
+                  </td>
+                </tr>
+                    <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
+                      <td className="font-medium">Total Tax</td>
+                      <td className="font-medium px-4 py-2">
+                        ₹{totals.totalTax.toFixed(2)}
+                      </td>
+                    </tr>
+                    <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
+                      <td className="font-bold text-lg">Total Amount</td>
+                      <td className="font-bold text-lg px-4">
+                        ₹{totals.finalTotal.toFixed(2)}
+                      </td>
+                    </tr>
+                  </tbody>
                 </table>
               </div>
             </div>

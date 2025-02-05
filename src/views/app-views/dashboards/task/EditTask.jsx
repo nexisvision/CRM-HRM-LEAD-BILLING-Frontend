@@ -55,23 +55,42 @@ const EditTask = ({ iddd, onClose }) => {
   useEffect(() => {
     if (fndatatask && iddd) {
       const task = fndatatask.find((task) => task.id === iddd);
-      const assignid = empData?.find(
-        (item) => item.id === JSON.parse(task?.assignTo)
-      );
       if (task) {
         const dueDate = task.dueDate ? new Date(task.dueDate) : null;
         setIsWithoutDueDate(dueDate === null);
         setIsOtherDetailsVisible(task.otherDetailsVisible);
 
+        let assignToArray = [];
+        try {
+          if (task.assignTo) {
+            if (typeof task.assignTo === 'string') {
+              assignToArray = JSON.parse(task.assignTo);
+            } else if (Array.isArray(task.assignTo)) {
+              assignToArray = task.assignTo;
+            } else {
+              assignToArray = [task.assignTo];
+            }
+          }
+        } catch (error) {
+          console.error("Error parsing assignTo:", error);
+          assignToArray = [];
+        }
+
+        if (!Array.isArray(assignToArray)) {
+          assignToArray = [assignToArray];
+        }
+
         setInitialValues({
-          taskName: task.taskName,
+          taskName: task.taskName || "",
           startDate: task.startDate ? new Date(task.startDate) : null,
           dueDate,
-          assignTo: assignid?.username || assignid?.firstName,
-          description: task.description,
-          status: task.status,
-          priority: task.priority,
+          assignTo: assignToArray,
+          description: task.description || "",
+          status: task.status || "",
+          priority: task.priority || "",
         });
+
+        console.log("Parsed assignTo values:", assignToArray);
       } else {
         message.error("Task not found.");
       }
@@ -87,7 +106,12 @@ const EditTask = ({ iddd, onClose }) => {
   });
 
   const onSubmit = async (values, { resetForm }) => {
-    dispatch(EditTasks({ iddd, values }))
+    const payload = {
+      ...values,
+      assignTo: JSON.stringify(values.assignTo)
+    };
+
+    dispatch(EditTasks({ iddd, values: payload }))
       .then(() => {
         dispatch(GetTasks(idd))
           .then(() => {
@@ -102,7 +126,7 @@ const EditTask = ({ iddd, onClose }) => {
       })
       .catch((error) => {
         message.error("Failed to update task.");
-        console.error("AddTask API error:", error);
+        console.error("EditTask API error:", error);
       });
   };
 
@@ -163,9 +187,9 @@ const EditTask = ({ iddd, onClose }) => {
                     className="w-full mt-2"
                     placeholder="Select Due Date"
                     onChange={(value) => setFieldValue("dueDate", value)}
-                    value={values.dueDate ? moment(values.dueDate) : null} // Convert to moment for Ant Design DatePicker
+                    value={values.dueDate ? moment(values.dueDate) : null}
                     onBlur={() => setFieldTouched("dueDate", true)}
-                    format="YYYY-MM-DD" // Optional: Specify your date format here
+                    format="YYYY-MM-DD"
                   />
                   <ErrorMessage
                     name="dueDate"
@@ -190,16 +214,14 @@ const EditTask = ({ iddd, onClose }) => {
                         onBlur={() => setFieldTouched("assignTo", true)}
                       >
                         {empData && empData.length > 0 ? (
-                          empData.map((client) => (
-                            <Option key={client.id} value={client.id}>
-                              {client.firstName ||
-                                client.username ||
-                                "Unnamed Client"}
+                          empData.map((employee) => (
+                            <Option key={employee.id} value={employee.id}>
+                              {employee.firstName || employee.username || "Unnamed Employee"}
                             </Option>
                           ))
                         ) : (
                           <Option value="" disabled>
-                            No Clients Available
+                            No Employees Available
                           </Option>
                         )}
                       </Select>

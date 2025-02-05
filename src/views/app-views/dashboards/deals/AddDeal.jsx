@@ -105,10 +105,11 @@ const AddDeal = ({ onClose }) => {
   const initialValues = {
     dealName: "",
     phoneNumber: "",
+    phoneCode: "",
     price: "",
     leadTitle: "",
     currency: "",
-    category:"",
+    category: "",
     pipeline: "",
     stage: "",
     closedDate: null,
@@ -117,8 +118,9 @@ const AddDeal = ({ onClose }) => {
   const validationSchema = Yup.object({
     dealName: Yup.string().required("Please enter a Deal Name."),
     phoneNumber: Yup.string()
-      .matches(/^\d{10}$/, "Telephone number must be exactly 10 digits")
-      .nullable(),
+      .matches(/^\d{10}$/, "Phone number must be exactly 10 digits")
+      .required("Phone number is required"),
+    phoneCode: Yup.string().required("Phone code is required"),
     price: Yup.string().required("Please enter a Price."),
     leadTitle: Yup.string().required("Please select a Lead Title."),
     currency: Yup.string().required("Please select a Currency."),
@@ -189,34 +191,56 @@ const AddDeal = ({ onClose }) => {
                 </div>
               </Col>
               <Col span={12} className="mt-2">
-                  <div className="form-item">
-                    <label className="font-semibold">Phone</label>
-                    <div className="flex">
-                      <Select
-                        style={{ width: '30%', marginRight: '8px' }}
-                        placeholder="Code"
-                        name="phoneCode"
-                        onChange={(value) => setFieldValue('phoneCode', value)}
-                      >
-                        {countries.map((country) => (
-                          <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
-                          </Option>
-                        ))}
-                      </Select>
-                      <Field
-                        name="phoneNumber"
-                        as={Input}
-                        style={{ width: '70%' }}
-                        placeholder="Enter phone"
-                      />
-                    </div>
-                    <ErrorMessage
-                      name="phoneNumber"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
+                <div className="form-item">
+                  <label className="font-semibold">Phone</label>
+                  <div className="flex">
+                    <Select
+                      style={{ width: '30%', marginRight: '8px' }}
+                      placeholder="Code"
+                      name="phoneCode"
+                      value={values.phoneCode}
+                      onChange={(value) => setFieldValue('phoneCode', value)}
+                    >
+                      {countries.map((country) => (
+                        <Option key={country.id} value={country.phoneCode}>
+                          (+{country.phoneCode})
+                        </Option>
+                      ))}
+                    </Select>
+                    <Field name="phoneNumber">
+                      {({ field }) => (
+                        <Input
+                          {...field}
+                          type="number"
+                          style={{ width: '70%' }}
+                          placeholder="Enter phone number"
+                          maxLength={10}
+                          onInput={(e) => {
+                            // Limit input to 10 digits
+                            e.target.value = e.target.value.slice(0, 10);
+                            setFieldValue('phoneNumber', e.target.value);
+                          }}
+                          onKeyPress={(e) => {
+                            // Allow only numbers
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          }}
+                        />
+                      )}
+                    </Field>
                   </div>
+                  <ErrorMessage
+                    name="phoneCode"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                  <ErrorMessage
+                    name="phoneNumber"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
               </Col>
               <Col span={12} className="mt-4 mb-4">
                 <div className="form-item">

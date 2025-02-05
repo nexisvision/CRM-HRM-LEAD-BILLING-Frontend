@@ -150,7 +150,7 @@ const CustomerList = () => {
     dispatch(Getcus());
     dispatch(Getcus());
     setUsers(users.filter((item) => item.id !== userId));
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
   const exportToExcel = () => {
     try {

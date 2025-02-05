@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./InvoiceService";
 import { toast } from "react-toastify";
+import { message } from "antd";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
 // Async thunk for adding user
@@ -138,7 +139,8 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(AddInvoices.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload?.data?.message);
+        // toast.success(action.payload?.data?.message);
+        message.success(action.payload?.message);
       })
       .addCase(AddInvoices.rejected, (state, action) => {
         state.isLoading = false;
@@ -151,7 +153,8 @@ const RoleAndPermissionSlice = createSlice({
       .addCase(getInvoice.fulfilled, (state, action) => {
         state.isLoading = false;
         state.salesInvoices = action?.payload;
-        toast.success(action.payload?.data?.message);
+        // toast.success(action.payload?.data?.message);
+        message.success(action.payload?.message);
       })
       .addCase(getInvoice.rejected, (state, action) => {
         state.isLoading = false;
@@ -165,7 +168,8 @@ const RoleAndPermissionSlice = createSlice({
       .addCase(getAllUsers.fulfilled, (state, action) => {
         state.isLoading = false;
         state.users = action.payload;
-        toast.success(`Users fetched successfully`);
+        // toast.success(`Users fetched successfully`);
+        message.success(action.payload?.message);
       })
       .addCase(getAllUsers.rejected, (state, action) => {
         state.isLoading = false;
@@ -179,7 +183,8 @@ const RoleAndPermissionSlice = createSlice({
       .addCase(getUserById.fulfilled, (state, action) => {
         state.isLoading = false;
         state.detailItem = action.payload?.user;
-        toast.success(action.payload.message);
+        // toast.success(action.payload.message);
+        message.success(action.payload?.message);
       })
       .addCase(getUserById.rejected, (state, action) => {
         state.isLoading = false;
@@ -191,7 +196,8 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(deleteInvoice.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload.message);
+        // toast.success(action.payload.message);
+        message.success(action.payload?.message);
       })
       .addCase(deleteInvoice.rejected, (state, action) => {
         state.isLoading = false;
@@ -205,6 +211,7 @@ const RoleAndPermissionSlice = createSlice({
       .addCase(editInvoice.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload; // Update the state with the updated employee data
+        message.success(action.payload?.message);
       })
       .addCase(editInvoice.rejected, (state, action) => {
         state.isLoading = false;

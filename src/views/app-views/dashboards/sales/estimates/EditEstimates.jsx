@@ -19,9 +19,18 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
     const [discountValue, setDiscountValue] = useState(0);
     const [discountRate, setDiscountRate] = useState(10);
     const dispatch = useDispatch();
-    const allempdata = useSelector((state) => state.estimate);
-    const quotationData = allempdata.salesquotations.data;
+    
+    // Safely access the Redux state with default values
+    const allempdata = useSelector((state) => state.estimate) || {};
+    const quotationData = allempdata?.salesquotations?.data || [];
+    
     const [form] = Form.useForm();
+    const [formData, setFormData] = useState({
+        customer: '',
+        category: '',
+        issueDate: null,
+    });
+
     const [totals, setTotals] = useState({
         subtotal: 0,
         discount: 0,
@@ -41,42 +50,68 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
         }
     ]);
 
+    // First useEffect to fetch all quotations
     useEffect(() => {
-        // Fetch expense data if not already available
-        if (!quotationData.length) {
-            dispatch(getallquotations());
-        }
+        const fetchQuotations = async () => {
+            try {
+                await dispatch(getallquotations()).unwrap();
+            } catch (error) {
+                message.error('Failed to fetch quotations');
+            }
+        };
+        
+        fetchQuotations();
     }, [dispatch]);
 
+    // Second useEffect to handle individual quotation data
     useEffect(() => {
-        if (quotationData.length > 0 && idd) {
-            const quodata = quotationData.find((item) => item.id === idd);
+        const fetchAndSetData = async () => {
+            if (idd && quotationData) {
+                try {
+                    const quodata = quotationData.find((item) => item.id === idd);
+                    
+                    if (quodata) {
+                        // Set form fields
+                        const formValues = {
+                            customer: quodata.customer || '',
+                            category: quodata.category || '',
+                            issueDate: quodata.issueDate ? dayjs(quodata.issueDate) : null,
+                        };
 
-            if (quodata) {
-                const itemsObject = tableData.reduce((acc, item, index) => {
-                    acc[`item_${index + 1}`] = {
-                        description: item.item,
-                        quantity: parseFloat(item.quantity) || 0,
-                        price: parseFloat(item.price) || 0,
-                        tax: parseFloat(item.tax) || 0,
-                        amount: parseFloat(item.amount) || 0,
-                    };
-                    return acc;
-                }, {});
+                        // Update form with values
+                        form.setFieldsValue(formValues);
+                        setFormData(formValues);
 
-                setInitialValues({
-                    id: idd,
-                    customer: quodata.customer || "",
-                    category: quodata.category || "",
-                    issueDate: quodata.issueDate ? dayjs(quodata.issueDate).format('YYYY-MM-DD') : null,
-                    items: itemsObject,
-                });
-            } else {
-                message.error("Estimate not found!");
-                navigate("/app/dashboards/sales/estimates");
+                        // Set table data if it exists
+                        if (quodata.items && Array.isArray(quodata.items)) {
+                            const formattedTableData = quodata.items.map(item => ({
+                                id: item.id || Date.now(),
+                                item: item.description || '',
+                                quantity: parseFloat(item.quantity) || 0,
+                                price: parseFloat(item.price) || 0,
+                                tax: parseFloat(item.tax) || 0,
+                                amount: (parseFloat(item.quantity || 0) * parseFloat(item.price || 0)).toString(),
+                                description: item.description || '',
+                            }));
+                            setTableData(formattedTableData);
+                        }
+
+                        // Set discount rate
+                        if (quodata.discountRate) {
+                            setDiscountRate(parseFloat(quodata.discountRate));
+                        }
+
+                        // Calculate totals
+                        calculateTotal(quodata.items || [], parseFloat(quodata.discountRate) || 0);
+                    }
+                } catch (error) {
+                    message.error('Failed to fetch quotation details');
+                }
             }
-        }
-    }, [idd]);
+        };
+
+        fetchAndSetData();
+    }, [idd, quotationData, form]);
 
     const handleFinish = async (values) => {
             // Ensure valid_till is properly formatted
@@ -119,26 +154,25 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
 
     // Function to handle adding a new row
     const handleAddRow = () => {
-        setRows([
-            ...rows,
-            {
-                id: Date.now(),
-                item: "",
-                quantity: "",
-                price: "",
-                discount: "",
-                tax: "",
-                amount: "0",
-                description: "",
-                isNew: true,
-            },
-        ]);
+        const newRow = {
+            id: Date.now(), // Unique ID for the new row
+            item: "",
+            quantity: 1,
+            price: "",
+            tax: 0,
+            amount: "0",
+            description: "",
+        };
+        
+        setTableData([...tableData, newRow]);
     };
 
-    // Delete row
+    // Function to handle deleting a row
     const handleDeleteRow = (id) => {
-        if (rows.length > 1) {
-            setRows(rows.filter(row => row.id !== id));
+        if (tableData.length > 1) {
+            const updatedData = tableData.filter(row => row.id !== id);
+            setTableData(updatedData);
+            calculateTotal(updatedData, discountRate);
         } else {
             message.warning('At least one item is required');
         }
@@ -268,6 +302,16 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
                         <div>
                             <div className="overflow-x-auto">
 
+                            <div className="form-buttons text-left mt-2 mb-2 justify-end flex">
+                            <Button 
+                    type="primary"
+                    onClick={handleAddRow}
+                    icon={<PlusOutlined />}
+                  >
+                    Add Items
+                  </Button>
+                            </div>
+
                                 <table className="w-full border border-gray-200 bg-white">
                                     <thead className="bg-gray-100">
                                         <tr>
@@ -308,6 +352,7 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
                                                             onChange={(e) => handleTableDataChange(row.id, 'quantity', e.target.value)}
                                                             placeholder="Qty"
                                                             className="w-full p-2 border rounded"
+                                                            min="1"
                                                         />
                                                     </td>
                                                     <td className="px-4 py-2 border-b">
@@ -317,13 +362,14 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
                                                             onChange={(e) => handleTableDataChange(row.id, 'price', e.target.value)}
                                                             placeholder="Price"
                                                             className="w-full p-2 border rounded-s"
+                                                            min="0"
                                                         />
                                                     </td>
                                                     <td className="px-4 py-2 border-b">
                                                         <select
                                                             value={row.tax}
                                                             onChange={(e) => handleTableDataChange(row.id, 'tax', e.target.value)}
-                                                            className="w-full p-2 border"
+                                                            className="w-full p-2 border rounded"
                                                         >
                                                             <option value="0">Nothing Selected</option>
                                                             <option value="10">GST:10%</option>
@@ -361,11 +407,7 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
                                     </tbody>
                                 </table>
                             </div>
-                            <div className="form-buttons text-left mt-2">
-                                <Button className='border-0 text-blue-500' onClick={handleAddRow}>
-                                    <PlusOutlined />  Add Items
-                                </Button>
-                            </div>
+                           
 
                             {/* Summary Section */}
                             <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">

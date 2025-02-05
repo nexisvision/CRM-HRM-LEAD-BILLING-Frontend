@@ -9,6 +9,7 @@ import {
   Row,
   Modal,
   Col,
+  Switch
 } from "antd";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form } from "antd";
@@ -36,40 +37,117 @@ const EditBilling = ({ idd, onClose }) => {
     dispatch(getbil(lid));
   }, []);
 
+  const [showTax, setShowTax] = useState(false);
+
+  const [discountRate, setDiscountRate] = useState(0);
+  const [totals, setTotals] = useState({
+    subtotal: "0.00",
+    discount: "0.00",
+    totalTax: "0.00",
+    finalTotal: "0.00",
+  });
+
+  const [tableData, setTableData] = useState([
+    {
+      id: Date.now(),
+      item: "",
+      quantity: 1,
+      price: 0,
+      tax: 0,
+      amount: 0,
+      description: "",
+    },
+  ]);
+
   const bildata = useSelector((state) => state.salesbilling);
   const fnsdatas = bildata.salesbilling.data;
 
   useEffect(() => {
     const fnd = fnsdatas.find((item) => item.id === idd);
     if (fnd) {
-      // Set all form fields
-      form.setFieldsValue({
-        vendor: fnd.vendor,
-        billDate: fnd.billDate ? moment(fnd.billDate) : null,
-        status: fnd.status,
-        billNumber: fnd.billNumber,
-        description: fnd.description,
-        discount: fnd.discount,
-        tax: fnd.tax,
-        note: fnd.note,
-      });
+      try {
+        // Parse items if they're stored as a string
+        let itemsArray = [];
+        if (fnd.items) {
+          try {
+            itemsArray = typeof fnd.items === 'string' 
+              ? JSON.parse(fnd.items) 
+              : fnd.items;
+          } catch (error) {
+            console.error("Error parsing items:", error);
+            itemsArray = [];
+          }
+        }
 
-      // Set rows data if it exists
-      if (fnd.items && Array.isArray(fnd.items)) {
-        const formattedRows = fnd.items.map((item) => ({
-          id: Date.now() + Math.random(), // Generate unique id
-          item: item.item,
-          quantity: item.quantity,
-          price: item.price,
-          discount: item.discount,
-          tax: item.tax,
-          amount: item.amount,
-          description: item.description,
-          category: item.category,
-          referenceNumber: item.referenceNumber,
-          isNew: false,
-        }));
-        setRows(formattedRows);
+        // Set form fields
+        form.setFieldsValue({
+          vendor: fnd.vendor || "",
+          billDate: fnd.billDate ? moment(fnd.billDate) : null,
+          status: fnd.status || "",
+          billNumber: fnd.billNumber || "",
+          discount: fnd.discount || 0,
+          tax: fnd.tax || 0,
+          note: fnd.note || "",
+        });
+
+        // Set rows with items data
+        if (itemsArray && Array.isArray(itemsArray) && itemsArray.length > 0) {
+          const formattedRows = itemsArray.map((item) => ({
+            id: Date.now() + Math.random(), // Generate unique ID
+            item: item.item || "",
+            quantity: Number(item.quantity) || 1,
+            price: Number(item.price) || 0,
+            discount: Number(item.discount) || 0,
+            tax: Number(item.tax) || 0,
+            amount: calculateAmount({
+              quantity: Number(item.quantity) || 1,
+              price: Number(item.price) || 0,
+              discount: Number(item.discount) || 0,
+              tax: Number(item.tax) || 0
+            }),
+            description: item.description || "",
+            category: item.category || "",
+            referenceNumber: item.referenceNumber || "",
+          }));
+          setRows(formattedRows);
+
+          // For debugging
+          console.log('Loaded Items:', formattedRows);
+        } else {
+          // Set default row if no items exist
+          setRows([{
+            id: Date.now(),
+            item: "",
+            quantity: 1,
+            price: 0,
+            discount: 0,
+            tax: 0,
+            amount: 0,
+            description: "",
+            category: "",
+            referenceNumber: "",
+          }]);
+        }
+
+        // Parse and set description if it exists
+        if (fnd.description) {
+          try {
+            const descriptionObj = typeof fnd.description === 'string'
+              ? JSON.parse(fnd.description)
+              : fnd.description;
+            
+            form.setFieldsValue({
+              description: descriptionObj.description || ""
+            });
+          } catch (error) {
+            console.error("Error parsing description:", error);
+            form.setFieldsValue({ description: "" });
+          }
+        }
+
+      } catch (error) {
+        console.error("Error setting form data:", error);
+        message.error("Error loading bill data");
       }
     }
   }, [fnsdatas, idd, form]);
@@ -122,47 +200,82 @@ const EditBilling = ({ idd, onClose }) => {
   };
 
   const handleFieldChange = (id, field, value) => {
-    const updatedRows = rows.map((row) =>
-      row.id === id
-        ? { ...row, [field]: value, amount: calculateAmount(row) }
-        : row
-    );
+    const updatedRows = rows.map((row) => {
+      if (row.id === id) {
+        const updatedRow = { ...row, [field]: value };
+        return {
+          ...updatedRow,
+          amount: calculateAmount(updatedRow)
+        };
+      }
+      return row;
+    });
     setRows(updatedRows);
   };
 
   const calculateAmount = (row) => {
-    const { quantity, price, discount, tax } = row;
+    const quantity = Number(row.quantity) || 0;
+    const price = Number(row.price) || 0;
+    const discount = Number(row.discount) || 0;
+    const tax = Number(row.tax) || 0;
+
     const discountAmount = (price * discount) / 100;
     const priceAfterDiscount = price - discountAmount;
     const taxAmount = (priceAfterDiscount * tax) / 100;
     const totalAmount = (priceAfterDiscount + taxAmount) * quantity;
+
     return totalAmount.toFixed(2);
   };
 
-  const calculateTotals = () => {
-    let subtotal = 0;
-    let totalDiscount = 0;
-    let totalTax = 0;
-
-    rows.forEach((row) => {
-      const { quantity, price, discount, tax } = row;
-      const discountAmount = (price * discount) / 100;
-      const priceAfterDiscount = price - discountAmount;
-      const taxAmount = (priceAfterDiscount * tax) / 100;
-
-      subtotal += priceAfterDiscount * quantity;
-      totalDiscount += discountAmount * quantity;
-      totalTax += taxAmount * quantity;
+  const handleTableDataChange = (id, field, value) => {
+    const updatedData = tableData.map((row) => {
+      if (row.id === id) {
+        const updatedRow = { ...row, [field]: value };
+        
+        if (field === 'quantity' || field === 'price' || field === 'tax') {
+          const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
+          const price = parseFloat(field === 'price' ? value : row.price) || 0;
+          const tax = showTax ? (parseFloat(field === 'tax' ? value : row.tax) || 0) : 0;
+          
+          const baseAmount = quantity * price;
+          const taxAmount = (baseAmount * tax) / 100;
+          updatedRow.amount = (baseAmount + taxAmount).toFixed(2);
+        }
+        
+        return updatedRow;
+      }
+      return row;
     });
 
-    const totalAmount = subtotal + totalTax - totalDiscount;
+    setTableData(updatedData);
+    calculateTotal(updatedData, discountRate);
+  };
 
-    return {
+  const calculateTotal = (data, discountRate) => {
+    let subtotal = 0;
+    let totalTax = 0;
+
+    data.forEach((row) => {
+      const quantity = parseFloat(row.quantity) || 0;
+      const price = parseFloat(row.price) || 0;
+      const tax = showTax ? (parseFloat(row.tax) || 0) : 0;
+      
+      const baseAmount = quantity * price;
+      const taxAmount = (baseAmount * tax) / 100;
+      
+      subtotal += baseAmount;
+      totalTax += taxAmount;
+    });
+
+    const discount = (subtotal * (parseFloat(discountRate) || 0)) / 100;
+    const finalTotal = subtotal - discount + totalTax;
+
+    setTotals({
       subtotal: subtotal.toFixed(2),
-      totalDiscount: totalDiscount.toFixed(2),
+      discount: discount.toFixed(2),
       totalTax: totalTax.toFixed(2),
-      totalAmount: totalAmount.toFixed(2),
-    };
+      finalTotal: finalTotal.toFixed(2),
+    });
   };
 
   const handleSubmit = () => {
@@ -170,7 +283,7 @@ const EditBilling = ({ idd, onClose }) => {
       .validateFields()
       .then((values) => {
         const { subtotal, totalDiscount, totalTax, totalAmount } =
-          calculateTotals();
+          calculateTotal();
 
         const selectedTag = tags.find((tag) => tag.name === values.status);
 
@@ -206,12 +319,13 @@ const EditBilling = ({ idd, onClose }) => {
           return {
             vendor: values.vendor,
             billDate: values.billDate?.format("YYYY-MM-DD"),
-            discription:values.description, // Pass the structured discription object
+            discription, // Pass the structured discription object
             status: values.status,
             discount: Number(totalDiscount),
             tax: Number(totalTax),
             total: Number(totalAmount),
             note: values.note || "",
+            
           };
         };
 
@@ -408,152 +522,191 @@ const EditBilling = ({ idd, onClose }) => {
         </Card>
 
         <Card>
-          <h4 className="font-semibold text-lg mb-3">Product & Services</h4>
+          <div className="flex justify-between items-center mb-4">
+            <h4 className="font-semibold text-lg">Product & Services</h4>
+            <div className="flex items-center gap-2">
+              <span>Enable Tax</span>
+              <Switch
+                checked={showTax}
+                onChange={(checked) => {
+                  setShowTax(checked);
+                  if (!checked) {
+                    const updatedData = tableData.map(row => ({
+                      ...row,
+                      tax: 0,
+                      amount: calculateAmount({ ...row, tax: 0 })
+                    }));
+                    setTableData(updatedData);
+                    calculateTotal(updatedData, discountRate);
+                  }
+                }}
+              />
+            </div>
+          </div>
+
           <div>
             <div className="form-buttons text-right mb-2">
-              <Button type="primary" onClick={handleAddRow}>
-                <PlusOutlined /> Add Items
+              <Button 
+                type="primary" 
+                onClick={handleAddRow}
+                icon={<PlusOutlined />}
+              >
+                Add Items
               </Button>
             </div>
-            <table className="w-full border border-gray-200 bg-white">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                    ITEMS
-                  </th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                    QUANTITY
-                  </th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                    PRICE
-                  </th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                    DISCOUNT
-                  </th>
-                  <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                    TAX (%)
-                  </th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 border-b">
-                    AMOUNT
-                  </th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-700 border-b">
-                    ACTIONS
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row) => (
-                  <tr key={row.id}>
-                    <td className="px-4 py-2 border-b">
-                      <select
-                        className="w-full p-2 border rounded"
-                        value={row.item}
-                        onChange={(e) =>
-                          handleFieldChange(row.id, "item", e.target.value)
-                        }
-                      >
-                        <option value="">--</option>
-                        <option value="item1">Item 1</option>
-                        <option value="item2">Item 2</option>
-                      </select>
-                    </td>
-                    <td className="px-4 py-2 border-b">
-                      <input
-                        type="number"
-                        value={row.quantity}
-                        onChange={(e) =>
-                          handleFieldChange(
-                            row.id,
-                            "quantity",
-                            Number(e.target.value)
-                          )
-                        }
-                        className="w-full p-2 border rounded"
-                      />
-                    </td>
-                    <td className="px-4 py-2 border-b">
-                      <div className="flex items-center">
-                        <input
-                          type="number"
-                          value={row.price}
-                          onChange={(e) =>
-                            handleFieldChange(
-                              row.id,
-                              "price",
-                              Number(e.target.value)
-                            )
-                          }
-                          className="w-full p-2 border rounded-s"
-                        />
-                        <span className="text-gray-500 border border-s rounded-e px-3 py-2">
-                          $
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-2 border-b">
-                      <input
-                        type="number"
-                        value={row.discount}
-                        onChange={(e) =>
-                          handleFieldChange(
-                            row.id,
-                            "discount",
-                            Number(e.target.value)
-                          )
-                        }
-                        className="w-full p-2 border rounded"
-                      />
-                    </td>
-                    <td className="px-4 py-2 border-b">
-                      <select
-                        value={row.tax}
-                        onChange={(e) => handleFieldChange(row.id, 'tax', e.target.value)}
-                        className="w-full p-2 border"
-                      >
-                        <option value="0">Nothing Selected</option>
-                        <option value="10">GST:10%</option>
-                        <option value="18">CGST:18%</option>
-                        <option value="10">VAT:10%</option>
-                        <option value="10">IGST:10%</option>
-                        <option value="10">UTGST:10%</option>
-                      </select>
-                    </td>
-                    <td className="px-4 py-2 border-b text-center">
-                      {row.amount}
-                    </td>
-                    <td className="px-2 py-1 border-b text-center">
-                      <Button danger onClick={() => handleDeleteRow(row.id)}>
-                        <DeleteOutlined />
-                      </Button>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full border border-gray-200 bg-white">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Description<span className="text-red-500">*</span>
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Quantity<span className="text-red-500">*</span>
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Unit Price<span className="text-red-500">*</span>
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      {showTax ? 'TAX (%)' : 'TAX'}
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Amount
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Actions
+                    </th>
                   </tr>
-                ))}
+                </thead>
+                <tbody>
+                  {tableData.map((row) => (
+                    <React.Fragment key={row.id}>
+                      <tr>
+                        <td className="px-4 py-2 border-b">
+                          <input
+                            type="text"
+                            value={row.item}
+                            onChange={(e) => handleTableDataChange(row.id, "item", e.target.value)}
+                            placeholder="Item Name"
+                            className="w-full p-2 border rounded"
+                          />
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                          <input
+                            type="number"
+                            min="1"
+                            value={row.quantity}
+                            onChange={(e) => handleTableDataChange(row.id, "quantity", e.target.value)}
+                            placeholder="Qty"
+                            className="w-full p-2 border rounded"
+                          />
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                          <input
+                            type="number"
+                            min="0"
+                            value={row.price}
+                            onChange={(e) => handleTableDataChange(row.id, "price", e.target.value)}
+                            placeholder="Price"
+                            className="w-full p-2 border rounded"
+                          />
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                          {showTax ? (
+                            <select
+                              value={row.tax}
+                              onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
+                              className="w-full p-2 border rounded"
+                            >
+                              <option value="0">Nothing Selected</option>
+                              <option value="10">GST:10%</option>
+                              <option value="18">CGST:18%</option>
+                              <option value="10">VAT:10%</option>
+                              <option value="10">IGST:10%</option>
+                              <option value="10">UTGST:10%</option>
+                            </select>
+                          ) : (
+                            <input
+                              type="text"
+                              value="0"
+                              disabled
+                              className="w-full p-2 border rounded bg-gray-100"
+                            />
+                          )}
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                          ₹{row.amount}
+                        </td>
+                        <td className="px-2 py-1 border-b text-center">
+                          <Button 
+                            danger 
+                            onClick={() => handleDeleteRow(row.id)}
+                            icon={<DeleteOutlined />}
+                          />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colSpan={6} className="px-4 py-2 border-b">
+                          <textarea
+                            rows={2}
+                            value={row.description}
+                            onChange={(e) => handleTableDataChange(row.id, "description", e.target.value)}
+                            placeholder="Description"
+                            className="w-[70%] p-2 border rounded"
+                          />
+                        </td>
+                      </tr>
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
+            <table className="w-full lg:w-[50%] p-2">
+              <tbody>
+                <tr className="flex justify-between px-2 py-2 border-x-2">
+                  <td className="font-medium">Sub Total</td>
+                  <td className="font-medium px-4 py-2">₹{totals.subtotal}</td>
+                </tr>
+
+                <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
+                  <td className="font-medium">Discount</td>
+                  <td className="flex items-center space-x-2">
+                    <div className="mb-4">
+                      <label className="block text-sm font-medium text-gray-700">
+                        Discount Rate (%)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={discountRate}
+                        onChange={(e) => {
+                          const newRate = parseFloat(e.target.value) || 0;
+                          setDiscountRate(newRate);
+                          calculateTotal(tableData, newRate);
+                        }}
+                        className="mt-1 block w-full p-2 border rounded"
+                      />
+                    </div>
+                  </td>
+                </tr>
+
+                <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
+                  <td className="font-medium">Total Tax</td>
+                  <td className="font-medium px-4 py-2">₹{totals.totalTax}</td>
+                </tr>
+
+                <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
+                  <td className="font-bold text-lg">Total Amount</td>
+                  <td className="font-bold text-lg px-4">₹{totals.finalTotal}</td>
+                </tr>
               </tbody>
             </table>
           </div>
 
-          <div className="mt-3 flex flex-col items-end space-y-2">
-            <div className="flex justify-between w-full sm:w-1/2">
-              <span className="text-sm">Subtotal:</span>
-              <span className="text-sm">${calculateTotals().subtotal}</span>
-            </div>
-            <div className="flex justify-between w-full sm:w-1/2">
-              <span className="text-sm">Discount:</span>
-              <span className="text-sm">
-                ${calculateTotals().totalDiscount}
-              </span>
-            </div>
-            <div className="flex justify-between w-full sm:w-1/2">
-              <span className="text-sm">Tax:</span>
-              <span className="text-sm">${calculateTotals().totalTax}</span>
-            </div>
-            <div className="flex justify-between w-full sm:w-1/2">
-              <span className="font-bold">Total:</span>
-              <span className="font-bold">
-                ${calculateTotals().totalAmount}
-              </span>
-            </div>
-          </div>
         </Card>
 
         <div className="mt-3 flex justify-end">

@@ -62,7 +62,7 @@ const EditCrediteNotes = ({ idd, onClose }) => {
   return (
     <div>
       <div>
-        <h2 className="mb-3 border-b pb-[5px] font-medium">Edit Credit Note</h2>
+        <h2 className="mb-3 border-b pb-[5px] font-medium"></h2>
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}

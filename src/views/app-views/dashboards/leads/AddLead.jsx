@@ -26,6 +26,7 @@ import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeS
 import { GetLable, AddLable } from "../project/milestone/LableReducer/LableSlice";
 import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
 
 const { Option } = Select;
 
@@ -35,9 +36,12 @@ const AddLead = ({ onClose }) => {
   const [details, setDetails] = useState(false);
   const [info, setInfo] = useState(false);
   const [organisation, setorganisation] = useState(false);
-
-  const { currencies } = useSelector((state) => state.currencies);
+ 
+//  const { currencies } = useSelector((state) => state.currencies);
+const currenciesState = useSelector((state) => state.currencies);
+  const currencies = currenciesState?.currencies?.data || [];
   const { data: employee } = useSelector((state) => state.employee.employee);
+  const [selectedCurrency, setSelectedCurrency] = useState(null);
   const alltagdata = useSelector((state) => state.Lable);
   const datas = alltagdata.Lable.data || [];
   const user = useSelector((state) => state.user.loggedInUser);
@@ -110,6 +114,7 @@ const AddLead = ({ onClose }) => {
 
   useEffect(() => {
     dispatch(getstages());
+    dispatch(getallcountries());
   }, []);
 
   const allstagedata = useSelector((state) => state.StagesLeadsDeals);
@@ -205,42 +210,61 @@ const AddLead = ({ onClose }) => {
       });
   };
 
-  const LeadValueField = ({ field, form }) => (
-    <Col span={24} className="mt-2">
-      <div className="form-item">
-        <div className="flex gap-2">
-          <Field
-            name="leadValue"
-            type="number"
-            as={Input}
-            placeholder="Enter Lead Value"
-            className="w-full"
-          />
-          <Field name="currencyId">
-            {({ field, form }) => (
-              <Select
-                {...field}
-                className="w-full"
-                placeholder="Currency"
-                onChange={(value) => form.setFieldValue("currencyId", value)}
-              >
-                {Array.isArray(currencies) && currencies?.map((currency) => (
-                  <Option key={currency.id} value={currency.id}>
-                    {currency.currencyCode} ({currency.currencyIcon})
-                  </Option>
-                ))}
-              </Select>
-            )}
-          </Field>
-        </div>
-        <ErrorMessage
-          name="leadValue"
-          component="div"
-          className="error-message text-red-500 my-1"
-        />
-      </div>
-    </Col>
-  );
+ const LeadValueField = ({ field, form }) => (
+     <Col span={24} className="mt-2">
+       <div className="form-item">
+         <div className="flex gap-2">
+           <Field
+             name="leadValue"
+             type="number"
+             as={Input}
+             placeholder="Enter Lead Value"
+             className="w-full"
+           />
+           <Field name="currencyId">
+             {({ field, form }) => (
+               <Select
+                 {...field}
+                 className="w-full"
+                 placeholder="Currency"
+                 onChange={(value) => {
+                   form.setFieldValue("currencyId", value);
+                   const selected = currencies.find(c => c.id === value);
+                   setSelectedCurrency(selected);
+                 }}
+                 value={field.value}
+               >
+                 {Array.isArray(currencies) && currencies.length > 0 ? (
+                   currencies.map((currency) => (
+                     <Option
+                       key={currency.id}
+                       value={currency.id}
+                     >
+                       {currency.currencyCode} ({currency.currencyIcon})
+                     </Option>
+                   ))
+                 ) : (
+                   <Option value="" disabled>
+                     Loading currencies...
+                   </Option>
+                 )}
+               </Select>
+             )}
+           </Field>
+         </div>
+         <ErrorMessage
+           name="leadValue"
+           component="div"
+           className="error-message text-red-500 my-1"
+         />
+         <ErrorMessage
+           name="currencyId"
+           component="div"
+           className="error-message text-red-500 my-1"
+         />
+       </div>
+     </Col>
+   );
 
   return (
     <div className="add-job-form">
@@ -407,21 +431,21 @@ const AddLead = ({ onClose }) => {
               </Col>
 
               <Col span={12} className="">
-                <div className="form-item">
-                  <label className="font-semibold">Lead Value</label>
-                  <Field name="leadValue" component={LeadValueField} />
-                  <ErrorMessage
-                    name="leadValue.amount"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                  <ErrorMessage
-                    name="leadValue.currencyId"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                              <div className="form-item">
+                                <label className="font-semibold">Lead Value</label>
+                                <Field name="leadValue" component={LeadValueField} />
+                                <ErrorMessage
+                                  name="leadValue.amount"
+                                  component="div"
+                                  className="error-message text-red-500 my-1"
+                                />
+                                <ErrorMessage
+                                  name="leadValue.currencyId"
+                                  component="div"
+                                  className="error-message text-red-500 my-1"
+                                />
+                              </div>
+                            </Col>
 
               <Col span={12} className="mt-2">
                 <div className="form-item">

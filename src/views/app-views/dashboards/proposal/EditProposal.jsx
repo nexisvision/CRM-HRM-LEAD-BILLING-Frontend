@@ -312,7 +312,7 @@ const EditProposal = ({id, onClose }) => {
         date:'',
         currency: '',
         calculatedtax:  "",
-       
+         
     };
 
     const validationSchema = Yup.object({

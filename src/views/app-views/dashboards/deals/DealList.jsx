@@ -41,7 +41,7 @@ import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/Co
 import { getstages } from '../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice';
 
 const DealList = () => {
-  const [users, setUsers] = useState(userData);
+  const [users, setUsers] = useState([]);
   const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const navigate = useNavigate();
@@ -61,6 +61,7 @@ const DealList = () => {
   const [dealStatisticData] = useState(DealStatisticData);
 
   const tabledata = useSelector((state) => state.Deals);
+  const clientsData = useSelector((state) => state?.SubClient?.SubClient?.data || []);
 
   // Add new state for stages
   const [stagesList, setStagesList] = useState([]);
@@ -186,16 +187,23 @@ const DealList = () => {
   };
 
   useEffect(() => {
-    // Fetch deals and stages data
     dispatch(GetDeals());
+    dispatch(ClientData());
     dispatch(getstages());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (tabledata && tabledata.Deals && tabledata.Deals.data) {
-      setUsers(tabledata.Deals.data);
+      const dealsWithClientInfo = tabledata.Deals.data.map(deal => {
+        const clientInfo = clientsData?.find(client => client.id === deal.clients);
+        return {
+          ...deal,
+          clientName: clientInfo?.username || clientInfo?.name || 'N/A'
+        };
+      });
+      setUsers(dealsWithClientInfo);
     }
-  }, [tabledata]);
+  }, [tabledata, clientsData]);
 
   useEffect(() => {
     if (stagesData && stagesData.StagesLeadsDeals && stagesData.StagesLeadsDeals.data) {
@@ -207,10 +215,6 @@ const DealList = () => {
     openEditDealModal();
     setIdd(id);
   };
-
-  useEffect(() => {
-    dispatch(ClientData());
-  }, [dispatch]);
 
   // Function to get stage name by ID
   const getStageName = (stageId) => {
@@ -291,26 +295,41 @@ const DealList = () => {
       title: "Name",
       dataIndex: "dealName",
       sorter: {
-        compare: (a, b) => a.branch.length - b.branch.length,
+        compare: (a, b) => a.dealName.localeCompare(b.dealName),
       },
     },
     {
       title: "Price",
       dataIndex: "price",
       sorter: {
-        compare: (a, b) => a.title.length - b.title.length,
+        compare: (a, b) => a.price - b.price,
       },
     },
     {
       title: "Stage",
       dataIndex: "stage",
-      render: (stageId) => getStageName(stageId), // Convert ID to name
+      render: (stageId) => getStageName(stageId),
       sorter: {
         compare: (a, b) => {
           const stageNameA = getStageName(a.stage);
           const stageNameB = getStageName(b.stage);
           return stageNameA.localeCompare(stageNameB);
         },
+      },
+    },
+    {
+      title: "Client",
+      dataIndex: "clientName",
+      render: (_, record) => (
+        <div className="d-flex">
+          <AvatarStatus 
+            size={30}
+            name={record.clientName}
+          />
+        </div>
+      ),
+      sorter: {
+        compare: (a, b) => (a.clientName || '').localeCompare(b.clientName || ''),
       },
     },
     {
@@ -329,16 +348,6 @@ const DealList = () => {
       },
     },
     {
-      title: "User",
-      dataIndex: "client",
-      render: (_, record) => (
-        <div className="d-flex">
-        <AvatarStatus size={30} src={record.client?.avatar} name={record.client?.name} />
-      </div>
-      ),
-      sorter: (a, b) => utils.antdTableSorter(a.client?.name, b.client?.name),
-    },
-    {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (
@@ -348,6 +357,13 @@ const DealList = () => {
       ),
     },
   ];
+
+  // For debugging
+  useEffect(() => {
+    console.log('Deals Data:', tabledata?.Deals?.data);
+    console.log('Clients Data:', clientsData);
+    console.log('Mapped Users:', users);
+  }, [users]);
 
   return (
     <Card bodyStyle={{ padding: "-3px" }}>

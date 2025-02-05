@@ -22,6 +22,7 @@ import { AddRevenues, getRevenue } from "./RevenueReducer/RevenueSlice";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import { useParams } from "react-router-dom";
+// import { GetAccounts } from '../accounts/AccountReducer/AccountSlice';
 
 const { Option } = Select;
 
@@ -128,38 +129,61 @@ const AddRevenue = ({ onClose }) => {
   const customerdata = useSelector((state) => state.customers);
   const fnddata = customerdata.customers.data;
 
+  // Get accounts from Redux store
+  const accountsData = useSelector((state) => state?.accounts?.accounts?.data || []);
+
+  // Fetch accounts when component mounts
+  // useEffect(() => {
+  //   dispatch(GetAccounts());
+  // }, [dispatch]);
+
+  const initialValues = {
+    date: null,
+    amount: "",
+    account: "",
+    accountNumber: "",
+    bankName: "",
+    branchName: "",
+    customer: "",
+    currency: "",
+    description: "",
+    category: "",
+    paymentReceipt: "",
+  };
+
+  const validationSchema = Yup.object({
+    date: Yup.date().nullable().required("Date is required."),
+    amount: Yup.number()
+      .typeError("Amount must be a number")
+      .positive("Amount must be positive")
+      .required("Please enter an amount."),
+    account: Yup.string().required("Please enter account."),
+    accountNumber: Yup.string()
+      .matches(/^\d{9,18}$/, "Account number must be between 9 and 18 digits")
+      .required("Please enter account number."),
+    bankName: Yup.string().required("Please enter bank name."),
+    branchName: Yup.string().required("Please enter branch name."),
+    currency: Yup.string().required("Please select currency."),
+    customer: Yup.string().required("Please select customer."),
+    description: Yup.string().required("Please enter description."),
+    category: Yup.string().required("Please select category."),
+    paymentReceipt: Yup.string().optional("Please enter a paymentreceipt."),
+  });
+
   const onSubmit = (values, { resetForm }) => {
-    dispatch(AddRevenues(values)).then(() => {
+    // Convert amount to number before submitting
+    const formattedValues = {
+      ...values,
+      amount: parseFloat(values.amount) || 0,
+    };
+
+    dispatch(AddRevenues(formattedValues)).then(() => {
       dispatch(getRevenue());
       message.success("Revenue added successfully!");
       onClose();
       resetForm();
     });
   };
-
-  const initialValues = {
-    date: null,
-    amount: "",
-    account: "",
-    customer: "",
-    currency: "",
-    description: "",
-    category: "",
-    // reference: "",
-    paymentReceipt: "",
-  };
-
-  const validationSchema = Yup.object({
-    date: Yup.date().nullable().required("Date is required."),
-    amount: Yup.string().required("Please enter a amount."),
-    account: Yup.string().required("Please select account."),
-    currency: Yup.string().required("Please select currency."),
-    customer: Yup.string().required("Please select customer."),
-    description: Yup.string().required("Please enter description."),
-    category: Yup.string().required("Please select customer."),
-    // reference: Yup.string().required("Please enter description."),
-    paymentReceipt: Yup.string().optional("Please enter a paymentreceipt."),
-  });
 
   return (
     <div className="add-job-form">
@@ -203,8 +227,17 @@ const AddRevenue = ({ onClose }) => {
                       <label className="font-semibold">Amount</label>
                       <Field
                         name="amount"
+                        type="number"
+                        step="0.01"
+                        min="0"
                         as={Input}
                         placeholder="Enter Amount"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          const numericValue = value.replace(/[^\d.]/g, '');
+                          const formattedValue = numericValue.replace(/(\..*)\./g, '$1');
+                          setFieldValue("amount", formattedValue);
+                        }}
                         onBlur={() => setFieldTouched("amount", true)}
                       />
                       <ErrorMessage
@@ -219,23 +252,77 @@ const AddRevenue = ({ onClose }) => {
                       <label className="font-semibold">Account</label>
                       <Field name="account">
                         {({ field }) => (
-                          <Select
+                          <Input
                             {...field}
-                            className="w-full"
                             placeholder="Select Account"
-                            onChange={(value) =>
-                              setFieldValue("account", value)
-                            }
-                            value={values.account}
+                            maxLength={18}
+                            // onChange={(e) => {
+                            //   const value = e.target.value.replace(/\D/g, '');
+                            //   setFieldValue("accountNumber", value);
+                            // }}
                             onBlur={() => setFieldTouched("account", true)}
-                          >
-                            <Option value="xyz">XYZ</Option>
-                            <Option value="abc">ABC</Option>
-                          </Select>
+
+
+                          />
                         )}
                       </Field>
                       <ErrorMessage
                         name="account"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+
+                      />
+                    </div>
+                  </Col>
+                  <Col span={12} className="mt-2">
+                    <div className="form-item">
+                      <label className="font-semibold">Account Number</label>
+                      <Field name="accountNumber">
+                        {({ field }) => (
+                          <Input
+                            {...field}
+                            placeholder="Enter Account Number"
+                            maxLength={18}
+                            // onChange={(e) => {
+                            //   const value = e.target.value.replace(/\D/g, '');
+                            //   setFieldValue("accountNumber", value);
+                            // }}
+                            onBlur={() => setFieldTouched("accountNumber", true)}
+                          />
+                        )}
+                      </Field>
+                      <ErrorMessage
+                        name="accountNumber"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+                  <Col span={12} className="mt-2">
+                    <div className="form-item">
+                      <label className="font-semibold">Bank Name</label>
+                      <Field
+                        name="bankName"
+                        as={Input}
+                        placeholder="Enter Bank Name"
+                      />
+                      <ErrorMessage
+                        name="bankName"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+                  <Col span={12} className="mt-2">
+                    <div className="form-item">
+                      <label className="font-semibold">Branch Name</label>
+                      <Field
+                        name="branchName"
+                        as={Input}
+                        placeholder="Enter Branch Name"
+                      />
+                      <ErrorMessage
+                        name="branchName"
                         component="div"
                         className="error-message text-red-500 my-1"
                       />

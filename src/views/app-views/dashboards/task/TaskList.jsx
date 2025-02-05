@@ -57,6 +57,19 @@ const getOrderStatus = (status) => {
 };
 
 const orderStatusList = ["Normal", "Expired"];
+
+const stripHtmlTags = (html) => {
+  if (!html) return '';
+  // First, decode any HTML entities
+  const decoded = html.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+  // Create a temporary element
+  const temp = document.createElement('div');
+  // Set the HTML content
+  temp.innerHTML = decoded;
+  // Get the text content
+  return temp.textContent || temp.innerText || '';
+};
+
 const TaskList = () => {
   // const [annualStatisticData] = useState(AnnualStatisticData);
 
@@ -237,19 +250,27 @@ const TaskList = () => {
       },
     },
     {
-      title: "description",
+      title: "Description",
       dataIndex: "description",
+      render: (text) => {
+        const cleanText = stripHtmlTags(text);
+        return <span>{cleanText}</span>;
+      },
       sorter: {
-        compare: (a, b) => a.description.length - b.description.length,
+        compare: (a, b) => {
+          const textA = stripHtmlTags(a.description || '');
+          const textB = stripHtmlTags(b.description || '');
+          return textA.length - textB.length;
+        },
       },
     },
-    {
-      title: "priority",
-      dataIndex: "priority",
-      sorter: {
-        compare: (a, b) => a.priority.length - b.priority.length,
-      },
-    },
+    // {
+    //   title: "Priority",
+    //   dataIndex: "priority",
+    //   sorter: {
+    //     compare: (a, b) => a.priority.length - b.priority.length,
+    //   },
+    // },
     // {
     //   title: "Date",
     //   dataIndex: "date",

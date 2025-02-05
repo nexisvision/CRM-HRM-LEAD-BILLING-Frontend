@@ -12,6 +12,9 @@ import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlic
 import { GetLeads } from "../leads/LeadReducers/LeadSlice";
 import { GetProject } from "../project/project-list/projectReducer/ProjectSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import {getallcountries} from "../../setting/countries/countriesreducer/countriesSlice";
+
+import dayjs from "dayjs";
 const { Option } = Select;
 const EditDeal = ({ onClose, id }) => {
   const navigate = useNavigate();
@@ -22,6 +25,10 @@ const EditDeal = ({ onClose, id }) => {
   const { data: Leads } = useSelector((state) => state.Leads.Leads);
   const { data: Project } = useSelector((state) => state.Project.Project);
   const countries = useSelector((state) => state.countries.countries);
+
+  useEffect(() => {
+    dispatch(getallcountries());
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(getcurren());
@@ -102,46 +109,7 @@ const EditDeal = ({ onClose, id }) => {
   useEffect(() => {
     dispatch(GetProject());
   }, [dispatch]);
-  const LeadValueField = ({ field, form }) => (
-    <Col span={24} className="mt-2">
-      <div className="form-item">
-        <div className="flex gap-2">
-          <Field
-            name="leadValue"
-            type="number"
-            as={Input}
-            placeholder="Enter Lead Value"
-            className="w-full"
-          />
-          <Field name="currencyId">
-            {({ field, form }) => (
-              <Select
-                {...field}
-                className="w-full"
-                placeholder="Currency"
-                onChange={(value) => form.setFieldValue("currencyId", value)}
-              >
-                {Array.isArray(currencies) && currencies.length > 0 ? (
-                  currencies.map((currency) => (
-                    <Option key={currency.id} value={currency.id}>
-                      {currency.currencyCode} ({currency.currencyIcon})
-                    </Option>
-                  ))
-                ) : (
-                  <Option value="" disabled>No currencies available</Option>
-                )}
-              </Select>
-            )}
-          </Field>
-        </div>
-        <ErrorMessage
-          name="leadValue"
-          component="div"
-          className="error-message text-red-500 my-1"
-        />
-      </div>
-    </Col>
-  );
+
   return (
     <div className="add-job-form">
       <Formik
@@ -178,34 +146,34 @@ const EditDeal = ({ onClose, id }) => {
                 </div>
               </Col>
               <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Phone</label>
-                  <div className="flex">
-                    <Select
-                      style={{ width: '30%', marginRight: '8px' }}
-                      placeholder="Code"
-                      name="phoneCode"
-                      onChange={(value) => setFieldValue('phoneCode', value)}
-                    >
-                      {countries.map((country) => (
-                        <Option key={country.id} value={country.phoneCode}>
-                          (+{country.phoneCode})
-                        </Option>
-                      ))}
-                    </Select>
-                    <Field
+                  <div className="form-item">
+                    <label className="font-semibold">Phone</label>
+                    <div className="flex">
+                      <Select
+                        style={{ width: '30%', marginRight: '8px' }}
+                        placeholder="Code"
+                        name="phoneCode"
+                        onChange={(value) => setFieldValue('phoneCode', value)}
+                      >
+                        {countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            (+{country.phoneCode})
+                          </Option>
+                        ))}
+                      </Select>
+                      <Field
+                        name="phoneNumber"
+                        as={Input}
+                        style={{ width: '70%' }}
+                        placeholder="Enter phone"
+                      />
+                    </div>
+                    <ErrorMessage
                       name="phoneNumber"
-                      as={Input}
-                      style={{ width: '70%' }}
-                      placeholder="Enter phone"
+                      component="div"
+                      className="error-message text-red-500 my-1"
                     />
                   </div>
-                  <ErrorMessage
-                    name="phoneNumber"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
               </Col>
               <Col span={12} className="mt-4">
                 <div className="form-item">
@@ -311,7 +279,7 @@ const EditDeal = ({ onClose, id }) => {
                   />
                 </div>
               </Col> */}
-              <Col span={12} className="">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Pipeline</label>
                   <div className="flex gap-2">
@@ -389,12 +357,14 @@ const EditDeal = ({ onClose, id }) => {
                 <div className="form-item">
                   <label className="font-semibold">Closed Date</label>
                   <Field name="closedDate">
-                    {({ field }) => (
+                    {({ field, form }) => (
                       <DatePicker
-                        {...field}
                         className="mt-2"
                         style={{ width: "100%" }}
-                        onChange={(date) => setFieldValue("closedDate", date)}
+                        value={field.value ? dayjs(field.value) : null}
+                        onChange={(date) => {
+                          form.setFieldValue("closedDate", date ? date.toISOString() : null);
+                        }}
                       />
                     )}
                   </Field>
