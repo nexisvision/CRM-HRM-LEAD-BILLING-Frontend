@@ -18,14 +18,23 @@ const PlanList = () => {
   const [idd, setIdd] = useState("");
   const dispatch = useDispatch();
   const Plandata = useSelector((state) => state.Plan);
-  const allPlans = Plandata.Plan?.data || [];
+  const allPlans = Plandata.Plan;
+
+  const allempdatass = useSelector((state) => state.currencies);
+  const currencyData = allempdatass?.currencies?.data || [];
+
+
+
+  useEffect(() => {
+    dispatch(getcurren())
+  }, [])
 
   useEffect(() => {
     dispatch(GetPlan());
   }, [dispatch]);
 
   useEffect(() => {
-    setPlans(allPlans);
+    setPlans(allPlans || []);
   }, [allPlans]);
 
   const deletePlan = async (planId) => {
@@ -75,13 +84,9 @@ const PlanList = () => {
     }
   ];
 
-  useEffect(() => {
-    dispatch(getcurren())
-  }, [])
+  
 
-  const allempdatass = useSelector((state) => state.currencies);
-  const currencyData = allempdatass?.currencies?.data || [];
-
+  
   return (
     <div className="plan-list-container p-6 bg-gray-50 min-h-screen">
       <div className="mx-auto">
@@ -147,7 +152,7 @@ const PlanList = () => {
                               <span className="text-xl">{selectedCurrency?.currencyIcon || ''}</span>
                               {plan.price}
                             </div>
-                            <div className="text-gray-600 font-medium">per {plan.duration.toLowerCase()}</div>
+                            <div className="text-gray-600 font-medium">per {plan.duration ? plan.duration.toLowerCase() : 'N/A'}</div>
                           </>
                         );
                       })()}

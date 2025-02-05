@@ -86,6 +86,10 @@ const LeadList = () => {
 
   const tabledata = useSelector((state) => state.Leads);
 
+
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
+
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     const searchArray = value ? list : OrderListData;
@@ -136,9 +140,9 @@ const LeadList = () => {
 
       setUsers(users.filter((item) => item.id !== userId));
 
-      message.success({ content: "Deleted user successfully", duration: 2 });
+      // message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
-      console.error("Error deleting user:", error);
+      // console.error("Error deleting user:", error);
     }
   };
   const exportToExcel = () => {
@@ -170,11 +174,22 @@ const LeadList = () => {
     dispatch(GetLeads());
   }, [dispatch]);
 
+  // useEffect(() => {
+  //   if (tabledata && tabledata.Leads && tabledata.Leads.data) {
+  //     setUsers(tabledata.Leads.data);
+  //   }
+  // }, [tabledata]);
+
+
   useEffect(() => {
     if (tabledata && tabledata.Leads && tabledata.Leads.data) {
-      setUsers(tabledata.Leads.data);
+      // Filter leads by created_by matching the logged-in user's username
+      const filteredLeads = tabledata.Leads.data.filter(lead => lead.created_by === user);
+      setUsers(filteredLeads);
     }
-  }, [tabledata]);
+  }, [tabledata, user]);
+
+
 
   const EditFun = (id) => {
     setId(id);
@@ -183,7 +198,7 @@ const LeadList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -195,7 +210,7 @@ const LeadList = () => {
             <span className="">View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item>
         <Flex alignItems="center">
           <Button

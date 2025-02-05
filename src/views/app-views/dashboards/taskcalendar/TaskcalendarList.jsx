@@ -36,7 +36,7 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
     ? [...tasks].sort((a, b) => moment(a.taskDate).valueOf() - moment(b.taskDate).valueOf())
     : [];
 
-  console.log("Sorted Tasks: ", sortedTasks);
+  // console.log("Sorted Tasks: ", sortedTasks);
 
   const handleDelete = (task) => {
     Modal.confirm({
@@ -90,6 +90,10 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
   useEffect(() => {
     dispatch(GetTaskdata());
   }, []);
+
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
+
 
   const allTaskData = useSelector((state) => state.TaskCalander);
   const taskData = allTaskData?.TaskCalander.data || [];

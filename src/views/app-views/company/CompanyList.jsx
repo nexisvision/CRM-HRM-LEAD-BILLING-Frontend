@@ -36,6 +36,7 @@ import PlanUpgrade from "./PlanUpgrade";
 import CompanyCard from "./CompanyCard"; // Import the CompanyCard component
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
+import { getsubplandata } from "../subscribeduserplans/subplanReducer/subplanSlice";
 
 const { Option } = Select;
 const VIEW_LIST = "LIST";
@@ -58,12 +59,17 @@ const CompanyList = () => {
   // const [isEditCompanyCardModalVisible, setIsEditCompanyCardModalVisible] = useState(false);
 
   const tableData = useSelector((state) => state.ClientData);
+
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+
   useEffect(() => {
     dispatch(ClientData());
+    
   }, [dispatch]);
+
 
   useEffect(() => {
     if (tableData && tableData.ClientData && tableData.ClientData.data) {
@@ -174,35 +180,49 @@ const CompanyList = () => {
   const tableColumns = [
     {
       title: "Company",
-      dataIndex: "company",
-      sorter: (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1),
+      dataIndex: "username",
+      sorter: (a, b) => (a.username.toLowerCase() > b.username.toLowerCase() ? -1 : 1),
     },
     {
       title: "Email",
       dataIndex: "email",
       sorter: (a, b) => a.leavetype.length - b.leavetype.length,
     },
-    // {
-    //   title: " Application",
-    //   dataIndex: " Application",
-    //   sorter: (a, b) => a.leavetype.length - b.leavetype.length,
-    // },
-    // {
-    //   title: "Add By",
-    //   dataIndex: "Add By",
-    //   sorter: (a, b) => a.leavetype.length - b.leavetype.length,
-    // },
     {
-      title: "Plan Exprire On",
-      dataIndex: "plan Exprire On",
-      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+      title: "Phone",
+      dataIndex: "phone",
+      sorter: (a, b) => utils.antdTableSorter(a, b, "phone"),
     },
 
-    // {
-    //   title: "Expected Joining Date",
-    //   dataIndex: "Expected Joining Date",
-    //   sorter: (a, b) => a.totaldays.length - b.totaldays.length,
-    // },
+    {
+      title: "Last Name",
+      dataIndex: "lastName",
+      sorter: (a, b) => utils.antdTableSorter(a, b, "lastName"),
+    },
+
+    {
+      title: "GSTIN",
+      dataIndex: "gstIn",
+      sorter: (a, b) => utils.antdTableSorter(a, b, "gstIn"),
+    },
+
+    {
+      title: "Bank Name",
+      dataIndex: "bankname",
+      sorter: (a, b) => utils.antdTableSorter(a, b, "bankname"),
+    },
+    
+    {
+      title: "IFSC",
+      dataIndex: "ifsc",
+      sorter: (a, b) => utils.antdTableSorter(a, b, "ifsc"),
+    },
+
+    
+
+
+
+   
     {
       title: "Status",
       dataIndex: "status",
@@ -304,6 +324,8 @@ const CompanyList = () => {
         title="Edit Company"
         visible={isEditCompanyModalVisible}
         onCancel={() => setIsEditCompanyModalVisible(false)}
+        width={900}
+        // className="1200px"
         footer={null}
       >
         <EditCompany

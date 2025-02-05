@@ -24,12 +24,16 @@ const EditLeave = ({ editid, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const leaveData = useSelector((state) => state.Leave);
   const empData = useSelector((state) => state.employee || []);
 
-  console.log("bbbb", leaveData);
-  console.log("vvvv", empData);
+  // console.log("bbbb", leaveData);
+  // console.log("vvvv", empData);
   const employeedata = empData.employee.data;
+
+  const filteredEmpData = employeedata?.filter((item) => item.created_by === user);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   useEffect(() => {
@@ -40,13 +44,14 @@ const EditLeave = ({ editid, onClose }) => {
     if (
       editid &&
       leaveData?.Leave?.data.length > 0 &&
-      employeedata.length > 0
+      filteredEmpData.length > 0
     ) {
       const leave = leaveData.Leave.data.find((item) => item.id === editid);
 
+
       if (leave) {
         form.setFieldsValue({
-          employee_id: leave.employee_id,
+          employeeId: leave.employeeId,
           leaveType: leave.leaveType,
           startDate: leave.startDate
             ? moment(leave.startDate, "DD-MM-YYYY")
@@ -58,7 +63,8 @@ const EditLeave = ({ editid, onClose }) => {
         setIsDataLoaded(true);
       }
     }
-  }, [editid, leaveData, employeedata, form]);
+  }, [editid, leaveData, filteredEmpData, form]);
+
 
   const onFinish = async (values) => {
     try {
@@ -66,7 +72,7 @@ const EditLeave = ({ editid, onClose }) => {
       dispatch(EditLeaveAction({ id, values }))
         .then(() => {
           dispatch(GetLeave());
-          message.success("Leave details updated successfully!");
+          // message.success("Leave details updated successfully!");
           onClose();
           navigate("/app/hrm/leave");
         })
@@ -104,16 +110,17 @@ const EditLeave = ({ editid, onClose }) => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              name="employee_id"
+              name="employeeId"
               label="Employee"
               rules={[{ required: true, message: "Please select an employee" }]}
             >
               <Select placeholder="Select Employee">
-                {employeedata.map((emp) => (
+                {filteredEmpData.map((emp) => (
                   <Option key={emp.id} value={emp.id}>
                     {emp.username}
                   </Option>
                 ))}
+
               </Select>
             </Form.Item>
           </Col>

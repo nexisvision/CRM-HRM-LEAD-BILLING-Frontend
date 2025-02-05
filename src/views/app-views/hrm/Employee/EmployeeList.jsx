@@ -40,8 +40,12 @@ const EmployeeList = () => {
     useState(false);
   const [isViewEmployeeModalVisible, setIsViewEmployeeModalVisible] =
     useState(false);
+
+    const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.employee);
+
   const [sub, setSub] = useState(false);
+
 
   const allroledata = useSelector((state) => state.role);
   const fndroledata = allroledata.role.data;
@@ -84,10 +88,10 @@ const EmployeeList = () => {
    
       if (parsedPermissions["extra-hrm-employee"] && parsedPermissions["extra-hrm-employee"][0]?.permissions) {
         allpermisson = parsedPermissions["extra-hrm-employee"][0].permissions;
-        console.log('Parsed Permissions:', allpermisson);
+        // console.log('Parsed Permissions:', allpermisson);
       
       } else {
-        console.log('extra-hrm-employee is not available');
+        // console.log('extra-hrm-employee is not available');
       }
       
       const canCreateClient = allpermisson?.includes('create');
@@ -112,11 +116,11 @@ const EmployeeList = () => {
       await dispatch(deleteEmp(userId));
 
       const updatedData = await dispatch(empdata());
-      console.log("lll", updatedData);
+      // console.log("lll", updatedData);
 
       setUsers(updatedData.employee.data || updatedData.payload.data);
 
-      message.success({ content: "Deleted user successfully", duration: 2 });
+      // message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error);
     }
@@ -151,23 +155,45 @@ const EmployeeList = () => {
     setSub(false);
   }, [sub, dispatch]);
 
+
+
+
   useEffect(() => {
     if (tabledata && tabledata.employee && tabledata.employee.data) {
       const datas = tabledata.employee.data;
 
       if (datas) {
-        // const matchingRoleData = fndroledata.find(
-        //   (item) => item.role_name === "employee"
-        // );
+        // Filter employees by created_by matching the logged-in user's username
+        const filteredData = datas.filter(
+          (item) => item.created_by === user && item.employeeId
+        );
 
-        // const filteredData = datas.filter(
-        //   (item) => item.role_id && item.role_name === "employee"
-        // );
-
-        setUsers(datas);
+        setUsers(filteredData); // Set the filtered users
       }
     }
-  }, [tabledata]); // Make sure to include roleiddd in dependencies if it changes
+  }, [tabledata, user]);
+
+
+
+
+
+  // useEffect(() => {
+  //   if (tabledata && tabledata.employee && tabledata.employee.data) {
+  //     const datas = tabledata.employee.data;
+
+  //     if (datas) {
+  //       // const matchingRoleData = fndroledata.find(
+  //       //   (item) => item.role_name === "employee"
+  //       // );
+
+  //       // const filteredData = datas.filter(
+  //       //   (item) => item.role_id && item.role_name === "employee"
+  //       // );
+
+  //       setUsers(datas);
+  //     }
+  //   }
+  // }, [tabledata]); // Make sure to include roleiddd in dependencies if it changes
 
   // Dropdown menu component
   const dropdownMenu = (elm) => (

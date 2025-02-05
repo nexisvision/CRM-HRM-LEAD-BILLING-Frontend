@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./currenciesService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
+import { message } from "antd";
 
 // Async thunk for adding user
 
@@ -99,7 +100,7 @@ const initialIsAuth = () => {
     return item ? JSON.parse(item) : false;
 };
 
-const RoleAndPermissionSlice = createSlice({
+const currenciesSlice = createSlice({
     name: "currencies",
     initialState: {
         currencies:[],
@@ -144,12 +145,14 @@ const RoleAndPermissionSlice = createSlice({
             })
             .addCase(addcurren.fulfilled, (state, action) => {
                 state.isLoading = false;
-                toast.success(action.payload?.data?.message);
+                message.success(action.payload?.message);
             })
+
             .addCase(addcurren.rejected, (state, action) => {
                 state.isLoading = false;
-                toast.error(action.payload?.message);
+                message.error(action.payload?.message);
             })
+
 
             // .addCase(GetPlan.pending, (state) => {
             //     state.isLoading = true;
@@ -170,11 +173,13 @@ const RoleAndPermissionSlice = createSlice({
                     .addCase(getcurren.fulfilled, (state, action) => {
                         state.currencies = action.payload;
                         state.isLoading = false;
+                        toast.success(action.payload?.message);
                     })
                     .addCase(getcurren.rejected, (state, action) => {
                         state.isLoading = false;
-                        toast.error(action.payload?.message);
+                        message.error(action.payload?.message);
                     })
+
            
             //getall
             .addCase(getAllUsers.pending, (state) => {
@@ -183,7 +188,7 @@ const RoleAndPermissionSlice = createSlice({
             .addCase(getAllUsers.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.users = action.payload;
-                toast.success(`Users fetched successfully`);
+                // toast.success(`Users fetched successfully`);
             })
             .addCase(getAllUsers.rejected, (state, action) => {
                 state.isLoading = false;
@@ -209,13 +214,15 @@ const RoleAndPermissionSlice = createSlice({
             })
             .addCase(deletecurren.fulfilled, (state, action) => {
                 state.isLoading = false;
-                toast.success(action.payload.message);
+                message.success(action.payload.message);
             })
+
             .addCase(deletecurren.rejected, (state, action) => {
                 state.isLoading = false;
-                toast.error(action.payload?.response?.data?.message);
+                message.error(action.payload?.response?.data?.message);
             })
             //update
+
             .addCase(editscurren.pending, (state) => {
                 state.isLoading = false;
                 state.error = null;
@@ -223,18 +230,22 @@ const RoleAndPermissionSlice = createSlice({
               .addCase(editscurren.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
+                message.success(action.payload?.message);
               })
+
               .addCase(editscurren.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload || "Failed to update employee";
+                // state.error = action.payload;
+                message.error(action.payload?.response?.data?.message);
               });
     },
 });
+
 
 export const {
     toggleAddModal,
     toggleEditModal,
     handleLogout,
     editUserData,
-} = RoleAndPermissionSlice.actions;
-export default RoleAndPermissionSlice.reducer;
+} = currenciesSlice.actions;
+export default currenciesSlice.reducer;

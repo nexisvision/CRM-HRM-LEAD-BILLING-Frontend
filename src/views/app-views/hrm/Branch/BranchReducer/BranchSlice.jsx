@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./BranchService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
+import { message } from "antd";
 
 // Async thunk for adding user
 
@@ -93,7 +94,7 @@ const initialIsAuth = () => {
   return item ? JSON.parse(item) : false;
 };
 
-const RoleAndPermissionSlice = createSlice({
+const BranchSlice = createSlice({
   name: "Branch",
   initialState: {
     Branch: [],
@@ -138,12 +139,13 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(AddBranchs.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload?.data?.message);
+        message.success(action.payload?.message);
       })
       .addCase(AddBranchs.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.message);
+        message.error(action.payload?.message);
       })
+
 
       .addCase(getBranch.pending, (state) => {
         state.isLoading = true;
@@ -158,45 +160,21 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-      //getall
-      .addCase(getAllUsers.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getAllUsers.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.users = action.payload;
-        toast.success(`Users fetched successfully`);
-      })
-      .addCase(getAllUsers.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
-      })
-
-      //getuserbyid
-      .addCase(getUserById.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getUserById.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.detailItem = action.payload?.user;
-        toast.success(action.payload.message);
-      })
-      .addCase(getUserById.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
-      })
+     
       //delete
       .addCase(deleteBranch.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(deleteBranch.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload.message);
+        message.success(action.payload?.message);
       })
+
       .addCase(deleteBranch.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
+        message.error(action.payload?.message);
       })
+
       //update
       .addCase(editBranch.pending, (state) => {
         state.isLoading = false;
@@ -205,14 +183,18 @@ const RoleAndPermissionSlice = createSlice({
       .addCase(editBranch.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload; // Update the state with the updated employee data
+        message.success(action.payload?.message);
       })
+
       .addCase(editBranch.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to update employee";
+        state.error = action.payload;
+        message.error(action.payload?.message);
       });
+
   },
 });
 
 export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-  RoleAndPermissionSlice.actions;
-export default RoleAndPermissionSlice.reducer;
+  BranchSlice.actions;
+export default BranchSlice.reducer;

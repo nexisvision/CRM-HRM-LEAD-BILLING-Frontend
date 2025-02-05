@@ -85,11 +85,11 @@ const EditDeal = ({ onClose, id }) => {
     dispatch(EditDeals({ id, values }))
       .then(() => {
         dispatch(GetDeals());
-        message.success("Deal updated successfully!");
+        // message.success("Deal updated successfully!");
         onClose();
       })
       .catch((error) => {
-        message.error("Failed to update Employee.");
+        // message.error("Failed to update Employee.");
         console.error("Edit API error:", error);
       });
   };

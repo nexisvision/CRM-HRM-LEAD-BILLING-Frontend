@@ -60,8 +60,8 @@ const AddTicket = ({ onClose }) => {
     dispatch(getAllTicket());
     onClose();
     resetForm();
-    console.log("Submitted values:", values);
-    message.success("Ticket created successfully!");
+    // console.log("Submitted values:", values);
+    // message.success("Ticket created successfully!");
   };
 
   return (

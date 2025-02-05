@@ -92,11 +92,11 @@ export const CountriesList = () => {
                     dispatch(DeletePs(id))
                         .unwrap()
                         .then(() => {
-                            message.success('Country deleted successfully');
+                            // message.success('Country deleted successfully');
                             resolve();
                         })
                         .catch((error) => {
-                            message.error(error.message || 'Failed to delete country');
+                            // message.error(error.message || 'Failed to delete country');
                             reject();
                         });
                 });
@@ -106,12 +106,12 @@ export const CountriesList = () => {
 
     const dropdownMenu = (elm) => (
         <Menu>
-            <Menu.Item>
+            {/* <Menu.Item>
                 <Flex alignItems="center" onClick={() => openEditCountriesModal(elm)}>
                     <EditOutlined />
                     <span className="ml-2">Edit</span>
                 </Flex>
-            </Menu.Item>
+            </Menu.Item> */}
             <Menu.Item>
                 <Flex alignItems="center" onClick={() => handleDeleteCountry(elm.id)}>
                     <DeleteOutlined />

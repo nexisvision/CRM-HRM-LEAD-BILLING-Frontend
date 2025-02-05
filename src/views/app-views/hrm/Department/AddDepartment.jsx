@@ -24,21 +24,24 @@ const AddDepartment = ({ onClose }) => {
     dispatch(getBranch());
   }, [dispatch]);
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const alldatas = useSelector((state) => state.Branch);
-  const fnddata = alldatas.Branch.data;
+  const fnddata = alldatas.Branch.data || [];
+  const fndbranchdata = fnddata.filter((item) => item.created_by === user);
+
 
   const handleSubmit = (values, { resetForm }) => {
     dispatch(AddDept(values))
       .then(() => {
         dispatch(getDept());
 
-        message.success("Department added successfully!");
+        // message.success("Department added successfully!");
         resetForm();
         onClose();
         navigate("/app/hrm/department");
       })
       .catch((error) => {
-        message.error("Failed to add department.");
+        // message.error("Failed to add department.");
         console.error("Add API error:", error);
       });
   };
@@ -95,7 +98,7 @@ const AddDepartment = ({ onClose }) => {
                         value={values.branch}
                         onBlur={() => setFieldTouched("branch", true)}
                       >
-                        {fnddata?.map((branch) => (
+                        {fndbranchdata?.map((branch) => (
                           <Option key={branch.id} value={branch.id}>
                             {branch.branchName}
                           </Option>

@@ -20,6 +20,8 @@ const EditDepartment = ({ comnyid, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const alldept = useSelector((state) => state.Department);
   const [singleEmp, setSingleEmp] = useState(null);
 
@@ -28,7 +30,9 @@ const EditDepartment = ({ comnyid, onClose }) => {
   }, [dispatch]);
 
   const alldatas = useSelector((state) => state.Branch);
-  const fnddata = alldatas.Branch.data;
+  const fnddata = alldatas.Branch.data || [];
+  const fndbranchdata = fnddata.filter((item) => item.created_by === user);
+
 
   useEffect(() => {
     const empData = alldept?.Department?.data || [];
@@ -45,12 +49,12 @@ const EditDepartment = ({ comnyid, onClose }) => {
     dispatch(EditDept({ comnyid, values }))
       .then(() => {
         dispatch(getDept());
-        message.success("Department updated successfully!");
+        // message.success("Department updated successfully!");
         onClose();
         navigate("/app/hrm/department");
       })
       .catch((error) => {
-        message.error("Failed to update department.");
+        // message.error("Failed to update department.");
         console.error("Edit API error:", error);
       });
   };
@@ -100,7 +104,7 @@ const EditDepartment = ({ comnyid, onClose }) => {
                         placeholder="Select Branch"
                         onChange={(value) => setFieldValue("branch", value)}
                       >
-                        {fnddata?.map((branch) => (
+                        {fndbranchdata?.map((branch) => (
                           <Option key={branch.id} value={branch.id}>
                             {branch.branchName}
                           </Option>

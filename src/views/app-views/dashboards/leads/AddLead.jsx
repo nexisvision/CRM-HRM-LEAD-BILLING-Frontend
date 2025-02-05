@@ -210,12 +210,12 @@ const currenciesState = useSelector((state) => state.currencies);
     dispatch(LeadsAdd(formData))
       .then(() => {
         dispatch(GetLeads()); // Refresh leave data
-        message.success("Leads added successfully!");
+        // message.success("Leads added successfully!");
         resetForm();
         onClose(); // Close modal
       })
       .catch((error) => {
-        message.error("Failed to add Leads.");
+        // message.error("Failed to add Leads.");
         console.error("Add API error:", error);
       });
   };

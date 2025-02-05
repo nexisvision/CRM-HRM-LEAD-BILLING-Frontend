@@ -48,7 +48,7 @@ const EditUser = ({ idd, visible, onClose, onUpdate, userData }) => {
     dispatch(Edituser({ idd, values }));
     dispatch(GetUsers());
     onClose();
-    console.log("Updated Values:", values);
+    // console.log("Updated Values:", values);
     onUpdate(values);
     form.resetFields();
   };

@@ -54,7 +54,8 @@ const AddPlan = ({ onClose }) => {
   }, []);
 
   const allempdatass = useSelector((state) => state.currencies);
-  const fnddatass = allempdatass?.currencies;
+  const fnddatass = allempdatass?.currencies?.data;
+
 
   const yearlyMenu = (
     <Menu onClick={({ key }) => {
@@ -314,7 +315,7 @@ const AddPlan = ({ onClose }) => {
                         <Select
                           {...field}
                           className="w-full mt-2"
-                          placeholder="Select AddProjectMember"
+                          placeholder="Select currency"
                           onChange={(value) => setFieldValue("currency", value)}
                           value={values.currency}
                         >
@@ -328,7 +329,7 @@ const AddPlan = ({ onClose }) => {
                             ))
                           ) : (
                             <Option value="" disabled>
-                              No Clients Available
+                              No currency Available
                             </Option>
                           )}
                         </Select>

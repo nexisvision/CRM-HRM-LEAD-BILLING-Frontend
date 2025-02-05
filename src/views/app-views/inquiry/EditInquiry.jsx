@@ -50,7 +50,7 @@ const EditInquiry = ({ idd, onClose }) => {
   const onSubmit = (values, { resetForm }) => {
     dispatch(editinqu({ idd, values })).then(() => {
       dispatch(getinqu());
-      message.success("Inquiry submitted successfully");
+      // message.success("Inquiry submitted successfully");
       onClose();
       resetForm();
     });

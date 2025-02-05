@@ -33,7 +33,7 @@ const AddInquiry = ({ onClose }) => {
   const onSubmit = (values, { resetForm }) => {
     dispatch(addinqu(values)).then(() => {
       dispatch(getinqu());
-      message.success("Inquiry submitted successfully!");
+      // message.success("Inquiry submitted successfully!");
       resetForm();
       onClose();
     });

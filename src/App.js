@@ -7,6 +7,9 @@ import history from './history'
 import Layouts from './layouts'
 import { THEME_CONFIG } from './configs/AppConfig';
 import './lang'
+import "react-toastify/dist/ReactToastify.css";
+
+
 
 const themes = {
   dark: `${process.env.PUBLIC_URL}/css/dark-theme.css`,
@@ -18,10 +21,12 @@ function App() {
     <div className="App">
       <Provider store={store}>
         <BrowserRouter history={history}>
+       
           <ThemeSwitcherProvider 
             themeMap={themes} 
             defaultTheme={THEME_CONFIG.currentTheme} 
             insertionPoint="styles-insertion-point"
+
           >
             <Layouts />
           </ThemeSwitcherProvider>

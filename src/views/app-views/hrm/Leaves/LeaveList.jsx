@@ -37,9 +37,12 @@ const LeaveList = () => {
   const [editid, setEditid] = useState(null);
   const dispatch = useDispatch();
   // console.log("xiiiii", editid);
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Leave);
   // State to toggle Add Employee Modal
   // Open Add Employee Modal
+
   const openAddLeaveModal = () => {
     setIsAddLeaveModalVisible(true);
   };
@@ -89,10 +92,10 @@ const LeaveList = () => {
              
                 if (parsedPermissions["extra-hrm-leave-leavelist"] && parsedPermissions["extra-hrm-leave-leavelist"][0]?.permissions) {
                   allpermisson = parsedPermissions["extra-hrm-leave-leavelist"][0].permissions;
-                  console.log('Parsed Permissions:', allpermisson);
+                  // console.log('Parsed Permissions:', allpermisson);
                 
                 } else {
-                  console.log('extra-hrm-leave-leavelist is not available');
+                  // console.log('extra-hrm-leave-leavelist is not available');
                 }
                 
                 const canCreateClient = allpermisson?.includes('create');
@@ -104,14 +107,14 @@ const LeaveList = () => {
 
   const deleteUser = async (userId) => {
     try {
-      console.log("dddddd", userId);
+      // console.log("dddddd", userId);
       await dispatch(DeleteLea(userId));
 
       const updatedData = await dispatch(GetLeave());
 
       setUsers(users.filter((item) => item.id !== userId));
 
-      message.success({ content: "Deleted user successfully", duration: 2 });
+      // message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       // message.error({ content: 'Failed to delete user', duration: 2 });
       console.error("Error deleting user:", error);
@@ -154,9 +157,11 @@ const LeaveList = () => {
 
   useEffect(() => {
     if (tabledata && tabledata.Leave && tabledata.Leave.data) {
-      setUsers(tabledata.Leave.data);
+      const filteredData = tabledata.Leave.data.filter(item => item.created_by === user);
+      setUsers(filteredData);
     }
-  }, [tabledata]);
+  }, [tabledata, user]);
+
   const editleave = (id) => {
     openEditLeaveModal();
     setEditid(id);
@@ -167,7 +172,7 @@ const LeaveList = () => {
   };
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -178,7 +183,7 @@ const LeaveList = () => {
             <span>View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
       
       <Menu.Item>
         <Flex alignItems="center">

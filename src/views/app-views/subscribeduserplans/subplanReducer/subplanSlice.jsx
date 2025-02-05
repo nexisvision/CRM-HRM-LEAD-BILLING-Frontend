@@ -93,7 +93,7 @@ const initialIsAuth = () => {
   return item ? JSON.parse(item) : false;
 };
 
-const RoleAndPermissionSlice = createSlice({
+const subplanSlice = createSlice({
   name: "subplan",
   initialState: {
     subplan: [],
@@ -214,5 +214,5 @@ const RoleAndPermissionSlice = createSlice({
 });
 
 export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-  RoleAndPermissionSlice.actions;
-export default RoleAndPermissionSlice.reducer;
+  subplanSlice.actions;
+export default subplanSlice.reducer;

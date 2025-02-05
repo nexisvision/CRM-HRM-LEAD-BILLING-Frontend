@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./EmployeeService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
+import { message } from "antd";
 
 // Async thunk for adding user
 export const addEmp = createAsyncThunk(
@@ -97,7 +98,7 @@ const initialIsAuth = () => {
     return item ? JSON.parse(item) : false;
 };
 
-const RoleAndPermissionSlice = createSlice({
+const EmployeeSlice = createSlice({
     name: "employee",
     initialState: {
         employee:[],
@@ -142,12 +143,14 @@ const RoleAndPermissionSlice = createSlice({
             })
             .addCase(addEmp.fulfilled, (state, action) => {
                 state.isLoading = false;
-                toast.success(action.payload?.data?.message);
+                message.success(action.payload?.message);
             })
+
             .addCase(addEmp.rejected, (state, action) => {
                 state.isLoading = false;
-                toast.error(action.payload?.message);
+                message.error(action.payload?.message);
             })
+
 
             .addCase(empdata.pending, (state) => {
                 state.isLoading = true;
@@ -162,46 +165,21 @@ const RoleAndPermissionSlice = createSlice({
                 toast.error(action.payload?.message);
             })
            
-            //getall
-            .addCase(getAllUsers.pending, (state) => {
-                state.isLoading = true;
-            })
-            .addCase(getAllUsers.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.users = action.payload;
-                toast.success(`Users fetched successfully`);
-            })
-            .addCase(getAllUsers.rejected, (state, action) => {
-                state.isLoading = false;
-                toast.error(action.payload?.response?.data?.message);
-            })
-            
-            //getuserbyid
-            .addCase(getUserById.pending, (state) => {
-                state.isLoading = true;
-            })
-            .addCase(getUserById.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.detailItem = action.payload?.user;
-                toast.success(action.payload.message);
-            })
-            .addCase(getUserById.rejected, (state, action) => {
-                state.isLoading = false;
-                toast.error(action.payload?.response?.data?.message);
-            })
             //delete
             .addCase(deleteEmp.pending, (state) => {
                 state.isLoading = true;
             })
             .addCase(deleteEmp.fulfilled, (state, action) => {
                 state.isLoading = false;
-                toast.success(action.payload.message);
+                message.success(action.payload?.message);
             })
+
             .addCase(deleteEmp.rejected, (state, action) => {
                 state.isLoading = false;
-                toast.error(action.payload?.response?.data?.message);
+                message.error(action.payload?.message);
             })
             //update
+
             .addCase(updateEmp.pending, (state) => {
                 state.isLoading = false;
                 state.error = null;
@@ -209,11 +187,15 @@ const RoleAndPermissionSlice = createSlice({
               .addCase(updateEmp.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload; // Update the state with the updated employee data
+                message.success(action.payload?.message);
               })
+
               .addCase(updateEmp.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload || "Failed to update employee";
+                state.error = action.payload;
+                message.error(action.payload?.message);
               });
+
     },
 });
 
@@ -222,5 +204,5 @@ export const {
     toggleEditModal,
     handleLogout,
     editUserData,
-} = RoleAndPermissionSlice.actions;
-export default RoleAndPermissionSlice.reducer;
+} = EmployeeSlice.actions;
+export default EmployeeSlice.reducer;

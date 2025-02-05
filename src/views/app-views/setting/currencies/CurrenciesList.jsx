@@ -25,22 +25,26 @@ export const CurrenciesList = () => {
     const [isEditCurrenciesModalVisible, setIsEditCurrenciesModalVisible] = useState(false);
     const [selectedCurrency, setSelectedCurrency] = useState(null);
     const dispatch = useDispatch();
-    const { currencies } = useSelector(
-        (state) => state.currencies.currencies
-    );
+    // const { currencies } = useSelector(
+    //     (state) => state.currencies.currencies
+    // );
 
     useEffect(() => {
         dispatch(getcurren());
     }, [dispatch]);
 
-    const allcurrdata = useSelector((state)=>state.currencies.currencies)
+    const allcurrdata = useSelector((state)=>state.currencies?.currencies?.data)
+    
+
 
      // Get countries data from Redux store
     //  const { countries, isLoading } = useSelector((state) => state.countries);
 
      useEffect(() => {
-        if(allcurrdata){
+        if (allcurrdata && Array.isArray(allcurrdata)) {
             setFilteredData(allcurrdata);
+        } else {
+            setFilteredData([]);
         }
     }, [allcurrdata]);
 
@@ -63,7 +67,7 @@ export const CurrenciesList = () => {
        dispatch(deletecurren(id))
         .then(()=>{
             dispatch(getcurren())
-            message.success('Currency deleted successfully');
+            // message.success('Currency deleted successfully');
             setFilteredData(filteredData.filter(item => item.id!== id));
         })
     };

@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./LeaveService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
+import { message } from "antd";
 
 // Async thunk for adding user
 export const CreateL = createAsyncThunk(
@@ -98,7 +99,7 @@ const initialIsAuth = () => {
     return item ? JSON.parse(item) : false;
 };
 
-const RoleAndPermissionSlice = createSlice({
+const LeaveSlice = createSlice({
     name: "Leave",
     initialState: {
         Leave:[],
@@ -143,11 +144,11 @@ const RoleAndPermissionSlice = createSlice({
             })
             .addCase(CreateL.fulfilled, (state, action) => {
                 state.isLoading = false;
-                toast.success(action.payload?.data?.message);
+                message.success(action.payload?.message);
             })
             .addCase(CreateL.rejected, (state, action) => {
                 state.isLoading = false;
-                toast.error(action.payload?.message);
+                message.error(action.payload?.message);
             })
 
             .addCase(GetLeave.pending, (state) => {
@@ -163,46 +164,21 @@ const RoleAndPermissionSlice = createSlice({
                 toast.error(action.payload?.message);
             })
            
-            //getall
-            .addCase(getAllUsers.pending, (state) => {
-                state.isLoading = true;
-            })
-            .addCase(getAllUsers.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.users = action.payload;
-                toast.success(`Users fetched successfully`);
-            })
-            .addCase(getAllUsers.rejected, (state, action) => {
-                state.isLoading = false;
-                toast.error(action.payload?.response?.data?.message);
-            })
-            
-            //getuserbyid
-            .addCase(getUserById.pending, (state) => {
-                state.isLoading = true;
-            })
-            .addCase(getUserById.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.detailItem = action.payload?.user;
-                toast.success(action.payload.message);
-            })
-            .addCase(getUserById.rejected, (state, action) => {
-                state.isLoading = false;
-                toast.error(action.payload?.response?.data?.message);
-            })
-            //delete
+         
             .addCase(DeleteLea.pending, (state) => {
                 state.isLoading = true;
             })
             .addCase(DeleteLea.fulfilled, (state, action) => {
                 state.isLoading = false;
-                toast.success(action.payload.message);
+                message.success(action.payload?.message);
             })
+
             .addCase(DeleteLea.rejected, (state, action) => {
                 state.isLoading = false;
-                toast.error(action.payload?.response?.data?.message);
+                message.error(action.payload?.message);
             })
             //update
+
             .addCase(EditLeave.pending, (state) => {
                 state.isLoading = false;
                 state.error = null;
@@ -210,10 +186,12 @@ const RoleAndPermissionSlice = createSlice({
               .addCase(EditLeave.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
+                message.success(action.payload?.message);
               })
               .addCase(EditLeave.rejected, (state, action) => {
                 state.isLoading = false;
-                state.error = action.payload || "Failed to update employee";
+                state.error = action.payload;
+                message.error(action.payload?.message);
               });
     },
 });
@@ -223,5 +201,5 @@ export const {
     toggleEditModal,
     handleLogout,
     editUserData,
-} = RoleAndPermissionSlice.actions;
-export default RoleAndPermissionSlice.reducer;
+} = LeaveSlice.actions;
+export default LeaveSlice.reducer;

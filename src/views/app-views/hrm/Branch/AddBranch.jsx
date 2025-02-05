@@ -21,12 +21,12 @@ const AddBranch = ({ onClose }) => {
     dispatch(AddBranchs(values))
       .then(() => {
         dispatch(getBranch());
-        message.success('Branch added successfully!');
+        // message.success('Branch added successfully!');
         resetForm();
         onClose();
       })
       .catch((error) => {
-        message.error('Failed to add department.');
+        // message.error('Failed to add department.');
         console.error('Add API error:', error);
       });
   };
@@ -47,7 +47,7 @@ const AddBranch = ({ onClose }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div style={{ marginBottom: '16px' }}>
-                  <label>Branch*</label>
+                  <label>Branch</label>
                   <Field
                     as={Input}
                     name="branchName"

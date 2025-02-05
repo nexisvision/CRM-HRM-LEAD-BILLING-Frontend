@@ -34,13 +34,20 @@ const AddSalary = ({ onClose }) => {
   }, [dispatch]);
 
   const allempdata = useSelector((state) => state.employee);
-  const fnddata = allempdata.employee.data;
+  const fndddata = allempdata.employee.data;
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
+
+  const fnddata = fndddata.filter((item) => item.created_by === user);
+
+  // console.log("fnddata", fnddata);
 
   const allloged = useSelector((state) => state.user.loggedInUser.username)
 
   const filterdata = fnddata.filter((item)=>item.created_by === allloged)
 
   const { currencies } = useSelector((state) => state.currencies);
+
 
   useEffect(() => {
     dispatch(getcurren());
@@ -78,7 +85,7 @@ const AddSalary = ({ onClose }) => {
       }
     } catch (error) {
       console.error("Failed to fetch statuses:", error);
-      message.error("Failed to load statuses");
+      // message.error("Failed to load statuses");
     }
   };
 
@@ -122,10 +129,10 @@ const AddSalary = ({ onClose }) => {
       dispatch(getSalaryss());
       onClose();
       resetForm();
-      message.success("salary added successfully");
+      // message.success("salary added successfully");
     });
     console.log("Submitted values:", values);
-    message.success("Job added successfully!");
+    // message.success("Job added successfully!");
   };
 
   const initialValues = {

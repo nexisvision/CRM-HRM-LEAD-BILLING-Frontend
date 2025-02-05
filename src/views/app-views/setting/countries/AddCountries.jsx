@@ -14,25 +14,31 @@ const AddCountries = ({onClose}) => {
       await dispatch(addCountry(values)).unwrap()
         .then(()=>{
           dispatch(getallcountries())
-          notification.success({
-            message: 'Success',
-            description: 'Country added successfully.',
-          });
+          // notification.success({
+            // message: 'Success',
+            // description: 'Country added successfully.',
+          // });
           onClose();
           form.resetFields();
         })
    
     } catch (error) {
-      notification.error({
-        message: 'Error',
-        description: error.message || 'Failed to add country.',
-      });
+      // notification.error({
+        // message: 'Error',
+        // description: error.message || 'Failed to add country.',
+      // });
     }
   };
 
   return (
-    <Card title="Add New Country">
+    <div>
+      <hr style={{ marginBottom: "15px", border: "1px solid #E8E8E8" }} />
+
+    {/* <Card title=""> */}
+
+
       <Form
+
         form={form}
         layout="vertical"
         onFinish={onFinish}
@@ -77,7 +83,8 @@ const AddCountries = ({onClose}) => {
           </Button>
         </Form.Item>
       </Form>
-    </Card>
+    {/* </Card> */}
+    </div>
   );
 };
 

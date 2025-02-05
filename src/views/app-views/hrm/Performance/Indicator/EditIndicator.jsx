@@ -13,11 +13,16 @@ const EditIndicator = ({ id , onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const alldept = useSelector((state) => state.indicator);
   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
+  const fndbranchdata = branchData.filter((item) => item.created_by === user);
+  const fnddepartmentdata = departmentData.filter((item) => item.created_by === user);
+  const fnddesignationdata = designationData.filter((item) => item.created_by === user);
   const [singleEmp, setSingleEmp] = useState(null);
+
 
   useEffect(() => {
     // Find the specific indicator data by ID
@@ -56,12 +61,12 @@ const EditIndicator = ({ id , onClose }) => {
         dispatch(editIndicator({ id, values }))
           .then(() => {
             dispatch(getIndicators());
-            message.success('Indicator updated successfully!');
+            // message.success('Indicator updated successfully!');
             onClose();
             navigate('/app/hrm/performance/indicator');
           })
           .catch((error) => {
-            message.error('Failed to update indicator.');
+            // message.error('Failed to update indicator.');
             console.error('Edit API error:', error);
           });
   };
@@ -90,11 +95,12 @@ const EditIndicator = ({ id , onClose }) => {
               rules={[{ required: true, message: 'Please select a branch' }]}
             >
               <Select placeholder="Select Branch">
-                {branchData.map((branch) => (
+                {fndbranchdata.map((branch) => (
                   <Option key={branch.id} value={branch.id}>
                     {branch.branchName}
                   </Option>
                 ))}
+
               </Select>
             </Form.Item>
           </Col>
@@ -106,11 +112,12 @@ const EditIndicator = ({ id , onClose }) => {
               rules={[{ required: true, message: 'Please select a department' }]}
             >
               <Select placeholder="Select Department">
-                {departmentData.map((dept) => (
+                {fnddepartmentdata.map((dept) => (
                   <Option key={dept.id} value={dept.id}>
                     {dept.department_name}
                   </Option>
                 ))}
+
               </Select>
             </Form.Item>
           </Col>
@@ -122,7 +129,7 @@ const EditIndicator = ({ id , onClose }) => {
               rules={[{ required: true, message: 'Please select a designation' }]}
             >
               <Select placeholder="Select Designation">
-                {designationData.map((des) => (
+                {fnddesignationdata.map((des) => (
                   <Option key={des.id} value={des.id}>
                     {des.designation_name}
                   </Option>

@@ -62,7 +62,7 @@ const AddUser = ({ visible, onClose, onCreate }) => {
       const response = await dispatch(AddUserss(values));
       if (response.payload?.data?.sessionToken) {
         setOtpToken(response.payload?.data?.sessionToken);
-        message.success("Employee added successfully! Please verify OTP.");
+        // message.success("Employee added successfully! Please verify OTP.");
         setShowOtpModal(true); // Show OTP modal when user is added
         onClose(); // Close the form modal
       }
@@ -70,7 +70,7 @@ const AddUser = ({ visible, onClose, onCreate }) => {
       form.resetFields();
       dispatch(GetUsers()); // Refetch user list after addition
     } catch (error) {
-      message.error("Failed to add employee. Please try again.");
+      // message.error("Failed to add employee. Please try again.");
     }
   };
 

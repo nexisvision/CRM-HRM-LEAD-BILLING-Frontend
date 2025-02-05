@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Menu, Grid } from 'antd';
 import IntlMessage from '../util-components/IntlMessage';
 import Icon from '../util-components/Icon';
-import navigationConfig from 'configs/NavigationConfig';
+import navigationConfig, { extraNavvvTree, dashBoardNavTree, extraNavvTree } from 'configs/NavigationConfig'; // Import extraNavvvTree
 import { useSelector, useDispatch } from 'react-redux';
 import { SIDE_NAV_LIGHT, NAV_TYPE_SIDE } from "constants/ThemeConstant";
 import utils from 'utils'
@@ -73,8 +73,9 @@ const SideNavContent = (props) => {
 	const roleId = useSelector((state) => state.user.loggedInUser.role_id);
 	const roles = useSelector((state) => state.role?.role?.data);
 	const roleData = roles?.find(role => role.id === roleId);
-	const isSuperAdmin = roleData?.role_name === 'super-admin' || roleData?.role_name === 'client';
-
+	const isSuperAdmin = roleData?.role_name === 'client';
+ 
+	const isSuper = roleData?.role_name === 'super-admin';
 	// Filter navigation items based on permissions
 	const menuItems = useMemo(() => {
 		// Parse permissions if it's a string
@@ -84,10 +85,15 @@ const SideNavContent = (props) => {
 
 		console.log('Parsed Permissions:', parsedPermissions);
 
-		if (isSuperAdmin) {
-			// console.log('Super Admin detected - showing all menu items');
-			return getSideNavMenuItem(navigationConfig);
+		if (isSuper) {
+			return getSideNavMenuItem(extraNavvvTree);
 		}
+
+		if (isSuperAdmin) {
+			// Show both dashboard and extra navigation items for super admin
+			return getSideNavMenuItem([...dashBoardNavTree, ...extraNavvTree]);
+		}
+
 
 		if (!parsedPermissions) {
 			console.warn('No permissions found for role ID:', roleId);
@@ -175,10 +181,11 @@ const SideNavContent = (props) => {
 		return getSideNavMenuItem(relevantNavigation);
 	
 
-	}, [isSuperAdmin, roleId, roleData]);
+	}, [isSuper, isSuperAdmin, roleId, roleData]);
 
 	
 	
+
 
 
 	return (

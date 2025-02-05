@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserAddCountries from "./countriesService";
 import { toast } from "react-toastify";
 import axios from 'axios';
+import { message } from "antd";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -101,11 +102,14 @@ const countriesSlice = createSlice({
         .addCase(addCountry.fulfilled, (state, action) => {
             state.countries.push(action.payload);
             state.isLoading = false;
+            message.success(action.payload?.message);
         })
         .addCase(addCountry.rejected, (state, action) => {
             state.isLoading = false;
             state.error = action.payload;
+            message.error(action.payload?.message);
         })
+
         .addCase(getallcountries.pending, (state, action) => {
             state.isLoading = true;
         })
@@ -123,28 +127,30 @@ const countriesSlice = createSlice({
         .addCase(updatecountries.fulfilled, (state, action) => {
           state.editItem = action.payload.data;
             state.isLoading = false;
+            message.success(action.payload?.message);
         })
         .addCase(updatecountries.rejected, (state, action) => {
             state.isLoading = false;
-            toast.error(action.payload?.message);
+            message.error(action.payload?.message);
         })
-
-
-
-
         .addCase(DeletePs.pending, (state) => {
             state.isLoading = true;
             state.error = null;
         })
+
         .addCase(DeletePs.fulfilled, (state, action) => {
             state.isLoading = false;
             state.countries = state.countries.filter(country => country.id !== action.payload.id);
-            state.message = "Country deleted successfully";
+            message.success(action.payload?.message);
         })
+
+
         .addCase(DeletePs.rejected, (state, action) => {
             state.isLoading = false;
             state.error = action.payload;
+            message.error(action.payload?.message);
         })
+
     }
 });
 

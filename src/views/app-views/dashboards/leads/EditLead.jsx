@@ -177,11 +177,11 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
     dispatch(LeadsEdit({ id, values: formData }))
       .then(() => {
         dispatch(GetLeads());
-        message.success("Lead updated successfully!");
+        // message.success("Lead updated successfully!");
         onClose();
       })
       .catch((error) => {
-        message.error("Failed to update Lead.");
+        // message.error("Failed to update Employee.");
         console.error("Edit API error:", error);
       });
     const updatedLead = {

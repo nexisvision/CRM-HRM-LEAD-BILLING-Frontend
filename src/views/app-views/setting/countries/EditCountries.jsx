@@ -18,8 +18,8 @@ const EditCountries = ({ idd, onClose }) => {
 
     const alladats = useSelector((state) => state.countries.countries);
 
-    console.log("ppp",alladats)
-    console.log("ppp",idd)
+    // console.log("ppp",alladats)
+    // console.log("ppp",idd)
 
     useEffect(() => {
         dispatch(getallcountries());
@@ -28,7 +28,7 @@ const EditCountries = ({ idd, onClose }) => {
     useEffect(() => {
         if (alladats && idd) {
             const data = alladats.find((x) => x.id === idd);
-            console.log("ppsssp",data)
+            // console.log("ppsssp",data)
             if (data) {
                 setInitialValues({
                     countryName: data.countryName || '',
@@ -45,12 +45,12 @@ const EditCountries = ({ idd, onClose }) => {
         dispatch(updatecountries({ idd, values }))
             .then(() => {
                 dispatch(getallcountries()); // Refresh country data
-                message.success('Country updated successfully!');
+                // message.success('Country updated successfully!');
                 onClose(); // Close modal or perform any other action
             })
             .catch((error) => {
-                message.error('Failed to update country.');
-                console.error('Edit API error:', error);
+                // message.error('Failed to update country.');
+                // console.error('Edit API error:', error);
             });
     };
 

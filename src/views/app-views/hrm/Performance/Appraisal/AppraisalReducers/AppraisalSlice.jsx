@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./AppraisalService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
+import { message } from "antd";
 
 // Async thunk for adding user
 
@@ -132,12 +133,14 @@ const AppraisalSlice = createSlice({
       })
       .addCase(addAppraisals.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload?.data?.message);
+        message.success(action.payload?.message);
       })
+
       .addCase(addAppraisals.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.message);
+        message.error(action.payload?.message);
       })
+
 
       .addCase(getAppraisals.pending, (state) => {
         state.isLoading = true;
@@ -163,7 +166,7 @@ const AppraisalSlice = createSlice({
       })
       .addCase(getAllAppraisals.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
+        message.error(action.payload?.message);
       })
 
       //getuserbyid
@@ -185,12 +188,14 @@ const AppraisalSlice = createSlice({
       })
       .addCase(deleteAppraisal.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload.message);
+        message.success(action.payload?.message);
       })
+
       .addCase(deleteAppraisal.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
+        message.error(action.payload?.message);
       })
+
       //update
       .addCase(editAppraisal.pending, (state) => {
         state.isLoading = false;
@@ -199,13 +204,16 @@ const AppraisalSlice = createSlice({
       .addCase(editAppraisal.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload?.appraisal; // Update the state with the updated employee data
-        toast.success(action.payload.message);
+        message.success(action.payload?.message);
       })
+
       .addCase(editAppraisal.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to update employee";
-        toast.error(action.payload?.response?.data?.message);
+        state.error = action.payload;
+        message.error(action.payload?.message);
       });
+
+
   },
 });
 

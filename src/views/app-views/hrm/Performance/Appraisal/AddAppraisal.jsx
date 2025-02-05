@@ -17,16 +17,20 @@ const AddAppraisal = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
+
   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
- 
+  const fndbranchdata = branchData.filter((item) => item.created_by === user);
+
   // const employeeData = useSelector((state) => state.employee?.employee?.data || []);
 
   const employeeData = useSelector((state) => 
       (state.employee?.employee?.data || []).filter((employee) => employee.employeeId)
     );
 
-  const { data: employee } = useSelector((state) => state.employee.employee);
+  const { data: employeee } = useSelector((state) => state.employee.employee);
 
+  const employee = employeee.filter((item) => item.created_by === user);
 
   useEffect(() => {
     dispatch(getBranch());
@@ -41,12 +45,12 @@ const AddAppraisal = ({ onClose }) => {
     dispatch(addAppraisals(values)) // Fixed naming
       .then(() => {
         dispatch(getAppraisals());
-        message.success('Appraisal added successfully!');
+        // message.success('Appraisal added successfully!');
         onClose(); // Optional if provided
         navigate('/app/hrm/performance/appraisal');
       })
       .catch((error) => {
-        message.error('Failed to add appraisal.');
+        // message.error('Failed to add appraisal.');
         console.error('Add API error:', error);
       });
   };
@@ -89,7 +93,7 @@ const AddAppraisal = ({ onClose }) => {
               rules={[{ required: true, message: 'Please select a branch' }]}
             >
               <Select placeholder="Select Branch">
-                {branchData.map((branch) => (
+                {fndbranchdata.map((branch) => (
                   <Option key={branch.id} value={branch.id}>
                     {branch.branchName}
                   </Option>

@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./indicatorService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
+import { message } from "antd";
 
 // Async thunk for adding user
 
@@ -132,12 +133,13 @@ const IndicatorSlice = createSlice({
       })
       .addCase(addIndicator.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload?.data?.message);
+        message.success(action.payload?.message);
       })
       .addCase(addIndicator.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.message);
+        message.error(action.payload?.message);
       })
+
 
       .addCase(getIndicators.pending, (state) => {
         state.isLoading = true;
@@ -173,24 +175,27 @@ const IndicatorSlice = createSlice({
       .addCase(getIndicatorById.fulfilled, (state, action) => {
         state.isLoading = false;
         state.detailItem = action.payload?.indicator;
-        toast.success(action.payload.message);
+        message.success(action.payload.message);
       })
       .addCase(getIndicatorById.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
+        message.error(action.payload?.response?.message);
       })
+
       //delete
       .addCase(deleteIndicator.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(deleteIndicator.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload.message);
+        message.success(action.payload.message);
       })
+
       .addCase(deleteIndicator.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
+        message.error(action.payload?.response?.message);
       })
+
       //update
       .addCase(editIndicator.pending, (state) => {
         state.isLoading = false;
@@ -199,13 +204,15 @@ const IndicatorSlice = createSlice({
       .addCase(editIndicator.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload?.indicator; // Update the state with the updated employee data
-        toast.success(action.payload.message);
+        message.success(action.payload.message);
       })
+
       .addCase(editIndicator.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to update employee";
-        toast.error(action.payload?.response?.data?.message);
+        state.error = action.payload;
+        message.error(action.payload?.response?.message);
       });
+
   },
 });
 

@@ -61,13 +61,23 @@ const ProposalList = () => {
   // const { data: Currencies } = useSelector((state) => state.currencies.currencies);
 
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
+  // console.log("user",user);
 
   const allproposal = useSelector((state) => state?.proposal);
   const fnddatas = allproposal?.proposal?.data;
 
-  useEffect(() => {
-    setUsers(fnddatas);
-  }, [fnddatas]);
+// console.log("fnddatas",fnddatas);
+
+  // useEffect(() => {
+  //   if (fnddatas) {
+  //     // Filter proposals by created_by matching the logged-in user's username
+  //     const filteredProposals = fnddatas.filter(proposal => proposal.created_by === user);
+      
+  //     setUsers(filteredProposals);
+  //   }
+  // }, [fnddatas, user]);
+
 
   const allempdata = useSelector((state) => state.Training);
   const fnddata = allempdata.Training.data;
@@ -111,24 +121,54 @@ const ProposalList = () => {
   //     setIsViewTrainingSetupModalVisible(false);
   //   };
 
+
+
   useEffect(() => {
-    if (fnddatas?.length && Leads?.length && Deals?.length) {
-      const enrichedData = fnddatas.map((proposal) => {
+    if (fnddatas) {
+      // Filter proposals by created_by matching the logged-in user's username
+      const filteredProposals = fnddatas.filter(proposal => proposal.created_by === user);
+      
+      // Enrich filtered proposals with lead and deal titles
+      const enrichedData = filteredProposals.map((proposal) => {
         const lead = Leads.find((l) => l.id === proposal.lead_title); // Match lead by ID
         const deal = Deals.find((d) => d.id === proposal.deal_title);
-        // 
 
         return {
           ...proposal,
           lead_title: lead?.leadTitle || "N/A", // Use `title` from Leads or fallback to "N/A"
-          deal_title: deal?.dealName || "N/A",
-          // Use `title` from Deals or fallback to "N/A"
+          deal_title: deal?.dealName || "N/A", // Use `title` from Deals or fallback to "N/A"
         };
       });
 
       setUsers(enrichedData); // Set enriched data for the table
     }
-  }, [fnddatas, Leads, Deals]);
+  }, [fnddatas, user, Leads, Deals]);
+
+
+
+
+
+
+
+
+  // useEffect(() => {
+  //   if (fnddatas?.length && Leads?.length && Deals?.length) {
+  //     const enrichedData = fnddatas.map((proposal) => {
+  //       const lead = Leads.find((l) => l.id === proposal.lead_title); // Match lead by ID
+  //       const deal = Deals.find((d) => d.id === proposal.deal_title);
+  //       // 
+
+  //       return {
+  //         ...proposal,
+  //         lead_title: lead?.leadTitle || "N/A", // Use `title` from Leads or fallback to "N/A"
+  //         deal_title: deal?.dealName || "N/A",
+  //         // Use `title` from Deals or fallback to "N/A"
+  //       };
+  //     });
+
+  //     // setUsers(enrichedData); // Set enriched data for the table
+  //   }
+  // }, [fnddatas, Leads, Deals]);
 
    //// permission
               
@@ -152,7 +192,7 @@ const ProposalList = () => {
                           console.log('Parsed Permissions:', allpermisson);
                         
                         } else {
-                          console.log('dashboards-proposal is not available');
+                          // console.log('dashboards-proposal is not available');
                         }
                         
                         const canCreateClient = allpermisson?.includes('create');
@@ -176,7 +216,7 @@ const ProposalList = () => {
     dispatch(delpropos(userId)).then(() => {
       dispatch(getpropos());
       setUsers(users.filter((item) => item.id !== userId));
-      message.success({ content: `Deleted user ${userId}`, duration: 2 });
+      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
     });
   };
 
@@ -208,11 +248,11 @@ const ProposalList = () => {
   //     dispatch(GetallTrainng());
   //   }, []);
 
-  useEffect(() => {
-    if (fnddata) {
-      setUsers(fnddata);
-    }
-  }, [fnddata]);
+  // useEffect(() => {
+  //   if (fnddata) {
+  //     setUsers(fnddata);
+  //   }
+  // }, [fnddata]);
 
   // const showViewApplication = (userInfo) => {
   //   setViewApplicationVisible(true);

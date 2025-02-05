@@ -29,6 +29,8 @@ const DepartmentList = () => {
   const [isEditDepartmentModalVisible, setIsEditDepartmentModalVisible] = useState(false);
   const  [dept,setDept] = useState("");
 
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Department);
 
 
@@ -52,10 +54,10 @@ const DepartmentList = () => {
          
             if (parsedPermissions["extra-hrm-department"] && parsedPermissions["extra-hrm-department"][0]?.permissions) {
               allpermisson = parsedPermissions["extra-hrm-department"][0].permissions;
-              console.log('Parsed Permissions:', allpermisson);
+              // console.log('Parsed Permissions:', allpermisson);
             
             } else {
-              console.log('extra-hrm-department is not available');
+              // console.log('extra-hrm-department is not available');
             }
             
             const canCreateClient = allpermisson?.includes('create');
@@ -104,9 +106,11 @@ const DepartmentList = () => {
 
     useEffect(() => {
       if (tabledata && tabledata.Department && tabledata.Department.data) {
-        setUsers(tabledata.Department.data);
+        const filteredData = tabledata.Department.data.filter((item) => item.created_by === user);
+        setUsers(filteredData);
       }
     }, [tabledata]);
+
 
   const deleteUser = (userId) => {
     // dispatch(DeleteDept());
@@ -117,12 +121,12 @@ const DepartmentList = () => {
       dispatch(DeleteDept( userId ))
             .then(() => {
               dispatch(getDept());
-              message.success('Department Deleted successfully!');
+              // message.success('Department Deleted successfully!');
               setUsers(users.filter(item => item.id !== userId));
               navigate('/app/hrm/department');
             })
             .catch((error) => {
-              message.error('Failed to update department.');
+              // message.error('Failed to update department.');
               console.error('Edit API error:', error);
             });
   };
@@ -159,11 +163,11 @@ const DepartmentList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Button type="" icon={<EyeOutlined />} onClick={handleParticularDepartmentModal} size="small">
           <span>View Details</span>
         </Button>
-      </Menu.Item>
+      </Menu.Item> */}
      
       <Menu.Item>
         <Button type="" icon={<PushpinOutlined />} onClick={() => showUserProfile(elm)} size="small">

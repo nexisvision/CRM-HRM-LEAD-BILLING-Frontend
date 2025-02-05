@@ -98,13 +98,14 @@ const initialIsAuth = () => {
     return item ? JSON.parse(item) : false;
 };
 
-const RoleAndPermissionSlice = createSlice({
+const PlanSlice = createSlice({
     name: "Plan",
     initialState: {
         Plan:[],
         editItem: {},
         isLoading: false,
         addModel: false,
+
         editModal: false,
     },
     reducers: {
@@ -155,8 +156,9 @@ const RoleAndPermissionSlice = createSlice({
             })
             .addCase(GetPlan.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.Plan = action?.payload;
+                state.Plan = action?.payload?.data;
                 toast.success(action.payload?.data?.message);
+
             })
             .addCase(GetPlan.rejected, (state, action) => {
                 state.isLoading = false;
@@ -223,5 +225,5 @@ export const {
     toggleEditModal,
     handleLogout,
     editUserData,
-} = RoleAndPermissionSlice.actions;
-export default RoleAndPermissionSlice.reducer;
+} = PlanSlice.actions;
+export default PlanSlice.reducer;

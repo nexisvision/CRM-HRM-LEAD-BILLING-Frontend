@@ -24,21 +24,24 @@ const AddDesignation = ({ onClose }) => {
 
   const { data: Branch, status, error } = useSelector((state) => state.Branch);
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
+
   const alldatas = useSelector((state) => state.Branch);
-  const fnddata = alldatas.Branch.data;
+  const fnddata = alldatas.Branch.data || [];
+  const fndbranchdata = fnddata.filter((item) => item.created_by === user);
 
   // Handle form submission
   const handleSubmit = (values, { resetForm }) => {
     dispatch(AddDes(values))
       .then(() => {
         dispatch(getDes());
-        message.success("Designation added successfully!");
+        // message.success("Designation added successfully!");
         resetForm();
         onClose();
         navigate("/app/hrm/designation");
       })
       .catch((error) => {
-        message.error("Failed to add designation.");
+        // message.error("Failed to add designation.");
         console.error("Add API error:", error);
       });
   };
@@ -94,7 +97,7 @@ const AddDesignation = ({ onClose }) => {
                         value={values.branch}
                         onBlur={() => setFieldTouched("branch", true)}
                       >
-                        {fnddata?.map((branch) => (
+                        {fndbranchdata?.map((branch) => (
                           <Option key={branch.id} value={branch.id}>
                             {branch.branchName}
                           </Option>

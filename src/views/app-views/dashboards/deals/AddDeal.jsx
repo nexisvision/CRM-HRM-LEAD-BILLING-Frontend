@@ -144,12 +144,12 @@ const AddDeal = ({ onClose }) => {
     dispatch(AddDeals(values))
       .then(() => {
         dispatch(GetDeals());
-        message.success("Deal added successfully!");
+        // message.success("Deal added successfully!");
         resetForm();
         onClose();
       })
       .catch((error) => {
-        message.error("Failed to add Deal.");
+        // message.error("Failed to add Deal.");
         console.error("Add API error:", error);
       });
   };

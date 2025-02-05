@@ -24,6 +24,7 @@ import {
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
+  PushpinOutlined,
 } from "@ant-design/icons";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import StatisticWidget from "components/shared-components/StatisticWidget";
@@ -76,6 +77,7 @@ const TaskList = () => {
   const [list, setList] = useState(OrderListData);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [pinnedTasks, setPinnedTasks] = useState([]);
 
   const dispatch = useDispatch();
 
@@ -103,6 +105,12 @@ const TaskList = () => {
       setList(fnddata);
     }
   }, [fnddata]);
+
+  useEffect(() => {
+    // Load pinned tasks from local storage on component mount
+    const storedPinnedTasks = JSON.parse(localStorage.getItem("pinnedTasks")) || [];
+    setPinnedTasks(storedPinnedTasks);
+  }, []);
 
    //// permission
                 
@@ -176,7 +184,7 @@ const TaskList = () => {
     dispatch(DeleteTasks(userId)).then(() => {
       dispatch(GetTasks(idd));
       setList(list.filter((itme) => itme.id !== userId));
-      message.success("Task Delete Success");
+      // message.success("Task Delete Success");
     });
   };
 
@@ -185,29 +193,43 @@ const TaskList = () => {
     setIddd(idd);
   };
 
+  const togglePinTask = (taskId) => {
+    setPinnedTasks((prevPinned) => {
+      const newPinned = prevPinned.includes(taskId)
+        ? prevPinned.filter((id) => id !== taskId) // Unpin the task
+        : [...prevPinned, taskId]; // Pin the task
+
+      // Save the updated pinned tasks to local storage
+      localStorage.setItem("pinnedTasks", JSON.stringify(newPinned));
+      return newPinned;
+    });
+  };
+
   const dropdownMenu = (row) => (
     <Menu>
+      <Menu.Item>
+        <Flex alignItems="center" onClick={() => togglePinTask(row.id)}>
+          {pinnedTasks.includes(row.id) ? (
+            <PushpinOutlined style={{ color: "gold" }} />
+          ) : (
+            <PushpinOutlined />
+          )}
+          <span className="ml-2">{pinnedTasks.includes(row.id) ? "Unpin" : "Pin"}</span>
+        </Flex>
+      </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center" onClick={openviewTaskModal}>
           <EyeOutlined />
           <span className="ml-2">View Details</span>
         </Flex>
       </Menu.Item>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <PlusCircleOutlined />
           <span className="ml-2">Add to remark</span>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
     
-      <Menu.Item>
-        <Flex alignItems="center">
-          <TiPinOutline />
-          <span className="ml-2">Pin</span>
-        </Flex>
-      </Menu.Item>
-      
-
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
                               <Menu.Item>
                               <Flex alignItems="center" onClick={() => editfubn(row.id)}>
@@ -231,10 +253,19 @@ const TaskList = () => {
   );
 
   const tableColumns = [
-    // {
-    //   title: "Id",
-    //   dataIndex: "id",
-    // },
+    {
+      title: "Pinned",
+      dataIndex: "pinned",
+      render: (text, record) => (
+        <span>
+          {pinnedTasks.includes(record.id) ? (
+            <PushpinOutlined style={{ color: "gold" }} />
+          ) : (
+            <PushpinOutlined />
+          )}
+        </span>
+      ),
+    },
     {
       title: "Title",
       dataIndex: "taskName",
@@ -250,18 +281,18 @@ const TaskList = () => {
       },
     },
     {
-      title: "Description",
-      dataIndex: "description",
-      render: (text) => {
-        const cleanText = stripHtmlTags(text);
-        return <span>{cleanText}</span>;
-      },
+    title: "Description",
+    dataIndex: "description",
+    render: (text) => (
+      <div dangerouslySetInnerHTML={{ __html: text }} />
+    ),
+    sorter: (a, b) => a.description.length - b.description.length,
+  },
+    {
+      title: "priority",
+      dataIndex: "priority",
       sorter: {
-        compare: (a, b) => {
-          const textA = stripHtmlTags(a.description || '');
-          const textB = stripHtmlTags(b.description || '');
-          return textA.length - textB.length;
-        },
+        compare: (a, b) => a.priority.length - b.priority.length,
       },
     },
     // {

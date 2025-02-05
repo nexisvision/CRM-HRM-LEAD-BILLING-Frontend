@@ -64,12 +64,12 @@ const AddTask = ({ onClose }) => {
         // Fetch updated tasks after successfully adding
         dispatch(GetTasks(idd))
           .then(() => {
-            message.success("Expenses added successfully!");
+            // message.success("Expenses added successfully!");
             resetForm();
             onClose();
           })
           .catch((error) => {
-            message.error("Failed to fetch the latest meeting data.");
+            // message.error("Failed to fetch the latest meeting data.");
             console.error("MeetData API error:", error);
           });
       })

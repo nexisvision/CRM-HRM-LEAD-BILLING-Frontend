@@ -26,6 +26,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   PlusOutlined,
+  PushpinOutlined,
 } from "@ant-design/icons";
 import { TiPinOutline } from "react-icons/ti";
 import AvatarStatus from "components/shared-components/AvatarStatus";
@@ -72,6 +73,7 @@ const paymentStatusList = ["Normal", "UNNormal", "Expired"];
 export const TicketList = () => {
   const [annualStatisticData] = useState(AnnualStatisticData);
   const [list, setList] = useState(OrderListData);
+  const [pinnedTasks, setPinnedTasks] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddTicketModalVisible, setIsAddTicketModalVisible] = useState(false);
@@ -86,7 +88,18 @@ export const TicketList = () => {
 
   const alldatat = useSelector((state) => state?.Ticket);
   const fnddata = alldatat?.Ticket?.data || [];
-  console.log(",mm,,m,m", fnddata);
+
+  const loggeddata = useSelector((state) => state?.user?.loggedInUser.username);
+
+  const finddata = fnddata?.filter((item) => item.created_by === loggeddata);
+
+  // console.log(",mm,,m,m", fnddata);
+
+  useEffect(() => {
+    // Load pinned tasks from local storage on component mount
+    const storedPinnedTasks = JSON.parse(localStorage.getItem("pinnedTasks")) || [];
+    setPinnedTasks(storedPinnedTasks);
+  }, []);
 
   // Open Add Job Modal
   const openAddTicketModal = () => {
@@ -132,10 +145,10 @@ export const TicketList = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (fnddata) {
-      setList(fnddata);
+    if (finddata) {
+      setList(finddata);
     }
-  }, [fnddata]);
+  }, [finddata]);
   const exportToExcel = () => {
     try {
       const ws = utils.json_to_sheet(list); // Convert JSON data to a sheet
@@ -151,16 +164,29 @@ export const TicketList = () => {
   };
 
   const deletfun = (userId) => {
-    dispatch(DeleteTicket(userId));
+    dispatch(DeleteTicket(userId)).then(() => {
     dispatch(getAllTicket());
-    dispatch(getAllTicket());
+
     setList(list.filter((item) => item.id !== userId));
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
+  });
   };
 
   const editfun = (idd) => {
     openEditTicketModal();
     setIdd(idd);
+  };
+
+  const togglePinTask = (taskId) => {
+    setPinnedTasks((prevPinned) => {
+      const newPinned = prevPinned.includes(taskId)
+        ? prevPinned.filter((id) => id !== taskId) // Unpin the task
+        : [...prevPinned, taskId]; // Pin the task
+
+      // Save the updated pinned tasks to local storage
+      localStorage.setItem("pinnedTasks", JSON.stringify(newPinned));
+      return newPinned;
+    });
   };
 
   const dropdownMenu = (row) => (
@@ -179,11 +205,21 @@ export const TicketList = () => {
         </Flex>
       </Menu.Item>
       <Menu.Item>
+        <Flex alignItems="center" onClick={() => togglePinTask(row.id)}>
+          {pinnedTasks.includes(row.id) ? (
+            <PushpinOutlined style={{ color: "gold" }} />
+          ) : (
+            <PushpinOutlined />
+          )}
+          <span className="ml-2">{pinnedTasks.includes(row.id) ? "Unpin" : "Pin"}</span>
+        </Flex>
+      </Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <PlusCircleOutlined />
           <span className="ml-2">Add to remark</span>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
 
       <Menu.Item>
         <Flex alignItems="center">
@@ -198,12 +234,7 @@ export const TicketList = () => {
           </Button>
         </Flex>
       </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <TiPinOutline />
-          <span className="ml-2">Pin</span>
-        </Flex>
-      </Menu.Item>
+      
       <Menu.Item>
         <Flex alignItems="center" onClick={() => deletfun(row.id)}>
           <DeleteOutlined />
@@ -214,6 +245,19 @@ export const TicketList = () => {
   );
 
   const tableColumns = [
+    {
+      title: "Pinned",
+      dataIndex: "pinned",
+      render: (text, record) => (
+        <span>
+          {pinnedTasks.includes(record.id) ? (
+            <PushpinOutlined style={{ color: "gold" }} />
+          ) : (
+            <PushpinOutlined />
+          )}
+        </span>
+      ),
+    },
     {
       title: "Subject",
       dataIndex: "ticketSubject",

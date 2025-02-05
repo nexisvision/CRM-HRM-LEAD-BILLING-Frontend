@@ -64,6 +64,8 @@ const DealList = () => {
   const tabledata = useSelector((state) => state.Deals);
   const clientsData = useSelector((state) => state?.SubClient?.SubClient?.data || []);
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
+
   // Add new state for stages
   const [stagesList, setStagesList] = useState([]);
 
@@ -135,7 +137,7 @@ const DealList = () => {
                         console.log('Parsed Permissions:', allpermisson);
                       
                       } else {
-                        console.log('dashboards-deal is not available');
+                        // console.log('dashboards-deal is not available');
                       }
                       
                       const canCreateClient = allpermisson?.includes('create');
@@ -173,7 +175,7 @@ const DealList = () => {
 
       setUsers(users.filter((item) => item.id !== userId));
 
-      message.success({ content: "Deleted user successfully", duration: 2 });
+      // message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error);
     }
@@ -197,18 +199,22 @@ const DealList = () => {
     dispatch(getstages());
   }, [dispatch]);
 
+  // useEffect(() => {
+  //   if (tabledata && tabledata.Deals && tabledata.Deals.data) {
+  //     setUsers(tabledata.Deals.data);
+  //   }
+  // }, [tabledata]);
+
+
+
   useEffect(() => {
     if (tabledata && tabledata.Deals && tabledata.Deals.data) {
-      const dealsWithClientInfo = tabledata.Deals.data.map(deal => {
-        const clientInfo = clientsData?.find(client => client.id === deal.clients);
-        return {
-          ...deal,
-          clientName: clientInfo?.username || clientInfo?.name || 'N/A'
-        };
-      });
-      setUsers(dealsWithClientInfo);
+      // Filter leads by created_by matching the logged-in user's username
+      const filteredDeals = tabledata.Deals.data.filter(deal => deal.created_by === user);
+      setUsers(filteredDeals);
     }
-  }, [tabledata, clientsData]);
+  }, [tabledata, user]);
+
 
   useEffect(() => {
     if (stagesData && stagesData.StagesLeadsDeals && stagesData.StagesLeadsDeals.data) {

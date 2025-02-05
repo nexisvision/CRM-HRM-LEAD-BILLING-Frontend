@@ -15,10 +15,14 @@ const AddIndicator = ({ onClose }) => {
   const [form] = Form.useForm(); // Ensure this is called at the top
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
+  const fndbranchdata = branchData.filter((item) => item.created_by === user);
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
+  const fnddepartmentdata = departmentData.filter((item) => item.created_by === user);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
+  const fnddesignationdata = designationData.filter((item) => item.created_by === user);
+
 
   useEffect(() => {
     dispatch(getBranch());
@@ -36,12 +40,12 @@ const AddIndicator = ({ onClose }) => {
     dispatch(addIndicator(values)) // Fixed naming
       .then(() => {
         dispatch(getIndicators());
-        message.success('Indicator added successfully!');
+        // message.success('Indicator added successfully!');
         onClose(); // Optional if provided
         navigate('/app/hrm/performance/indicator');
       })
       .catch((error) => {
-        message.error('Failed to add indicator.');
+        // message.error('Failed to add indicator.');
         console.error('Add API error:', error);
       });
   };
@@ -84,7 +88,7 @@ const AddIndicator = ({ onClose }) => {
               rules={[{ required: true, message: 'Please select a branch' }]}
             >
               <Select placeholder="Select Branch">
-                {branchData.map((branch) => (
+                {fndbranchdata.map((branch) => (
                   <Option key={branch.id} value={branch.id}>
                     {branch.branchName}
                   </Option>
@@ -100,7 +104,7 @@ const AddIndicator = ({ onClose }) => {
               rules={[{ required: true, message: 'Please select a department' }]}
             >
               <Select placeholder="Select Department">
-                {departmentData.map((dept) => (
+                {fnddepartmentdata.map((dept) => (
                   <Option key={dept.id} value={dept.id}>
                     {dept.department_name}
                   </Option>
@@ -116,7 +120,7 @@ const AddIndicator = ({ onClose }) => {
               rules={[{ required: true, message: 'Please select a designation' }]}
             >
               <Select placeholder="Select Designation">
-                {designationData.map((des) => (
+                {fnddesignationdata.map((des) => (
                   <Option key={des.id} value={des.id}>
                     {des.designation_name}
                   </Option>

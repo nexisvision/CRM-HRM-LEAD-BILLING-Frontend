@@ -128,7 +128,7 @@ const InquiryList = () => {
       dispatch(getinqu());
       const updatedUsers = users.filter((item) => item.id !== userId);
       setUsers(updatedUsers);
-      message.success({ content: `Deleted user ${userId}`, duration: 2 });
+      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
     });
   };
 
@@ -181,13 +181,13 @@ const InquiryList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button type="" className="" icon={<EyeOutlined />} size="small">
             <span>View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
 
       <Menu.Item>
         <Flex alignItems="center">

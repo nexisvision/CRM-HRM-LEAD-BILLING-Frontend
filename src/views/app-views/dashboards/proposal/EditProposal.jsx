@@ -196,12 +196,12 @@ const EditProposal = ({ id, onClose }) => {
       console.log('Proposal Data:', proposalData);
       dispatch(edpropos({ id, proposalData }))
         .then(() => {
-          message.success("Proposal updated successfully!");
+          // message.success("Proposal updated successfully!");
           dispatch(getpropos());
           onClose();
         })
         .catch((error) => {
-          message.error("Failed to add proposal. Please try again.");
+          // message.error("Failed to add proposal. Please try again.");
           console.error("Error during proposal submission:", error);
         });
     } catch (error) {

@@ -111,7 +111,7 @@ const PolicyList = () => {
       dispatch(getpolicys());
       const updatedUsers = users.filter((item) => item.id !== userId);
       setUsers(updatedUsers);
-      message.success({ content: `Deleted user ${userId}`, duration: 2 });
+      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
     });
   };
 
@@ -178,39 +178,7 @@ const PolicyList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" className="" icon={<EyeOutlined />} size="small">
-            <span>View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<MailOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span>Send Mail</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<PushpinOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span className="ml-2">Add to Job OnBoard</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
+  
       <Menu.Item>
         <Flex alignItems="center">
           <Button
@@ -263,10 +231,13 @@ const PolicyList = () => {
     {
       title: "Description",
       dataIndex: "description",
+      render: (text) => (
+        <div dangerouslySetInnerHTML={{ __html: text }} />
+      ),
       sorter: (a, b) => a.description.length - b.description.length,
     },
     {
-      title: "created_by",
+      title: "Created By",
       dataIndex: "created_by",
       sorter: (a, b) => a.created_by.length - b.created_by.length,
     },
@@ -316,16 +287,16 @@ const PolicyList = () => {
         <Flex gap="7px">
           <Button type="primary" className="ml-2" onClick={openAddpolicyModal}>
             <PlusOutlined />
-            <span>New</span>
+            <span>New</span>  
           </Button>
-          <Button
+          {/* <Button
                 type="primary"
                 icon={<FileExcelOutlined />}
                 onClick={exportToExcel} // Call export function when the button is clicked
                 block
               >
                 Export All
-              </Button>
+              </Button> */}
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">

@@ -299,10 +299,57 @@ const extraNavvTree = [
         submenu: []
       },
 
+      {
+        key: 'setting',
+        path: `${APP_PREFIX_PATH}/setting`,
+        title: 'Setting',
+        icon:  SettingOutlined ,
+        breadcrumb: true,
+        submenu: [
+          {
+            key: 'extra-superadmin-setting-general',
+            path: `${APP_PREFIX_PATH}/setting/general`,
+            title: 'General',
+            icon: ControlOutlined,
+            breadcrumb: true,
+            submenu: []
+          },
+          {
+            key: 'extra-superadmin-setting-countries',
+            path: `${APP_PREFIX_PATH}/setting/countries`,
+            title: 'Countries',
+            icon: GlobalOutlined ,
+            breadcrumb: true,
+            submenu: []
+          },
+          {
+            key: 'extra-superadmin-setting-currencies',
+            path: `${APP_PREFIX_PATH}/setting/currencies`,
+            title: 'Currencies',
+            icon: DollarOutlined ,
+            breadcrumb: true,
+            submenu: []
+          },
+          {
+            key: 'extra-superadmin-setting-esignature',
+            path: `${APP_PREFIX_PATH}/setting/esignature`,
+            title: 'ESignature',
+            icon: FileDoneOutlined,
+            breadcrumb: true,
+            submenu: []
+          },
+         
+        ]
+        
+      },
+
       
     ]
+
+      export { extraNavvTree };
   // }
 // ]
+
 
 const extraNavvvTree = [
   {
@@ -428,6 +475,8 @@ const extraNavvvTree = [
         
   }
 ]
+
+export { extraNavvvTree };
 
 
 
@@ -709,7 +758,7 @@ const dashBoardNavTree = [{
 }]
 
 
-
+export { dashBoardNavTree };
 
 
 const navigationConfig = [

@@ -29,6 +29,8 @@ const AppraisalList = () => {
   const [isViewAppraisalModalVisible, setIsViewAppraisalModalVisible] = useState(false);
   const dispatch = useDispatch();
 
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
     const tabledata = useSelector((state) => state.appraisal);
     const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
  const employeeData = useSelector((state) => state.employee?.employee?.data || []);
@@ -52,10 +54,10 @@ const AppraisalList = () => {
    
       if (parsedPermissions["extra-hrm-performance-appraisal"] && parsedPermissions["extra-hrm-performance-appraisal"][0]?.permissions) {
         allpermisson = parsedPermissions["extra-hrm-performance-appraisal"][0].permissions;
-        console.log('Parsed Permissions:', allpermisson);
+        // console.log('Parsed Permissions:', allpermisson);
       
       } else {
-        console.log('extra-hrm-performance-appraisal is not available');
+        // console.log('extra-hrm-performance-appraisal is not available');
       }
       
       const canCreateClient = allpermisson?.includes('create');
@@ -108,7 +110,7 @@ useEffect(() => {
 
 useEffect(() => {
   if (tabledata?.Appraisals?.data) {
-    const mappedData = tabledata.Appraisals.data.map((appraisal) => {
+    const mappedData = tabledata.Appraisals.data.filter((item) => item.created_by === user).map((appraisal) => {
       const branch = branchData.find((b) => b.id === appraisal.branch)?.branchName || 'N/A';
       const employee = employeeData.find((e) => e.id === appraisal.employee)?.username || 'N/A';
       
@@ -139,7 +141,7 @@ useEffect(() => {
 
   const deleteUser = (userId) => {
     setUsers(users.filter(item => item.id !== userId));
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
 
   const showUserProfile = (userInfo) => {

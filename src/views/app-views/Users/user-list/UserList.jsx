@@ -55,7 +55,7 @@ const UserList = () => {
   
   const allroledata = useSelector((state) => state.role);
   const fnddata = allroledata.role.data;
-  const loggedInUser = useSelector((state) => state.user.loggedInUser);
+  const logged = useSelector((state) => state.user.loggedInUser.username);
 
   const [users, setUsers] = useState([]);
 
@@ -85,10 +85,10 @@ const UserList = () => {
 
    if (parsedPermissions["extra-users-list"] && parsedPermissions["extra-users-list"][0]?.permissions) {
      allpermisson = parsedPermissions["extra-users-list"][0].permissions;
-     console.log('Parsed Permissions:', allpermisson);
+    //  console.log('Parsed Permissions:', allpermisson);
    
    } else {
-     console.log('extra-users-list is not available');
+    //  console.log('extra-users-list is not available'); 
    }
    
    const canCreateClient = allpermisson?.includes('create');

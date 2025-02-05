@@ -70,10 +70,10 @@ const SalaryList = () => {
 
    if (parsedPermissions["extra-hrm-payroll-salary"] && parsedPermissions["extra-hrm-payroll-salary"][0]?.permissions) {
      allpermisson = parsedPermissions["extra-hrm-payroll-salary"][0].permissions;
-     console.log('Parsed Permissions:', allpermisson);
+    //  console.log('Parsed Permissions:', allpermisson);
    
    } else {
-     console.log('extra-hrm-payroll-salary is not available');
+    //  console.log('extra-hrm-payroll-salary is not available');
    }
    
    const canCreateClient = allpermisson?.includes('create');
@@ -124,7 +124,7 @@ const SalaryList = () => {
   const deleteUser = (userId) => {
     dispatch(deleteSalaryss(userId)).then(() => {
       dispatch(getSalaryss());
-      message.success({ content: `Deleted user ${userId}`, duration: 2 });
+      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
       setList(list.filter((item) => item.id !== userId));
     });
   };

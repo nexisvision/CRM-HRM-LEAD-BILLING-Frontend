@@ -42,7 +42,9 @@ const dispatch = useDispatch();
   const openViewIndicatorModal = () => setIsViewIndicatorModalVisible(true);
   const closeViewIndicatorModal = () => setIsViewIndicatorModalVisible(false);
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
     const tabledata = useSelector((state) => state.indicator);
+
 
 const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
@@ -67,10 +69,10 @@ const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
   
      if (parsedPermissions["extra-hrm-performance-indicator"] && parsedPermissions["extra-hrm-performance-indicator"][0]?.permissions) {
        allpermisson = parsedPermissions["extra-hrm-performance-indicator"][0].permissions;
-       console.log('Parsed Permissions:', allpermisson);
+      //  console.log('Parsed Permissions:', allpermisson);
      
      } else {
-       console.log('extra-hrm-performance-indicator is not available');
+      //  console.log('extra-hrm-performance-indicator is not available');
      }
      
      const canCreateClient = allpermisson?.includes('create');
@@ -98,23 +100,50 @@ useEffect(() => {
 }, [dispatch]);
 
 
+
+
+
 useEffect(() => {
   if (tabledata?.Indicators?.data) {
-    const mappedData = tabledata.Indicators.data.map((indicator) => {
-      const branch = branchData.find((b) => b.id === indicator.branch)?.branchName || 'N/A';
-      const department = departmentData.find((d) => d.id === indicator.department)?.department_name || 'N/A';
-      const designation = designationData.find((des) => des.id === indicator.designation)?.designation_name || 'N/A';
+    const mappedData = tabledata.Indicators.data
+      .filter(indicator => indicator.created_by === user) // Filter by created_by matching the username
+      .map((indicator) => {
+        const branch = branchData.find((b) => b.id === indicator.branch)?.branchName || 'N/A';
+        const department = departmentData.find((d) => d.id === indicator.department)?.department_name || 'N/A';
+        const designation = designationData.find((des) => des.id === indicator.designation)?.designation_name || 'N/A';
 
-      return {
-        ...indicator,
-        branch,
-        department,
-        designation,
-      };
-    });
+        return {
+          ...indicator,
+          branch,
+          department,
+          designation,
+        };
+      });
     setUsers(mappedData);
   }
-}, [tabledata, branchData, departmentData, designationData]);
+}, [tabledata, branchData, departmentData, designationData, user]);
+
+
+
+
+
+// useEffect(() => {
+//   if (tabledata?.Indicators?.data) {
+//     const mappedData = tabledata.Indicators.data.map((indicator) => {
+//       const branch = branchData.find((b) => b.id === indicator.branch)?.branchName || 'N/A';
+//       const department = departmentData.find((d) => d.id === indicator.department)?.department_name || 'N/A';
+//       const designation = designationData.find((des) => des.id === indicator.designation)?.designation_name || 'N/A';
+
+//       return {
+//         ...indicator,
+//         branch,
+//         department,
+//         designation,
+//       };
+//     });
+//     setUsers(mappedData);
+//   }
+// }, [tabledata, branchData, departmentData, designationData]);
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
@@ -161,7 +190,7 @@ useEffect(() => {
         dispatch(deleteIndicator( userId )) 
                   .then(() => {
                     dispatch(getIndicators());
-                    message.success('Indicator Deleted successfully!');
+                    // message.success('Indicator Deleted successfully!');
                     setUsers(users.filter(item => item.id !== userId));
                     navigate('/app/hrm/performance/indicator');
                   })

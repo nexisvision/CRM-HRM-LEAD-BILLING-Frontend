@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./TicketService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
+import { message } from "antd";
 
 // Async thunk for adding user
 
@@ -93,7 +94,7 @@ const initialIsAuth = () => {
   return item ? JSON.parse(item) : false;
 };
 
-const RoleAndPermissionSlice = createSlice({
+const TicketSlice = createSlice({
   name: "Ticket",
   initialState: {
     Ticket: [],
@@ -138,12 +139,13 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(AddTickets.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload?.data?.message);
+        message.success(action.payload?.message);
       })
       .addCase(AddTickets.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.message);
+        message.error(action.payload?.message);
       })
+
 
       .addCase(getAllTicket.pending, (state) => {
         state.isLoading = true;
@@ -158,45 +160,20 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-      //getall
-      .addCase(getAllUsers.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getAllUsers.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.users = action.payload;
-        toast.success(`Users fetched successfully`);
-      })
-      .addCase(getAllUsers.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
-      })
-
-      //getuserbyid
-      .addCase(getUserById.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getUserById.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.detailItem = action.payload?.user;
-        toast.success(action.payload.message);
-      })
-      .addCase(getUserById.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
-      })
+      
       //delete
       .addCase(DeleteTicket.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(DeleteTicket.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload.message);
+        message.success(action.payload?.message);
       })
       .addCase(DeleteTicket.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
+        message.error(action.payload?.message);
       })
+
       //update
       .addCase(Editicket.pending, (state) => {
         state.isLoading = false;
@@ -204,15 +181,20 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(Editicket.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; // Update the state with the updated employee data
+        state.editItem = action.payload; 
+        message.success(action.payload?.message);
+        // Update the state with the updated employee data
       })
       .addCase(Editicket.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to update employee";
+        state.error = action.payload;
+        message.error(action.payload?.message);
       });
+
+
   },
 });
 
-export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-  RoleAndPermissionSlice.actions;
-export default RoleAndPermissionSlice.reducer;
+export const { toggleAddModal, toggleEditModal, handleLogout, editUserData, toggleDetailModal, closeDetailModal } =
+  TicketSlice.actions;
+export default TicketSlice.reducer;

@@ -63,12 +63,12 @@ const EditAppraisal = ({ id , onClose }) => {
         dispatch(editAppraisal({ id, values }))
           .then(() => {
             dispatch(getAppraisals());
-            message.success('Appraisal updated successfully!');
+            // message.success('Appraisal updated successfully!');
             onClose();
             navigate('/app/hrm/performance/appraisal');
           })
           .catch((error) => {
-            message.error('Failed to update appraisal.');
+            // message.error('Failed to update appraisal.');
             console.error('Edit API error:', error);
           });
   };

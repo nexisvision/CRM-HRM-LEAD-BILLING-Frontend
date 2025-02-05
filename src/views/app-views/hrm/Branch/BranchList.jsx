@@ -42,18 +42,22 @@ const BranchList = () => {
 
   const [idd, setIdd] = useState("");
 
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Branch);
-  const fnddata = tabledata.Branch.data;
+ 
 
   useEffect(() => {
     dispatch(getBranch());
   }, []);
 
   useEffect(() => {
-    if (fnddata) {
-      setUsers(fnddata);
+    if (tabledata && tabledata.Branch && tabledata.Branch.data) {
+      const filteredData = tabledata.Branch.data.filter((item) => item.created_by === user);
+      setUsers(filteredData);
     }
-  }, [fnddata]);
+  }, [tabledata]);
+
 
    //// permission
                             
@@ -73,10 +77,10 @@ const BranchList = () => {
            
               if (parsedPermissions["extra-hrm-branch"] && parsedPermissions["extra-hrm-branch"][0]?.permissions) {
                 allpermisson = parsedPermissions["extra-hrm-branch"][0].permissions;
-                console.log('Parsed Permissions:', allpermisson);
+                // console.log('Parsed Permissions:', allpermisson);
               
               } else {
-                console.log('extra-hrm-branch is not available');
+                // console.log('extra-hrm-branch is not available');
               }
               
               const canCreateClient = allpermisson?.includes('create');
@@ -126,11 +130,11 @@ const BranchList = () => {
     dispatch(deleteBranch(userId))
       .then(() => {
         dispatch(getBranch());
-        message.success("Department Deleted successfully!");
+        // message.success("Department Deleted successfully!");
         setUsers(users.filter((item) => item.id !== userId));
       })
       .catch((error) => {
-        message.error("Failed to update department.");
+        // message.error("Failed to update department.");
         console.error("Edit API error:", error);
       });
   };

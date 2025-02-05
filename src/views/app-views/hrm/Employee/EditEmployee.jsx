@@ -106,19 +106,19 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
     dispatch(updateEmp({ employeeIdd, values }))
       .then(() => {
         dispatch(empdata());
-        message.success("Employee details updated successfully!");
+        // message.success("Employee details updated successfully!");
         onClose();
         navigate("/app/hrm/employee");
       })
       .catch((error) => {
-        message.error("Failed to update Employee.");
+        // message.error("Failed to update Employee.");
         console.error("Edit API error:", error);
       });
   };
 
   const onFinishFailed = (errorInfo) => {
     console.error("Form submission failed:", errorInfo);
-    message.error("Please fill out all required fields.");
+    // message.error("Please fill out all required fields.");
   };
 
 

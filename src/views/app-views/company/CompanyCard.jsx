@@ -108,7 +108,7 @@ const CompanyCard = ({ company }) => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -120,7 +120,7 @@ const CompanyCard = ({ company }) => {
             <span className="">Edit</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item>
         <Flex alignItems="center">
           <Button
@@ -203,9 +203,9 @@ const CompanyCard = ({ company }) => {
         >
           Upgrade Plan
         </Button>
-        <Button className="bg-blue-600 text-white py-2 px-4 rounded">
+        {/* <Button className="bg-blue-600 text-white py-2 px-4 rounded">
           AdminHub
-        </Button>
+        </Button> */}
       </div>
       <Modal
         title="Add Upgrade Plan"

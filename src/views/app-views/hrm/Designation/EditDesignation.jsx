@@ -24,8 +24,12 @@ const EditDesignation = ({ id, onClose }) => {
     dispatch(getBranch());
   }, [dispatch]);
 
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const alldatas = useSelector((state) => state.Branch);
-  const fnddata = alldatas.Branch.data;
+  const fnddata = alldatas?.Branch?.data || [];
+  const fndbranchdata = fnddata.filter((item) => item.created_by === user);
+
 
   const alldept = useSelector((state) => state.Designation);
   const [singleEmp, setSingleEmp] = useState(null);
@@ -45,12 +49,12 @@ const EditDesignation = ({ id, onClose }) => {
     dispatch(EditDes({ id, values }))
       .then(() => {
         dispatch(getDes());
-        message.success("Designation updated successfully!");
+        // message.success("Designation updated successfully!");
         onClose();
         navigate("/app/hrm/designation");
       })
       .catch((error) => {
-        message.error("Failed to update designation.");
+        // message.error("Failed to update designation.");
         console.error("Edit API error:", error);
       });
   };
@@ -72,7 +76,7 @@ const EditDesignation = ({ id, onClose }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
-                  <label>Designation*</label>
+                  <label>Designation</label>
                   <Field
                     as={Input}
                     name="designation_name"
@@ -93,18 +97,23 @@ const EditDesignation = ({ id, onClose }) => {
                 <div className="form-item">
                   <label>Branch</label>
                   <Field name="branch">
-                    {({ field }) => (
+                    {({ field, form }) => (
                       <Select
                         {...field}
                         className="w-full"
                         placeholder="Select Branch"
-                        onChange={(value) => setFieldValue("branch", value)}
+                        onChange={(value) => form.setFieldValue("branch", value)}
+                        disabled={fndbranchdata.length === 0}
                       >
-                        {fnddata?.map((branch) => (
-                          <Option key={branch.id} value={branch.id}>
-                            {branch.branchName}
-                          </Option>
-                        ))}
+                        {fndbranchdata.length > 0 ? (
+                          fndbranchdata.map((branch) => (
+                            <Option key={branch.id} value={branch.id}>
+                              {branch.branchName}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option disabled>No branches available</Option>
+                        )}
                       </Select>
                     )}
                   </Field>

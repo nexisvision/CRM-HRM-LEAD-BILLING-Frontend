@@ -25,6 +25,8 @@ const DesignationList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
     const tabledata = useSelector((state) => state.Designation);
 
     const [id,setId]=useState("");
@@ -51,10 +53,10 @@ const DesignationList = () => {
        
           if (parsedPermissions["extra-hrm-designation"] && parsedPermissions["extra-hrm-designation"][0]?.permissions) {
             allpermisson = parsedPermissions["extra-hrm-designation"][0].permissions;
-            console.log('Parsed Permissions:', allpermisson);
+            // console.log('Parsed Permissions:', allpermisson);
           
           } else {
-            console.log('extra-hrm-designation is not available');
+            // console.log('extra-hrm-designation is not available');
           }
           
           const canCreateClient = allpermisson?.includes('create');
@@ -67,9 +69,11 @@ const DesignationList = () => {
   
       useEffect(() => {
         if (tabledata && tabledata.Designation && tabledata.Designation.data) {
-          setUsers(tabledata.Designation.data);
+          const filteredData = tabledata.Designation.data.filter((item) => item.created_by === user);
+          setUsers(filteredData);
         }
       }, [tabledata]);
+
 
 
   // Open Add Employee Modal
@@ -119,12 +123,12 @@ const DesignationList = () => {
       dispatch(DeleteDes( userId ))
                 .then(() => {
                   dispatch(getDes());
-                  message.success('designation Deleted successfully!');
+                  // message.success('designation Deleted successfully!');
                   setUsers(users.filter(item => item.id !== userId));
                   navigate('/app/hrm/designation');
                 })
                 .catch((error) => {
-                  message.error('Failed to delete designation.');
+                  // message.error('Failed to delete designation.');
                   console.error('Edit API error:', error);
                 });
   };
@@ -159,13 +163,13 @@ const DesignationList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button type="" icon={<EyeOutlined />} onClick={handleParticularDesignationModal} size="small">
             <span className="">View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
       
       <Menu.Item>
         <Flex alignItems="center">

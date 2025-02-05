@@ -120,18 +120,18 @@ const EditTask = ({ iddd, onClose }) => {
       .then(() => {
         dispatch(GetTasks(idd))
           .then(() => {
-            message.success("Task updated successfully!");
+            // message.success("Task updated successfully!");
             resetForm();
             onClose();
           })
           .catch((error) => {
-            message.error("Failed to fetch the latest task data.");
+            // message.error("Failed to fetch the latest task data.");
             console.error("GetTasks API error:", error);
           });
       })
       .catch((error) => {
-        message.error("Failed to update task.");
-        console.error("EditTask API error:", error);
+        // message.error("Failed to update task.");
+        console.error("AddTask API error:", error);
       });
   };
 

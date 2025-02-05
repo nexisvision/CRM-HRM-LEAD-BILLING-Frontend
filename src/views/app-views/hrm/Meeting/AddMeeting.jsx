@@ -32,24 +32,30 @@ const AddMeeting = ({ onClose }) => {
     dispatch(getDept());
   }, [dispatch]);
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
+
   const AllDepart = useSelector((state) => state.Department);
-  const datadept = AllDepart.Department.data;
+  const datadept = AllDepart.Department.data || [];
+  const filteredDept = datadept?.filter((item) => item.created_by === user);
+
 
   const allempdata = useSelector((state) => state.employee);
-  const empData = allempdata?.employee?.data;
+  const empData = allempdata?.employee?.data || [];
+
+  const filteredEmpData = empData?.filter((item) => item.created_by === user);
 
   const onSubmit = (values, { resetForm }) => {
     dispatch(AddMeet(values))
       .then(() => {
         dispatch(MeetData())
           .then(() => {
-            message.success("Meeting added successfully!");
+            // message.success("Meeting added successfully!");
             resetForm();
             onClose();
             navigate("/app/hrm/meeting");
           })
           .catch((error) => {
-            message.error("Failed to fetch the latest meeting data.");
+            // message.error("Failed to fetch the latest meeting data.");
             console.error("MeetData API error:", error);
           });
       })
@@ -112,17 +118,18 @@ const AddMeeting = ({ onClose }) => {
                         style={{ width: "100%" }}
                         {...field}
                         placeholder="Select Department"
-                        loading={!datadept}
+                        loading={!filteredDept}
                         value={form.values.department}
                         onChange={(value) =>
                           form.setFieldValue("department", value)
                         }
                         onBlur={() => form.setFieldTouched("department", true)}
                       >
-                        {datadept && datadept.length > 0 ? (
-                          datadept.map((dept) => (
+                        {filteredDept && filteredDept.length > 0 ? (
+                          filteredDept.map((dept) => (
                             <Option key={dept.id} value={dept.id}>
                               {dept.department_name || "Unnamed Department"}
+
                             </Option>
                           ))
                         ) : (
@@ -151,16 +158,18 @@ const AddMeeting = ({ onClose }) => {
                         style={{ width: "100%" }}
                         {...field}
                         placeholder="Select Employee"
-                        loading={!empData}
+                        loading={!filteredEmpData}
                         value={form.values.employee}
                         onChange={(value) =>
                           form.setFieldValue("employee", value)
                         }
+
                         onBlur={() => form.setFieldTouched("employee", true)}
                       >
-                        {empData && empData.length > 0 ? (
-                          empData.map((emp) => (
+                        {filteredEmpData && filteredEmpData.length > 0 ? (
+                          filteredEmpData.map((emp) => (
                             <Option key={emp.id} value={emp.id}>
+
                               {emp.username || "Unnamed Employee"}
                             </Option>
                           ))

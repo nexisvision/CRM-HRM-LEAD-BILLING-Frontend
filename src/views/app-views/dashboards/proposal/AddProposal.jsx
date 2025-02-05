@@ -40,8 +40,8 @@ import * as Yup from "yup";
 
 import { GetLeads } from "../leads/LeadReducers/LeadSlice";
 import { GetDeals } from "../deals/DealReducers/DealSlice";
-import { addpropos } from "./proposalReducers/proposalSlice";
-import { getpropos } from "./proposalReducers/proposalSlice";
+import { addpropos,getpropos } from "./proposalReducers/proposalSlice";
+// import {  } from "./proposalReducers/proposalSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
@@ -195,16 +195,16 @@ const AddProposal = ({ onClose }) => {
       // Dispatch create proposal action
       dispatch(addpropos(proposalData))
         .then(() => {
-          message.success("Proposal added successfully!");
+          // message.success("Proposal added successfully!");
           dispatch(getpropos());
           onClose();
         })
         .catch((error) => {
-          message.error("Failed to add proposal. Please try again.");
+          // message.error("Failed to add proposal. Please try again.");
           console.error("Error during proposal submission:", error);
         });
     } catch (error) {
-      message.error("Failed to create proposal: " + error.message);
+      // message.error("Failed to create proposal: " + error.message);
     } finally {
       setLoading(false);
     }

@@ -13,23 +13,25 @@ const AddCurrencies = ({ onClose }) => {
       await dispatch(addcurren(values)).unwrap()
         .then(() => {
           dispatch(getcurren());
-          notification.success({
-            message: 'Success',
-            description: 'Currency added successfully.',
-          });
+          // notification.success({
+          //   message: 'Success',
+          //   description: 'Currency added successfully.',
+          // });
           onClose();
           form.resetFields();
         });
     } catch (error) {
-      notification.error({
-        message: 'Error',
-        description: error.message || 'Failed to add currency.',
-      });
+      // notification.error({
+      //   message: 'Error',
+      //   description: error.message || 'Failed to add currency.',
+      // });
     }
   };
 
   return (
-    <Card title="Add New Currency">
+    <div>
+    <hr style={{ marginBottom: "15px", border: "1px solid #E8E8E8" }} />
+
       <Form
         form={form}
         layout="vertical"
@@ -75,8 +77,9 @@ const AddCurrencies = ({ onClose }) => {
           </Button>
         </Form.Item>
       </Form>
-    </Card>
+    </div>
   );
 };
+
 
 export default AddCurrencies;

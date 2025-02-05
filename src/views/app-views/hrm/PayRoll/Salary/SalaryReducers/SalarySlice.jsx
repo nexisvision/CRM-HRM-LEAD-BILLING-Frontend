@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./SalaryService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
+import { message } from "antd";
 
 // Async thunk for adding user
 
@@ -93,7 +94,7 @@ const initialIsAuth = () => {
   return item ? JSON.parse(item) : false;
 };
 
-const RoleAndPermissionSlice = createSlice({
+const SalarySlice = createSlice({
   name: "salary",
   initialState: {
     salary: [],
@@ -138,11 +139,11 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(AddSalaryss.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload?.data?.message);
+        message.success(action.payload?.message);
       })
       .addCase(AddSalaryss.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.message);
+        message.error(action.payload?.message);
       })
 
       .addCase(getSalaryss.pending, (state) => {
@@ -151,68 +152,46 @@ const RoleAndPermissionSlice = createSlice({
       .addCase(getSalaryss.fulfilled, (state, action) => {
         state.isLoading = false;
         state.salary = action?.payload;
-        toast.success(action.payload?.data?.message);
+        toast.success(action.payload?.message);
       })
       .addCase(getSalaryss.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
-      //getall
-      .addCase(getAllUsers.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getAllUsers.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.users = action.payload;
-        toast.success(`Users fetched successfully`);
-      })
-      .addCase(getAllUsers.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
-      })
-
-      //getuserbyid
-      .addCase(getUserById.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getUserById.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.detailItem = action.payload?.user;
-        toast.success(action.payload.message);
-      })
-      .addCase(getUserById.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
-      })
       //delete
       .addCase(deleteSalaryss.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(deleteSalaryss.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload.message);
+        message.success(action.payload.message);
       })
+
       .addCase(deleteSalaryss.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
+        message.error(action.payload?.response?.message);
       })
       //update
+
       .addCase(editSalaryss.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
       .addCase(editSalaryss.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; // Update the state with the updated employee data
+        state.editItem = action.payload;
+        message.success(action.payload?.message);
       })
+
       .addCase(editSalaryss.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to update employee";
+        state.error = action.payload;
+        message.error(action.payload?.message);
       });
   },
 });
 
 export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-  RoleAndPermissionSlice.actions;
-export default RoleAndPermissionSlice.reducer;
+  SalarySlice.actions;
+export default SalarySlice.reducer;

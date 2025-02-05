@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./policyService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
+import { message } from "antd";
 
 // Async thunk for adding user
 
@@ -69,6 +69,7 @@ export const deletepolicys = createAsyncThunk(
     }
   }
 );
+
 export const editpolicys = createAsyncThunk(
   "users/editpolicys",
   async ({ idd, values }, thunkAPI) => {
@@ -93,7 +94,7 @@ const initialIsAuth = () => {
   return item ? JSON.parse(item) : false;
 };
 
-const RoleAndPermissionSlice = createSlice({
+const policySlice = createSlice({
   name: "policy",
   initialState: {
     policy: [],
@@ -138,11 +139,12 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(Addpolicys.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload?.data?.message);
+        message.success(action.payload?.message);
       })
+
       .addCase(Addpolicys.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.message);
+        message.error(action.payload?.message);
       })
 
       .addCase(getpolicys.pending, (state) => {
@@ -191,12 +193,13 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(deletepolicys.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload.message);
+        message.success(action.payload?.message);
       })
       .addCase(deletepolicys.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
+        message.error(action.payload?.response?.data?.message);
       })
+
       //update
       .addCase(editpolicys.pending, (state) => {
         state.isLoading = false;
@@ -205,14 +208,17 @@ const RoleAndPermissionSlice = createSlice({
       .addCase(editpolicys.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload; // Update the state with the updated employee data
+        message.success(action.payload?.message);
       })
+
       .addCase(editpolicys.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to update employee";
+        message.error(action.payload?.message);
       });
+
   },
 });
 
 export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-  RoleAndPermissionSlice.actions;
-export default RoleAndPermissionSlice.reducer;
+  policySlice.actions;
+export default policySlice.reducer;

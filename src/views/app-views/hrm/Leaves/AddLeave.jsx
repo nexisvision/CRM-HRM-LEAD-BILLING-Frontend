@@ -28,18 +28,23 @@ const AddLeave = ({ onClose }) => {
     dispatch(GetLeave());
   }, [dispatch]);
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const allempdata = useSelector((state) => state.employee);
-  const empData = allempdata?.employee?.data; // Extract employee data
+  const empData = allempdata?.employee?.data || [];
+  
+
+  const filteredEmpData = empData?.filter((item) => item.created_by === user);
+  // Extract employee data
   const onFinish = (values) => {
     dispatch(CreateL(values))
       .then(() => {
         dispatch(GetLeave()); // Refresh leave data
-        message.success("Leave added successfully!");
+        // message.success("Leave added successfully!");
         form.resetFields(); // Reset form fields
         onClose(); // Close modal
       })
       .catch((error) => {
-        message.error("Failed to add leave.");
+        // message.error("Failed to add leave.");
         console.error("Add API error:", error);
       });
   };
@@ -67,10 +72,11 @@ const AddLeave = ({ onClose }) => {
                 { required: true, message: "Please select an employee." },
               ]}
             >
-              <Select placeholder="Select Employee" loading={!empData}>
-                {empData && empData.length > 0 ? (
-                  empData.map((emp) => (
+              <Select placeholder="Select Employee" loading={!filteredEmpData}>
+                {filteredEmpData && filteredEmpData.length > 0 ? (
+                  filteredEmpData.map((emp) => (
                     <Option key={emp.id} value={emp.id}>
+
                       {emp.username || "Unnamed Employee"}
                     </Option>
                   ))

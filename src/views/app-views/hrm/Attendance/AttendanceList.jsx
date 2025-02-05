@@ -57,14 +57,23 @@ const AttendanceList = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
+
   const tabledata = useSelector((state) => state.attendance);
-  const fnddat = tabledata.Attendances.data;
+  const fnddat = tabledata.Attendances.data || [];
+  const fndattendancedata = fnddat.filter((item) => item.created_by === user);
+
+
   const employeeData = useSelector((state) => state.employee?.employee?.data || []);
+  const fndemployeeData = employeeData.filter((item) => item.created_by === user);
+  
   const leaveData = useSelector((state) => state.Leave?.Leave?.data || []);
+  const fndleavedata = leaveData.filter((item) => item.created_by === user);
+
 
   useEffect(() => {
-    if (employeeData) {
-      const employeeAttendanceMap = employeeData.reduce((acc, employee) => {
+    if (fndemployeeData) {
+      const employeeAttendanceMap = fndemployeeData.reduce((acc, employee) => {
         acc[employee.id] = {
           employee: employee.username,
           id: employee.id,
@@ -85,8 +94,8 @@ const AttendanceList = () => {
         }
       }
 
-      if (fnddat) {
-        fnddat.forEach((attendance) => {
+      if (fndattendancedata) {
+        fndattendancedata.forEach((attendance) => {
           const attendanceDate = dayjs(attendance.date);
           if (attendanceDate.isSame(selectedMonth, 'month')) {
             const day = attendanceDate.date();
@@ -106,8 +115,8 @@ const AttendanceList = () => {
         });
       }
 
-      if (leaveData) {
-        leaveData.forEach((leave) => {
+      if (fndleavedata) {
+        fndleavedata.forEach((leave) => {
           const leaveStart = dayjs(leave.startDate);
           const leaveEnd = dayjs(leave.endDate);
           if (leaveStart.isSame(selectedMonth, 'month') || leaveEnd.isSame(selectedMonth, 'month')) {
@@ -134,10 +143,93 @@ const AttendanceList = () => {
         totalWorkingDays,
       }));
 
-      setUsers(aggregatedData);
-      console.log(aggregatedData, "users");
+      // Only set users if the data has changed
+      if (JSON.stringify(users) !== JSON.stringify(aggregatedData)) {
+        setUsers(aggregatedData);
+        // console.log(aggregatedData, "users");
+      }
     }
-  }, [fnddat, employeeData, leaveData, selectedMonth]);
+  }, [fndattendancedata, fndemployeeData, fndleavedata, selectedMonth]);
+
+
+
+  // useEffect(() => {
+  //   if (fndemployeeData) {
+  //     const employeeAttendanceMap = fndemployeeData.reduce((acc, employee) => {
+  //       acc[employee.id] = {
+  //         employee: employee.username,
+  //         id: employee.id,
+  //         attendanceByDay: {},
+  //         totalWorkingHours: 0,
+  //         workingDays: 0,
+  //       };
+  //       return acc;
+  //     }, {});
+
+  //     let totalWorkingDays = 0;
+  //     const daysInMonth = selectedMonth.daysInMonth();
+
+  //     for (let i = 1; i <= daysInMonth; i++) {
+  //       const date = selectedMonth.date(i);
+  //       if (date.day() !== 0) { // Exclude Sundays
+  //         totalWorkingDays++;
+  //       }
+  //     }
+
+  //     if (fndattendancedata) {
+  //       fndattendancedata.forEach((attendance) => {
+  //         const attendanceDate = dayjs(attendance.date);
+  //         if (attendanceDate.isSame(selectedMonth, 'month')) {
+  //           const day = attendanceDate.date();
+  //           if (!employeeAttendanceMap[attendance.employee].attendanceByDay[day]) {
+  //             employeeAttendanceMap[attendance.employee].attendanceByDay[day] = {
+  //               status: 'P',
+  //               startTime: attendance.startTime,
+  //               endTime: attendance.endTime,
+  //             };
+  //             const startTime = dayjs(attendance.startTime, "HH:mm:ss");
+  //             const endTime = dayjs(attendance.endTime, "HH:mm:ss");
+  //             const hoursWorked = endTime.diff(startTime, 'hour', true);
+  //             employeeAttendanceMap[attendance.employee].totalWorkingHours += hoursWorked;
+  //             employeeAttendanceMap[attendance.employee].workingDays++;
+  //           }
+  //         }
+  //       });
+  //     }
+
+  //     if (fndleavedata) {
+  //       fndleavedata.forEach((leave) => {
+  //         const leaveStart = dayjs(leave.startDate);
+  //         const leaveEnd = dayjs(leave.endDate);
+  //         if (leaveStart.isSame(selectedMonth, 'month') || leaveEnd.isSame(selectedMonth, 'month')) {
+  //           const employee = employeeAttendanceMap[leave.employeeId];
+  //           if (employee) {
+  //             for (let d = leaveStart; d.isBefore(leaveEnd) || d.isSame(leaveEnd); d = d.add(1, 'day')) {
+  //               if (d.isSame(selectedMonth, 'month')) {
+  //                 const day = d.date();
+  //                 employee.attendanceByDay[day] = {
+  //                   status: 'L',
+  //                   leaveType: leave.leaveType,
+  //                   remark: leave.remarks,
+  //                   statusText: leave.status,
+  //                 };
+  //               }
+  //             }
+  //           }
+  //         }
+  //       });
+  //     }
+
+  //     const aggregatedData = Object.values(employeeAttendanceMap).map(employee => ({
+  //       ...employee,
+  //       totalWorkingDays,
+  //     }));
+
+  //     setUsers(aggregatedData);
+  //     console.log(aggregatedData, "users");
+  //   }
+  // }, [fndattendancedata, fndemployeeData, fndleavedata, selectedMonth]);
+
 
   useEffect(() => {
     dispatch(getAttendances());

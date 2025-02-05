@@ -42,6 +42,8 @@ import ViewSubscribedUserPlans from "./ViewSubscribedUserPlans";
 import EditSubscribedUserPlans from "./EditSubscribedUserPlans";
 import { getsubplandata } from "./subplanReducer/subplanSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { GetPlan } from "../plan/PlanReducers/PlanSlice";
+import { ClientData } from "../company/CompanyReducers/CompanySlice";
 
 // import userData from '../../../../../assets/data/user-list.data.json';
 
@@ -71,8 +73,23 @@ export const SubscribedUserPlansList = () => {
     dispatch(getsubplandata());
   }, []);
 
+
+  useEffect(() => {
+    dispatch(GetPlan());
+    dispatch(ClientData());
+  }, []);
+
+
   const alldatas = useSelector((state) => state.subplan);
   const fnddtat = alldatas.subplan.data;
+
+  const allclient = useSelector((state) => state.ClientData);
+  const fndclient = allclient.ClientData.data;
+
+  const allplan = useSelector((state) => state.Plan);
+  const fndplan = allplan?.Plan;
+
+
 
   useEffect(() => {
     if (fnddtat) {
@@ -139,12 +156,7 @@ export const SubscribedUserPlansList = () => {
           <span className="ml-2">Edit</span>
         </Flex>
       </Menu.Item>
-      {/* <Menu.Item>
-				<Flex alignItems="center">
-					<TiPinOutline />
-					<span className="ml-2">Pin</span>
-				</Flex>
-			</Menu.Item> */}
+     
       <Menu.Item>
         <Flex alignItems="center">
           <DeleteOutlined />
@@ -158,51 +170,79 @@ export const SubscribedUserPlansList = () => {
   const handleStatusChange = (checked, userId) => {
     const newStatus = checked ? "active" : "inactive";
     // Update your data/API here
-    console.log(`User ${userId} status changed to ${newStatus}`);
+    // console.log(`User ${userId} status changed to ${newStatus}`);
   };
 
   const tableColumns = [
+    // {
+    //   title: "created_by",
+    //   dataIndex: "created_by",
+    // },
     {
-      title: "created_by",
-      dataIndex: "created_by",
+      title: "Plan Name",
+      dataIndex: "plan_id",
+      render: (plan_id) => {
+        const plan = fndplan.find((p) => p.id === plan_id);
+        return plan ? plan.name : "Unknown Plan"; // Display the plan name or a fallback
+      },
     },
+
+
+
     {
-      title: "current_clients_count",
+      title: "Client Name",
+      dataIndex: "client_id",
+      render: (client_id) => {
+        const client = fndclient.find((c) => c.id === client_id);
+        return client ? client.username : "Unknown Client"; // Display the client name or a fallback
+      },
+    },
+
+
+    {
+      title: "Total Client Count",
       dataIndex: "current_clients_count",
     },
+
+
     {
-      title: "current_storage_used",
+      title: "Total Storage Used",
       dataIndex: "current_storage_used",
     },
+
     {
-      title: "current_users_count",
+      title: "Total Users Count",
       dataIndex: "current_users_count",
     },
 
+
     {
-      title: "payment_status",
+      title: "Payment Status",
       dataIndex: "payment_status",
-    },
-    {
-      title: "status",
-      dataIndex: "status",
     },
 
     {
-      title: "Start  Date",
-      dataIndex: "startdate",
+      title: "Status",
+      dataIndex: "status",
+    },
+
+
+    {
+      title: "Start Date",
+      dataIndex: "start_date",
       render: (_, record) => (
-        <span>{dayjs.unix(record.date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
+        <span>{dayjs(record.start_date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
       ),
-      sorter: (a, b) => utils.antdTableSorter(a, b, "startdate"),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "start_date"),
     },
     {
       title: "End Date",
-      dataIndex: "enddate",
+      dataIndex: "end_date",
       render: (_, record) => (
-        <span>{dayjs.unix(record.date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
+        <span>{dayjs(record.end_date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
       ),
-      sorter: (a, b) => utils.antdTableSorter(a, b, "enddate"),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "end_date"),
+
     },
     // {
     //   title: "Status",

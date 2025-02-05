@@ -40,7 +40,7 @@ const EditSalary = ({ onClose, initialData }) => {
     dispatch(updateSalary({ id: initialData.id, ...values })).then(() => {
       dispatch(getSalaryss());
       onClose();
-      message.success("Salary updated successfully");
+      // message.success("Salary updated successfully");
     });
     setSubmitting(false);
   };

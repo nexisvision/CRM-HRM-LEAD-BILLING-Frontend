@@ -95,13 +95,13 @@ const AddEmployee = ({ onClose, setSub }) => {
       const response = await dispatch(addEmp(values));
       if (response.payload?.data?.sessionToken) {
         setOtpToken(response.payload?.data?.sessionToken);
-        message.success("Employee added successfully! Please verify OTP.");
+        // message.success("Employee added successfully! Please verify OTP.");
         setShowOtpModal(true);
       }
       resetForm();
       onClose();
     } catch (error) {
-      message.error("Failed to add employee. Please try again.");
+      // message.error("Failed to add employee. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -109,7 +109,7 @@ const AddEmployee = ({ onClose, setSub }) => {
 
   const onFinishFailed = (errorInfo) => {
     console.error("Form submission failed:", errorInfo);
-    message.error("Please fill out all required fields.");
+    // message.error("Please fill out all required fields.");
   };
 
   const onOpenOtpModal = () => {

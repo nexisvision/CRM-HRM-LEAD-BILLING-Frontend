@@ -86,11 +86,11 @@ const EditTicket = ({ idd, onClose }) => {
     dispatch(Editicket({ idd, values }))
       .then(() => {
         dispatch(getAllTicket());
-        message.success("Expenses added successfully!");
+        // message.success("Expenses added successfully!");
         onClose();
       })
       .catch((error) => {
-        message.error("Failed to update Employee.");
+        // message.error("Failed to update Employee.");
         console.error("Edit API error:", error);
       });
   };

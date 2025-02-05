@@ -34,12 +34,12 @@ const AddpolicyList = ({ onClose }) => {
         dispatch(getpolicys());
         onClose();
         resetForm();
-        message.success("Form submitted successfully");
+        // message.success("Form submitted successfully");
       });
-      message.success("Job application added successfully!");
+      // message.success("Policy added successfully!");
     } catch (error) {
       console.error("Submission error:", error);
-      message.error("An error occurred while submitting the job application.");
+      // message.error("An error occurred while submitting the job application.");
     }
   };
   const initialValues = {
@@ -79,7 +79,7 @@ const AddpolicyList = ({ onClose }) => {
             <Row gutter={16}>
               <Col span={12} className="mb-4">
                 <div className="form-item">
-                  <label>Branch</label>
+                  <label className="font-semibold">Branch</label>
                   <Field name="branch">
                     {({ field }) => (
                       <Select
