@@ -79,9 +79,13 @@ const EditProject = ({ id, onClose }) => {
     dispatch(GetProject());
   }, [dispatch]);
 
+    const allloggeduser = useSelector((state)=>state.user.loggedInUser.id)
+
   const allempdata = useSelector((state) => state.Project);
   const AllEmployee = useSelector((state) => state.employee);
   const employeedata = AllEmployee.employee.data;
+
+  const fnd = employeedata?.filter((item)=>item?.created_by === allloggeduser)
 
   const projectdata = allempdata.Project.data;
   const [singleEmp, setSingleEmp] = useState(null);

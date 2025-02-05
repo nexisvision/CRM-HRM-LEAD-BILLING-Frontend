@@ -39,6 +39,7 @@ import { DeleteDeals, GetDeals } from "./DealReducers/DealSlice";
 import { useNavigate } from "react-router-dom";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { getstages } from '../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice';
+import { GetPip } from "../systemsetup/Pipeline/PiplineReducer/piplineSlice";
 
 const DealList = () => {
   const [users, setUsers] = useState([]);
@@ -65,6 +66,10 @@ const DealList = () => {
 
   // Add new state for stages
   const [stagesList, setStagesList] = useState([]);
+
+    useEffect(()=>{
+      dispatch(GetPip())
+    },[dispatch])
   
   // Get stages data from redux store
   const stagesData = useSelector((state) => state.StagesLeadsDeals);

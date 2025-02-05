@@ -95,8 +95,12 @@ const AddProjectMember = ({ onClose }) => {
     }
   };
 
+const loggeduserdata = useSelector((state)=>state.user.loggedInUser.username)
+
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data;
+
+  const fndemp = empData.filter((item)=>item.created_by === loggeduserdata)
 
   const Allpeoject = useSelector((state) => state.Project);
   const Filterdta = Allpeoject?.Project?.data;
@@ -139,8 +143,8 @@ const AddProjectMember = ({ onClose }) => {
                         value={values.project_members}
                         onBlur={() => setFieldTouched("project_members", true)}
                       >
-                        {empData && empData.length > 0 ? (
-                          empData.map((client) => (
+                        {fndemp && fndemp.length > 0 ? (
+                          fndemp.map((client) => (
                             <Option key={client.id} value={client.id}>
                               {client.firstName ||
                                 client.username ||

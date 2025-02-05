@@ -162,7 +162,7 @@ const InterviewList = () => {
                                                                                                <h4 style={{ color: "#34C759", margin: 0 }}>{item.title}</h4>
                                                                                                <p style={{ margin: "8px 0 4px" }}>{item.interviewer}</p>
                                                                                                <p style={{ margin: 0 }}>
-                                                                                                 {moment(item.date).format("MMM DD, YYYY hh:mm A")}
+                                                                                                 {moment(item.startOn).format("MMM DD, YYYY hh:mm A")}
                                                                                                </p>
                                                                                              </div>
                                                                                                    ) : null}

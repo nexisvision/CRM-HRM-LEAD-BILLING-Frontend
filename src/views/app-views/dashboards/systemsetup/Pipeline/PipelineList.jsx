@@ -30,6 +30,10 @@ const PipelineList = () => {
   const Allpipline = useSelector((state) => state.Piplines);
   const Filterpipline = Allpipline?.Piplines?.data || [];
 
+  const logged = useSelector((state)=>state.user.loggedInUser.username)
+
+  const fnddatas = Filterpipline.filter((item)=>item.created_by === logged)
+
   const dispatch = useDispatch();
 
   // Open Add Pipeline Modal
@@ -125,7 +129,7 @@ const PipelineList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? Filterpipline : Filterpipline;
+    const searchArray = e.currentTarget.value ? fnddatas : fnddatas;
     const data = utils.wildCardSearch(searchArray, value);
     setSelectedRowKeys([]);
   };
@@ -172,7 +176,7 @@ const PipelineList = () => {
         <div className="table-responsive">
           <Table
             columns={tableColumns}
-            dataSource={Filterpipline} // Use Filterpipline data here
+            dataSource={fnddatas} 
             rowKey="id"
           />
         </div>

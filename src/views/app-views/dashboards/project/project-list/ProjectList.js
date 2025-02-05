@@ -26,57 +26,21 @@ const ProjectList = () => {
 	const [clientid,setClientId] = useState("");
 
 	const [idd,setIdd]= useState("");
-	
-	// const allloggeddata = useSelector((state)=>state.user.loggedInUser.role_id);`
-	// const roledata = useSelector((state)=>state.role.role.data)
-
-	// const fndidd = roledata.find((item)=>item.id == allloggeddata)
-
-
-	//permission
-
-	
-	  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-		const roles = useSelector((state) => state.role?.role?.data);
-		const roleData = roles?.find(role => role.id === roleId);
-
-		const whorole = roleData.role_name;
-
-	  const parsedPermissions = Array.isArray(roleData?.permissions)
-		? roleData.permissions
-		: typeof roleData?.permissions === 'string'
-		? JSON.parse(roleData.permissions)
-		: [];
-	
-	
-		let allpermisson;  
-
-		if (parsedPermissions["dashboards-project-list"] && parsedPermissions["dashboards-project-list"][0]?.permissions) {
-			allpermisson = parsedPermissions["dashboards-project-list"][0].permissions;
-			console.log('Parsed Permissions:', allpermisson);
-		
-		} else {
-			console.log('dashboards-project-list is not available');
-		}
-		
-		const canCreateClient = allpermisson?.includes('create');
-		const canEditClient = allpermisson?.includes('edit');
-		const canDeleteClient = allpermisson?.includes('delete');
-		const canViewClient = allpermisson?.includes('view');
-
-		//endpermisstion 
 
 	  const AllProject = useSelector((state) => state.Project);
 	  const properdata = AllProject.Project.data;
+	  console.log("opopopopop",properdata)
 
 	  const loggedInUser = useSelector((state) => state.user.loggedInUser);
 	  const username = loggedInUser ? loggedInUser.username : "";
 
 	  const {state} = useLocation();
  
-	  useEffect(()=>{
-		setClientId(state?.idd) 
-	  },[])
+	  useEffect(() => {
+		if (state?.idd) {
+		  setClientId(state.idd);
+		}
+	  }, [state]);
 
 	  const matchingClients = properdata?.filter(client => client?.client === clientid);
 
@@ -94,31 +58,24 @@ const ProjectList = () => {
 
 	  useEffect(() => {
 		dispatch(empdata());
-	  }, [dispatch]);
-	
-	  useEffect(() => {
 		dispatch(ClientData());
-	  }, [dispatch]);
-
-	  useEffect(() => {
 		dispatch(GetProject());
 	  }, [dispatch]);
 
 	  useEffect(() => {
-		let filteredProjects = [];
+		if (!properdata) return;
 
-		if (matchingClients?.length > 0) {
-		  // Filter the matching clients first
-		  filteredProjects = matchingClients?.filter(
-			(item) => item.created_by === username
-		  );
+		let filteredProjects = [];
+		
+		if (clientid && properdata.length > 0) {
+		  filteredProjects = properdata.filter(item => item.client === clientid);
 		} else {
-		  // Filter the entire project list based on `created_by`
-		  filteredProjects = properdata?.filter(
-			(item) => item.created_by === username
-		  );
+		  filteredProjects = properdata;
 		}
-		const formattedData = filteredProjects?.map((item) => {
+
+		filteredProjects = filteredProjects.filter(item => item.created_by === username);
+
+		const formattedData = filteredProjects.map((item) => {
 			const currentDate = new Date();
 			const endDate = new Date(item.endDate);
 			const startDate = new Date(item.startDate);
@@ -130,19 +87,19 @@ const ProjectList = () => {
 			return {
 				id: item.id,
 				name: item.project_name || item.name,
-				category: item?.category || item.category,
-				attachmentCount: item?.attachmentCount,
-				totalTask: item?.budget || item.budget,
+				category: item.category,
+				attachmentCount: item.attachmentCount,
+				totalTask: item.budget,
 				completedTask: `${adjustedCompletedDays}/${totalDays}`,
-				progression: item?.startDate || item.progression,
+				progression: item.startDate,
 				dayleft: Math.max(0, Math.ceil((endDate - currentDate) / (1000 * 3600 * 24))),
-				statusColor: item?.status || item.statusColor,
-				member: item?.member,
-				tag: item?.tag || item.tag_name || item.tag,
+				statusColor: item.status,
+				member: item.member,
+				tag: item.tag_name || item.tag,
 			  };
 			});
 			setList(formattedData);
-		}, [clientid]);
+		}, [properdata, clientid, username]);
 
 
 	  
@@ -156,11 +113,11 @@ const ProjectList = () => {
 
 	// Delete Project
 	const deleteItem = (id) => {
-
-		dispatch(DeletePro(id));
-		const updatedList = list.filter((item) => item.id !== id);
-		setList(updatedList);
+		dispatch(DeletePro(id)); // Assuming DeletePro is a redux action
+		const updatedList = list.filter((item) => item.id !== id); // Update the list after deletion
+		setList(updatedList); // Set the updated list in the state
 	};
+	
 
 	const editp = (id) => {
 		openEditProjectModal(id)
@@ -180,18 +137,14 @@ const ProjectList = () => {
 		
 
 
-{(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
 								<Menu.Item key="edit"  onClick={() => editp(id)}>
 								<EditOutlined /> Edit
 							</Menu.Item>
-							) : null}
 
 
-{(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
 								<Menu.Item key="delete" onClick={() => deleteItem(id)}>
 								<DeleteOutlined /> Delete
 							</Menu.Item>
-							) : null}
 
 		</Menu>
 	);
@@ -300,18 +253,16 @@ const ProjectList = () => {
 									<UnorderedListOutlined />
 								</Radio.Button>
 							</Radio.Group>
-							{(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
 								<Button type="primary" icon={<PlusOutlined />} onClick={openAddProjectModal} className="flex items-center">
 									New Project
 								</Button>
-							) : null}
 						</div>
 					</Flex>
 				</div>
 			</PageHeaderAlt>
 
 			<div className="my-4 container-fluid">
-				{view === VIEW_LIST && (whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+				{view === VIEW_LIST  ? (
 					<Table
 						columns={tableColumns}
 						dataSource={list}
@@ -327,17 +278,13 @@ const ProjectList = () => {
 							} else if (item.dayleft > 5) {
 								statusColor = 'orange'; // Warning status
 							} else {
-								statusColor = 'red'; // Critical status
+								statusColor = 'red'; // Critical 
 							}
 
 							return (
 									<Col xs={24} sm={24} lg={8} xl={8} xxl={6} key={item.id}>
 										
-									
-
-
-										{(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-							<Card>
+<Card>
 							<div className='flex items-center justify-between'>
 								<div className='' onClick={() => handleProjectClick(item.id)}>
 									<p className='font-medium'>{item.name}</p>
@@ -404,7 +351,6 @@ const ProjectList = () => {
 								/>
 							</p>
 						</Card>
-							) : null}
 
 								</Col>
 								

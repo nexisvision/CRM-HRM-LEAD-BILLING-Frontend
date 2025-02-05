@@ -68,8 +68,13 @@ const AddProposal = ({ onClose }) => {
   const [discountRate, setDiscountRate] = useState(10);
   const dispatch = useDispatch();
 
-  const { data: Leads } = useSelector((state) => state.Leads.Leads);
-  const { data: Deals } = useSelector((state) => state.Deals.Deals);
+  const Leads  = useSelector((state) => state.Leads.Leads.data);
+  const Deals  = useSelector((state) => state.Deals.Deals.data);
+
+  const allogged = useSelector((state)=>state.user.loggedInUser.username);
+
+  const fnddeal = Deals.filter((item)=>item?.created_by === allogged);
+  const fndlead = Leads.filter((item)=>item?.created_by === allogged);
 
   // console.log("SubClient Data:", subClientData.username);
 
@@ -369,8 +374,8 @@ const AddProposal = ({ onClose }) => {
                     >
                       <Select placeholder="Select Lead Title">
                         {/* Populate dropdown options from Leads */}
-                        {Array.isArray(Leads) && Leads.length > 0 ? (
-                          Leads.map((lead) => (
+                        {Array.isArray(fndlead) && fndlead.length > 0 ? (
+                          fndlead.map((lead) => (
                             <Option key={lead.id} value={lead.id}>
                               {lead.leadTitle}
                             </Option>
@@ -394,8 +399,8 @@ const AddProposal = ({ onClose }) => {
                     >
                       <Select placeholder="Select Deal Title">
                         {/* Populate dropdown options from Deals */}
-                        {Array.isArray(Deals) && Deals.length > 0 ? (
-                          Deals.map((deal) => (
+                        {Array.isArray(fnddeal) && fnddeal.length > 0 ? (
+                          fnddeal.map((deal) => (
                             <Option key={deal.id} value={deal.id}>
                               {deal.dealName}
                             </Option>

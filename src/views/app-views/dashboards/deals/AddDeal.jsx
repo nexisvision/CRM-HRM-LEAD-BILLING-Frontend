@@ -24,6 +24,17 @@ const AddDeal = ({ onClose }) => {
   const { data: Piplines, isLoading } = useSelector(
     (state) => state.Piplines.Piplines
   );
+
+  useEffect(()=>{
+    dispatch(GetPip())
+  },[dispatch])
+
+  const allpipline = useSelector((state) => state.Piplines.Piplines.data);
+
+   const logged = useSelector((state)=>state.user.loggedInUser.username)
+  
+    const fnddatas = allpipline.filter((item)=>item.created_by === logged)
+
   const { data: StagesLeadsDeals } = useSelector(
     (state) => state.StagesLeadsDeals.StagesLeadsDeals
   );
@@ -390,16 +401,16 @@ const AddDeal = ({ onClose }) => {
                           placeholder="Select Pipeline"
                           onChange={(value) => {
                             const selectedPipeline =
-                              Array.isArray(Piplines) &&
-                              Piplines.find((e) => e.id === value);
+                              Array.isArray(fnddatas) &&
+                              fnddatas.find((e) => e.id === value);
                             form.setFieldValue(
                               "pipeline",
                               selectedPipeline?.pipeline_name || ""
                             );
                           }}
                         >
-                          {Array.isArray(Piplines) &&
-                            Piplines.map((pipeline) => (
+                          {Array.isArray(fnddatas) &&
+                            fnddatas.map((pipeline) => (
                               <Option key={pipeline.id} value={pipeline.id}>
                                 {pipeline.pipeline_name}
                               </Option>

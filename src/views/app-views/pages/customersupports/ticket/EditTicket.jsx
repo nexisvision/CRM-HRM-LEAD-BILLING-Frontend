@@ -38,6 +38,10 @@ const EditTicket = ({ idd, onClose }) => {
   const alldatat = useSelector((state) => state.Ticket);
   const fndfdata = alldatat.Ticket.data;
 
+    const llogedid = useSelector((state) => state.user.loggedInUser.username);
+  
+    const fnddatass = fnddatas.filter((item)=>item.created_by === llogedid);
+
   useEffect(() => {
     const perfectdata = fndfdata.find((item) => item.id === idd);
 
@@ -124,12 +128,12 @@ const EditTicket = ({ idd, onClose }) => {
                         {...field}
                         className="w-full"
                         placeholder="Select requestor"
-                        loading={!fnddatas} // Loading state
+                        loading={!fnddatass} // Loading state
                         onChange={(value) => setFieldValue("requestor", value)}
                         value={values.customer}
                       >
-                        {fnddatas && fnddatas.length > 0 ? (
-                          fnddatas.map((client) => (
+                        {fnddatass && fnddatass.length > 0 ? (
+                          fnddatass.map((client) => (
                             <Option key={client.id} value={client.id}>
                               {client.username || "Unnamed requestor"}
                             </Option>

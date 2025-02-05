@@ -35,6 +35,13 @@ const AddEmployee = ({ onClose, setSub }) => {
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
 
+  const loggedusername = useSelector((state)=>state.user.loggedInUser.username);
+
+
+  const fnddepart =  departmentData.filter((item)=>item.created_by === loggedusername);
+  const fnddesi = designationData.filter((item)=>item.created_by === loggedusername);
+
+
   const countries = useSelector((state) => state.countries.countries);
 
   useEffect(() => {
@@ -301,7 +308,7 @@ const AddEmployee = ({ onClose, setSub }) => {
                         placeholder="Select Department"
                         onChange={(value) => setFieldValue("department", value)}
                       >
-                        {departmentData.map((dept) => (
+                        {fnddepart.map((dept) => (
                           <Option key={dept.id} value={dept.id}>
                             {dept.department_name}
                           </Option>
@@ -325,7 +332,7 @@ const AddEmployee = ({ onClose, setSub }) => {
                         placeholder="Select Designation"
                         onChange={(value) => setFieldValue("designation", value)}
                       >
-                        {designationData.map((des) => (
+                        {fnddesi.map((des) => (
                           <Option key={des.id} value={des.id}>
                             {des.designation_name}
                           </Option>

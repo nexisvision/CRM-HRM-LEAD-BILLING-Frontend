@@ -31,10 +31,14 @@ const AddSalary = ({ onClose }) => {
 
   useEffect(() => {
     dispatch(empdata());
-  }, []);
+  }, [dispatch]);
 
   const allempdata = useSelector((state) => state.employee);
   const fnddata = allempdata.employee.data;
+
+  const allloged = useSelector((state) => state.user.loggedInUser.username)
+
+  const filterdata = fnddata.filter((item)=>item.created_by === allloged)
 
   const { currencies } = useSelector((state) => state.currencies);
 
@@ -50,6 +54,8 @@ const AddSalary = ({ onClose }) => {
   const AllLoggedData = useSelector((state) => state.user);
 
   const lid = AllLoggedData.loggedInUser.id;
+
+
 
   const fetchLables = async (lableType, setter) => {
     try {
@@ -177,8 +183,8 @@ const AddSalary = ({ onClose }) => {
                         value={values.employeeId}
                         onBlur={() => setFieldTouched("employeeId", true)}
                       >
-                        {fnddata && fnddata.length > 0 ? (
-                          fnddata.map((client) => (
+                        {filterdata && filterdata.length > 0 ? (
+                          filterdata.map((client) => (
                             <Option key={client.id} value={client.id}>
                               {client.firstName ||
                                 client.username ||

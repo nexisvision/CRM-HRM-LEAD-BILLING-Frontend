@@ -31,6 +31,10 @@ const AddTicket = ({ onClose }) => {
   const alldata = useSelector((state) => state.employee);
   const fnddata = alldata.employee.data;
 
+  const llogedid = useSelector((state) => state.user.loggedInUser.username);
+
+  const fnddatass = fnddata.filter((item)=>item.created_by === llogedid);
+
   const initialValues = {
     ticketSubject: "",
     requestor: "",
@@ -110,12 +114,12 @@ const AddTicket = ({ onClose }) => {
                         {...field}
                         className="w-full"
                         placeholder="Select requestor"
-                        loading={!fnddata} // Loading state
+                        loading={!fnddatass} // Loading state
                         onChange={(value) => setFieldValue("requestor", value)}
                         value={values.customer}
                       >
-                        {fnddata && fnddata.length > 0 ? (
-                          fnddata.map((client) => (
+                        {fnddatass && fnddatass.length > 0 ? (
+                          fnddatass.map((client) => (
                             <Option key={client.id} value={client.id}>
                               {client.username || "Unnamed requestor"}
                             </Option>

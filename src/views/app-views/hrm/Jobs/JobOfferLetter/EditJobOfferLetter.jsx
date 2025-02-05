@@ -175,7 +175,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
             <Row gutter={16}>
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Job</label>
+                  <label className="font-semibold">Job Application</label>
                   <Field name="job">
                     {({ field }) => (
                       <Select
@@ -211,7 +211,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Job Application</label>
+                  <label className="font-semibold">Job</label>
                   <Field name="job_applicant">
                     {({ field }) => (
                       <Select

@@ -33,6 +33,10 @@ const EditTask = ({ iddd, onClose }) => {
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data;
 
+  const loggedusername = useSelector((state) => state.user.loggedInUser.username)
+  
+    const fndassine = empData.filter(((item)=>item.created_by === loggedusername))
+
   const allloggeduserdata = useSelector((state) => state.user);
   const loggedUserData = allloggeduserdata?.loggedInUser;
 
@@ -213,10 +217,12 @@ const EditTask = ({ iddd, onClose }) => {
                         value={values.assignTo}
                         onBlur={() => setFieldTouched("assignTo", true)}
                       >
-                        {empData && empData.length > 0 ? (
-                          empData.map((employee) => (
-                            <Option key={employee.id} value={employee.id}>
-                              {employee.firstName || employee.username || "Unnamed Employee"}
+                        {fndassine && fndassine.length > 0 ? (
+                          fndassine.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.firstName ||
+                                client.username ||
+                                "Unnamed Client"}
                             </Option>
                           ))
                         ) : (

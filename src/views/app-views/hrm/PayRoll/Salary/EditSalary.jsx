@@ -29,6 +29,10 @@ const EditSalary = ({ onClose, initialData }) => {
   const allempdata = useSelector((state) => state.employee);
   const fnddata = allempdata.employee.data;
 
+  const allloged = useSelector((state) => state.user.loggedInUser.username)
+  
+    const filterdata = fnddata.filter((item)=>item.created_by === allloged)
+
   const allempdatass = useSelector((state) => state.currencies);
   const fnddatass = allempdatass?.currencies;
 
@@ -85,8 +89,8 @@ const EditSalary = ({ onClose, initialData }) => {
                         value={values.employeeId}
                         onBlur={() => setFieldTouched("employeeId", true)}
                       >
-                        {fnddata && fnddata.length > 0 ? (
-                          fnddata.map((client) => (
+                        {filterdata && filterdata.length > 0 ? (
+                          filterdata.map((client) => (
                             <Option key={client.id} value={client.id}>
                               {client.firstName || client.username || "Unnamed employee"}
                             </Option>

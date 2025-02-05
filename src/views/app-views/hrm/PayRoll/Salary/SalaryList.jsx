@@ -21,6 +21,7 @@ import Commission from "./Commission";
 import SetSalary from "./SetSalary";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteSalaryss, getSalaryss } from "./SalaryReducers/SalarySlice";
+import { empdata } from "../../Employee/EmployeeReducers/EmployeeSlice";
 
 const SalaryList = () => {
   const [users, setUsers] = useState(userData);
@@ -45,6 +46,10 @@ const SalaryList = () => {
       setList(dfnddata);
     }
   }, [dfnddata]);
+
+ useEffect(() => {
+    dispatch(empdata());
+  }, [dispatch]);
 
    //// permission
                  
@@ -88,6 +93,8 @@ const SalaryList = () => {
       state: { user: selectedUser },
     }); // Pass user data as state if needed
   };
+
+
 
   // Close Add Salary Modal
   const closeAddSalaryModal = () => {

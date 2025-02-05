@@ -42,7 +42,7 @@ import { useDispatch, useSelector } from "react-redux";
 import useSelection from "antd/es/table/hooks/useSelection";
 
 const CustomerList = () => {
-  const [users, setUsers] = useState(userData);
+  const [users, setUsers] = useState("");
   const dispatch = useDispatch();
   const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -58,18 +58,28 @@ const CustomerList = () => {
 
   const [idd, setIdd] = useState("");
 
-  const alldata = useSelector((state) => state.customers);
-  const fnddata = alldata.customers.data;
-
   useEffect(() => {
     dispatch(Getcus());
-  }, []);
+  }, [dispatch]);
+  
+  const alldata = useSelector((state) => state.customers);
+  console.log("Fetched Customer Data:", alldata);  // Check if the data exists
+  
+  const fnddata = alldata?.customers?.data || [];  // Add a fallback to avoid errors if data is undefined
+  const loggid = useSelector((state)=>state.user.loggedInUser);
+
+  const filterdata = fnddata.filter((item) => item?.created_by === loggid.username);
+console.log("Filtered Data:", filterdata);  // Check if the filtering is correct
+
 
   useEffect(() => {
-    if (fnddata) {
-      setUsers(fnddata);
+    if (filterdata) {
+      setUsers(filterdata);
+    } else {
+      console.log("No matching users found");
     }
-  }, [fnddata]);
+  }, []);
+  
 
   
     //// permission
@@ -154,25 +164,7 @@ const CustomerList = () => {
   };
   const exportToExcel = () => {
     try {
-      // Format the data for Excel
-      // const formattedData = list.map(row => ({
-      //   ID: row.id,
-      //   RelatedID: row.related_id,
-      //   TaskName: row.taskName,
-      //   Category: row.category,
-      //   Project: row.project,
-      //   StartDate: row.startDate,
-      //   DueDate: row.dueDate,
-      //   AssignedTo: JSON.parse(row.assignTo).join(", "), // Assuming assignTo is a JSON string
-      //   Status: row.status,
-      //   Priority: row.priority,
-      //   Description: row.description.replace(/<[^>]+>/g, ''), // Remove HTML tags from description
-      //   CreatedBy: row.created_by,
-      //   CreatedAt: row.createdAt,
-      //   UpdatedAt: row.updatedAt,
-      // }));
-
-      // Create a worksheet from the formatted data
+     
       const ws = utils.json_to_sheet(list);
       const wb = utils.book_new(); // Create a new workbook
       utils.book_append_sheet(wb, ws, "Customer"); // Append the worksheet to the workbook

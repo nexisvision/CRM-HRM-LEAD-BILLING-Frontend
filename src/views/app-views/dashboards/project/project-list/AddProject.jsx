@@ -23,6 +23,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { GetTagspro, AddTags } from "./tagReducer/TagSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { AddLablee, GetLablee } from "../milestone/LableReducer/LableSlice";
+import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 const { Option } = Select;
 
@@ -41,9 +42,10 @@ const AddProject = ({ onClose }) => {
   const [categories, setCategories] = useState([]);
   const [statuses, setStatuses] = useState([]);
 
-
   const AllLoggedData = useSelector((state) => state.user);
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     dispatch(empdata());
@@ -57,19 +59,44 @@ const AddProject = ({ onClose }) => {
     dispatch(GetTagspro());
   }, [dispatch]);
 
+  useEffect(() => {
+    dispatch(GetUsers());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        await dispatch(GetProject());
+        setLoading(false);
+      } catch (err) {
+        setError(err);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [dispatch]);
+
+  const allloggeduser = useSelector((state)=>state.user.loggedInUser.username)
+
+  const alluserdatas = useSelector((state) => state.Users);
+  const fnadat = alluserdatas?.Users?.data;
+  
+  const fnd = fnadat?.filter((item)=>item?.created_by === allloggeduser)
+
   const Tagsdetail = useSelector((state) => state.Tags);
   const AllTags = Tagsdetail?.Tags?.data;
 
   const Allclient = useSelector((state) => state.ClientData);
   const clientdata = Allclient.ClientData.data;
 
-
   const AllEmployee = useSelector((state) => state.employee);
   const employeedata = AllEmployee.employee.data;
 
+  const fnd2 = employeedata?.filter((item)=>item?.created_by === allloggeduser)
+
   const AllLoggeddtaa = useSelector((state) => state.user);
-
-
 
   const initialValues = {
     project_name: "",
@@ -85,6 +112,7 @@ const AddProject = ({ onClose }) => {
     project_description: "",
     tag: "",
     status: "",
+    
   };
 
   const validationSchema = Yup.object({
@@ -139,11 +167,6 @@ const AddProject = ({ onClose }) => {
     GetLablee(lid);
   }, []);
 
-
-
-
-
-
   const fetchLables = async (lableType, setter) => {
     try {
       const lid = AllLoggedData.loggedInUser.id; // User ID to fetch specific labels
@@ -166,10 +189,6 @@ const AddProject = ({ onClose }) => {
     fetchLables("category", setCategories);
     fetchLables("status", setStatuses);
   }, []);
-
-
-
-
 
   const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
     if (!newValue.trim()) {
@@ -194,8 +213,13 @@ const AddProject = ({ onClose }) => {
     }
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-
+  if (error) {
+    return <div>Error loading data: {error.message}</div>;
+  }
 
   return (
     <div className="add-job-form">
@@ -269,30 +293,6 @@ const AddProject = ({ onClose }) => {
                 </div>
               </Col>
 
-
-
-
-
-
-
-
-              {/* <Col span={24} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Category</label>
-                  <Field
-                    name="project_category"
-                    as={Input}
-                    placeholder="Enter Project project_category"
-                    rules={[{ required: true }]}
-                  />
-                  <ErrorMessage
-                    name="project_category"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
-
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Start Date</label>
@@ -329,22 +329,20 @@ const AddProject = ({ onClose }) => {
                 </div>
               </Col>
 
-
-
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Client</label>
                   <Select
                     style={{ width: "100%" }}
                     placeholder="Select Client"
-                    loading={!clientdata}
+                    loading={!fnd}
                     value={values.client} // Bind value to Formik's field
                     // value="sdfsdf"
                     onChange={(value) => setFieldValue("client", value)} // Update Formik's field value
                     onBlur={() => setFieldTouched("client", true)} // Set touched state
                   >
-                    {clientdata && clientdata.length > 0 ? (
-                      clientdata
+                    {fnd && fnd?.length > 0 ? (
+                      fnd
                         .filter(client => client.created_by === AllLoggedData.loggedInUser.username) // Filter clients based on created_by
                         .map((client) => (
                           <Option key={client.id} value={client.id}>
@@ -365,60 +363,19 @@ const AddProject = ({ onClose }) => {
                 </div>
               </Col>
 
-
-
-
-
-
-
-
-
-              {/* <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Client</label>
-                  <Select
-                    style={{ width: "100%" }}
-                    placeholder="Select Client"
-                    loading={!clientdata}
-                    value={values.client} // Bind value to Formik's field
-                    onChange={(value) => setFieldValue("client", value)} // Update Formik's field value
-                    onBlur={() => setFieldTouched("client", true)} // Set touched state
-                  >
-                    {clientdata && clientdata.length > 0 ? (
-                      clientdata.map((client) => (
-                        <Option key={client.id} value={client.id}>
-                          {client.firstName ||
-                            client.username ||
-                            "Unnamed Client"}
-                        </Option>
-                      ))
-                    ) : (
-                      <Option value="" disabled>
-                        No Clients Available
-                      </Option>
-                    )}
-                  </Select>
-                  <ErrorMessage
-                    name="client"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
-
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">User</label>
                   <Select
                     style={{ width: "100%" }}
                     placeholder="Select User"
-                    loading={!employeedata}
+                    loading={!fnd2}
                     value={values.user} // Bind value to Formik's field
                     onChange={(value) => setFieldValue("user", value)} // Update Formik's field value
                     onBlur={() => setFieldTouched("user", true)} // Set touched state
                   >
-                    {employeedata && employeedata.length > 0 ? (
-                      employeedata.map((employee) => (
+                    {fnd2 && fnd2.length > 0 ? (
+                      fnd2.map((employee) => (
                         <Option key={employee.id} value={employee.id}>
                           {employee.username || "Unnamed User"}
                         </Option>
@@ -505,10 +462,7 @@ const AddProject = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-
               </Col>
-
-
 
               <Col span={24}>
                 <div className="form-item">
@@ -542,65 +496,6 @@ const AddProject = ({ onClose }) => {
                   <ErrorMessage name="tag" component="div" className="error-message text-red-500 my-1" />
                 </div>
               </Col>
-
-
-
-
-
-
-
-
-              {/* <Col span={24} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Tag</label>
-                  <div className="flex gap-2">
-                    <Field name="tag">
-                      {({ field, form }) => (
-                        <Select
-                          {...field}
-                          className="w-full"
-                          placeholder="Select or add new tag"
-                          onChange={(value) => {
-                            form.setFieldValue("tag", value);
-                          }}
-                          onBlur={() => form.setFieldTouched("tag", true)}
-                          dropdownRender={(menu) => (
-                            <div>
-                              {menu}
-                              <div
-                                style={{
-                                  padding: "8px",
-                                  borderTop: "1px solid #e8e8e8",
-                                }}
-                              >
-                                <Button
-                                  type="link"
-                                  icon={<PlusOutlined />}
-                                  onClick={() => setIsTagModalVisible(true)}
-                                  block
-                                >
-                                  Add New Tag
-                                </Button>
-                              </div>
-                            </div>
-                          )}
-                        >
-                          {tags.map((tag) => (
-                            <Option key={tag.id} value={tag.name}>
-                              {tag.name}
-                            </Option>
-                          ))}
-                        </Select>
-                      )}
-                    </Field>
-                  </div>
-                  <ErrorMessage
-                    name="tag"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
 
               <Col span={24}>
                 <div className="form-item">
@@ -638,42 +533,6 @@ const AddProject = ({ onClose }) => {
                   />
                 </div>
               </Col>
-
-
-
-
-
-
-
-
-              {/* <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Status</label>
-                  <Field name="status">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full"
-                        placeholder="Select Status"
-                        onChange={(value) => setFieldValue("status", value)}
-                        value={values.status}
-                        onBlur={() => setFieldTouched("status", true)}
-                      >
-                        <Option value="pending">pending</Option>
-                        <Option value="in_progress">in_progress</Option>
-                        <Option value="completed">completed</Option>
-                        <Option value="onhold">On Hold</Option>
-                      </Select>
-                    )}
-                  </Field>
-
-                  <ErrorMessage
-                    name="status"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
             </Row>
 
             <div className="form-buttons text-right mt-4">

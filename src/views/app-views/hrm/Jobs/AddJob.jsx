@@ -25,6 +25,7 @@ import {
 } from "views/app-views/dashboards/project/milestone/LableReducer/LableSlice";
 import { AddJobs, GetJobdata } from "./JobReducer/JobSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import { getInterview } from "./Interview/interviewReducer/interviewSlice";
 
 const { Option } = Select;
 
@@ -44,6 +45,15 @@ const AddJob = ({ onClose }) => {
   useEffect(() => {
     dispatch(getcurren());
   }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getInterview());
+  }, [dispatch]);
+
+  const allinterview = useSelector((state)=>state.Interviews.Interviews.data);
+  
+
+
   const initialValues = {
     title: "",
     category: "",
@@ -206,7 +216,7 @@ const AddJob = ({ onClose }) => {
                                   onClick={() => setIsTagModalVisible(true)}
                                   block
                                 >
-                                  Add New Category
+                                  Add New Category 
                                 </Button>
                               </div>
                             </div>
@@ -311,8 +321,10 @@ const AddJob = ({ onClose }) => {
                         onBlur={() => setFieldTouched("interviewRounds", true)}
                         allowClear={false}
                       >
-                        <Option value="xyz">XYZ</Option>
-                        <Option value="abc">ABC</Option>
+                        <Option value="HR">HR</Option>
+                        <Option value="Technical">Technical</Option>
+                        <Option value="Prectical">Prectical</Option>
+                        <Option value="Communication">Communication</Option>
                       </Select>
                     )}
                   </Field>
@@ -323,6 +335,10 @@ const AddJob = ({ onClose }) => {
                   />
                 </div>
               </Col>
+
+              
+
+
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Start Date </label>

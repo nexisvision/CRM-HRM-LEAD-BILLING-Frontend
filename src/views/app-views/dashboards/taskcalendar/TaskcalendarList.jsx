@@ -94,15 +94,16 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
   const allTaskData = useSelector((state) => state.TaskCalander);
   const taskData = allTaskData?.TaskCalander.data || [];
 
-  console.log("pppp", taskData)
+  const alllogeed = useSelector((state)=>state.user.loggedInUser.username);
+  const fnddata = taskData.filter((item)=>item.created_by === alllogeed)
 
   return (
     <div className="sidebar-tasks">
       <h4 className="mb-3">Upcoming Tasks</h4>
-      {taskData.length === 0 ? (
+      {fnddata.length === 0 ? (
         <div className="text-muted">No tasks scheduled</div>
       ) : (
-        taskData.map((task) => (
+        fnddata.map((task) => (
           <div key={task.id} className="task-card-wrapper">
             <div className="task-card mb-3" style={{ borderLeft: `4px solid ${task.color || '#007bff'}`, paddingLeft: '12px' }}>
               <h5 className="task-card-title">{task.taskName}</h5>

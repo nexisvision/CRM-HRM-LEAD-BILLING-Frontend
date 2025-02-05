@@ -120,6 +120,12 @@ const currenciesState = useSelector((state) => state.currencies);
   const allstagedata = useSelector((state) => state.StagesLeadsDeals);
   const fndata = allstagedata?.StagesLeadsDeals?.data || [];
 
+  const allcurrency = useSelector((state) => state.currencies);
+  const fndcurr = allcurrency?.currencies?.data || [];
+
+  const allcountry = useSelector((state) => state.countries);
+  const fndcountry = allcountry?.countries?.data || [];
+
   const initialValues = {
     leadTitle: "",
     firstName: "",
@@ -143,6 +149,10 @@ const currenciesState = useSelector((state) => state.currencies);
 
   useEffect(() => {
     dispatch(getcurren());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getallcountries());
   }, [dispatch]);
 
   useEffect(() => {

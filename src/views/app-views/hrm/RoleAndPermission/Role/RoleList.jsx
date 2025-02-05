@@ -63,7 +63,7 @@ const RoleList = () => {
     if (filteredData) {
       setUsers(filteredData);
     }
-  }, []);
+  }, [filteredData]);
 
   //// permission
                                                 
@@ -108,7 +108,6 @@ const RoleList = () => {
         dispatch(getRoles());
         message.success('Appraisal Deleted successfully!');
         setUsers(users.filter(item => item.id !== userId));
-
       })
       .catch((error) => {
         console.error('Edit API error:', error);
@@ -118,9 +117,6 @@ const RoleList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-     
-    
-
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                 <Menu.Item>
                                 <Flex alignItems="center">

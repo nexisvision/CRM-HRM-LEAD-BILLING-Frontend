@@ -53,6 +53,11 @@ const AddLeadStages = ({ onClose }) => {
   const allpipline = useSelector((state) => state.Piplines);
   const fndpip = allpipline.Piplines.data;
 
+  const loggd = useSelector((state)=>state.user.loggedInUser.username)
+
+  const fnddd = fndpip.filter((item)=>item.created_by === loggd)
+
+
   useEffect(() => {
     dispatch(GetPip());
   }, []);
@@ -132,8 +137,8 @@ const AddLeadStages = ({ onClose }) => {
                                 value={values.pipeline}
                                 onBlur={() => setFieldTouched("pipeline", true)}
                               >
-                                {fndpip && fndpip.length > 0 ? (
-                                  fndpip.map((client) => (
+                                {fnddd && fnddd.length > 0 ? (
+                                  fnddd.map((client) => (
                                     <Option key={client.id} value={client.id}>
                                       {client.pipeline_name || "Unnamed Client"}
                                     </Option>

@@ -30,6 +30,10 @@ const AddTask = ({ onClose }) => {
 
   const idd = loggedUserData.id;
 
+  const loggedusername = useSelector((state) => state.user.loggedInUser.username)
+
+  const fndassine = empData.filter(((item)=>item.created_by === loggedusername))
+
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
   const initialValues = {
@@ -163,8 +167,8 @@ const AddTask = ({ onClose }) => {
                         value={values.assignTo}
                         onBlur={() => setFieldTouched("assignTo", true)}
                       >
-                        {empData && empData.length > 0 ? (
-                          empData.map((client) => (
+                        {fndassine && fndassine.length > 0 ? (
+                          fndassine.map((client) => (
                             <Option key={client.id} value={client.id}>
                               {client.firstName ||
                                 client.username ||

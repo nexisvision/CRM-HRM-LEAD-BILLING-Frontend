@@ -19,7 +19,7 @@ export const addNewUser = createAsyncThunk(
 // Async thunk for user login
 
 export const userLogin = createAsyncThunk(
-  "users/userLogin",
+  "users/userLogin",  
   async (loginData, thunkAPI) => {
     try {
       const response = await UserService.userLoginapi(loginData);
