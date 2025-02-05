@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { ContaractData, Editcon } from "./ContractReducers/ContractSlice";
 import { useDispatch } from "react-redux";
 import moment from "moment";
+import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
 
 const { Option } = Select;
 
@@ -18,6 +19,12 @@ const EditContract = ({ id, onClose }) => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
+
+  const countries = useSelector((state) => state.countries.countries);
+
+  useEffect(() => {
+    dispatch(getallcountries());
+  }, [dispatch]);
 
   const [initialValues, setInitialValues] = useState({
     subject: "",
@@ -28,6 +35,8 @@ const EditContract = ({ id, onClose }) => {
     endDate: null,
     value: "",
     description: "",
+    phone: "",
+    phoneCode: "",
     // options: [],
   });
   const validationSchema = Yup.object({
@@ -41,6 +50,8 @@ const EditContract = ({ id, onClose }) => {
       .optional("Please Select a contractvalue.")
       .positive("Contract Value must be positive."),
     description: Yup.string().optional("Please enter a Description."),
+    phone: Yup.string().optional("Please enter a Phone Number."),
+    phoneCode: Yup.string().optional("Please select Country Code."),
     // options: Yup.array().min(1, 'Please select at least one option.'),
   });
 
@@ -74,6 +85,11 @@ const EditContract = ({ id, onClose }) => {
   const AllContract = useSelector((state) => state?.Contract);
   const filcon0 = AllContract?.Contract?.data;
 
+  const handlePhoneNumberChange = (e, setFieldValue) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setFieldValue('phone', value);
+  };
+
   useEffect(() => {
     const filcon = filcon0.find((item) => item.id === id);
     console.log("ioi", filcon);
@@ -87,6 +103,8 @@ const EditContract = ({ id, onClose }) => {
         endDate: filcon.endDate ? moment(filcon.endDate) : null,
         value: filcon.value || "",
         description: filcon.description || "",
+        phone: filcon.phone || "",
+        phoneCode: filcon.phoneCode || "",
       });
     }
   }, [id, filcon0]);
@@ -115,6 +133,43 @@ const EditContract = ({ id, onClose }) => {
                   />
                   <ErrorMessage
                     name="subject"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">Phone</label>
+                  <div className="flex">
+                    <Select
+                      style={{ width: '30%', marginRight: '8px' }}
+                      placeholder="Code"
+                      name="phoneCode"
+                      value={values.phoneCode}
+                      onChange={(value) => setFieldValue('phoneCode', value)}
+                    >
+                      {countries.map((country) => (
+                        <Option key={country.id} value={country.phoneCode}>
+                          (+{country.phoneCode})
+                        </Option>
+                      ))}
+                    </Select>
+                    <Field name="phone">
+                      {({ field }) => (
+                        <Input
+                          {...field}
+                          type="number"
+                          style={{ width: '70%' }}
+                          placeholder="Enter phone"
+                          onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
+                        />
+                      )}
+                    </Field>
+                  </div>
+                  <ErrorMessage
+                    name="phone"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -286,6 +341,8 @@ const EditContract = ({ id, onClose }) => {
                   />
                 </div>
               </Col>
+
+             
             </Row>
 
             <div className="form-buttons text-right mt-4">

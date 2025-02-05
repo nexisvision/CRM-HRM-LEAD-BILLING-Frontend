@@ -81,19 +81,18 @@ const AddInvoice = ({ onClose }) => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
         
-        // Recalculate amount when quantity, price, or tax changes
-        if (field === 'quantity' || field === 'price' || field === 'tax') {
-          const quantity = field === 'quantity' ? parseFloat(value) || 0 : parseFloat(row.quantity) || 0;
-          const price = field === 'price' ? parseFloat(value) || 0 : parseFloat(row.price) || 0;
-          const tax = field === 'tax' ? parseFloat(value) || 0 : parseFloat(row.tax) || 0;
-          
-          const baseAmount = quantity * price;
-          const taxAmount = (baseAmount * tax) / 100;
-          const totalAmount = baseAmount + taxAmount;
-          
-          updatedRow.amount = totalAmount.toFixed(2);
-        }
+        // Recalculate amount when quantity, price, tax, or discount changes
+        const quantity = parseFloat(updatedRow.quantity) || 0;
+        const price = parseFloat(updatedRow.price) || 0;
+        const taxPercentage = parseFloat(updatedRow.tax) || 0;
+        const discountPercentage = parseFloat(updatedRow.discountPercentage) || 0;
         
+        const subtotal = quantity * price;
+        const discountAmount = (subtotal * discountPercentage) / 100;
+        const afterDiscount = subtotal - discountAmount;
+        const taxAmount = (afterDiscount * taxPercentage) / 100;
+        
+        updatedRow.amount = (afterDiscount + taxAmount).toFixed(2);
         return updatedRow;
       }
       return row;
@@ -142,42 +141,38 @@ const AddInvoice = ({ onClose }) => {
     form
       .validateFields()
       .then((values) => {
-        // Create items object with proper structure
-        const itemsData = tableData.map(row => ({
-          item: row.item,
-          quantity: Number(row.quantity),
-          price: Number(row.price),
-          tax: Number(row.tax),
-          amount: Number(row.amount),
-          description: row.description || "",
-        }));
-
-        // Prepare the `items` field as an object
-      const itemsObject = tableData.reduce((acc, item, index) => {
-        acc[`item_${index + 1}`] = {
-          item: item.item,
-          quantity: parseFloat(item.quantity) || 0,
-          price: parseFloat(item.price) || 0,
-          tax: parseFloat(item.tax) || 0,
-          amount: parseFloat(item.amount) || 0,
-        };
-        return acc;
-      }, {});
+        // Transform table data into an object with numbered keys
+        const itemsForDatabase = tableData.reduce((acc, item, index) => {
+          acc[`item_${index + 1}`] = {
+            item: item.item,
+            quantity: parseFloat(item.quantity) || 0,
+            price: parseFloat(item.price) || 0,
+            tax: parseFloat(item.tax) || 0, // Store tax as percentage
+            // discount: parseFloat(item.discountPercentage) || 0,
+            description: item.description || "",
+            amount: parseFloat(item.amount) || 0
+          };
+          return acc;
+        }, {});
 
         const invoiceData = {
           customer: values.customer,
-          issueDate: values.issuedate?.format("YYYY-MM-DD"),
-          dueDate: values.duedate?.format("YYYY-MM-DD"),
+          issueDate: values.issueDate?.format("YYYY-MM-DD"),
+          dueDate: values.dueDate?.format("YYYY-MM-DD"),
           category: values.category,
-          items: itemsObject,
-          discount: Number(totals.discount),
-          tax: Number(totals.totalTax),
-          total: Number(totals.finalTotal),
+          refnumber: values.refnumber,
+          items: itemsForDatabase,
+          subtotal: parseFloat(totals.subtotal),
+          tax: parseFloat(totals.totalTax), // Store total tax as percentage
+          total: parseFloat(totals.finalTotal),
+          discount: parseFloat(discountRate) || 0,
+          status: "pending"
+
         };
 
         dispatch(AddInvoices(invoiceData))
           .then(() => {
-            // message.success("Invoice added successfully!");
+            message.success("Invoice added successfully");
             dispatch(getInvoice());
             onClose();
           })
@@ -278,10 +273,11 @@ const AddInvoice = ({ onClose }) => {
             <Col span={12} className="mt-1">
               <Form.Item
                 label="Issue Date"
-                name="issuedate"
+                name="issueDate"
                 rules={[
                   { required: true, message: "Please select issue date" },
                 ]}
+
               >
                 <DatePicker className="w-full" format="DD-MM-YYYY" />
               </Form.Item>
@@ -290,9 +286,10 @@ const AddInvoice = ({ onClose }) => {
             <Col span={12}>
               <Form.Item
                 label="Due Date"
-                name="duedate"
+                name="dueDate"
                 rules={[{ required: true, message: "Please select due date" }]}
               >
+
                 <DatePicker className="w-full" format="DD-MM-YYYY" />
               </Form.Item>
             </Col>

@@ -15,6 +15,7 @@ import * as Yup from "yup";
 import { useNavigate, useParams } from "react-router-dom";
 import { UploadOutlined } from "@ant-design/icons";
 import moment from "moment";
+import dayjs from "dayjs";
 import { useSelector } from "react-redux";
 import { Editicket, getAllTicket } from "./TicketReducer/TicketSlice";
 import { useDispatch } from "react-redux";
@@ -210,7 +211,7 @@ const EditTicket = ({ idd, onClose }) => {
                          </Field>
                        </Col> */}
 
-              <Col span={8} className="mt-3">
+              {/* <Col span={8} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">End Date</label>
 
@@ -226,6 +227,24 @@ const EditTicket = ({ idd, onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
+              </Col> */}
+
+              <Col span={12} className="mt-4">
+                <label className="font-semibold">End Date</label>
+                <DatePicker
+                  className="w-full"
+                  format="DD-MM-YYYY"
+                  value={values.endDate ? dayjs(values.endDate) : null}
+                  onChange={(endDate) => setFieldValue("endDate", endDate)}
+                  // onBlur={() => setFieldTouched("endDate", true)}
+
+                />
+                <ErrorMessage
+                  name="endDate"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+
+                />
               </Col>
 
               {/* Description */}

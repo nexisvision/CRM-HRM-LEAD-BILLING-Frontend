@@ -306,7 +306,7 @@ const AddSalary = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24}>
+              <Col span={12}>
                 <div className="form-item mt-2">
                   <label className="font-semibold">Status</label>
                   <Select
@@ -349,19 +349,13 @@ const AddSalary = ({ onClose }) => {
                   <label className="font-semibold">Bank Account</label>
                   <Field name="bankAccount">
                     {({ field }) => (
-                      <Select
+                      <Input
                         {...field}
                         className="w-full"
-                        placeholder="Select Bank"
-                        onChange={(value) =>
-                          setFieldValue("bankAccount", value)
-                        }
+                        placeholder="Enter Bank Account"
+                        onChange={(e) => setFieldValue("bankAccount", e.target.value)}
                         onBlur={() => setFieldTouched("bankAccount", true)}
-                      >
-                        <Option value="ICICI">ICICI Bank</Option>
-                        <Option value="HDFC">HDFC Bank</Option>
-                        <Option value="AXIS">Axis Bank</Option>
-                      </Select>
+                      />
                     )}
                   </Field>
                   <ErrorMessage
@@ -371,6 +365,7 @@ const AddSalary = ({ onClose }) => {
                   />
                 </div>
               </Col>
+
             </Row>
 
             <div className="form-buttons text-right mt-4">

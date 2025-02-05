@@ -415,13 +415,9 @@ const EditBilling = ({ idd, onClose }) => {
               <Form.Item
                 label="Vendor"
                 name="vendor"
-                rules={[{ required: true, message: "Please select vendor" }]}
+                rules={[{ required: true, message: "Please enter vendor name" }]}
               >
-                <Select placeholder="Select Vendor">
-                  <Option value="vendor1">Vendor 1</Option>
-                  <Option value="vendor2">Vendor 2</Option>
-                  <Option value="vendor3">Vendor 3</Option>
-                </Select>
+                <Input placeholder="Enter Vendor Name" />
               </Form.Item>
             </Col>
 

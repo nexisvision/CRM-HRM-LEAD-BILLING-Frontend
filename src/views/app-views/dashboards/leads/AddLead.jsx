@@ -163,8 +163,8 @@ const currenciesState = useSelector((state) => state.currencies);
     leadTitle: Yup.string().required("Lead Title is required"),
     firstName: Yup.string().required("First name is required"),
     lastName: Yup.string().required("Last Name is required"),
-    telephone: Yup.string()
-      .matches(/^\d{10}$/, "telephone number must be exactly 10 digits")
+    telephone: Yup.number()
+      .typeError("Please enter a valid number")
       .nullable(),
     email: Yup.string().email("Please enter a valid email address").nullable(),
     leadValue: Yup.number().typeError("Lead Value must be a number").nullable(),
@@ -352,8 +352,8 @@ const currenciesState = useSelector((state) => state.currencies);
                     <Select
                       style={{ width: '30%', marginRight: '8px' }}
                       placeholder="Code"
-                      name="telephone"
-                      onChange={(value) => setFieldValue('telephone', value)}
+                      name="phoneCode"
+                      onChange={(value) => setFieldValue('phoneCode', value)}
                     >
                       {countries.map((country) => (
                         <Option key={country.id} value={country.phoneCode}>
@@ -363,6 +363,7 @@ const currenciesState = useSelector((state) => state.currencies);
                     </Select>
                     <Field
                       name="telephone"
+                      type="number"
                       as={Input}
                       style={{ width: '70%' }}
                       placeholder="Enter Telephone"

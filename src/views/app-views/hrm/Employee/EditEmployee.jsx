@@ -219,41 +219,49 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item
-              name="phone"
-              label="Phone"
-              rules={[{ required: true, message: "Phone number is required" }]}
-            >
-              <Input.Group compact>
-                <Form.Item
-                  name={['phone', 'code']}
-                  noStyle
-                  rules={[{ required: true, message: 'Code is required' }]}
-                >
-                  <Select
-                    style={{ width: '30%' }}
-                    placeholder="Code"
-                  >
-                    {countries.map((country) => (
-                      <Option key={country.id} value={country.phoneCode}>
-                        (+{country.phoneCode})
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-                <Form.Item
-                  name={['phone', 'number']}
-                  noStyle
-                  rules={[{ required: true, message: 'Phone number is required' }]}
-                >
-                  <Input 
-                    style={{ width: '70%' }} 
-                    placeholder="Enter Phone"
-                  />
-                </Form.Item>
-              </Input.Group>
-            </Form.Item>
-          </Col>
+  <Form.Item
+    name="phone"
+    label="Phone"
+    rules={[{ required: true, message: "Phone number is required" }]}
+  >
+    <Input.Group compact>
+      <Form.Item
+        name={['phone', 'code']}
+        noStyle
+        rules={[{ required: true, message: 'Code is required' }]}
+      >
+        <Select
+          style={{ width: '30%' }}
+          placeholder="Code"
+        >
+          {countries.map((country) => (
+            <Option key={country.id} value={country.phoneCode}>
+              (+{country.phoneCode})
+            </Option>
+          ))}
+        </Select>
+      </Form.Item>
+      <Form.Item
+        name={['phone', 'number']}
+        noStyle
+        rules={[{ required: true, message: 'Phone number is required' }]}
+      >
+        <Input 
+          type="number"
+          style={{ width: '70%' }} 
+          placeholder="Enter Phone"
+          onKeyPress={(e) => {
+            // Allow only numbers
+            if (!/[0-9]/.test(e.key)) {
+              e.preventDefault();
+            }
+          }}
+          className="hide-number-spinner"
+        />
+      </Form.Item>
+    </Input.Group>
+  </Form.Item>
+</Col>
         </Row>
 
         {/* Address Information */}

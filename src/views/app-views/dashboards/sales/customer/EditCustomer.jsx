@@ -86,29 +86,25 @@ const EditCustomer = ({ idd, onClose }) => {
   }, [finddata]);
 
   const handlePhoneNumberChange = (e, setFieldValue, fieldName) => {
-    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+    const value = e.target.value.replace(/\D/g, '');
     setFieldValue(fieldName, value);
   };
 
   const validationSchema = Yup.object({
     name: Yup.string().required("Please enter a Name."),
     contact: Yup.string()
-      .matches(/^\d{10}$/, "Contact number must be 10 digits")
       .required("Please enter a Contact Number"),
     email: Yup.string()
       .email("Please enter a valid email address with @.")
       .required("Please enter an email"),
     taxnumber: Yup.string().required("Please enter a Tax Number."),
     alternate_number: Yup.string()
-      .matches(/^\d{10}$/, "Alternate number must be 10 digits")
       .nullable()
       .transform((value) => (value === "" ? null : value))
       .required("Please enter an Alternate Number"),
     billing_phone: Yup.string()
-      .matches(/^\d{10}$/, "Phone number must be 10 digits")
       .required("Please enter a phone number"),
     shipping_phone: Yup.string()
-      .matches(/^\d{10}$/, "Phone number must be 10 digits")
       .required("Please enter a phone number"),
     billing_address: Yup.string().required("Please enter a Billing Address."),
     billing_city: Yup.string().required("Please enter a City."),
@@ -220,7 +216,6 @@ const EditCustomer = ({ idd, onClose }) => {
                             type="number"
                             style={{ width: '70%' }}
                             placeholder="Enter Contact"
-                            maxLength={10}
                             onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'contact')}
                             onKeyPress={(e) => {
                               if (!/[0-9]/.test(e.key)) {
@@ -291,7 +286,6 @@ const EditCustomer = ({ idd, onClose }) => {
                             type="number"
                             style={{ width: '70%' }}
                             placeholder="Enter Alternate Number"
-                            maxLength={10}
                             onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'alternate_number')}
                             onKeyPress={(e) => {
                               if (!/[0-9]/.test(e.key)) {
@@ -354,7 +348,6 @@ const EditCustomer = ({ idd, onClose }) => {
                             type="number"
                             style={{ width: '70%' }}
                             placeholder="Enter Billing Phone"
-                            maxLength={10}
                             onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'billing_phone')}
                             onKeyPress={(e) => {
                               if (!/[0-9]/.test(e.key)) {
@@ -506,7 +499,6 @@ const EditCustomer = ({ idd, onClose }) => {
                             type="number"
                             style={{ width: '70%' }}
                             placeholder="Enter Shipping Phone"
-                            maxLength={10}
                             onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'shipping_phone')}
                             onKeyPress={(e) => {
                               if (!/[0-9]/.test(e.key)) {

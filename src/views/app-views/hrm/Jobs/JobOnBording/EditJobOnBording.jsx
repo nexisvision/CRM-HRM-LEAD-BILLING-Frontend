@@ -187,19 +187,13 @@ const EditJobOnBording = ({ idd, onClose }) => {
                   <label className="font-semibold">Interviewer</label>
                   <Field name="interviewer">
                     {({ field }) => (
-                      <Select
+                      <Input
                         {...field}
                         className="w-full"
-                        placeholder="Select Interviewer"
-                        onChange={(value) =>
-                          setFieldValue("interviewer", value)
-                        }
-                        value={values.interviewer}
+                        placeholder="Enter Interviewer Name"
+                        onChange={(e) => setFieldValue("interviewer", e.target.value)}
                         onBlur={() => setFieldTouched("interviewer", true)}
-                      >
-                        <Option value="interviewer1">Interviewer 1</Option>
-                        <Option value="interviewer2">Interviewer 2</Option>
-                      </Select>
+                      />
                     )}
                   </Field>
                   <ErrorMessage
@@ -209,6 +203,7 @@ const EditJobOnBording = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
+
 
               {/* Joining Date */}
               <Col span={12}>

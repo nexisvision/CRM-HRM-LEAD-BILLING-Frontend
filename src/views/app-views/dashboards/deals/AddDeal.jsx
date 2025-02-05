@@ -129,7 +129,6 @@ const AddDeal = ({ onClose }) => {
   const validationSchema = Yup.object({
     dealName: Yup.string().required("Please enter a Deal Name."),
     phoneNumber: Yup.string()
-      .matches(/^\d{10}$/, "Phone number must be exactly 10 digits")
       .required("Phone number is required"),
     phoneCode: Yup.string().required("Phone code is required"),
     price: Yup.string().required("Please enter a Price."),
@@ -225,12 +224,6 @@ const AddDeal = ({ onClose }) => {
                           type="number"
                           style={{ width: '70%' }}
                           placeholder="Enter phone number"
-                          maxLength={10}
-                          onInput={(e) => {
-                            // Limit input to 10 digits
-                            e.target.value = e.target.value.slice(0, 10);
-                            setFieldValue('phoneNumber', e.target.value);
-                          }}
                           onKeyPress={(e) => {
                             // Allow only numbers
                             if (!/[0-9]/.test(e.key)) {

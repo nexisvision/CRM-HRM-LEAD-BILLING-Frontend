@@ -105,7 +105,7 @@ const AddTicket = ({ onClose }) => {
                 </Field>
               </Col> */}
 
-              <Col span={12} className="mt-2">
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Employee</label>
                   <Field name="requestor">
@@ -196,9 +196,10 @@ const AddTicket = ({ onClose }) => {
                 </Field>
               </Col> */}
 
-              <Col span={8} className="mt-3">
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">End Date</label>
+
 
                   <DatePicker
                     className="w-full mt-2"

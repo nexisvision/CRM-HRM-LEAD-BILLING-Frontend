@@ -94,7 +94,9 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
     leadTitle: Yup.string().required("Lead Title is required"),
     firstName: Yup.string().required("First Name is required"),
     lastName: Yup.string().required("Last Name is required"),
-    telephone: Yup.string(),
+    telephone: Yup.number()
+      .typeError("Please enter a valid number")
+      .nullable(),
     email: Yup.string().email("Invalid email format"),
     leadValue: Yup.number().nullable(),
     currencyId: Yup.string().nullable(),
@@ -348,35 +350,36 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                 </div>
               </Col>
               <Col span={12} className="mt-2">
-                  <div className="form-item">
-                    <label className="font-semibold">Telephone</label>
-                    <div className="flex">
-                      <Select
-                        style={{ width: '30%', marginRight: '8px' }}
-                        placeholder="Code"
-                        name="telephone"
-                        onChange={(value) => setFieldValue('telephone', value)}
-                      >
-                        {countries.map((country) => (
-                          <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
-                          </Option>
-                        ))}
-                      </Select>
-                      <Field
-                        name="telephone"
-                        as={Input}
-                        style={{ width: '70%' }}
-                        placeholder="Enter Telephone"
-                      />
-                    </div>
-                    <ErrorMessage
+                <div className="form-item">
+                  <label className="font-semibold">Telephone</label>
+                  <div className="flex">
+                    <Select
+                      style={{ width: '30%', marginRight: '8px' }}
+                      placeholder="Code"
+                      name="phoneCode"
+                      onChange={(value) => setFieldValue('phoneCode', value)}
+                    >
+                      {countries.map((country) => (
+                        <Option key={country.id} value={country.phoneCode}>
+                          (+{country.phoneCode})
+                        </Option>
+                      ))}
+                    </Select>
+                    <Field
                       name="telephone"
-                      component="div"
-                      className="error-message text-red-500 my-1"
+                      type="number"
+                      as={Input}
+                      style={{ width: '70%' }}
+                      placeholder="Enter Telephone"
                     />
                   </div>
-                </Col>
+                  <ErrorMessage
+                    name="telephone"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
 
               <Col span={12} className="mt-2">
                 <div className="form-item">

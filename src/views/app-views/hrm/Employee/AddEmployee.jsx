@@ -227,35 +227,47 @@ const AddEmployee = ({ onClose, setSub }) => {
                 </div>
               </Col>
               <Col span={12} className="mt-2">
-                  <div className="form-item">
-                    <label className="font-semibold">Phone</label>
-                    <div className="flex">
-                      <Select
-                        style={{ width: '30%', marginRight: '8px' }}
-                        placeholder="Code"
-                        name="phone"
-                        onChange={(value) => setFieldValue('phone', value)}
-                      >
-                        {countries.map((country) => (
-                          <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
-                          </Option>
-                        ))}
-                      </Select>
-                      <Field
-                        name="phone"
-                        as={Input}
-                        style={{ width: '70%' }}
-                        placeholder="Enter Phone"
-                      />
-                    </div>
-                    <ErrorMessage
-                      name="phone"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
+  <div className="form-item">
+    <label className="font-semibold">Phone</label>
+    <div className="flex">
+      <Select
+        style={{ width: '30%', marginRight: '8px' }}
+        placeholder="Code"
+        name="phoneCode"
+        onChange={(value) => setFieldValue('phoneCode', value)}
+      >
+        {countries.map((country) => (
+          <Option key={country.id} value={country.phoneCode}>
+            (+{country.phoneCode})
+          </Option>
+        ))}
+      </Select>
+      <Field name="phoneNumber">
+        {({ field }) => (
+          <Input
+            {...field}
+            type="number"
+            style={{ width: '70%' }}
+            placeholder="Enter phone number"
+            onKeyPress={(e) => {
+              // Allow only numbers
+              if (!/[0-9]/.test(e.key)) {
+                e.preventDefault();
+              }
+            }}
+            // Remove spinner arrows
+            className="hide-number-spinner"
+          />
+        )}
+      </Field>
+    </div>
+    <ErrorMessage
+      name="phoneNumber"
+      component="div"
+      className="error-message text-red-500 my-1"
+    />
+  </div>
+</Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>

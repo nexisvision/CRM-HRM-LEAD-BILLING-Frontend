@@ -104,6 +104,11 @@ const AddContract = ({ onClose }) => {
     dispatch(ClientData());
   }, [dispatch]);
 
+  const handlePhoneNumberChange = (e, setFieldValue) => {
+    const value = e.target.value.replace(/\D/g, '');
+    setFieldValue('phone', value);
+  };
+
   return (
     <div className="add-contract-form">
       <Formik
@@ -147,52 +152,48 @@ const AddContract = ({ onClose }) => {
               </Col>
 
               <Col span={12} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">Phone</label>
-                    <div className="flex">
-                      <Select
-                        style={{ width: '30%', marginRight: '8px' }}
-                        placeholder="Code"
-                        name="phoneCode"
-                        onChange={(value) => setFieldValue('phoneCode', value)}
-                      >
-                        {countries.map((country) => (
-                          <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
-                          </Option>
-                        ))}
-                      </Select>
-                      <Field
-                        name="phone"
-                        as={Input}
-                        style={{ width: '70%' }}
-                        placeholder="Enter phone"
-                      />
-                    </div>
-                    <ErrorMessage
-                      name="phone"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-              </Col>
-
-              <Col span={24} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">Address</label>
-                    <Field name="address">
+                <div className="form-item">
+                  <label className="font-semibold">Phone</label>
+                  <div className="flex">
+                    <Select
+                      style={{ width: '30%', marginRight: '8px' }}
+                      placeholder="Code"
+                      name="phoneCode"
+                      onChange={(value) => setFieldValue('phoneCode', value)}
+                    >
+                      {countries.map((country) => (
+                        <Option key={country.id} value={country.phoneCode}>
+                          (+{country.phoneCode})
+                        </Option>
+                      ))}
+                    </Select>
+                    <Field name="phone">
                       {({ field }) => (
-                        <ReactQuill
+                        <Input
                           {...field}
-                          value={values.address}
-                          onChange={(value) =>
-                            setFieldValue("address", value)
-                          }
+                          type="number"
+                          style={{ width: '70%' }}
+                          placeholder="Enter phone"
+                          onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
                         />
                       )}
                     </Field>
+                  </div>
+                  <ErrorMessage
+                    name="phone"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={24} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Address</label>
+                    <Field name="billing_address" as={Input} placeholder="Enter Address" />
                     <ErrorMessage
-                      name="address"
+                      name="billing_address"
+
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
@@ -216,28 +217,28 @@ const AddContract = ({ onClose }) => {
               </Col>
 
               <Col span={12} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">Country</label>
-                    <Select
-                      className="w-full"
-                      placeholder="Select Country"
-                      name="country"
-                      onChange={(value) => setFieldValue('country', value)}
-                      value={values.country}
-                    >
-                      {countries.map((country) => (
-                        <Option key={country.id} value={country.countryName}>
-                          {country.countryName}
-                        </Option>
-                      ))}
-                    </Select>
-                    <ErrorMessage
-                      name="country"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
+                <div className="form-item">
+                  <label className="font-semibold">Country</label>
+                  <Select
+                    className="w-full"
+                    placeholder="Select Country"
+                    name="country"
+                    onChange={(value) => setFieldValue('country', value)}
+                    value={values.country}
+                  >
+                    {countries.map((country) => (
+                      <Option key={country.id} value={country.countryName}>
+                        {country.countryName}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage
+                    name="country"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
@@ -256,21 +257,21 @@ const AddContract = ({ onClose }) => {
               </Col>
 
               <Col span={12} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">Zip Code</label>
-                    <Field
-                      name="zipcode"
-                      as={Input}
-                      placeholder="Enter Zip Code"
-                    />
+                <div className="form-item">
+                  <label className="font-semibold">Zip Code</label>
+                  <Field
+                    name="zipcode"
+                    as={Input}
+                    placeholder="Enter Zip Code"
+                  />
 
-                    <ErrorMessage
-                      name="zipcode"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
+                  <ErrorMessage
+                    name="zipcode"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
 
               <Col span={12} className="mt-4">
                 <div className="form-item">

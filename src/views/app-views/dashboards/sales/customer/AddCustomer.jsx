@@ -50,21 +50,18 @@ const AddCustomer = ({ onClose }) => {
     name: Yup.string().required("Please enter a Name."),
     country_code: Yup.string().required("Country code is required"),
     contact: Yup.string()
-      .matches(/^\d{10}$/, "Contact number must be 10 digits")
       .required("Please enter a Contact Number"),
     email: Yup.string()
       .email("Please enter a valid email address with @.")
       .required("please enter a email"),
     taxnumber: Yup.string().required("Please enter a Tax Number."),
     alternatemobilenumber: Yup.string()
-      .matches(/^\d{10}$/, "Alternate number must be 10 digits")
       .nullable()
       .transform((value) => (value === "" ? null : value))
       .required("Please enter an Alternate Number"),
     billing_name: Yup.string().required("Please enter a Name."),
     billing_country_code: Yup.string().required("Country code is required"),
     billing_phone: Yup.string()
-      .matches(/^\d{10}$/, "Phone number must be 10 digits")
       .required("Please enter a phone number"),
     billing_address: Yup.string().required("Please enter a Billing Address."),
     billing_city: Yup.string().required("Please enter a City."),
@@ -74,7 +71,6 @@ const AddCustomer = ({ onClose }) => {
     shipping_name: Yup.string().required("Please enter a Name."),
     shipping_country_code: Yup.string().required("Country code is required"),
     shipping_phone: Yup.string()
-      .matches(/^\d{10}$/, "Phone number must be 10 digits")
       .required("Please enter a phone number"),
     shipping_address: Yup.string().required("Please enter a Shipping Address."),
     shipping_city: Yup.string().required("Please enter a City."),
@@ -84,7 +80,7 @@ const AddCustomer = ({ onClose }) => {
   });
 
   const handlePhoneNumberChange = (e, setFieldValue, fieldName) => {
-    const value = e.target.value.replace(/\D/g, '').slice(0, 10);
+    const value = e.target.value.replace(/\D/g, '');
     setFieldValue(fieldName, value);
   };
 

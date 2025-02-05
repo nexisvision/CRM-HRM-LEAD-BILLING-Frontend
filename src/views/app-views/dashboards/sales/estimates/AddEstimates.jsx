@@ -72,6 +72,7 @@ const AddEstimates = ({ onClose }) => {
       id: Date.now(),
       item: "",
       quantity: 1,
+      discount: 0,
       price: "",
       tax: 0,
       amount: "0",
@@ -93,7 +94,8 @@ const AddEstimates = ({ onClose }) => {
   
       const itemsObject = tableData.reduce((acc, item, index) => {
         acc[`item_${index + 1}`] = {
-          description: item.item,
+          item: item.item,
+          discount: Number(totals.discount),
           quantity: parseFloat(item.quantity) || 0,
           price: parseFloat(item.price) || 0,
           tax: parseFloat(item.tax) || 0,

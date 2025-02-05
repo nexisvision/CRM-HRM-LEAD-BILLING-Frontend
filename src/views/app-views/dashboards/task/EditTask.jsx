@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import dayjs from "dayjs";
 import * as Yup from "yup";
 import {
   AddTasks,
@@ -163,7 +164,7 @@ const EditTask = ({ iddd, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              {/* <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Start Date</label>
                   <DatePicker
@@ -181,9 +182,30 @@ const EditTask = ({ iddd, onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
 
               <Col span={12} className="mt-4">
+                <label className="font-semibold">Start Date</label>
+                <DatePicker
+                  className="w-full"
+                  format="DD-MM-YYYY"
+                  value={values.startDate ? dayjs(values.startDate) : null}
+
+                  onChange={(startDate) =>
+                    setFieldValue("startDate", startDate)
+                  }
+                  onBlur={() => setFieldTouched("startDate", true)}
+
+                />
+                <ErrorMessage
+                  name="startDate"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+
+                />
+              </Col>
+
+              {/* <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Due Date</label>
                   <DatePicker
@@ -201,7 +223,22 @@ const EditTask = ({ iddd, onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
+               <Col span={12} className="mt-4">
+                  <label className="font-semibold">Due Date</label>
+                  <DatePicker
+                    className="w-full"
+                    format="DD-MM-YYYY"
+                    value={values.dueDate ? dayjs(values.dueDate) : null}
+                    onChange={(dueDate) => setFieldValue("dueDate", dueDate)}
+                    onBlur={() => setFieldTouched("dueDate", true)}
+                  />
+                  <ErrorMessage
+                    name="dueDate"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </Col>
 
               <Col span={24} className="mt-4">
                 <div className="form-item">

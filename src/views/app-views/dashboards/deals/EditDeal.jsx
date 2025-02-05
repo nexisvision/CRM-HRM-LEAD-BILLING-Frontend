@@ -71,7 +71,6 @@ const EditDeal = ({ onClose, id }) => {
   const validationSchema = Yup.object({
     dealName: Yup.string().optional("Please enter a Deal Name."),
     phoneNumber: Yup.string()
-      .matches(/^\d{10}$/, "telephone number must be exactly 10 digits")
       .nullable(),
     price: Yup.string().optional("Please enter a Price."),
     clients: Yup.string().required("Please select clients."),
@@ -146,34 +145,44 @@ const EditDeal = ({ onClose, id }) => {
                 </div>
               </Col>
               <Col span={12} className="mt-2">
-                  <div className="form-item">
-                    <label className="font-semibold">Phone</label>
-                    <div className="flex">
-                      <Select
-                        style={{ width: '30%', marginRight: '8px' }}
-                        placeholder="Code"
-                        name="phoneCode"
-                        onChange={(value) => setFieldValue('phoneCode', value)}
-                      >
-                        {countries.map((country) => (
-                          <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
-                          </Option>
-                        ))}
-                      </Select>
-                      <Field
-                        name="phoneNumber"
-                        as={Input}
-                        style={{ width: '70%' }}
-                        placeholder="Enter phone"
-                      />
-                    </div>
-                    <ErrorMessage
-                      name="phoneNumber"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
+                <div className="form-item">
+                  <label className="font-semibold">Phone</label>
+                  <div className="flex">
+                    <Select
+                      style={{ width: '30%', marginRight: '8px' }}
+                      placeholder="Code"
+                      name="phoneCode"
+                      onChange={(value) => setFieldValue('phoneCode', value)}
+                    >
+                      {countries.map((country) => (
+                        <Option key={country.id} value={country.phoneCode}>
+                          (+{country.phoneCode})
+                        </Option>
+                      ))}
+                    </Select>
+                    <Field name="phoneNumber">
+                      {({ field }) => (
+                        <Input
+                          {...field}
+                          type="number"
+                          style={{ width: '70%' }}
+                          placeholder="Enter phone number"
+                          onKeyPress={(e) => {
+                            // Allow only numbers
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          }}
+                        />
+                      )}
+                    </Field>
                   </div>
+                  <ErrorMessage
+                    name="phoneNumber"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
               </Col>
               <Col span={12} className="mt-4">
                 <div className="form-item">

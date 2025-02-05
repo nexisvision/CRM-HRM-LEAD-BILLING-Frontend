@@ -242,8 +242,10 @@ const AddProposal = ({ onClose }) => {
 
   // Delete row
   const handleDeleteRow = (id) => {
-    if (rows.length > 1) {
-      setRows(rows.filter((row) => row.id !== id));
+    if (tableData.length > 1) {
+      const updatedData = tableData.filter((row) => row.id !== id);
+      setTableData(updatedData);
+      calculateTotal(updatedData, discountRate);
     } else {
       message.warning("At least one item is required");
     }
@@ -485,50 +487,6 @@ const AddProposal = ({ onClose }) => {
             </div>
             <div>
               <div className="overflow-x-auto">
-                <Flex
-                  alignItems="center"
-                  mobileFlex={false}
-                  className="flex mb-4 gap-4"
-                >
-                  <Flex className="flex " mobileFlex={false}>
-                    <div className="w-full flex gap-4">
-                      <div>
-                        {/* <Select
-                                                    value={selectedProduct}
-                                                    onChange={handleProductChange}
-                                                    className="w-full !rounded-none"
-                                                    placeholder="Select Product"
-                                                    rootClassName="!rounded-none"
-                                                >
-                                                    <Option value="smart_speakers">Smart Speakers</Option>
-                                                    <Option value="electric_kettle">Electric Kettle</Option>
-                                                    <Option value="headphones">Headphones</Option>
-                                                </Select> */}
-                      </div>
-                    </div>
-                  </Flex>
-                  <Flex gap="7px" className="flex">
-                    <div className="w-full flex gap-4">
-                      <div>
-                        {/* <Select
-                                                    value={selectedMilestone}
-                                                    onChange={handleMilestoneChange}
-                                                    className="w-full !rounded-none"
-                                                    placeholder="Select Milestone"
-                                                    rootClassName="!rounded-none"
-                                                    loading={loading}
-                                                >
-                                                    {milestones?.map((milestone) => (
-                                                        <Option key={milestone.id} value={milestone.id}>
-                                                            {milestone.milestone_title}
-                                                        </Option>
-                                                    ))}
-                                                </Select> */}
-                      </div>
-                    </div>
-                  </Flex>
-                </Flex>
-
                 <table className="w-full border border-gray-200 bg-white">
                   <thead className="bg-gray-100">
                     <tr>
@@ -556,12 +514,15 @@ const AddProposal = ({ onClose }) => {
                     {tableData.map((row) => (
                       <React.Fragment key={row.id}>
                         <tr>
-                          <td className="px-4 py-2 border-b">
-                            <Select placeholder="Select Item">
-                              <Option value="item1">Item1</Option>
-                              <Option value="item2">Item2</Option>
-                            </Select>
-                          </td>
+                        <td className="px-4 py-2 border-b">
+                          <input
+                            type="text"
+                            value={row.item}
+                            onChange={(e) => handleTableDataChange(row.id, "item", e.target.value)}
+                            placeholder="Item Name"
+                            className="w-full p-2 border rounded-s"
+                          />
+                        </td>
                           <td className="px-4 py-2 border-b">
                             <input
                               type="number"
@@ -614,18 +575,6 @@ const AddProposal = ({ onClose }) => {
                         <DeleteOutlined />
                       </Button>
                     </td>
-                
-                          <td className="px-4 py-2 border-b">
-                            <span>{row.amount}</span>
-                          </td>
-                          <td className="px-2 py-1 border-b text-center">
-                            <Button
-                              danger
-                              onClick={() => handleDeleteRow(row.id)}
-                            >
-                              <DeleteOutlined />
-                            </Button>
-                          </td>
                         </tr>
                       </React.Fragment>
                     ))}
