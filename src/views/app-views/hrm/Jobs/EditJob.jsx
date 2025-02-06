@@ -341,7 +341,7 @@ const EditJob = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={8} className="mt-2">
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">End Date</label>
 
@@ -399,14 +399,15 @@ const EditJob = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={8} className="mt-2">
-                <div className="mt-4 w-full">
+              <Col span={12} className="mt-2">
+                <div className="form-item">
                   <div className="form-item">
                     <label className="font-semibold">Work Experence</label>
                     <Field
                     className="mt-2"
                     name="work experence"
                     as={Input}
+
                     placeholder="Enter work experence"
                   />
                     <ErrorMessage
@@ -455,8 +456,8 @@ const EditJob = ({ onClose }) => {
                     </div>
                   </Col>
 
-              <div className="mt-2">
-                <Col span={24} className="mt-2">
+             
+                <Col span={12} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">Status</label>
                     <Field name="status">
@@ -505,18 +506,16 @@ const EditJob = ({ onClose }) => {
                     />
                   </div>
                 </Col>
-              </div>
+             
 
-              <div className="mt-2 ">
-                <Col span={24} className="mt-2">
+             
+                <Col span={12} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">Expect Salary</label>
                     <Field
                       className="mt-2"
                       name="expectedSalary"
                       as={Input}
-                      type="number"
-                      min="0"
                       placeholder="Enter expectedSalary"
                     />
                     <ErrorMessage
@@ -526,7 +525,6 @@ const EditJob = ({ onClose }) => {
                     />
                   </div>
                 </Col>
-              </div>
 
               <div className="mt-2 w-full">
                 <Col span={24} className="mt-2">
@@ -554,7 +552,7 @@ const EditJob = ({ onClose }) => {
                 Cancel
               </Button>
               <Button type="primary" htmlType="submit">
-                Create
+                Update
               </Button>
             </div>
           </Form>

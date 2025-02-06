@@ -108,8 +108,10 @@ const ExpensesList = () => {
     };
 
     useEffect(() => {
-        dispatch(Getexp(id));
-    }, []);
+        if (id) {
+            dispatch(Getexp(id));
+        }
+    }, [dispatch, id]);
 
     useEffect(() => {
         if (filtermin) {
@@ -153,8 +155,7 @@ const ExpensesList = () => {
     const DeleteFun = async (exid) => {
         try {
             await dispatch(DeleteExp(exid));
-
-            const updatedData = await dispatch(Getexp(id));
+             await dispatch(Getexp(id));
 
             setList(list.filter((item) => item.id !== exid));
 
@@ -241,10 +242,13 @@ const ExpensesList = () => {
         {
             title: "Purchase Date",
             dataIndex: "purchase_date",
-            sorter: {
-                compare: (a, b) => a.purchaseDate.length - b.purchaseDate.length,
-            },
-        },
+            render: (_, record) => (
+              <span>
+                {record.purchase_date ? dayjs(record.purchase_date).format('DD-MM-YYYY') : ''}
+              </span>
+            ),
+            sorter: (a, b) => utils.antdTableSorter(a, b, "date"),
+          },
         // {
         //   title: "Status",
         //   dataIndex: "status",

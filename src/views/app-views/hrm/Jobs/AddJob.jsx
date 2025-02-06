@@ -528,8 +528,6 @@ const AddJob = ({ onClose }) => {
                       className="mt-2"
                       name="expectedSalary"
                       as={Input}
-                      type="number"
-                      min="0"
                       placeholder="Enter expectedSalary"
                     />
                     <ErrorMessage

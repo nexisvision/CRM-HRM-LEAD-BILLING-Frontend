@@ -229,7 +229,10 @@ const ProductList = () => {
     {
       title: "Description",
       dataIndex: "description",
-      sorter: (a, b) => utils.antdTableSorter(a, b, "description"),
+      render: (text) => (
+        <div dangerouslySetInnerHTML={{ __html: text }} />
+      ),
+      sorter: (a, b) => a.description.length - b.description.length,
     },
     // {
     // 	title: 'Status',

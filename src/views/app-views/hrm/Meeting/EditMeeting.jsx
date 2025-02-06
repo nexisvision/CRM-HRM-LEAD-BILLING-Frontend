@@ -9,14 +9,18 @@ import {
   Col,
   TimePicker,
 } from "antd";
+import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import moment from "moment";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+
 import { EditMeet, MeetData } from "./MeetingReducer/MeetingSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
+import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
 
 const { Option } = Select;
 
@@ -28,24 +32,53 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
     dispatch(MeetData());
   }, [dispatch]);
 
+  useEffect(() => {
+    dispatch(empdata());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getDept());
+  }, [dispatch]);
+
   const tabledata = useSelector((state) => state.Meeting);
 
   const dataM = tabledata.Meeting.data.find((item) => item.id === meetid);
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
+  
+  const AllDepart = useSelector((state) => state.Department);
+  const datadept = AllDepart.Department.data || [];
+  const filteredDept = datadept?.filter((item) => item.created_by === user);
+
+  const allempdata = useSelector((state) => state.employee);
+  const empData = allempdata?.employee?.data || [];
+  const filteredEmpData = empData?.filter((item) => item.created_by === user);
+
   const [initialValues, setInitialValues] = useState({
+    department: "",
+    employee: "",
     title: "",
     date: null,
     startTime: null,
+    endTime: null,
+    status: "",
+    meetingLink: "",
     description: "",
   });
 
   useEffect(() => {
     if (dataM) {
       setInitialValues({
+        department: dataM.department || "",
+        employee: dataM.employee || "",
         title: dataM.title || "",
         date: dataM.date ? moment(dataM.date, "DD-MM-YYYY") : null,
         startTime: dataM.startTime ? moment(dataM.startTime, "HH:mm") : null,
+        endTime: dataM.endTime ? moment(dataM.endTime, "HH:mm") : null,
+        meetingLink: dataM.meetingLink || "",
+        status: dataM.status || "",
         description: dataM.description || "",
+
       });
     }
   }, [dataM]);
@@ -65,10 +98,15 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
   };
 
   const validationSchema = Yup.object({
+    department: Yup.string().required("Please Select a department."),
+    employee: Yup.string().required("Please select an employee."),
     title: Yup.string().required("Please enter a meeting title."),
-    date: Yup.date().nullable().required("Meeting date is required."),
+    date: Yup.date().nullable().required("Event Start Date is required."),
     startTime: Yup.date().nullable().required("Meeting time is required."),
+    endTime: Yup.date().nullable().required("Meeting time is required."),
     description: Yup.string().required("Please enter a description."),
+    meetingLink: Yup.string().required("Please enter a meeting link."),
+    status: Yup.string().required("Please select a status."),
   });
 
   return (
@@ -84,6 +122,78 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
             <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
 
             <Row gutter={16}>
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Department</label>
+                  <Field name="department">
+                    {({ field, form }) => (
+                      <Select
+                        style={{ width: "100%" }}
+                        {...field}
+                        placeholder="Select Department"
+                        loading={!filteredDept}
+                        value={form.values.department}
+                        onChange={(value) => form.setFieldValue("department", value)}
+                        onBlur={() => form.setFieldTouched("department", true)}
+                      >
+                        {filteredDept && filteredDept.length > 0 ? (
+                          filteredDept.map((dept) => (
+                            <Option key={dept.id} value={dept.id}>
+                              {dept.department_name || "Unnamed Department"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Department Available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="department"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Employee</label>
+                  <Field name="employee">
+                    {({ field, form }) => (
+                      <Select
+                        style={{ width: "100%" }}
+                        {...field}
+                        placeholder="Select Employee"
+                        loading={!filteredEmpData}
+                        value={form.values.employee}
+                        onChange={(value) => form.setFieldValue("employee", value)}
+                        onBlur={() => form.setFieldTouched("employee", true)}
+                      >
+                        {filteredEmpData && filteredEmpData.length > 0 ? (
+                          filteredEmpData.map((emp) => (
+                            <Option key={emp.id} value={emp.id}>
+                              {emp.username || "Unnamed Employee"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Employees Available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="employee"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
               <Col span={24} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Meeting Title</label>
@@ -97,21 +207,21 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
               </Col>
 
               <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Meeting Date</label>
-                  <DatePicker
-                    className="w-full"
-                    format="DD-MM-YYYY"
-                    value={values.date}
-                    onChange={(date) => setFieldValue("date", date)}
-                    onBlur={() => setFieldTouched("date", true)}
-                  />
-                  <ErrorMessage
-                    name="date"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
+                <label className="font-semibold">Meeting Date</label>
+                <DatePicker
+                  className="w-full"
+                  format="DD-MM-YYYY"
+                  value={values.date ? dayjs(values.date) : null}
+                  onChange={(date) =>
+                    setFieldValue("date", date)
+                  }
+                  onBlur={() => setFieldTouched("date", true)}
+                />
+                <ErrorMessage
+                  name="date"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
               </Col>
 
               <Col span={12} className="mt-2">
@@ -121,9 +231,7 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
                     className="w-full"
                     format="HH:mm"
                     value={values.startTime}
-                    onChange={(startTime) =>
-                      setFieldValue("startTime", startTime)
-                    }
+                    onChange={(time) => setFieldValue("startTime", time)}
                     onBlur={() => setFieldTouched("startTime", true)}
                   />
                   <ErrorMessage
@@ -134,6 +242,44 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
                 </div>
               </Col>
 
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Meeting End Time</label>
+                  <TimePicker
+                    className="w-full"
+                    format="HH:mm"
+                    value={values.endTime}
+                    onChange={(time) => setFieldValue("endTime", time)}
+                    onBlur={() => setFieldTouched("endTime", true)}
+                  />
+                  <ErrorMessage
+                    name="endTime"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Status</label>
+                  <Select
+                    placeholder="Select Status"
+                    value={values.status}
+                    onChange={(value) => setFieldValue("status", value)}
+
+                     className="w-full"
+                  >
+                    <Option value="scheduled">scheduled</Option>
+                    <Option value="completed">completed</Option>
+                    <Option value="cancelled">cancelled</Option>
+                  </Select>
+                  <ErrorMessage
+                    name="status"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
               <Col span={24} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Meeting Note</label>
@@ -152,6 +298,18 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
                   </Field>
                   <ErrorMessage
                     name="description"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={24} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Meeting Link</label>
+                  <Field name="meetingLink" as={Input} placeholder="Meeting Link" />
+                  <ErrorMessage
+                    name="meetingLink"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />

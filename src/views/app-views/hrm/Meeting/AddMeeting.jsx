@@ -73,6 +73,7 @@ const AddMeeting = ({ onClose }) => {
     startTime: null,
     endTime: null,
     meetingLink:"",
+    status:"",
     description: "",
   };
 
@@ -84,6 +85,7 @@ const AddMeeting = ({ onClose }) => {
     startTime: Yup.date().nullable().required("Meeting time is required."), // Required field (time)
     endTime: Yup.date().nullable().required("Meeting time is required."), // Required field (time)
     description: Yup.string().required("Please enter a description."), // Required field
+    status: Yup.string().required("Please select a status."), // Required field
     meetingLink: Yup.string().required("Please enter a description."), // Required field
   });
 
@@ -261,7 +263,27 @@ const AddMeeting = ({ onClose }) => {
                   />
                 </div>
               </Col>
+              <Col span={12}>
+                <div className="form-item mt-2">
+                  <label className="font-semibold">Status</label>
+                  <Select
+                    placeholder="Select Status"
+                    value={values.status}
+                    onChange={(value) => setFieldValue("status", value)}
 
+                     className="w-full mt-2"
+                  >
+                    <Option value="scheduled">scheduled</Option>
+                    <Option value="completed">completed</Option>
+                    <Option value="cancelled">cancelled</Option>
+                  </Select>
+                  <ErrorMessage
+                    name="status"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
               {/* Meeting Notes Field */}
               <Col span={24} className="mt-2">
                 <div className="form-item">
@@ -286,6 +308,7 @@ const AddMeeting = ({ onClose }) => {
                   />
                 </div>
               </Col>
+
               <Col span={24} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">meetingLink Title</label>

@@ -248,7 +248,7 @@ const DashboardList = () => {
                     <div className="bg-white p-6 rounded-lg shadow">
                         <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <div className="bg-blue-500 px-2 pb-0 rounded-lg ">
+                            <div className="bg-blue-500 p-2 pb-0 rounded-lg ">
                                 <RiseOutlined  className="text-white text-2xl" />
                             </div>
                             <div>

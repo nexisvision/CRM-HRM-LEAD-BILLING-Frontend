@@ -187,6 +187,7 @@ const sub = subClients?.SubClient?.data;
 
       const invoiceData = {
         ...values,
+      
         issueDate: values.issueDate.format("YYYY-MM-DD"),
         dueDate: values.dueDate.format("YYYY-MM-DD"),
         items: tableData,
@@ -199,7 +200,7 @@ const sub = subClients?.SubClient?.data;
       await dispatch(updateInvoice({ idd, data: invoiceData }));
       message.success("Invoice updated successfully");
       onClose();
-      navigate("/app/dashboards/project/list");
+      navigate("/app/dashboards/project/invoice");
     } catch (error) {
       message.error(
         "Failed to update invoice: " + (error.message || "Unknown error")
@@ -225,28 +226,28 @@ const sub = subClients?.SubClient?.data;
 
   // Function to handle adding a new row
   const handleAddRow = () => {
-    setRows([
-      ...rows,
-      {
-        id: Date.now(),
-        item: "",
-        quantity: "",
-        price: "",
-        discount: "",
-        tax: "",
-        amount: "0",
-        description: "",
-        isNew: true,
-      },
+    setTableData([
+        ...tableData,
+        {
+            id: Date.now(),
+            item: "",
+            quantity: 1,
+            price: "",
+            tax: 0,
+            amount: "0",
+            description: "",
+        }
     ]);
   };
 
   // Delete row
   const handleDeleteRow = (id) => {
-    if (rows.length > 1) {
-      setRows(rows.filter((row) => row.id !== id));
+    if (tableData.length > 1) {
+        const updatedTableData = tableData.filter(row => row.id !== id);
+        setTableData(updatedTableData);
+        calculateTotal(updatedTableData, discountRate); // Recalculate totals after deletion
     } else {
-      message.warning("At least one item is required");
+        message.warning('At least one item is required');
     }
   };
 
@@ -254,7 +255,7 @@ const sub = subClients?.SubClient?.data;
 
   // Calculate subtotal (sum of all row amounts before discount)
   const calculateSubTotal = () => {
-    return rows.reduce((sum, row) => {
+    return tableData.reduce((sum, row) => {
       const quantity = parseFloat(row.quantity || 0);
       const price = parseFloat(row.price || 0);
       return sum + quantity * price;
@@ -363,11 +364,11 @@ const sub = subClients?.SubClient?.data;
                           );
                         }}
                       >
-                        {currencies?.map((currency) => (
-                          <Option key={currency.id} value={currency.id}>
-                            {currency.currencyCode}
-                          </Option>
-                        ))}
+                         {currencies?.data?.map((currency) => (
+                                <Option key={currency.id} value={currency.id}>
+                                  {currency.currencyCode}
+                                </Option>
+                              ))}
                       </Select>
                     </Form.Item>
                   </Col>
@@ -421,7 +422,7 @@ const sub = subClients?.SubClient?.data;
 <Col span={12}>
     {/* Display the project name */}
     <Form.Item
-        name="projectName"
+        name="project"
         label="Project Name"
         initialValue={fnddata?.project_name}
         rules={[{ required: true, message: "Please enter the project name" }]}
@@ -721,7 +722,7 @@ const sub = subClients?.SubClient?.data;
               <Row justify="end" gutter={16}>
                 <Col>
                   <Button
-                    onClick={() => navigate("/app/dashboards/project/list")}
+                    onClick={() => navigate("/app/dashboards/project/invoice")}
                   >
                     Cancel
                   </Button>

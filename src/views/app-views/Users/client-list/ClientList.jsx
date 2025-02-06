@@ -360,8 +360,10 @@ const ClientList = () => {
     {
       title: "createdAt",
       dataIndex: "createdAt",
-      sorter: (a, b) => a.createdAt.length - b.createdAt.length,
+      render: (date) => dayjs(date).format("DD/MM/YYYY"),
+      sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
     },
+
   
     {
       title: "Action",

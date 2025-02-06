@@ -111,6 +111,8 @@ const AddContract = ({ onClose }) => {
 
   return (
     <div className="add-contract-form">
+       <h2 className="mb-4 border-b pb-2 font-medium"></h2>
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -187,7 +189,7 @@ const AddContract = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24} className="mt-2">
+              <Col span={24} className="mt-4">
                   <div className="form-item">
                     <label className="font-semibold">Address</label>
                     <Field name="billing_address" as={Input} placeholder="Enter Address" />
@@ -309,14 +311,15 @@ const AddContract = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold mb-2">Currency</label>
+                  <label className="font-semibold">Currency</label>
                   <div className="flex gap-2">
                     <Field name="currency">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full mt-2"
+                          className="w-full"
                           placeholder="Select Currency"
+
                           onChange={(value) => {
                             const selectedCurrency = Array.isArray(currencies?.data) && 
                               currencies?.data?.find((c) => c.id === value);
@@ -354,7 +357,7 @@ const AddContract = ({ onClose }) => {
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full mt-2"
+                        className="w-full"
                         placeholder="Select Projects"
                         onChange={(value) => setFieldValue("project", value)}
                         value={values.project}

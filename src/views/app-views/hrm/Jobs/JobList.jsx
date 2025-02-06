@@ -276,13 +276,27 @@ const JobList = () => {
     {
       title: "Start Date",
       dataIndex: "startDate",
-      sorter: (a, b) => dayjs(a.startdate).unix() - dayjs(b.startdate).unix(),
+      render: (_, record) => (
+        <span>
+          {record.startDate ? dayjs(record.startDate).format('DD-MM-YYYY') : ''}
+        </span>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "startDate"),
     },
+
     {
       title: "End Date",
       dataIndex: "endDate",
-      sorter: (a, b) => dayjs(a.enddate).unix() - dayjs(b.enddate).unix(),
+      render: (_, record) => (
+
+        <span>
+          {record.endDate ? dayjs(record.endDate).format('DD-MM-YYYY') : ''}
+        </span>
+
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "endDate"),
     },
+
     {
       title: "Status",
       dataIndex: "status",

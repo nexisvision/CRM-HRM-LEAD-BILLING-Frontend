@@ -44,7 +44,7 @@ const AddPayment = ({ onClose }) => {
 
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const initialValues = {
-    project_name: fnddata?.id || "",
+    project: fnddata?.id || "",
     invoice: "",
     paidOn: "",
     amount: "",
@@ -57,7 +57,7 @@ const AddPayment = ({ onClose }) => {
     remark: "",
   };
   const validationSchema = Yup.object({
-    project_name: Yup.string().optional("Please enter Project."),
+    project: Yup.string().optional("Please enter Project."),
     invoice: Yup.string().optional("Please enter Invoice."),
     paidOn: Yup.string().optional("Please enter Paid On."),
     amount: Yup.string().optional("Please enter Amount."),
@@ -97,7 +97,7 @@ const AddPayment = ({ onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Project</label>
                   <Field
-                    name="project_name"
+                    name="project"
                     as={Input}
                     placeholder="Enter Project"
                     className=""
@@ -237,9 +237,11 @@ const AddPayment = ({ onClose }) => {
                         onBlur={() => setFieldTouched("paymentMethod", true)}
                         allowClear={false}
                       >
-                        <Option value="xyz">XYZ</Option>
-                        <Option value="abc">ABC</Option>
+                        <Option value="online">Online Payment</Option>
+                        <Option value="offline">Offline Payment</Option>
                       </Select>
+
+
                     )}
                   </Field>
                   <ErrorMessage

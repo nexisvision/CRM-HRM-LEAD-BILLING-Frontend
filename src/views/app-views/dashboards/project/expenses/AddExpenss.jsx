@@ -105,7 +105,7 @@ const AddExpenses = ({ onClose }) => {
                 {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
                     <Form className="formik-form" onSubmit={handleSubmit}>
                         <Row gutter={16}>
-                            <Col span={8}>
+                            <Col span={12}>
                                 <div className="form-item">
                                     <label className="font-semibold">ItemName</label>
                                     <Field name="item" as={Input} placeholder="Enter item" />
@@ -116,33 +116,40 @@ const AddExpenses = ({ onClose }) => {
                                     />
                                 </div>
                             </Col>
-                            <Col span={8}>
+                            <Col span={12}>
                                 <div className="form-item">
-                                    <label className='font-semibold mb-2'>Currency</label>
-                                    <div className="flex gap-2">
-                                        <Field name="currency">
-                                            {({ field, form }) => (
-                                                <Select
-                                                    {...field}
-                                                    className="w-full"
-                                                    placeholder="Select Currency"
-                                                    onChange={(value) => {
-                                                        const selectedCurrency = currencies.find(c => c.id === value);
-                                                        form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
-                                                    }}
-                                                >
-                                                    {currencies?.map((currency) => (
-                                                        <Option
-                                                            key={currency.id}
-                                                            value={currency.id}
-                                                        >
-                                                            {currency.currencyCode}
-                                                        </Option>
-                                                    ))}
-                                                </Select>
-                                            )}
-                                        </Field>
-                                    </div>
+                                    <label className="font-semibold">Currency</label>
+                                    <Field name="currency">
+
+                                        {({ field, form }) => (
+                                            <Select
+                                                {...field}
+                                                placeholder="Select Currency"
+                                                className="w-full"
+                                                onChange={(value) => {
+                                                    const selectedCurrency = currencies?.data?.find(
+                                                        (c) => c.id === value
+                                                    );
+                                                    form.setFieldValue(
+                                                        "currency",
+                                                        selectedCurrency?.currencyCode || ""
+                                                    );
+                                                }}
+                                                value={form.values.currency}
+                                                onBlur={() => form.setFieldTouched("currency", true)}
+                                                allowClear={false}
+                                            >
+                                                {Array.isArray(currencies?.data) && currencies?.data?.map((currency) => (
+                                                    <Option 
+                                                        key={currency.id} 
+                                                        value={currency.id}
+                                                    >
+                                                        {currency.currencyCode}
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        )}
+                                    </Field>
                                     <ErrorMessage
                                         name="currency"
                                         component="div"
@@ -157,10 +164,11 @@ const AddExpenses = ({ onClose }) => {
                                     <ErrorMessage name="ExchangeRate" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col> */}
-                            <Col span={8}>
+                            <Col span={12}>
                                 <div className="form-item">
                                     <label className="font-semibold">Price</label>
                                     <Field
+
                                         name="price"
                                         type="number"
                                         as={Input}
@@ -173,9 +181,10 @@ const AddExpenses = ({ onClose }) => {
                                     />
                                 </div>
                             </Col>
-                            <Col span={8} className="mt-2">
+                            <Col span={12}>
                                 <div className="form-item">
                                     <label className="font-semibold">Purchase Date</label>
+
                                     <DatePicker
                                         className="w-full"
                                         format="DD-MM-YYYY"
@@ -216,9 +225,10 @@ const AddExpenses = ({ onClose }) => {
                                     />
                                 </div>
                             </Col> */}
-                            <Col span={8} className="mt-2">
+                            <Col span={12} className="mt-2">
                                 <div className="form-item">
                                     <label className="font-semibold mb-2">Employee</label>
+
                                     <div className="flex gap-2">
                                         <Field name="employee">
                                             {({ field, form }) => (
@@ -253,9 +263,10 @@ const AddExpenses = ({ onClose }) => {
                                     />
                                 </div>
                             </Col>
-                            <Col span={8} className="mt-2">
+                            <Col span={12} className="mt-2">
                                 <div className="form-item">
                                     <label className="font-semibold">Project</label>
+
                                     <Input
                                         defaultValue={fnddata?.project_name}
                                         placeholder="Enter project"
@@ -269,9 +280,10 @@ const AddExpenses = ({ onClose }) => {
                                 </div>
                             </Col>
 
-                            <Col span={8} className="mt-2">
+                            <Col span={12} className="mt-2">
                                 <div className="form-item">
                                     <label className="font-semibold">Purchased From</label>
+
                                     <Field
                                         name="PurchasedFrom"
                                         as={Input}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, Select, Radio, message, Row, Col } from "antd";
+import { Input, Button, Select, Radio, message, Row, Col ,Upload} from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import ReactQuill from "react-quill";
@@ -10,6 +10,7 @@ import {
 } from "./JobapplicationReducer/JobapplicationSlice";
 import { GetJobdata } from "../JobReducer/JobSlice";
 import { getallcountries } from "../../../setting/countries/countriesreducer/countriesSlice";
+import { UploadOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 const EditJobApplication = ({ idd, onClose }) => {
@@ -68,6 +69,7 @@ const EditJobApplication = ({ idd, onClose }) => {
     status: "",
     applied_source: "",
     cover_letter: "",
+    cv: null,
   });
   const validationSchema = Yup.object({
     job: Yup.string().required("Please select a job."),
@@ -76,7 +78,6 @@ const EditJobApplication = ({ idd, onClose }) => {
       .email("Please enter a valid email address.")
       .required("Please enter an email."),
     phone: Yup.string()
-      .matches(/^\d{10}$/, "Phone number must be 10 digits.")
       .required("Please enter a phone number."),
     location: Yup.string().required("Please enter a location."),
     total_experience: Yup.string().required(
@@ -89,9 +90,11 @@ const EditJobApplication = ({ idd, onClose }) => {
     status: Yup.string().required("Please select a status."),
     applied_source: Yup.string().required("Please enter the applied source."),
     cover_letter: Yup.string().required("Please enter a cover letter."),
+    // cv: Yup.mixed().required("Please upload a CV."),
   });
   return (
     <div>
+  
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -109,7 +112,7 @@ const EditJobApplication = ({ idd, onClose }) => {
           >
             <Row gutter={16}>
               {/* Job */}
-              <Col span={12} className="mt-2">
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">job</label>
                   <Field name="job">
@@ -157,7 +160,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                 </div>
               </Col>
               {/* Email */}
-              <Col span={12}>
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Email</label>
                   <Field name="email" as={Input} placeholder="Enter Email" />
@@ -176,8 +179,8 @@ const EditJobApplication = ({ idd, onClose }) => {
                     <Select
                       style={{ width: '30%', marginRight: '8px' }}
                       placeholder="Code"
-                      name="phone"
-                      onChange={(value) => setFieldValue('phone', value)}
+                      name="phoneCode"
+                      onChange={(value) => setFieldValue('phoneCode', value)}
                     >
                       {countries.map((country) => (
                         <Option key={country.id} value={country.phoneCode}>
@@ -188,6 +191,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                     <Field
                       name="phone"
                       as={Input}
+                      type="number"
                       style={{ width: '70%' }}
                       placeholder="Enter Phone"
                     />
@@ -200,7 +204,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                 </div>
               </Col>
               {/* Location */}
-              <Col span={12}>
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Location</label>
                   <Field
@@ -216,7 +220,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                 </div>
               </Col>
               {/* Total Experience */}
-              <Col span={12}>
+              <Col span={12}  className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Total Experience</label>
                   <Select
@@ -240,7 +244,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                 </div>
               </Col>
               {/* Current Location */}
-              <Col span={12}>
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Current Location</label>
                   <Field
@@ -256,7 +260,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                 </div>
               </Col>
               {/* Notice Period */}
-              <Col span={12}>
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Notice Period</label>
                   <Select
@@ -278,9 +282,9 @@ const EditJobApplication = ({ idd, onClose }) => {
                 </div>
               </Col>
               {/* Status */}
-              <Col span={12}>
+              <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Status</label>
+                  <label className="font-semibold">Status</label><br/>
                   <Radio.Group
                     value={values.status}
                     onChange={(e) => setFieldValue("status", e.target.value)}
@@ -296,7 +300,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                 </div>
               </Col>
               {/* Applied Source */}
-              <Col span={12}>
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Applied Sources</label>
                   <Field
@@ -311,8 +315,35 @@ const EditJobApplication = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
+               {/* CV Upload */}
+               <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Upload CV</label><br/>
+                  <Field name="cv">
+                    {({ field, form }) => (
+                      <Upload
+                        className="w-full mt-2"
+                        action="http://localhost:5500/api/users/upload-cv"
+                        accept=".pdf"
+                        maxCount={1}
+                        showUploadList={{ showRemoveIcon: true }}
+                        onChange={({ file }) => {
+                          form.setFieldValue('cv', file);
+                        }}
+                      >
+                        <Button icon={<UploadOutlined />}>Upload</Button>
+                      </Upload>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="cv"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
               {/* Cover Letter */}
-              <Col span={24}>
+              <Col span={24} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Cover Letter</label>
                   <ReactQuill

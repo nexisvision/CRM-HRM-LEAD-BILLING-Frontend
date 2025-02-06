@@ -676,7 +676,6 @@ const calculateVAT = (subtotal) => {
                         />
                     </Table>
 
-
                     {/* Invoice Summary */}
                     <div className="d-flex justify-content-end mb-3">
                         <div className="text-center">

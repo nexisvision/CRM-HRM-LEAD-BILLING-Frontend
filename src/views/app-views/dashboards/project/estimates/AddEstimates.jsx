@@ -21,7 +21,10 @@ const AddEstimates = ({ onClose }) => {
     const [discountValue, setDiscountValue] = useState(0);
     const { currencies } = useSelector((state) => state.currencies);
 
-    const { data: Leads } = useSelector((state) => state.Leads.Leads);
+    // Add loading state for leads
+    const [leadsLoading, setLeadsLoading] = useState(true);
+    const { data: Leads, isLoading: isLeadsLoading, error: leadsError } = useSelector((state) => state.Leads.Leads);
+
     const [selectedLead, setSelectedLead] = useState(null);
 
     const subClients = useSelector((state) => state.SubClient);
@@ -59,11 +62,33 @@ const AddEstimates = ({ onClose }) => {
 
     // Fetch currencies
     useEffect(() => {
-        dispatch(getcurren());
+        const fetchCurrencies = async () => {
+            try {
+                await dispatch(getcurren()).unwrap();
+            } catch (error) {
+                console.error('Failed to fetch currencies:', error);
+                message.error('Failed to load currencies');
+            }
+        };
+
+        fetchCurrencies();
     }, [dispatch]);
 
+    // Modify the useEffect to handle loading and errors
     useEffect(() => {
-        dispatch(GetLeads());
+        const fetchLeads = async () => {
+            try {
+                setLeadsLoading(true);
+                await dispatch(GetLeads()).unwrap();
+            } catch (error) {
+                console.error('Failed to fetch leads:', error);
+                message.error('Failed to load leads');
+            } finally {
+                setLeadsLoading(false);
+            }
+        };
+
+        fetchLeads();
     }, [dispatch]);
 
     const initialValues = {
@@ -137,8 +162,6 @@ const AddEstimates = ({ onClose }) => {
             setLoading(false);
         }
     };
-
-
 
     const [rows, setRows] = useState([
         {
@@ -303,30 +326,31 @@ const AddEstimates = ({ onClose }) => {
                                             name="lead"
                                             label="Lead Title"
                                             rules={[
-                                                { 
-                                                    required: true, 
-                                                    message: "Please select a Lead Title" 
+                                                {
+                                                    required: true,
+                                                    message: "Please select a Lead Title"
                                                 }
                                             ]}
                                         >
                                             <Select
                                                 className="w-full"
                                                 placeholder="Select Lead Title"
+                                                loading={leadsLoading}
                                                 onChange={(value) => {
                                                     if (value) {
                                                         const selectedLead = Leads?.find(
                                                             (lead) => lead.id === value
                                                         );
                                                         setSelectedLead(selectedLead);
-                                                        form.setFieldsValue({ 
-                                                            lead: value  // Set the form field value
+                                                        form.setFieldsValue({
+                                                            lead: value
                                                         });
                                                     }
                                                 }}
                                             >
                                                 {Array.isArray(Leads) && Leads.map((lead) => (
-                                                    <Option 
-                                                        key={lead.id} 
+                                                    <Option
+                                                        key={lead.id}
                                                         value={lead.id}
                                                     >
                                                         {lead.leadTitle}
@@ -364,21 +388,25 @@ const AddEstimates = ({ onClose }) => {
                                         <Form.Item
                                             name="currency"
                                             label="Currency"
-                                            rules={[{ required: true, message: "Please select a currency" }]}
+                                            rules={[
+                                                { required: true, message: "Please select a currency" },
+                                            ]}
                                         >
                                             <Select
                                                 className="w-full mt-2"
                                                 placeholder="Select Currency"
                                                 onChange={(value) => {
-                                                    const selectedCurrency = currencies.find(c => c.id === value);
-                                                    form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
+                                                    const selectedCurrency = currencies.find(
+                                                        (c) => c.id === value
+                                                    );
+                                                    form.setFieldValue(
+                                                        "currency",
+                                                        selectedCurrency?.currencyCode || ""
+                                                    );
                                                 }}
                                             >
-                                                {currencies?.map((currency) => (
-                                                    <Option
-                                                        key={currency.id}
-                                                        value={currency.id}
-                                                    >
+                                                {currencies?.data?.map((currency) => (
+                                                    <Option key={currency.id} value={currency.id}>
                                                         {currency.currencyCode}
                                                     </Option>
                                                 ))}

@@ -206,10 +206,16 @@ const MeetingList = () => {
     },
 
     {
-      title: 'Meeting Date',
-      dataIndex: 'date',
-      sorter: (a, b) => dayjs(a.startdate).unix() - dayjs(b.startdate).unix(),
+      title: "Meeting Date",
+      dataIndex: "date",
+      render: (_, record) => (
+        <span>
+          {record.date ? dayjs(record.date).format('DD-MM-YYYY') : ''}
+        </span>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "date"),
     },
+
 
     {
       title: 'Meeting Time',

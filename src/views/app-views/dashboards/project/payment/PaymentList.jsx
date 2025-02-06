@@ -192,13 +192,14 @@ const PaymentList = () => {
   const tableColumns = [
     {
       title: "Project",
-      dataIndex: "project_name",
-      render: (_, record) => getProjectName(record.project_name),
+      dataIndex: "project",
+      render: (_, record) => getProjectName(record.project),
       sorter: (a, b) => {
-        const nameA = getProjectName(a.project_name);
-        const nameB = getProjectName(b.project_name);
+        const nameA = getProjectName(a.project);
+        const nameB = getProjectName(b.project);
         return nameA.localeCompare(nameB);
       },
+
     },
     {
       title: "Invoice",
@@ -213,8 +214,10 @@ const PaymentList = () => {
     {
       title: "Order",
       dataIndex: "paidOn",
-      sorter: (a, b) => utils.antdTableSorter(a, b, "paidOn"),
+      render: (date) => dayjs(date).format("DD/MM/YYYY"),
+      sorter: (a, b) => new Date(a.paidOn) - new Date(b.paidOn),
     },
+
     {
       title: "Amount",
       dataIndex: "amount",
@@ -230,14 +233,14 @@ const PaymentList = () => {
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "amount"),
     },
-    {
-      title: "Paid On",
-      dataIndex: "paidOn",
-      render: (_, record) => (
-        <span>{dayjs.unix(record.paidOn).format(DATE_FORMAT_DD_MM_YYYY)}</span>
-      ),
-      sorter: (a, b) => utils.antdTableSorter(a, b, "paidOn"),
-    },
+    // {
+    //   title: "Paid On",
+    //   dataIndex: "paidOn",
+    //   render: (_, record) => (
+    //     <span>{dayjs.unix(record.paidOn).format(DATE_FORMAT_DD_MM_YYYY)}</span>
+    //   ),
+    //   sorter: (a, b) => utils.antdTableSorter(a, b, "paidOn"),
+    // },
     {
       title: "Payment Gateway",
       dataIndex: "paymentMethod",

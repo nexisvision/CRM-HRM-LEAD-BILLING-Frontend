@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Input, Button, Select, Radio, message, Row, Col } from "antd";
+import { Input, Button, Select, Radio, message, Row, Col, Upload } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import ReactQuill from "react-quill";
@@ -10,6 +10,7 @@ import {
 } from "./JobapplicationReducer/JobapplicationSlice";
 import { GetJobdata } from "../JobReducer/JobSlice";
 import { getallcountries } from "../../../setting/countries/countriesreducer/countriesSlice";
+import { UploadOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 const AddJobApplication = ({ onClose }) => {
@@ -54,6 +55,7 @@ const AddJobApplication = ({ onClose }) => {
     status: "",
     applied_source: "",
     cover_letter: "",
+    cv: null,
   };
   const validationSchema = Yup.object({
     job: Yup.string().required("Please select a job."),
@@ -62,7 +64,6 @@ const AddJobApplication = ({ onClose }) => {
       .email("Please enter a valid email address.")
       .required("Please enter an email."),
     phone: Yup.string()
-      .matches(/^\d{10}$/, "Phone number must be 10 digits.")
       .required("Please enter a phone number."),
     location: Yup.string().required("Please enter a location."),
     total_experience: Yup.string().required(
@@ -75,6 +76,7 @@ const AddJobApplication = ({ onClose }) => {
     status: Yup.string().required("Please select a status."),
     applied_source: Yup.string().required("Please enter the applied source."),
     cover_letter: Yup.string().required("Please enter a cover letter."),
+    // cv: Yup.mixed().required("Please upload a CV."),
   });
   return (
     <div>
@@ -156,35 +158,36 @@ const AddJobApplication = ({ onClose }) => {
               </Col>
               {/* Phone */}
               <Col span={12} className="mt-2">
-                  <div className="form-item">
-                    <label className="font-semibold">Phone</label>
-                    <div className="flex">
-                      <Select
-                        style={{ width: '30%', marginRight: '8px' }}
-                        placeholder="Code"
-                        name="phone"
-                        onChange={(value) => setFieldValue('phone', value)}
-                      >
-                        {countries.map((country) => (
-                          <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
-                          </Option>
-                        ))}
-                      </Select>
-                      <Field
-                        name="phone"
-                        as={Input}
-                        style={{ width: '70%' }}
-                        placeholder="Enter Phone"
-                      />
-                    </div>
-                    <ErrorMessage
+                <div className="form-item">
+                  <label className="font-semibold">Phone</label>
+                  <div className="flex">
+                    <Select
+                      style={{ width: '30%', marginRight: '8px' }}
+                      placeholder="Code"
                       name="phone"
-                      component="div"
-                      className="error-message text-red-500 my-1"
+                      onChange={(value) => setFieldValue('phone', value)}
+                    >
+                      {countries.map((country) => (
+                        <Option key={country.id} value={country.phoneCode}>
+                          (+{country.phoneCode})
+                        </Option>
+                      ))}
+                    </Select>
+                    <Field
+                      name="phone"
+                      as={Input}
+                      type="number"
+                      style={{ width: '70%' }}
+                      placeholder="Enter Phone"
                     />
                   </div>
-                </Col>
+                  <ErrorMessage
+                    name="phone"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
               {/* Location */}
               <Col span={12}>
                 <div className="form-item mt-2">
@@ -302,6 +305,34 @@ const AddJobApplication = ({ onClose }) => {
                   />
                 </div>
               </Col>
+              {/* CV Upload */}
+              <Col span={12}>
+                <div className="form-item mt-2">
+                  <label className="font-semibold">Upload CV</label>
+                  <Field name="cv">
+                    {({ field, form }) => (
+                      <Upload
+                        className="w-full mt-2"
+                        action="http://localhost:5500/api/users/upload-cv"
+                        accept=".pdf"
+                        maxCount={1}
+                        showUploadList={{ showRemoveIcon: true }}
+                        onChange={({ file }) => {
+                          form.setFieldValue('cv', file);
+                        }}
+                      >
+                        <Button icon={<UploadOutlined />}>Upload</Button>
+                      </Upload>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="cv"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
               {/* Cover Letter */}
               <Col span={24}>
                 <div className="form-item mt-2">
@@ -320,6 +351,7 @@ const AddJobApplication = ({ onClose }) => {
                   />
                 </div>
               </Col>
+             
             </Row>
             <div style={{ textAlign: "right", marginTop: "16px" }}>
               <Button style={{ marginRight: 8 }} onClick={onClose}>

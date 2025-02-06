@@ -121,7 +121,7 @@ const ProfileData = () => {
 				{/* <div className=""> */}
 
 				{/* Client Section */}
-				<div className="bg-white p-6 rounded-lg shadow">
+				{/* <div className="bg-white p-6 rounded-lg shadow">
                         <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <div className="bg-blue-500 px-2 pt-2 pb-0 rounded-lg ">
@@ -142,10 +142,10 @@ const ProfileData = () => {
                             <p className="text-gray-600 text-base font-semibold ">40</p>
                         </div>
                         </div>
-                    </div>
+                    </div> */}
 
 
-					<div className="bg-white p-6 rounded-lg shadow">
+					{/* <div className="bg-white p-6 rounded-lg shadow">
                         <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <div className="bg-blue-500 px-2 pt-2 pb-0 rounded-lg ">
@@ -167,8 +167,81 @@ const ProfileData = () => {
                             <p className="text-gray-600 text-base font-semibold ">40</p>
                         </div>
                         </div>
+                    </div> */}
+					 <div className="bg-white p-6 rounded-lg shadow">
+                        <h3 className="text-gray-600 mb-2 text-lg font-semibold ">
+                        Total Projects
+                        </h3>
+                        <span className="flex justify-end mb-2">
+                            {" "}
+                            <IoLayers  className="text-gray-500 text-2xl" />
+                        </span>
+                        <p className="text-xl font-medium md:text-base text-blue-500">
+                        2
+                        </p>
+                    </div>
+                    <div className="bg-white p-6 rounded-lg shadow">
+                        <h3 className="text-gray-600 mb-2 text-lg font-semibold">
+                        Total Earnings
+                        </h3>
+                        <span className="flex justify-end">
+                            {" "}
+                            <IoLayers className="text-gray-500 text-2xl mb-2" />
+                        </span>
+                        <p className="text-xl font-medium md:text-base text-blue-500">
+                        67991
+                        </p>
                     </div>
 					<div className="bg-white p-6 rounded-lg shadow">
+                        <h3 className="text-gray-600 mb-2 text-lg font-semibold ">
+                        Total Task
+                        </h3>
+                        <span className="flex justify-end mb-2">
+                            {" "}
+                            <IoLayers  className="text-gray-500 text-2xl" />
+                        </span>
+                        <p className="text-xl font-medium md:text-base text-blue-500">
+                        2
+                        </p>
+                    </div>
+					<div className="bg-white p-6 rounded-lg shadow">
+                        <h3 className="text-gray-600 mb-2 text-lg font-semibold ">
+                        Total Lead
+                        </h3>
+                        <span className="flex justify-end mb-2">
+                            {" "}
+                            <IoLayers  className="text-gray-500 text-2xl" />
+                        </span>
+                        <p className="text-xl font-medium md:text-base text-blue-500">
+                        2
+                        </p>
+                    </div>
+                    <div className="bg-white p-6 rounded-lg shadow">
+                        <h3 className="text-gray-600 mb-2 text-lg font-semibold">
+                        Total Deal
+                        </h3>
+                        <span className="flex justify-end">
+                            {" "}
+                            <IoLayers className="text-gray-500 text-2xl mb-2" />
+                        </span>
+                        <p className="text-xl font-medium md:text-base text-blue-500">
+                        67991
+                        </p>
+                    </div>
+					<div className="bg-white p-6 rounded-lg shadow">
+                        <h3 className="text-gray-600 mb-2 text-lg font-semibold ">
+                        Total Contract
+                        </h3>
+                        <span className="flex justify-end mb-2">
+                            {" "}
+                            <IoLayers  className="text-gray-500 text-2xl" />
+                        </span>
+                        <p className="text-xl font-medium md:text-base text-blue-500">
+                        2
+                        </p>
+                    </div>
+                   
+					{/* <div className="bg-white p-6 rounded-lg shadow">
                         <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <div className="bg-blue-500 px-2 pt-2 pb-0 rounded-lg ">
@@ -190,7 +263,7 @@ const ProfileData = () => {
                             <p className="text-gray-600 text-base font-semibold ">40</p>
                         </div>
                         </div>
-                    </div>
+                    </div> */}
 			</div>
 			<div className="container mx-auto p-4 bg-white  rounded-lg shadow">
 				<h1 className="text-2xl font-bold mb-4">My Tasks</h1>

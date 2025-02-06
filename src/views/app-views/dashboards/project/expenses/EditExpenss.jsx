@@ -28,13 +28,13 @@ const EditExpenses = ({ idd, onClose }) => {
   const Expensedata = allempdata?.Expense?.data || [];
 
   const { data: employee } = useSelector((state) => state.employee.employee);
-  const {  currencies } = useSelector((state) => state.currencies.currencies);
+  const { currencies } = useSelector((state) => state.currencies);
 
   // const currencies = useSelector((state) => state.currencies.currencies);
 
-    useEffect(() => {
-        dispatch(getcurren());
-    }, [dispatch]);
+  useEffect(() => {
+    dispatch(getcurren());
+  }, [dispatch]);
 
   const [initialValues, setInitialValues] = useState({
     item: "",
@@ -60,7 +60,7 @@ const EditExpenses = ({ idd, onClose }) => {
 
   useEffect(() => {
     dispatch(empdata());
-}, [dispatch]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (Expensedata.length > 0 && idd) {
@@ -147,31 +147,37 @@ const EditExpenses = ({ idd, onClose }) => {
               </Col>
               <Col span={8}>
                 <div className="form-item">
-                  <label className='font-semibold mb-2'>Currency</label>
-                  <div className="flex gap-2">
-                    <Field name="currency">
-                      {({ field, form }) => (
-                        <Select
-                          {...field}
-                          className="w-full"
-                          placeholder="Select Currency"
-                          onChange={(value) => {
-                            const selectedCurrency = currencies.find(c => c.id === value);
-                            form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
-                          }}
-                        >
-                          {currencies?.map((currency) => (
-                            <Option
-                              key={currency.id}
-                              value={currency.id}
-                            >
-                              {currency.currencyCode}
-                            </Option>
-                          ))}
-                        </Select>
-                      )}
-                    </Field>
-                  </div>
+                  <label className="font-semibold">Currency</label>
+                  <Field name="currency">
+                    {({ field, form }) => (
+                      <Select
+                        {...field}
+                        placeholder="Select Currency"
+                        className="w-full"
+                        onChange={(value) => {
+                          const selectedCurrency = currencies?.data?.find(
+                            (c) => c.id === value
+                          );
+                          form.setFieldValue(
+                            "currency",
+                            selectedCurrency?.currencyCode || ""
+                          );
+                        }}
+                        value={form.values.currency}
+                        onBlur={() => form.setFieldTouched("currency", true)}
+                        allowClear={false}
+                      >
+                        {Array.isArray(currencies?.data) && currencies?.data?.map((currency) => (
+                          <Option
+                            key={currency.id}
+                            value={currency.id}
+                          >
+                            {currency.currencyCode}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
                   <ErrorMessage
                     name="currency"
                     component="div"
@@ -213,42 +219,42 @@ const EditExpenses = ({ idd, onClose }) => {
                 </div>
               </Col>
               <Col span={8} className="mt-2">
-                                <div className="form-item">
-                                    <label className="font-semibold mb-2">Employee</label>
-                                    <div className="flex gap-2">
-                                        <Field name="employee">
-                                            {({ field, form }) => (
-                                                <Select
-                                                    {...field}
-                                                    className="w-full mt-2"
-                                                    placeholder="Select Employee"
-                                                    onChange={(value) => {
-                                                        const selectedEmployee =
-                                                            Array.isArray(employee) &&
-                                                            employee.find((e) => e.id === value);
-                                                        form.setFieldValue(
-                                                            "employee",
-                                                            selectedEmployee?.username || ""
-                                                        );
-                                                    }}
-                                                >
-                                                    {Array.isArray(employee) &&
-                                                        employee.map((emp) => (
-                                                            <Option key={emp.id} value={emp.id}>
-                                                                {emp.username}
-                                                            </Option>
-                                                        ))}
-                                                </Select>
-                                            )}
-                                        </Field>
-                                    </div>
-                                    <ErrorMessage
-                                        name="employee"
-                                        component="div"
-                                        className="error-message text-red-500 my-1"
-                                    />
-                                </div>
-                            </Col>
+                <div className="form-item">
+                  <label className="font-semibold mb-2">Employee</label>
+                  <div className="flex gap-2">
+                    <Field name="employee">
+                      {({ field, form }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-2"
+                          placeholder="Select Employee"
+                          onChange={(value) => {
+                            const selectedEmployee =
+                              Array.isArray(employee) &&
+                              employee.find((e) => e.id === value);
+                            form.setFieldValue(
+                              "employee",
+                              selectedEmployee?.username || ""
+                            );
+                          }}
+                        >
+                          {Array.isArray(employee) &&
+                            employee.map((emp) => (
+                              <Option key={emp.id} value={emp.id}>
+                                {emp.username}
+                              </Option>
+                            ))}
+                        </Select>
+                      )}
+                    </Field>
+                  </div>
+                  <ErrorMessage
+                    name="employee"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
               <Col span={8} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Project</label>
@@ -265,10 +271,10 @@ const EditExpenses = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-               <Col span={8} className="mt-2">
-                 <div className="form-item">
-                   <label className="font-semibold">PurchasedFrom</label>
-                   <Field
+              <Col span={8} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">PurchasedFrom</label>
+                  <Field
                     name="PurchasedFrom"
                     as={Input}
                     placeholder="Enter PurchasedFrom"

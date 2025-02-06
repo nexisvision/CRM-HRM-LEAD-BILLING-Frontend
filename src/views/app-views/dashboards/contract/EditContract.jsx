@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { ContaractData, Editcon } from "./ContractReducers/ContractSlice";
 import { useDispatch } from "react-redux";
 import moment from "moment";
+import { getcurren } from "../../setting/currencies/currenciesSlice/currenciesSlice";
 import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
 
 const { Option } = Select;
@@ -21,10 +22,15 @@ const EditContract = ({ id, onClose }) => {
   const dispatch = useDispatch();
 
   const countries = useSelector((state) => state.countries.countries);
+  const { currencies } = useSelector((state) => state.currencies);
 
   useEffect(() => {
     dispatch(getallcountries());
   }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getcurren());
+  }, []);
 
   const [initialValues, setInitialValues] = useState({
     subject: "",
@@ -37,6 +43,14 @@ const EditContract = ({ id, onClose }) => {
     description: "",
     phone: "",
     phoneCode: "",
+    contract_number: "",
+    currency: "",
+    address: "",
+    city: "",
+    country: "",
+    state: "",
+    zipcode: "",
+    notes: "",
     // options: [],
   });
   const validationSchema = Yup.object({
@@ -46,12 +60,20 @@ const EditContract = ({ id, onClose }) => {
     type: Yup.string().optional("Please enter Contract Value ."),
     startDate: Yup.date().nullable().optional("Start date is required."),
     endDate: Yup.date().nullable().optional("End date is required."),
+    contract_number: Yup.string().optional("Please enter a Contract Number."),
     value: Yup.number()
       .optional("Please Select a contractvalue.")
       .positive("Contract Value must be positive."),
     description: Yup.string().optional("Please enter a Description."),
     phone: Yup.string().optional("Please enter a Phone Number."),
     phoneCode: Yup.string().optional("Please select Country Code."),
+    currency: Yup.string().optional("Please select Currency."),
+    address: Yup.string().optional("Please enter a Address."),
+    city: Yup.string().optional("Please enter a City."),
+    country: Yup.string().optional("Please select Country."),
+    state: Yup.string().optional("Please enter a State."),
+    zipcode: Yup.string().optional("Please enter a Zip Code."),
+    notes: Yup.string().optional("Please enter a Notes."),
     // options: Yup.array().min(1, 'Please select at least one option.'),
   });
 
@@ -105,9 +127,19 @@ const EditContract = ({ id, onClose }) => {
         description: filcon.description || "",
         phone: filcon.phone || "",
         phoneCode: filcon.phoneCode || "",
+        contract_number: filcon.contract_number || "",
+        currency: filcon.currency || "",
+        address: filcon.address || "",
+        city: filcon.city || "",
+        country: filcon.country || "",
+
+        state: filcon.state || "",
+        zipcode: filcon.zipcode || "",
+        notes: filcon.notes || "",
       });
     }
   }, [id, filcon0]);
+
 
   return (
     <div className="add-job-form">
@@ -122,7 +154,7 @@ const EditContract = ({ id, onClose }) => {
             <h2 className="mb-4 border-b pb-2 font-medium"></h2>
 
             <Row gutter={16}>
-              <Col span={24}>
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Subject</label>
                   <Field
@@ -139,7 +171,23 @@ const EditContract = ({ id, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">Contract Number</label>
+                  <Field
+                    name="contract_number"
+                    as={Input}
+                    placeholder="Enter Contract Number"
+                  />
+                  <ErrorMessage
+                    name="contract_number"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Phone</label>
                   <div className="flex">
@@ -170,6 +218,92 @@ const EditContract = ({ id, onClose }) => {
                   </div>
                   <ErrorMessage
                     name="phone"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={24} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Address</label>
+                    <Field name="billing_address" as={Input} placeholder="Enter Address" />
+                    <ErrorMessage
+                      name="billing_address"
+
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={12} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">City</label>
+                  <Field
+                    name="city"
+                    as={Input}
+                    placeholder="Enter City Name"
+                  />
+                  <ErrorMessage
+                    name="city"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">Country</label>
+                  <Select
+                    className="w-full"
+                    placeholder="Select Country"
+                    name="country"
+                    onChange={(value) => setFieldValue('country', value)}
+                    value={values.country}
+                  >
+                    {countries.map((country) => (
+                      <Option key={country.id} value={country.countryName}>
+                        {country.countryName}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage
+                    name="country"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">State</label>
+                  <Field
+                    name="state"
+                    as={Input}
+                    placeholder="Enter State Name"
+                  />
+                  <ErrorMessage
+                    name="state"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">Zip Code</label>
+                  <Field
+                    name="zipcode"
+                    as={Input}
+                    placeholder="Enter Zip Code"
+                  />
+
+                  <ErrorMessage
+                    name="zipcode"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -207,6 +341,47 @@ const EditContract = ({ id, onClose }) => {
 
                   <ErrorMessage
                     name="client"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">Currency</label>
+                  <div className="flex gap-2">
+                    <Field name="currency">
+                      {({ field, form }) => (
+                        <Select
+                          {...field}
+                          className="w-full"
+                          placeholder="Select Currency"
+
+                          onChange={(value) => {
+                            const selectedCurrency = Array.isArray(currencies?.data) && 
+                              currencies?.data?.find((c) => c.id === value);
+                            form.setFieldValue(
+                              "currency",
+                              selectedCurrency?.currencyCode || ""
+                            );
+                          }}
+                        >
+                          {Array.isArray(currencies?.data) && currencies?.data?.length > 0 ? (
+                            currencies.data.map((currency) => (
+                              <Option key={currency.id} value={currency.id}>
+                                {currency.currencyCode}
+                              </Option>
+                            ))
+                          ) : (
+                            <Option value="" disabled>No Currencies Available</Option>
+                          )}
+                        </Select>
+                      )}
+                    </Field>
+                  </div>
+                  <ErrorMessage
+                    name="currency"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -328,11 +503,12 @@ const EditContract = ({ id, onClose }) => {
 
               <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Job Description</label>
+                  <label className="font-semibold">Description</label>
                   <ReactQuill
                     value={values.description}
                     onChange={(value) => setFieldValue("description", value)}
-                    placeholder="Enter Job Description"
+                    placeholder="Enter Description"
+
                   />
                   <ErrorMessage
                     name="description"
@@ -342,7 +518,28 @@ const EditContract = ({ id, onClose }) => {
                 </div>
               </Col>
 
-             
+              <Col span={24} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Notes</label>
+                    <Field name="notes">
+                      {({ field }) => (
+                        <ReactQuill
+                          {...field}
+                          value={values.notes}
+                          onChange={(value) =>
+                            setFieldValue("notes", value)
+                          }
+                        />
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="notes"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
             </Row>
 
             <div className="form-buttons text-right mt-4">
@@ -350,7 +547,7 @@ const EditContract = ({ id, onClose }) => {
                 Cancel
               </Button>
               <Button type="primary" htmlType="submit">
-                Create
+                Update
               </Button>
             </div>
           </Form>

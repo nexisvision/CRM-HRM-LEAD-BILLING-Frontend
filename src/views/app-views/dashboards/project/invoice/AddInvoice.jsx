@@ -211,26 +211,26 @@ const sub = subClients?.SubClient?.data;
 
     // Function to handle adding a new row
     const handleAddRow = () => {
-        setRows([
-            ...rows,
+        setTableData([
+            ...tableData,
             {
                 id: Date.now(),
                 item: "",
-                quantity: "",
+                quantity: 1,
                 price: "",
-                discount: "",
-                tax: "",
+                tax: 0,
                 amount: "0",
                 description: "",
-                isNew: true,
-            },
+            }
         ]);
     };
 
     // Delete row
     const handleDeleteRow = (id) => {
-        if (rows.length > 1) {
-            setRows(rows.filter(row => row.id !== id));
+        if (tableData.length > 1) {
+            const updatedTableData = tableData.filter(row => row.id !== id);
+            setTableData(updatedTableData);
+            calculateTotal(updatedTableData, discountRate); // Recalculate totals after deletion
         } else {
             message.warning('At least one item is required');
         }
@@ -247,7 +247,7 @@ const sub = subClients?.SubClient?.data;
         }
         return parseFloat(discountValue) || 0;
     };
-
+    
     // Calculate total tax
     const calculateTotalTax = () => {
         const subTotal = calculateSubTotal();

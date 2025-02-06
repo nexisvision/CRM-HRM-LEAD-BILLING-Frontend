@@ -425,7 +425,7 @@ const JobApplicationList = () => {
       </Modal>
 
       <Modal
-        title="Add Job Application"
+        title="Edit Job Application"
         visible={isAddJobAEditlicationModalVisible}
         onCancel={closeEditJobApplicationModal}
         footer={null}

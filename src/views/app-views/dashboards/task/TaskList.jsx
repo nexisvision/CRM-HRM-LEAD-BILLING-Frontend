@@ -281,13 +281,13 @@ const TaskList = () => {
       },
     },
     {
-    title: "Description",
-    dataIndex: "description",
-    render: (text) => (
-      <div dangerouslySetInnerHTML={{ __html: text }} />
-    ),
-    sorter: (a, b) => a.description.length - b.description.length,
-  },
+      title: "Description",
+      dataIndex: "description",
+      render: (text) => (
+        <div dangerouslySetInnerHTML={{ __html: text }} />
+      ),
+      sorter: (a, b) => a.description.length - b.description.length,
+    },
     {
       title: "priority",
       dataIndex: "priority",

@@ -69,8 +69,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
         }
     }, [invoiceData]);
 
-
-
     //error handleing
     useEffect(() => {
         if (error) {
@@ -285,8 +283,8 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 />
                                 <Table.Column
                                     title="Product"
-                                    dataIndex="product"
-                                    key="product"
+                                    dataIndex="item"
+                                    key="item"
                                     render={(text) => (
                                         <div dangerouslySetInnerHTML={{ __html: text }} />
                                     )}
@@ -488,8 +486,8 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                         />
                         <Table.Column
                             title="Product"
-                            dataIndex="product"
-                            key="product"
+                            dataIndex="item"
+                            key="item"
                             render={(text) => (
                                 <div dangerouslySetInnerHTML={{ __html: text }} />
                             )}
@@ -690,8 +688,8 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 />
                                 <Table.Column
                                     title="Product"
-                                    dataIndex="product"
-                                    key="product"
+                                    dataIndex="item"
+                                    key="item"
                                     render={(text) => (
                                         <div dangerouslySetInnerHTML={{ __html: text }} />
                                     )}
@@ -890,11 +888,12 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 />
                                 <Table.Column
                                     title="Product"
-                                    dataIndex="product"
-                                    key="product"
+                                    dataIndex="item"
+                                    key="item"
                                     render={(text) => (
                                         <div dangerouslySetInnerHTML={{ __html: text }} />
                                     )}
+
                                 />
                                 <Table.Column
                                     title="Quantity"
