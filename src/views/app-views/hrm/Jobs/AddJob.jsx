@@ -27,6 +27,7 @@ import { AddJobs, GetJobdata } from "./JobReducer/JobSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { getInterview } from "./Interview/interviewReducer/interviewSlice";
 
+
 const { Option } = Select;
 
 const AddJob = ({ onClose }) => {
@@ -336,9 +337,6 @@ const AddJob = ({ onClose }) => {
                 </div>
               </Col>
 
-              
-
-
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Start Date </label>
@@ -357,7 +355,7 @@ const AddJob = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={8} className="mt-2">
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">End Date</label>
 
@@ -376,64 +374,47 @@ const AddJob = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={8} className="mt-2">
+              <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Recuiter</label>
-                  <Field name="recruiter">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        placeholder="Select recruiter"
-                        className="w-full mt-2"
-                        onChange={(value) => setFieldValue("recruiter", value)}
-                        value={values.recruiter}
-                        onBlur={() => setFieldTouched("recruiter", true)}
-                        allowClear={false}
-                      >
-                        <Option value="xyz">XYZ</Option>
-                        <Option value="abc">ABC</Option>
-                      </Select>
-                    )}
-                  </Field>
+                  <label className="font-semibold">Recruiter</label>
+                  <Field
+                    className="mt-2"
+                    name="recruiter"
+                    as={Input}
+                    placeholder="Enter recruiter"
+
+
+                  />
                   <ErrorMessage
                     name="recruiter"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Job Type</label>
+                  <Field
+
+                    className="mt-2"
+                    name="jobType"
+                    as={Input}
+                    placeholder="Enter job type"
+
+                  />
+                  <ErrorMessage
+                    name="jobType"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
                 </div>
               </Col>
 
-              <Col span={8} className="mt-2">
-                <div className="w-full">
-                  <div className="form-item">
-                    <label className="font-semibold">Job Types</label>
-                    <Field name="jobType">
-                      {({ field }) => (
-                        <Select
-                          {...field}
-                          placeholder="Select jobType"
-                          className="w-full mt-2"
-                          onChange={(value) => setFieldValue("jobType", value)}
-                          value={values.jobTypes}
-                          onBlur={() => setFieldTouched("jobType", true)}
-                          allowClear={false}
-                        >
-                          <Option value="xyz">XYZ</Option>
-                          <Option value="abc">ABC</Option>
-                        </Select>
-                      )}
-                    </Field>
-                    <ErrorMessage
-                      name="jon types"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </div>
-              </Col>
-
-              <Col span={8} className="mt-2">
-                <div className="mt-4 w-full">
+              <Col span={12} className="mt-2">
+                <div className=" w-full">
                   <div className="form-item">
                     <label className="font-semibold">Work Experence</label>
                     <Field
@@ -451,39 +432,45 @@ const AddJob = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={8} className="mt-2">
-                <div className="mt-4 w-full">
-                  <div className="form-item">
-                    <label className="font-semibold">Curreney</label>
-                    <Field name="currency">
-                      {({ field }) => (
-                        <Select
-                          {...field}
-                          placeholder="Select currency"
-                          className="w-full mt-2"
-                          onChange={(value) => setFieldValue("currency", value)}
-                          value={values.currency}
-                          onBlur={() => setFieldTouched("currency", true)}
-                          allowClear={false}
-                        >
-                          <Option value="xyz">XYZ</Option>
-                          <Option value="abc">ABC</Option>
-                        </Select>
-                      )}
-                    </Field>
-                    <ErrorMessage
-                      name="currency"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </div>
-              </Col>
+              <Col span={12} className="mt-2">
+                    <div className="form-item">
+                      <label className="font-semibold mb-2">Currency</label>
+                      <div className="flex gap-2">
+                        <Field name="currency">
+                          {({ field, form }) => (
+                            <Select
+                              {...field}
+                              className="w-full mt-2"
+                              placeholder="Select Currency"
+                              onChange={(value) => {
+                                const selectedCurrency = currencies?.data?.find(
+                                  (c) => c.id === value
+                                );
+                                form.setFieldValue(
+                                  "currency",
+                                  selectedCurrency?.currencyCode || ""
+                                );
+                              }}
+                            >
+                              {currencies?.data?.map((currency) => (
+                                <Option key={currency.id} value={currency.id}>
+                                  {currency.currencyCode}
+                                </Option>
+                              ))}
+                            </Select>
+                          )}
+                        </Field>
+                      </div>
+                      <ErrorMessage
+                        name="currency"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
 
-
-
-              <div className="mt-2 w-full">
-                <Col span={24} className="mt-2">
+             
+                <Col span={12} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">Status</label>
                     <Field name="status">
@@ -532,16 +519,17 @@ const AddJob = ({ onClose }) => {
                     />
                   </div>
                 </Col>
-              </div>
 
-              <div className="mt-2 w-full">
-                <Col span={24} className="mt-2">
+
+                <Col span={12} className="mt-2">
                   <div className="form-item">
                     <label className="font-semibold">Expect Salary</label>
                     <Field
                       className="mt-2"
                       name="expectedSalary"
                       as={Input}
+                      type="number"
+                      min="0"
                       placeholder="Enter expectedSalary"
                     />
                     <ErrorMessage
@@ -551,7 +539,6 @@ const AddJob = ({ onClose }) => {
                     />
                   </div>
                 </Col>
-              </div>
               <div className="mt-2 w-full">
                 <Col span={24} className="mt-2">
                   <div className="form-item">

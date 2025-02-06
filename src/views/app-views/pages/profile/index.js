@@ -1,188 +1,248 @@
-import React, { Component } from 'react'
-import { Row, Col, Card, Avatar, Button } from 'antd';
-import { Icon } from 'components/util-components/Icon'
-import { employementList, interestedList, connectionList, groupList } from './profileData';
-import { 
-	GlobalOutlined,
-	MailOutlined,
-	HomeOutlined,
-	PhoneOutlined
-} from '@ant-design/icons';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import PageHeaderAlt from 'components/layout-components/PageHeaderAlt'
-import Flex from 'components/shared-components/Flex'
+import React, { useState } from "react";
+import "react-circular-progressbar/dist/styles.css";
+import { TfiMenuAlt } from "react-icons/tfi";
+import { FaLayerGroup } from "react-icons/fa";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import {
+    EyeOutlined,
+    DeleteOutlined,
+    CopyOutlined,
+    EditOutlined,
+    FundProjectionScreenOutlined,
+    RiseOutlined,
+    CopyrightOutlined,
+    FormOutlined,
+  } from "@ant-design/icons";
+import { FaCoins } from "react-icons/fa";
+import { IoLayers } from "react-icons/io5";
 
-const ProfileInfo = props => (
-	<Card>
-		<Row justify="center"> 
-			<Col sm={24} md={23}>
-				<div className="d-md-flex">
-					<div className="rounded p-2 bg-white shadow-sm mx-auto" style={{'marginTop': '-3.5rem', 'maxWidth': `${props.avatarSize + 16}px`}}>
-						<Avatar shape="square" size={props.avatarSize} src="/img/avatars/thumb-15.jpg" />
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+const ProfileData = () => {
+	const [tasks, setTasks] = useState([
+		{ id: 1, task: "March Hare moved.", status: "To Do", dueDate: "Sun 06 Oct 2024" },
+		{ id: 2, task: "This seemed to be.", status: "Doing", dueDate: "Fri 28 Jun 2024" },
+		{ id: 3, task: "Mock Turtle, and.", status: "Doing", dueDate: "Fri 11 Oct 2024" },
+		{ id: 4, task: "The moment Alice.", status: "Doing", dueDate: "Wed 14 Feb 2024" },
+	]);
+	// State for managing profile data
+	const [openTasks, setOpenTasks] = useState(4);
+	const [projects, setProjects] = useState(2);
+	const [pendingTasks, setPendingTasks] = useState(4);
+	const [overdueTasks, setOverdueTasks] = useState(4);
+	const [expenses, setExpenses] = useState(0);
+	// Function to handle any updates dynamically (example)
+	// const updateProfile = () => {
+	//  setOpenTasks(openTasks + 1); // Increase open tasks dynamically
+	//  setExpenses(expenses + 50);  // Add 50 to expenses
+	// };
+	return (
+		<div className="p-4 bg-gray-50">
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-6">
+				{/* Profile Information */}
+				<div className="bg-white p-6 rounded-lg shadow flex flex-col">
+					<div className="flex items-center gap-4">
+						<img
+							src="https://i.pravatar.cc/300?u=admin@example.com"
+							alt="Client"
+							className="w-24 h-24 rounded-md object-cover"
+						/>
+						<div>
+							<h2 className="text-xl font-medium mb-1 text-black">Prof. Amya Zemlak</h2>
+							<p className="text-sm text-gray-500 mb-1">Junior</p>
+							<p className="text-sm text-gray-500">Employee Id: EMP-1</p>
+						</div>
 					</div>
-					<div className="ml-md-4 w-100">
-						<Flex alignItems="center" mobileFlex={false} className="mb-3 text-md-left text-center">
-							<h2 className="mb-0 mt-md-0 mt-2">Ella Robinson</h2>
-							<div className="ml-md-3 mt-3 mt-md-0">
-								<Button size="small" type="primary">Follow</Button>
-								<Button size="small" className="ml-2">Message</Button>
-							</div>
-						</Flex>
-						<Row gutter="16"> 
-							<Col sm={24} md={8}>
-								<p className="mt-0 mr-3 text-muted text-md-left text-center">
-									It is a long established fact that a reader will be distracted.
+					<h2 className=" border-b pb-2 font-medium"></h2>
+					<div className="flex justify-between py-3">
+						<div className="">
+							<span className="text-sm text-gray-500">Open Tasks</span>
+							<p className="text-xl font-semibold text-black  ">4</p>
+						</div>
+						<div>
+							<span className="text-sm text-gray-500">Projects</span>
+							<p className="text-xl font-semibold text-black">2</p>
+						</div>
+					</div>
+				</div>
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+					<div className="bg-white p-6 rounded-lg shadow flex flex-col">
+						<h3 className="text-gray-600 text-lg font-semibold">Tasks</h3>
+						<span className="flex justify-end mb-4">
+							<TfiMenuAlt className="text-gray-500 text-2xl" />
+						</span>
+						<div className="flex gap-8  ">
+							<div>
+								<p className="text-xl font-medium md:text-base text-blue-500">
+									4
 								</p>
-							</Col>
-							<Col xs={24} sm={24} md={8}>
-								<Row className="mb-2"> 
-									<Col xs={12} sm={12} md={9}>
-										<Icon type={MailOutlined} className="text-primary font-size-md"/>
-										<span className="text-muted ml-2">Email:</span>
-									</Col>
-									<Col xs={12} sm={12} md={15}>
-										<span className="font-weight-semibold">ellarbae@coolmail.io</span>
-									</Col>
-								</Row>
-								<Row> 
-									<Col xs={12} sm={12} md={9}>
-										<Icon type={PhoneOutlined} className="text-primary font-size-md"/>
-										<span className="text-muted ml-2">Phone:</span>
-									</Col>
-									<Col xs={12} sm={12} md={15}>
-										<span className="font-weight-semibold">+12 123 1234</span>
-									</Col>
-								</Row>
-							</Col>
-							<Col xs={24} sm={24} md={8}>
-								<Row className="mb-2 mt-2 mt-md-0 "> 
-									<Col xs={12} sm={12} md={9}>
-										<Icon type={HomeOutlined} className="text-primary font-size-md"/>
-										<span className="text-muted ml-2">Address:</span>
-									</Col>
-									<Col xs={12} sm={12} md={15}>
-										<span className="font-weight-semibold">Los Angeles, CA</span>
-									</Col>
-								</Row>
-								<Row className="mb-2"> 
-									<Col xs={12} sm={12} md={9}>
-										<Icon type={GlobalOutlined} className="text-primary font-size-md"/>
-										<span className="text-muted ml-2">Website:</span>
-									</Col>
-									<Col xs={12} sm={12} md={15}>
-										<span className="font-weight-semibold">ellarbae.io</span>
-									</Col>
-								</Row>
-							</Col>
-						</Row>
-					</div>
-				</div>
-			</Col>
-		</Row>
-	</Card>
-)
-
-const Experiences = () => (
-	<Card title="Experiences">
-		<div className="mb-3">
-			<Row>
-				<Col sm={24} md={22}>
-					{employementList.map((elm, i) => {
-						return (
-							<div className={`${i === (employementList.length - 1)? '' : 'mb-4'}`} key={`eduction-${i}`}>
-								<AvatarStatus src={elm.img} name={elm.title} subTitle={elm.duration}/>
-								<p className="pl-5 mt-2 mb-0">{elm.desc}</p>
+								<p className="f-14 mb-0 text-lightest">
+									Pending
+								</p>
 							</div>
-						)
-					})}
-				</Col>
-			</Row>
-		</div>
-	</Card>
-)
-
-const Interested = () => (
-	<Card title="Interested">
-		<Row gutter={30}>
-			<Col sm={24} md={12}>
-				{interestedList.filter((_, i) => i < 4).map((elm, i) => {
-					return (
-						<div className="mb-3" key={`interested-${i}`}>
-							<h4 className="font-weight-semibold">{elm.title}</h4>
-							<p>{elm.desc}</p>
-						</div>
-					)
-				})}
-			</Col>
-			<Col sm={24} md={12}>
-				{interestedList.filter((_, i) => i >= 4).map((elm, i) => {
-					return (
-						<div className="mb-3" key={`interested-${i}`}>
-							<h4 className="font-weight-semibold">{elm.title}</h4>
-							<p>{elm.desc}</p>
-						</div>
-					)
-				})}
-			</Col>
-		</Row>
-	</Card>
-)
-
-const Connection = () => (
-	<Card title="Connection">
-		{
-			connectionList.map((elm, i) => {
-				return (
-					<div className={`${i === (connectionList.length - 1)? '' : 'mb-4'}`} key={`connection-${i}`}>
-						<AvatarStatus src={elm.img} name={elm.name} subTitle={elm.title}/>
-					</div>
-				)
-			}) 
-		}
-	</Card>
-)
-
-const Group = () => (
-	<Card title="Group">
-		{
-			groupList.map((elm, i) => {
-				return (
-					<div className={`${i === (groupList.length - 1)? '' : 'mb-4'}`} key={`connection-${i}`}>
-						<AvatarStatus src={elm.img} name={elm.name} subTitle={elm.desc}/>
-					</div>
-				)
-			}) 
-		}
-	</Card>
-)
-
-export class Profile extends Component {
-	render() {
-		const avatarSize = 150;
-		return (
-			<>
-				<PageHeaderAlt background="/img/others/img-12.jpg" cssClass="bg-primary" overlap>
-					<div className="container text-center">
-						<div className="py-5 my-md-5">
+							<div>
+								<p className="text-xl font-medium md:text-base text-red-500">
+									4
+								</p>
+								<p className="f-14 mb-0 text-lightest">
+									Overdue
+								</p>
+							</div>
 						</div>
 					</div>
-				</PageHeaderAlt>
-				<div className="container my-4">
-					<ProfileInfo avatarSize={avatarSize} />
-					<Row gutter="16">
-						<Col xs={24} sm={24} md={8}>
-							<Connection />
-							<Group />
-						</Col>
-						<Col xs={24} sm={24} md={16}>
-							<Experiences />
-							<Interested />
-						</Col>
-					</Row> 
+					<div className="bg-white p-6 rounded-lg shadow flex flex-col">
+						<h3 className="text-gray-600 text-lg font-semibold">Project</h3>
+						<span className="flex justify-end mb-4">
+							<FaLayerGroup className="text-gray-500 text-2xl" />
+						</span>
+						<div className="flex gap-8  ">
+							<div>
+								<p className="text-xl font-medium md:text-base text-blue-500">
+									4
+								</p>
+								<p className="f-14 mb-0 text-lightest">
+									In Progress
+								</p>
+							</div>
+							<div>
+								<p className="text-xl font-medium md:text-base text-red-500">
+									4
+								</p>
+								<p className="f-14 mb-0 text-lightest">
+									Overdue
+								</p>
+							</div>
+						</div>
+					</div>
 				</div>
-			</>
-		)
-	}
-}
+			</div>
+			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
 
-export default Profile
+				{/* <div className=""> */}
+
+				{/* Client Section */}
+				<div className="bg-white p-6 rounded-lg shadow">
+                        <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="bg-blue-500 px-2 pt-2 pb-0 rounded-lg ">
+                                <RiseOutlined  className="text-white text-2xl" />
+                            </div>
+                            <div>
+                                <p className="text-gray-600 text-base  font-medium">
+                                    Total
+                                </p>
+
+                                <h3 className="text-gray-600 mb-2 text-base font-medium">
+                                    Lead
+                                </h3>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            <p className="text-gray-600 text-base font-semibold ">40</p>
+                        </div>
+                        </div>
+                    </div>
+
+
+					<div className="bg-white p-6 rounded-lg shadow">
+                        <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="bg-blue-500 px-2 pt-2 pb-0 rounded-lg ">
+                                <FundProjectionScreenOutlined  className="text-white text-2xl" />
+                            </div>
+                            <div>
+                                <p className="text-gray-600 text-base  font-medium">
+                                    Total
+                                </p>
+
+                                <h3 className="text-gray-600 mb-2 text-base font-medium">
+                                    Task
+                                </h3>
+                            </div>
+                        </div>
+
+
+                        <div className="flex items-center gap-2">
+                            <p className="text-gray-600 text-base font-semibold ">40</p>
+                        </div>
+                        </div>
+                    </div>
+					<div className="bg-white p-6 rounded-lg shadow">
+                        <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="bg-blue-500 px-2 pt-2 pb-0 rounded-lg ">
+                                <RiseOutlined  className="text-white text-2xl" />
+                            </div>
+                            <div>
+                                <p className="text-gray-600 text-base  font-medium">
+                                    Total
+                                </p>
+
+                                <h3 className="text-gray-600 mb-2 text-base font-medium">
+                                    Expense
+                                </h3>
+                            </div>
+                        </div>
+
+
+                        <div className="flex items-center gap-2">
+                            <p className="text-gray-600 text-base font-semibold ">40</p>
+                        </div>
+                        </div>
+                    </div>
+			</div>
+			<div className="container mx-auto p-4 bg-white  rounded-lg shadow">
+				<h1 className="text-2xl font-bold mb-4">My Tasks</h1>
+				<table className="w-full  ">
+					<thead>
+						<tr>
+							<th className="border-b p-2 text-center">Task#</th>
+							<th className="border-b p-2 text-center">Task</th>
+							<th className="border-b p-2 text-center">Status</th>
+							<th className="border-b p-2 text-center">Due Date</th>
+						</tr>
+					</thead>
+					<tbody>
+						{tasks.map((task) => (
+							<tr key={task.id} className="hover:bg-gray-100">
+								<td className="border-b p-2 text-center">{task.id}</td>
+								<td className="border-b p-2 text-center">{task.task}</td>
+								<td className="border-b p-2 flex items-center justify-center">
+									<span
+										className={`inline-block rounded-full w-4 h-4  ${task.status === "To Do"
+											? "bg-yellow-300 text-yellow-800"
+											: "bg-blue-300 text-blue-800"
+											}`}
+									>
+									</span>
+									<span className="ms-2">
+										{task.status}
+									</span>
+								</td>
+								<td className="border-b p-2 text-center">{task.dueDate}</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+			<div className="container mx-auto p-4 bg-white  rounded-lg shadow mt-4">
+				<h1 className="text-2xl font-bold ">Tickets</h1>
+				<div className="mt-4">
+					<table className="w-full  ">
+						<thead className="border-b">
+							<tr>
+								<th className=" p-2 text-center">Tickets#</th>
+								<th className=" p-2 text-center">Ticket Subject</th>
+								<th className=" p-2 text-center">Status</th>
+								<th className=" p-2 text-center">Requested On </th>
+							</tr>
+						</thead>
+					</table>
+					<p className="text-gray-500 text-center mt-4">- No record found. -</p>
+				</div>
+			</div>
+		</div>
+	);
+};
+export default ProfileData;

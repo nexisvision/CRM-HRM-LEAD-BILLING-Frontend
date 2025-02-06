@@ -61,16 +61,17 @@ export const protectedRoutes = [
         path: `${APP_PREFIX_PATH}/dashboards/default`,
         component: React.lazy(() => import('views/app-views/dashboards/default')),
     },
+        {
+            key: 'dashboard.analytic',
+            path: `${APP_PREFIX_PATH}/dashboards/analytic`,
+            component: React.lazy(() => import('views/app-views/dashboards/analytic')),
+        },
     {
-        key: 'dashboard.analytic',
-        path: `${APP_PREFIX_PATH}/dashboards/analytic`,
-        component: React.lazy(() => import('views/app-views/dashboards/analytic')),
+        key: 'dashboard.crm',
+        path: `${APP_PREFIX_PATH}/dashboards/crm`,
+        component: React.lazy(() => import('views/app-views/dashboards/crmDashboard')),
     },
-    {
-        key: 'dashboard.sales',
-        path: `${APP_PREFIX_PATH}/dashboards/sales`,
-        component: React.lazy(() => import('views/app-views/dashboards/sales2')),
-    },
+
     {
         key: 'dashboard.superadmindashboard',
         path: `${APP_PREFIX_PATH}/dashboards/superadmindashboard`,

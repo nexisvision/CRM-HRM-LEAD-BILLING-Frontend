@@ -160,7 +160,7 @@ const EditMilestone = ({ idd, onClose }) => {
   return (
     <div>
       <div className="ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4">
-        {/* <h2 className="border-b pb-[30px] font-medium">Edit Milestone</h2> */}
+        <h2 className="border-b pb-[30px] font-medium"></h2>
         <div className="p-2">
           <Formik
             initialValues={initialValues}
@@ -171,7 +171,7 @@ const EditMilestone = ({ idd, onClose }) => {
             {({ values, setFieldValue, setFieldTouched, isSubmitting }) => (
               <Form className="formik-form">
                 <Row gutter={16}>
-                  <Col span={12}>
+                  <Col span={12} className="mt-4">
                     <div className="form-item">
                       <label className="font-semibold mb-2">
                         Milestone Title
@@ -189,7 +189,7 @@ const EditMilestone = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12}>
+                  <Col span={12} className="mt-4">
                     <div className="form-item">
                       <label className="font-semibold mb-2">
                         Milestone Cost
@@ -261,7 +261,7 @@ const EditMilestone = ({ idd, onClose }) => {
                                         />
                                       </div>
                                     </Col>
-                  <Col span={12} className="mt-2">
+                  <Col span={12} className="mt-4">
                     <div className="form-item">
                       <label className="font-semibold mb-2">
                         Add Cost To Project Budget
@@ -287,10 +287,11 @@ const EditMilestone = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={24} className="mt-2">
+                  <Col span={24} className="mt-4">
                     <div className="form-item">
                       <label className="font-semibold">Milestone Summary</label>
                       <ReactQuill
+
                         value={values.milestone_summary}
                         onChange={(value) =>
                           setFieldValue("milestone_summary", value)
@@ -304,9 +305,10 @@ const EditMilestone = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-2">
+                  <Col span={12} className="mt-4">
                     <div className="form-item">
                       <label className="font-semibold mb-2">Start Date</label>
+
                       <DatePicker
                         className="w-full"
                         format="DD-MM-YYYY"
@@ -325,9 +327,10 @@ const EditMilestone = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-2">
+                  <Col span={12} className="mt-4">
                     <div className="form-item">
                       <label className="font-semibold mb-2">End Date</label>
+
                       <DatePicker
                         className="w-full"
                         format="DD-MM-YYYY"

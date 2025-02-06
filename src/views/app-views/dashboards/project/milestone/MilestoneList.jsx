@@ -150,8 +150,16 @@ export const MilestoneList = () => {
     }
   }, [filtermin]);
 
-  const deleetfuc = (userId) => {
-    dispatch(Deletemins(userId));
+  const deleetfuc = async (userId) => {
+    try {
+      await dispatch(Deletemins(userId)).unwrap();
+      // Update the local state immediately after successful deletion
+      setList(prevList => prevList.filter(item => item.id !== userId));
+      // message.success('Milestone deleted successfully');
+    } catch (error) {
+      // message.error('Failed to delete milestone');
+      console.error('Delete error:', error);
+    }
   };
 
   const Editfunc = (id) => {

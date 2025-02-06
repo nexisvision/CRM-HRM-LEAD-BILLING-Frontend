@@ -101,13 +101,15 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
 
   let allpermisson;
 
-  if (parsedPermissions["dashboards-TaskCalendar"] && parsedPermissions["dashboards-TaskCalendar"][0]?.permissions) {
-    allpermisson = parsedPermissions["dashboards-TaskCalendar"][0].permissions;
+  if (parsedPermissions["dashboards-Interview"] && parsedPermissions["dashboards-Interview"][0]?.permissions) {
+    allpermisson = parsedPermissions["dashboards-Interview"][0].permissions;
     console.log('Parsed Permissions:', allpermisson);
 
+
   } else {
-    console.log('dashboards-TaskCalendar is not available');
+    console.log('dashboards-Interview is not available');
   }
+
 
   const canCreateClient = allpermisson?.includes('create');
   const canEditClient = allpermisson?.includes('edit');
@@ -123,9 +125,10 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
   }, []);
 
 
-  const allTaskData = useSelector((state) => state.TaskCalander);
-  const taskData = allTaskData?.TaskCalander.data || [];
+  const allTaskData = useSelector((state) => state.Interviews);
+  const taskData = allTaskData?.Interviews.data || [];
   console.log("lplplplplpl",taskData)
+
 
   console.log("pppp", taskData)
 
@@ -138,12 +141,13 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
         taskData.map((task) => (
           <div key={task.id} className="task-card-wrapper">
             <div className="task-card mb-3" style={{ borderLeft: `4px solid ${task.color || '#007bff'}`, paddingLeft: '12px' }}>
-              <h5 className="task-card-title">{task.taskName}</h5>
+              <h5 className="task-card-title">{task.interviewer}</h5>
               <div className="task-card-time">
-                <div>{moment(task.taskDate).format('MMM DD, YYYY')}</div>
+                <div>{moment(task.startOn).format('MMM DD, YYYY')}</div>
                 <div className="text-muted">
-                  {moment(task.taskDate).format('HH:mm')} - {moment(task.taskTime, 'HH:mm').format('HH:mm')}
+                  {moment(task.startOn).format('HH:mm')} - {moment(task.startTime, 'HH:mm').format('HH:mm')}
                 </div>
+
               </div>
               <div className="task-card-actions">
                 <Tooltip title="Delete task">

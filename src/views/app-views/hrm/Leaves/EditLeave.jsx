@@ -137,7 +137,7 @@ const EditLeave = ({ editid, onClose }) => {
               </Select>
             </Form.Item>
           </Col>
-          <Col span={12}>
+          {/* <Col span={12}>
             <Form.Item
               name="startDate"
               label="Start Date"
@@ -145,16 +145,32 @@ const EditLeave = ({ editid, onClose }) => {
             >
               <DatePicker style={{ width: "100%" }} format="DD-MM-YYYY" />
             </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
+          </Col> */}
+           <Col span={12}>
+           <Form.Item
+              name="startDate"
+              rules={[{ required: true, message: "Start date is required" }]}
+            >
+                <label>Start Date</label>
+                <DatePicker
+                  className="w-full"
+                  format="DD-MM-YYYY"
+                />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+           <Form.Item
               name="endDate"
-              label="End Date"
               rules={[{ required: true, message: "End date is required" }]}
             >
-              <DatePicker style={{ width: "100%" }} format="DD-MM-YYYY" />
-            </Form.Item>
-          </Col>
+                <label className="flex items-center"><h4 className="text-red-500 h-4 w-4">*</h4>End Date</label>
+                <DatePicker
+                  className="w-full"
+                  format="DD-MM-YYYY"
+                />
+                </Form.Item>
+              </Col>
+        
           <Col span={24}>
             <Form.Item
               name="reason"

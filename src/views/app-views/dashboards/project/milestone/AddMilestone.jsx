@@ -213,7 +213,7 @@ const AddMilestone = ({ onClose }) => {
                               className="w-full mt-2"
                               placeholder="Select Currency"
                               onChange={(value) => {
-                                const selectedCurrency = currencies.find(
+                                const selectedCurrency = currencies?.data?.find(
                                   (c) => c.id === value
                                 );
                                 form.setFieldValue(
@@ -222,7 +222,7 @@ const AddMilestone = ({ onClose }) => {
                                 );
                               }}
                             >
-                              {currencies?.map((currency) => (
+                              {currencies?.data?.map((currency) => (
                                 <Option key={currency.id} value={currency.id}>
                                   {currency.currencyCode}
                                 </Option>

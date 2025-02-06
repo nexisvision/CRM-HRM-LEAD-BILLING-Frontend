@@ -506,8 +506,17 @@ const dashBoardNavTree = [{
       breadcrumb: false,
       submenu: []
     },
-  
+    {
+      key: 'dashboards-crm',
+      path: `${APP_PREFIX_PATH}/dashboards/crm`,
+      title: 'Dashboard',
+      icon: HomeOutlined ,
+      breadcrumb: false,
+      submenu: []
+
+    },
    
+
     {
             key: 'dashboards-project',
             path: `${APP_PREFIX_PATH}/dashboards/project`,
@@ -704,7 +713,15 @@ const dashBoardNavTree = [{
                 breadcrumb: true,
                 submenu: []
               },
-             
+              {
+                key: 'extra-pages-profile',
+                path: `${APP_PREFIX_PATH}/pages/profile`,
+                title: 'sidenav.pages.profile',
+                icon: FileDoneOutlined,
+                breadcrumb: true,
+                submenu: []
+              },
+
             
             ]
           },
