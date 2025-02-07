@@ -81,7 +81,7 @@ const EditPipeLine = ({ idd, onClose }) => {
 
   return (
     <div>
-      <h2 className="mb-1 border-b font-medium">Edit Pipeline</h2>
+      <h2 className="mb-1 border-b font-medium"></h2>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

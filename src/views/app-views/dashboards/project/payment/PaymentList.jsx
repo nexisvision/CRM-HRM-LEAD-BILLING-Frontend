@@ -341,12 +341,12 @@ const PaymentList = () => {
             dataSource={list}
             rowKey="id"
             scroll={{ x: 1200 }}
-            rowSelection={{
-              selectedRowKeys: selectedRowKeys,
-              type: "checkbox",
-              preserveSelectedRowKeys: false,
-              ...rowSelection,
-            }}
+            // rowSelection={{
+            //   selectedRowKeys: selectedRowKeys,
+            //   type: "checkbox",
+            //   preserveSelectedRowKeys: false,
+            //   ...rowSelection,
+            // }}
           />
         </div>
       </Card>

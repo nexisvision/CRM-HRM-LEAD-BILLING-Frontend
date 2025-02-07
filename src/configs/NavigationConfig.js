@@ -506,15 +506,15 @@ const dashBoardNavTree = [{
       breadcrumb: false,
       submenu: []
     },
-    {
-      key: 'dashboards-crm',
-      path: `${APP_PREFIX_PATH}/dashboards/crm`,
-      title: 'Dashboard',
-      icon: HomeOutlined ,
-      breadcrumb: false,
-      submenu: []
+    // {
+    //   key: 'dashboards-crm',
+    //   path: `${APP_PREFIX_PATH}/dashboards/crm`,
+    //   title: 'Dashboard',
+    //   icon: HomeOutlined ,
+    //   breadcrumb: false,
+    //   submenu: []
 
-    },
+    // },
    
 
     {

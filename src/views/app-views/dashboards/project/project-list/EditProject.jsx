@@ -20,6 +20,10 @@ import moment from "moment";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { GetTagspro, AddTags } from "./tagReducer/TagSlice";
 import { PlusOutlined } from "@ant-design/icons";
+import { GetLable, AddLable } from "../../sales/LableReducer/LableSlice";
+import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
+import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
+// import { AllLoggedData } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 
 const { Option } = Select;
 
@@ -27,37 +31,54 @@ const EditProject = ({ id, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const initialValues = {
-    project_name: "",
-    startdate: null,
-    enddate: null,
-    projectimage: "",
-    client: "",
-    budget: "",
-    estimatedmonths: "",
-    project_description: "",
-    tag: "",
-    status: "",
-  };
 
-  const validationSchema = Yup.object({
-    project_name: Yup.string().optional("Please enter a Project Name."),
-    startdate: Yup.date().nullable().optional("Start date is required."),
-    enddate: Yup.date().nullable().optional("End date is required."),
-    projectimage: Yup.mixed().optional("Please upload a Project Image."),
-    client: Yup.string().optional("Please select Client."),
-    budget: Yup.number()
-      .optional("Please enter a Project Budget.")
-      .positive("Budget must be positive."),
-    estimatedmonths: Yup.number()
-      .optional("Please enter Estimated Hours.")
-      .positive("Hours must be positive."),
-    project_description: Yup.string().optional(
-      "Please enter a Project Description."
-    ),
-    tag: Yup.string().optional("Please enter a Tag."),
-    status: Yup.string().optional("Please select Status."),
-  });
+    const allloggeduser = useSelector((state)=>state.user.loggedInUser.username)
+
+   const AllLoggedData = useSelector((state) => state.user);
+
+  const allempdata = useSelector((state) => state.Project);
+  const AllEmployee = useSelector((state) => state.employee);
+  const employeedata = AllEmployee.employee.data;
+
+  const alluserdatas = useSelector((state) => state.Users);
+  const fnadat = alluserdatas?.Users?.data;
+
+  const fnd = fnadat?.filter((item)=>item?.created_by === allloggeduser)
+
+  const fnd2 = employeedata?.filter((item)=>item?.created_by === allloggeduser)
+
+  const AllLoggeddtaa = useSelector((state) => state.user);
+
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
+
+  const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
+  const [newStatus, setNewStatus] = useState("");
+  const [statuses, setStatuses] = useState([]);
+
+  const [newCategory, setNewCategory] = useState("");
+  const [categories, setCategories] = useState([]);
+
+  const [newTag, setNewTag] = useState("");
+  const [tags, setTags] = useState([]);
+
+  const Tagsdetail = useSelector((state) => state.Tags);
+  const AllTags = Tagsdetail?.Tags?.data;
+
+  const projectdata = allempdata.Project.data;
+  const [singleEmp, setSingleEmp] = useState(null);
+
+  const Allclient = useSelector((state) => state.ClientData);
+  const clientdata = Allclient.ClientData.data;
+
+  useEffect(() => {
+    if (id && projectdata.length > 0) {
+      const project = projectdata.find((item) => item.id === id);
+      if (project) {
+        setSingleEmp(project);
+      }
+    }
+  }, [id, projectdata]);
 
   const onSubmit = (values) => {
     dispatch(Editpro({ id, values }))
@@ -71,6 +92,24 @@ const EditProject = ({ id, onClose }) => {
         console.error("Edit API error:", error);
       });
   };
+ 
+
+  useEffect(() => {
+    dispatch(GetTagspro());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(GetUsers());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(empdata());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(ClientData());
+  }, [dispatch]);
+
   useEffect(() => {
     dispatch(empdata());
   }, [dispatch]);
@@ -79,59 +118,103 @@ const EditProject = ({ id, onClose }) => {
     dispatch(GetProject());
   }, [dispatch]);
 
-    const allloggeduser = useSelector((state)=>state.user.loggedInUser.id)
-
-  const allempdata = useSelector((state) => state.Project);
-  const AllEmployee = useSelector((state) => state.employee);
-  const employeedata = AllEmployee.employee.data;
-
-  const fnd = employeedata?.filter((item)=>item?.created_by === allloggeduser)
-
-  const projectdata = allempdata.Project.data;
-  const [singleEmp, setSingleEmp] = useState(null);
 
   useEffect(() => {
-    if (id && projectdata.length > 0) {
-      const project = projectdata.find((item) => item.id === id);
-      if (project) {
-        setSingleEmp(project);
-      }
-    }
-  }, [id, projectdata]);
+    const lid = AllLoggeddtaa.loggedInUser.id;
+    GetLable(lid);
+  }, []);
 
-  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
-  const [newTag, setNewTag] = useState("");
-
-  useEffect(() => {
-    dispatch(GetTagspro());
-  }, [dispatch]);
-
-  const Tagsdetail = useSelector((state) => state.Tags);
-  const AllTags = Tagsdetail?.Tags?.data;
-
-  const handleAddNewTag = async () => {
-    if (!newTag.trim()) {
-      message.error("Please enter a tag name");
-      return;
-    }
-
+  const fetchLables = async (lableType, setter) => {
     try {
-      await dispatch(AddTags({ name: newTag }));
-      message.success("Tag added successfully");
-      setNewTag("");
-      setIsTagModalVisible(false);
-      dispatch(GetTagspro());
+      const lid = AllLoggedData.loggedInUser.id;
+      const response = await dispatch(GetLable(lid));
+      if (response.payload && response.payload.data) {
+        const filteredLables = response.payload.data
+          .filter((lable) => lable.lableType === lableType)
+
+          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+        setter(filteredLables);
+      }
     } catch (error) {
-      console.error("Failed to add tag:", error);
-      message.error("Failed to add tag");
+      console.error(`Failed to fetch ${lableType}:`, error);
+      message.error(`Failed to load ${lableType}`);
     }
   };
+
+  useEffect(() => {
+    fetchLables("tag", setTags);
+    fetchLables("category", setCategories);
+    fetchLables("status", setStatuses);
+  }, []);
+
+  const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
+    if (!newValue.trim()) {
+      message.error(`Please enter a ${lableType} name.`);
+      return;
+    }
+    try {
+      const lid = AllLoggedData.loggedInUser.id;
+      const payload = {
+        name: newValue.trim(),
+        lableType,
+      };
+      await dispatch(AddLable({ lid, payload }));
+      message.success(`${lableType} added successfully.`);
+      setter("");
+      modalSetter(false);
+
+      await fetchLables(lableType, lableType === "tag" ? setTags : lableType === "category" ? setCategories : setStatuses);
+    } catch (error) {
+      console.error(`Failed to add ${lableType}:`, error);
+      message.error(`Failed to add ${lableType}.`);
+    }
+  };
+
+  const initialValues = {
+    project_name: "",
+    project_category: "",
+    startDate: null,
+    endDate: null,
+    projectimage: "",
+    client: "",
+    user: "",
+    budget: "",
+    estimatedmonths: "",
+    estimatedhours: "",
+    project_description: "",
+    tag: "",
+    status: "",
+  };
+
+  const validationSchema = Yup.object({
+    project_name: Yup.string().required("Please enter a Project Name."),
+    project_category: Yup.string().required("Please enter a Category."),
+    startDate: Yup.date().nullable().required("Start date is required."),
+    endDate: Yup.date().nullable().required("End date is required."),
+    projectimage: Yup.mixed().optional("Please upload a Project Image."),
+    client: Yup.string().required("Please select Client."),
+    user: Yup.string().required("Please select User."),
+    budget: Yup.number()
+      .required("Please enter a Project Budget.")
+      .positive("Budget must be positive."),
+    estimatedmonths: Yup.number()
+      .required("Please enter Estimated Months.")
+      .positive("Months must be positive.")
+      .integer("Months must be a whole number"),
+    estimatedhours: Yup.number()
+      .required("Please enter Estimated Hours.")
+      .positive("Hours must be positive.")
+      .integer("Hours must be a whole number"),
+    project_description: Yup.string().required("Please enter a Project Description."),
+    tag: Yup.string().required("Please enter a Tag."),
+    status: Yup.string().required("Please select Status."),
+  });
 
   return (
     <div className="add-job-form">
       <Formik
         initialValues={singleEmp || initialValues}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         enableReinitialize
         onSubmit={onSubmit}
       >
@@ -157,6 +240,43 @@ const EditProject = ({ id, onClose }) => {
                 </div>
               </Col>
 
+              <Col span={24}>
+                <div className="form-item">
+                  <label className="font-semibold">Category</label>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new category"
+                    value={values.project_category}
+                    onChange={(value) => setFieldValue("project_category", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsCategoryModalVisible(true)}
+                          >
+                            Add New Category
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  >
+                    {categories.map((category) => (
+                      <Option key={category.id} value={category.name}>
+                        {category.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage
+                    name="project_category"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Start Date</label>
@@ -164,11 +284,11 @@ const EditProject = ({ id, onClose }) => {
                     className="w-full"
                     format="DD-MM-YYYY"
                     value={values.startDate ? moment(values.startDate) : null}
-                    onChange={(date) => setFieldValue("startdate", date)}
-                    onBlur={() => setFieldTouched("startdate", true)}
+                    onChange={(date) => setFieldValue("startDate", date)}
+                    onBlur={() => setFieldTouched("startDate", true)}
                   />
                   <ErrorMessage
-                    name="startdate"
+                    name="startDate"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -182,11 +302,11 @@ const EditProject = ({ id, onClose }) => {
                     className="w-full"
                     format="DD-MM-YYYY"
                     value={values.endDate ? moment(values.endDate) : null}
-                    onChange={(date) => setFieldValue("enddate", date)}
-                    onBlur={() => setFieldTouched("enddate", true)}
+                    onChange={(date) => setFieldValue("endDate", date)}
+                    onBlur={() => setFieldTouched("endDate", true)}
                   />
                   <ErrorMessage
-                    name="enddate"
+                    name="endDate"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -196,33 +316,62 @@ const EditProject = ({ id, onClose }) => {
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Client</label>
-                  <Field name="client">
-                    {({ field }) => (
-                      <Select
-                        style={{ width: "100%" }}
-                        placeholder="Select User"
-                        loading={!employeedata}
-                        value={values.client}
-                        onChange={(value) => setFieldValue("user", value)}
-                        onBlur={() => setFieldTouched("user", true)}
-                      >
-                        {employeedata && employeedata.length > 0 ? (
-                          employeedata.map((employee) => (
-                            <Option key={employee.id} value={employee.id}>
-                              {employee.firstName || "Unnamed User"}
-                            </Option>
-                          ))
-                        ) : (
-                          <Option value="" disabled>
-                            No Users Available
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select Client"
+                    loading={!fnd}
+                    value={values.client} // Bind value to Formik's field
+                    // value="sdfsdf"
+                    onChange={(value) => setFieldValue("client", value)} // Update Formik's field value
+                    onBlur={() => setFieldTouched("client", true)} // Set touched state
+                  >
+                    {fnd && fnd?.length > 0 ? (
+                      fnd
+                        .filter(client => client.created_by === AllLoggedData.loggedInUser.username) // Filter clients based on created_by
+                        .map((client) => (
+                          <Option key={client.id} value={client.id}>
+                            {client.firstName || client.username || "Unnamed Client"}
                           </Option>
-                        )}
-                      </Select>
+                        ))
+                    ) : (
+                      <Option value="" disabled>
+                        No Clients Available
+                      </Option>
                     )}
-                  </Field>
-
+                  </Select>
                   <ErrorMessage
                     name="client"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">User</label>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select User"
+                    loading={!fnd2}
+                    value={values.user} // Bind value to Formik's field
+                    onChange={(value) => setFieldValue("user", value)} // Update Formik's field value
+                    onBlur={() => setFieldTouched("user", true)} // Set touched state
+                  >
+                    {fnd2 && fnd2.length > 0 ? (
+                      fnd2.map((employee) => (
+                        <Option key={employee.id} value={employee.id}>
+                          {employee.username || "Unnamed User"}
+                        </Option>
+                      ))
+                    ) : (
+                      <Option value="" disabled>
+                        No Users Available
+                      </Option>
+                    )}
+                  </Select>
+                  <ErrorMessage
+                    name="user"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -248,15 +397,32 @@ const EditProject = ({ id, onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Estimated Hours</label>
+                  <label className="font-semibold">Estimated Months</label>
                   <Field
                     name="estimatedmonths"
+                    as={Input}
+                    type="number"
+                    placeholder="Enter Estimated Months"
+                  />
+                  <ErrorMessage
+                    name="estimatedmonths"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">Estimated Hours</label>
+                  <Field
+                    name="estimatedhours"
                     as={Input}
                     type="number"
                     placeholder="Enter Estimated Hours"
                   />
                   <ErrorMessage
-                    name="estimatedmonths"
+                    name="estimatedhours"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -282,77 +448,68 @@ const EditProject = ({ id, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24} className="mt-4">
+              <Col span={24}>
                 <div className="form-item">
                   <label className="font-semibold">Tag</label>
-                  <div className="flex gap-2">
-                    <Field name="tag">
-                      {({ field, form }) => (
-                        <Select
-                          {...field}
-                          className="w-full"
-                          placeholder="Select or add new tag"
-                          onChange={(value) => form.setFieldValue("tag", value)}
-                          onBlur={() => form.setFieldTouched("tag", true)}
-                          value={values.tag}
-                          dropdownRender={(menu) => (
-                            <div>
-                              {menu}
-                              <div
-                                style={{
-                                  padding: "8px",
-                                  borderTop: "1px solid #e8e8e8",
-                                }}
-                              >
-                                <Button
-                                  type="link"
-                                  icon={<PlusOutlined />}
-                                  onClick={() => setIsTagModalVisible(true)}
-                                  block
-                                >
-                                  Add New Tag
-                                </Button>
-                              </div>
-                            </div>
-                          )}
-                        >
-                          {AllTags &&
-                            AllTags.map((tag) => (
-                              <Option key={tag.id} value={tag.name}>
-                                {tag.name}
-                              </Option>
-                            ))}
-                        </Select>
-                      )}
-                    </Field>
-                  </div>
-                  <ErrorMessage
-                    name="tag"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new tag"
+                    value={values.tag}
+                    onChange={(value) => setFieldValue("tag", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsTagModalVisible(true)}
+                          >
+                            Add New Tag
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  >
+                    {tags.map((tag) => (
+                      <Option key={tag.id} value={tag.name}>
+                        {tag.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage name="tag" component="div" className="error-message text-red-500 my-1" />
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              <Col span={24}>
                 <div className="form-item">
                   <label className="font-semibold">Status</label>
-                  <Field name="status">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full"
-                        placeholder="Select Status"
-                        onChange={(value) => setFieldValue("status", value)}
-                        value={values.status}
-                        onBlur={() => setFieldTouched("status", true)}
-                      >
-                        <Option value="active">Active</Option>
-                        <Option value="inactive">Inactive</Option>
-                      </Select>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new status"
+                    value={values.status}
+                    onChange={(value) => setFieldValue("status", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsStatusModalVisible(true)}
+                          >
+                            Add New Status
+                          </Button>
+                        </div>
+                      </div>
                     )}
-                  </Field>
-
+                  >
+                    {statuses.map((status) => (
+                      <Option key={status.id} value={status.name}>
+                        {status.name}
+                      </Option>
+                    ))}
+                  </Select>
                   <ErrorMessage
                     name="status"
                     component="div"
@@ -377,15 +534,44 @@ const EditProject = ({ id, onClose }) => {
       {/* Add Tag Modal */}
       <Modal
         title="Add New Tag"
-        visible={isTagModalVisible}
+        open={isTagModalVisible}
         onCancel={() => setIsTagModalVisible(false)}
-        onOk={handleAddNewTag}
+        onOk={() => handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible)}
         okText="Add Tag"
       >
         <Input
           placeholder="Enter new tag name"
           value={newTag}
           onChange={(e) => setNewTag(e.target.value)}
+        />
+      </Modal>
+
+      <Modal
+        title="Add New Category"
+        open={isCategoryModalVisible}
+        onCancel={() => setIsCategoryModalVisible(false)}
+        onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
+        okText="Add Category"
+      >
+        <Input
+          placeholder="Enter new category name"
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value)}
+        />
+      </Modal>
+
+      {/* Add Status Modal */}
+      <Modal
+        title="Add New Status"
+        open={isStatusModalVisible}
+        onCancel={() => setIsStatusModalVisible(false)}
+        onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible)}
+        okText="Add Status"
+      >
+        <Input
+          placeholder="Enter new status name"
+          value={newStatus}
+          onChange={(e) => setNewStatus(e.target.value)}
         />
       </Modal>
     </div>

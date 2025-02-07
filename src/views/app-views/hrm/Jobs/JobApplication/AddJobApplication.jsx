@@ -55,7 +55,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
     total_experience: "",
     current_location: "",
     notice_period: "",
-    status: "",
+    status: "active",
     applied_source: "",
     cover_letter: "",
     cv: null,

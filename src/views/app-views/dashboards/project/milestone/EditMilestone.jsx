@@ -19,6 +19,8 @@ import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { Editmins, Getmins } from "./minestoneReducer/minestoneSlice";
 import { AddLable, GetLable } from "./LableReducer/LableSlice";
+import dayjs from "dayjs";
+
 const { Option } = Select;
 const EditMilestone = ({ idd, onClose }) => {
   const navigate = useNavigate();
@@ -291,7 +293,7 @@ const EditMilestone = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-4">
+                  {/* <Col span={12} className="mt-4">
                     <div className="form-item">
                       <label className="font-semibold mb-2">Start Date</label>
 
@@ -312,29 +314,42 @@ const EditMilestone = ({ idd, onClose }) => {
                         className="error-message text-red-500 my-1"
                       />
                     </div>
-                  </Col>
-                  <Col span={12} className="mt-4">
-                    <div className="form-item">
-                      <label className="font-semibold mb-2">End Date</label>
+                  </Col> */}
+                 <Col span={12} className="mt-4">
+                <label className="font-semibold">Start Date</label>
+                <DatePicker
+                  className="w-full"
+                  format="DD-MM-YYYY"
+                  value={values.milestone_start_date ? dayjs(values.milestone_start_date) : null}
+                  onChange={(startDate) =>
+                    setFieldValue("milestone_start_date", startDate)
+                  }
+                  onBlur={() => setFieldTouched("milestone_start_date", true)}
+                />
+                <ErrorMessage
+                  name="milestone_start_date"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
+              </Col>
 
-                      <DatePicker
-                        className="w-full"
-                        format="DD-MM-YYYY"
-                        value={values.milestone_end_date}
-                        onChange={(date) =>
-                          setFieldValue("milestone_end_date", date)
-                        }
-                        onBlur={() =>
-                          setFieldTouched("milestone_end_date", true)
-                        }
-                      />
-                      <ErrorMessage
-                        name="milestone_end_date"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
-                    </div>
-                  </Col>
+              <Col span={12} className="mt-4">
+                <label className="font-semibold">End Date</label>
+                <DatePicker
+                  className="w-full"
+                  format="DD-MM-YYYY"
+                  value={values.milestone_end_date ? dayjs(values.milestone_end_date) : null}
+                  onChange={(endDate) =>
+                    setFieldValue("milestone_end_date", endDate)
+                  }
+                  onBlur={() => setFieldTouched("milestone_end_date", true)}
+                />
+                <ErrorMessage
+                  name="milestone_end_date"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
+              </Col>
                 </Row>
                 <div className="form-buttons text-right py-2">
                   <Button type="default" className="mr-2" onClick={onClose}>

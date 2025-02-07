@@ -23,12 +23,18 @@ const { Option } = Select;
 
 const EditExpenses = ({ idd, onClose }) => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const dispatch = useDispatch();
   const allempdata = useSelector((state) => state.Expense);
   const Expensedata = allempdata?.Expense?.data || [];
 
+
   const { data: employee } = useSelector((state) => state.employee.employee);
   const { currencies } = useSelector((state) => state.currencies);
+
+  const allproject = useSelector((state) => state.Project);
+  const fndrewduxxdaa = allproject.Project.data;
+  const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
 
   // const currencies = useSelector((state) => state.currencies.currencies);
 
@@ -80,11 +86,12 @@ const EditExpenses = ({ idd, onClose }) => {
           price: expdata.price ? expdata.price.toString() : "", // Convert to string for input
           purchase_date: purchaseDate,
           employee: expdata.employee || "",
-          project: expdata.project || "",
+          project: fnddata?.id || "",
           ExpenseCategory: expdata.ExpenseCategory || "",
           PurchasedFrom: expdata.PurchasedFrom || "",
           BankAccount: expdata.BankAccount || "",
           description: expdata.description || "", // Fixed property name
+
           bill: expdata.bill || "",
         });
       } else {
@@ -106,7 +113,7 @@ const EditExpenses = ({ idd, onClose }) => {
     try {
       await dispatch(EditExp({ id: idd, values: updatedValues })).unwrap();
       message.success("Expenses updated successfully!");
-      dispatch(Getexp(idd));
+      dispatch(Getexp(id));
       onClose();
       resetForm();
     } catch (error) {
@@ -134,7 +141,7 @@ const EditExpenses = ({ idd, onClose }) => {
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
             <Row gutter={16}>
-              <Col span={8}>
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">ItemName</label>
                   <Field name="item" as={Input} placeholder="Enter item" />
@@ -145,7 +152,7 @@ const EditExpenses = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={8}>
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Currency</label>
                   <Field name="currency">
@@ -185,7 +192,7 @@ const EditExpenses = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={8}>
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Price</label>
                   <Field
@@ -201,7 +208,7 @@ const EditExpenses = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={8} className="mt-2">
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">PurchaseDate</label>
                   <DatePicker
@@ -218,10 +225,11 @@ const EditExpenses = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={8} className="mt-2">
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold mb-2">Employee</label>
                   <div className="flex gap-2">
+
                     <Field name="employee">
                       {({ field, form }) => (
                         <Select
@@ -255,14 +263,20 @@ const EditExpenses = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={8} className="mt-2">
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Project</label>
-                  <Field
-                    name="project"
-                    as={Input}
-                    placeholder="Enter project"
-                  />
+
+                  <Field name="project">
+                    {({ field }) => (
+                      <Input
+                        {...field}
+                        value={fnddata?.project_name || ''}
+                        disabled
+                        placeholder="Project name will appear here"
+                      />
+                    )}
+                  </Field>
                   <ErrorMessage
                     name="project"
                     component="div"
@@ -271,9 +285,10 @@ const EditExpenses = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={8} className="mt-2">
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">PurchasedFrom</label>
+
                   <Field
                     name="PurchasedFrom"
                     as={Input}

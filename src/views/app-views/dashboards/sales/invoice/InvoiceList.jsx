@@ -253,13 +253,13 @@ export const InvoiceList = () => {
       title: "Tax",
       dataIndex: "tax",
       render: (_, record) => <span>{record.tax}</span>,
-      sorter: (a, b) => utils.antdTableSorter(a, b, "duedate"),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "tax"),
     },
     {
       title: "Total",
       dataIndex: "total",
       render: (_, record) => <span>{record.total}</span>,
-      sorter: (a, b) => utils.antdTableSorter(a, b, "duedate"),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "total"),
     },
     // {
     //   title: "Due Amount",

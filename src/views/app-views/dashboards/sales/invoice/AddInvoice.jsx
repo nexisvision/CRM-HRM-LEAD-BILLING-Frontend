@@ -141,6 +141,7 @@ const AddInvoice = ({ onClose }) => {
     form
       .validateFields()
       .then((values) => {
+
         // Transform table data into an object with numbered keys
         const itemsForDatabase = tableData.reduce((acc, item, index) => {
           acc[`item_${index + 1}`] = {
@@ -163,7 +164,7 @@ const AddInvoice = ({ onClose }) => {
           refnumber: values.refnumber,
           items: itemsForDatabase,
           subtotal: parseFloat(totals.subtotal),
-          tax: parseFloat(totals.totalTax), // Store total tax as percentage
+          // tax: parseFloat(totals.totalTax), // Store total tax as percentage
           total: parseFloat(totals.finalTotal),
           discount: parseFloat(discountRate) || 0,
           status: "pending"

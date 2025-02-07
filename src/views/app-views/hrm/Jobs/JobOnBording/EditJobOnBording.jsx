@@ -269,7 +269,7 @@ useEffect(() => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Salary</label>
-                  <Field name="salary" as={Input} placeholder="Enter Salary" />
+                  <Field name="salary" as={Input} placeholder="Enter Salary" type="number" />
                   <ErrorMessage
                     name="salary"
                     component="div"

@@ -19,7 +19,7 @@ const AddInvoice = ({ onClose }) => {
     const { id } = useParams();
     const [discountType, setDiscountType] = useState("%");
     const [loading, setLoading] = useState(false);
-    const [discountValue, setDiscountValue] = useState(0);
+    const [discountValue, setDiscountValue] = useState("");
     const [isAddProductModalVisible, setIsAddProductModalVisible] = useState(false);
     const [list, setList] = useState(OrderListData)
     const [selectedProduct, setSelectedProduct] = useState(null);
@@ -31,9 +31,8 @@ const AddInvoice = ({ onClose }) => {
     // const [selectedProject, setSelectedProject] = useState(null);
     // const [clientOptions, setClientOptions] = useState([]);
 
-    const currenciesState = useSelector((state) => state.currencies);
-    const [currenciesList, setCurrenciesList] = useState([]);
-    const [discountRate, setDiscountRate] = useState(10);
+    const { currencies } = useSelector((state) => state.currencies);
+    const [discountRate, setDiscountRate] = useState(0);
     const dispatch = useDispatch();
 
 
@@ -61,46 +60,21 @@ const sub = subClients?.SubClient?.data;
         finalTotal: 0,
     });
 
-  
-
-
-    //   const handleProjectChange = (projectId) => {
-    //     setSelectedProject(projectId);
-    
-    //     // Find associated clients for the selected project
-    //     const relatedClients = subClients.filter(
-    //       (client) => client.projectId === projectId
-    //     );
-    
-    //     // Update client dropdown options
-    //     setClientOptions(relatedClients);
-    //   };
-
-
-
-    const [tableData, setTableData] = useState([
-        {
-            id: Date.now(),
-            item: "",
-            quantity: 1,
-            price: "",
-            tax: 0,
-            amount: "0",
-            description: "",
-        }
-    ]);
+    const [tableData, setTableData] = useState([{
+        id: Date.now(),
+        item: "",
+        quantity: 1,
+        price: 0,
+        tax: 0,
+        amount: "0",
+        description: "",
+    }]);
 
     // Fetch currencies
     useEffect(() => {
         dispatch(getcurren());
     }, [dispatch]);
 
-    // Handle currencies data when it changes
-    useEffect(() => {
-        if (currenciesState?.currencies?.data) {
-            setCurrenciesList(currenciesState.currencies.data);
-        }
-    }, [currenciesState]);
 
     // Fetch milestones when product changes
     useEffect(() => {
@@ -116,7 +90,7 @@ const sub = subClients?.SubClient?.data;
             id: Date.now(),
             item: "",
             quantity: 1,
-            price: "",
+            price: 0,
             tax: 0,
             amount: "0",
             description: "",
@@ -128,18 +102,18 @@ const sub = subClients?.SubClient?.data;
         setSelectedMilestone(value);
 
         if (selectedMile) {
-            // Update table data with milestone information
-            setTableData([
-                {
-                    id: Date.now(),
-                    item: selectedMile.milestone_title,
-                    quantity: 1,
-                    price: selectedMile.milestone_cost,
-                    tax: 0,
-                    amount: selectedMile.milestone_cost.toString(),
-                    description: selectedMile.milestone_summary
-                }
-            ]);
+            const newTableData = [{
+                id: Date.now(),
+                item: selectedMile.milestone_title,
+                quantity: 1,
+                price: selectedMile.milestone_cost,
+                tax: 0,
+                amount: selectedMile.milestone_cost.toString(),
+                description: selectedMile.milestone_summary
+            }];
+            
+            setTableData(newTableData);
+            calculateTotal(newTableData, discountRate); // Calculate totals after setting milestone data
         }
     };
 
@@ -211,26 +185,26 @@ const sub = subClients?.SubClient?.data;
 
     // Function to handle adding a new row
     const handleAddRow = () => {
-        setTableData([
-            ...tableData,
+        setRows([
+            ...rows,
             {
                 id: Date.now(),
                 item: "",
-                quantity: 1,
+                quantity: "",
                 price: "",
-                tax: 0,
+                discount: "",
+                tax: "",
                 amount: "0",
                 description: "",
-            }
+                isNew: true,
+            },
         ]);
     };
 
     // Delete row
     const handleDeleteRow = (id) => {
-        if (tableData.length > 1) {
-            const updatedTableData = tableData.filter(row => row.id !== id);
-            setTableData(updatedTableData);
-            calculateTotal(updatedTableData, discountRate); // Recalculate totals after deletion
+        if (rows.length > 1) {
+            setRows(rows.filter(row => row.id !== id));
         } else {
             message.warning('At least one item is required');
         }
@@ -247,7 +221,7 @@ const sub = subClients?.SubClient?.data;
         }
         return parseFloat(discountValue) || 0;
     };
-    
+
     // Calculate total tax
     const calculateTotalTax = () => {
         const subTotal = calculateSubTotal();
@@ -280,37 +254,74 @@ const sub = subClients?.SubClient?.data;
         let totalTax = 0;
 
         data.forEach((row) => {
-            const amount = row.quantity * row.price;
-            const taxAmount = (amount * row.tax) / 100;
+            const quantity = parseFloat(row.quantity) || 0;
+            const price = parseFloat(row.price) || 0;
+            const tax = parseFloat(row.tax) || 0;
+            
+            const rowAmount = quantity * price;
+            row.amount = rowAmount.toString(); // Update row amount
 
-            row.amount = amount; // Update the row's amount
-            subtotal += amount;
-            totalTax += taxAmount;
+            // Calculate tax based on tax calculation method
+            const taxableAmount = form.getFieldValue('calctax') === 'before' 
+                ? rowAmount 
+                : (rowAmount * (1 - discountRate/100));
+            
+            const rowTax = (taxableAmount * tax) / 100;
+            
+            subtotal += rowAmount;
+            totalTax += rowTax;
         });
 
+        // Calculate discount
         const discount = (subtotal * discountRate) / 100;
+        
+        // Calculate final total
         const finalTotal = subtotal - discount + totalTax;
 
-        setTotals({ subtotal, discount, totalTax, finalTotal });
+        // Update totals state
+        setTotals({
+            subtotal: subtotal,
+            discount: discount,
+            totalTax: totalTax,
+            finalTotal: finalTotal
+        });
+
+        // Update form fields with calculated values
+        form.setFieldsValue({
+            sub_total: subtotal.toFixed(2),
+            total_tax: totalTax.toFixed(2),
+            total: finalTotal.toFixed(2)
+        });
     };
 
     const handleTableDataChange = (id, field, value) => {
         const updatedData = tableData.map((row) =>
-            row.id === id ? { ...row, [field]: field === 'quantity' || field === 'price' || field === 'tax' ? parseFloat(value) || 0 : value } : row
+            row.id === id ? { 
+                ...row, 
+                [field]: field === 'quantity' || field === 'price' || field === 'tax' 
+                    ? parseFloat(value) || 0 
+                    : value 
+            } : row
         );
 
         setTableData(updatedData);
-        calculateTotal(updatedData, discountRate); // Recalculate totals
+        calculateTotal(updatedData, discountRate);
     };
 
-        const initialValues = {
-            issueDate: null,
-            dueDate: null,
-            currency: '',
-            client: fnddata?.client || "",
-            project: fnddata?.id || "",
-            calctax: '',
-        };
+    const handleDiscountChange = (value) => {
+        const newRate = parseFloat(value) || 0;
+        setDiscountRate(newRate);
+        calculateTotal(tableData, newRate);
+    };
+
+    const initialValues = {
+        issueDate: null,
+        dueDate: null,
+        currency: '',
+        client: fnddata?.client || "",
+        project: fnddata?.id || "",
+        calctax: '',
+    };
 
     const validationSchema = Yup.object({
         issueDate: Yup.date().nullable().required('Invoice Date is required.'),
@@ -489,7 +500,7 @@ const sub = subClients?.SubClient?.data;
                                                 className="w-full mt-2"
                                                 placeholder="Select Currency"
                                                 onChange={(value) => {
-                                                    const selectedCurrency = currenciesList.find(c => c.id === value);
+                                                    const selectedCurrency = currencies.find(c => c.id === value);
                                                     form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
                                                 }}
                                             >
@@ -503,7 +514,7 @@ const sub = subClients?.SubClient?.data;
                                     </Col>
                                     <Col span={12}>
     <Form.Item
-        name="clientName"
+        name="client"
         label="Client Name"
         initialValue={subClientData?.username}
         rules={[{ required: true, message: "Please enter the client name" }]}
@@ -663,10 +674,11 @@ const sub = subClients?.SubClient?.data;
                                                     </td>
                                                     <td className="px-4 py-2 border-b">
                                                         <select
-                                                            value={row.tax}
-                                                            onChange={(e) => handleTableDataChange(row.id, 'tax', e.target.value)}
+                                                            value={row.discount}
+                                                            onChange={(e) => handleTableDataChange(row.id, 'discount', e.target.value)}
                                                             className="w-full p-2 border"
                                                         >
+
                                                             <option value="0">Nothing Selected</option>
                                                             <option value="10">GST:10%</option>
                                                             <option value="18">CGST:18%</option>
@@ -729,13 +741,11 @@ const sub = subClients?.SubClient?.data;
                                                     Discount Rate (%)
                                                 </label>
                                                 <input
+                                                    name="discount"
                                                     type="number"
                                                     value={discountRate}
-                                                    onChange={(e) => {
-                                                        setDiscountRate(parseFloat(e.target.value) || 0);
-                                                        calculateTotal(tableData, parseFloat(e.target.value) || 0); // Recalculate with new discount rate
-                                                    }}
-                                                    className="mt-1 block w-full p-2 border rounded"
+                                                    onChange={handleDiscountChange}
+                                                    className="mt-1 block w-full p-2 border rounded"        
                                                 />
                                             </div>
                                         </td>
@@ -777,7 +787,7 @@ const sub = subClients?.SubClient?.data;
 
                                     >
                                         <span className='text-xl'>Choose File</span>
-                                        {/* <CloudUploadOutlined className='text-4xl' /> */}
+                                        
                                     </Upload>
                                 </Col>
                             </div>

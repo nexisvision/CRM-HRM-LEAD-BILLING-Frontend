@@ -419,7 +419,7 @@ const EditInvoice = ({ idd, onClose }) => {
 <Col span={12}>
     {/* Display the project name */}
     <Form.Item
-        name="project"
+        name="projectName"
         label="Project Name"
         initialValue={fnddata?.project_name}
         rules={[{ required: true, message: "Please enter the project name" }]}
