@@ -27,6 +27,7 @@ import {
   EyeOutlined,
   FileExcelOutlined,
   SearchOutlined,
+  PushpinOutlined,
   PlusCircleOutlined,
   EditOutlined,
   PlusOutlined,
@@ -78,6 +79,8 @@ const paymentStatusList = ["Paid", "Pending", "Expired"];
 
 export const TaskList = () => {
   const [annualStatisticData] = useState(AnnualStatisticData);
+  const [pinnedTasks, setPinnedTasks] = useState([]);
+
   const [list, setList] = useState(OrderListData);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isAddTaskModalVisible, setIsAddTaskModalVisible] = useState(false);
@@ -162,6 +165,12 @@ export const TaskList = () => {
     }
   }, [fnddata]);
 
+  useEffect(() => {
+    // Load pinned tasks from local storage on component mount
+    const storedPinnedTasks = JSON.parse(localStorage.getItem("pinnedTasks")) || [];
+    setPinnedTasks(storedPinnedTasks);
+  }, []);
+
   const DeleteFun = async (idd) => {
     try {
       const response = await dispatch(DeleteTasks(idd));
@@ -171,7 +180,7 @@ export const TaskList = () => {
       const updatedData = await dispatch(GetTasks(id));
       setList(list.filter((item) => item.id !== idd));
 
-      message.success({ content: "Deleted user successfully", duration: 2 });
+      // message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error.message || error);
     }
@@ -182,8 +191,32 @@ export const TaskList = () => {
     setIdd(idd);
   };
 
+
+  const togglePinTask = (taskId) => {
+    setPinnedTasks((prevPinned) => {
+      const newPinned = prevPinned.includes(taskId)
+        ? prevPinned.filter((id) => id !== taskId) // Unpin the task
+        : [...prevPinned, taskId]; // Pin the task
+
+      // Save the updated pinned tasks to local storage
+      localStorage.setItem("pinnedTasks", JSON.stringify(newPinned));
+      return newPinned;
+    });
+  };
+
   const dropdownMenu = (row) => (
     <Menu>
+
+<Menu.Item>
+        <Flex alignItems="center" onClick={() => togglePinTask(row.id)}>
+          {pinnedTasks.includes(row.id) ? (
+            <PushpinOutlined style={{ color: "gold" }} />
+          ) : (
+            <PushpinOutlined />
+          )}
+          <span className="ml-2">{pinnedTasks.includes(row.id) ? "Unpin" : "Pin"}</span>
+        </Flex>
+      </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center" onClick={openViewTaskModal}>
           <EyeOutlined />
@@ -191,12 +224,7 @@ export const TaskList = () => {
           <span className="ml-2">View Details</span>
         </Flex>
       </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <PlusCircleOutlined />
-          <span className="ml-2">Add to remark</span>
-        </Flex>
-      </Menu.Item>
+     
 
       <Menu.Item>
         <Flex alignItems="center" onClick={() => EditTaskfun(row.id)}>
@@ -205,12 +233,7 @@ export const TaskList = () => {
           <span className="ml-2">Edit</span>
         </Flex>
       </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <TiPinOutline />
-          <span className="ml-2">Pin</span>
-        </Flex>
-      </Menu.Item>
+    
       <Menu.Item>
         <Flex alignItems="center" onClick={() => DeleteFun(row.id)}>
           <DeleteOutlined />
@@ -225,6 +248,19 @@ export const TaskList = () => {
     //   title: "Code",
     //   dataIndex: "id",
     // },
+    {
+      title: "Pinned",
+      dataIndex: "pinned",
+      render: (text, record) => (
+        <span>
+          {pinnedTasks.includes(record.id) ? (
+            <PushpinOutlined style={{ color: "gold" }} />
+          ) : (
+            <PushpinOutlined />
+          )}
+        </span>
+      ),
+    },
     {
       title: "Task",
       dataIndex: "taskName",

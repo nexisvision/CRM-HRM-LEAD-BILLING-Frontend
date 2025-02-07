@@ -6,6 +6,20 @@ import { message } from "antd";
 
 // Async thunk for adding user
 
+
+export const AddTaskk = createAsyncThunk(
+  "users/AddTasks",
+  async ({ id, values }, thunkAPI) => {
+    try {
+      const response = await UserService.Addtask(id, values);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+
 export const AddTasks = createAsyncThunk(
   "users/AddTasks",
   async ({ idd, values }, thunkAPI) => {

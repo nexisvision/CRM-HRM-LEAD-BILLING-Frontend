@@ -147,12 +147,12 @@ const AddProject = ({ onClose }) => {
       .then(() => {
         dispatch(GetProject())
           .then(() => {
-            message.success("Project added successfully!");
+            // message.success("Project added successfully!");
             resetForm();
             onClose();
           })
           .catch((error) => {
-            message.error("Failed to fetch the latest project data.");
+            // message.error("Failed to fetch the latest project data.");
             console.error("Project Data API error:", error);
           });
       })

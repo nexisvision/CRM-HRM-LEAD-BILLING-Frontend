@@ -63,11 +63,11 @@ const EditProject = ({ id, onClose }) => {
     dispatch(Editpro({ id, values }))
       .then(() => {
         dispatch(GetProject());
-        message.success("Project updated successfully!");
+        // message.success("Project updated successfully!");
         onClose();
       })
       .catch((error) => {
-        message.error("Failed to update employee.");
+        // message.error("Failed to update employee.");
         console.error("Edit API error:", error);
       });
   };

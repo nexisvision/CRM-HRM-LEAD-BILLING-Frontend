@@ -520,7 +520,7 @@ const EditTask = ({ idd, onClose }) => {
                 Cancel
               </Button>
               <Button type="primary" htmlType="submit">
-                Create
+                Update
               </Button>
             </div>
           </Form>

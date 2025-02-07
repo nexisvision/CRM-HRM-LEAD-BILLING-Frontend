@@ -49,9 +49,11 @@ const JobCandidateList = () => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
-
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const alldata = useSelector((state) => state.jobapplications);
-  const fnddta = alldata.jobapplications.data;
+  const fnddta = alldata.jobapplications.data || [];
+
+  const filteredData = fnddta.filter((item) => item.created_by === user);
 
   useEffect(() => {
     dispatch(getjobapplication());
@@ -59,7 +61,7 @@ const JobCandidateList = () => {
 
   useEffect(() => {
     if (fnddta) {
-      setUsers(fnddta);
+      setUsers(filteredData);
     }
   }, [fnddta]);
 
@@ -97,7 +99,7 @@ const JobCandidateList = () => {
   // Delete user
   const deleteUser = (userId) => {
     setUsers(users.filter((item) => item.id !== userId));
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
 
   // Show user profile
@@ -130,10 +132,10 @@ const JobCandidateList = () => {
                    
                       if (parsedPermissions["extra-hrm-jobs-jobcandidate"] && parsedPermissions["extra-hrm-jobs-jobcandidate"][0]?.permissions) {
                         allpermisson = parsedPermissions["extra-hrm-jobs-jobcandidate"][0].permissions;
-                        console.log('Parsed Permissions:', allpermisson);
+                        // console.log('Parsed Permissions:', allpermisson);
                       
                       } else {
-                        console.log('extra-hrm-jobs-jobcandidate is not available');
+                        // console.log('extra-hrm-jobs-jobcandidate is not available');
                       }
                       
                       const canCreateClient = allpermisson?.includes('create');
@@ -226,17 +228,17 @@ const JobCandidateList = () => {
       sorter: (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1),
     },
     {
-      title: "notice_period",
+      title: "Notice Period",
       dataIndex: "notice_period",
       sorter: (a, b) => a.leavetype.length - b.leavetype.length,
     },
     {
-      title: "location",
+      title: "Location",
       dataIndex: "location",
       sorter: (a, b) => a.leavetype.length - b.leavetype.length,
     },
     {
-      title: "job",
+      title: "Job",
       dataIndex: "job",
       sorter: (a, b) => a.leavetype.length - b.leavetype.length,
     },

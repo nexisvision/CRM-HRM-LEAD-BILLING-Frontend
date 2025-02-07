@@ -23,7 +23,7 @@ import {
   AddLable,
   GetLable,
 } from "views/app-views/dashboards/project/milestone/LableReducer/LableSlice";
-import { AddJobs, GetJobdata } from "./JobReducer/JobSlice";
+import { AddJobs, EditJobs, GetJobdata } from "./JobReducer/JobSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
@@ -87,11 +87,11 @@ const EditJob = ({ onClose }) => {
       interviewRounds: { InterviewRounds: values.interviewRounds },
     };
 
-    dispatch(AddJobs(transformedValues));
+    dispatch(EditJobs(transformedValues));
     dispatch(GetJobdata());
     onClose();
-    console.log("Submitted values:", transformedValues);
-    message.success("Job added successfully!");
+    // console.log("Submitted values:", transformedValues);
+    // message.success("Job added successfully!");
     resetForm();
   };
 

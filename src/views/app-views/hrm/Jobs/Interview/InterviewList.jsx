@@ -125,12 +125,11 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
   }, []);
 
 
-  const allTaskData = useSelector((state) => state.Interviews);
-  const taskData = allTaskData?.Interviews.data || [];
-  console.log("lplplplplpl",taskData)
+  const allTaskData = useSelector((state) => state.TaskCalander);
+  const taskData = allTaskData?.TaskCalander.data || [];
+  // console.log("lplplplplpl",taskData)
 
-
-  console.log("pppp", taskData)
+  // console.log("pppp", taskData)
 
   return (
     <div className="sidebar-tasks">
@@ -231,7 +230,7 @@ const TaskModal = ({ open, addTask, cancel }) => {
         </Form.Item>
         <Form.Item className="text-right mb-0">
           <Button type="primary" htmlType="submit">
-            Add Task
+            Add Interview
           </Button>
         </Form.Item>
       </Form>

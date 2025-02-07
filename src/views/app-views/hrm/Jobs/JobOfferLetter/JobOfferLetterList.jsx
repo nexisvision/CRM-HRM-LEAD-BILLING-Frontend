@@ -59,13 +59,17 @@ const JobOfferLetterList = () => {
   useEffect(() => {
     dispatch(getjobofferss());
   }, []);
+ 
+const user = useSelector((state) => state.user.loggedInUser.username);
 
   const alldatas = useSelector((state) => state.joboffers);
-  const fnddata = alldatas.joboffers.data;
+  const fnddata = alldatas.joboffers.data || [];
+
+  const fnddtaa = fnddata.filter((item) => item.created_by === user);
 
   useEffect(() => {
     if (fnddata) {
-      setUsers(fnddata);
+      setUsers(fnddtaa);
     }
   }, [fnddata]);
 
@@ -95,10 +99,10 @@ const JobOfferLetterList = () => {
                        
                           if (parsedPermissions["extra-hrm-jobs-jobonbording"] && parsedPermissions["extra-hrm-jobs-jobonbording"][0]?.permissions) {
                             allpermisson = parsedPermissions["extra-hrm-jobs-jobonbording"][0].permissions;
-                            console.log('Parsed Permissions:', allpermisson);
+                            // console.log('Parsed Permissions:', allpermisson);
                           
                           } else {
-                            console.log('extra-hrm-jobs-jobonbording is not available');
+                            // console.log('extra-hrm-jobs-jobonbording is not available');
                           }
                           
                           const canCreateClient = allpermisson?.includes('create');
@@ -149,7 +153,7 @@ const JobOfferLetterList = () => {
       dispatch(getjobofferss());
       const updatedUsers = users.filter((item) => item.id !== userId);
       setUsers(updatedUsers);
-      message.success({ content: `Deleted user ${userId}`, duration: 2 });
+      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
     });
   };
 
@@ -215,14 +219,14 @@ const JobOfferLetterList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button type="" className="" icon={<EyeOutlined />} size="small">
             <span>View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
-      <Menu.Item>
+      </Menu.Item> */}
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -234,8 +238,8 @@ const JobOfferLetterList = () => {
             <span>Send Mail</span>
           </Button>
         </Flex>
-      </Menu.Item>
-      <Menu.Item>
+      </Menu.Item> */}
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -247,7 +251,7 @@ const JobOfferLetterList = () => {
             <span className="ml-2">Add to Job OnBoard</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
     
      
 
@@ -302,32 +306,32 @@ const JobOfferLetterList = () => {
     //   sorter: (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1),
     // },
     {
-      title: "salary",
+      title: "Salary",
       dataIndex: "salary",
       sorter: (a, b) => a.salary.length - b.salary.length,
     },
     {
-      title: "offer_expiry",
+      title: "Offer Expiry",
       dataIndex: "offer_expiry",
-      sorter: (a, b) => a.offer_expiry.length - b.offer_expiry.length,
+      render: (text) => dayjs(text).format("DD-MM-YYYY"), // Format the date
     },
     {
-      title: "expected_joining_date",
+      title: "Expected Joining Date",
       dataIndex: "expected_joining_date",
-      sorter: (a, b) =>
-        a.expected_joining_date.length - b.expected_joining_date.length,
+      render: (text) => dayjs(text).format("DD-MM-YYYY"),
     },
     {
-      title: "description",
+      title: "Description",
       dataIndex: "description",
-      sorter: (a, b) => a.description.length - b.description.length,
+      render: (text) => (
+        <div dangerouslySetInnerHTML={{ __html: text }} />
+      ),
     },
-
-    {
-      title: "created_by",
-      dataIndex: "created_by",
-      sorter: (a, b) => a.created_by.length - b.created_by.length,
-    },
+    // {
+    //   title: "created_by",
+    //   dataIndex: "created_by",
+    //   sorter: (a, b) => a.created_by.length - b.created_by.length,
+    // },
     {
       title: "Status",
       dataIndex: "status",

@@ -14,11 +14,23 @@ const { Option } = Select;
 const EditJobOnBording = ({ idd, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [singleEmp, setSingleEmp] = useState(null);
+
 
   const alldata = useSelector((state) => state.jobonboarding);
-  const fnddtaa = alldata.jobonboarding.data;
+  const fnddtaa = alldata.jobonboarding.data || [];
+
+  console.log("fnddtaa",fnddtaa)
 
   const fnd = fnddtaa.find((item) => item.id === idd);
+
+console.log("fnd",fnd)
+
+  // useEffect(() => {
+  //   const empData = alldata?.jobonboarding?.data || [];
+  //   const data = empData.find((item) => item.id === idd);
+  //   setSingleEmp(data || null);
+  // }, [idd, alldata]);
 
   useEffect(() => {
     dispatch(getJobonBoarding());
@@ -90,21 +102,31 @@ const EditJobOnBording = ({ idd, onClose }) => {
 
   // status end
 
-  useEffect(() => {
-    if (fnd) {
-      setInitialValues({
-        related_id: fnd.related_id,
-        interviewer: fnd.interviewer,
-        joiningDate: fnd.joiningDate ? new Date(fnd.joiningDate) : null,
-        daysOfWeek: fnd.daysOfWeek,
-        salary: fnd.salary,
-        salaryType: fnd.salaryType,
-        salaryDuration: fnd.salaryDuration,
-        jobType: fnd.jobType,
-        status: fnd.status,
-      });
-    }
-  }, [fnd]);
+//   useEffect(() => {
+//     if (fnddtaa) {
+//       const findofferdatas = fnddtaa.find((item) => item.id === idd);
+// if(findofferdatas){
+//       setInitialValues({
+//         related_id: findofferdatas.related_id,
+//         interviewer: findofferdatas.interviewer,
+//         joiningDate: findofferdatas.joiningDate ? new Date(findofferdatas.joiningDate) : null,
+//         daysOfWeek: findofferdatas.daysOfWeek,
+//         salary: findofferdatas.salary,
+//         salaryType: findofferdatas.salaryType,
+//         salaryDuration: findofferdatas.salaryDuration,
+//         jobType: findofferdatas.jobType,
+//         status: findofferdatas.status,
+//       });
+//     }
+//   }
+//   }, [fnddtaa]);
+
+useEffect(() => {
+  if (fnd) {
+    setInitialValues(fnd);
+  }
+}, [fnd]);
+
 
   // Submit the form data
   const onSubmit = async (values, { resetForm }) => {
@@ -125,12 +147,12 @@ const EditJobOnBording = ({ idd, onClose }) => {
 
       dispatch(EditJobOnBording(data)).then(() => {
         dispatch(getJobonBoarding());
-        message.success("Job Candidate added successfully!");
+        // message.success("Job Candidate added successfully!");
         resetForm();
         onClose();
       });
     } catch (error) {
-      message.error("Failed to add job candidate. Please try again.");
+      // message.error("Failed to add job candidate. Please try again.");
       console.error(error);
     }
   };

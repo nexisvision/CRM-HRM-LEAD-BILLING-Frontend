@@ -24,6 +24,7 @@ const AnnouncementList = () => {
 
   const navigate = useNavigate();
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
     const tabledata = useSelector((state) => state.Announce);  
 
   const dispatch = useDispatch();
@@ -51,12 +52,12 @@ const AnnouncementList = () => {
           dispatch(DeleteAnn( userId ))
                 .then(() => {
                   dispatch(GetAnn());
-                  message.success('announcement Deleted successfully!');
+                  // message.success('announcement Deleted successfully!');
                   setUsers(prevUsers => prevUsers.filter(item => item.id !== userId));
                   navigate('/app/hrm/announcement');
                 })
                 .catch((error) => {
-                  message.error('Failed to update department.');
+                  // message.error('Failed to update department.');
                   console.error('Edit API error:', error);
                 });
   };
@@ -122,8 +123,10 @@ const AnnouncementList = () => {
 
   
       useEffect(() => {
-        if (tabledata && tabledata.Announce && tabledata.Announce.data) {
-          setUsers(tabledata.Announce.data);
+        if
+         (tabledata && tabledata.Announce && tabledata.Announce.data) {
+          const filteredData = tabledata.Announce.data.filter((item) => item.created_by === user);
+          setUsers(filteredData);
         }
       }, [tabledata]);
 

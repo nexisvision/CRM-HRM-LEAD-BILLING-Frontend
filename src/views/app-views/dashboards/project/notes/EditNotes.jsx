@@ -179,7 +179,11 @@ const EditNotes = ({ idd, onClose }) => {
   const dispatch = useDispatch();
   const { id } = useParams();
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const { data: employee } = useSelector((state) => state.employee.employee);
+
+  const employeeData = employee?.filter((item) => item.created_by === user);
+  
 
   useEffect(() => {
     dispatch(empdata());
@@ -233,13 +237,13 @@ const EditNotes = ({ idd, onClose }) => {
 
     values.employee = employeeObject;
 
-    console.log("va", values);
+    // console.log("va", values);
 
     dispatch(EditeNotes({ idd, values }));
     onClose();
     dispatch(GetNote(id));
-    console.log("Submitted values:", values);
-    message.success("Note updated successfully!");
+    // console.log("Submitted values:", values);
+    // message.success("Note updated successfully!");
     resetForm();
   };
 
@@ -284,16 +288,16 @@ const EditNotes = ({ idd, onClose }) => {
                           placeholder="Select Employee"
                           onChange={(value) => {
                             const selectedEmployee =
-                              Array.isArray(employee) &&
-                              employee.find((e) => e.id === value);
+                              Array.isArray(employeeData) &&
+                              employeeData.find((e) => e.id === value);
                             form.setFieldValue(
                               "employee",
                               selectedEmployee?.username || ""
                             );
                           }}
                         >
-                          {Array.isArray(employee) &&
-                            employee.map((emp) => (
+                          {Array.isArray(employeeData) &&
+                            employeeData.map((emp) => (
                               <Option key={emp.id} value={emp.id}>
                                 {emp.username}
                               </Option>

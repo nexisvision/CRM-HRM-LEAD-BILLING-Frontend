@@ -153,7 +153,7 @@ const MeetingSlice = createSlice({
       .addCase(MeetData.fulfilled, (state, action) => {
         state.isLoading = false;
         state.Meeting = action?.payload;
-        message.success(action.payload?.message);
+        // .success(action.payload?.message);
       })
       .addCase(MeetData.rejected, (state, action) => {
         state.isLoading = false;

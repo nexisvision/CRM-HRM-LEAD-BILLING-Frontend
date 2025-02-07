@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import EstimateService from './EstimatesService';
+import { message } from 'antd';
 
 // Create estimate
 export const createestimate = createAsyncThunk(
@@ -101,10 +102,12 @@ const estimateSlice = createSlice({
         state.loading = false;
         state.estimates.push(action.payload.data);
         state.success = true;
+        message.success(action.payload?.message);
       })
       .addCase(createestimate.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        message.error(action.payload?.message);
       })
 
       // Get all estimates
@@ -150,10 +153,14 @@ const estimateSlice = createSlice({
         if (index !== -1) {
           state.estimates[index] = action.payload.data;
         }
+        message.success(action.payload?.message);
+
       })
       .addCase(updateestimate.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        message.error(action.payload?.message);
+
       })
       
       // Delete estimate
@@ -167,10 +174,12 @@ const estimateSlice = createSlice({
           (estimate) => estimate._id !== action.payload
         );
         state.success = true;
+        message.success(action.payload?.message);
       })
       .addCase(deleteestimate.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        message.error(action.payload?.message);
       });
   },
 });

@@ -26,13 +26,13 @@ const AddAnnouncement = ({onClose}) => {
     dispatch(addAnnounce(values))
           .then(() => {
             dispatch(GetAnn());
-            message.success('Announcement added successfully!');
+            // message.success('Announcement added successfully!');
             resetForm();
             onClose();
             navigate('/app/hrm/announcement');
           })
           .catch((error) => {
-            message.error('Failed to add Announcement.');
+            // message.error('Failed to add Announcement.');
             console.error('Add API error:', error);
           });
   };

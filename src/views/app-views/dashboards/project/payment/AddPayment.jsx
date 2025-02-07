@@ -20,6 +20,7 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { AddPay, Getpay } from "./PaymentReducer/paymentSlice";
 import { getAllInvoices } from '../invoice/invoicereducer/InvoiceSlice';
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 const { Option } = Select;
 const AddPayment = ({ onClose }) => {
   const navigate = useNavigate();
@@ -30,11 +31,28 @@ const AddPayment = ({ onClose }) => {
 
   const [invoices, setInvoices] = useState([]);
 
+
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
+
+  const { currencies } = useSelector((state) => state.currencies);
+const curr = currencies?.data || [];
+
+const curren = curr?.filter((item) => item.created_by === user);
+
   // Get invoices from Redux store
   const invoiceData = useSelector((state) => state.invoice.invoices);
 
   useEffect(() => {
     dispatch(getAllInvoices(id));
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(getcurren());
+    } else {
+      // message.error("Milestone ID is not defined.");
+    }
   }, [dispatch, id]);
 
   const allproject = useSelector((state) => state.Project);
@@ -73,12 +91,12 @@ const AddPayment = ({ onClose }) => {
     dispatch(AddPay({ id, values }))
       .then(() => {
         dispatch(Getpay(id));
-        message.success("Milestone added successfully!");
+        // message.success("Milestone added successfully!");
         resetForm();
         onClose();
       })
       .catch((error) => {
-        message.error("Failed to add Leads.");
+        // message.error("Failed to add Leads.");
         console.error("Add API error:", error);
       });
   };
@@ -164,32 +182,42 @@ const AddPayment = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={6} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Currency</label>
-                  <Field name="currency">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        placeholder="Select Currency"
-                        className="w-full"
-                        onChange={(value) => setFieldValue("currency", value)}
-                        value={values.currency}
-                        onBlur={() => setFieldTouched("currency", true)}
-                        allowClear={false}
-                      >
-                        <Option value="INR">INR</Option>
-                        <Option value="USD">USD</Option>
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="currency"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+              <Col span={12} className="">
+                    <div className="form-item">
+                      <label className="font-semibold mb-2">Currency</label>
+                      <div className="flex gap-2">
+                        <Field name="currency">
+                          {({ field, form }) => (
+                            <Select
+                              {...field}
+                              className="w-full mt-2"
+                              placeholder="Select Currency"
+                              onChange={(value) => {
+                                const selectedCurrency = curren.find(
+                                  (c) => c.id === value
+                                );
+                                form.setFieldValue(
+                                  "currency",
+                                  selectedCurrency?.currencyCode || ""
+                                );
+                              }}
+                            >
+                              {curren.map((currency) => (
+                                <Option key={currency.id} value={currency.id}>
+                                  {currency.currencyCode}
+                                </Option>
+                              ))}
+                            </Select>
+                          )}
+                        </Field>
+                      </div>
+                      <ErrorMessage
+                        name="currency"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
               {/* <Col span={6}>
                 <div className="form-item">
                   <label className="font-semibold">Exchange Rate </label>

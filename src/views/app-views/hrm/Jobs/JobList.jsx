@@ -54,10 +54,15 @@ const JobList = () => {
 
   const [annualStatisticData] = useState(AnnualStatisticData);
 
+const user = useSelector((state) => state.user.loggedInUser.username);
+
   const allempdata = useSelector((state) => state.Jobs);
 
-  const filtermin = allempdata.Jobs.data;
+  const filtermin = allempdata.Jobs.data || [];
 
+  const filteredData = filtermin.filter((item) => item.created_by === user);
+
+  // console.log("filteredData", filteredData);
   // Open Add Job Modal
   const openAddJobModal = () => {
     setIsAddJobModalVisible(true);
@@ -96,7 +101,7 @@ const JobList = () => {
     dispatch(Deletejobs(userId));
     dispatch(GetJobdata());
     setUsers(list.filter((item) => item.id !== userId));
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
 
   const exportToExcel = () => {
@@ -132,10 +137,10 @@ const JobList = () => {
                  
                     if (parsedPermissions["extra-hrm-jobs-joblist"] && parsedPermissions["extra-hrm-jobs-joblist"][0]?.permissions) {
                       allpermisson = parsedPermissions["extra-hrm-jobs-joblist"][0].permissions;
-                      console.log('Parsed Permissions:', allpermisson);
+                      // console.log('Parsed Permissions:', allpermisson);
                     
                     } else {
-                      console.log('extra-hrm-jobs-joblist is not available');
+                      // console.log('extra-hrm-jobs-joblist is not available');
                     }
                     
                     const canCreateClient = allpermisson?.includes('create');
@@ -185,8 +190,8 @@ const JobList = () => {
 
   useEffect(() => {
     if (filtermin) {
-      console.log("aaaaaa", filtermin);
-      setList(filtermin);
+      // console.log("aaaaaa", filtermin);
+      setList(filteredData);
     }
   }, [filtermin]);
 

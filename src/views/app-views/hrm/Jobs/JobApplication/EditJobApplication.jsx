@@ -16,8 +16,12 @@ const { Option } = Select;
 const EditJobApplication = ({ idd, onClose }) => {
   const dispatch = useDispatch();
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
+
   const alldata = useSelector((state) => state.jobapplications);
-  const fnddaa = alldata.jobapplications.data;
+  const fnddaa = alldata.jobapplications.data || [];
+
+  // const fnddtaa = fnddaa.filter((item) => item.created_by === user);
 
   const fnd = fnddaa.find((item) => item.id === idd);
 
@@ -31,8 +35,12 @@ const EditJobApplication = ({ idd, onClose }) => {
     dispatch(getallcountries());
   }, [dispatch]);
 
+
+
   const customerdata = useSelector((state) => state.Jobs);
-  const fnddata = customerdata.Jobs.data;
+  const fnddata = customerdata.Jobs.data || [];
+
+  const fnddataa = fnddata.filter((item) => item.created_by === user);
 
   useEffect(() => {
     if (fnd) {
@@ -49,12 +57,12 @@ const EditJobApplication = ({ idd, onClose }) => {
       dispatch(editjobapplication({ idd, values })).then(() => {
         dispatch(getjobapplication());
         onClose();
-        message.success("Form submitted successfully");
+        // message.success("Form submitted successfully");
       });
-      message.success("Job application added successfully!");
+      // message.success("Job application added successfully!");
     } catch (error) {
       console.error("Submission error:", error);
-      message.error("An error occurred while submitting the job application.");
+      // message.error("An error occurred while submitting the job application.");
     }
   };
   const [initialValues, setInitialValues] = useState({
@@ -121,20 +129,20 @@ const EditJobApplication = ({ idd, onClose }) => {
                         {...field}
                         className="w-full"
                         placeholder="Select job"
-                        loading={!fnddata} // Loading state
+                        loading={!fnddataa} // Loading state
                         onChange={(value) => setFieldValue("job", value)}
                         value={values.customer}
                         onBlur={() => setFieldTouched("job", true)}
                       >
-                        {fnddata && fnddata.length > 0 ? (
-                          fnddata.map((client) => (
+                        {fnddataa && fnddataa.length > 0 ? (
+                          fnddataa.map((client) => (
                             <Option key={client.id} value={client.id}>
                               {client.title || "Unnamed job"}
                             </Option>
                           ))
                         ) : (
                           <Option value="" disabled>
-                            No customers available
+                            No job available
                           </Option>
                         )}
                       </Select>

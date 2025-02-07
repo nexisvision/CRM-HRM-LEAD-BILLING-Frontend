@@ -98,11 +98,12 @@ const AddJob = ({ onClose }) => {
       interviewRounds: { InterviewRounds: values.interviewRounds },
     };
 
-    dispatch(AddJobs(transformedValues));
-    dispatch(GetJobdata());
-    onClose();
-    console.log("Submitted values:", transformedValues);
-    message.success("Job added successfully!");
+    dispatch(AddJobs(transformedValues)).then(()=>{
+      dispatch(GetJobdata());
+      onClose();
+    })
+    // console.log("Submitted values:", transformedValues);
+    // message.success("Job added successfully!");
     resetForm();
   };
 

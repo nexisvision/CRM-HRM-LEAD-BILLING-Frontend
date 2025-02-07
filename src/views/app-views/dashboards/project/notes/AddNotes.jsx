@@ -19,7 +19,11 @@ const AddNotes = ({ onClose }) => {
   //   (state.employee?.employee?.data || []).filter((employee) => employee.employeeId)
   // );
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
+
   const { data: employee } = useSelector((state) => state.employee.employee);
+
+  const employeeData = employee?.filter((item) => item.created_by === user);
 
   const navigate = useNavigate();
 
@@ -31,7 +35,7 @@ const AddNotes = ({ onClose }) => {
     note_title: "",
     notetype: "public",
     description: "",
-    employee: {},
+    employees: {},
   };
 
   const validationSchema = Yup.object({
@@ -42,24 +46,26 @@ const AddNotes = ({ onClose }) => {
 
   const onSubmit = async (values, { resetForm }) => {
     try {
+
+      
       const employeeObject =
         values.employees.length > 0 ? { id: values.employees[0] } : null;
 
       values.employees = employeeObject;
 
-      console.log("Dispatching AddNote with values:", { id, values });
+      // console.log("Dispatching AddNote with values:", { id, values });
       const result = await dispatch(AddNote({ id, values })).unwrap();
       dispatch(GetNote(id));
       onClose();
-      console.log("Dispatch result:", result);
+      // console.log("Dispatch result:", result);
 
       if (result) {
-        message.success("Note added successfully!");
+        // message.success("Note added successfully!");
         resetForm();
       }
     } catch (error) {
       console.error("Error adding note:", error);
-      message.error("Failed to add note: " + error.message);
+      // message.error("Failed to add note: " + error.message);
     }
   };
 
@@ -104,16 +110,16 @@ const AddNotes = ({ onClose }) => {
                           placeholder="Select Employee"
                           onChange={(value) => {
                             const selectedEmployee =
-                              Array.isArray(employee) &&
-                              employee.find((e) => e.id === value);
+                              Array.isArray(employeeData) &&
+                              employeeData.find((e) => e.id === value);
                             form.setFieldValue(
                               "employee",
                               selectedEmployee?.username || ""
                             );
                           }}
                         >
-                          {Array.isArray(employee) &&
-                            employee.map((emp) => (
+                          {Array.isArray(employeeData) &&
+                            employeeData.map((emp) => (
                               <Option key={emp.id} value={emp.id}>
                                 {emp.username}
                               </Option>

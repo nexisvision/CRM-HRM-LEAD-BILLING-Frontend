@@ -33,15 +33,18 @@ export const GetLablee = createAsyncThunk(
 
 export const AddLable = createAsyncThunk(
   "users/AddLable",
-  async ({ lid, payload }, thunkAPI) => {
+  async ({ id, payload }, thunkAPI) => {
     try {
-      const response = await UserService.AddLable(lid, payload);
+      const response = await UserService.AddLable(id, payload);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
+
+
+
 
 // Async thunk for user login
 

@@ -30,15 +30,19 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
     dispatch(GetJobdata());
   }, [dispatch]);
 
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const customerdata = useSelector((state) => state.Jobs);
-  const fnddata = customerdata.Jobs.data;
+  const fnddata = customerdata.Jobs.data || [];
+  const fnd = fnddata.filter((item) => item.created_by === user);
 
   useEffect(() => {
     dispatch(getjobapplication());
   }, [dispatch]);
 
   const customerdatass = useSelector((state) => state.jobapplications);
-  const fnddatass = customerdatass.jobapplications.data;
+  const fnddatass = customerdatass.jobapplications.data || [];
+  const fnddtaa = fnddatass.filter((item) => item.created_by === user);
 
   useEffect(() => {
     dispatch(getjobapplication());
@@ -94,15 +98,15 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
             dispatch(getjobofferss());
             onClose();
             resetForm();
-            message.success("Job offer letter added successfully!");
+            // message.success("Job offer letter added successfully!");
           } else {
-            message.error("Failed to add the job offer letter.");
+            // message.error("Failed to add the job offer letter.");
           }
         };
       } else {
         const payload = {
           job: values.job,
-          job_applicant: values.job_applicant,
+          job_applicant: values.job_applicant,  
           offer_expiry: values.offer_expiry,
           expected_joining_date: values.expected_joining_date,
           salary: values.salary,
@@ -115,9 +119,9 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
           dispatch(getjobofferss());
           onClose();
           resetForm();
-          message.success("Job offer letter added successfully!");
+          // message.success("Job offer letter added successfully!");
         } else {
-          message.error("Failed to add the job offer letter.");
+          // message.error("Failed to add the job offer letter.");
         }
       }
     } catch (error) {
@@ -182,20 +186,20 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                         {...field}
                         className="w-full"
                         placeholder="Select job"
-                        loading={!fnddatass}
+                        loading={!fnddtaa}
                         onChange={(value) => setFieldValue("job", value)}
                         value={values.job}
                         onBlur={() => setFieldTouched("job", true)}
                       >
-                        {fnddatass && fnddatass.length > 0 ? (
-                          fnddatass.map((client) => (
+                        {fnddtaa && fnddtaa.length > 0 ? (
+                          fnddtaa.map((client) => (
                             <Option key={client.id} value={client.id}>
                               {client.name || "Unnamed job"}
                             </Option>
                           ))
                         ) : (
                           <Option value="" disabled>
-                            No jobs available
+                            No job Application available
                           </Option>
                         )}
                       </Select>
@@ -218,22 +222,22 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                         {...field}
                         className="w-full"
                         placeholder="Select job application"
-                        loading={!fnddata}
+                        loading={!fnd}
                         onChange={(value) =>
                           setFieldValue("job_applicant", value)
                         }
                         value={values.job_applicant}
                         onBlur={() => setFieldTouched("job_applicant", true)}
                       >
-                        {fnddata && fnddata.length > 0 ? (
-                          fnddata.map((client) => (
+                        {fnd && fnd.length > 0 ? (
+                          fnd.map((client) => (
                             <Option key={client.id} value={client.id}>
                               {client.title || "Unnamed job application"}
                             </Option>
                           ))
                         ) : (
                           <Option value="" disabled>
-                            No job applications available
+                            No jobs available
                           </Option>
                         )}
                       </Select>

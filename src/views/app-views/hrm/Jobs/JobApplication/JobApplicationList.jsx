@@ -57,8 +57,11 @@ const JobApplicationList = () => {
     setIsEditJobApplicationModalVisible,
   ] = useState(false);
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const alldata = useSelector((state) => state.jobapplications);
-  const fnddta = alldata.jobapplications.data;
+  const fnddta = alldata.jobapplications.data || [];
+
+  const fnddtaa = fnddta.filter((item) => item.created_by === user);
 
   useEffect(() => {
     dispatch(getjobapplication());
@@ -66,7 +69,7 @@ const JobApplicationList = () => {
 
   useEffect(() => {
     if (fnddta) {
-      setUsers(fnddta);
+      setUsers(fnddtaa);
     }
   }, [fnddta]);
 
@@ -112,10 +115,10 @@ const JobApplicationList = () => {
                      
                         if (parsedPermissions["extra-hrm-jobs-jobonbording"] && parsedPermissions["extra-hrm-jobs-jobonbording"][0]?.permissions) {
                           allpermisson = parsedPermissions["extra-hrm-jobs-jobonbording"][0].permissions;
-                          console.log('Parsed Permissions:', allpermisson);
+                          // console.log('Parsed Permissions:', allpermisson);
                         
                         } else {
-                          console.log('extra-hrm-jobs-jobonbording is not available');
+                          // console.log('extra-hrm-jobs-jobonbording is not available');
                         }
                         
                         const canCreateClient = allpermisson?.includes('create');
@@ -145,7 +148,7 @@ const JobApplicationList = () => {
       dispatch(getjobapplication());
       const updatedUsers = users.filter((item) => item.id !== userId);
       setUsers(updatedUsers);
-      message.success({ content: `Deleted user ${userId}`, duration: 2 });
+      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
     });
   };
 

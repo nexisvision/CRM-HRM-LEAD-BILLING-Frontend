@@ -23,15 +23,20 @@ const AddInterview = ({ onClose, onAddInterview }) => {
     dispatch(GetJobdata());
   }, []);
 
+  const user = useSelector((state) => state.auth.user);
   const customerdata = useSelector((state) => state.Jobs);
-  const fnddata = customerdata.Jobs.data;
+  const fnddata = customerdata.Jobs.data || [];
 
+  const fnddataa = fnddata.filter((item) => item.created_by === user);
+ 
   useEffect(() => {
     dispatch(getjobapplication());
   }, []);
 
   const allappdata = useSelector((state) => state.jobapplications);
-  const datafnd = allappdata.jobapplications.data;
+  const datafnd = allappdata.jobapplications.data || [];
+
+  const fnddataaa = datafnd.filter((item) => item.created_by === user);
 
   const onSubmit = (values, { resetForm }) => {
     const formattedData = {
@@ -99,77 +104,81 @@ const AddInterview = ({ onClose, onAddInterview }) => {
           <Row gutter={16}>
             {/* Job Dropdown */}
 
-            <Col span={12} className="mt-2">
-              <div className="form-item">
-                <label className="font-semibold">job</label>
-                <Field name="job">
-                  {({ field }) => (
-                    <Select
-                      {...field}
-                      className="w-full"
-                      placeholder="Select job"
-                      loading={!fnddata} // Loading state
-                      onChange={(value) => setFieldValue("job", value)}
-                      value={values.customer}
-                      onBlur={() => setFieldTouched("job", true)}
-                    >
-                      {fnddata && fnddata.length > 0 ? (
-                        fnddata.map((client) => (
-                          <Option key={client.id} value={client.id}>
-                            {client.title || "Unnamed job"}
-                          </Option>
-                        ))
-                      ) : (
-                        <Option value="" disabled>
-                          No customers available
-                        </Option>
-                      )}
-                    </Select>
-                  )}
-                </Field>
-                <ErrorMessage
-                  name="customer"
-                  component="div"
-                  className="error-message text-red-500 my-1"
-                />
-              </div>
-            </Col>
+
 
             <Col span={12} className="mt-2">
-              <div className="form-item">
-                <label className="font-semibold">candidate</label>
-                <Field name="candidate">
-                  {({ field }) => (
-                    <Select
-                      {...field}
-                      className="w-full"
-                      placeholder="Select candidate"
-                      loading={!fnddata} // Loading state
-                      onChange={(value) => setFieldValue("candidate", value)}
-                      value={values.customer}
-                      onBlur={() => setFieldTouched("candidate", true)}
-                    >
-                      {datafnd && datafnd.length > 0 ? (
-                        datafnd.map((client) => (
-                          <Option key={client.id} value={client.id}>
-                            {client.name || "Unnamed candidate"}
+                <div className="form-item">
+                  <label className="font-semibold">Job</label>
+                  <Field name="job_applicant">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-2"
+                        placeholder="Select job application"
+                        loading={!fnddataa}
+                        onChange={(value) =>
+                          setFieldValue("job_applicant", value)
+                        }
+                        value={values.job_applicant}
+                        onBlur={() => setFieldTouched("job_applicant", true)}
+                      >
+                        {fnddataa && fnddataa.length > 0 ? (
+                          fnddataa.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.title || "Unnamed job application"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No jobs available
                           </Option>
-                        ))
-                      ) : (
-                        <Option value="" disabled>
-                          No customers available
-                        </Option>
-                      )}
-                    </Select>
-                  )}
-                </Field>
-                <ErrorMessage
-                  name="customer"
-                  component="div"
-                  className="error-message text-red-500 my-1"
-                />
-              </div>
-            </Col>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="job_applicant"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Candidate</label>
+                  <Field name="job">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-2"
+                        placeholder="Select candidate"
+                        loading={!fnddataaa}
+                        onChange={(value) => setFieldValue("job", value)}
+                        value={values.job}
+                        onBlur={() => setFieldTouched("job", true)}
+                      >
+                        {fnddataaa && fnddataaa.length > 0 ? (
+                          fnddataaa.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.name || "Unnamed job"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No job Application available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="job"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
             {/* Interviewer Dropdown */}
             <Col span={12} className="mt-2">
               <div className="form-item">

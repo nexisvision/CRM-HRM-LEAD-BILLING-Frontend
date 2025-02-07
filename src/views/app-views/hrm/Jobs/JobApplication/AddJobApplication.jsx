@@ -20,9 +20,12 @@ const AddJobApplication = ({ onClose }) => {
     dispatch(GetJobdata());
   }, []);
 
-  const customerdata = useSelector((state) => state.Jobs);
-  const fnddata = customerdata.Jobs.data;
+const user = useSelector((state) => state.user.loggedInUser.username);
 
+  const customerdata = useSelector((state) => state.Jobs);
+  const fnddata = customerdata.Jobs.data || [];
+
+  const fnddtaa = fnddata.filter((item) => item.created_by === user);
   const countries = useSelector((state) => state.countries.countries);
 
   useEffect(() => {
@@ -37,7 +40,7 @@ const AddJobApplication = ({ onClose }) => {
         onClose();
         // message.success("Form submitted successfully");
       });
-      message.success("Job application added successfully!");
+      // message.success("Job application added successfully!");
     } catch (error) {
       console.error("Submission error:", error);
       message.error("An error occurred while submitting the job application.");
@@ -106,20 +109,20 @@ const AddJobApplication = ({ onClose }) => {
                         {...field}
                         className="w-full mt-2"
                         placeholder="Select job"
-                        loading={!fnddata} // Loading state
+                        loading={!fnddtaa} // Loading state
                         onChange={(value) => setFieldValue("job", value)}
                         value={values.customer}
                         onBlur={() => setFieldTouched("job", true)}
                       >
-                        {fnddata && fnddata.length > 0 ? (
-                          fnddata.map((client) => (
+                        {fnddtaa && fnddtaa.length > 0 ? (
+                          fnddtaa.map((client) => (
                             <Option key={client.id} value={client.id}>
                               {client.title || "Unnamed job"}
                             </Option>
                           ))
                         ) : (
                           <Option value="" disabled>
-                            No customers available
+                            No job available
                           </Option>
                         )}
                       </Select>

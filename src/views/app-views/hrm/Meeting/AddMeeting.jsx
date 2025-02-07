@@ -315,6 +315,7 @@ const AddMeeting = ({ onClose }) => {
                   <Field name="meetingLink" as={Input} placeholder="Event meetingLink" />
                   <ErrorMessage
                     name="meetingLink"
+
                     component="div"
                     className="error-message text-red-500 my-1"
                   />

@@ -29,9 +29,8 @@ const MeetingList = () => {
 
   const dispatch = useDispatch();
 
-
+ const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Meeting);
-
 
   //   const [dealStatisticData] = useState(DealStatisticData);
 
@@ -74,10 +73,10 @@ const MeetingList = () => {
                
                   if (parsedPermissions["extra-hrm-meeting"] && parsedPermissions["extra-hrm-meeting"][0]?.permissions) {
                     allpermisson = parsedPermissions["extra-hrm-meeting"][0].permissions;
-                    console.log('Parsed Permissions:', allpermisson);
+                    // console.log('Parsed Permissions:', allpermisson);
                   
                   } else {
-                    console.log('extra-hrm-meeting is not available');
+                    // console.log('extra-hrm-meeting is not available');
                   }
                   
                   const canCreateClient = allpermisson?.includes('create');
@@ -108,7 +107,7 @@ const MeetingList = () => {
 
       setUsers(users.filter((item) => item.id !== userId));
 
-      message.success({ content: 'Deleted user successfully.', duration: 2 });
+      // message.success({ content: 'Deleted user successfully.', duration: 2 });
     } catch (error) {
       // message.error({ content: 'Failed to delete user', duration: 2 });
       console.error('Error deleting user:', error);
@@ -147,9 +146,11 @@ const MeetingList = () => {
 
   useEffect(() => {
     if (tabledata && tabledata.Meeting) {
-      setUsers(tabledata.Meeting.data);
+      // Filter meetings by created_by matching the logged-in user's username
+      const filteredData = tabledata.Meeting.data.filter((item) => item.created_by === user);
+          setUsers(filteredData);
     }
-  }, [tabledata]);
+  }, [tabledata]); 
 
   const EditMeet = (id) => {
     openEditMeetingModal();

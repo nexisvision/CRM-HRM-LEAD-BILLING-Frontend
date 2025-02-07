@@ -20,7 +20,7 @@ import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { AddTasks, GetTasks } from "./TaskReducer/TaskSlice";
+import { AddTaskk, GetTasks } from "./TaskReducer/TaskSlice";
 import { useDispatch, useSelector } from "react-redux";
 import useSelection from "antd/es/table/hooks/useSelection";
 import { assign, values } from "lodash";
@@ -53,7 +53,8 @@ const AddTask = ({ onClose }) => {
 
   const { id } = useParams();
 
-  
+  const user = useSelector((state) => state.user.loggedInUser.username);
+
   const allproject = useSelector((state) => state.Project);
   const fndrewduxxdaa = allproject.Project.data
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
@@ -62,8 +63,9 @@ const AddTask = ({ onClose }) => {
   const AllLoggedData = useSelector((state) => state.user);
 
   const allempdata = useSelector((state) => state.employee);
-  const empData = allempdata?.employee?.data;
+  const empData = allempdata?.employee?.data || [];
 
+  const fnd = empData.filter((item) => item.created_by === user);
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
   const initialValues = {
@@ -146,7 +148,7 @@ const AddTask = ({ onClose }) => {
     // }
 
     // Dispatch AddTasks with updated values
-    dispatch(AddTasks({ id, values }))
+    dispatch(AddTaskk({ id, values }))
       .then(() => {
         // Fetch updated tasks after successfully adding
         dispatch(GetTasks(id))
@@ -369,8 +371,8 @@ const AddTask = ({ onClose }) => {
                         value={values.assignTo}
                         onBlur={() => setFieldTouched("assignTo", true)}
                       >
-                        {empData && empData.length > 0 ? (
-                          empData.map((client) => (
+                        {fnd && fnd.length > 0 ? (
+                          fnd.map((client) => (
                             <Option key={client.id} value={client.id}>
                               {client.firstName ||
                                 client.username ||
@@ -379,7 +381,7 @@ const AddTask = ({ onClose }) => {
                           ))
                         ) : (
                           <Option value="" disabled>
-                            No Clients Available
+                            No Employee Available
                           </Option>
                         )}
                       </Select>

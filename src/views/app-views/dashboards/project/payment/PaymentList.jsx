@@ -165,7 +165,7 @@ const PaymentList = () => {
       const updatedData = await dispatch(Getpay(id));
       setList(list.filter((item) => item.id !== exid));
 
-      message.success({ content: "Deleted user successfully", duration: 2 });
+      // message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error.message || error);
     }

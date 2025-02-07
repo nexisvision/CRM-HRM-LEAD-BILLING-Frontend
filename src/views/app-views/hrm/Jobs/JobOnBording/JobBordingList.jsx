@@ -54,8 +54,12 @@ const JobOnBordingList = () => {
     useState(false);
   const navigate = useNavigate();
 
+  const user = useSelector((state) => state.user.loggedInUser.username);
+
   const alldata = useSelector((state) => state.jobonboarding);
-  const fnddata = alldata.jobonboarding.data;
+  const fnddata = alldata.jobonboarding.data || [];
+
+  const filteredData = fnddata.filter((item) => item.created_by === user);
 
   useEffect(() => {
     dispatch(getJobonBoarding());
@@ -63,7 +67,7 @@ const JobOnBordingList = () => {
 
   useEffect(() => {
     if (fnddata) {
-      setUsers(fnddata);
+      setUsers(filteredData);
     }
   }, [fnddata]);
 
@@ -114,10 +118,10 @@ const JobOnBordingList = () => {
                    
                       if (parsedPermissions["extra-hrm-jobs-jobonbording"] && parsedPermissions["extra-hrm-jobs-jobonbording"][0]?.permissions) {
                         allpermisson = parsedPermissions["extra-hrm-jobs-jobonbording"][0].permissions;
-                        console.log('Parsed Permissions:', allpermisson);
+                        // console.log('Parsed Permissions:', allpermisson);
                       
                       } else {
-                        console.log('extra-hrm-jobs-jobonbording is not available');
+                        // console.log('extra-hrm-jobs-jobonbording is not available');
                       }
                       
                       const canCreateClient = allpermisson?.includes('create');
@@ -134,7 +138,7 @@ const JobOnBordingList = () => {
     dispatch(deleteJobonBoarding(userId)).then(() => {
       dispatch(getJobonBoarding());
       setUsers(users.filter((item) => item.id !== userId));
-      message.success({ content: `Deleted user ${userId}`, duration: 2 });
+      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
     });
   };
 

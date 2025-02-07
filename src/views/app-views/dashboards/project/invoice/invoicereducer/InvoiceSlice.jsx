@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import InvoiceService from "../../../project/invoice/invoicereducer/InvoiceService";
+import { message } from "antd";
 
 // Async thunks
 export const getAllInvoices = createAsyncThunk(
@@ -177,10 +178,12 @@ const invoiceSlice = createSlice({
         state.loading = false;
         state.invoices.push(action.payload);
         state.success = true;
+        message.success(action.payload?.message);
       })
       .addCase(createInvoice.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        message.error(action.payload?.message);
       })
 
       // Update invoice
@@ -195,12 +198,14 @@ const invoiceSlice = createSlice({
           (invoice) => invoice.id === action.payload.id
         );
         if (index !== -1) {
-          state.invoices[index] = action.payload; // Update the invoice
+          state.invoices[index] = action.payload;
+          message.success(action.payload?.message);
         }
       })
       .addCase(updateInvoice.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        message.error(action.payload?.message);
       })
 
       // Delete invoice
@@ -214,10 +219,12 @@ const invoiceSlice = createSlice({
           (invoice) => invoice._id !== action.payload
         );
         state.success = true;
+        message.success(action.payload?.message);
       })
       .addCase(deleteInvoice.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        message.error(action.payload?.message);
       });
 
     // Fetch statistics
