@@ -24,6 +24,7 @@ import { GetTagspro, AddTags } from "./tagReducer/TagSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { AddLablee, GetLablee } from "../milestone/LableReducer/LableSlice";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
 
@@ -80,6 +81,13 @@ const AddProject = ({ onClose }) => {
 
   const allloggeduser = useSelector((state)=>state.user.loggedInUser.username)
 
+
+  const { currencies } = useSelector((state) => state.currencies);
+
+  const curr = currencies?.data || [];
+  
+  const curren = curr?.filter((item) => item.created_by === allloggeduser);
+
   const alluserdatas = useSelector((state) => state.Users);
   const fnadat = alluserdatas?.Users?.data;
   
@@ -100,6 +108,7 @@ const AddProject = ({ onClose }) => {
 
   const initialValues = {
     project_name: "",
+    currency: "",
     project_category: "",
     startDate: null,
     endDate: null,
@@ -115,10 +124,15 @@ const AddProject = ({ onClose }) => {
     
   };
 
+  useEffect(() => {
+    dispatch(getcurren());
+}, [dispatch]);
+
   const validationSchema = Yup.object({
     project_name: Yup.string().required("Please enter a Project Name."),
-
+    currency: Yup.string().required("Please select Currency."),
     project_category: Yup.string().required("Please enter a Category."),
+    currency: Yup.string().required("Please select Currency."),
     startDate: Yup.date().nullable().required("Start date is required."),
     endDate: Yup.date().nullable().required("End date is required."),
     // projectimage: Yup.mixed().required("Please upload a Project Image."),
@@ -410,6 +424,48 @@ const AddProject = ({ onClose }) => {
                   />
                 </div>
               </Col>
+
+              <Col span={12}>
+                                <div className="form-item">
+                                    <label className="font-semibold">Currency</label>
+                                    <Field name="currency">
+
+                                        {({ field, form }) => (
+                                            <Select
+                                                {...field}
+                                                placeholder="Select Currency"
+                                                className="w-full"
+                                                onChange={(value) => {
+                                                    const selectedCurrency = curren.find(
+                                                        (c) => c.id === value
+                                                    );
+                                                    form.setFieldValue(
+                                                        "currency",
+                                                        selectedCurrency?.currencyCode || ""
+                                                    );
+                                                }}
+                                                value={form.values.currency}
+                                                onBlur={() => form.setFieldTouched("currency", true)}
+                                                allowClear={false}
+                                            >
+                                                {Array.isArray(curren) && curren.map((currency) => (
+                                                    <Option 
+                                                        key={currency.id} 
+                                                        value={currency.id}
+                                                    >
+                                                        {currency.currencyCode}
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        )}
+                                    </Field>
+                                    <ErrorMessage
+                                        name="currency"
+                                        component="div"
+                                        className="error-message text-red-500 my-1"
+                                    />
+                                </div>
+                            </Col>
 
               <Col span={8} className="mt-4">
                 <div className="form-item">

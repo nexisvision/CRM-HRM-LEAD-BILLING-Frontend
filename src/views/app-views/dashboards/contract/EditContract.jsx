@@ -43,7 +43,7 @@ const EditContract = ({ id, onClose }) => {
     description: "",
     phone: "",
     phoneCode: "",
-    contract_number: "",
+    // contract_number: "",
     currency: "",
     address: "",
     city: "",
@@ -60,7 +60,7 @@ const EditContract = ({ id, onClose }) => {
     type: Yup.string().optional("Please enter Contract Value ."),
     startDate: Yup.date().nullable().optional("Start date is required."),
     endDate: Yup.date().nullable().optional("End date is required."),
-    contract_number: Yup.string().optional("Please enter a Contract Number."),
+    // contract_number: Yup.string().optional("Please enter a Contract Number."),
     value: Yup.number()
       .optional("Please Select a contractvalue.")
       .positive("Contract Value must be positive."),
@@ -89,11 +89,11 @@ const EditContract = ({ id, onClose }) => {
     dispatch(Editcon({ id, values }))
       .then(() => {
         dispatch(ContaractData());
-        message.success("Project added successfully!");
+        // message.success("Project added successfully!");
         onClose();
       })
       .catch((error) => {
-        message.error("Failed to update employee.");
+        // message.error("Failed to update employee.");
         console.error("Edit API error:", error);
       });
   };
@@ -127,7 +127,7 @@ const EditContract = ({ id, onClose }) => {
         description: filcon.description || "",
         phone: filcon.phone || "",
         phoneCode: filcon.phoneCode || "",
-        contract_number: filcon.contract_number || "",
+        // contract_number: filcon.contract_number || "",
         currency: filcon.currency || "",
         address: filcon.address || "",
         city: filcon.city || "",
@@ -171,7 +171,7 @@ const EditContract = ({ id, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12}>
+              {/* <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Contract Number</label>
                   <Field
@@ -185,7 +185,7 @@ const EditContract = ({ id, onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
 
               <Col span={12}>
                 <div className="form-item">

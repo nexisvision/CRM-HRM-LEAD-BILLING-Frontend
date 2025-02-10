@@ -63,8 +63,22 @@ const SourcesList = () => {
 
   const lid = userdata.id;
 
+  const user = userdata.username;
+
+
+  
   const alltagdata = useSelector((state) => state.Lable);
-  const datas = alltagdata.Lable.data;
+
+  const alltaggdata = alltagdata.Lable.data || [];
+
+
+  const fndddata = alltaggdata.filter(item => item.created_by === user);
+
+  // console.log("fndddata", fndddata);
+
+  const datas = fndddata?.filter(item => item.lableType === "source");  
+
+
 
   // Open Add Job Modal
   const openAddSourcesModal = () => {
@@ -104,7 +118,7 @@ const SourcesList = () => {
     if (datas) {
       setList(datas);
     }
-  }, [datas]);
+  }, []);
 
   const deletefun = async (userId) => {
     try {

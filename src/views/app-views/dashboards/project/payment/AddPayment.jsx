@@ -62,10 +62,10 @@ const curren = curr?.filter((item) => item.created_by === user);
 
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const initialValues = {
-    project: fnddata?.id || "",
+    project_name: fnddata?.id || "",
     invoice: "",
     paidOn: "",
-    amount: "",
+    amount: "", 
     currency: "",
     exchangeRate: "",
     transactionId: "",
@@ -75,7 +75,7 @@ const curren = curr?.filter((item) => item.created_by === user);
     remark: "",
   };
   const validationSchema = Yup.object({
-    project: Yup.string().optional("Please enter Project."),
+    project_name: Yup.string().optional("Please enter Project."),
     invoice: Yup.string().optional("Please enter Invoice."),
     paidOn: Yup.string().optional("Please enter Paid On."),
     amount: Yup.string().optional("Please enter Amount."),
@@ -115,7 +115,7 @@ const curren = curr?.filter((item) => item.created_by === user);
                 <div className="form-item">
                   <label className="font-semibold">Project</label>
                   <Field
-                    name="project"
+                    name="project_name"
                     as={Input}
                     placeholder="Enter Project"
                     className=""

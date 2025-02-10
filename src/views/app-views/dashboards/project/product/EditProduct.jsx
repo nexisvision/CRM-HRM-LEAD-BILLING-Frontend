@@ -387,11 +387,11 @@ const EditProduct = ({ idd, onClose }) => {
     dispatch(EditProdu({ idd, values }))
       .then(() => {
         dispatch(GetProdu(id));
-        message.success("Product updated successfully!");
+        // message.success("Product updated successfully!");
         onClose();
       })
       .catch((error) => {
-        message.error("Failed to update Employee.");
+        // message.error("Failed to update Employee.");
         console.error("Edit API error:", error);
       });
   };

@@ -24,7 +24,25 @@ const { Option } = Select;
 const AddContract = ({ onClose }) => {
   const dispatch = useDispatch();
 
+
+  const allloggeduser = useSelector((state)=>state.user.loggedInUser.username)
+
   const countries = useSelector((state) => state.countries.countries);
+
+  const countrydata = countries?.filter((item) => item.created_by === allloggeduser);
+ 
+  const { currencies } = useSelector((state) => state.currencies);
+
+  const curr = currencies?.data || [];
+  
+  const curren = curr?.filter((item) => item.created_by === allloggeduser);
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
+
+  // const AllProject = useSelector((state) => state.Project);
+  // const properdata = AllProject.Project.data;
+
+  // const projectdata = properdata?.filter((item) => item.created_by === user);
 
   useEffect(() => {
     dispatch(getallcountries());
@@ -48,7 +66,7 @@ const AddContract = ({ onClose }) => {
     value: "",
     notes: "",
     description: "",
-    contract_number: "",
+    // contract_number: "",
   };
 
   const validationSchema = Yup.object({
@@ -61,7 +79,7 @@ const AddContract = ({ onClose }) => {
     phone: Yup.string().required("Please enter a Phone Number."),
     city: Yup.string().required("Please enter a City."),
     notes: Yup.string().required("Please enter a Notes."),
-    contract_number: Yup.string().required("Please enter a Contract Number."),
+    // contract_number: Yup.string().required("Please enter a Contract Number."),
     country: Yup.string().required("Please select a Country."),
     state: Yup.string().required("Please enter a State."),
     currency: Yup.string().required("Please enter Contract currency."),
@@ -78,25 +96,30 @@ const AddContract = ({ onClose }) => {
     dispatch(AddCon(values))
       .then(() => {
         dispatch(ContaractData());
-        message.success("Contract added successfully!");
+        // message.success("Contract added successfully!");
         resetForm();
         onClose();
       })
       .catch((error) => {
-        message.error("Failed to add Contract.");
+        // message.error("Failed to add Contract.");
         console.error("Add API error:", error);
       });
   };
 
   const Clientdata = useSelector((state) => state.SubClient);
-  const filtersubclient = Clientdata.SubClient.data;
-  const { currencies } = useSelector((state) => state.currencies);
+  const filtersubclient = Clientdata.SubClient.data || [];
+
+  const clientdata = filtersubclient?.filter((item) => item.created_by === allloggeduser);
+  // const { currencies } = useSelector((state) => state.currencies);
   const Projectdtaa = useSelector((state) => state.Project);
-  const filterprojectdata = Projectdtaa.Project.data;
+  const filterprojectdata = Projectdtaa.Project.data || [];
+
+  const projectdata = filterprojectdata?.filter((item) => item.created_by === allloggeduser);
   // const [form] = Form.useForm();
 
   useEffect(() => {
     dispatch(getcurren());
+    dispatch(getallcountries());
   }, []);
 
   useEffect(() => {
@@ -137,7 +160,7 @@ const AddContract = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12}>
+              {/* <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Contract Number</label>
                   <Field
@@ -151,7 +174,7 @@ const AddContract = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
@@ -163,7 +186,7 @@ const AddContract = ({ onClose }) => {
                       name="phoneCode"
                       onChange={(value) => setFieldValue('phoneCode', value)}
                     >
-                      {countries.map((country) => (
+                      {countrydata.map((country) => (
                         <Option key={country.id} value={country.phoneCode}>
                           (+{country.phoneCode})
                         </Option>
@@ -228,7 +251,7 @@ const AddContract = ({ onClose }) => {
                     onChange={(value) => setFieldValue('country', value)}
                     value={values.country}
                   >
-                    {countries.map((country) => (
+                    {countrydata.map((country) => (
                       <Option key={country.id} value={country.countryName}>
                         {country.countryName}
                       </Option>
@@ -263,6 +286,7 @@ const AddContract = ({ onClose }) => {
                   <label className="font-semibold">Zip Code</label>
                   <Field
                     name="zipcode"
+                    type="number"
                     as={Input}
                     placeholder="Enter Zip Code"
                   />
@@ -287,8 +311,8 @@ const AddContract = ({ onClose }) => {
                         onChange={(value) => setFieldValue("client", value)}
                         value={values.client}
                       >
-                        {filtersubclient && filtersubclient.length > 0 ? (
-                          filtersubclient.map((client) => (
+                        {clientdata && clientdata.length > 0 ? (
+                          clientdata.map((client) => (
                             <Option key={client.id} value={client.id}>
                               {client.username || client.name || "Unnamed Client"}
                             </Option>
@@ -321,16 +345,16 @@ const AddContract = ({ onClose }) => {
                           placeholder="Select Currency"
 
                           onChange={(value) => {
-                            const selectedCurrency = Array.isArray(currencies?.data) && 
-                              currencies?.data?.find((c) => c.id === value);
+                            const selectedCurrency = Array.isArray(curren) && 
+                            curren.find((c) => c.id === value);
                             form.setFieldValue(
                               "currency",
                               selectedCurrency?.currencyCode || ""
                             );
                           }}
                         >
-                          {Array.isArray(currencies?.data) && currencies?.data?.length > 0 ? (
-                            currencies.data.map((currency) => (
+                          {Array.isArray(curren) && curren?.length > 0 ? (
+                            curren.map((currency) => (
                               <Option key={currency.id} value={currency.id}>
                                 {currency.currencyCode}
                               </Option>
@@ -362,8 +386,8 @@ const AddContract = ({ onClose }) => {
                         onChange={(value) => setFieldValue("project", value)}
                         value={values.project}
                       >
-                        {filterprojectdata && filterprojectdata.length > 0 ? (
-                          filterprojectdata.map((project) => (
+                        {projectdata && projectdata.length > 0 ? (
+                          projectdata.map((project) => (
                             <Option key={project.id} value={project.id}>
                               {project.project_name || "Unnamed Project"}
                             </Option>

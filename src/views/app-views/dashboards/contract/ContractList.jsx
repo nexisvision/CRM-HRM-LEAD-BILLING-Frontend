@@ -139,7 +139,7 @@ const ContractList = () => {
 
       setUsers(users.filter((item) => item.id !== userId));
 
-      message.success({ content: "Deleted user successfully", duration: 2 });
+      // message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error);
     }
@@ -218,10 +218,10 @@ const ContractList = () => {
   
       if (parsedPermissions["dashboards-project-Contract"] && parsedPermissions["dashboards-project-Contract"][0]?.permissions) {
         allpermisson = parsedPermissions["dashboards-project-Contract"][0].permissions;
-        console.log('Parsed Permissions:', allpermisson);
+        // console.log('Parsed Permissions:', allpermisson);
       
       } else {
-        console.log('dashboards-project-Contract is not available');
+        // console.log('dashboards-project-Contract is not available');
       }
       
       const canCreateClient = allpermisson?.includes('create');
@@ -233,9 +233,6 @@ const ContractList = () => {
 
 
       ///endpermission
-
-
-
 
   const dropdownMenu = (elm) => (
     <Menu>

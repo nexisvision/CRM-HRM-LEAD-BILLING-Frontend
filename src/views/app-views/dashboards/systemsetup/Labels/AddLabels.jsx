@@ -35,6 +35,8 @@ const AddLabels = ({ onClose }) => {
   // const navigate = useNavigate();
   const dispatch = useDispatch();
 
+
+  
   const allpipline = useSelector((state) => state.Piplines);
   const fndpip = allpipline.Piplines.data;
 

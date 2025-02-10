@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { useState, useEffect } from "react";
 // import { PrinterOutlined } from '@ant-design/icons';
 import StatisticWidget from "components/shared-components/StatisticWidget";
-import { AnnualStatisticData } from "../../../dashboards/default/DefaultDashboardData";
+// import { AnnualStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import {
   Row,
   Card,
@@ -75,7 +75,7 @@ const getShippingStatus = (status) => {
 const paymentStatusList = ["Paid", "Pending", "Expired"];
 export const InvoiceList = () => {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
-  const [annualStatisticData] = useState(AnnualStatisticData);
+  // const [annualStatisticData] = useState(AnnualStatisticData);
   const [list, setList] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isAddInvoiceModalVisible, setIsAddInvoiceModalVisible] =

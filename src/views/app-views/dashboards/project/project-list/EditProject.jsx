@@ -395,6 +395,48 @@ const EditProject = ({ id, onClose }) => {
                 </div>
               </Col>
 
+              <Col span={12}>
+                                <div className="form-item">
+                                    <label className="font-semibold">Currency</label>
+                                    <Field name="currency">
+
+                                        {({ field, form }) => (
+                                            <Select
+                                                {...field}
+                                                placeholder="Select Currency"
+                                                className="w-full"
+                                                onChange={(value) => {
+                                                    const selectedCurrency = curren.find(
+                                                        (c) => c.id === value
+                                                    );
+                                                    form.setFieldValue(
+                                                        "currency",
+                                                        selectedCurrency?.currencyCode || ""
+                                                    );
+                                                }}
+                                                value={form.values.currency}
+                                                onBlur={() => form.setFieldTouched("currency", true)}
+                                                allowClear={false}
+                                            >
+                                                {Array.isArray(curren) && curren.map((currency) => (
+                                                    <Option 
+                                                        key={currency.id} 
+                                                        value={currency.id}
+                                                    >
+                                                        {currency.currencyCode}
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        )}
+                                    </Field>
+                                    <ErrorMessage
+                                        name="currency"
+                                        component="div"
+                                        className="error-message text-red-500 my-1"
+                                    />
+                                </div>
+                            </Col>
+
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Estimated Months</label>

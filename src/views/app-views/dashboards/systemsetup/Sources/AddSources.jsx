@@ -38,10 +38,12 @@ const AddSources = ({ onClose }) => {
     // Add static labelType to payload
     const payload = {
       ...values,
-      labelType: "source",
+      lableType: "source",
     };
 
     dispatch(AddLablee({ lid, payload }));
+
+    // console.log("payload", payload);
     dispatch(GetLablee(lid));
     dispatch(GetLablee(lid));
     onClose();

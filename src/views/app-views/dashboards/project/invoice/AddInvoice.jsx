@@ -31,8 +31,17 @@ const AddInvoice = ({ onClose }) => {
     // const [selectedProject, setSelectedProject] = useState(null);
     // const [clientOptions, setClientOptions] = useState([]);
 
-    const { currencies } = useSelector((state) => state.currencies);
-    const [discountRate, setDiscountRate] = useState(0);
+
+    const user = useSelector((state) => state.user.loggedInUser.username);
+
+    const currenciesState = useSelector((state) => state.currencies);
+
+    const curr = currenciesState?.currencies?.data || [];
+
+    const curren = curr?.filter((item) => item.created_by === user);
+
+    const [currenciesList, setCurrenciesList] = useState([]);
+    const [discountRate, setDiscountRate] = useState(10);
     const dispatch = useDispatch();
 
 
@@ -75,6 +84,12 @@ const sub = subClients?.SubClient?.data;
         dispatch(getcurren());
     }, [dispatch]);
 
+    // Handle currencies data when it changes
+    useEffect(() => {
+        if (curren) {
+            setCurrenciesList(curren);
+        }
+    }, [curren]);
 
     // Fetch milestones when product changes
     useEffect(() => {
@@ -500,11 +515,11 @@ const sub = subClients?.SubClient?.data;
                                                 className="w-full mt-2"
                                                 placeholder="Select Currency"
                                                 onChange={(value) => {
-                                                    const selectedCurrency = currencies.find(c => c.id === value);
+                                                    const selectedCurrency = curren.find(c => c.id === value);
                                                     form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
                                                 }}
                                             >
-                                                 {currencies?.data?.map((currency) => (
+                                                 {curren.map((currency) => (
                                 <Option key={currency.id} value={currency.id}>
                                   {currency.currencyCode}
                                 </Option>

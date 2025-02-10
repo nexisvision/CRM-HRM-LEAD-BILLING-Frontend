@@ -122,8 +122,7 @@ const initialIsAuth = () => {
 const usersSlice = createSlice({
   name: "user",
   initialState: {
-    isAuth: initialIsAuth(),
-    users: [],
+    isAuth: initialIsAuth(),  
     loggedInUser: initialUser(),
     employees: [],
     editItem: {},

@@ -38,21 +38,26 @@ const AddContractType = ({ onClose }) => {
 
   const lid = userdata.id;
 
+
+
   const onSubmit = (values, { resetForm }) => {
     // Add static labelType to payload
     const payload = {
       ...values,
-      labelType: "contract",
+      lableType: "contract",
     };
+
+    // console.log("payload", payload);
 
     dispatch(AddLablee({ lid, payload }));
     dispatch(GetLablee(lid));
     dispatch(GetLablee(lid));
     onClose();
     resetForm();
-    console.log("Submitted values:", payload);
-    message.success("Country added successfully!");
+    // console.log("Submitted values:", payload);
+    message.success("Contract Type added successfully!");
   };
+
 
   const initialValues = {
     name: "",

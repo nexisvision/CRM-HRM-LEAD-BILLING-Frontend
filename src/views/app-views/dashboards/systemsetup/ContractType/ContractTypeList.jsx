@@ -28,7 +28,7 @@ import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
 
 import utils from "utils";
-import { PaymentStatisticData } from "../../../dashboards/default/DefaultDashboardData";
+// import { PaymentStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 
 import {
   DeleteLabless,
@@ -56,7 +56,7 @@ const ContractTypeList = () => {
     useState(false);
   const [isViewSourcesModalVisible, setIsViewSourcesModalVisible] =
     useState(false);
-  const [paymentStatisticData] = useState(PaymentStatisticData);
+  // const [paymentStatisticData] = useState(PaymentStatisticData);
 
   const [idd, setIdd] = useState("");
 
@@ -65,8 +65,25 @@ const ContractTypeList = () => {
 
   const lid = userdata.id;
 
+  
+  const user = userdata.username;
+
+
+  
   const alltagdata = useSelector((state) => state.Lable);
-  const datas = alltagdata.Lable.data;
+
+  const alltaggdata = alltagdata.Lable.data || [];
+
+
+  const fndddata = alltaggdata.filter(item => item.created_by === user);
+
+  // console.log("fndddata", fndddata);
+
+  const datas = fndddata?.filter(item => item.lableType === "contract");  
+
+
+  // const alltagdata = useSelector((state) => state.Lable);
+  // const datas = alltagdata.Lable.data;
 
   // Open Add Job Modal
   const openAddSourcesModal = () => {

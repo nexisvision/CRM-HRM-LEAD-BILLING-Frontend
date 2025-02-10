@@ -30,10 +30,19 @@ const AddExpenses = ({ onClose }) => {
     const { id } = useParams();
 
     const dispatch = useDispatch();
+
+const user = useSelector((state) => state.user.loggedInUser.username);
+
     const { currencies } = useSelector((state) => state.currencies);
+
+const curr = currencies?.data || [];
+
+const curren = curr?.filter((item) => item.created_by === user);
+
 
     const { data: employee } = useSelector((state) => state.employee.employee);
 
+    const employeeData = employee?.filter((item) => item.created_by === user);
 
     const allproject = useSelector((state) => state.Project);
     const fndrewduxxdaa = allproject.Project.data
@@ -127,7 +136,7 @@ const AddExpenses = ({ onClose }) => {
                                                 placeholder="Select Currency"
                                                 className="w-full"
                                                 onChange={(value) => {
-                                                    const selectedCurrency = currencies?.data?.find(
+                                                    const selectedCurrency = curren.find(
                                                         (c) => c.id === value
                                                     );
                                                     form.setFieldValue(
@@ -139,7 +148,7 @@ const AddExpenses = ({ onClose }) => {
                                                 onBlur={() => form.setFieldTouched("currency", true)}
                                                 allowClear={false}
                                             >
-                                                {Array.isArray(currencies?.data) && currencies?.data?.map((currency) => (
+                                                {Array.isArray(curren) && curren.map((currency) => (
                                                     <Option 
                                                         key={currency.id} 
                                                         value={currency.id}
@@ -238,16 +247,16 @@ const AddExpenses = ({ onClose }) => {
                                                     placeholder="Select Employee"
                                                     onChange={(value) => {
                                                         const selectedEmployee =
-                                                            Array.isArray(employee) &&
-                                                            employee.find((e) => e.id === value);
+                                                            Array.isArray(employeeData) &&
+                                                            employeeData.find((e) => e.id === value);
                                                         form.setFieldValue(
                                                             "employee",
                                                             selectedEmployee?.username || ""
                                                         );
                                                     }}
                                                 >
-                                                    {Array.isArray(employee) &&
-                                                        employee.map((emp) => (
+                                                    {Array.isArray(employeeData) &&
+                                                        employeeData.map((emp) => (
                                                             <Option key={emp.id} value={emp.id}>
                                                                 {emp.username}
                                                             </Option>
