@@ -49,7 +49,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
   const project = datleads.find((item) => item.id === id);
   const currenciesState = useSelector((state) => state.currencies);
   const currencies = currenciesState?.currencies?.data || [];
-  const { data: employee } = useSelector((state) => state.employee.employee);
+
   const countries = useSelector((state) => state.countries.countries);
   const alltagdata = useSelector((state) => state.Lable);
   const datas = alltagdata.Lable.data || [];
@@ -61,6 +61,18 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
 
   const AllLoggedData = useSelector((state) => state.user);
   const loggedInUserId = AllLoggedData?.loggedInUser?.id;
+
+    
+    useEffect(()=>{
+      dispatch(empdata())
+    },[dispatch])
+
+
+    const filterdata = useSelector((state)=>state.employee.employee.data || []);
+  
+    const loggeduser = useSelector((state)=>state.user.loggedInUser.username);
+  
+    const employee = filterdata.filter((item)=>item.created_by === loggeduser)
 
   // Define initialValues using the project data
   const initialValues = {
@@ -94,7 +106,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
     leadTitle: Yup.string().required("Lead Title is required"),
     firstName: Yup.string().required("First Name is required"),
     lastName: Yup.string().required("Last Name is required"),
-    telephone: Yup.number()
+    telephone: Yup.string()
       .typeError("Please enter a valid number")
       .nullable(),
     email: Yup.string().email("Invalid email format"),
@@ -367,7 +379,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                     </Select>
                     <Field
                       name="telephone"
-                      type="number"
+                      type="text"
                       as={Input}
                       style={{ width: '70%' }}
                       placeholder="Enter Telephone"

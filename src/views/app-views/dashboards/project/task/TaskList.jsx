@@ -99,13 +99,13 @@ export const TaskList = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "paymentStatus";
-      const data = utils.filterArray(OrderListData, key, value);
-      setList(data);
-    } else {
-      setList(OrderListData);
-    }
+    // if (value !== "All") {
+    //   const key = "paymentStatus";
+    //   const data = utils.filterArray(OrderListData, key, value);
+    //   setList(data);
+    // } else {
+    //   setList([]);
+    // }
   };
 
   // Open Add Job Modal

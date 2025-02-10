@@ -22,12 +22,12 @@ const GetTask = async (id) => {
   }
 };
 
-const Addtask = async (idd, values) => {
+const Addtask = async (id, values) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/tasks/${idd}`,
+      `http://localhost:5353/api/v1/tasks/${id}`,
       values,
       {
         headers: {
@@ -63,11 +63,11 @@ const Deletetask = async (idd) => {
   }
 };
 
-const EditTask = async (iddd, values) => {
+const EditTask = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/tasks/${iddd}`,
+      `http://localhost:5353/api/v1/tasks/${idd}`,
       values,
       {
         headers: {

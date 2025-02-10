@@ -308,7 +308,7 @@ const EditTask = ({ iddd, onClose }) => {
               <Col span={10} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Priority</label>
-                  <Field name="priority">
+                  <Field name="priority">    
                     {({ field }) => (
                       <Select
                         {...field}
@@ -318,7 +318,7 @@ const EditTask = ({ iddd, onClose }) => {
                       >
                         <Option value="Medium">
                           <div className="flex items-center">
-                            <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
+                            <span className="h-2 w-2 rounded-`full bg-yellow-500 mr-2"></span>
                             Medium
                           </div>
                         </Option>

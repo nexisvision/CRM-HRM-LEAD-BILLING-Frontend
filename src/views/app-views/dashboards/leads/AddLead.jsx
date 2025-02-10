@@ -36,11 +36,26 @@ const AddLead = ({ onClose }) => {
   const [details, setDetails] = useState(false);
   const [info, setInfo] = useState(false);
   const [organisation, setorganisation] = useState(false);
+  const dispatch = useDispatch();
  
 //  const { currencies } = useSelector((state) => state.currencies);
 const currenciesState = useSelector((state) => state.currencies);
   const currencies = currenciesState?.currencies?.data || [];
-  const { data: employee } = useSelector((state) => state.employee.employee);
+  // 
+  // const { data: employee } = useSelector((state) => state.employee.employee);
+  
+  useEffect(()=>{
+    dispatch(empdata())
+  },[dispatch])
+
+
+  const filterdata = useSelector((state)=>state.employee.employee.data || []);
+
+  const loggeduser = useSelector((state)=>state.user.loggedInUser.username);
+
+  const employee = filterdata.filter((item)=>item.created_by === loggeduser)
+
+
   const [selectedCurrency, setSelectedCurrency] = useState(null);
   const alltagdata = useSelector((state) => state.Lable);
   const datas = alltagdata.Lable.data || [];
@@ -59,7 +74,6 @@ const currenciesState = useSelector((state) => state.currencies);
 
   const AllLoggedData = useSelector((state) => state.user);
   const loggedInUserId = AllLoggedData?.loggedInUser?.id;
-  const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries.countries);
 
   const fetchLables = async (lableType, setter) => {
@@ -163,7 +177,7 @@ const currenciesState = useSelector((state) => state.currencies);
     leadTitle: Yup.string().required("Lead Title is required"),
     firstName: Yup.string().required("First name is required"),
     lastName: Yup.string().required("Last Name is required"),
-    telephone: Yup.number()
+    telephone: Yup.string()
       .typeError("Please enter a valid number")
       .nullable(),
     email: Yup.string().email("Please enter a valid email address").nullable(),
@@ -363,12 +377,12 @@ const currenciesState = useSelector((state) => state.currencies);
                     </Select>
                     <Field
                       name="telephone"
-                      type="number"
+                      type="text"
                       as={Input}
                       style={{ width: '70%' }}
                       placeholder="Enter Telephone"
                     />
-                  </div>
+                  </div> 
                   <ErrorMessage
                     name="telephone"
                     component="div"

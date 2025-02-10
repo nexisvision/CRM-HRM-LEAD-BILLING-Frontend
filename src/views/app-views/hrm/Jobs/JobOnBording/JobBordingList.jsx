@@ -52,6 +52,7 @@ const JobOnBordingList = () => {
     useState(false);
   const [isEditJobOnBordingModalVisible, setIsEditJobOnBordingModalVisible] =
     useState(false);
+    const [idd, setIdd] = useState("");
   const navigate = useNavigate();
 
   const user = useSelector((state) => state.user.loggedInUser.username);
@@ -82,7 +83,8 @@ const JobOnBordingList = () => {
   const closeAddJobOnBordingModal = () => {
     setIsAddJobOnBordingModalVisible(false);
   };
-  const openEditJobOnBordingModal = () => {
+  const editfunction = (idd) => {
+    setIdd(idd)
     setIsEditJobOnBordingModalVisible(true);
   };
 
@@ -220,7 +222,7 @@ const JobOnBordingList = () => {
                                        type=""
                                        className=""
                                        icon={<EditOutlined />}
-                                       onClick={openEditJobOnBordingModal}
+                                       onClick={()=> editfunction(elm.id)}
                                        size="small"
                                      >
                                        <span className="">Edit</span>
@@ -413,7 +415,7 @@ const JobOnBordingList = () => {
         footer={null}
         width={1000}
       >
-        <EditJobOnBording onClose={closeEditJobOnBordingModal} />
+        <EditJobOnBording onClose={closeEditJobOnBordingModal} idd={idd}/>
       </Modal>
     </Card>
   );

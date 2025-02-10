@@ -70,11 +70,11 @@ export const deleteJobonBoarding = createAsyncThunk(
     }
   }
 );
-export const editJobonBoarding = createAsyncThunk(
+export const editJobonBoardingss = createAsyncThunk(
   "users/editJobonBoarding",
-  async ({ idd, values }, thunkAPI) => {
+  async ({ idd, data }, thunkAPI) => {
     try {
-      const response = await UserService.editjobonb(idd, values);
+      const response = await UserService.editjobonb(idd, data);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -172,16 +172,16 @@ const jobonboardingSlice = createSlice({
         message.error(action.payload?.message);
       })
       //update
-      .addCase(editJobonBoarding.pending, (state) => {
+      .addCase(editJobonBoardingss.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(editJobonBoarding.fulfilled, (state, action) => {
+      .addCase(editJobonBoardingss.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload;
         message.success(action.payload?.message);
       })
-      .addCase(editJobonBoarding.rejected, (state, action) => {
+      .addCase(editJobonBoardingss.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
         message.error(action.payload?.message);

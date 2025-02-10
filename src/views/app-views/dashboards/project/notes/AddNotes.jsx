@@ -31,6 +31,17 @@ const AddNotes = ({ onClose }) => {
     dispatch(empdata());
   }, []);
 
+  // const { data: employee } = useSelector((state) => state.employee.employee);
+
+  const filterdata = useSelector((state)=>state.employee.employee.data)
+
+  const loggeduesr = useSelector((state)=>state.user.loggedInUser.username)
+
+  // const employee = filterdata.filter((item)=>item.created_by === loggeduesr)
+
+
+
+
   const initialValues = {
     note_title: "",
     notetype: "public",
@@ -102,7 +113,7 @@ const AddNotes = ({ onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold mb-2">Employee</label>
                   <div className="flex gap-2">
-                    <Field name="employee">
+                    <Field name="employees">
                       {({ field, form }) => (
                         <Select
                           {...field}
@@ -129,42 +140,12 @@ const AddNotes = ({ onClose }) => {
                     </Field>
                   </div>
                   <ErrorMessage
-                    name="employee"
+                    name="employees"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
                 </div>
               </Col>
-              {/* <Col span={12} className="mt-2">
-  <div className="form-item">
-    <label className="font-semibold">Employees</label>
-    <Field name="employees">
-      {({ field }) => (
-        <Select
-          {...field}
-          className="w-full"
-          placeholder="Select Employees"
-          mode="multiple" // Enable multiple selection
-          onChange={(value) => setFieldValue("employees", value)}
-          value={values.employees}
-          onBlur={() => setFieldTouched("employees", true)}
-        >
-          {employeeData.map((emp) => (
-            <Option key={emp.id} value={emp.id}>
-              {emp.username}
-            </Option>
-          ))}
-        </Select>
-      )}
-    </Field>
-    <ErrorMessage
-      name="employees"
-      component="div"
-      className="error-message text-red-500 my-1"
-    />
-  </div>
-</Col>   */}
-
 
               <Col span={24} className="mt-4">
                 <div className="form-item">

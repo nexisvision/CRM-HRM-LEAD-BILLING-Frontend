@@ -25,16 +25,24 @@ const EditUser = ({ idd, visible, onClose, onUpdate, userData }) => {
   const getalllrole = useSelector((state) => state.role);
   const fnddata = getalllrole.role.data;
 
+    const loggeduser = useSelector((state)=>state?.user?.loggedInUser?.username);
+  
+  
+    const rolefnd = fnddata?.filter((item)=>item?.created_by === loggeduser)
+
   const Getalluser = useSelector((state) => state.Users);
   const fnduset = Getalluser.Users.data;
 
   useEffect(() => {
     const finddata = fnduset.find((item) => item.id === idd);
+
+    const fndroleee = fnddata.find((item) => item.id === finddata.role_id)
+
     if (finddata) {
       form.setFieldsValue({
         username: finddata.username,
         email: finddata.email,
-        role_id: finddata.role_id,
+        role_id: fndroleee,
       });
     }
   }, [fnduset]);
@@ -108,7 +116,7 @@ const EditUser = ({ idd, visible, onClose, onUpdate, userData }) => {
             rules={[{ required: true, message: "Please select a user role" }]}
           >
             <Select placeholder="Select Role">
-              {fnddata?.map((tag) => (
+              {rolefnd?.map((tag) => (
                 <Option key={tag?.id} value={tag?.id}>
                   {tag?.role_name}
                 </Option>

@@ -98,13 +98,13 @@ const ExpensesList = () => {
         setIsViewExpensesModalVisible(false);
     };
     const handleShowStatus = (value) => {
-        if (value !== "All") {
-            const key = "orderStatus";
-            const data = utils.filterArray(OrderListData, key, value);
-            setList(data);
-        } else {
-            setList(OrderListData);
-        }
+        // if (value !== "All") {
+        //     const key = "orderStatus";
+        //     const data = utils.filterArray(OrderListData, key, value);
+        //     setList(data);
+        // } else {
+        //     setList(OrderListData);
+        // }
     };
 
     useEffect(() => {

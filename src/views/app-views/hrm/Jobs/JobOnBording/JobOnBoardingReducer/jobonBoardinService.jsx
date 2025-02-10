@@ -66,12 +66,12 @@ const deletejobonb = async (id) => {
   }
 };
 
-const editjobonb = async (idd, values) => {
+const editjobonb = async (idd, data) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
       `http://localhost:5353/api/v1/job-onboarding/${idd}`,
-      values,
+      data,
       {
         headers: {
           Authorization: `Bearer ${token}`,

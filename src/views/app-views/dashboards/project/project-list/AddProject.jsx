@@ -93,20 +93,23 @@ const AddProject = ({ onClose }) => {
   
   const fnd = fnadat?.filter((item)=>item?.created_by === allloggeduser)
 
+
   const Tagsdetail = useSelector((state) => state.Tags);
   const AllTags = Tagsdetail?.Tags?.data;
 
   const Allclient = useSelector((state) => state.ClientData);
   const clientdata = Allclient.ClientData.data;
 
-  const AllEmployee = useSelector((state) => state.employee);
-  const employeedata = AllEmployee.employee.data;
+  const AllEmployee = useSelector((state) => state.SubClient);
+  const employeedata = AllEmployee.SubClient.data;
 
-  const fnd2 = employeedata?.filter((item)=>item?.created_by === allloggeduser)
+
+  const fnd2 = employeedata?.filter((item)=>item?.username === allloggeduser)
+
 
   const AllLoggeddtaa = useSelector((state) => state.user);
 
-  const initialValues = {
+  const initialValues = { 
     project_name: "",
     currency: "",
     project_category: "",
@@ -383,13 +386,13 @@ const AddProject = ({ onClose }) => {
                   <Select
                     style={{ width: "100%" }}
                     placeholder="Select User"
-                    loading={!fnd2}
+                    loading={!employeedata}
                     value={values.user} // Bind value to Formik's field
                     onChange={(value) => setFieldValue("user", value)} // Update Formik's field value
                     onBlur={() => setFieldTouched("user", true)} // Set touched state
                   >
-                    {fnd2 && fnd2.length > 0 ? (
-                      fnd2.map((employee) => (
+                    {employeedata && employeedata.length > 0 ? (
+                      employeedata.map((employee) => (
                         <Option key={employee.id} value={employee.id}>
                           {employee.username || "Unnamed User"}
                         </Option>

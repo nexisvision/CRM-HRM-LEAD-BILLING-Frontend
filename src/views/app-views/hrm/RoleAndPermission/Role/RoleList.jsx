@@ -117,7 +117,7 @@ const RoleList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
+      {/* {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                 <Menu.Item>
                                 <Flex alignItems="center">
                                   <Button
@@ -132,7 +132,7 @@ const RoleList = () => {
                                   </Button>
                                 </Flex>
                               </Menu.Item>
-                                ) : null}
+                                ) : null} */}
                   
                   
                   {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (

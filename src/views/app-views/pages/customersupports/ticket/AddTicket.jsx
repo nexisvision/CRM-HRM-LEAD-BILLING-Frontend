@@ -33,7 +33,7 @@ const AddTicket = ({ onClose }) => {
 
   const llogedid = useSelector((state) => state.user.loggedInUser.username);
 
-  const fnddatass = fnddata.filter((item)=>item.created_by === llogedid);
+  const fnddatass = fnddata?.filter((item)=>item?.created_by === llogedid);
 
   const initialValues = {
     ticketSubject: "",

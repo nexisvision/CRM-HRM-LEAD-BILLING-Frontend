@@ -28,17 +28,19 @@ export const CurrenciesList = () => {
     // const { currencies } = useSelector(
     //     (state) => state.currencies.currencies
     // );
-
-    useEffect(() => {
-        dispatch(getcurren());
-    }, [dispatch]);
-
-    const allcurrdata = useSelector((state)=>state.currencies?.currencies?.data)
+    const filterdata = useSelector((state) => state.currencies?.currencies?.data);
+        
+    // Get logged-in username
+    const loggedusername = useSelector((state) => state.user.loggedInUser.username);
     
+    useEffect(() => {
+        if (!filterdata || filterdata.length === 0) {
+            dispatch(getcurren());
+        }
+    }, [dispatch, filterdata]); 
 
-
-     // Get countries data from Redux store
-    //  const { countries, isLoading } = useSelector((state) => state.countries);
+    const allcurrdata = filterdata?.filter((item) => item?.created_by === loggedusername);
+   
 
      useEffect(() => {
         if (allcurrdata && Array.isArray(allcurrdata)) {
@@ -46,7 +48,7 @@ export const CurrenciesList = () => {
         } else {
             setFilteredData([]);
         }
-    }, [allcurrdata]);
+    }, [filterdata]);
 
     const openAddCurrenciesModal = () => {
         setIsAddCurrenciesModalVisible(true);

@@ -16,12 +16,15 @@ import { TbClockHour3Filled } from "react-icons/tb";
 import { GetProject } from "../project-list/projectReducer/ProjectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
+import { useParams } from "react-router-dom";
 
 // Register the chart components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const OverViewList = () => {
   const dispatch = useDispatch();
+
+const {id} = useParams();
 
   const [proo, setProo] = useState("");
 
@@ -66,9 +69,20 @@ const OverViewList = () => {
 
   const dataclient = Allclientdata.SubClient?.data || [];
 
+
   const updatedList = dataclient?.filter(
     (item) => item.id == filterdata[0]?.client
   );
+
+  const projectdata = useSelector((state)=>state.Project.Project.data)
+  
+  const findproject = projectdata.find((item)=>item.id === id);
+
+  
+  const subclient = useSelector((state)=>state.SubClient.SubClient.data)
+
+  const filteclient = subclient.find((item)=>item.id ===findproject.client)
+
 
   useEffect(() => {
     dispatch(ClientData());
@@ -207,10 +221,10 @@ const OverViewList = () => {
               />
               <div>
                 <h3 className="f-18 f-w-500 mb-0 text-black mt-6">
-                  {/* {updatedList[0]?.username} */}
+                  {filteclient?.username}
                 </h3>
                 <p className="f-14 mb-0 text-lightest">
-                  {/* {updatedList[0]?.email} */}
+                  {filteclient?.email}
                 </p>
               </div>
             </div>

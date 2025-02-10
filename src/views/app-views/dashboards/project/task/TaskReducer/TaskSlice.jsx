@@ -22,9 +22,9 @@ export const AddTaskk = createAsyncThunk(
 
 export const AddTasks = createAsyncThunk(
   "users/AddTasks",
-  async ({ idd, values }, thunkAPI) => {
+  async ({ id, values }, thunkAPI) => {
     try {
-      const response = await UserService.Addtask(idd, values);
+      const response = await UserService.Addtask(id, values);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -86,9 +86,9 @@ export const DeleteTasks = createAsyncThunk(
 );
 export const EditTasks = createAsyncThunk(
   "users/EditTasks",
-  async ({ iddd, values }, thunkAPI) => {
+  async ({ idd, values }, thunkAPI) => {
     try {
-      const response = await UserService.EditTask(iddd, values);
+      const response = await UserService.EditTask(idd, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(

@@ -109,10 +109,14 @@ const LeadCards = () => {
     const Allpipline = useSelector((state) => state.Piplines);
     const Filterpipline = Allpipline?.Piplines?.data || [];
 
+    const alldatas = useSelector((state)=>state.user.loggedInUser.username)
+
+    const fnddatss = Filterpipline.filter((item)=>item.created_by === alldatas)
+
   useEffect(() => {
     if (fndata.length > 0) {
       const leadsGroupedByStage = fndata
-        .filter((stage) => !selectedPipeline || stage.pipeline === selectedPipeline)
+        .filter((stage) => stage.pipeline === selectedPipeline || !selectedPipeline)
         .map((stage) => ({
           status: stage.stageName,
           stageId: stage.id,
@@ -252,7 +256,7 @@ const LeadCards = () => {
                 value={selectedPipeline}
               >
                 <Option value="all">All Pipelines</Option>
-                {Filterpipline.map((pipeline) => (
+                {fnddatss.map((pipeline) => (
                   <Option key={pipeline.id} value={pipeline.id}>
                     {pipeline.pipeline_name}
                   </Option>

@@ -23,6 +23,10 @@ const LeadStagesList = () => {
   const Allpipline = useSelector((state) => state.Piplines);
   const Filterpipline = Allpipline?.Piplines?.data || [];
 
+  const loggeduser = useSelector((state) => state.user.loggedInUser.username);
+
+  const filterpipline = Filterpipline.filter((item)=>item.created_by === loggeduser)
+
   const [leadadatafilter, setLeadadatafilter] = useState([]);
   const [idd, setIdd] = useState("");
   const [selectedPipeline, setSelectedPipeline] = useState("all");
@@ -105,7 +109,7 @@ const LeadStagesList = () => {
           value={selectedPipeline}
         >
           <Option value="all">All Pipelines</Option>
-          {Filterpipline.map((pipeline) => (
+          {filterpipline.map((pipeline) => (
             <Option key={pipeline.id} value={pipeline.id}>
               {pipeline.pipeline_name}
             </Option>

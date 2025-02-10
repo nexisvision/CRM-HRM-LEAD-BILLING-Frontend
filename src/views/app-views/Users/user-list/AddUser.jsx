@@ -15,6 +15,11 @@ const AddUser = ({ visible, onClose, onCreate }) => {
   const getalllrole = useSelector((state) => state.role);
   const fnddata = getalllrole.role.data;
 
+  const loggeduser = useSelector((state)=>state?.user?.loggedInUser?.username);
+
+
+  const rolefnd = fnddata?.filter((item)=>item?.created_by === loggeduser)
+
   const [otpToken, setOtpToken] = useState(null);
   const [otp, setOtp] = useState("");
 
@@ -139,7 +144,7 @@ const AddUser = ({ visible, onClose, onCreate }) => {
               rules={[{ required: true, message: "Please select a user role" }]}
             >
               <Select placeholder="Select Role">
-                {fnddata?.map((tag) => (
+                {rolefnd?.map((tag) => (
                   <Option key={tag?.id} value={tag?.id}>
                     {tag?.role_name}
                   </Option>

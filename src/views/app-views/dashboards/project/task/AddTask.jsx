@@ -49,8 +49,6 @@ const AddTask = ({ onClose }) => {
     const [statuses, setStatuses] = useState([]);
 
 
-
-
   const { id } = useParams();
 
   const user = useSelector((state) => state.user.loggedInUser.username);
@@ -66,6 +64,11 @@ const AddTask = ({ onClose }) => {
   const empData = allempdata?.employee?.data || [];
 
   const fnd = empData.filter((item) => item.created_by === user);
+  const loggeduser = useSelector((state)=>state.user.loggedInUser.username);
+
+  const fnduserdatas = empData.filter((item)=>item.created_by === loggeduser);
+
+
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
   const initialValues = {
@@ -341,27 +344,6 @@ const AddTask = ({ onClose }) => {
                   <label className="font-semibold">AssignTo</label>
                   <Field name="assignTo">
                     {({ field }) => (
-                      // <Select
-                      //   {...field}
-                      //   mode="multiple"
-                      //   placeholder="Select assignTo"
-                      //   className="w-full mt-2"
-                      //   onChange={(value) => {
-                      //     const assignToObjects = value.map((id) => ({
-                      //       id,
-                      //       name:
-                      //         id === "xyz" ? "XYZ" : id === "abc" ? "ABC" : "",
-                      //     }));
-                      //     setFieldValue("assignTo", assignToObjects);
-                      //   }}
-                      //   value={values.assignTo.map((item) => item.id)}
-                      //   onBlur={() => setFieldTouched("assignTo", true)}
-                      //   allowClear={false}
-                      // >
-                      //   <Option value="xyz">XYZ</Option>
-                      //   <Option value="abc">ABC</Option>
-                      // </Select>
-
                       <Select
                         {...field}
                         className="w-full mt-2"
@@ -371,8 +353,8 @@ const AddTask = ({ onClose }) => {
                         value={values.assignTo}
                         onBlur={() => setFieldTouched("assignTo", true)}
                       >
-                        {fnd && fnd.length > 0 ? (
-                          fnd.map((client) => (
+                        {fnduserdatas && fnduserdatas.length > 0 ? (
+                          fnduserdatas.map((client) => (
                             <Option key={client.id} value={client.id}>
                               {client.firstName ||
                                 client.username ||

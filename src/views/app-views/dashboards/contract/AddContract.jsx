@@ -18,6 +18,7 @@ import { GetProject } from "../project/project-list/projectReducer/ProjectSlice"
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { getcurren } from "../../setting/currencies/currenciesSlice/currenciesSlice";
 import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
+import moment from "moment";
 
 const { Option } = Select;
 
@@ -61,8 +62,8 @@ const AddContract = ({ onClose }) => {
     country: "",
     state: "",
     zipcode: "",
-    startDate: null,
-    endDate: null,
+    startDate: "",
+    endDate: "",
     value: "",
     notes: "",
     description: "",
@@ -75,25 +76,58 @@ const AddContract = ({ onClose }) => {
     project: Yup.string().required("Please select a Project."),
     type: Yup.string().required("Please enter Contract Type."),
     address: Yup.string().required("Please enter a Address."),
-    phoneCode: Yup.string().required("Please select a Country."),
-    phone: Yup.string().required("Please enter a Phone Number."),
+    phoneCode: Yup.string().required("Please select a Country Code."),
+    phone: Yup.string()
+      .required("Please enter a Phone Number.")
+      .matches(/^\d+$/, "Phone number must contain only digits"),
     city: Yup.string().required("Please enter a City."),
-    notes: Yup.string().required("Please enter a Notes."),
-    // contract_number: Yup.string().required("Please enter a Contract Number."),
+    notes: Yup.string().required("Please enter Notes."),
+    contract_number: Yup.string().required("Please enter a Contract Number."),
     country: Yup.string().required("Please select a Country."),
     state: Yup.string().required("Please enter a State."),
-    currency: Yup.string().required("Please enter Contract currency."),
-    startDate: Yup.date().nullable().required("Start date is required."),
-    endDate: Yup.date().nullable().required("End date is required."),
-    zipcode: Yup.string().required("Please enter a Zip Code."),
+    currency: Yup.string().required("Please select Contract currency."),
+    startDate: Yup.date()
+      .required("Start date is required.")
+      .nullable()
+      .test("startDate", "Start date cannot be in the past", function(value) {
+        if (!value) return true;
+        return moment(value).startOf('day').isSameOrAfter(moment().startOf('day'));
+      }),
+    endDate: Yup.date()
+      .required("End date is required.")
+      .nullable()
+      .test("endDate", "End date must be after start date", function(value) {
+        const { startDate } = this.parent;
+        if (!startDate || !value) return true;
+        return moment(value).isAfter(moment(startDate));
+      }),
+    zipcode: Yup.string()
+      .required("Please enter a Zip Code.")
+      .matches(/^[0-9]+$/, "Zip Code must be numeric"),
     value: Yup.number()
       .required("Please enter a Contract Value.")
-      .positive("Contract Value must be positive."),
-    description: Yup.string().required("Please enter a Description."),
+      .positive("Contract Value must be positive.")
+      .typeError("Contract Value must be a number"),
+    description: Yup.string()
+      .required("Please enter a Description.")
+      .min(10, "Description must be at least 10 characters long"),
   });
 
   const onSubmit = (values, { resetForm }) => {
-    dispatch(AddCon(values))
+    // Format dates to ISO string before sending
+    const formattedValues = {
+      ...values,
+      startDate: values.startDate ? values.startDate.toISOString() : null,
+      endDate: values.endDate ? values.endDate.toISOString() : null,
+      phone: values.phoneCode + values.phone,
+      // Ensure value is properly converted to number and not null
+      value: values.value ? parseFloat(values.value) : 0
+    };
+
+    console.log("Submitting values:", formattedValues);
+    
+    dispatch(AddCon(formattedValues))
+      .unwrap()
       .then(() => {
         dispatch(ContaractData());
         // message.success("Contract added successfully!");
@@ -101,7 +135,7 @@ const AddContract = ({ onClose }) => {
         onClose();
       })
       .catch((error) => {
-        // message.error("Failed to add Contract.");
+        message.error("Failed to add Contract: " + (error.message || "Unknown error"));
         console.error("Add API error:", error);
       });
   };
@@ -138,7 +172,7 @@ const AddContract = ({ onClose }) => {
 
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({ handleSubmit, setFieldValue, values }) => (
@@ -215,9 +249,9 @@ const AddContract = ({ onClose }) => {
               <Col span={24} className="mt-4">
                   <div className="form-item">
                     <label className="font-semibold">Address</label>
-                    <Field name="billing_address" as={Input} placeholder="Enter Address" />
+                    <Field name="address" as={Input} placeholder="Enter Address" />
                     <ErrorMessage
-                      name="billing_address"
+                      name="address"
 
                       component="div"
                       className="error-message text-red-500 my-1"
@@ -434,15 +468,26 @@ const AddContract = ({ onClose }) => {
                 </div>
               </Col>
 
+              
+
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Contract Value</label>
-                  <Field
-                    name="value"
-                    as={Input}
-                    placeholder="Enter Contract Value"
-                    type="text"
-                  />
+                  <Field name="value">
+                    {({ field }) => (
+                      <Input
+                        {...field}
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="Enter Contract Value"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setFieldValue('value', value ? parseFloat(value) : '');
+                        }}
+                      />
+                    )}
+                  </Field>
                   <ErrorMessage
                     name="value"
                     component="div"
@@ -458,8 +503,12 @@ const AddContract = ({ onClose }) => {
                     {({ field }) => (
                       <DatePicker
                         className="w-full"
-                        format="DD-MM-YYYY"
-                        onChange={(date) => setFieldValue("startDate", date)}
+                        format="YYYY-MM-DD"
+                        onChange={(date) => {
+                          const formattedDate = date ? date.toDate() : null;
+                          setFieldValue("startDate", formattedDate);
+                        }}
+                        value={values.startDate ? moment(values.startDate) : null}
                       />
                     )}
                   </Field>
@@ -478,8 +527,12 @@ const AddContract = ({ onClose }) => {
                     {({ field }) => (
                       <DatePicker
                         className="w-full"
-                        format="DD-MM-YYYY"
-                        onChange={(date) => setFieldValue("endDate", date)}
+                        format="YYYY-MM-DD"
+                        onChange={(date) => {
+                          const formattedDate = date ? date.toDate() : null;
+                          setFieldValue("endDate", formattedDate);
+                        }}
+                        value={values.endDate ? moment(values.endDate) : null}
                       />
                     )}
                   </Field>

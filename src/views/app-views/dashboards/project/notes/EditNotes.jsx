@@ -179,8 +179,13 @@ const EditNotes = ({ idd, onClose }) => {
   const dispatch = useDispatch();
   const { id } = useParams();
 
-  const user = useSelector((state) => state.user.loggedInUser.username);
-  const { data: employee } = useSelector((state) => state.employee.employee);
+  // const { data: employee } = useSelector((state) => state.employee.employee);
+
+    const filterdata = useSelector((state)=>state.employee.employee.data)
+  
+    const loggeduesr = useSelector((state)=>state.user.loggedInUser.username)
+  
+    const employee = filterdata.filter((item)=>item.created_by === loggeduesr)
 
   const employeeData = employee?.filter((item) => item.created_by === user);
   
@@ -193,7 +198,7 @@ const EditNotes = ({ idd, onClose }) => {
     note_title: "",
     notetype: "public",
     description: "",
-    employee: {},
+    employees: null,
   });
 
   const validationSchema = Yup.object({
@@ -206,24 +211,18 @@ const EditNotes = ({ idd, onClose }) => {
   const Expensedata = allempdata?.Notes?.data || [];
 
   useEffect(() => {
-    // Only proceed if we have data and an ID to look for
     if (!Expensedata.length || !idd) {
       return;
     }
 
-    // Find the note data
     const noteData = Expensedata.find((item) => item.id === idd);
 
     if (noteData) {
-      // Update all form fields with existing data
       setInitialValues({
         note_title: noteData.note_title || "",
         notetype: noteData.notetype || "public",
         description: noteData.description || "",
-        employee:
-          typeof noteData.employee === "object" && noteData.employee !== null
-            ? Object.values(noteData.employee)[0] // Extract only the value without id
-            : {}, // Default empty object if not valid
+        employees: noteData.employees?.id || null,
       });
     } else {
       message.error("Note not found!");
@@ -231,20 +230,28 @@ const EditNotes = ({ idd, onClose }) => {
     }
   }, [idd, Expensedata, navigate]);
 
-  const onSubmit = (values, { resetForm }) => {
-    const employeeObject =
-      values.employee.length > 0 ? { id: values.employee[0] } : null;
+  const onSubmit = async (values, { resetForm }) => {
+    try {
+      const employeesObject = values.employees ? { id: values.employees } : null;
+      
+      const payload = {
+        ...values,
+        employees: employeesObject
+      };
 
-    values.employee = employeeObject;
+      console.log("Updating note with values:", { idd, values: payload });
+      const result = await dispatch(EditeNotes({ idd, values: payload })).unwrap();
+      dispatch(GetNote(id));
+      onClose();
 
-    // console.log("va", values);
-
-    dispatch(EditeNotes({ idd, values }));
-    onClose();
-    dispatch(GetNote(id));
-    // console.log("Submitted values:", values);
-    // message.success("Note updated successfully!");
-    resetForm();
+      if (result) {
+        message.success("Note updated successfully!");
+        resetForm();
+      }
+    } catch (error) {
+      console.error("Error updating note:", error);
+      message.error("Failed to update note: " + error.message);
+    }
   };
 
   return (
@@ -276,24 +283,18 @@ const EditNotes = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="">
+              <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold mb-2">Employee</label>
                   <div className="flex gap-2">
-                    <Field name="employee">
+                    <Field name="employees">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full mt-2"
+                          className="w-full"
                           placeholder="Select Employee"
                           onChange={(value) => {
-                            const selectedEmployee =
-                              Array.isArray(employeeData) &&
-                              employeeData.find((e) => e.id === value);
-                            form.setFieldValue(
-                              "employee",
-                              selectedEmployee?.username || ""
-                            );
+                            form.setFieldValue("employees", value);
                           }}
                         >
                           {Array.isArray(employeeData) &&
@@ -307,7 +308,7 @@ const EditNotes = ({ idd, onClose }) => {
                     </Field>
                   </div>
                   <ErrorMessage
-                    name="employee"
+                    name="employees"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />

@@ -5,9 +5,10 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios"; // Import axios for API requests
-import { getJobonBoarding } from "./JobOnBoardingReducer/jobonboardingSlice";
+import {  editJobonBoardingss, getJobonBoarding } from "./JobOnBoardingReducer/jobonboardingSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { AddLable, GetLable } from "../../../dashboards/sales/LableReducer/LableSlice";
+import moment from "moment/moment";
 
 const { Option } = Select;
 
@@ -24,13 +25,6 @@ const EditJobOnBording = ({ idd, onClose }) => {
 
   const fnd = fnddtaa.find((item) => item.id === idd);
 
-console.log("fnd",fnd)
-
-  // useEffect(() => {
-  //   const empData = alldata?.jobonboarding?.data || [];
-  //   const data = empData.find((item) => item.id === idd);
-  //   setSingleEmp(data || null);
-  // }, [idd, alldata]);
 
   useEffect(() => {
     dispatch(getJobonBoarding());
@@ -102,31 +96,21 @@ console.log("fnd",fnd)
 
   // status end
 
-//   useEffect(() => {
-//     if (fnddtaa) {
-//       const findofferdatas = fnddtaa.find((item) => item.id === idd);
-// if(findofferdatas){
-//       setInitialValues({
-//         related_id: findofferdatas.related_id,
-//         interviewer: findofferdatas.interviewer,
-//         joiningDate: findofferdatas.joiningDate ? new Date(findofferdatas.joiningDate) : null,
-//         daysOfWeek: findofferdatas.daysOfWeek,
-//         salary: findofferdatas.salary,
-//         salaryType: findofferdatas.salaryType,
-//         salaryDuration: findofferdatas.salaryDuration,
-//         jobType: findofferdatas.jobType,
-//         status: findofferdatas.status,
-//       });
-//     }
-//   }
-//   }, [fnddtaa]);
-
-useEffect(() => {
-  if (fnd) {
-    setInitialValues(fnd);
-  }
-}, [fnd]);
-
+  useEffect(() => {
+    if (fnd) {
+      setInitialValues({
+        related_id: fnd?.related_id,
+        interviewer: fnd?.Interviewer,
+        joiningDate: fnd?.JoiningDate ? new moment(fnd?.JoiningDate) : null,
+        daysOfWeek: fnd?.DaysOfWeek,
+        salary: fnd?.Salary,
+        salaryType: fnd?.SalaryType,
+        salaryDuration: fnd?.SalaryDuration,
+        jobType: fnd?.JobType,
+        status: fnd?.Status,
+      });
+    }
+  }, [fnd]);
 
   // Submit the form data
   const onSubmit = async (values, { resetForm }) => {
@@ -145,7 +129,7 @@ useEffect(() => {
         Status: values.status,
       };
 
-      dispatch(EditJobOnBording(data)).then(() => {
+      dispatch(editJobonBoardingss({idd,data})).then(() => {
         dispatch(getJobonBoarding());
         // message.success("Job Candidate added successfully!");
         resetForm();
