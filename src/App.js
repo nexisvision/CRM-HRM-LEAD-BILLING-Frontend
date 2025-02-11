@@ -1,15 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
-import { BrowserRouter  } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom';
 import { ThemeSwitcherProvider } from 'react-css-theme-switcher';
 import store from './store';
-import history from './history'
-import Layouts from './layouts'
+import history from './history';
+import Layouts from './layouts';
 import { THEME_CONFIG } from './configs/AppConfig';
-import './lang'
+import './lang';
 import "react-toastify/dist/ReactToastify.css";
-
-
+import socketService from './services/SocketService';
+import './assets/styles/custom-scrollbar.css';
 
 const themes = {
   dark: `${process.env.PUBLIC_URL}/css/dark-theme.css`,
@@ -17,21 +17,29 @@ const themes = {
 };
 
 function App() {
+  useEffect(() => {
+    // Initialize socket connection
+    const socket = socketService.connect();
+
+    // Cleanup on unmount
+    return () => {
+      socketService.disconnect();
+    };
+  }, []);
+
   return (
     <div className="App">
       <Provider store={store}>
         <BrowserRouter history={history}>
-       
-          <ThemeSwitcherProvider 
-            themeMap={themes} 
-            defaultTheme={THEME_CONFIG.currentTheme} 
+          <ThemeSwitcherProvider
+            themeMap={themes}
+            defaultTheme={THEME_CONFIG.currentTheme}
             insertionPoint="styles-insertion-point"
-
           >
             <Layouts />
           </ThemeSwitcherProvider>
-        </BrowserRouter>  
-      </Provider> 
+        </BrowserRouter>
+      </Provider>
     </div>
   );
 }
