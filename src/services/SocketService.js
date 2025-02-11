@@ -64,17 +64,10 @@ class SocketService {
     sendMessage(data) {
         if (this.socket) {
             try {
-                // Validate data
-                if (!data.sender_id || !data.receiver_id || !data.message) {
-                    console.error('Missing required message fields:', data);
-                    return;
-                }
-
-                // Ensure message is a string
                 const messageData = {
                     ...data,
                     message: String(data.message).trim(),
-                    timestamp: data.timestamp || new Date().toISOString()
+                    timestamp: new Date().toISOString()
                 };
 
                 this.socket.emit('send_message', messageData);
@@ -181,6 +174,38 @@ class SocketService {
     onGroupUpdate(callback) {
         if (this.socket) {
             this.socket.on('group_updated', callback);
+        }
+    }
+
+    markMessagesAsRead(data) {
+        if (this.socket) {
+            this.socket.emit('mark_messages_read', data);
+        }
+    }
+
+    sendFiles(data) {
+        if (this.socket) {
+            return new Promise((resolve, reject) => {
+                this.socket.emit('upload_chat_files', data, (response) => {
+                    if (response.error) {
+                        reject(response.error);
+                    } else {
+                        resolve(response);
+                    }
+                });
+            });
+        }
+    }
+
+    onUploadProgress(callback) {
+        if (this.socket) {
+            this.socket.on('upload_progress', callback);
+        }
+    }
+
+    onUploadError(callback) {
+        if (this.socket) {
+            this.socket.on('upload_error', callback);
         }
     }
 }
