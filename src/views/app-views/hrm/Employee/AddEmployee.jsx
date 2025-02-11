@@ -92,16 +92,17 @@ const AddEmployee = ({ onClose, setSub }) => {
 
   const onSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
+      console.log("values", values);
       const response = await dispatch(addEmp(values));
       if (response.payload?.data?.sessionToken) {
         setOtpToken(response.payload?.data?.sessionToken);
-        // message.success("Employee added successfully! Please verify OTP.");
         setShowOtpModal(true);
       }
       resetForm();
       onClose();
     } catch (error) {
-      // message.error("Failed to add employee. Please try again.");
+      console.error("Error submitting form:", error);
+      message.error("Failed to add employee. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -169,7 +170,7 @@ const AddEmployee = ({ onClose, setSub }) => {
     <div className="add-employee p-6">
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({
@@ -409,10 +410,12 @@ const AddEmployee = ({ onClose, setSub }) => {
               <Button type="default" className="mr-2" onClick={() => onClose()}>
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit" onClick={onOpenOtpModal}>
-                <button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Submitting..." : "Submit"}
-                </button>
+              <Button 
+                type="primary" 
+                htmlType="submit"
+                loading={isSubmitting}
+              >
+                {isSubmitting ? "Submitting..." : "Submit"}
               </Button>
             </div>
           </Form>

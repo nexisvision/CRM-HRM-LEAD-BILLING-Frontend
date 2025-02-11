@@ -63,7 +63,7 @@ const AddTask = ({ onClose }) => {
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data || [];
 
-  const fnd = empData.filter((item) => item.created_by === user);
+  // const fnd = empData.filter((item) => item.created_by === user);
   const loggeduser = useSelector((state)=>state.user.loggedInUser.username);
 
   const fnduserdatas = empData.filter((item)=>item.created_by === loggeduser);

@@ -320,7 +320,7 @@ const AddJobOfferLetter = ({ onClose }) => {
 
               <div className="mt-2 w-full">
                 <span className="block p-2 font-semibold">Add File</span>
-                <Col span={24}>
+                {/* <Col span={24}>
                   <Upload
                     listType="picture"
                     accept=".pdf"
@@ -330,7 +330,25 @@ const AddJobOfferLetter = ({ onClose }) => {
                   >
                     <span className="text-xl">Choose File</span>
                   </Upload>
-                </Col>
+                </Col> */}
+
+                <Col span={24}>
+                <Field name="file">
+                       {({ field }) => (
+                           <Form.Item label="Attachment">
+                               <Upload
+                                   beforeUpload={(file) => {
+                                       setFieldValue("file", file); // Set the uploaded file in Formik state
+                                       return false; // Prevent automatic upload
+                                   }}
+                                   showUploadList={false} // Hide the default upload list
+                               >
+                                   <Button icon={<UploadOutlined />}>Choose File</Button>
+                               </Upload>
+                           </Form.Item>
+                       )}
+                   </Field>
+              </Col>
               </div>
             </Row>
             <div style={{ textAlign: "right", marginTop: "16px" }}>

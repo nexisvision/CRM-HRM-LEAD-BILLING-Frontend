@@ -139,7 +139,7 @@ const AddTicket = ({ onClose }) => {
                               {client.username || "Unnamed requestor"}
                             </Option>
                           ))
-                        ) : (
+                        ) : ( 
                           <Option value="" disabled>
                             No Employee available
                           </Option>
@@ -247,7 +247,7 @@ const AddTicket = ({ onClose }) => {
 
               {/* Attachment */}
               <Col span={24}>
-    <Field name="file">
+       <Field name="file">
         {({ field }) => (
             <Form.Item label="Attachment">
                 <Upload

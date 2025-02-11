@@ -41,7 +41,7 @@ const EditTicket = ({ idd, onClose }) => {
 
     const llogedid = useSelector((state) => state.user.loggedInUser.username);
   
-    const fnddatass = fnddatas.filter((item)=>item.created_by === llogedid);
+    const fnddatass = fnddatas?.filter((item)=>item?.created_by === llogedid);
 
   useEffect(() => {
     const perfectdata = fndfdata.find((item) => item.id === idd);
@@ -83,16 +83,29 @@ const EditTicket = ({ idd, onClose }) => {
   }, []);
 
   const onSubmit = (values, { resetForm }) => {
-    dispatch(Editicket({ idd, values }))
-      .then(() => {
-        dispatch(getAllTicket());
-        // message.success("Expenses added successfully!");
-        onClose();
-      })
-      .catch((error) => {
-        // message.error("Failed to update Employee.");
-        console.error("Edit API error:", error);
-      });
+    // dispatch(Editicket({ idd, values }))
+    //   .then(() => {
+    //     dispatch(getAllTicket());
+    //     // message.success("Expenses added successfully!");
+    //     onClose();
+    //   })
+    //   .catch((error) => {
+    //     // message.error("Failed to update Employee.");
+    //     console.error("Edit API error:", error);
+    //   });
+
+        const formData = new FormData();
+          for (const key in values) {
+              formData.append(key, values[key]);
+          }
+      
+          
+          dispatch(Editicket({idd,formData})).then((res)=>{
+           
+            dispatch(getAllTicket());
+            onClose();
+            resetForm();
+          })
   };
 
   return (
@@ -264,20 +277,21 @@ const EditTicket = ({ idd, onClose }) => {
 
               {/* Attachment */}
               <Col span={24}>
-                <Field name="attachment">
-                  {({ field }) => (
-                    <Form.Item label="Attachment">
-                      <Upload
-                        beforeUpload={(file) => {
-                          setFieldValue("attachment", file);
-                          return false;
-                        }}
-                      >
-                        <Button icon={<UploadOutlined />}>Choose File</Button>
-                      </Upload>
-                    </Form.Item>
-                  )}
-                </Field>
+                <Field name="file">
+                       {({ field }) => (
+                           <Form.Item label="Attachment">
+                               <Upload
+                                   beforeUpload={(file) => {
+                                       setFieldValue("file", file); // Set the uploaded file in Formik state
+                                       return false; // Prevent automatic upload
+                                   }}
+                                   showUploadList={false} // Hide the default upload list
+                               >
+                                   <Button icon={<UploadOutlined />}>Choose File</Button>
+                               </Upload>
+                           </Form.Item>
+                       )}
+                   </Field>
               </Col>
             </Row>
 

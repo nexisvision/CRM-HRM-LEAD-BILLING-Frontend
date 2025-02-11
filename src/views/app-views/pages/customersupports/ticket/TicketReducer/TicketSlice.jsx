@@ -74,9 +74,9 @@ export const DeleteTicket = createAsyncThunk(
 );
 export const Editicket = createAsyncThunk(
   "users/Editicket",
-  async ({ idd, values }, thunkAPI) => {
+  async ({ idd, formData }, thunkAPI) => {
     try {
-      const response = await UserService.Editticket(idd, values);
+      const response = await UserService.Editticket(idd, formData);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(

@@ -64,12 +64,12 @@ const Deleteticket = async (id) => {
   }
 };
 
-const Editticket = async (idd, values) => {
+const Editticket = async (idd, formData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
       `http://localhost:5353/api/v1/tickets/${idd}`,
-      values,
+      formData,
       {
         headers: {
           Authorization: `Bearer ${token}`,
