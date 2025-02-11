@@ -12,6 +12,9 @@ const AddUser = ({ visible, onClose, onCreate }) => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
+
+const user = useSelector((state)=>state.user.loggedInUser.username)
+
   const getalllrole = useSelector((state) => state.role);
   const fnddata = getalllrole.role.data;
 

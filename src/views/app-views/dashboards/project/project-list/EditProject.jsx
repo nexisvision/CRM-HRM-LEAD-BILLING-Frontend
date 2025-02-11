@@ -23,6 +23,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import { GetLable, AddLable } from "../../sales/LableReducer/LableSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 // import { AllLoggedData } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 
 const { Option } = Select;
@@ -33,6 +34,16 @@ const EditProject = ({ id, onClose }) => {
 
 
     const allloggeduser = useSelector((state)=>state.user.loggedInUser.username)
+
+    
+  // const allloggeduser = useSelector((state)=>state.user.loggedInUser.username)
+
+
+  const { currencies } = useSelector((state) => state.currencies);
+
+  const curr = currencies?.data || [];
+  
+  const curren = curr?.filter((item) => item.created_by === allloggeduser);
 
    const AllLoggedData = useSelector((state) => state.user);
 
@@ -104,6 +115,10 @@ const EditProject = ({ id, onClose }) => {
   useEffect(() => {
     dispatch(GetTagspro());
   }, [dispatch]); 
+
+  useEffect(() => {
+    dispatch(getcurren());
+}, [dispatch]);
 
   useEffect(() => {
     dispatch(GetUsers());

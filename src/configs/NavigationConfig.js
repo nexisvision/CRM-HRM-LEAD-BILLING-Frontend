@@ -142,6 +142,14 @@ const extraNavvTree = [
             breadcrumb: false,
             submenu: []
           },
+          {
+            key: 'extra-hrm-branch',
+            path: `${APP_PREFIX_PATH}/hrm/branch`,
+            title: 'Branch',
+            icon: BranchesOutlined,
+            breadcrumb: false,
+            submenu: []
+          },
          
           {
             key: 'extra-hrm-designation',
@@ -159,14 +167,7 @@ const extraNavvTree = [
             breadcrumb: false,
             submenu: []
           },
-          {
-            key: 'extra-hrm-branch',
-            path: `${APP_PREFIX_PATH}/hrm/branch`,
-            title: 'Branch',
-            icon: BranchesOutlined,
-            breadcrumb: false,
-            submenu: []
-          },
+         
           {
             key: 'extra-hrm-attendance',
             path: `${APP_PREFIX_PATH}/hrm/attendance`,

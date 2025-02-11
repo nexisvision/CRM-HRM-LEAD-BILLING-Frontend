@@ -29,9 +29,11 @@ const AddTicket = ({ onClose }) => {
   }, []);
 
   const alldata = useSelector((state) => state.employee);
-  const fnddata = alldata.employee.data;
+  const fnddata = alldata.employee.data || [];
 
-  const llogedid = useSelector((state) => state.user.loggedInUser.username);
+
+  const llogedid = useSelector((state) => state.user.loggedInUser.username || []);
+
 
   const fnddatass = fnddata?.filter((item)=>item?.created_by === llogedid);
 
@@ -42,7 +44,7 @@ const AddTicket = ({ onClose }) => {
     status: "Open",
     endDate: null,
     description: "",
-    attachment: null,
+    file: '',
   };
 
   const validationSchema = Yup.object({
@@ -55,11 +57,24 @@ const AddTicket = ({ onClose }) => {
   });
 
   const onSubmit = (values, { resetForm }) => {
-    dispatch(AddTickets(values));
-    dispatch(getAllTicket());
-    dispatch(getAllTicket());
-    onClose();
-    resetForm();
+    // console.log("values", values);
+    const formData = new FormData();
+    for (const key in values) {
+        formData.append(key, values[key]);
+    }
+
+    
+    dispatch(AddTickets(formData)).then((res)=>{
+     
+      dispatch(getAllTicket());
+      onClose();
+      resetForm();
+    });
+
+
+   
+    // dispatch(getAllTicket());
+   
     // console.log("Submitted values:", values);
     // message.success("Ticket created successfully!");
   };
@@ -232,21 +247,22 @@ const AddTicket = ({ onClose }) => {
 
               {/* Attachment */}
               <Col span={24}>
-                <Field name="attachment">
-                  {({ field }) => (
-                    <Form.Item label="Attachment">
-                      <Upload
-                        beforeUpload={(file) => {
-                          setFieldValue("attachment", file);
-                          return false;
-                        }}
-                      >
-                        <Button icon={<UploadOutlined />}>Choose File</Button>
-                      </Upload>
-                    </Form.Item>
-                  )}
-                </Field>
-              </Col>
+    <Field name="file">
+        {({ field }) => (
+            <Form.Item label="Attachment">
+                <Upload
+                    beforeUpload={(file) => {
+                        setFieldValue("file", file); // Set the uploaded file in Formik state
+                        return false; // Prevent automatic upload
+                    }}
+                    showUploadList={false} // Hide the default upload list
+                >
+                    <Button icon={<UploadOutlined />}>Choose File</Button>
+                </Upload>
+            </Form.Item>
+        )}
+    </Field>
+</Col>
             </Row>
 
             {/* Form Actions */}

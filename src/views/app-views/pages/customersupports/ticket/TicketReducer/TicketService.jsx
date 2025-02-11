@@ -29,6 +29,7 @@ const CreateTicket = async (payload) => {
     const res = await axios.post(
       "http://localhost:5353/api/v1/tickets/",
       payload,
+      // console.log("payload", payload),
       {
         headers: {
           Authorization: `Bearer ${token}`,

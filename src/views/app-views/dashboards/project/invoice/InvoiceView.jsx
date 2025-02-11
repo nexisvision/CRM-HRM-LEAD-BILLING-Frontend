@@ -28,7 +28,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     const [parsedInvoice, setParsedInvoice] = useState(null);
 
 
-    console.log("ssssssssss", invoiceDataa, "invoiceDataa");
+    // console.log("ssssssssss", invoiceDataa, "invoiceDataa");
 
     const allloggeduser = useSelector((state) => state.user.loggedInUser)
     console.log(allloggeduser, "allloggeduser");
@@ -37,7 +37,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     const allclient = useSelector((state) => state.SubClient.SubClient.data);
     const clientDataa = allclient.find((SubClient) => SubClient.id === invoiceDataa?.client);
 
-    console.log("ppppppppppppp", clientDataa, "clientDataa");
+    // console.log("ppppppppppppp", clientDataa, "clientDataa");
     // const clientDataa = allclient.find((SubClient) => SubClient.id === id);
 
     // UseEffect to fetch client data
