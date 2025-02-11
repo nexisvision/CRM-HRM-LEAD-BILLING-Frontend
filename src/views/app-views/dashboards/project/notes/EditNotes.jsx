@@ -187,7 +187,7 @@ const EditNotes = ({ idd, onClose }) => {
   
     const employee = filterdata.filter((item)=>item.created_by === loggeduesr)
 
-  const employeeData = employee?.filter((item) => item.created_by === user);
+  const employeeData = employee?.filter((item) => item.created_by === loggeduesr);
   
 
   useEffect(() => {

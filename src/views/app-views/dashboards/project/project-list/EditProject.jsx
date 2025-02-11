@@ -76,8 +76,8 @@ const EditProject = ({ id, onClose }) => {
   const Tagsdetail = useSelector((state) => state.Tags);
   const AllTags = Tagsdetail?.Tags?.data;
 
-    const alluserdatas = useSelector((state) => state.Users);
-    const fnadat = alluserdatas?.Users?.data;
+    // const alluserdatas = useSelector((state) => state.Users);
+    // const fnadat = alluserdatas?.Users?.data;
     
     const fnds = fnadat?.filter((item)=>item?.created_by === allloggeduser)
 
