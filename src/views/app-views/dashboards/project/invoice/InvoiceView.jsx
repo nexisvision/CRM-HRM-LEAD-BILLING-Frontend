@@ -28,14 +28,21 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     const [parsedInvoice, setParsedInvoice] = useState(null);
 
 
-    // console.log("ssssssssss", invoiceDataa, "invoiceDataa");
+    console.log("ssssssssss", idd);
 
     const allloggeduser = useSelector((state) => state.user.loggedInUser)
     console.log(allloggeduser, "allloggeduser");
 
     // Get the client data for the selected ID
     const allclient = useSelector((state) => state.SubClient.SubClient.data);
+
+    console.log(allclient, "allclient");
+
+    console.log(invoiceDataa, "invoiceDataa");
+
+
     const clientDataa = allclient.find((SubClient) => SubClient.id === invoiceDataa?.client);
+    
 
     // console.log("ppppppppppppp", clientDataa, "clientDataa");
     // const clientDataa = allclient.find((SubClient) => SubClient.id === id);
@@ -363,24 +370,24 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                             <h4 className="font-medium mb-2">Payment Info:</h4>
                             <div className='flex gap-2'>
                                 <p className='font-normal text-black'>Account Holder Name : </p>
-                                <p>{clientDataa.accountholder}</p>
+                                <p>{clientDataa?.accountholder || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
 
                                 <p className='font-normal text-black'>Account Number : </p>
-                                <p> {clientDataa.accountnumber}</p>
+                                <p>{clientDataa?.accountnumber || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
                                 <p className='font-normal text-black'>IFSC : </p>
-                                <p> {clientDataa.ifsc}</p>
+                                <p>{clientDataa?.ifsc || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
                                 <p className='font-normal text-black'>Account Type : </p>
-                                <p> {clientDataa.branch}</p>
+                                <p>{clientDataa?.branch || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
                                 <p className='font-normal text-black'>Bank Name : </p>
-                                <p>{clientDataa.bankname}</p>
+                                <p>{clientDataa?.bankname || 'N/A'}</p>
                             </div>
                             {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
 
@@ -564,24 +571,24 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                             <h4 className="font-medium mb-2">Payment Info:</h4>
                             <div className='flex gap-2'>
                                 <p className='font-normal text-black'>Account Holder Name : </p>
-                                <p>{clientDataa.accountholder}</p>
+                                <p>{clientDataa?.accountholder || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
 
                                 <p className='font-normal text-black'>Account Number : </p>
-                                <p> {clientDataa.accountnumber}</p>
+                                <p>{clientDataa?.accountnumber || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
                                 <p className='font-normal text-black'>IFSC : </p>
-                                <p> {clientDataa.ifsc}</p>
+                                <p>{clientDataa?.ifsc || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
                                 <p className='font-normal text-black'>Account Type : </p>
-                                <p> {clientDataa.branch}</p>
+                                <p>{clientDataa?.branch || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
                                 <p className='font-normal text-black'>Bank Name : </p>
-                                <p>{clientDataa.bankname}</p>
+                                <p>{clientDataa?.bankname || 'N/A'}</p>
                             </div>
                             {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
 
@@ -765,24 +772,24 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 <h4 className="font-medium mb-2">Payment Info:</h4>
                                 <div className='flex gap-2'>
                                     <p className='font-normal text-black'>Account Holder Name : </p>
-                                    <p>{clientDataa.accountholder}</p>
+                                    <p>{clientDataa?.accountholder || 'N/A'}</p>
                                 </div>
                                 <div className='flex gap-2'>
 
                                     <p className='font-normal text-black'>Account Number : </p>
-                                    <p> {clientDataa.accountnumber}</p>
+                                    <p>{clientDataa?.accountnumber || 'N/A'}</p>
                                 </div>
                                 <div className='flex gap-2'>
                                     <p className='font-normal text-black'>IFSC : </p>
-                                    <p> {clientDataa.ifsc}</p>
+                                    <p>{clientDataa?.ifsc || 'N/A'}</p>
                                 </div>
                                 <div className='flex gap-2'>
                                     <p className='font-normal text-black'>Account Type : </p>
-                                    <p> {clientDataa.branch}</p>
+                                    <p>{clientDataa?.branch || 'N/A'}</p>
                                 </div>
                                 <div className='flex gap-2'>
                                     <p className='font-normal text-black'>Bank Name : </p>
-                                    <p>{clientDataa.bankname}</p>
+                                    <p>{clientDataa?.bankname || 'N/A'}</p>
                                 </div>
                                 {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
 
@@ -966,24 +973,24 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 <h4 className="font-medium mb-2">Payment Info:</h4>
                                 <div className='flex gap-2'>
                                     <p className='font-normal text-black'>Account Holder Name : </p>
-                                    <p>{clientDataa.accountholder}</p>
+                                    <p>{clientDataa?.accountholder || 'N/A'}</p>
                                 </div>
                                 <div className='flex gap-2'>
 
                                     <p className='font-normal text-black'>Account Number : </p>
-                                    <p> {clientDataa.accountnumber}</p>
+                                    <p>{clientDataa?.accountnumber || 'N/A'}</p>
                                 </div>
                                 <div className='flex gap-2'>
                                     <p className='font-normal text-black'>IFSC : </p>
-                                    <p> {clientDataa.ifsc}</p>
+                                    <p>{clientDataa?.ifsc || 'N/A'}</p>
                                 </div>
                                 <div className='flex gap-2'>
                                     <p className='font-normal text-black'>Account Type : </p>
-                                    <p> {clientDataa.branch}</p>
+                                    <p>{clientDataa?.branch || 'N/A'}</p>
                                 </div>
                                 <div className='flex gap-2'>
                                     <p className='font-normal text-black'>Bank Name : </p>
-                                    <p>{clientDataa.bankname}</p>
+                                    <p>{clientDataa?.bankname || 'N/A'}</p>
                                 </div>
                                 {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
 

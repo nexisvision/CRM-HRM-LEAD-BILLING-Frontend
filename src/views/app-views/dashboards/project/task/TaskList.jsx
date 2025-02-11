@@ -284,19 +284,15 @@ export const TaskList = () => {
     },
     {
       title: "Start Date",
-      dataIndex: "startdate",
-      render: (_, record) => (
-        <span>{dayjs.unix(record.date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
-      ),
-      sorter: (a, b) => utils.antdTableSorter(a, b, "startdate"),
+      dataIndex: "startDate",
+      render: (date) => dayjs(date).format("DD/MM/YYYY"),
+      sorter: (a, b) => new Date(a.startDate) - new Date(b.startDate),
     },
     {
-      title: "Due Date",
-      dataIndex: "duedate",
-      render: (_, record) => (
-        <span>{dayjs.unix(record.date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
-      ),
-      sorter: (a, b) => utils.antdTableSorter(a, b, "duedate"),
+      title: "End Date",
+      dataIndex: "endDate",
+      render: (date) => dayjs(date).format("DD/MM/YYYY"),
+      sorter: (a, b) => new Date(a.endDate) - new Date(b.endDate),
     },
     // {
     //   title: "Estimated Time",
@@ -315,15 +311,15 @@ export const TaskList = () => {
     },
     {
       title: "status",
-      dataIndex: "taskStatus",
+      dataIndex: "status",
       render: (_, record) => (
         <>
-          <Tag color={getPaymentStatus(record.taskStatus)}>
-            {record.taskStatus}
+          <Tag color={getPaymentStatus(record.status)}>
+            {record.status}
           </Tag>
         </>
       ),
-      sorter: (a, b) => utils.antdTableSorter(a, b, "taskStatus"),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
     },
 
     {
