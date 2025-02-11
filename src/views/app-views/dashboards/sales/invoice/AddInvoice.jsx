@@ -17,7 +17,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { ErrorMessage, Field } from "formik";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
-import { getcurren } from "../../../setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
 
@@ -25,9 +24,7 @@ const AddInvoice = ({ onClose }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
-  const [discountRate, setDiscountRate] = useState(0);
   const [newTag, setNewTag] = useState("");
-  const [selectedCurrencyIcon, setSelectedCurrencyIcon] = useState('₹');
 
   const [tags, setTags] = useState([]);
   const AllLoggeddtaa = useSelector((state) => state.user);
@@ -42,19 +39,10 @@ const AddInvoice = ({ onClose }) => {
       quantity: 1,
       price: 0,
       tax: 0,
-      discount: 0,
       amount: 0,
       description: "",
     },
   ]);
-
-  // Get currencies from the store
-  const currencies = useSelector((state) => state.currencies.currencies.data);
-
-  // Fetch currencies when component mounts
-  useEffect(() => {
-    dispatch(getcurren());
-  }, [dispatch]);
 
   const handleAddRow = () => {
     setTableData([
@@ -64,7 +52,6 @@ const AddInvoice = ({ onClose }) => {
         item: "",
         quantity: 1,
         price: 0,
-        discount: 0,
         tax: 0,
         amount: 0,
         description: "",
@@ -93,21 +80,19 @@ const AddInvoice = ({ onClose }) => {
     const updatedData = tableData.map((row) => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
-
-        // Calculate individual item amounts
+        
+        // Recalculate amount when quantity, price, tax, or discount changes
         const quantity = parseFloat(updatedRow.quantity) || 0;
         const price = parseFloat(updatedRow.price) || 0;
-        const itemDiscountPercentage = parseFloat(updatedRow.discount) || 0;
         const taxPercentage = parseFloat(updatedRow.tax) || 0;
-
-        const baseAmount = quantity * price;
-        const itemDiscountAmount = (baseAmount * itemDiscountPercentage) / 100;
-        const taxAmount = (baseAmount * taxPercentage) / 100;
-
-        // Calculate final amount with individual discount
-        const finalAmount = baseAmount - itemDiscountAmount + taxAmount;
-
-        updatedRow.amount = finalAmount.toFixed(2);
+        const discountPercentage = parseFloat(updatedRow.discountPercentage) || 0;
+        
+        const subtotal = quantity * price;
+        const discountAmount = (subtotal * discountPercentage) / 100;
+        const afterDiscount = subtotal - discountAmount;
+        const taxAmount = (afterDiscount * taxPercentage) / 100;
+        
+        updatedRow.amount = (afterDiscount + taxAmount).toFixed(2);
         return updatedRow;
       }
       return row;
@@ -117,107 +102,71 @@ const AddInvoice = ({ onClose }) => {
     calculateTotal(updatedData, discountRate);
   };
 
-  const calculateTotal = (data,discountRate) => {
-
+  const calculateTotal = (data, discountRate) => {
     let subtotal = 0;
-    let tax = 0;
-    let itemDiscount = 0;
-    let globalDiscount = 0;
-    let baseTotal = 0;
+    let totalTax = 0;
 
-
-
-    const totals = data.reduce((acc, row) => {
+    data.forEach((row) => {
       const quantity = parseFloat(row.quantity) || 0;
       const price = parseFloat(row.price) || 0;
-      const itemDiscountPercentage = parseFloat(row.discount) || 0;
-      const taxPercentage = parseFloat(row.tax) || 0;
-
+      const tax = parseFloat(row.tax) || 0;
+      
       const baseAmount = quantity * price;
-      const itemDiscountAmount = (baseAmount * itemDiscountPercentage) / 100;
-      const taxAmount = (baseAmount * taxPercentage) / 100;
-
-      // Calculate item total after individual discount and tax
-      const itemTotal = baseAmount - itemDiscountAmount + taxAmount;
-
-      return {
-        subtotal: acc.subtotal + itemTotal,
-        itemDiscount: acc.itemDiscount + itemDiscountAmount,
-        tax: acc.tax + taxAmount,
-        baseTotal: acc.baseTotal + baseAmount
-      };
+      const taxAmount = (baseAmount * tax) / 100;
+      
+      subtotal += baseAmount;
+      totalTax += taxAmount;
     });
 
-    // Calculate global discount rate amount
-    const globalDiscountAmount = (subtotal * discountRate) / 100;
-
-    // Calculate final total after both discounts
-    const finalTotal = totals.subtotal - globalDiscountAmount;
+    const discount = (subtotal * discountRate) / 100;
+    const finalTotal = subtotal - discount + totalTax;
 
     setTotals({
-      subtotal: totals.subtotal.toFixed(2),
-      itemDiscount: totals.itemDiscount.toFixed(2),
-      globalDiscount: globalDiscountAmount.toFixed(2),
-      totalTax: totals.tax.toFixed(2),
-      finalTotal: finalTotal.toFixed(2)
+      subtotal: subtotal.toFixed(2),
+      discount: discount.toFixed(2),
+      totalTax: totalTax.toFixed(2),
+      finalTotal: finalTotal.toFixed(2),
     });
   };
 
+  const [discountRate, setDiscountRate] = useState(0);
   const [totals, setTotals] = useState({
     subtotal: "0.00",
-    itemDiscount: "0.00",
-    globalDiscount: "0.00",
+    discount: "0.00",
     totalTax: "0.00",
     finalTotal: "0.00",
-
   });
 
   const handleSubmit = () => {
     form
       .validateFields()
       .then((values) => {
+
+        // Transform table data into an object with numbered keys
         const itemsForDatabase = tableData.reduce((acc, item, index) => {
-          const quantity = parseFloat(item.quantity) || 0;
-          const price = parseFloat(item.price) || 0;
-          const itemDiscountPercentage = parseFloat(item.discount) || 0;
-          const taxPercentage = parseFloat(item.tax) || 0;
-
-          const baseAmount = quantity * price;
-          const itemDiscountAmount = (baseAmount * itemDiscountPercentage) / 100;
-          const taxAmount = (baseAmount * taxPercentage) / 100;
-          const itemTotal = baseAmount - itemDiscountAmount + taxAmount;
-
           acc[`item_${index + 1}`] = {
             item: item.item,
-            quantity: quantity,
-            price: price,
-            tax_percentage: taxPercentage,
-            tax_amount: taxAmount,
-            discount_percentage: itemDiscountPercentage,
-            discount_amount: itemDiscountAmount,
-            base_amount: baseAmount,
-            final_amount: itemTotal,
-            description: item.description || ""
+            quantity: parseFloat(item.quantity) || 0,
+            price: parseFloat(item.price) || 0,
+            tax: parseFloat(item.tax) || 0, // Store tax as percentage
+            // discount: parseFloat(item.discountPercentage) || 0,
+            description: item.description || "",
+            amount: parseFloat(item.amount) || 0
           };
           return acc;
         }, {});
 
-        // Calculate global discount on subtotal
-        const subtotal = Object.values(itemsForDatabase).reduce((sum, item) =>
-          sum + item.final_amount, 0);
-        const globalDiscountAmount = (subtotal * discountRate) / 100;
-        const finalTotal = subtotal - globalDiscountAmount;
-
         const invoiceData = {
-          ...values,
+          customer: values.customer,
+          issueDate: values.issueDate?.format("YYYY-MM-DD"),
+          dueDate: values.dueDate?.format("YYYY-MM-DD"),
+          category: values.category,
+          refnumber: values.refnumber,
           items: itemsForDatabase,
-          subtotal: subtotal.toFixed(2),
-          discount_rate: discountRate.toFixed(2),
-          global_discount_amount: globalDiscountAmount.toFixed(2),
-          total_item_discount: totals.itemDiscount,
-          total_global_discount: totals.globalDiscount,
-          tax: totals.totalTax,
-          total: finalTotal.toFixed(2),
+          subtotal: parseFloat(totals.subtotal),
+          // tax: parseFloat(totals.totalTax), // Store total tax as percentage
+          total: parseFloat(totals.finalTotal),
+          discount: parseFloat(discountRate) || 0,
           status: "pending"
 
         };
@@ -226,27 +175,6 @@ const AddInvoice = ({ onClose }) => {
           .then(() => {
             message.success("Invoice added successfully");
             dispatch(getInvoice());
-            form.resetFields();
-            // setDiscountRate(0);
-            setTableData([
-              {
-                id: Date.now(),
-                item: "",
-                quantity: 1,
-                price: 0,
-                tax: 0,
-                discount: 0,
-                amount: 0,
-                description: "",
-              }
-            ]);
-            setTotals({
-              subtotal: "0.00",
-              itemDiscount: "0.00",
-              globalDiscount: "0.00",
-              totalTax: "0.00",
-              finalTotal: "0.00",
-            });
             onClose();
           })
           .catch((error) => {
@@ -308,30 +236,6 @@ const AddInvoice = ({ onClose }) => {
       console.error("Failed to add Status:", error);
       message.error("Failed to add Status");
     }
-  };
-
-  // Add a reset function that can be called independently if needed
-  const resetForm = () => {
-    form.resetFields();
-    setTableData([
-      {
-        id: Date.now(),
-        item: "",
-        quantity: 1,
-        price: 0,
-        tax: 0,
-        discount: 0,
-        amount: 0,
-        description: "",
-      }
-    ]);
-    setTotals({
-      subtotal: "0.00",
-      itemDiscount: "0.00",
-      globalDiscount: "0.00",
-      totalTax: "0.00",
-      finalTotal: "0.00",
-    });
   };
 
   return (
@@ -444,32 +348,6 @@ const AddInvoice = ({ onClose }) => {
                 <Input placeholder="Enter Reference Number" />
               </Form.Item>
             </Col>
-
-            <Col span={12}>
-              <Form.Item
-                label="Currency"
-                name="currency"
-                rules={[{ required: true, message: 'Please select currency' }]}
-              >
-                <Select
-                  placeholder="Select Currency"
-                  onChange={(value) => {
-                    const selected = currencies?.find(c => c.currencyCode === value);
-                    setSelectedCurrencyIcon(selected?.currencyIcon || '₹');
-                  }}
-                >
-                  {currencies?.map((currency) => (
-                    <Option
-                      key={currency.id}
-                      value={currency.currencyCode}
-                    >
-                      {currency.currencyName} ({currency.currencyIcon})
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-
           </Row>
         </Card>
 
@@ -493,9 +371,6 @@ const AddInvoice = ({ onClose }) => {
                     </th>
                     <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Unit Price<span className="text-red-500">*</span>
-                    </th>
-                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                      Discount (%)
                     </th>
                     <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       TAX (%)
@@ -532,25 +407,13 @@ const AddInvoice = ({ onClose }) => {
                           />
                         </td>
                         <td className="px-4 py-2 border-b">
-                          <Input
-                            prefix={selectedCurrencyIcon}
+                          <input
                             type="number"
                             min="0"
                             value={row.price}
                             onChange={(e) => handleTableDataChange(row.id, "price", e.target.value)}
                             placeholder="Price"
                             className="w-full p-2 border rounded-s"
-                          />
-                        </td>
-                        <td className="px-4 py-2 border-b">
-                          <input
-                            type="number"
-                            min="0"
-                            max="100"
-                            value={row.discount || 0}
-                            onChange={(e) => handleTableDataChange(row.id, "discount", e.target.value)}
-                            placeholder="0"
-                            className="w-full p-2 border rounded"
                           />
                         </td>
                         <td className="px-4 py-2 border-b">
@@ -568,7 +431,7 @@ const AddInvoice = ({ onClose }) => {
                           </select>
                         </td>
                         <td className="px-4 py-2 border-b">
-                          <span>{selectedCurrencyIcon} {parseFloat(row.amount || 0).toFixed(2)}</span>
+                          ₹{row.amount}
                         </td>
                         <td className="px-2 py-1 border-b text-center">
                           <Button danger onClick={() => handleDeleteRow(row.id)}>
@@ -594,29 +457,30 @@ const AddInvoice = ({ onClose }) => {
             </div>
           </div>
 
-          {/* summary */}
-
           <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
             <table className="w-full lg:w-[50%] p-2">
               <tbody>
                 <tr className="flex justify-between px-2 py-2 border-x-2">
                   <td className="font-medium">Sub Total</td>
-                  <td className="font-medium px-4 py-2">{selectedCurrencyIcon} {totals.subtotal}</td>
+                  <td className="font-medium px-4 py-2">₹{totals.subtotal}</td>
                 </tr>
 
                 <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
-                  <td className="font-medium">Item Discount</td>
+                  <td className="font-medium">Discount</td>
                   <td className="flex items-center space-x-2">
                     <div className="mb-4">
                       <label className="block text-sm font-medium text-gray-700">
-                        Item Discount Rate (%)
+                        Discount Rate (%)
                       </label>
                       <input
                         type="number"
+                        min="0"
+                        max="100"
                         value={discountRate}
                         onChange={(e) => {
-                          setDiscountRate(parseFloat(e.target.value) || 0);
-                          calculateTotal(tableData, parseFloat(e.target.value) || 0); // Recalculate with new discount rate
+                          const newRate = parseFloat(e.target.value) || 0;
+                          setDiscountRate(newRate);
+                          calculateTotal(tableData, newRate);
                         }}
                         className="mt-1 block w-full p-2 border rounded"
                       />
@@ -624,26 +488,14 @@ const AddInvoice = ({ onClose }) => {
                   </td>
                 </tr>
 
-                {parseFloat(totals.itemDiscount) > 0 && (
-                  <tr className="flex justify-between px-2 py-2 border-x-2">
-                    <td className="font-medium">Total Item Discount Amount</td>
-                    <td className="font-medium px-4 py-2 text-red-500">-₹{totals.itemDiscount}</td>
-                  </tr>
-                )}
-
-                <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
-                  <td className="font-medium">Global Discount</td>
-                  <td className="font-medium px-4 py-2">{selectedCurrencyIcon} {totals.globalDiscount}</td>
-                </tr>
-
                 <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
                   <td className="font-medium">Total Tax</td>
-                  <td className="font-medium px-4 py-2">{selectedCurrencyIcon} {totals.totalTax}</td>
+                  <td className="font-medium px-4 py-2">₹{totals.totalTax}</td>
                 </tr>
 
                 <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
                   <td className="font-bold text-lg">Total Amount</td>
-                  <td className="font-bold text-lg px-4">{selectedCurrencyIcon} {totals.finalTotal}</td>
+                  <td className="font-bold text-lg px-4">₹{totals.finalTotal}</td>
                 </tr>
               </tbody>
             </table>
@@ -651,10 +503,7 @@ const AddInvoice = ({ onClose }) => {
         </Card>
 
         <div className="form-buttons text-right mt-4">
-          <Button type="default" className="mr-2" onClick={() => {
-            resetForm();
-            onClose();
-          }}>
+          <Button type="default" className="mr-2" onClick={onClose}>
             Cancel
           </Button>
           <Button type="primary" onClick={handleSubmit}>

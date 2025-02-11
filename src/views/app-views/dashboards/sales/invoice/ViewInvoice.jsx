@@ -353,24 +353,24 @@ const calculateVAT = (subtotal) => {
                             )}
                             key="price"
                         />
-                       <Table.Column
-                                title="Discount (%)"
-                                render={(record) => `${record.discount_percentage || 0}%`}
-                                key="discount_percentage"
-                            />
-                            <Table.Column
-                                title="Discount Amount"
-                                render={(record) => (
-                                    <NumberFormat
-                                        displayType="text"
-                                        value={record.discount_amount || 0}
-                                        prefix="₹"
-                                        thousandSeparator={true}
-                                    />
-                                )}
-                                key="discount_amount"
-                            />
-                            {/* <Table.Column
+                        <Table.Column
+                            title="Discount (%)"
+                            render={(record) => `${parsedInvoice.discount || 0}%`}
+                            key="discount"
+                        />
+                        <Table.Column
+                            title="Discount Amount"
+                            render={(record) => (
+                                <NumberFormat
+                                    displayType="text"
+                                    value={Math.round(((record.price * (parsedInvoice.discount || 0)) / 100) * record.quantity * 100) / 100}
+                                    prefix="$"
+                                    thousandSeparator={true}
+                                />
+                            )}
+                            key="discountAmount"
+                        />
+                        {/* <Table.Column
                             title="Price After Discount"
                             render={(record) => (
                                 <NumberFormat
@@ -382,41 +382,52 @@ const calculateVAT = (subtotal) => {
                             )}
                             key="discountedPrice"
                         /> */}
-                            <Table.Column
-                                title="Tax (%)"
-                                render={(record) => `${record.tax || 0}%`}
-                                key="tax"
-                            />
+                        <Table.Column
+                            title="Amount"
+                            render={(record) => (
+                                <NumberFormat
+                                    displayType="text"
+                                    // value={Math.round((record.price - (record.price * (record.discount || 0)) / 100) * record.quantity * 100) / 100}
+                                    value={Math.round((record.amount))}
+                                    prefix="$"
+                                    thousandSeparator={true}
+                                />
+                            )}
+                            key="amount"
+                        />
                     </Table>
 
                     {/* Invoice Summary */}
                         <div className="d-flex justify-content-end mb-3">
                             <div className="text-center">
-                            <div className="border-bottom">
+                                <div className="border-bottom">
                                     <p className="mb-2">
                                         <span>Sub-Total : </span>
                                         <NumberFormat
                                             displayType="text"
-                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + item.amount, 0)}
-                                            prefix="₹"
+                                            value={Math.round(subtotal * 100) / 100}
+                                            prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
                                     <p className="mb-2">
-                                        <span>Total Discount Amount: </span>
-                                        <NumberFormat
-                                            displayType="text"
-                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
-                                            prefix="₹"
-                                            thousandSeparator={true}
-                                        />
+                                        <span>Discount ({parsedInvoice.discount || 0}%)</span>
+                                        <span>
+                                            <NumberFormat
+                                                displayType="text"
+
+                                                value={Math.round(totalDiscount * 100) / 100}
+                                                prefix="$"
+                                                thousandSeparator={true}
+                                            />
+                                        </span>
                                     </p>
                                     <p>
-                                        <span>Total Tax Amount: </span>
+                                        <span>Total Tax ({parsedInvoice.tax || 0}%): </span>
                                         <NumberFormat
                                             displayType="text"
-                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.total - item.amount), 0)}
-                                            prefix="₹"
+                                            value={Math.round(totalTax * 100) / 100}
+                                            prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
@@ -425,8 +436,8 @@ const calculateVAT = (subtotal) => {
                                     <span className="mr-1">Final Total: </span>
                                     <NumberFormat
                                         displayType="text"
-                                        value={parsedInvoice.total}
-                                        prefix="₹"
+                                        value={Math.round(finalTotal * 100) / 100}
+                                        prefix="$"
                                         thousandSeparator={true}
                                     />
                                 </h2>
@@ -511,50 +522,68 @@ const calculateVAT = (subtotal) => {
                 </div>
 
                 <div className="">
-                    <div className="">
-                        <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
-                            <Table.Column title="No." key="key" render={(text, record, index) => index + 1} />
-                            <Table.Column title="Product" dataIndex="item" key="item" />
-                            <Table.Column title="Quantity" dataIndex="quantity" key="quantity" />
-                            <Table.Column
-                                title="Original Price"
-                                render={(record) => (
-                                    <NumberFormat
-                                        displayType="text"
-                                        value={Math.round(record.price * 100) / 100}
-                                        prefix="$"
-                                        thousandSeparator={true}
-                                    />
-                                )}
-                                key="price"
-                            />
-                            <Table.Column
-                                title="Discount (%)"
-                                render={(record) => `${record.discount_percentage || 0}%`}
-                                key="discount_percentage"
-                            />
-                            
-                            <Table.Column
-                                title="Tax (%)"
-                                render={(record) => `${record.tax_percentage || 0}%`}
-                                key="tax_percentage"
-                            />
-                            <Table.Column
-                                title="Amount"
-                                render={(record) => (
-                                    <NumberFormat
-                                        displayType="text"
-                                        // value={Math.round((record.price - (record.price * (record.discount || 0)) / 100) * record.quantity * 100) / 100}
-                                        value={Math.round((record.final_amount))}
-                                        prefix="$"
-                                        thousandSeparator={true}
-                                    />
-                                )}
-                                key="amount"
-                            />
-                        </Table>
+                <div className="">
+                    <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
+                        <Table.Column title="No." key="key" render={(text, record, index) => index + 1} />
+                        <Table.Column title="Product" dataIndex="item" key="item" />
+                        <Table.Column title="Quantity" dataIndex="quantity" key="quantity" />
+                        <Table.Column
+                            title="Original Price"
+                            render={(record) => (
+                                <NumberFormat
+                                    displayType="text"
+                                    value={Math.round(record.price * 100) / 100}
+                                    prefix="$"
+                                    thousandSeparator={true}
+                                />
+                            )}
+                            key="price"
+                        />
+                        <Table.Column
+                            title="Discount (%)"
+                            render={(record) => `${parsedInvoice.discount || 0}%`}
+                            key="discount"
+                        />
+                        <Table.Column
+                            title="Discount Amount"
+                            render={(record) => (
+                                <NumberFormat
+                                    displayType="text"
+                                    value={Math.round(((record.price * (parsedInvoice.discount || 0)) / 100) * record.quantity * 100) / 100}
+                                    prefix="$"
+                                    thousandSeparator={true}
+                                />
+                            )}
+                            key="discountAmount"
+                        />
+                        {/* <Table.Column
+                            title="Price After Discount"
+                            render={(record) => (
+                                <NumberFormat
+                                    displayType="text"
+                                    value={Math.round((record.price - (record.price * (record.discount || 0)) / 100) * 100) / 100}
+                                    prefix="$"
+                                    thousandSeparator={true}
+                                />
+                            )}
+                            key="discountedPrice"
+                        /> */}
+                        <Table.Column
+                            title="Amount"
+                            render={(record) => (
+                                <NumberFormat
+                                    displayType="text"
+                                    // value={Math.round((record.price - (record.price * (record.discount || 0)) / 100) * record.quantity * 100) / 100}
+                                    value={Math.round((record.amount))}
+                                    prefix="$"
+                                    thousandSeparator={true}
+                                />
+                            )}
+                            key="amount"
+                        />
+                    </Table>
 
-                        {/* Invoice Summary */}
+                    {/* Invoice Summary */}
                         <div className="d-flex justify-content-end mb-3">
                             <div className="text-center">
                                 <div className="border-bottom">
@@ -562,27 +591,27 @@ const calculateVAT = (subtotal) => {
                                         <span>Sub-Total : </span>
                                         <NumberFormat
                                             displayType="text"
-                                            value={parsedInvoice.total || 0}  // Using the tax field directly
-                                            prefix="₹"
+                                            value={Math.round(subtotal * 100) / 100}
+                                            prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
                                     <p className="mb-2">
-                                        <span>Total Discount Amount: </span>
-                                        <NumberFormat
-                                            displayType="text"
-                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
-                                            prefix="₹"
-                                            thousandSeparator={true}
-                                        />
+                                        <span>Discount ({parsedInvoice.discount || 0}%)</span>
+                                       
+                                            <NumberFormat
+                                                displayType="text"
+                                                value={Math.round(totalDiscount * 100) / 100}
+                                                prefix="$"
+                                                thousandSeparator={true}
+                                            />
                                     </p>
                                     <p>
-                                        <span>Total Tax Amount: </span>
+                                        <span>Total Tax ({parsedInvoice.tax || 0}%): </span>
                                         <NumberFormat
                                             displayType="text"
-                                            value={parsedInvoice.tax
-                                                || 0}  // Using the tax field directly
-                                            prefix="₹"
+                                            value={Math.round(totalTax * 100) / 100}
+                                            prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
@@ -591,16 +620,16 @@ const calculateVAT = (subtotal) => {
                                     <span className="mr-1">Final Total: </span>
                                     <NumberFormat
                                         displayType="text"
-                                        value={parsedInvoice.total}
-                                        prefix="₹"
+                                        value={Math.round(finalTotal * 100) / 100}
+                                        prefix="$"
                                         thousandSeparator={true}
                                     />
                                 </h2>
                             </div>
                         </div>
                     </div>
-                    {/* </div> */}
-                    <div>
+                {/* </div> */}
+                <div>
                         <h4 className="font-medium mb-2">Terms & Conditions:</h4>
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
                             <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>

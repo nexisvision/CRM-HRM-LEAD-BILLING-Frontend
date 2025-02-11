@@ -46,11 +46,7 @@ const AddPlan = ({ onClose }) => {
   const [selectedYear, setSelectedYear] = useState(null);
 
   const handleMenuClick = (e) => {
-    if (e.key === 'Lifetime') {
-      setDurationType('Lifetime');
-      setSelectedMonth(null);
-      setSelectedYear(null);
-    }
+    console.log('Selected:', e.key);
   };
 
   useEffect(() => {
@@ -91,7 +87,7 @@ const AddPlan = ({ onClose }) => {
   );
 
   const mainMenu = (
-    <Menu onClick={handleMenuClick}>
+    <Menu>
       <Menu.Item key="Lifetime">Lifetime</Menu.Item>
       <Menu.SubMenu key="Yearly" title="Yearly">
         {yearlyMenu}
@@ -216,9 +212,7 @@ const AddPlan = ({ onClose }) => {
                           ? `${selectedMonth} Month${selectedMonth > 1 ? 's' : ''}`
                           : durationType === 'Yearly' && selectedYear
                             ? `${selectedYear} Year${selectedYear > 1 ? 's' : ''}`
-                            : durationType === 'Lifetime'
-                              ? 'Lifetime'
-                              : 'Select Duration'}
+                            : 'Select Duration'}
                       </Button>
                     </Dropdown>
                     {errors.duration && touched.duration && (
@@ -381,7 +375,7 @@ const AddPlan = ({ onClose }) => {
                 </Field>
               </div>
 
-              {isTrialEnabled && durationType !== 'Lifetime' && (
+              {isTrialEnabled && (
                 <div className="form-group">
                   <label>Trial Days</label>
                   <Field name="trial_period">
