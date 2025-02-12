@@ -334,24 +334,41 @@ const ClientList = () => {
 
   const tableColumns = [
     {
+      title: "profilePic",
+      dataIndex: 'profilePic',
+      render: (_, record) => (
+        <AvatarStatus
+          src={record.profilePic}
+          name={record.username || record.firstName}
+          size={40}
+        />
+      ),
+    },
+    {
       title: "username",
       dataIndex: "username",
       sorter: (a, b) => a.username.length - b.username.length,
     },
+
     {
       title: "Client",
-      dataIndex: "name",
-      render: (_, record) => (
-        <div className="d-flex" onClick={() => ClickFun(record.id)}>
-          <AvatarStatus
-            src={record.img}
-            name={record.name}
-            subTitle={record.email}
-          />
-        </div>
-      ),
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      dataIndex: "email",
+      sorter: (a, b) => a.email.length - b.email.length,
     },
+    // {
+    //   title: "Client",
+    //   dataIndex: "name",
+    //   render: (_, record) => (
+    //     <div className="d-flex" onClick={() => ClickFun(record.id)}>
+    //       <AvatarStatus
+    //         src={record.img}
+    //         name={record.name}
+    //         subTitle={record.email}
+    //       />
+    //     </div>
+    //   ),
+    //   sorter: (a, b) => a.name.localeCompare(b.name),
+    // },
     {
       title: "created_by",
       dataIndex: "created_by",

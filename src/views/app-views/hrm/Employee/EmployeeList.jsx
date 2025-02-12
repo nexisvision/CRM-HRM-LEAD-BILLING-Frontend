@@ -279,6 +279,17 @@ const EmployeeList = () => {
 
   const tableColumns = [
     {
+      title: "profilePic",
+      dataIndex: 'profilePic',
+      render: (_, record) => (
+        <AvatarStatus
+          src={record.profilePic}
+          name={record.username || record.firstName}
+          size={40}
+        />
+      ),
+    },
+    {
       title: "User",
       dataIndex: `username` || `firstName`,
       sorter: {

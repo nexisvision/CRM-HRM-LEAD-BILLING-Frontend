@@ -12,7 +12,7 @@ import {
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { Field, ErrorMessage } from "formik";
-import { UploadOutlined } from "@ant-design/icons";
+import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import moment from "moment";
 import TextArea from "antd/es/input/TextArea";
 import { useSelector } from "react-redux";
@@ -22,6 +22,7 @@ import { empdata, updateEmp } from "./EmployeeReducers/EmployeeSlice";
 import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
 import { getallcountries } from "../../setting/countries/countriesreducer/countriesSlice";
+import {  QuestionCircleOutlined} from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -30,6 +31,8 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // Add state for file handling
+  const [fileList, setFileList] = useState([]);
 
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
@@ -43,6 +46,11 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
   
 
   const countries = useSelector((state) => state.countries.countries);
+  
+
+  useEffect(()=>{
+    dispatch(empdata())
+  },[dispatch])
 
   useEffect(() => {
     dispatch(getallcountries());
@@ -93,27 +101,32 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
 
 
   const onFinish = async (values) => {
-    // try {
-    //   console.log("Payload:", values);
-    //   await dispatch(updateEmp({ employeeIdd, values })).unwrap();
-    //   message.success("Employee details updated successfully!");
-    //   navigate("/app/hrm/employee");
-    //   onClose();
-    // } catch (error) {
-    //   message.error(error || "Failed to update employee details. Please try again.");
-    // }
+    try {
+      const formData = new FormData();
+      
+      // Handle profile picture separately
+      if (fileList.length > 0) {
+        formData.append('profilePic', fileList[0].originFileObj || fileList[0]);
+      }
 
-    dispatch(updateEmp({ employeeIdd, values }))
-      .then(() => {
-        dispatch(empdata());
-        // message.success("Employee details updated successfully!");
-        onClose();
-        navigate("/app/hrm/employee");
-      })
-      .catch((error) => {
-        // message.error("Failed to update Employee.");
-        console.error("Edit API error:", error);
+      // Add all other form values to FormData
+      Object.keys(values).forEach(key => {
+        if (key !== 'profilePic' && values[key] !== undefined && values[key] !== null) {
+          formData.append(key, values[key]);
+        }
       });
+
+      const response = await dispatch(updateEmp({ employeeIdd, formData })).unwrap();
+      
+      if (response) {
+        message.success('Employee updated successfully!');
+        dispatch(empdata());
+        onClose();
+      }
+    } catch (error) {
+      console.error("Update error:", error);
+      message.error(error?.message || "An error occurred while updating the employee.");
+    }
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -149,6 +162,17 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
   //   return <div>Loading...</div>;
   // }
 
+  // Update file handling function
+  const handleFileChange = ({ file }) => {
+    // Store the actual file object
+    setFileList([{
+      uid: '-1',
+      name: file.name,
+      status: 'done',
+      originFileObj: file
+    }]);
+  };
+
   return (
     <div className="edit-employee">
       <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
@@ -160,7 +184,6 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
         onFinish={onFinish}
         initialValues={initialValues}
         onFinishFailed={onFinishFailed}
-
       >
         {/* User Information */}
         <h1 className="text-lg font-bold mb-3">Personal Information</h1>
@@ -288,12 +311,49 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
               <DatePicker style={{ width: "100%" }} />
             </Form.Item>
           </Col>
+
           <Col span={12}>
             <Form.Item name="leaveDate" label="Leave Date">
               <DatePicker style={{ width: "100%" }} />
             </Form.Item>
           </Col>
-          <Col span={12} className="mt-2">
+
+          
+        </Row>
+
+
+
+
+
+        {/* Designation, Salary, and CV Upload */}
+        <Row gutter={16}>
+        <Col span={24} className="mt-4">
+                <span className="block font-semibold p-2">
+                  Profile Picture <QuestionCircleOutlined />
+                </span>
+                <Form.Item name="profilePic">
+                  <Upload
+                    fileList={fileList}
+                    beforeUpload={(file) => {
+                      handleFileChange({ file });
+                      return false; // Prevent auto upload
+                    }}
+                    onRemove={() => {
+                      form.setFieldsValue({ profilePic: null });
+                      setFileList([]);
+                    }}
+                    accept="image/*"
+                  >
+                    <Button 
+                      icon={<UploadOutlined />} 
+                      disabled={fileList.length > 0}
+                    >
+                      Choose Profile Picture            
+                    </Button>
+                  </Upload>
+                </Form.Item>
+              </Col>
+        <Col span={8} className="mt-2">
             <Form.Item
               name="department"
               label="Department"
@@ -311,15 +371,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
               </Select>
             </Form.Item>
           </Col>
-        </Row>
-
-
-
-
-
-        {/* Designation, Salary, and CV Upload */}
-        <Row gutter={16}>
-          <Col span={12} className="mt-2">
+          <Col span={8} className="mt-2">
             <Form.Item
               name="designation"
               label="Designation"
@@ -337,6 +389,8 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
               </Select>
             </Form.Item>
           </Col>
+          
+
         </Row>
 
         <h1 className="text-lg font-bold mb-3">Bank Details</h1>
@@ -375,7 +429,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
           <Col span={12}>
             <Form.Item name="file" label="Upload CV">
               <Upload
-                action="http://localhost:5500/api/users/upload-cv"
+                action="http://localhost:3000/api/users/upload-cv"
                 listType="picture"
                 accept=".pdf"
                 maxCount={1}
