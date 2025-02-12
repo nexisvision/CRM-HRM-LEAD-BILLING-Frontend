@@ -30,7 +30,7 @@ const MeetingList = () => {
   const dispatch = useDispatch();
 
  const user = useSelector((state) => state.user.loggedInUser.username);
-  const tabledata = useSelector((state) => state.Meeting);
+  const tabledata = useSelector((state) => state.Meeting || []);
 
   //   const [dealStatisticData] = useState(DealStatisticData);
 
@@ -58,7 +58,7 @@ const MeetingList = () => {
   //// permission
                                 
                   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                  const roles = useSelector((state) => state.role?.role?.data);
+                  const roles = useSelector((state) => state.role?.role?.data || []);
                   const roleData = roles?.find(role => role.id === roleId);
                
                   const whorole = roleData.role_name;

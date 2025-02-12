@@ -179,6 +179,13 @@ const CompanyList = () => {
 
   const tableColumns = [
     {
+      title: "Profile",
+      dataIndex: "profilePic",
+      render: (text, record) => (
+        <img src={`http://localhost:5353/uploads/${text}`} alt="Profile" className="w-10 h-10 rounded-full" />
+      ),
+    },
+    {
       title: "Company",
       dataIndex: "username",
       sorter: (a, b) => (a.username.toLowerCase() > b.username.toLowerCase() ? -1 : 1),

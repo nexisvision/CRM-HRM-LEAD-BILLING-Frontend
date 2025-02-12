@@ -18,8 +18,10 @@ const AddIndicator = ({ onClose }) => {
   const user = useSelector((state) => state.user.loggedInUser.username);
   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
   const fndbranchdata = branchData.filter((item) => item.created_by === user);
+  
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const fnddepartmentdata = departmentData.filter((item) => item.created_by === user);
+
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
   const fnddesignationdata = designationData.filter((item) => item.created_by === user);
 

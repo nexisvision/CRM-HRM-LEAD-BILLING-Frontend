@@ -180,6 +180,7 @@ const EditNotes = ({ idd, onClose }) => {
   const { id } = useParams();
 
   // const { data: employee } = useSelector((state) => state.employee.employee);
+// const user = useSelector((state)=>state.user.loggedInUser.username)
 
     const filterdata = useSelector((state)=>state.employee.employee.data)
   

@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./CompanyService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
+import { message } from "antd";
 
 // Async thunk for adding user
 
@@ -83,9 +84,9 @@ export const deleteClient = createAsyncThunk(
 );
 export const Editclients = createAsyncThunk(
   "users/updateEmployee",
-  async ({ comnyid, values }, thunkAPI) => {
+  async ({ comnyid, formData }, thunkAPI) => {
     try {
-      const response = await UserService.EditClientss(comnyid, values);
+      const response = await UserService.EditClientss(comnyid, formData);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -107,7 +108,7 @@ const initialIsAuth = () => {
   return item ? JSON.parse(item) : false;
 };
 
-const RoleAndPermissionSlice = createSlice({
+const CompanySlice = createSlice({
   name: "ClientData",
   initialState: {
     ClientData: [],
@@ -163,11 +164,11 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(addClient.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload?.data?.message);
+        message.success(action.payload?.message);
       })
       .addCase(addClient.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.message);
+        message.error(action.payload?.message);
       })
 
       .addCase(ClientData.pending, (state) => {
@@ -216,11 +217,11 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(deleteClient.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload.message);
+        message.success(action.payload?.message);
       })
       .addCase(deleteClient.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
+        message.error(action.payload?.message);
       })
       //update
       .addCase(Editclients.pending, (state) => {
@@ -230,14 +231,16 @@ const RoleAndPermissionSlice = createSlice({
       .addCase(Editclients.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload;
+        message.success(action.payload?.message);
       })
       .addCase(Editclients.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to update employee";
+        state.error = action.payload;
+        message.error(action.payload?.message);
       });
   },
 });
 
 export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-  RoleAndPermissionSlice.actions;
-export default RoleAndPermissionSlice.reducer;
+CompanySlice.actions;
+export default CompanySlice.reducer;

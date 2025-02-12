@@ -506,22 +506,22 @@ const AttendanceList = () => {
               format="MMM YYYY"
               onChange={(date) => setSelectedMonth(date)}
             />
-            <Select
+            {/* <Select
               defaultValue="All Department"
               style={{ width: 150 }}
               onChange={(value) => setSelectedDepartment(value)}
             >
               <Option value="All Department">All Department</Option>
               {/* Add department options */}
-            </Select>
+            {/* </Select>
             <Select
               defaultValue="All Employee"
               style={{ width: 150 }}
               onChange={(value) => setSelectedEmployee(value)}
             >
               <Option value="All Employee">All Employee</Option>
-              {/* Add employee options */}
-            </Select>
+              Add employee options */}
+            {/* </Select> */}
           </div>
           <div className="flex gap-2">
           
