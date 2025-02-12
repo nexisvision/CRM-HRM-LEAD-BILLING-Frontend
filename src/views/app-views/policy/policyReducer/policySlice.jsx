@@ -72,9 +72,9 @@ export const deletepolicys = createAsyncThunk(
 
 export const editpolicys = createAsyncThunk(
   "users/editpolicys",
-  async ({ idd, values }, thunkAPI) => {
+  async ({ idd, formData }, thunkAPI) => {
     try {
-      const response = await UserService.editpolicy(idd, values);
+      const response = await UserService.editpolicy(idd, formData);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(

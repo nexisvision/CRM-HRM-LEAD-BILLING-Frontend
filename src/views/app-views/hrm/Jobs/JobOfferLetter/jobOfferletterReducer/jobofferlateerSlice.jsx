@@ -72,9 +72,9 @@ export const deletejobofferss = createAsyncThunk(
 );
 export const editjobofferss = createAsyncThunk(
   "users/editjobofferss",
-  async ({ idd, payload }, thunkAPI) => {
+  async ({ idd, formData }, thunkAPI) => {
     try {
-      const response = await UserService.editoffer(idd, payload);
+      const response = await UserService.editoffer(idd, formData);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(

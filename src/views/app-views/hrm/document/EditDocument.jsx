@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Form, Input, Button, Row, Col, message, Upload, Select } from "antd";
 import { useNavigate } from "react-router-dom";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { RxCross2 } from "react-icons/rx";
 import * as Yup from "yup";
 import { Formik, Field, ErrorMessage } from "formik";
@@ -89,12 +89,26 @@ const EditDocument = ({ idd, onClose }) => {
   // };
 
   const onSubmit = async (values, { resetForm }) => {
-    dispatch(editDocu({ idd, values })).then(() => {
-      dispatch(getDocu());
-      message.success("Document added successfully!");
-      resetForm();
-      onClose();
-    });
+    // dispatch(editDocu({ idd, values })).then(() => {
+    //   dispatch(getDocu());
+    //   message.success("Document added successfully!");
+    //   resetForm();
+    //   onClose();
+    // });
+      const formData = new FormData();
+        for (const key in values) {
+            formData.append(key, values[key]);
+        }
+    
+        
+        dispatch(editDocu({ idd,formData})).then((res)=>{
+         
+          dispatch(getDocu());
+          message.success("Document added successfully!");
+          resetForm();
+          onClose();
+        })
+    
   };
 
   return (
@@ -175,18 +189,23 @@ const EditDocument = ({ idd, onClose }) => {
                   </div>
                 </Col>
               </div>
-              {/* <Col span={24} className="mt-2">
-                <span className="block p-2">Add File</span>
-                <Upload
-                  listType="picture"
-                  accept=".pdf"
-                  maxCount={1}
-                  showUploadList={{ showRemoveIcon: true }}
-                  className="border-2 flex justify-center items-center p-10"
-                >
-                  <span className="text-xl">Choose File</span>
-                </Upload>
-              </Col> */}
+              <Col span={24} className="mt-2">
+              <Field name="file">
+                       {({ field }) => (
+                           <Form.Item label="Attachment">
+                               <Upload
+                                   beforeUpload={(file) => {
+                                       setFieldValue("file", file); // Set the uploaded file in Formik state
+                                       return false; // Prevent automatic upload
+                                   }}
+                                   showUploadList={false} // Hide the default upload list
+                               >
+                                   <Button icon={<UploadOutlined />}>Choose File</Button>
+                               </Upload>
+                           </Form.Item>
+                       )}
+                   </Field>
+              </Col>
             </Row>
             <Form.Item>
               <div className="text-right mt-2">

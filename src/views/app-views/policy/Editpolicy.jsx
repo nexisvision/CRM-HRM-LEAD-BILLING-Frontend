@@ -16,10 +16,12 @@ import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
 import { editpolicys, getpolicys } from "./policyReducer/policySlice";
 import { getBranch } from "../hrm/Branch/BranchReducer/BranchSlice";
+import { UploadOutlined } from '@ant-design/icons';
 const { Option } = Select;
 
 const EditpolicyList = ({ idd, onClose }) => {
   const dispatch = useDispatch();
+  const [fileList, setFileList] = useState([]);
 
   useEffect(() => {
     dispatch(getBranch());
@@ -48,17 +50,45 @@ const EditpolicyList = ({ idd, onClose }) => {
     }
   }, [fndpolicy]);
 
-  const onSubmit = async (values) => {
+  // const onSubmit = async (values) => {
+  //   try {
+  //     dispatch(editpolicys({ idd, values })).then(() => {
+  //       dispatch(getpolicys());
+  //       onClose();
+  //       // message.success("Form submitted successfully");
+  //     });
+  //     // message.success("Policy updated successfully!");
+  //   } catch (error) {
+  //     console.error("Submission error:", error);
+  //     // message.error("An error occurred while updating policy.");
+  //   }
+  // };
+
+  const onSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
-      dispatch(editpolicys({ idd, values })).then(() => {
-        dispatch(getpolicys());
-        onClose();
-        // message.success("Form submitted successfully");
+      const formData = new FormData();
+      
+      Object.keys(values).forEach(key => {
+        if (key === 'file' && values[key]) {
+          formData.append('file', values[key]);
+        } else if (values[key]) {
+          formData.append(key, values[key]);
+        }
       });
-      // message.success("Policy updated successfully!");
+
+      const response = await dispatch(editpolicys({idd,formData})).unwrap();
+      
+      if (response) {
+        message.success('Policy added successfully!');
+        dispatch(getpolicys());
+        resetForm();
+        onClose();
+      }
     } catch (error) {
       console.error("Submission error:", error);
-      // message.error("An error occurred while updating policy.");
+      message.error(error?.message || "An error occurred while adding the policy.");
+    } finally {
+      setSubmitting(false);
     }
   };
   const [initialValues, setInitialValues] = useState({
@@ -152,15 +182,26 @@ const EditpolicyList = ({ idd, onClose }) => {
               <div className="mt-4 w-full">
                 <span className="block  font-semibold p-2">Add File</span>
                 <Col span={24}>
-                  <Upload
-                    listType="picture"
-                    accept=".pdf"
-                    maxCount={1}
-                    showUploadList={{ showRemoveIcon: true }}
-                    className="border-2 flex justify-center items-center p-10 "
-                  >
-                    <span className="text-xl">Choose Files</span>
-                  </Upload>
+                <Field name="file">
+                    {({ field }) => (
+                      <Upload
+                        fileList={fileList}
+                        beforeUpload={(file) => {
+                          setFieldValue("file", file);
+                          setFileList([file]);
+                          return false;
+                        }}
+                        onRemove={() => {
+                          setFieldValue("file", null);
+                          setFileList([]);
+                        }}
+                      >
+                        <Button icon={<UploadOutlined />} disabled={fileList.length > 0}>
+                          Choose File
+                        </Button>
+                      </Upload>
+                    )}
+                  </Field>
                 </Col>
               </div>
             </Row>

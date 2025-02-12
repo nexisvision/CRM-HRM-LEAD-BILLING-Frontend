@@ -63,12 +63,12 @@ const DeleteClient = async (id) => {
   }
 };
 
-const EditClient = async (comnyid, values) => {
+const EditClient = async (comnyid, formData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
       `http://localhost:5353/api/v1/sub-clients/${comnyid}`,
-      values,
+      formData,
       {
         headers: {
           Authorization: `Bearer ${token}`,

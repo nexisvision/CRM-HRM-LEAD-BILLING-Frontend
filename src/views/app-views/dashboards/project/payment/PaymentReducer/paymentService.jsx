@@ -22,15 +22,15 @@ const GetPayment = async (id) => {
   }
 };
 
-const AddPyment = async (id, values) => {
+const AddPyment = async (id, formData) => {
   const token = localStorage.getItem("auth_token");
 
-  console.log("wewwew", values);
+  console.log("wewwew", formData);
 
   try {
     const res = await axios.post(
       `http://localhost:5353/api/v1/payments/${id}`,
-      values,
+      formData,
       {
         headers: {
           Authorization: `Bearer ${token}`,

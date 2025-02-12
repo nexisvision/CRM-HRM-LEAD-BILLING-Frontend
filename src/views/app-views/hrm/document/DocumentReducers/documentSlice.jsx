@@ -68,9 +68,9 @@ export const deleteDocu = createAsyncThunk(
 );
 export const editDocu = createAsyncThunk(
   "users/editDocu",
-  async ({ idd, values }, thunkAPI) => {
+  async ({ idd, formData }, thunkAPI) => {
     try {
-      const response = await UserService.editdoc(idd, values);
+      const response = await UserService.editdoc(idd, formData);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(

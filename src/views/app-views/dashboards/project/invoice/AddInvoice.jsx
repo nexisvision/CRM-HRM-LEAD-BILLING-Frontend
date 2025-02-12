@@ -45,12 +45,15 @@ const AddInvoice = ({ onClose }) => {
     const dispatch = useDispatch();
 
 
-    const subClients = useSelector((state) => state.SubClient);
-const sub = subClients?.SubClient?.data;
+    const subClientsss = useSelector((state) => state.SubClient);
+const sub = subClientsss?.SubClient?.data;
+
+
 
     const allproject = useSelector((state) => state.Project);
     const fndrewduxxdaa = allproject.Project.data
     const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
+
     
     const client = fnddata?.client;
     
@@ -393,7 +396,7 @@ const sub = subClients?.SubClient?.data;
                                     </Col>
                                     <Col span={12}>
                                         <Form.Item
-                                            name="clientName"
+                                            name="client"
                                             label="Client Name"
                                             initialValue={subClientData?.username}
                                             rules={[{ required: true, message: "Please enter the client name" }]}

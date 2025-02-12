@@ -1,85 +1,88 @@
-import React, { useEffect } from "react";
-import {
-  Input,
-  Button,
-  Select,
-  Radio,
-  message,
-  Row,
-  Col,
-  Upload,
-  DatePicker,
-} from "antd";
+import React, { useEffect, useState } from "react";
+import { Input, Button, Select, message, Row, Col, Upload } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
 import { Addpolicys, getpolicys } from "./policyReducer/policySlice";
 import { getBranch } from "../hrm/Branch/BranchReducer/BranchSlice";
+import { UploadOutlined } from "@ant-design/icons";
+
 const { Option } = Select;
 
 const AddpolicyList = ({ onClose }) => {
   const dispatch = useDispatch();
+  const [fileList, setFileList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
+  // Fetch branches on component mount
   useEffect(() => {
-    dispatch(getBranch());
-  }, []);
+    dispatch(getBranch())
+      .unwrap()
+      .catch(() => message.error("Failed to fetch branches"));
+  }, [dispatch]);
 
-  const allbranch = useSelector((state) => state.Branch);
-  const fndbranch = allbranch.Branch.data;
+  const branches = useSelector((state) => state.Branch.Branch?.data || []);
 
-  const onSubmit = async (values, { resetForm }) => {
-    try {
-      dispatch(Addpolicys(values)).then(() => {
-        dispatch(getpolicys());
-        onClose();
-        resetForm();
-        // message.success("Form submitted successfully");
-      });
-      // message.success("Policy added successfully!");
-    } catch (error) {
-      console.error("Submission error:", error);
-      // message.error("An error occurred while submitting the job application.");
-    }
-  };
   const initialValues = {
     branch: "",
     title: "",
     description: "",
+    file: null
   };
-  const validationSchema = Yup.object({
-    branch: Yup.string().required("Please select a Branch."),
-    title: Yup.string().required("Please enter a Title."),
-    description: Yup.string().required("Please enter a description."),
-  });
-  return (
-    <div>
-      <hr style={{ marginBottom: "15px", border: "1px solid #E8E8E8" }} />
 
+  const validationSchema = Yup.object({
+    branch: Yup.string().required("Branch is required"),
+    title: Yup.string()
+      .required("Title is required")
+      .max(100, "Title must not exceed 100 characters"),
+    description: Yup.string()
+      .required("Description is required")
+      .min(10, "Description must be at least 10 characters"),
+    file: Yup.mixed().nullable()
+  });
+
+  const handleSubmit = async (values, { resetForm }) => {
+    setLoading(true);
+    try {
+      const formData = new FormData();
+
+      // Add form fields to formData
+      formData.append("branch", values.branch);
+      formData.append("title", values.title);
+      formData.append("description", values.description);
+      
+      if (values.file) {
+        formData.append("file", values.file);
+      }
+
+      await dispatch(Addpolicys(formData)).unwrap();
+      await dispatch(getpolicys());
+      
+      message.success("Policy added successfully");
+      resetForm();
+      setFileList([]);
+      onClose();
+    } catch (error) {
+      message.error(error.message || "Failed to add policy");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="p-4">
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
       >
-        {({
-          values,
-          setFieldValue,
-          setFieldTouched,
-          handleSubmit,
-          resetForm,
-        }) => (
-          <Form
-            onSubmit={handleSubmit}
-            style={{
-              padding: "20px",
-              background: "#fff",
-              borderRadius: "8px",
-            }}
-          >
+        {({ setFieldValue }) => (
+          <Form>
             <Row gutter={16}>
-              <Col span={12} className="mb-4">
-                <div className="form-item">
-                  <label className="font-semibold">Branch</label>
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Branch</label>
                   <Field name="branch">
                     {({ field }) => (
                       <Select
@@ -87,10 +90,8 @@ const AddpolicyList = ({ onClose }) => {
                         className="w-full"
                         placeholder="Select Branch"
                         onChange={(value) => setFieldValue("branch", value)}
-                        value={values.branch}
-                        onBlur={() => setFieldTouched("branch", true)}
                       >
-                        {fndbranch?.map((branch) => (
+                        {branches.map((branch) => (
                           <Option key={branch.id} value={branch.id}>
                             {branch.branchName}
                           </Option>
@@ -101,61 +102,75 @@ const AddpolicyList = ({ onClose }) => {
                   <ErrorMessage
                     name="branch"
                     component="div"
-                    className="error-message text-red-500 my-1"
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
               </Col>
 
               <Col span={12}>
-                <div className="form-item ">
-                  <label className="font-semibold ">Title</label>
-                  <Field name="title" as={Input} placeholder="Enter Title" />
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Title</label>
+                  <Field
+                    name="title"
+                    as={Input}
+                    placeholder="Enter title"
+                  />
                   <ErrorMessage
                     name="title"
                     component="div"
-                    className="error-message text-red-500  my-1"
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
               </Col>
 
               <Col span={24}>
-                <div className="form-item mt-4">
-                  <label className="font-semibold">Description</label>
-                  <ReactQuill
-                    value={values.description}
-                    onChange={(value) => setFieldValue("description", value)}
-                    onBlur={() => setFieldTouched("description", true)}
-                    placeholder="Enter Description"
-                  />
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Description</label>
+                  <Field name="description">
+                    {({ field }) => (
+                      <ReactQuill
+                        value={field.value}
+                        onChange={(value) => setFieldValue("description", value)}
+                        placeholder="Enter description"
+                      />
+                    )}
+                  </Field>
                   <ErrorMessage
                     name="description"
                     component="div"
-                    className="error-message text-red-500 my-1"
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
               </Col>
 
-              <div className="mt-4 w-full">
-                <span className="block  font-semibold p-2">Add File</span>
-                <Col span={24}>
+              <Col span={24}>
+                <div className="mb-4">
+                  <label className="block font-medium mb-1">Upload File</label>
                   <Upload
-                    listType="picture"
-                    accept=".pdf"
-                    maxCount={1}
-                    showUploadList={{ showRemoveIcon: true }}
-                    className="border-2 flex justify-center items-center p-10 "
+                    fileList={fileList}
+                    beforeUpload={(file) => {
+                      setFieldValue("file", file);
+                      setFileList([file]);
+                      return false;
+                    }}
+                    onRemove={() => {
+                      setFieldValue("file", null);
+                      setFileList([]);
+                    }}
                   >
-                    <span className="text-xl">Choose File</span>
-                    {/* <CloudUploadOutlined className='text-4xl' /> */}
+                    <Button icon={<UploadOutlined />} disabled={fileList.length > 0}>
+                      Select File
+                    </Button>
                   </Upload>
-                </Col>
-              </div>
+                </div>
+              </Col>
             </Row>
-            <div style={{ textAlign: "right", marginTop: "16px" }}>
-              <Button style={{ marginRight: 8 }} onClick={onClose}>
+
+            <div className="flex justify-end gap-2 mt-4">
+              <Button onClick={onClose} disabled={loading}>
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" loading={loading}>
                 Submit
               </Button>
             </div>

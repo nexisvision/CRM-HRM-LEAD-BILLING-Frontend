@@ -63,12 +63,12 @@ const deletepolicy = async (id) => {
   }
 };
 
-const editpolicy = async (idd, values) => {
+const editpolicy = async (idd, formData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
       `http://localhost:5353/api/v1/policies/${idd}`,
-      values,
+      formData,
       {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -22,15 +22,15 @@ const GetPro = async (id) => {
   }
 };
 
-const AddPro = async (id, values) => {
+const AddPro = async (id, formData) => {
   const token = localStorage.getItem("auth_token");
 
-  console.log("Making API request with:", { id, values });
+  console.log("Making API request with:", { id, formData });
 
   try {
     const res = await axios.post(
       `http://localhost:5353/api/v1/products/${id}`,
-      values,
+      formData,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -65,12 +65,12 @@ const DeletePro = async (userId) => {
   }
 };
 
-const EditPro = async (idd, values) => {
+const EditPro = async (idd, formData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
       `http://localhost:5353/api/v1/products/${idd}`,
-      values,
+      formData,
       {
         headers: {
           Authorization: `Bearer ${token}`,

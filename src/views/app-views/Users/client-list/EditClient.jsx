@@ -13,6 +13,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { ClientData, Editclient } from "./CompanyReducers/CompanySlice";
 import { getDept } from "views/app-views/hrm/Department/DepartmentReducers/DepartmentSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+import Upload from "antd/es/upload/Upload";
+import { UploadOutlined } from '@ant-design/icons';
+import {  QuestionCircleOutlined } from "@ant-design/icons";
 
 const EditClient = ({ comnyid, onClose }) => {
   const navigate = useNavigate();
@@ -63,17 +66,29 @@ const EditClient = ({ comnyid, onClose }) => {
   }, [fnddatas]);
 
   const onSubmit = async (values, { resetForm }) => {
-    try {
-      console.log("Form values:", values); // Debugging
-      await dispatch(Editclient({ comnyid, values }));
-      dispatch(ClientData());
-      message.success("Client edited successfully");
-      resetForm();
-      onClose();
-    } catch (error) {
-      console.error("Error during submit:", error);
-      message.error("Failed to edit client");
-    }
+    // try {
+    //   console.log("Form values:", values); // Debugging
+    //   await dispatch(Editclient({ comnyid, values }));
+    //   dispatch(ClientData());
+    //   message.success("Client edited successfully");
+    //   resetForm();
+    //   onClose();
+    // } catch (error) {
+    //   console.error("Error during submit:", error);
+    //   message.error("Failed to edit client");
+    // }
+
+      const formData = new FormData();
+                    for (const key in values) {
+                      formData.append(key, values[key]);
+                    }
+                
+                    dispatch(Editclient({ comnyid, formData })).then(() => {
+                      dispatch(ClientData());
+                      message.success("Client edited successfully");
+                      resetForm();
+                      onClose();
+                    });
   };
 
   const [initialValues,setInitialValues] =  useState({
@@ -125,6 +140,7 @@ const EditClient = ({ comnyid, onClose }) => {
           isSubmitting,
           isValid,
           dirty,
+          setFieldValue
         }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
             <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
@@ -354,6 +370,55 @@ const EditClient = ({ comnyid, onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
+              </Col>
+              {/* <Col span={12} className="mt-4 space-y-2">
+                <div className="flex flex-col gap-3">
+                  <label className="font-semibold text-gray-700">Profile Picture</label>
+                  <Field name="profilePic">
+                    {({ field, form }) => (
+                      <Upload
+                        accept="image/*"
+                        beforeUpload={(file) => {
+                          form.setFieldValue('profilePic', file);
+                          
+                          return false;
+                          
+                        }}
+                        showUploadList={true}
+                      >
+                        <Button icon={<UploadOutlined />} className="flex items-center gap-2">
+                          Upload Profile Picture
+                        </Button>
+                      </Upload>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="profilePic"
+                    component="div"
+                    className="text-red-500 text-sm"
+                  />
+                </div>
+              </Col> */}
+
+              <Col span={24} className="mt-4">
+                <span className="block font-semibold p-2">
+                  Add <QuestionCircleOutlined />
+                </span>
+                <Field name="profilePic">
+                  {({ field }) => (
+                    <div>
+                      <Upload
+                        beforeUpload={(file) => {
+                          setFieldValue("profilePic", file); // Set file in Formik state
+                          return false; // Prevent auto upload
+                        }}
+                        showUploadList={false}
+                      >
+                        <Button icon={<UploadOutlined />}>Upload Profile Picture</Button>
+                      </Upload>
+                    </div>
+                  )}
+                </Field>
               </Col>
             </Row>
 

@@ -63,12 +63,12 @@ const deldetoffer = async (id) => {
   }
 };
 
-const editoffer = async (idd, payload) => {
+const editoffer = async (idd, formData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
       `http://localhost:5353/api/v1/offer-letters/${idd}`,
-      payload,
+      formData,
       {
         headers: {
           Authorization: `Bearer ${token}`,

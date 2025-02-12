@@ -15,6 +15,8 @@ import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
 import { GetJobdata } from "../JobReducer/JobSlice";
 import { getjobapplication } from "../JobApplication/JobapplicationReducer/JobapplicationSlice";
+import { QuestionCircleOutlined, UploadOutlined } from "@ant-design/icons";
+
 import {
   Addjobofferss,
   editjobofferss,
@@ -71,64 +73,94 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
     }
   }, [fnddatassss]);
 
-  const onSubmit = async (values, { resetForm }) => {
-    try {
-      // Check for file and convert to base64 if present
-      let fileBase64 = null;
-      if (values.file) {
-        const reader = new FileReader();
-        reader.readAsDataURL(values.file.file);
-        reader.onloadend = async () => {
-          fileBase64 = reader.result;
+  // const onSubmit = async (values, { resetForm }) => {
+  //   try {
+  //     // Check for file and convert to base64 if present
+  //     let fileBase64 = null;
+  //     if (values.file) {
+  //       const reader = new FileReader();
+  //       reader.readAsDataURL(values.file.file);
+  //       reader.onloadend = async () => {
+  //         fileBase64 = reader.result;
 
-          // Prepare the payload object
-          const payload = {
-            job: values.job,
-            job_applicant: values.job_applicant,
-            offer_expiry: values.offer_expiry,
-            expected_joining_date: values.expected_joining_date,
-            salary: values.salary,
-            description: values.description,
-            file: fileBase64,
-          };
+  //         // Prepare the payload object
+  //         const payload = {
+  //           job: values.job,
+  //           job_applicant: values.job_applicant,
+  //           offer_expiry: values.offer_expiry,
+  //           expected_joining_date: values.expected_joining_date,
+  //           salary: values.salary,
+  //           description: values.description,
+  //           file: fileBase64,
+  //         };
 
-          const response = await dispatch(editjobofferss({ idd, payload }));
+  //         const response = await dispatch(editjobofferss({ idd, payload }));
 
-          if (response && response.payload) {
-            dispatch(getjobofferss());
-            onClose();
-            resetForm();
-            // message.success("Job offer letter added successfully!");
-          } else {
-            // message.error("Failed to add the job offer letter.");
+  //         if (response && response.payload) {
+  //           dispatch(getjobofferss());
+  //           onClose();
+  //           resetForm();
+  //           // message.success("Job offer letter added successfully!");
+  //         } else {
+  //           // message.error("Failed to add the job offer letter.");
+  //         }
+  //       };
+  //     } else {
+  //       const payload = {
+  //         job: values.job,
+  //         job_applicant: values.job_applicant,  
+  //         offer_expiry: values.offer_expiry,
+  //         expected_joining_date: values.expected_joining_date,
+  //         salary: values.salary,
+  //         description: values.description,
+  //       };
+
+  //       const response = await dispatch(editjobofferss({ idd, payload }));
+
+  //       if (response && response.payload) {
+  //         dispatch(getjobofferss());
+  //         onClose();
+  //         resetForm();
+  //         // message.success("Job offer letter added successfully!");
+  //       } else {
+  //         // message.error("Failed to add the job offer letter.");
+  //       }
+  //     }
+  //   } catch (error) {
+  //     console.error("Submission error:", error);
+  //     message.error("An error occurred while submitting the job offer letter.");
+  //   }
+  // };
+
+   const onSubmit = async (values, { resetForm }) => {
+      try {
+        const formData = new FormData();
+        
+        // Format dates
+        const formattedValues = {
+          ...values,
+          offer_expiry: values.offer_expiry ? moment(values.offer_expiry).format('YYYY-MM-DD') : null,
+          expected_joining_date: values.expected_joining_date ? moment(values.expected_joining_date).format('YYYY-MM-DD') : null,
+        };
+  
+        // Append all form values to FormData
+        Object.keys(formattedValues).forEach(key => {
+          if (key === 'file' && formattedValues[key]) {
+            formData.append('file', formattedValues[key]);
+          } else if (formattedValues[key] !== null && formattedValues[key] !== undefined) {
+            formData.append(key, formattedValues[key]);
           }
-        };
-      } else {
-        const payload = {
-          job: values.job,
-          job_applicant: values.job_applicant,  
-          offer_expiry: values.offer_expiry,
-          expected_joining_date: values.expected_joining_date,
-          salary: values.salary,
-          description: values.description,
-        };
-
-        const response = await dispatch(editjobofferss({ idd, payload }));
-
-        if (response && response.payload) {
-          dispatch(getjobofferss());
-          onClose();
-          resetForm();
-          // message.success("Job offer letter added successfully!");
-        } else {
-          // message.error("Failed to add the job offer letter.");
-        }
+        });
+  
+        await dispatch(editjobofferss({idd,formData})).unwrap();
+        await dispatch(getjobofferss());
+        message.success('Job offer letter added successfully');
+        onClose();
+        resetForm();
+      } catch (error) {
+        message.error(error?.message || 'Failed to add job offer letter');
       }
-    } catch (error) {
-      console.error("Submission error:", error);
-      message.error("An error occurred while submitting the job offer letter.");
-    }
-  };
+    };
 
   const [initialValues, setInitialValues] = useState({
     job: "",
@@ -345,20 +377,26 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              <div className="mt-2 w-full">
-                <span className="block p-2">Add File</span>
-                <Col span={24}>
-                  <Upload
-                    listType="picture"
-                    accept=".pdf"
-                    maxCount={1}
-                    showUploadList={{ showRemoveIcon: true }}
-                    className="border-2 flex justify-center items-center p-10 mt-2"
-                  >
-                    <span className="text-xl">Choose File</span>
-                  </Upload>
-                </Col>
-              </div>
+              <Col span={24} className="mt-4">
+                <span className="block font-semibold p-2">
+                  Add <QuestionCircleOutlined />
+                </span>
+                <Field name="file">
+                  {({ field }) => (
+                    <div>
+                      <Upload
+                        beforeUpload={(file) => {
+                          setFieldValue("file", file); // Set file in Formik state
+                          return false; // Prevent auto upload
+                        }}
+                        showUploadList={false}
+                      >
+                        <Button icon={<UploadOutlined />}>Choose File</Button>
+                      </Upload>
+                    </div>
+                  )}
+                </Field>
+              </Col>
             </Row>
             <div style={{ textAlign: "right", marginTop: "16px" }}>
               <Button style={{ marginRight: 8 }} onClick={onClose}>

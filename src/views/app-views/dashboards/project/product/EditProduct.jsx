@@ -247,7 +247,7 @@ import {
   Upload,
   Modal,
 } from "antd";
-import { CloudUploadOutlined, QuestionCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { CloudUploadOutlined, QuestionCircleOutlined, PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -384,17 +384,27 @@ const EditProduct = ({ idd, onClose }) => {
   });
 
   const onSubmit = (values, { resetForm }) => {
-    dispatch(EditProdu({ idd, values }))
-      .then(() => {
-        dispatch(GetProdu(id));
-        // message.success("Product updated successfully!");
-        onClose();
-      })
-      .catch((error) => {
-        // message.error("Failed to update Employee.");
-        console.error("Edit API error:", error);
-      });
-  };
+    // dispatch(EditProdu({ idd, values }))
+    //   .then(() => {
+    //     dispatch(GetProdu(id));
+    //     // message.success("Product updated successfully!");
+    //     onClose();
+    //   })
+    //   .catch((error) => {
+    //     // message.error("Failed to update Employee.");
+    //     console.error("Edit API error:", error);
+    //   });
+
+       const formData = new FormData();
+          for (const key in values) {
+            formData.append(key, values[key]);
+          }
+      
+          dispatch(EditProdu({ idd, formData })).then(() => {
+            dispatch(GetProdu(id));
+            onClose();
+          });
+  };     
 
   return (
     <div className="add-expenses-form">
@@ -527,6 +537,29 @@ const EditProduct = ({ idd, onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
+              </Col>
+
+              
+
+              <Col span={24} className="mt-4">
+                <span className="block font-semibold p-2">
+                  Add <QuestionCircleOutlined />
+                </span>
+                <Field name="image">
+                  {({ field }) => (
+                    <div>
+                      <Upload
+                        beforeUpload={(file) => {
+                          setFieldValue("image", file); // Set file in Formik state
+                          return false; // Prevent auto upload
+                        }}
+                        showUploadList={false}
+                      >
+                        <Button icon={<UploadOutlined />}>Choose File</Button>
+                      </Upload>
+                    </div>
+                  )}
+                </Field>
               </Col>
 
               <div className="form-buttons text-right mt-4">

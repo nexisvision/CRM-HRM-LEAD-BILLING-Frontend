@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Form, Input, Button, Row, Col, message, Upload, Select } from "antd";
 import { useNavigate } from "react-router-dom";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { RxCross2 } from "react-icons/rx";
 import * as Yup from "yup";
 import { Formik, Field, ErrorMessage } from "formik";
@@ -69,12 +69,24 @@ const AddDocument = ({ onClose }) => {
   // };
 
   const onSubmit = async (values, { resetForm }) => {
-    dispatch(AddDocu(values)).then(() => {
+    // dispatch(AddDocu(values)).then(() => {
+    //   dispatch(getDocu());
+     
+    // });
+
+    const formData = new FormData();
+    for (const key in values) {
+        formData.append(key, values[key]);
+    }
+
+    
+    dispatch(AddDocu(formData)).then((res)=>{
+     
       dispatch(getDocu());
       message.success("Document added successfully!");
       resetForm();
       onClose();
-    });
+    })
   };
 
   return (
@@ -154,17 +166,22 @@ const AddDocument = ({ onClose }) => {
                   </div>
                 </Col>
               </div>
-              <Col span={24} className="mt-2">
-                <span className="block p-2">Add File</span>
-                <Upload
-                  listType="picture"
-                  accept=".pdf"
-                  maxCount={1}
-                  showUploadList={{ showRemoveIcon: true }}
-                  className="border-2 flex justify-center items-center p-10"
-                >
-                  <span className="text-xl">Choose File</span>
-                </Upload>
+              <Col span={24}>
+                <Field name="file">
+                       {({ field }) => (
+                           <Form.Item label="Attachment">
+                               <Upload
+                                   beforeUpload={(file) => {
+                                       setFieldValue("file", file); // Set the uploaded file in Formik state
+                                       return false; // Prevent automatic upload
+                                   }}
+                                   showUploadList={false} // Hide the default upload list
+                               >
+                                   <Button icon={<UploadOutlined />}>Choose File</Button>
+                               </Upload>
+                           </Form.Item>
+                       )}
+                   </Field>
               </Col>
             </Row>
             <Form.Item>

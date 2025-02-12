@@ -11,7 +11,7 @@ import {
   Upload,
   Modal,
 } from "antd";
-import { CloudUploadOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { CloudUploadOutlined, QuestionCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -68,7 +68,7 @@ const curren = curr?.filter((item) => item.created_by === user);
     amount: "", 
     currency: "",
     exchangeRate: "",
-    transactionId: "",
+    transactionId: "",   
     paymentMethod: "",
     bankAccount: "",
     receipt: "",
@@ -81,24 +81,35 @@ const curren = curr?.filter((item) => item.created_by === user);
     amount: Yup.string().optional("Please enter Amount."),
     currency: Yup.string().optional("Please enter Currency."),
     exchangeRate: Yup.string().optional("Please enter Exchange Rate."),
-    transactionId: Yup.string().optional("Please enter Transaction Id."),
+    transactionId: Yup.number().optional("Please enter Transaction Id."),
     paymentMethod: Yup.string().optional("Please enter Payment Gateway."),
     bankAccount: Yup.string().optional("Please enter Bank Account."),
     receipt: Yup.string().optional("Please enter Receipt."),
     remark: Yup.string().optional("Please enter Remark."),
   });
   const onSubmit = (values, { resetForm }) => {
-    dispatch(AddPay({ id, values }))
-      .then(() => {
-        dispatch(Getpay(id));
-        // message.success("Milestone added successfully!");
-        resetForm();
-        onClose();
-      })
-      .catch((error) => {
-        // message.error("Failed to add Leads.");
-        console.error("Add API error:", error);
-      });
+    // dispatch(AddPay({ id, values }))
+    //   .then(() => {
+    //     dispatch(Getpay(id));
+    //     // message.success("Milestone added successfully!");
+    //     resetForm();
+    //     onClose();
+    //   })
+    //   .catch((error) => {
+    //     // message.error("Failed to add Leads.");
+    //     console.error("Add API error:", error);
+    //   });
+
+            const formData = new FormData();
+                for (const key in values) {
+                  formData.append(key, values[key]);
+                }
+            
+                dispatch(AddPay({ id, formData })).then(() => {
+                  dispatch(Getpay(id));
+                  onClose();
+                  resetForm();
+                });
   };
   return (
     <div className="add-expenses-form">
@@ -120,7 +131,7 @@ const curren = curr?.filter((item) => item.created_by === user);
                     placeholder="Enter Project"
                     className=""
                     initialValue={fnddata?.project_name}
-                    value={fnddata?.project_name}
+                    value={fnddata?.project_name} 
                     disabled
                   />
                 </div>
@@ -312,19 +323,26 @@ const curren = curr?.filter((item) => item.created_by === user);
                 <span className="block  font-semibold p-2">
                   Receipt <QuestionCircleOutlined />
                 </span>
-                <Col span={24}>
-                  <Upload
-                    action="http://localhost:5500/api/users/upload-cv"
-                    listType="picture"
-                    accept=".pdf"
-                    maxCount={1}
-                    showUploadList={{ showRemoveIcon: true }}
-                    className="border-2 flex justify-center items-center p-10 "
-                  >
-                    <CloudUploadOutlined className="text-4xl" />
-                    <span className="text-xl">Choose File</span>
-                  </Upload>
-                </Col>
+                <Col span={24} className="mt-4">
+                <span className="block font-semibold p-2">
+                  Add <QuestionCircleOutlined />
+                </span>
+                <Field name="receipt">
+                  {({ field }) => (
+                    <div>
+                      <Upload
+                        beforeUpload={(file) => {
+                          setFieldValue("receipt", file); // Set file in Formik state
+                          return false; // Prevent auto upload
+                        }}
+                        showUploadList={false}
+                      >
+                        <Button icon={<UploadOutlined />}>Choose File</Button>
+                      </Upload>
+                    </div>
+                  )}
+                </Field>
+              </Col>
               </div>
               <Col span={24} className="mt-2">
                 <div className="form-item">

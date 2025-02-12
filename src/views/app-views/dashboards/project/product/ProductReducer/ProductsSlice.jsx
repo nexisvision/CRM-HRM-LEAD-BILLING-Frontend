@@ -8,9 +8,9 @@ import { message } from "antd";
 
 export const AddProdu = createAsyncThunk(
   "users/AddProdu",
-  async ({ id, values }, thunkAPI) => {
+  async ({ id, formData }, thunkAPI) => {
     try {
-      const response = await UserService.AddPro(id, values);
+      const response = await UserService.AddPro(id, formData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -72,10 +72,10 @@ export const DeleteProdu = createAsyncThunk(
 );
 export const EditProdu = createAsyncThunk(
   "users/EditProdu",
-  async ({ idd, values }, thunkAPI) => {
+  async ({ idd, formData }, thunkAPI) => {
     try {
       console.log("idinslice", idd);
-      const response = await UserService.EditPro(idd, values);
+      const response = await UserService.EditPro(idd, formData);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(

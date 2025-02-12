@@ -56,27 +56,59 @@ const AddTicket = ({ onClose }) => {
     description: Yup.string().required("Please enter a description."),
   });
 
-  const onSubmit = (values, { resetForm }) => {
-    // console.log("values", values);
-    const formData = new FormData();
-    for (const key in values) {
-        formData.append(key, values[key]);
-    }
+  const onSubmit = async (values, { resetForm }) => {
+    try {
+      const formData = new FormData();
+      
+      // Append all non-file fields
+      Object.keys(values).forEach(key => {
+        if (key !== 'file') {
+          formData.append(key, values[key]);
+        }
+      });
 
-    
-    dispatch(AddTickets(formData)).then((res)=>{
-     
+      // Handle file upload
+      if (values.file) {
+        formData.append('file', values.file);
+      }
+
+      // Dispatch with proper error handling
+      await dispatch(AddTickets(formData)).unwrap();
+      message.success('Ticket created successfully!');
       dispatch(getAllTicket());
       onClose();
       resetForm();
-    });
+    } catch (error) {
+      message.error(error?.message || 'Failed to create ticket');
+    }
+  };
 
+  // Update the file upload component
+  const FileUploadField = ({ field, form }) => {
+    const handleFileChange = (info) => {
+      if (info.file) {
+        form.setFieldValue('file', info.file);
+      }
+    };
 
-   
-    // dispatch(getAllTicket());
-   
-    // console.log("Submitted values:", values);
-    // message.success("Ticket created successfully!");
+    return (
+      <Upload
+        beforeUpload={(file) => {
+          // Validate file type and size if needed
+          const isValidFile = file.size < 5000000; // 5MB limit example
+          if (!isValidFile) {
+            message.error('File must be smaller than 5MB!');
+            return false;
+          }
+          return false; // Return false to prevent auto upload
+        }}
+        onChange={handleFileChange}
+        maxCount={1}
+        showUploadList={true}
+      >
+        <Button icon={<UploadOutlined />}>Select File</Button>
+      </Upload>
+    );
   };
 
   return (
@@ -247,22 +279,19 @@ const AddTicket = ({ onClose }) => {
 
               {/* Attachment */}
               <Col span={24}>
-       <Field name="file">
-        {({ field }) => (
-            <Form.Item label="Attachment">
-                <Upload
-                    beforeUpload={(file) => {
-                        setFieldValue("file", file); // Set the uploaded file in Formik state
-                        return false; // Prevent automatic upload
-                    }}
-                    showUploadList={false} // Hide the default upload list
-                >
-                    <Button icon={<UploadOutlined />}>Choose File</Button>
-                </Upload>
-            </Form.Item>
-        )}
-    </Field>
-</Col>
+                <Field name="file">
+                  {({ field, form }) => (
+                    <Form.Item label="Attachment">
+                      <FileUploadField field={field} form={form} />
+                      <ErrorMessage
+                        name="file"
+                        component="div"
+                        className="text-red-500"
+                      />
+                    </Form.Item>
+                  )}
+                </Field>
+              </Col>
             </Row>
 
             {/* Form Actions */}

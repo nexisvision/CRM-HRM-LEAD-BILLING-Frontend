@@ -69,9 +69,9 @@ export const deleteClient = createAsyncThunk(
 );
 export const Editclient = createAsyncThunk(
   "users/updateEmployee",
-  async ({ comnyid, values }, thunkAPI) => {
+  async ({ comnyid, formData }, thunkAPI) => {
     try {
-      const response = await UserService.EditClient(comnyid, values);
+      const response = await UserService.EditClient(comnyid, formData);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(

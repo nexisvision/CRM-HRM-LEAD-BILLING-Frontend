@@ -115,6 +115,7 @@ import {
   Row,
   Col,
   TimePicker,
+  Upload,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
@@ -126,7 +127,7 @@ import CompanyService from "./CompanyReducers/CompanyService";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { Editclients } from "./CompanyReducers/CompanySlice";
-
+import { UploadOutlined } from '@ant-design/icons';
 const { Option } = Select;
 const { EditClient, ClientData } = CompanyService;
 
@@ -428,6 +429,35 @@ const fndcom = allcom.ClientData?.data;
                     name="address"
                     component="div"
                     className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-4 space-y-2">
+                <div className="flex flex-col gap-3">
+                  <label className="font-semibold text-gray-700">Profile Picture</label>
+                  <Field name="profilePic">
+                    {({ field, form }) => (
+                      <Upload
+                        accept="image/*"
+                        beforeUpload={(file) => {
+                          form.setFieldValue('profilePic', file);
+                          
+                          return false;
+                          
+                        }}
+                        showUploadList={true}
+                      >
+                        <Button icon={<UploadOutlined />} className="flex items-center gap-2">
+                          Upload Profile Picture
+                        </Button>
+                      </Upload>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="profilePic"
+                    component="div"
+                    className="text-red-500 text-sm"
                   />
                 </div>
               </Col>

@@ -8,9 +8,9 @@ import { message } from "antd";
 
 export const AddPay = createAsyncThunk(
   "users/AddPay",
-  async ({ id, values }, thunkAPI) => {
+  async ({ id, formData }, thunkAPI) => {
     try {
-      const response = await UserService.AddPyment(id, values);
+      const response = await UserService.AddPyment(id, formData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
