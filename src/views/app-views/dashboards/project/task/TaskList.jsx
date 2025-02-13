@@ -207,7 +207,7 @@ export const TaskList = () => {
   const dropdownMenu = (row) => (
     <Menu>
 
-<Menu.Item>
+{/* <Menu.Item>
         <Flex alignItems="center" onClick={() => togglePinTask(row.id)}>
           {pinnedTasks.includes(row.id) ? (
             <PushpinOutlined style={{ color: "gold" }} />
@@ -216,7 +216,7 @@ export const TaskList = () => {
           )}
           <span className="ml-2">{pinnedTasks.includes(row.id) ? "Unpin" : "Pin"}</span>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
       {/* <Menu.Item>
         <Flex alignItems="center" onClick={openViewTaskModal}>
           <EyeOutlined />
@@ -247,19 +247,19 @@ export const TaskList = () => {
     //   title: "Code",
     //   dataIndex: "id",
     // },
-    {
-      title: "Pinned",
-      dataIndex: "pinned",
-      render: (text, record) => (
-        <span>
-          {pinnedTasks.includes(record.id) ? (
-            <PushpinOutlined style={{ color: "gold" }} />
-          ) : (
-            <PushpinOutlined />
-          )}
-        </span>
-      ),
-    },
+    // {
+    //   title: "Pinned",
+    //   dataIndex: "pinned",
+    //   render: (text, record) => (
+    //     <span>
+    //       {pinnedTasks.includes(record.id) ? (
+    //         <PushpinOutlined style={{ color: "gold" }} />
+    //       ) : (
+    //         <PushpinOutlined />
+    //       )}
+    //     </span>
+    //   ),
+    // },
     {
       title: "Task",
       dataIndex: "taskName",
@@ -367,7 +367,7 @@ export const TaskList = () => {
                 onChange={(e) => onSearch(e)}
               />
             </div>
-            <div className="mb-3">
+            {/* <div className="mb-3">
               <h1 className="mb-2 text-black text-base">Status</h1>
               <Select
                 defaultValue="All"
@@ -417,7 +417,7 @@ export const TaskList = () => {
                   </Option>
                 ))}
               </Select>
-            </div>
+            </div> */}
           </Flex>
           <Flex gap="7px" className="flex">
             <Button

@@ -384,7 +384,7 @@ const EstimatesList = () => {
   return (
     <>
       <Card>
-        <Row gutter={16}>
+        {/* <Row gutter={16}>
           {annualStatisticData.map((elm, i) => (
             <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
               <StatisticWidget
@@ -395,7 +395,7 @@ const EstimatesList = () => {
               />
             </Col>
           ))}
-        </Row>
+        </Row> */}
         <Flex
           alignItems="center"
           justifyContent="space-between"

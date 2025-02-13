@@ -346,7 +346,7 @@ const LeadList = () => {
     <div>
       {/* <LeadCardsList /> */}
       <Card bodyStyle={{ padding: "-3px" }}>
-        <Row gutter={16}>
+        {/* <Row gutter={16}>
           {dealStatisticData.map((elm, i) => (
             <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
               <StatisticWidget
@@ -357,7 +357,7 @@ const LeadList = () => {
               />
             </Col>
           ))}
-        </Row>
+        </Row> */}
         <Flex
           alignItems="center"
           justifyContent="space-between"

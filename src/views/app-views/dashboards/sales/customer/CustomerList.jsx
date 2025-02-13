@@ -154,7 +154,6 @@ const CustomerList = () => {
   const deleteUser = (userId) => {
     dispatch(delcus(userId))
       .then(() => {
-        message.success('Customer deleted successfully');
         dispatch(Getcus()); // Refresh the customer list
       })
       .catch((error) => {

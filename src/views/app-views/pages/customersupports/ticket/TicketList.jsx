@@ -342,7 +342,7 @@ export const TicketList = () => {
 
   return (
     <div className="container">
-      <Row gutter={16}>
+      {/* <Row gutter={16}>
         {annualStatisticData.map((elm, i) => (
           <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
             <StatisticWidget
@@ -353,7 +353,7 @@ export const TicketList = () => {
             />
           </Col>
         ))}
-      </Row>
+      </Row> */}
       <Card>
         <Flex
           alignItems="center"
@@ -368,7 +368,7 @@ export const TicketList = () => {
                 onChange={(e) => onSearch(e)}
               />
             </div>
-            <div className="mb-3">
+            {/* <div className="mb-3">
               <Select
                 defaultValue="All"
                 className="w-100"
@@ -383,7 +383,7 @@ export const TicketList = () => {
                   </Option>
                 ))}
               </Select>
-            </div>
+            </div> */}
           </Flex>
 
           <Flex alignItems="center" justifyContent="space-between" gap="7px">

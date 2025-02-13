@@ -277,7 +277,7 @@ const EstimatesList = () => {
 		<>
 			<Card>
 
-				<Row gutter={16}>
+				{/* <Row gutter={16}>
 					{
 						annualStatisticData.map((elm, i) => (
 							<Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
@@ -291,7 +291,7 @@ const EstimatesList = () => {
 							</Col>
 						))
 					}
-				</Row>
+				</Row> */}
 				<Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
 					<Flex cclassName="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
 						<div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48 me-2">

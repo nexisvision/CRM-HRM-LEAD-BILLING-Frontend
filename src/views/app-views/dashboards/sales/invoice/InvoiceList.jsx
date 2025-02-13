@@ -322,7 +322,7 @@ export const InvoiceList = () => {
   // render() {
   return (
     <div className="container">
-      <Row gutter={16}>
+      {/* <Row gutter={16}>
         {annualStatisticData.map((elm, i) => (
           <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
             <StatisticWidget
@@ -333,7 +333,7 @@ export const InvoiceList = () => {
             />
           </Col>
         ))}
-      </Row>
+      </Row> */}
       <Card>
         <Flex
           alignItems="center"
@@ -352,7 +352,7 @@ export const InvoiceList = () => {
                 onChange={(e) => onSearch(e)}
               />
             </div>
-            <div className="mb-3">
+            {/* <div className="mb-3">
               <Select
                 defaultValue="All"
                 className="w-100"
@@ -367,7 +367,7 @@ export const InvoiceList = () => {
                   </Option>
                 ))}
               </Select>
-            </div>
+            </div> */}
           </Flex>
           <Flex gap="7px" className="flex">
                {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (

@@ -298,9 +298,9 @@ const AddEstimates = ({ onClose }) => {
                                 <Row gutter={16}>
                                     <Col span={12}>
                                         <Form.Item
-                                            name="clientName"
+                                            name="client"
                                             label="Client Name"
-                                            initialValue={subClientData?.username}
+                                            initialValue={fnddata?.client}
                                             rules={[{ required: true, message: "Please enter the client name" }]}
                                         >
                                             <Input placeholder="Enter client name" disabled />

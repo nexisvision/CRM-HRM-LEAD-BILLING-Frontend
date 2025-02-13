@@ -251,6 +251,7 @@ const sub = subClientsss?.SubClient?.data;
 
             dispatch(createInvoice({ id, invoiceData }))
               .then(() => {
+
                 dispatch(getAllInvoices(id));
                 form.resetFields();
                 // setDiscountRate(0);

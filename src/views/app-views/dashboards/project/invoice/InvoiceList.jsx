@@ -267,7 +267,7 @@ export const InvoiceList = () => {
                         <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
                             <Input placeholder="Search" prefix={<SearchOutlined />} onChange={handleSearch} />
                         </div>
-                        <div className="mb-3">
+                        {/* <div className="mb-3">
                             <Select
                                 defaultValue="All"
                                 className="w-100"
@@ -278,7 +278,7 @@ export const InvoiceList = () => {
                                 <Option value="All">All payment </Option>
                                 {paymentStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
                             </Select>
-                        </div>
+                        </div> */}
                     </Flex>
                     <Flex gap="7px" className="flex">
                         <div className='flex gap-4'>

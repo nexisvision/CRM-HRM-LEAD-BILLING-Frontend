@@ -302,7 +302,7 @@ const ExpensesList = () => {
                             onChange={(e) => onSearch(e)}
                         />
                     </div>
-                    <div className="w-full md:w-48">
+                    {/* <div className="w-full md:w-48">
                         <Select
                             defaultValue="All"
                             className="w-full"
@@ -317,7 +317,7 @@ const ExpensesList = () => {
                                 </Option>
                             ))}
                         </Select>
-                    </div>
+                    </div> */}
                 </Flex>
                 <Flex gap="7px" className="flex">
                     <Button

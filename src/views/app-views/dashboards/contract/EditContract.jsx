@@ -67,7 +67,7 @@ const EditContract = ({ id, onClose }) => {
     phone: Yup.string().required("Please enter a Phone Number."),
     phoneCode: Yup.string().required("Please select Country Code."),
     currency: Yup.string().required("Please select Currency."),
-    address: Yup.string().required("Please enter an Address."),
+    address: Yup.string().required("Please enter an address."),
     city: Yup.string().required("Please enter a City."),
     country: Yup.string().required("Please select Country."),
     state: Yup.string().required("Please enter a State."),
@@ -227,10 +227,10 @@ const EditContract = ({ id, onClose }) => {
 
               <Col span={24} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold">Address <span className="text-rose-500">*</span></label>
-                    <Field name="billing_address" as={Input} placeholder="Enter Address" className="mt-1" />
+                    <label className="font-semibold">address <span className="text-rose-500">*</span></label>
+                    <Field name="address" as={Input} placeholder="Enter address" className="mt-1" />
                     <ErrorMessage
-                      name="billing_address"
+                      name="address"
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
