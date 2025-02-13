@@ -133,14 +133,13 @@ const AddProject = ({ onClose }) => {
 
   const validationSchema = Yup.object({
     project_name: Yup.string().required("Please enter a Project Name."),
-    currency: Yup.string().required("Please select Currency."),
+    currency: Yup.string().optional("Please select Currency."),
     project_category: Yup.string().required("Please enter a Category."),
-    currency: Yup.string().required("Please select Currency."),
     startDate: Yup.date().nullable().required("Start date is required."),
     endDate: Yup.date().nullable().required("End date is required."),
     // projectimage: Yup.mixed().required("Please upload a Project Image."),
-    client: Yup.string().required("Please select Client."),
-    user: Yup.string().required("Please select User."),
+    client: Yup.string().optional("Please select Client."),
+    user: Yup.string().optional("Please select User."),
     budget: Yup.number()
       .required("Please enter a Project Budget.")
       .positive("Budget must be positive."),
@@ -156,7 +155,7 @@ const AddProject = ({ onClose }) => {
       "Please enter a Project Description."
     ),
     tag: Yup.string().required("Please enter a Tag."),
-    status: Yup.string().required("Please select Status."),
+    status: Yup.string().optional("Please select Status."),
   });
 
   const onSubmit = (values, { resetForm }) => {
@@ -258,9 +257,10 @@ const AddProject = ({ onClose }) => {
             <Row gutter={16}>
               <Col span={24}>
                 <div className="form-item">
-                  <label className="font-semibold">Project Name</label>
+                  <label className="font-semibold">Project Name <span className="text-red-500">*</span></label>
                   <Field
                     name="project_name"
+                    className="mt-1"
                     as={Input}
                     placeholder="Enter Project Name"
                     rules={[{ required: true }]}
@@ -273,13 +273,14 @@ const AddProject = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24}>
+              <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Category</label>
+                  <label className="font-semibold">Category <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
                     placeholder="Select or add new category"
                     value={values.project_category}
+                    className="mt-1"
                     onChange={(value) => setFieldValue("project_category", value)}
                     dropdownRender={(menu) => (
                       <div>
@@ -312,9 +313,9 @@ const AddProject = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Start Date</label>
+                  <label className="font-semibold">Start Date <span className="text-rose-500">*</span></label>
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.startDate}
                     onChange={(date) => setFieldValue("startDate", date)}
@@ -330,9 +331,9 @@ const AddProject = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">End Date</label>
+                  <label className="font-semibold">End Date <span className="text-rose-500">*</span></label>
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.endDate}
                     onChange={(date) => setFieldValue("endDate", date)}
@@ -351,6 +352,7 @@ const AddProject = ({ onClose }) => {
                   <label className="font-semibold">Client</label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select Client"
                     loading={!fnd}
                     value={values.client} // Bind value to Formik's field
@@ -385,6 +387,7 @@ const AddProject = ({ onClose }) => {
                   <label className="font-semibold">User</label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select User"
                     loading={!employeedata}
                     value={values.user} // Bind value to Formik's field
@@ -411,13 +414,14 @@ const AddProject = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={8} className="mt-4">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Budget</label>
+                  <label className="font-semibold">Budget <span className="text-red-500">*</span></label>
                   <Field
                     name="budget"
                     as={Input}
                     type="number"
+                    className="mt-1"
                     placeholder="Enter Project Budget"
                   />
                   <ErrorMessage
@@ -428,7 +432,7 @@ const AddProject = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12}>
+              <Col span={12} className="mt-4">
                                 <div className="form-item">
                                     <label className="font-semibold">Currency</label>
                                     <Field name="currency">
@@ -437,7 +441,7 @@ const AddProject = ({ onClose }) => {
                                             <Select
                                                 {...field}
                                                 placeholder="Select Currency"
-                                                className="w-full"
+                                                className="w-full mt-1"
                                                 onChange={(value) => {
                                                     const selectedCurrency = curren.find(
                                                         (c) => c.id === value
@@ -470,12 +474,13 @@ const AddProject = ({ onClose }) => {
                                 </div>
                             </Col>
 
-              <Col span={8} className="mt-4">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Estimated Months</label>
+                  <label className="font-semibold">Estimated Months <span className="text-red-500">*</span></label>
                   <Field
                     name="estimatedmonths"
                     as={Input}
+                    className="mt-1"
                     type="number"
                     placeholder="Enter Estimated Months"
                   />
@@ -487,13 +492,14 @@ const AddProject = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={8} className="mt-4">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Estimated Hours</label>
+                  <label className="font-semibold">Estimated Hours <span className="text-red-500">*</span></label>
                   <Field
                     name="estimatedhours"
                     as={Input}
                     type="number"
+                    className="mt-1"
                     placeholder="Enter Estimated Hours"
                   />
                   <ErrorMessage
@@ -508,6 +514,7 @@ const AddProject = ({ onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Description</label>
                   <ReactQuill
+                    className="mt-1"
                     value={values.project_description}
                     onChange={(value) =>
                       setFieldValue("project_description", value)
@@ -523,11 +530,12 @@ const AddProject = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24}>
+              <Col span={24} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Tag</label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select or add new tag"
                     value={values.tag}
                     onChange={(value) => setFieldValue("tag", value)}
@@ -556,11 +564,12 @@ const AddProject = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24}>
+              <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Status</label>
+                  <label className="font-semibold">Status<span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select or add new status"
                     value={values.status}
                     onChange={(value) => setFieldValue("status", value)}

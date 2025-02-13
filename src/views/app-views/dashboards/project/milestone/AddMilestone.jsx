@@ -170,13 +170,13 @@ const curren = curr?.filter((item) => item.created_by === user);
                   <Col span={12}>
                     <div className="form-item">
                       <label className="font-semibold mb-2">
-                        Milestone Title
+                        Milestone Title <span className="text-red-500">*</span>
                       </label>
                       <Field
                         name="milestone_title"
                         as={Input}
                         placeholder="Enter Milestone Title"
-                         className="w-full mt-2"
+                         className="w-full mt-1"
                       />
                       <ErrorMessage
                         name="milestone_title"
@@ -187,13 +187,13 @@ const curren = curr?.filter((item) => item.created_by === user);
                   </Col>
                   <Col span={12} className="">
                     <div className="form-item">
-                      <label className="font-semibold mb-2">Currency</label>
+                      <label className="font-semibold mb-2">Currency <span className="text-red-500">*</span></label>
                       <div className="flex gap-2">
                         <Field name="currency">
                           {({ field, form }) => (
                             <Select
                               {...field}
-                              className="w-full mt-2"
+                              className="w-full mt-1"
                               placeholder="Select Currency"
                               onChange={(value) => {
                                 const selectedCurrency = curren.find(
@@ -222,15 +222,15 @@ const curren = curr?.filter((item) => item.created_by === user);
                     </div>
                   </Col>
                   <Col span={12}>
-                    <div className="form-item mt-2">
+                    <div className="form-item mt-4">
                       <label className="font-semibold mb-2">
-                        Milestone Cost
+                        Milestone Cost <span className="text-red-500">*</span>
                       </label>
                       <Field
                         name="milestone_cost"
                         as={Input}
                         placeholder="Enter Milestone Cost"
-                        className="w-full mt-2"
+                        className="w-full mt-1"
                       />
                       <ErrorMessage
                         name="milestone_cost"
@@ -239,10 +239,10 @@ const curren = curr?.filter((item) => item.created_by === user);
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-2">
+                  <Col span={12} className="mt-4">
                     <div className="form-item">
                       <label className="font-semibold mb-2">
-                        Add Cost To Project Budget
+                        Add Cost To Project Budget <span className="text-red-500">*</span>
                       </label>
                       <Select
                         value={values.add_cost_to_project_budget}
@@ -252,7 +252,7 @@ const curren = curr?.filter((item) => item.created_by === user);
                         onBlur={() =>
                           setFieldTouched("add_cost_to_project_budget", true)
                         }
-                        className="w-full mt-2"
+                        className="w-full mt-1"
                         placeholder="Select Option"
                       >
                         <Option value="no">No</Option>
@@ -266,11 +266,11 @@ const curren = curr?.filter((item) => item.created_by === user);
                     </div>
                   </Col>
                   
-                  <Col span={12} className="mt-2">
+                  <Col span={12} className="mt-4">
                     <div className="form-item">
-                      <label className="font-semibold mb-2">Start Date</label>
+                      <label className="font-semibold mb-2">Start Date <span className="text-red-500">*</span></label>
                       <DatePicker
-                        className="w-full"
+                        className="w-full mt-1"
                         format="DD-MM-YYYY"
                         value={values.milestone_start_date}
                         onChange={(date) =>
@@ -287,11 +287,11 @@ const curren = curr?.filter((item) => item.created_by === user);
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-2">
+                  <Col span={12} className="mt-4">
                     <div className="form-item">
-                      <label className="font-semibold mb-2">End Date</label>
+                      <label className="font-semibold mb-2">End Date <span className="text-red-500">*</span></label>
                       <DatePicker
-                        className="w-full"
+                        className="w-full mt-1"
                         format="DD-MM-YYYY"
                         value={values.milestone_end_date}
                         onChange={(date) =>
@@ -308,11 +308,12 @@ const curren = curr?.filter((item) => item.created_by === user);
                       />
                     </div>
                   </Col>
-                  <Col span={24}>
+                  <Col span={24} className="mt-4">
                     <div className="form-item">
-                      <label className="font-semibold">Status</label>
+                      <label className="font-semibold">Status <span className="text-red-500">*</span></label>
                       <Select
                         style={{ width: "100%" }}
+                        className="mt-1"
                         placeholder="Select or add new status"
                         value={values.milestone_status}
                         onChange={(value) => setFieldValue("milestone_status", value)}
@@ -344,10 +345,11 @@ const curren = curr?.filter((item) => item.created_by === user);
                       />
                     </div>
                   </Col>
-                  <Col span={24} className="mt-2">
+                  <Col span={24} className="mt-4">
                     <div className="form-item">
-                      <label className="font-semibold">Milestone Summary</label>
+                      <label className="font-semibold">Milestone Summary <span className="text-red-500">*</span></label>
                       <ReactQuill
+                        className="mt-1"
                         value={values.milestone_summary}
                         onChange={(value) =>
                           setFieldValue("milestone_summary", value)
@@ -362,7 +364,7 @@ const curren = curr?.filter((item) => item.created_by === user);
                     </div>
                   </Col>
                 </Row>
-                <div className="form-buttons text-right py-2">
+                <div className="form-buttons text-right mt-4">
                   <Button type="default" className="mr-2" onClick={onClose}>
                     Cancel
                   </Button>

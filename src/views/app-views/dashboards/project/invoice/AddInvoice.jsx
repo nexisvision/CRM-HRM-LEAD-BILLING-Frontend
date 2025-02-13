@@ -8,20 +8,21 @@ import Flex from 'components/shared-components/Flex';
 import { Getmins } from '../../../dashboards/project/milestone/minestoneReducer/minestoneSlice';
 import { useSelector, useDispatch } from 'react-redux';
 // import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { createInvoice } from '../../../dashboards/project/invoice/invoicereducer/InvoiceSlice';
+import { createInvoice, getAllInvoices } from '../../../dashboards/project/invoice/invoicereducer/InvoiceSlice';
 import * as Yup from 'yup';
 import { getcurren } from 'views/app-views/setting/currencies/currenciesSlice/currenciesSlice';
+import { GetProdu } from '../product/ProductReducer/ProductsSlice';
+import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
 
 const { Option } = Select;
 
 const AddInvoice = ({ onClose }) => {
 
     const { id } = useParams();
-    const [discountType, setDiscountType] = useState("%");
     const [loading, setLoading] = useState(false);
-    const [discountValue, setDiscountValue] = useState(0);
-    const [isAddProductModalVisible, setIsAddProductModalVisible] = useState(false);
-    const [list, setList] = useState(OrderListData)
+    const [selectedCurrencyIcon, setSelectedCurrencyIcon] = useState('₹');
+    const [selectedCurrencyDetails, setSelectedCurrencyDetails] = useState(null);
+    const [products, setProducts] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [selectedMilestone, setSelectedMilestone] = useState(null);
     const [showFields, setShowFields] = useState(false);
@@ -56,9 +57,14 @@ const sub = subClientsss?.SubClient?.data;
 
     
     const client = fnddata?.client;
-    
+
     const subClientData = sub?.find((subClient) => subClient?.id === client);
 
+     // Add this selector to get products from Redux store
+    //  const { data: products } = useSelector((state) => state.Product.Product);
+
+      // Add this to get taxes from Redux store
+    const { taxes } = useSelector((state) => state.tax);
 
     // console.log("SubClient Data:", subClientData.username);
 
@@ -67,26 +73,12 @@ const sub = subClientsss?.SubClient?.data;
     const [form] = Form.useForm();
     const [totals, setTotals] = useState({
         subtotal: 0,
+        itemDiscount: 0,
+        globalDiscount: 0,
         discount: 0,
         totalTax: 0,
         finalTotal: 0,
     });
-
-  
-
-
-    //   const handleProjectChange = (projectId) => {
-    //     setSelectedProject(projectId);
-    
-    //     // Find associated clients for the selected project
-    //     const relatedClients = subClients.filter(
-    //       (client) => client.projectId === projectId
-    //     );
-    
-    //     // Update client dropdown options
-    //     setClientOptions(relatedClients);
-    //   };
-
 
 
     const [tableData, setTableData] = useState([
@@ -118,107 +110,181 @@ const sub = subClientsss?.SubClient?.data;
         dispatch(Getmins(id));
     }, [dispatch]);
 
+   
+    
+    // Add this useEffect to fetch products when component mounts
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await dispatch(GetProdu(id));
+                if (response.payload && response.payload.data) {
+                    setProducts(response.payload.data);
+                }
+            } catch (error) {
+                console.error("Error fetching products:", error);
+                message.error("Failed to load products");
+            }
+        };
+        fetchProducts();
+    }, [dispatch, id]);
 
     // Handle product selection
-    const handleProductChange = (value) => {
-        setSelectedProduct(value);
-        setSelectedMilestone(null); // Reset milestone selection
-        setTableData([{  // Reset table data
-            id: Date.now(),
-            item: "",
-            quantity: 1,
-            price: "",
-            tax: 0,
-            amount: "0",
-            description: "",
-        }]);
-    };
-    // Handle milestone selection
-    const handleMilestoneChange = (value) => {
-        const selectedMile = milestones?.find(m => m.id === value);
-        setSelectedMilestone(value);
-
-        if (selectedMile) {
-            // Update table data with milestone information
-            setTableData([
-                {
-                    id: Date.now(),
-                    item: selectedMile.milestone_title,
-                    quantity: 1,
-                    price: selectedMile.milestone_cost,
-                    tax: 0,
-                    amount: selectedMile.milestone_cost.toString(),
-                    description: selectedMile.milestone_summary
-                }
-            ]);
+    const handleProductChange = (productId) => {
+        if (productId) {
+            const selectedProd = products.find(p => p.id === productId);
+            if (selectedProd) {
+                // Update the current row with product details
+                const updatedData = tableData.map(row => ({
+                    ...row,
+                    item: selectedProd.name,
+                    hsn_sac: selectedProd.hsn_sac,
+                    price: selectedProd.price,
+                    description: selectedProd.description || ""
+                }));
+                setTableData(updatedData);
+                setSelectedProduct(productId);
+                calculateTotal(updatedData, discountRate);
+            }
         }
     };
 
+    // Handle milestone selection
+    const handleMilestoneChange = (value) => {
+        if (value) {
+            const selectedMile = milestones?.find(m => m.id === value);
+            setSelectedMilestone(value);
+            setSelectedProduct(null); // Reset product selection when milestone is selected
 
-    const handleFinish = async (values) => {
-        try {
-            setLoading(true);
+            if (selectedMile) {
+                // Update table data with milestone information
+                setTableData([
+                    {
+                        id: Date.now(),
+                        item: selectedMile.milestone_title,
+                        quantity: 1,
+                        price: selectedMile.milestone_cost,
+                        tax: 0,
+                        amount: selectedMile.milestone_cost.toString(),
+                        description: selectedMile.milestone_summary
+                    }
+                ]);
+                calculateTotal([{
+                    quantity: 1,
+                    price: selectedMile.milestone_cost,
+                    tax: 0,
+                    discount: 0
+                }], discountRate);
+            }
+        } else {
+            // If deselecting milestone, clear the table data
+            setSelectedMilestone(null);
+            setTableData([{
+                id: Date.now(),
+                item: "",
+                quantity: 1,
+                price: "",
+                tax: 0,
+                amount: "0",
+                description: "",
+            }]);
+        }
+    };
 
-            const subTotal = calculateSubTotal();
-            const totalTax = calculateTotalTax();
-            // const discount = calculateDiscount();
-            // const totalAmount = calculateTotal();
-            const discount = (subTotal * discountRate) / 100; // Discount calculation
-            const totalAmount = subTotal - discount + totalTax; // Final total calculation
+     // Add this useEffect to fetch taxes when component mounts
+  useEffect(() => {
+    dispatch(getAllTaxes());
+  }, [dispatch]);
+
+    const handleFinish = () => {
+        form
+          .validateFields()
+          .then((values) => {
+            const itemsArray = tableData.map((item) => {
+                const quantity = parseFloat(item.quantity) || 0;
+                const unitPrice = parseFloat(item.price) || 0;
+                const itemDiscountPercentage = parseFloat(item.discount) || 0;
+                const taxDetails = item.tax || { gstName: '', gstPercentage: 0 };
+
+                // Calculate per unit amounts
+                const discountAmount = (unitPrice * itemDiscountPercentage) / 100;
+                const gstAmount = (unitPrice * taxDetails.gstPercentage) / 100;
+                const unitAmount = unitPrice - discountAmount + gstAmount;
+                
+                // Calculate total amounts
+                const totalAmount = unitAmount * quantity;
+
+                return {
+                    item: item.item,
+                    quantity: quantity,
+                    price: unitPrice,
+                    tax_name: taxDetails.gstName,
+                    tax_percentage: taxDetails.gstPercentage,
+                    tax_amount: gstAmount * quantity,
+                    discount_percentage: itemDiscountPercentage,
+                    discount_amount: discountAmount * quantity,
+                    base_amount: unitPrice * quantity,
+                    final_amount: totalAmount,
+                    description: item.description || "",
+                    hsn_sac: item.hsn_sac || ""
+                };
+            });
 
             const invoiceData = {
                 product_id: id,
                 issueDate: values.issueDate.format('YYYY-MM-DD'),
                 dueDate: values.dueDate.format('YYYY-MM-DD'),
-                currency: values.currency,
                 client: values.client,
                 project: values.project,
+                currency: values.currency,
+                currencyIcon: selectedCurrencyIcon,
+                currencyCode: selectedCurrencyDetails?.currencyCode,
                 tax_calculation: values.calctax,
-                items: tableData.map(item => ({
-                    item: item.item,
-                    quantity: parseFloat(item.quantity),
-                    price: parseFloat(item.price),
-                    tax: parseFloat(item.tax),
-                    amount: parseFloat(item.amount),
-                    description: item.description
-                })),
-                sub_total: subTotal.toFixed(2),
-                discount: discount.toFixed(2),
-                total_tax: totalTax.toFixed(2),
-                total: totalAmount.toFixed(2),
-                status: 'pending'
+                items: itemsArray,
+                subtotal: totals.subtotal,
+                discount: discountRate,
+                global_discount_amount: totals.globalDiscount,
+                total_item_discount: totals.itemDiscount,
+                total_tax: totals.totalTax,
+                total: totals.finalTotal,
+                status: "pending"
             };
 
-            // console.log('Invoice Data:', invoiceData);
-
-            // Dispatch create invoice action
-            const result = await dispatch(createInvoice({ id, invoiceData })).unwrap();
-
-            if (result) {
-                message.success('Invoice created successfully');
+            dispatch(createInvoice({ id, invoiceData }))
+              .then(() => {
+                message.success("Invoice added successfully");
+                dispatch(getAllInvoices(id));
                 form.resetFields();
+                // setDiscountRate(0);
+                setTableData([
+                  {
+                    id: Date.now(),
+                    item: "",
+                    quantity: 1,
+                    price: 0,
+                    tax: 0,
+                    discount: 0,
+                    amount: 0,
+                    description: "",
+                  }
+                ]);
+                setTotals({
+                  subtotal: "0.00",
+                  itemDiscount: "0.00",
+                  globalDiscount: "0.00",
+                  totalTax: "0.00",
+                  finalTotal: "0.00",
+                });
                 onClose();
-            }
-        } catch (error) {
-            message.error('Failed to create invoice: ' + error.message);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const [rows, setRows] = useState([
-        {
-            id: Date.now(),
-            item: "",
-            quantity: "",
-            price: "",
-            discount: "",
-            tax: "",
-            amount: "0",
-            description: "",
-            isNew: false,
-        },
-    ]);
+              })
+              .catch((error) => {
+                message.error("Failed to add invoice. Please try again.");
+                console.error("Error during invoice submission:", error);
+              });
+          })
+          .catch((error) => {
+            console.error("Validation failed:", error);
+          });
+      };
 
     // Function to handle adding a new row
     const handleAddRow = () => {
@@ -230,8 +296,10 @@ const sub = subClientsss?.SubClient?.data;
                 quantity: 1,
                 price: "",
                 tax: 0,
+                discount: 0,
                 amount: "0",
                 description: "",
+                hsn_sac: ""
             }
         ]);
     };
@@ -247,81 +315,113 @@ const sub = subClientsss?.SubClient?.data;
         }
     };
 
-    const navigate = useNavigate();
-
-
-    // Calculate discount amount
-    const calculateDiscount = () => {
-        const subTotal = calculateSubTotal();
-        if (discountType === '%') {
-            return subTotal * (parseFloat(discountValue) || 0) / 100;
-        }
-        return parseFloat(discountValue) || 0;
-    };
-    
-    // Calculate total tax
-    const calculateTotalTax = () => {
-        const subTotal = calculateSubTotal();
-        const discount = calculateDiscount();
-        const taxableAmount = form.getFieldValue('calctax') === 'before'
-            ? subTotal
-            : (subTotal - discount);
-
-        return tableData.reduce((sum, row) => {
-            const quantity = parseFloat(row.quantity) || 0;
-            const price = parseFloat(row.price) || 0;
-            const tax = parseFloat(row.tax) || 0;
-            const rowAmount = quantity * price;
-            return sum + (rowAmount * (tax / 100));
-        }, 0);
-    };
-
-    // Calculate subtotal (sum of all row amounts before discount)
-    const calculateSubTotal = () => {
-        return rows.reduce((sum, row) => {
-            const quantity = parseFloat(row.quantity || 0);
-            const price = parseFloat(row.price || 0);
-            return sum + (quantity * price);
-        }, 0);
-    };
-
-
     const calculateTotal = (data, discountRate) => {
-        let subtotal = 0;
-        let totalTax = 0;
+        // Calculate amounts for each row and total
+        const calculatedTotals = data.reduce((acc, row) => {
+            const quantity = parseFloat(row.quantity) || 0;
+            const unitPrice = parseFloat(row.price) || 0;
+            const itemDiscountPercentage = parseFloat(row.discount) || 0;
+            const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
 
-        data.forEach((row) => {
-            const amount = row.quantity * row.price;
-            const taxAmount = (amount * row.tax) / 100;
+            // Calculate discount amount from unit price
+            const discountAmount = (unitPrice * itemDiscountPercentage) / 100;
+            
+            // Calculate GST amount from unit price
+            const gstAmount = (unitPrice * taxPercentage) / 100;
+            
+            // Calculate amount for single unit: unit price - discount + GST
+            const unitAmount = unitPrice - discountAmount + gstAmount;
+            
+            // Calculate total amount for this row (unit amount × quantity)
+            const rowAmount = unitAmount * quantity;
 
-            row.amount = amount; // Update the row's amount
-            subtotal += amount;
-            totalTax += taxAmount;
+            return {
+                totalBaseAmount: acc.totalBaseAmount + (unitPrice * quantity),
+                totalItemDiscount: acc.totalItemDiscount + (discountAmount * quantity),
+                totalTax: acc.totalTax + (gstAmount * quantity),
+                totalAmount: acc.totalAmount + rowAmount
+            };
+        }, { totalBaseAmount: 0, totalItemDiscount: 0, totalTax: 0, totalAmount: 0 });
+
+        // Calculate subtotal (sum of all row amounts)
+        const subtotal = calculatedTotals.totalAmount;
+
+        // Calculate global discount
+        const globalDiscountAmount = (subtotal * discountRate) / 100;
+
+        // Calculate final total
+        const finalTotal = subtotal - globalDiscountAmount;
+
+        // Update the totals state
+        setTotals({
+            subtotal: subtotal.toFixed(2),
+            itemDiscount: calculatedTotals.totalItemDiscount.toFixed(2),
+            globalDiscount: globalDiscountAmount.toFixed(2),
+            totalTax: calculatedTotals.totalTax.toFixed(2),
+            finalTotal: finalTotal.toFixed(2)
         });
 
-        const discount = (subtotal * discountRate) / 100;
-        const finalTotal = subtotal - discount + totalTax;
+        // Update the amount displayed for each row
+        const updatedData = data.map(row => {
+            const quantity = parseFloat(row.quantity) || 0;
+            const unitPrice = parseFloat(row.price) || 0;
+            const itemDiscountPercentage = parseFloat(row.discount) || 0;
+            const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
 
-        setTotals({ subtotal, discount, totalTax, finalTotal });
+            // Calculate per unit amounts
+            const discountAmount = (unitPrice * itemDiscountPercentage) / 100;
+            const gstAmount = (unitPrice * taxPercentage) / 100;
+            const unitAmount = unitPrice - discountAmount + gstAmount;
+            
+            // Calculate total row amount
+            const rowAmount = unitAmount * quantity;
+
+            return {
+                ...row,
+                amount: rowAmount.toFixed(2)
+            };
+        });
+
+        setTableData(updatedData);
     };
 
     const handleTableDataChange = (id, field, value) => {
-        const updatedData = tableData.map((row) =>
-            row.id === id ? { ...row, [field]: field === 'quantity' || field === 'price' || field === 'tax' ? parseFloat(value) || 0 : value } : row
-        );
+        const updatedData = tableData.map((row) => {
+            if (row.id === id) {
+                const updatedRow = { ...row, [field]: value };
+                
+                // Calculate amount immediately for display
+                const quantity = parseFloat(updatedRow.quantity) || 0;
+                const unitPrice = parseFloat(updatedRow.price) || 0;
+                const itemDiscountPercentage = parseFloat(updatedRow.discount) || 0;
+                const taxPercentage = updatedRow.tax ? parseFloat(updatedRow.tax.gstPercentage) || 0 : 0;
+
+                // Calculate per unit amounts
+                const discountAmount = (unitPrice * itemDiscountPercentage) / 100;
+                const gstAmount = (unitPrice * taxPercentage) / 100;
+                const unitAmount = unitPrice - discountAmount + gstAmount;
+                
+                // Calculate total row amount
+                const rowAmount = unitAmount * quantity;
+
+                updatedRow.amount = rowAmount.toFixed(2);
+                return updatedRow;
+            }
+            return row;
+        });
 
         setTableData(updatedData);
-        calculateTotal(updatedData, discountRate); // Recalculate totals
+        calculateTotal(updatedData, discountRate);
     };
 
-        const initialValues = {
-            issueDate: null,
-            dueDate: null,
-            currency: '',
-            client: fnddata?.client || "",
-            project: fnddata?.id || "",
-            calctax: '',
-        };
+    const initialValues = {
+        issueDate: null,
+        dueDate: null,
+        currency: '',
+        client: fnddata?.client || "",
+        project: fnddata?.id || "",
+        calctax: '',
+    };
 
     const validationSchema = Yup.object({
         issueDate: Yup.date().nullable().required('Invoice Date is required.'),
@@ -332,6 +432,206 @@ const sub = subClientsss?.SubClient?.data;
         calctax: Yup.string().required('Please select tax.'),
     });
 
+    // Modified currency selection handler
+    const handleCurrencyChange = (currencyId) => {
+        const selectedCurrency = curren?.find(c => c.id === currencyId);
+        if (selectedCurrency) {
+            setSelectedCurrencyIcon(selectedCurrency.currencyIcon);
+            setSelectedCurrencyDetails(selectedCurrency);
+            form.setFieldsValue({ currency: currencyId });
+        }
+    };
+
+    // Modify the currency form item
+    const renderCurrencySelect = () => (
+        <Form.Item
+            name="currency"
+            label="Currency"
+            rules={[{ required: true, message: "Please select a currency" }]}
+        >
+            <Select
+                className="w-full"
+                placeholder="Select Currency"
+                onChange={handleCurrencyChange}
+            >
+                {curren?.map((currency) => (
+                    <Option key={currency.id} value={currency.id}>
+                        {currency.currencyCode} ({currency.currencyIcon})
+                    </Option>
+                ))}
+            </Select>
+        </Form.Item>
+    );
+
+    // Modify the table to show currency icons in all price/amount fields
+    const renderTableRows = () => (
+        <tbody>
+            {tableData.map((row) => (
+                <React.Fragment key={row.id}>
+                    <tr>
+                        <td className="px-4 py-2 border-b">
+                            <input
+                                type="text"
+                                value={row.item}
+                                onChange={(e) => handleTableDataChange(row.id, "item", e.target.value)}
+                                placeholder="Item Name"
+                                className="w-full p-2 border rounded-s"
+                                readOnly={selectedProduct !== null}
+                            />
+                        </td>
+                        
+                        <td className="px-4 py-2 border-b">
+                            <input
+                                type="number"
+                                min="1"
+                                value={row.quantity}
+                                onChange={(e) => handleTableDataChange(row.id, "quantity", e.target.value)}
+                                placeholder="Qty"
+                                className="w-full p-2 border rounded"
+                            />
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                            <Input
+                                prefix={selectedCurrencyIcon}
+                                type="number"
+                                min="0"
+                                value={row.price}
+                                onChange={(e) => handleTableDataChange(row.id, "price", e.target.value)}
+                                placeholder="Price"
+                                className="w-full p-2 border rounded-s"
+                            />
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={row.discount || 0}
+                                onChange={(e) => handleTableDataChange(row.id, "discount", e.target.value)}
+                                placeholder="0"
+                                className="w-full p-2 border rounded"
+                            />
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                            <input
+                                type="text"
+                                value={row.hsn_sac || ""}
+                                onChange={(e) => handleTableDataChange(row.id, "hsn_sac", e.target.value)}
+                                placeholder="HSN/SAC"
+                                className="w-full p-2 border rounded"
+                                readOnly={selectedProduct !== null}
+                            />
+                        </td>
+                        
+                        <td className="px-4 py-2 border-b">
+                            <select
+                                value={row.tax ? `${row.tax.gstName}|${row.tax.gstPercentage}` : ''}
+                                onChange={(e) => {
+                                    const [gstName, gstPercentage] = e.target.value.split('|');
+                                    handleTableDataChange(row.id, "tax", {
+                                        gstName,
+                                        gstPercentage: parseFloat(gstPercentage) || 0
+                                    });
+                                }}
+                                className="w-full p-2 border"
+                            >
+                                <option value="">Nothing Selected</option>
+                                {taxes && taxes.data && taxes.data.map(tax => (
+                                    <option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
+                                        {tax.gstName} ({tax.gstPercentage}%)
+                                    </option>
+                                ))}
+                            </select>
+                        </td>
+                        <td className="px-4 py-2 border-b">
+                            <span>{selectedCurrencyIcon} {parseFloat(row.amount || 0).toFixed(2)}</span>
+                        </td>
+                    </tr>
+                       
+                    <tr>
+                        <td colSpan={8} className="px-4 py-2 border-b">
+                            <textarea
+                                rows={2}
+                                value={row.description}
+                                onChange={(e) => handleTableDataChange(row.id, "description", e.target.value)}
+                                placeholder="Description"
+                                className="w-[70%] p-2 border"
+                            />
+                        </td>
+                        <td className="px-2 py-1 border-b text-center">
+                            <Button danger onClick={() => handleDeleteRow(row.id)}>
+                                <DeleteOutlined />
+                            </Button>
+                        </td>
+                    </tr>
+                </React.Fragment>
+            ))}
+        </tbody>
+    );
+
+    // Modify the summary section to show currency icons
+    const renderSummarySection = () => (
+        <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
+            <table className="w-full lg:w-[50%] p-2">
+                <tbody>
+                    <tr className="flex justify-between px-2 py-2 border-x-2">
+                        <td className="font-medium">Sub Total</td>
+                        <td className="font-medium px-4 py-2">
+                            {selectedCurrencyIcon} {totals.subtotal}
+                        </td>
+                    </tr>
+
+                    <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
+                        <td className="font-medium">Item Discount</td>
+                        <td className="flex items-center space-x-2">
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Item Discount Rate (%)
+                                </label>
+                                <input
+                                    type="number"
+                                    value={discountRate}
+                                    onChange={(e) => {
+                                        setDiscountRate(parseFloat(e.target.value) || 0);
+                                        calculateTotal(tableData, parseFloat(e.target.value) || 0); // Recalculate with new discount rate
+                                    }}
+                                    className="mt-1 block w-full p-2 border rounded"
+                                />
+                            </div>
+                        </td>
+                    </tr>
+
+                    {parseFloat(totals.itemDiscount) > 0 && (
+                        <tr className="flex justify-between px-2 py-2 border-x-2">
+                            <td className="font-medium">Total Item Discount Amount</td>
+                            <td className="font-medium px-4 py-2 text-red-500">-₹{totals.itemDiscount}</td>
+                        </tr>
+                    )}
+
+                    <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
+                        <td className="font-medium">Global Discount</td>
+                        <td className="font-medium px-4 py-2">
+                            {selectedCurrencyIcon} {totals.globalDiscount}
+                        </td>
+                    </tr>
+
+                    <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
+                        <td className="font-medium">Total Tax</td>
+                        <td className="font-medium px-4 py-2">
+                            {selectedCurrencyIcon} {totals.totalTax}
+                        </td>
+                    </tr>
+
+                    <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
+                        <td className="font-bold text-lg">Total Amount</td>
+                        <td className="font-bold text-lg px-4">
+                            {selectedCurrencyIcon} {totals.finalTotal}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    );
 
     return (
         <>
@@ -342,13 +642,13 @@ const sub = subClientsss?.SubClient?.data;
                         form={form}
                         layout="vertical"
                         onFinish={handleFinish}
-                validationSchema={validationSchema}
-                initialValues={initialValues}
+                        validationSchema={validationSchema}
+                        initialValues={initialValues}
                     >
                         {/* <Card className="border-0 mt-2"> */}
                         <div className="">
                             <div className=" p-2">
-                               
+
 
                                 <Row gutter={16}>
 
@@ -373,26 +673,7 @@ const sub = subClientsss?.SubClient?.data;
                                     </Col>
 
                                     <Col span={12}>
-                                        <Form.Item
-                                            name="currency"
-                                            label="Currency"
-                                            rules={[{ required: true, message: "Please select a currency" }]}
-                                        >
-                                            <Select
-                                                className="w-full mt-2"
-                                                placeholder="Select Currency"
-                                                onChange={(value) => {
-                                                    const selectedCurrency = curren.find(c => c.id === value);
-                                                    form.setFieldValue("currency", selectedCurrency?.currencyCode || '');
-                                                }}
-                                            >
-                                                {curren.map((currency) => (
-                                                    <Option key={currency.id} value={currency.id}>
-                                                        {currency.currencyCode}
-                                                    </Option>
-                                                ))}
-                                            </Select>
-                                        </Form.Item>
+                                        {renderCurrencySelect()}
                                     </Col>
                                     <Col span={12}>
                                         <Form.Item
@@ -409,7 +690,7 @@ const sub = subClientsss?.SubClient?.data;
                                         </Form.Item>
                                     </Col>
 
-                                        
+
                                     <Col span={12}>
                                         {/* Display the project name */}
                                         <Form.Item
@@ -440,29 +721,20 @@ const sub = subClientsss?.SubClient?.data;
                                         </Form.Item>
                                     </Col>
                                 </Row>
-
-                                {/* <Form.Item>
-                                        <Row justify="end" gutter={16}>
-                                            <Col>
-                                                <Button onClick={() => navigate("/app/dashboards/project/list")}>Cancel</Button>
-                                            </Col>
-                                            <Col>
-                                                <Button type="primary" htmlType="submit">
-                                                    Create
-                                                </Button>
-                                            </Col>
-                                        </Row>
-                                    </Form.Item> */}
-                                {/* </Form> */}
                             </div>
                         </div>
                         {/* </Card> */}
 
                         {/* <Card> */}
                         <div>
+                            <div className="form-buttons text-right mb-2">
+                                <Button type="primary" onClick={handleAddRow}>
+                                    <PlusOutlined /> Add Items
+                                </Button>
+                            </div>
                             <div className="overflow-x-auto">
                                 <Flex alignItems="center" mobileFlex={false} className='flex mb-4 gap-4'>
-                                    <Flex className="flex " mobileFlex={false}>
+                                    <Flex className="flex" mobileFlex={false}>
                                         <div className="w-full flex gap-4">
                                             <div>
                                                 <Select
@@ -471,10 +743,13 @@ const sub = subClientsss?.SubClient?.data;
                                                     className="w-full !rounded-none"
                                                     placeholder="Select Product"
                                                     rootClassName="!rounded-none"
+                                                    allowClear
                                                 >
-                                                    <Option value="smart_speakers">Smart Speakers</Option>
-                                                    <Option value="electric_kettle">Electric Kettle</Option>
-                                                    <Option value="headphones">Headphones</Option>
+                                                    {products?.map((product) => (
+                                                        <Option key={product.id} value={product.id}>
+                                                            {product.name} 
+                                                        </Option>
+                                                    ))}
                                                 </Select>
                                             </div>
 
@@ -491,6 +766,7 @@ const sub = subClientsss?.SubClient?.data;
                                                     placeholder="Select Milestone"
                                                     rootClassName="!rounded-none"
                                                     loading={loading}
+                                                    allowClear
                                                 >
                                                     {milestones?.map((milestone) => (
                                                         <Option key={milestone.id} value={milestone.id}>
@@ -515,6 +791,13 @@ const sub = subClientsss?.SubClient?.data;
                                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Unit Price <span className="text-red-500">*</span>
                                             </th>
+                                            
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                                Discount <span className="text-red-500">*</span>
+                                            </th>
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                                Hsn/Sac <span className="text-red-500">*</span>
+                                            </th>
                                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 TAX (%)
                                             </th>
@@ -523,140 +806,10 @@ const sub = subClientsss?.SubClient?.data;
                                             </th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        {tableData.map((row) => (
-                                            <React.Fragment key={row.id}>
-                                                <tr>
-                                                    <td className="px-4 py-2 border-b">
-                                                        <input
-                                                            type="text"
-                                                            value={row.item}
-                                                            onChange={(e) => handleTableDataChange(row.id, 'item', e.target.value)}
-                                                            placeholder="Item Name"
-                                                            className="w-full p-2 border rounded-s"
-                                                        />
-                                                    </td>
-                                                    <td className="px-4 py-2 border-b">
-                                                        <input
-                                                            type="number"
-                                                            value={row.quantity}
-                                                            onChange={(e) => handleTableDataChange(row.id, 'quantity', e.target.value)}
-                                                            placeholder="Qty"
-                                                            className="w-full p-2 border rounded"
-                                                        />
-                                                    </td>
-                                                    <td className="px-4 py-2 border-b">
-                                                        <input
-                                                            type="number"
-                                                            value={row.price}
-                                                            onChange={(e) => handleTableDataChange(row.id, 'price', e.target.value)}
-                                                            placeholder="Price"
-                                                            className="w-full p-2 border rounded-s"
-                                                        />
-                                                    </td>
-                                                    <td className="px-4 py-2 border-b">
-                                                        <select
-                                                            value={row.tax}
-                                                            onChange={(e) => handleTableDataChange(row.id, 'tax', e.target.value)}
-                                                            className="w-full p-2 border"
-                                                        >
-                                                            <option value="0">Nothing Selected</option>
-                                                            <option value="10">GST:10%</option>
-                                                            <option value="18">CGST:18%</option>
-                                                            <option value="10">VAT:10%</option>
-                                                            <option value="10">IGST:10%</option>
-                                                            <option value="10">UTGST:10%</option>
-                                                        </select>
-                                                    </td>
-                                                    <td className="px-4 py-2 border-b">
-                                                        <span>{row.amount}</span>
-                                                    </td>
-                                                    <td className="px-2 py-1 border-b text-center">
-                                                        <Button
-                                                            danger
-                                                            onClick={() => handleDeleteRow(row.id)}
-                                                        >
-                                                            <DeleteOutlined />
-                                                        </Button>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colSpan={6} className="px-4 py-2 border-b">
-                                                        <textarea
-                                                            rows={2}
-                                                            value={row.description}
-                                                            onChange={(e) => handleTableDataChange(row.id, 'description', e.target.value)}
-                                                            placeholder="Description"
-                                                            className="w-[70%] p-2 border"
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            </React.Fragment>
-                                        ))}
-                                    </tbody>
+                                    {renderTableRows()}
                                 </table>
                             </div>
-                            <div className="form-buttons text-left mt-2">
-                                <Button className='border-0 text-blue-500' onClick={handleAddRow}>
-                                    <PlusOutlined />  Add Items
-                                </Button>
-                            </div>
-
-                            {/* Summary Section */}
-                            <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
-                                <table className='w-full lg:w-[50%] p-2'>
-                                    {/* Sub Total */}
-                                    <tr className="flex justify-between px-2 py-2 border-x-2">
-                                        <td className="font-medium">Sub Total</td>
-                                        <td className="font-medium px-4 py-2">
-                                            ₹{totals.subtotal.toFixed(2)}
-                                        </td>
-                                    </tr>
-
-                                    {/* Discount */}
-                                    <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
-                                        <td className="font-medium">Discount</td>
-                                        <td className='flex items-center space-x-2'>
-                                            <div className="mb-4">
-                                                <label className="block text-sm font-medium text-gray-700">
-                                                    Discount Rate (%)
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    value={discountRate}
-                                                    onChange={(e) => {
-                                                        setDiscountRate(parseFloat(e.target.value) || 0);
-                                                        calculateTotal(tableData, parseFloat(e.target.value) || 0); // Recalculate with new discount rate
-                                                    }}
-                                                    className="mt-1 block w-full p-2 border rounded"
-                                                />
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                    {/* Tax */}
-                                    <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
-                                        <td className="font-medium">Total Tax</td>
-                                        <td className="font-medium px-4 py-2">
-                                            ₹{totals.totalTax.toFixed(2)}
-                                        </td>
-                                    </tr>
-
-                                    {/* Total */}
-                                    <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
-                                        <td className="font-bold text-lg">Total Amount</td>
-                                        <td className="font-bold text-lg px-4">
-                                            ₹{totals.finalTotal.toFixed(2)}
-                                        </td>
-                                    </tr>
-
-                                    {/* Terms and Conditions */}
-                                </table>
-                            </div>
-                            <div className="pt-4 text-right">
-                                <h3 className="font-medium">Terms and Conditions</h3>
-                                <p className="text-sm text-gray-600">Thank you for your business.</p>
-                            </div>
+                            {renderSummarySection()}
                             <div className='mt-4'>
                                 <span className='block mb-2'>Add File</span>
                                 <Col span={24} >

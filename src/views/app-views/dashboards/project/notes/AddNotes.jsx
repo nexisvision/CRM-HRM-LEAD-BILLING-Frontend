@@ -52,7 +52,7 @@ const AddNotes = ({ onClose }) => {
   const validationSchema = Yup.object({
     note_title: Yup.string().required("Please enter Note Title."),
     notetype: Yup.string().required("Please select Note Type."),
-    description: Yup.string().required("Please enter Description."),
+    description: Yup.string().optional("Please enter Description."),
   });
 
   const onSubmit = async (values, { resetForm }) => {
@@ -93,12 +93,12 @@ const AddNotes = ({ onClose }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Note Title</label>
+                  <label className="font-semibold">Note Title <span className="text-red-500">*</span></label>
                   <Field
                     name="note_title"
                     as={Input}
                     placeholder="Enter Note Title"
-                    className="mt-2"
+                    className="mt-1"
                   />
                   <ErrorMessage
                     name="note_title"
@@ -109,15 +109,15 @@ const AddNotes = ({ onClose }) => {
               </Col>
 
 
-              <Col span={12} className="mt-2">
+              <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold mb-2">Employee</label>
+                  <label className="font-semibold">Employee</label>
                   <div className="flex gap-2">
                     <Field name="employees">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full "
+                          className="w-full mt-1"
                           placeholder="Select Employee"
                           onChange={(value) => {
                             const selectedEmployee =
@@ -152,6 +152,7 @@ const AddNotes = ({ onClose }) => {
                   <label className="font-semibold">Description</label>
                   <ReactQuill
                     value={values.description}
+                    className="mt-1"
                     onChange={(value) => setFieldValue("description", value)}
                     placeholder="Enter Description"
                     onBlur={() => setFieldTouched("description", true)}

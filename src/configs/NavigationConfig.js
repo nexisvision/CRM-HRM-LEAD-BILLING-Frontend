@@ -4,6 +4,7 @@ import {
   FileTextOutlined,
   // SettingOutlined,
   // DollarOutlined,
+  MoneyCollectOutlined,
   AntDesignOutlined,
   BugOutlined,
   SafetyOutlined,
@@ -328,6 +329,14 @@ const extraNavvTree = [
             path: `${APP_PREFIX_PATH}/setting/currencies`,
             title: 'Currencies',
             icon: DollarOutlined ,
+            breadcrumb: true,
+            submenu: []
+          },
+          {
+            key: 'extra-superadmin-setting-tax',
+            path: `${APP_PREFIX_PATH}/setting/tax`,
+            title: 'Tax',
+            icon: MoneyCollectOutlined ,
             breadcrumb: true,
             submenu: []
           },

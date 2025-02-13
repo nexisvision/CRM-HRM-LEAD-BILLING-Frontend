@@ -114,23 +114,43 @@ const AddProduct = ({ idd, onClose }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Name</label>
-                  <Field className="mt-2" name="name" as={CustomInput} placeholder="Enter Name" />
-                  <ErrorMessage name="name" component="div" className="error-message text-red-500 my-1" />
+                  <label className="font-semibold">Name <span className="text-red-500">*</span> </label>
+                  <Field
+                    className="mt-1"
+                    name="name"
+                    as={Input}
+                    placeholder="Enter Name"
+                  />
+                  <ErrorMessage
+                    name="name"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Price</label>
-                  <Field className="mt-2" type="number" name="price" as={CustomInput} placeholder="Enter Price" />
-                  <ErrorMessage name="price" component="div" className="error-message text-red-500 my-1" />
+                  <label className="font-semibold">Price <span className="text-red-500">*</span></label>
+                  <Field
+                    className="mt-1"
+                    type="number"
+                    name="price"
+                    as={Input}
+                    placeholder="Enter Price"
+                  />
+                  <ErrorMessage
+                    name="price"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
               <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Category</label>
+                <div className="form-item mt-2">
+                  <label className="font-semibold">Category <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select or add new category"
                     value={values.category}
                     onChange={(value) => setFieldValue("category", value)}
@@ -177,11 +197,11 @@ const AddProduct = ({ idd, onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Description</label>
                   <ReactQuill
+                    className="mt-1"
                     value={values.description}
                     onChange={(value) => setFieldValue("description", value)}
                     placeholder="Enter Description"
                     onBlur={() => setFieldTouched("description", true)}
-                    className="mt-2"
                   />
                   <ErrorMessage name="description" component="div" className="error-message text-red-500 my-1" />
                 </div>

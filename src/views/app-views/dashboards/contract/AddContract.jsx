@@ -180,9 +180,10 @@ const AddContract = ({ onClose }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Subject</label>
+                  <label className="font-semibold">Subject <span className="text-red-500">*</span></label>
                   <Field
                     name="subject"
+                    className="mt-1"
                     as={Input}
                     placeholder="Enter Subject Name"
                   />
@@ -210,13 +211,14 @@ const AddContract = ({ onClose }) => {
                 </div>
               </Col> */}
 
-              <Col span={12} className="mt-4">
+              <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Phone</label>
+                  <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
                   <div className="flex">
                     <Select
                       style={{ width: '30%', marginRight: '8px' }}
                       placeholder="Code"
+                      className="mt-1"
                       name="phoneCode"
                       onChange={(value) => setFieldValue('phoneCode', value)}
                     >
@@ -231,6 +233,7 @@ const AddContract = ({ onClose }) => {
                         <Input
                           {...field}
                           type="number"
+                          className="mt-1"
                           style={{ width: '70%' }}
                           placeholder="Enter phone"
                           onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
@@ -248,8 +251,8 @@ const AddContract = ({ onClose }) => {
 
               <Col span={24} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold">Address</label>
-                    <Field name="address" as={Input} placeholder="Enter Address" />
+                    <label className="font-semibold">Address <span className="text-red-500">*</span></label>
+                    <Field name="address" className="mt-1" as={Input} placeholder="Enter Address" />
                     <ErrorMessage
                       name="address"
 
@@ -261,9 +264,10 @@ const AddContract = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">City</label>
+                  <label className="font-semibold">City <span className="text-red-500">*</span></label>
                   <Field
                     name="city"
+                    className="mt-1"
                     as={Input}
                     placeholder="Enter City Name"
                   />
@@ -277,9 +281,9 @@ const AddContract = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Country</label>
+                  <label className="font-semibold">Country <span className="text-red-500">*</span></label>
                   <Select
-                    className="w-full"
+                    className="w-full mt-1"
                     placeholder="Select Country"
                     name="country"
                     onChange={(value) => setFieldValue('country', value)}
@@ -301,9 +305,10 @@ const AddContract = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">State</label>
+                  <label className="font-semibold">State <span className="text-red-500">*</span></label>
                   <Field
                     name="state"
+                    className="mt-1"
                     as={Input}
                     placeholder="Enter State Name"
                   />
@@ -317,9 +322,10 @@ const AddContract = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Zip Code</label>
+                  <label className="font-semibold">Zip Code <span className="text-red-500">*</span></label>
                   <Field
                     name="zipcode"
+                    className="mt-1"
                     type="number"
                     as={Input}
                     placeholder="Enter Zip Code"
@@ -335,12 +341,12 @@ const AddContract = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Client</label>
+                  <label className="font-semibold">Client <span className="text-red-500">*</span></label>
                   <Field name="client">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-1"
                         placeholder="Select Client"
                         onChange={(value) => setFieldValue("client", value)}
                         value={values.client}
@@ -369,13 +375,13 @@ const AddContract = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Currency</label>
+                  <label className="font-semibold">Currency <span className="text-red-500">*</span></label>
                   <div className="flex gap-2">
                     <Field name="currency">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full"
+                          className="w-full mt-1"
                           placeholder="Select Currency"
 
                           onChange={(value) => {
@@ -410,12 +416,12 @@ const AddContract = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Projects</label>
+                  <label className="font-semibold">Projects <span className="text-red-500">*</span></label>
                   <Field name="project">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-1"
                         placeholder="Select Projects"
                         onChange={(value) => setFieldValue("project", value)}
                         value={values.project}
@@ -445,12 +451,12 @@ const AddContract = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Contract Type</label>
+                  <label className="font-semibold">Contract Type <span className="text-red-500">*</span></label>
                   <Field name="type">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-1"
                         placeholder="Select Contract Type"
                         onChange={(value) => setFieldValue("type", value)}
                         value={values.type}
@@ -472,12 +478,13 @@ const AddContract = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Contract Value</label>
+                  <label className="font-semibold">Contract Value <span className="text-red-500">*</span></label>
                   <Field name="value">
                     {({ field }) => (
                       <Input
                         {...field}
                         type="number"
+                        className="mt-1"
                         step="0.01"
                         min="0"
                         placeholder="Enter Contract Value"
@@ -498,7 +505,7 @@ const AddContract = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Start Date</label>
+                  <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
                   <Field name="startDate">
                     {({ field }) => (
                       <DatePicker
@@ -522,11 +529,11 @@ const AddContract = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">End Date</label>
+                  <label className="font-semibold">End Date <span className="text-red-500">*</span></label>
                   <Field name="endDate">
                     {({ field }) => (
                       <DatePicker
-                        className="w-full"
+                        className="w-full mt-1"
                         format="YYYY-MM-DD"
                         onChange={(date) => {
                           const formattedDate = date ? date.toDate() : null;
@@ -546,10 +553,11 @@ const AddContract = ({ onClose }) => {
 
               <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Description</label>
+                  <label className="font-semibold">Description <span className="text-red-500">*</span></label>
                   <Field name="description">
                     {({ field }) => (
                       <ReactQuill
+                        className="mt-1"
                         value={field.value}
                         onChange={(value) => setFieldValue("description", value)}
                         placeholder="Enter description"
@@ -566,11 +574,12 @@ const AddContract = ({ onClose }) => {
                     
               <Col span={24} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold">Notes</label>
+                    <label className="font-semibold">Notes <span className="text-red-500">*</span></label>
                     <Field name="notes">
                       {({ field }) => (
                         <ReactQuill
                           {...field}
+                          className="mt-1"
                           value={values.notes}
                           onChange={(value) =>
                             setFieldValue("notes", value)

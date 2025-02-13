@@ -196,12 +196,12 @@ const AddTask = ({ onClose }) => {
             <Row gutter={16}>
               <Col span={24}>
                 <div className="form-item">
-                  <label className="font-semibold">Task Name</label>
+                  <label className="font-semibold">Task Name <span className="text-red-500">*</span></label>
                   <Field
                     name="taskName"
+                    className="mt-1"
                     as={Input}
                     placeholder="Enter taskTitle"
-                    className="mt-2"
                   />
                   <ErrorMessage
                     name="taskName"
@@ -211,39 +211,14 @@ const AddTask = ({ onClose }) => {
                 </div>
               </Col>
 
-              {/* <Col span={12}>
+
+
+              <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Task Category</label>
-                  <Field name="category">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        placeholder="Select category"
-                        className="w-full mt-2"
-                        onChange={(value) => setFieldValue("category", value)}
-                        value={values.category}
-                        onBlur={() => setFieldTouched("category", true)}
-                        allowClear={false}
-                      >
-                        <Option value="Task Category">Task Category</Option>
-                        <Option value="Task Category">Task Category</Option>
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="category"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
-
-
-              <Col span={24}>
-                <div className="form-item mt-2">
-                  <label className="font-semibold">Category</label>
+                  <label className="font-semibold">Category <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select or add new category"
                     value={values.category}
                     onChange={(value) => setFieldValue("category", value)}
@@ -281,15 +256,15 @@ const AddTask = ({ onClose }) => {
 
 
               {fnddata?.project_name && (
-                <Col span={24} className="mt-2">
+                <Col span={24} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold">Project</label>
+                    <label className="font-semibold">Project <span className="text-red-500">*</span></label>
                     <Field
                       value={fnddata.project_name}
                       name="project"
                       as={Input}
                       placeholder="Enter projectName"
-                      className="mt-2"
+                      className="mt-1"
                       disabled
                     />
                     <ErrorMessage
@@ -303,10 +278,10 @@ const AddTask = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold ">StartDate</label>
+                  <label className="font-semibold ">StartDate <span className="text-red-500">*</span></label>
                   <DatePicker
                     name="startDate"
-                    className="w-full mt-2"
+                    className="w-full mt-1"
                     placeholder="Select startDate"
                     onChange={(value) => setFieldValue("startDate", value)}
                     value={values.startDate}
@@ -322,10 +297,10 @@ const AddTask = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold ">DueDate</label>
+                  <label className="font-semibold ">DueDate <span className="text-red-500">*</span></label>
                   <DatePicker
                     name="dueDate"
-                    className="w-full mt-2"
+                    className="w-full mt-1"
                     placeholder="Select DueDate"
                     onChange={(value) => setFieldValue("dueDate", value)}
                     value={values.dueDate}
@@ -339,14 +314,33 @@ const AddTask = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24} className="mt-4">
+              <Col span={12} className="mt-4">
+                <label className="font-semibold">Lead <span className="text-red-500">*</span></label>
+                <Field name="lead">
+                  {({ field }) => (
+                    <Select
+                      {...field}
+                      className="w-full mt-1"
+                      placeholder="Select Lead"
+                      onChange={(value) => setFieldValue("lead", value)}
+                      value={values.lead}
+                      onBlur={() => setFieldTouched("lead", true)}
+                    >
+                      <Option value="1">Lead 1</Option>
+                      <Option value="2">Lead 2</Option>
+                    </Select>
+                  )}
+                </Field>
+              </Col>
+
+              <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">AssignTo</label>
                   <Field name="assignTo">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full mt-2"
+                        className="w-full mt-1"
                         mode="multiple"
                         placeholder="Select AddProjectMember"
                         onChange={(value) => setFieldValue("assignTo", value)}
@@ -377,12 +371,12 @@ const AddTask = ({ onClose }) => {
                 </div>
               </Col>
 
-
-              <Col span={24}>
-                <div className="form-item mt-2">
-                  <label className="font-semibold">Status</label>
+              <Col span={24} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">Status <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select or add new status"
                     value={values.status}
                     onChange={(value) => setFieldValue("status", value)}
@@ -416,11 +410,12 @@ const AddTask = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24}>
-                <div className="form-item mt-2">
-                  <label className="font-semibold">Priority</label>
+              <Col span={24} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">Priority <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select or add new Priority"
                     value={values.priority}
                     onChange={(value) => setFieldValue("priority", value)}
@@ -451,11 +446,12 @@ const AddTask = ({ onClose }) => {
               </Col>
 
               
-              <Col span={24} className="mt-2">
+              <Col span={24} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Description</label>
                   <ReactQuill
                     value={values.description}
+                    className="mt-1"
                     onChange={(value) => setFieldValue("description", value)}
                     placeholder="Enter description"
                     onBlur={() => setFieldTouched("description", true)}
@@ -482,49 +478,49 @@ const AddTask = ({ onClose }) => {
         )}
       </Formik>
 
-       <Modal
-                    title="Add New priority"
-                    open={isPriorityModalVisible}
-                    onCancel={() => setIsPriorityModalVisible(false)}
-                    onOk={() => handleAddNewLable("priority", newPriority, setNewPriority, setIsPriorityModalVisible)}
-                    okText="Add priority"
-                  >
-                    <Input
-                      placeholder="Enter new priority name"
-                      value={newPriority}
-                      onChange={(e) => setNewPriority(e.target.value)}
-                    />
-                  </Modal>
+      <Modal
+        title="Add New priority"
+        open={isPriorityModalVisible}
+        onCancel={() => setIsPriorityModalVisible(false)}
+        onOk={() => handleAddNewLable("priority", newPriority, setNewPriority, setIsPriorityModalVisible)}
+        okText="Add priority"
+      >
+        <Input
+          placeholder="Enter new priority name"
+          value={newPriority}
+          onChange={(e) => setNewPriority(e.target.value)}
+        />
+      </Modal>
       
                   {/* Add Category Modal */}
-                  <Modal
-                    title="Add New Category"
-                    open={isCategoryModalVisible}
-                    onCancel={() => setIsCategoryModalVisible(false)}
-                    onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
-                    okText="Add Category"
-                  >
-                    <Input
-                      placeholder="Enter new category name"
-                      value={newCategory}
-                      onChange={(e) => setNewCategory(e.target.value)}
-                    />
-                  </Modal>
-      
-                  {/* Add Status Modal */}
-                  <Modal
-                    title="Add New Status"
-                    open={isStatusModalVisible}
-                    onCancel={() => setIsStatusModalVisible(false)}
-                    onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible)}
-                    okText="Add Status"
-                  >
-                    <Input
-                      placeholder="Enter new status name"
-                      value={newStatus}
-                      onChange={(e) => setNewStatus(e.target.value)}
-                    />
-                  </Modal>
+      <Modal
+        title="Add New Category"
+        open={isCategoryModalVisible}
+        onCancel={() => setIsCategoryModalVisible(false)}
+        onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
+        okText="Add Category"
+      >
+        <Input
+          placeholder="Enter new category name"
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value)}
+        />
+      </Modal>
+
+      {/* Add Status Modal */}
+      <Modal
+        title="Add New Status"
+        open={isStatusModalVisible}
+        onCancel={() => setIsStatusModalVisible(false)}
+        onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible)}
+        okText="Add Status"
+      >
+        <Input
+          placeholder="Enter new status name"
+          value={newStatus}
+          onChange={(e) => setNewStatus(e.target.value)}
+        />
+      </Modal>
     </div>
   );
 };

@@ -74,17 +74,17 @@ const curren = curr?.filter((item) => item.created_by === user);
         bill: "",
     };
     const validationSchema = Yup.object({
-        item: Yup.string().optional("Please enter item."),
-        currency: Yup.string().optional("Please enter Currency."),
-        ExchangeRate: Yup.string().optional("Please enter ExchangeRate."),
-        price: Yup.string().optional("Please enter Price."),
-        purchase_date: Yup.date().nullable().optional("Date is required."),
-        employee: Yup.string().optional("Please enter Employee."),
-        project: Yup.string().optional("Please enter Project."),
-        ExpenseCategory: Yup.string().optional("Please enter ExpenseCategory."),
-        PurchasedFrom: Yup.string().optional("Please enter PurchasedFrom."),
-        BankAccount: Yup.string().optional("Please enter BankAccount."),
-        Description: Yup.string().optional("Please enter a Description."),
+        item: Yup.string().required("Please enter item."),
+        currency: Yup.string().required("Please enter Currency."),
+        // ExchangeRate: Yup.string().optional("Please enter ExchangeRate."),
+        price: Yup.string().required("Please enter Price."),
+        purchase_date: Yup.date().nullable().required("Date is required."),
+        employee: Yup.string().required("Please enter Employee."),
+        project: Yup.string().required("Please enter Project."),
+        // ExpenseCategory: Yup.string().optional("Please enter ExpenseCategory."),
+        PurchasedFrom: Yup.string().required("Please enter PurchasedFrom."),
+        // BankAccount: Yup.string().optional("Please enter BankAccount."),
+        // Description: Yup.string().required("Please enter a Description."),
         bill: Yup.string().optional("Please enter Bill."),
         description: Yup.string().optional("Please enter a description."),
     });
@@ -116,8 +116,8 @@ const curren = curr?.filter((item) => item.created_by === user);
                         <Row gutter={16}>
                             <Col span={12}>
                                 <div className="form-item">
-                                    <label className="font-semibold">ItemName</label>
-                                    <Field name="item" as={Input} placeholder="Enter item" />
+                                    <label className="font-semibold">ItemName <span className="text-red-500">*</span></label>
+                                    <Field name="item" as={Input} placeholder="Enter item" className="mt-1" />
                                     <ErrorMessage
                                         name="item"
                                         component="div"
@@ -127,14 +127,14 @@ const curren = curr?.filter((item) => item.created_by === user);
                             </Col>
                             <Col span={12}>
                                 <div className="form-item">
-                                    <label className="font-semibold">Currency</label>
+                                    <label className="font-semibold">Currency <span className="text-red-500">*</span></label>
                                     <Field name="currency">
 
                                         {({ field, form }) => (
                                             <Select
                                                 {...field}
                                                 placeholder="Select Currency"
-                                                className="w-full"
+                                                className="w-full mt-1"
                                                 onChange={(value) => {
                                                     const selectedCurrency = curren.find(
                                                         (c) => c.id === value
@@ -173,11 +173,11 @@ const curren = curr?.filter((item) => item.created_by === user);
                                     <ErrorMessage name="ExchangeRate" component="div" className="error-message text-red-500 my-1" />
                                 </div>
                             </Col> */}
-                            <Col span={12}>
+                            <Col span={12} className="mt-4">
                                 <div className="form-item">
-                                    <label className="font-semibold">Price</label>
+                                    <label className="font-semibold">Price <span className="text-red-500">*</span></label>
                                     <Field
-
+                                        className="mt-1"
                                         name="price"
                                         type="number"
                                         as={Input}
@@ -190,12 +190,12 @@ const curren = curr?.filter((item) => item.created_by === user);
                                     />
                                 </div>
                             </Col>
-                            <Col span={12}>
+                            <Col span={12} className="mt-4">
                                 <div className="form-item">
-                                    <label className="font-semibold">Purchase Date</label>
+                                    <label className="font-semibold">Purchase Date <span className="text-red-500">*</span></label>
 
                                     <DatePicker
-                                        className="w-full"
+                                        className="w-full mt-1"
                                         format="DD-MM-YYYY"
                                         value={values.purchase_date}
                                         onChange={(date) => setFieldValue("purchase_date", date)}
@@ -234,16 +234,16 @@ const curren = curr?.filter((item) => item.created_by === user);
                                     />
                                 </div>
                             </Col> */}
-                            <Col span={12} className="mt-2">
+                            <Col span={12} className="mt-4">
                                 <div className="form-item">
-                                    <label className="font-semibold mb-2">Employee</label>
+                                    <label className="font-semibold mb-2">Employee <span className="text-red-500">*</span></label>
 
                                     <div className="flex gap-2">
                                         <Field name="employee">
                                             {({ field, form }) => (
                                                 <Select
                                                     {...field}
-                                                    className="w-full mt-2"
+                                                    className="w-full mt-1"
                                                     placeholder="Select Employee"
                                                     onChange={(value) => {
                                                         const selectedEmployee =
@@ -272,11 +272,12 @@ const curren = curr?.filter((item) => item.created_by === user);
                                     />
                                 </div>
                             </Col>
-                            <Col span={12} className="mt-2">
+                            <Col span={12} className="mt-4">
                                 <div className="form-item">
-                                    <label className="font-semibold">Project</label>
+                                    <label className="font-semibold">Project <span className="text-red-500">*</span></label>
 
-                                    <Input
+                                        <Input
+                                        className="mt-1"
                                         defaultValue={fnddata?.project_name}
                                         placeholder="Enter project"
                                         disabled
@@ -289,14 +290,15 @@ const curren = curr?.filter((item) => item.created_by === user);
                                 </div>
                             </Col>
 
-                            <Col span={12} className="mt-2">
+                            <Col span={12} className="mt-4">
                                 <div className="form-item">
-                                    <label className="font-semibold">Purchased From</label>
+                                    <label className="font-semibold">Purchased From <span className="text-red-500">*</span></label>
 
                                     <Field
                                         name="PurchasedFrom"
                                         as={Input}
                                         placeholder="Enter PurchasedFrom"
+                                        className="mt-1"
                                     />
                                     <ErrorMessage
                                         name="PurchasedFrom"
@@ -305,10 +307,11 @@ const curren = curr?.filter((item) => item.created_by === user);
                                     />
                                 </div>
                             </Col>
-                            <Col span={24} className="mt-2">
+                            <Col span={24} className="mt-4">
                                 <div className="form-item">
                                     <label className="font-semibold">Description</label>
                                     <ReactQuill
+                                        className="mt-1"
                                         value={values.description}
                                         onChange={(value) => setFieldValue("description", value)}
                                         placeholder="Enter Description"

@@ -205,7 +205,7 @@ const EditNotes = ({ idd, onClose }) => {
   const validationSchema = Yup.object({
     note_title: Yup.string().required("Please enter Note Title."),
     notetype: Yup.string().required("Please select Note Type."),
-    description: Yup.string().required("Please enter Description."),
+    description: Yup.string().optional("Please enter Description."),
   });
 
   const allempdata = useSelector((state) => state.Notes);
@@ -269,7 +269,7 @@ const EditNotes = ({ idd, onClose }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Note Title</label>
+                  <label className="font-semibold">Note Title <span className="text-red-500">*</span></label>
                   <Field
                     name="note_title"
                     as={Input}
@@ -292,7 +292,7 @@ const EditNotes = ({ idd, onClose }) => {
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full"
+                          className="w-full mt-1"
                           placeholder="Select Employee"
                           onChange={(value) => {
                             form.setFieldValue("employees", value);
@@ -321,6 +321,7 @@ const EditNotes = ({ idd, onClose }) => {
                   <label className="font-semibold">Description</label>
                   <ReactQuill
                     value={values.description}
+                    className="mt-1"
                     onChange={(value) => setFieldValue("description", value)}
                     placeholder="Enter Description"
                     onBlur={() => setFieldTouched("description", true)}

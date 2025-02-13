@@ -18,6 +18,7 @@ import { ErrorMessage, Field } from "formik";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import { getcurren } from "../../../setting/currencies/currenciesSlice/currenciesSlice";
+import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
 
 const { Option } = Select;
 
@@ -51,9 +52,17 @@ const AddInvoice = ({ onClose }) => {
   // Get currencies from the store
   const currencies = useSelector((state) => state.currencies.currencies.data);
 
+  // Add this to get taxes from Redux store
+  const { taxes } = useSelector((state) => state.tax);
+
   // Fetch currencies when component mounts
   useEffect(() => {
     dispatch(getcurren());
+  }, [dispatch]);
+
+  // Add this useEffect to fetch taxes when component mounts
+  useEffect(() => {
+    dispatch(getAllTaxes());
   }, [dispatch]);
 
   const handleAddRow = () => {
@@ -118,15 +127,6 @@ const AddInvoice = ({ onClose }) => {
   };
 
   const calculateTotal = (data,discountRate) => {
-
-    let subtotal = 0;
-    let tax = 0;
-    let itemDiscount = 0;
-    let globalDiscount = 0;
-    let baseTotal = 0;
-
-
-
     const totals = data.reduce((acc, row) => {
       const quantity = parseFloat(row.quantity) || 0;
       const price = parseFloat(row.price) || 0;
@@ -146,10 +146,10 @@ const AddInvoice = ({ onClose }) => {
         tax: acc.tax + taxAmount,
         baseTotal: acc.baseTotal + baseAmount
       };
-    });
+    }, { subtotal: 0, itemDiscount: 0, tax: 0, baseTotal: 0 });
 
     // Calculate global discount rate amount
-    const globalDiscountAmount = (subtotal * discountRate) / 100;
+    const globalDiscountAmount = (totals.subtotal * discountRate) / 100;
 
     // Calculate final total after both discounts
     const finalTotal = totals.subtotal - globalDiscountAmount;
@@ -212,14 +212,13 @@ const AddInvoice = ({ onClose }) => {
           ...values,
           items: itemsForDatabase,
           subtotal: subtotal.toFixed(2),
-          discount_rate: discountRate.toFixed(2),
+          discount: discountRate.toFixed(2),
           global_discount_amount: globalDiscountAmount.toFixed(2),
           total_item_discount: totals.itemDiscount,
           total_global_discount: totals.globalDiscount,
           tax: totals.totalTax,
           total: finalTotal.toFixed(2),
           status: "pending"
-
         };
 
         dispatch(AddInvoices(invoiceData))
@@ -560,11 +559,11 @@ const AddInvoice = ({ onClose }) => {
                             className="w-full p-2 border"
                           >
                             <option value="0">Nothing Selected</option>
-                            <option value="10">GST:10%</option>
-                            <option value="18">CGST:18%</option>
-                            <option value="10">VAT:10%</option>
-                            <option value="10">IGST:10%</option>
-                            <option value="10">UTGST:10%</option>
+                            {taxes && taxes.data && taxes.data.map(tax => (
+                              <option key={tax.id} value={tax.gstPercentage}>
+                                {tax.gstName}: {tax.gstPercentage}%
+                              </option>
+                            ))}
                           </select>
                         </td>
                         <td className="px-4 py-2 border-b">

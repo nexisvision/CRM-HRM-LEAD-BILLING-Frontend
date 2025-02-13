@@ -37,17 +37,17 @@ const EditTask = ({ idd, onClose }) => {
 
   const { id } = useParams();
 
-    const [isPriorityModalVisible, setIsPriorityModalVisible] = useState(false);
-    const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
-    const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
-    const [newPriority, setNewPriority] = useState("");
-    const [newCategory, setNewCategory] = useState("");
-    const [newStatus, setNewStatus] = useState("");
-    // const [priorites, setTags] = useState([]);
-  
-    const [priorities, setPriorities] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [statuses, setStatuses] = useState([]);
+  const [isPriorityModalVisible, setIsPriorityModalVisible] = useState(false);
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
+  const [newPriority, setNewPriority] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [newStatus, setNewStatus] = useState("");
+  // const [priorites, setTags] = useState([]);
+
+  const [priorities, setPriorities] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [statuses, setStatuses] = useState([]);
 
 
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
@@ -75,27 +75,27 @@ const EditTask = ({ idd, onClose }) => {
   const allempdata = useSelector((state) => state.Tasks);
   const Expensedata = allempdata?.Tasks?.data || [];
 
- const AllLoggedData = useSelector((state) => state.user);
+  const AllLoggedData = useSelector((state) => state.user);
 
- const allempdatass = useSelector((state) => state.employee);
-   const empData = allempdatass?.employee?.data;
- 
-   const loggeduser = useSelector((state)=>state.user.loggedInUser.username);
- 
-   const fnduserdatas = empData.filter((item)=>item.created_by === loggeduser);
+  const allempdatass = useSelector((state) => state.employee);
+  const empData = allempdatass?.employee?.data;
+
+  const loggeduser = useSelector((state) => state.user.loggedInUser.username);
+
+  const fnduserdatas = empData.filter((item) => item.created_by === loggeduser);
 
 
-     const allproject = useSelector((state) => state.Project);
-     const fndrewduxxdaa = allproject.Project.data
-     const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
+  const allproject = useSelector((state) => state.Project);
+  const fndrewduxxdaa = allproject.Project.data
+  const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
 
-     
 
-     useEffect(()=>{
-      dispatch(GetTasks(id))
-     },[dispatch])
 
-     const taskadata = useSelector((state)=>state.Tasks.Tasks.data)
+  useEffect(() => {
+    dispatch(GetTasks(id))
+  }, [dispatch])
+
+  const taskadata = useSelector((state) => state.Tasks.Tasks.data)
 
 
 
@@ -103,13 +103,13 @@ const EditTask = ({ idd, onClose }) => {
     if (idd) {
       const milestone = taskadata.find((item) => item.id === idd);
 
-      console.log("xxx",milestone)
+      console.log("xxx", milestone)
 
-      console.log("lpp",milestone)
+      console.log("lpp", milestone)
 
       if (milestone) {
-        const assignToArray = typeof milestone.assignTo === 'string' 
-          ? JSON.parse(milestone.assignTo) 
+        const assignToArray = typeof milestone.assignTo === 'string'
+          ? JSON.parse(milestone.assignTo)
           : milestone.assignTo || [];
 
         const updatedValues = {
@@ -149,7 +149,7 @@ const EditTask = ({ idd, onClose }) => {
       message.error(`Failed to load ${lableType}`);
     }
   };
-  
+
   // Call fetchLabels for each labelType on mount
   useEffect(() => {
     fetchLables("priority", setPriorities);
@@ -166,7 +166,7 @@ const EditTask = ({ idd, onClose }) => {
       message.error(`Please enter a ${lableType} name.`);
       return;
     }
-  
+
     try {
       const lid = AllLoggedData.loggedInUser.id; // User ID
       const payload = {
@@ -233,15 +233,15 @@ const EditTask = ({ idd, onClose }) => {
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
             <Row gutter={16}>
-              <Col span={12}>
+              <Col span={24}>
                 <div className="form-item">
-                  <label className="font-semibold">Task Name</label>
+                  <label className="font-semibold">Task Name <span className="text-red-500">*</span></label>
                   <Field
                     name="taskTitle"
                     as={Input}
                     value={values.taskTitle}
                     placeholder="Enter Task Title"
-                    className="mt-2"
+                    className="mt-1"
                   />
                   <ErrorMessage
                     name="taskTitle"
@@ -251,14 +251,15 @@ const EditTask = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-             
 
 
-<Col span={24}>
+
+              <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Category</label>
+                  <label className="font-semibold">Category <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select or add new category"
                     value={values.category}
                     onChange={(value) => setFieldValue("category", value)}
@@ -293,33 +294,33 @@ const EditTask = ({ idd, onClose }) => {
 
 
 
-             {fnddata?.project_name && (
-                            <Col span={24} className="mt-2">
-                              <div className="form-item">
-                                <label className="font-semibold">Project</label>
-                                <Field
-                                  value={fnddata.project_name}
-                                  name="project"
-                                  as={Input}
-                                  placeholder="Enter projectName"
-                                  className="mt-2"
-                                  disabled
-                                />
-                                <ErrorMessage
-                                  name="project"
-                                  component="div"
-                                  className="error-message text-red-500 my-1"
-                                />
-                              </div>
-                            </Col>
-                          )}
+              {fnddata?.project_name && (
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Project <span className="text-red-500">*</span></label>
+                    <Field
+                      value={fnddata.project_name}
+                      name="project"
+                      as={Input}
+                      placeholder="Enter projectName"
+                      className="mt-1"
+                      disabled
+                    />
+                    <ErrorMessage
+                      name="project"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+              )}
 
-              <Col span={8} className="mt-4">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Start Date</label>
+                  <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
                   <DatePicker
                     name="taskDate"
-                    className="w-full mt-2"
+                    className="w-full mt-1"
                     placeholder="Select Start Date"
                     onChange={(value) => setFieldValue("taskDate", value)}
                     value={values.taskDate}
@@ -333,12 +334,12 @@ const EditTask = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={8} className="mt-4">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Due Date</label>
+                  <label className="font-semibold">Due Date <span className="text-red-500">*</span></label>
                   <DatePicker
                     name="dueDate"
-                    className="w-full mt-2"
+                    className="w-full mt-1"
                     placeholder="Select Due Date"
                     onChange={(value) => setFieldValue("dueDate", value)}
                     value={values.dueDate}
@@ -352,49 +353,50 @@ const EditTask = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-               <Col span={24} className="mt-4">
-                              <div className="form-item">
-                                <label className="font-semibold">AssignTo</label>
-                                <Field name="assignTo">
-                                  {({ field }) => (
-                                    <Select
-                                      {...field}
-                                      className="w-full mt-2"
-                                      mode="multiple"
-                                      placeholder="Select AddProjectMember"
-                                      onChange={(value) => setFieldValue("assignTo", value)}
-                                      value={values.assignTo}
-                                      onBlur={() => setFieldTouched("assignTo", true)}
-                                    >
-                                      {fnduserdatas && fnduserdatas.length > 0 ? (
-                                        fnduserdatas.map((client) => (
-                                          <Option key={client.id} value={client.id}>
-                                            {client.firstName ||
-                                              client.username ||
-                                              "Unnamed Client"}
-                                          </Option>
-                                        ))
-                                      ) : (
-                                        <Option value="" disabled>
-                                          No Clients Available
-                                        </Option>
-                                      )}
-                                    </Select>
-                                  )}
-                                </Field>
-                                <ErrorMessage
-                                  name="assignTo"
-                                  component="div"
-                                  className="error-message text-red-500 my-1"
-                                />
-                              </div>
-                            </Col>
+              <Col span={12} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">AssignTo</label>
+                  <Field name="assignTo">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-2"
+                        mode="multiple"
+                        placeholder="Select AddProjectMember"
+                        onChange={(value) => setFieldValue("assignTo", value)}
+                        value={values.assignTo}
+                        onBlur={() => setFieldTouched("assignTo", true)}
+                      >
+                        {fnduserdatas && fnduserdatas.length > 0 ? (
+                          fnduserdatas.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.firstName ||
+                                client.username ||
+                                "Unnamed Client"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Clients Available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="assignTo"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
 
-              <Col span={24} className="mt-2">
+              <Col span={24} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Description</label>
                   <ReactQuill
                     value={values.description}
+                    className="mt-1"
                     onChange={(value) => setFieldValue("description", value)}
                     placeholder="Enter Description"
                     onBlur={() => setFieldTouched("description", true)}
@@ -407,16 +409,17 @@ const EditTask = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-            
 
 
-<Col span={24}>
+
+              <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Status</label>
+                  <label className="font-semibold">Status <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
                     placeholder="Select or add new status"
                     value={values.status}
+                    className="mt-1"
                     onChange={(value) => setFieldValue("status", value)}
                     dropdownRender={(menu) => (
                       <div>
@@ -449,13 +452,14 @@ const EditTask = ({ idd, onClose }) => {
 
 
 
-            
 
-<Col span={24}>
+
+              <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Priority</label>
+                  <label className="font-semibold">Priority <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select or add new Priority"
                     value={values.priority}
                     onChange={(value) => setFieldValue("priority", value)}
@@ -480,7 +484,7 @@ const EditTask = ({ idd, onClose }) => {
                       </Option>
                     ))}
                   </Select>
-                  <ErrorMessage name="tag" component="div" className="error-message text-red-500 my-1" />
+                  <ErrorMessage name="priority" component="div" className="error-message text-red-500 my-1" />
                 </div>
               </Col>
 
@@ -502,49 +506,49 @@ const EditTask = ({ idd, onClose }) => {
         )}
       </Formik>
 
- <Modal
-                    title="Add New priority"
-                    open={isPriorityModalVisible}
-                    onCancel={() => setIsPriorityModalVisible(false)}
-                    onOk={() => handleAddNewLable("priority", newPriority, setNewPriority, setIsPriorityModalVisible)}
-                    okText="Add priority"
-                  >
-                    <Input
-                      placeholder="Enter new priority name"
-                      value={newPriority}
-                      onChange={(e) => setNewPriority(e.target.value)}
-                    />
-                  </Modal>
-      
-                  {/* Add Category Modal */}
-                  <Modal
-                    title="Add New Category"
-                    open={isCategoryModalVisible}
-                    onCancel={() => setIsCategoryModalVisible(false)}
-                    onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
-                    okText="Add Category"
-                  >
-                    <Input
-                      placeholder="Enter new category name"
-                      value={newCategory}
-                      onChange={(e) => setNewCategory(e.target.value)}
-                    />
-                  </Modal>
-      
-                  {/* Add Status Modal */}
-                  <Modal
-                    title="Add New Status"
-                    open={isStatusModalVisible}
-                    onCancel={() => setIsStatusModalVisible(false)}
-                    onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible)}
-                    okText="Add Status"
-                  >
-                    <Input
-                      placeholder="Enter new status name"
-                      value={newStatus}
-                      onChange={(e) => setNewStatus(e.target.value)}
-                    />
-                  </Modal>
+      <Modal
+        title="Add New priority"
+        open={isPriorityModalVisible}
+        onCancel={() => setIsPriorityModalVisible(false)}
+        onOk={() => handleAddNewLable("priority", newPriority, setNewPriority, setIsPriorityModalVisible)}
+        okText="Add priority"
+      >
+        <Input
+          placeholder="Enter new priority name"
+          value={newPriority}
+          onChange={(e) => setNewPriority(e.target.value)}
+        />
+      </Modal>
+
+      {/* Add Category Modal */}
+      <Modal
+        title="Add New Category"
+        open={isCategoryModalVisible}
+        onCancel={() => setIsCategoryModalVisible(false)}
+        onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
+        okText="Add Category"
+      >
+        <Input
+          placeholder="Enter new category name"
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value)}
+        />
+      </Modal>
+
+      {/* Add Status Modal */}
+      <Modal
+        title="Add New Status"
+        open={isStatusModalVisible}
+        onCancel={() => setIsStatusModalVisible(false)}
+        onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible)}
+        okText="Add Status"
+      >
+        <Input
+          placeholder="Enter new status name"
+          value={newStatus}
+          onChange={(e) => setNewStatus(e.target.value)}
+        />
+      </Modal>
 
     </div>
   );

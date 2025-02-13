@@ -42,7 +42,7 @@ import { useDispatch, useSelector } from "react-redux";
 import useSelection from "antd/es/table/hooks/useSelection";
 
 const CustomerList = () => {
-  const [users, setUsers] = useState("");
+  const [users, setUsers] = useState([]);  // Initialize as empty array
   const dispatch = useDispatch();
   const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -58,27 +58,23 @@ const CustomerList = () => {
 
   const [idd, setIdd] = useState("");
 
+  // Fetch customers when component mounts
   useEffect(() => {
     dispatch(Getcus());
   }, [dispatch]);
   
   const alldata = useSelector((state) => state.customers);
-  console.log("Fetched Customer Data:", alldata);  // Check if the data exists
-  
-  const fnddata = alldata?.customers?.data || [];  // Add a fallback to avoid errors if data is undefined
-  const loggid = useSelector((state)=>state.user.loggedInUser);
+  const fnddata = alldata?.customers?.data || [];
+  const loggid = useSelector((state) => state.user.loggedInUser);
 
-  const filterdata = fnddata.filter((item) => item?.created_by === loggid.username);
-console.log("Filtered Data:", filterdata);  // Check if the filtering is correct
-
-
+  // Update users state whenever customer data changes
   useEffect(() => {
-    if (filterdata) {
+    if (loggid && fnddata.length > 0) {
+      const filterdata = fnddata.filter((item) => item?.created_by === loggid.username);
       setUsers(filterdata);
-    } else {
-      console.log("No matching users found");
+      console.log("Filtered Customer Data:", filterdata);
     }
-  }, []);
+  }, [fnddata, loggid]);
   
 
   
@@ -154,13 +150,17 @@ console.log("Filtered Data:", filterdata);  // Check if the filtering is correct
     setSelectedRowKeys([]);
   };
 
-  // Delete user
+  // Delete user function update
   const deleteUser = (userId) => {
-    dispatch(delcus(userId));
-    dispatch(Getcus());
-    dispatch(Getcus());
-    setUsers(users.filter((item) => item.id !== userId));
-    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    dispatch(delcus(userId))
+      .then(() => {
+        message.success('Customer deleted successfully');
+        dispatch(Getcus()); // Refresh the customer list
+      })
+      .catch((error) => {
+        message.error('Failed to delete customer');
+        console.error('Delete error:', error);
+      });
   };
   const exportToExcel = () => {
     try {
@@ -280,33 +280,46 @@ console.log("Filtered Data:", filterdata);  // Check if the filtering is correct
     {
       title: "Name",
       dataIndex: "name",
-      sorter: {
-        compare: (a, b) => a.branch.length - b.branch.length,
+      sorter: (a, b) => {
+        if (a.name && b.name) {
+          return a.name.length - b.name.length;
+        }
+        return 0;
       },
     },
     {
       title: "Contact",
       dataIndex: "contact",
-      render: (contact) => contact, // This will display the full contact number with country code
-    sorter: {
-      compare: (a, b) => a.title.length - b.title.length,
-    },
+      render: (contact) => contact || 'N/A',
+      sorter: (a, b) => {
+        if (a.contact && b.contact) {
+          return a.contact.length - b.contact.length;
+        }
+        return 0;
+      },
     },
     {
       title: "Email",
       dataIndex: "email",
-      sorter: {
-        compare: (a, b) => a.title.length - b.title.length,
+      render: (email) => email || 'N/A',
+      sorter: (a, b) => {
+        if (a.email && b.email) {
+          return a.email.length - b.email.length;
+        }
+        return 0;
       },
     },
     {
-      title: "tax_number",
+      title: "Tax Number",
       dataIndex: "tax_number",
-      sorter: {
-        compare: (a, b) => a.balance.length - b.balance.length,
+      render: (tax_number) => tax_number || 'N/A',
+      sorter: (a, b) => {
+        if (a.tax_number && b.tax_number) {
+          return a.tax_number.length - b.tax_number.length;
+        }
+        return 0;
       },
     },
-
     {
       title: "Action",
       dataIndex: "actions",
@@ -359,15 +372,15 @@ console.log("Filtered Data:", filterdata);  // Check if the filtering is correct
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                        <Table
-                        columns={tableColumns}
-                        dataSource={users}
-                        rowKey="id"
-                        scroll={{ x: 1200 }}
-                      />
-                      ) : null}
+          <Table
+            columns={tableColumns}
+            dataSource={users}
+            rowKey="id"
+            scroll={{ x: 1200 }}
+            loading={!users.length} // Add loading state
+          />
+        ) : null}
       </div>
       <UserView 
         data={selectedUser}

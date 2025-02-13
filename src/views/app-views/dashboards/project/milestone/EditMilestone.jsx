@@ -159,16 +159,16 @@ const EditMilestone = ({ idd, onClose }) => {
             {({ values, setFieldValue, setFieldTouched, isSubmitting }) => (
               <Form className="formik-form">
                 <Row gutter={16}>
-                  <Col span={12} className="mt-4">
+                  <Col span={12} className="mt-2">
                     <div className="form-item">
                       <label className="font-semibold mb-2">
-                        Milestone Title
+                        Milestone Title <span className="text-red-500">*</span>
                       </label>
                       <Field
                         name="milestone_title"
                         as={Input}
                         placeholder="Enter Milestone Title"
-                        className="rounded-e-lg rounded-s-none"
+                        className="rounded-e-lg rounded-s-none mt-1"
                       />
                       <ErrorMessage
                         name="milestone_title"
@@ -177,16 +177,16 @@ const EditMilestone = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-4">
+                  <Col span={12} className="mt-2">
                     <div className="form-item">
                       <label className="font-semibold mb-2">
-                        Milestone Cost
+                        Milestone Cost <span className="text-red-500">*</span>
                       </label>
                       <Field
                         name="milestone_cost"
                         as={Input}
                         placeholder="Enter Milestone Cost"
-                        className="rounded-e-lg rounded-s-none"
+                        className="rounded-e-lg rounded-s-none mt-1"
                       />
                       <ErrorMessage
                         name="milestone_cost"
@@ -197,13 +197,13 @@ const EditMilestone = ({ idd, onClose }) => {
                   </Col>
                     <Col span={24} className="mt-4">
                                       <div className="form-item">
-                                        <label className="font-semibold">Status</label>
+                                        <label className="font-semibold">Status <span className="text-red-500">*</span></label>
                                         <div className="flex gap-2">
                                           <Field name="milestone_status">
                                             {({ field, form }) => (
                                               <Select
                                                 {...field}
-                                                className="w-full"
+                                                className="w-full mt-1"
                                                 placeholder="Select or add new tag"
                                                 onChange={(value) =>
                                                   form.setFieldValue("milestone_status", value)
@@ -252,7 +252,7 @@ const EditMilestone = ({ idd, onClose }) => {
                   <Col span={12} className="mt-4">
                     <div className="form-item">
                       <label className="font-semibold mb-2">
-                        Add Cost To Project Budget
+                        Add Cost To Project Budget <span className="text-red-500">*</span>
                       </label>
                       <Select
                         value={values.add_cost_to_project_budget}
@@ -262,7 +262,7 @@ const EditMilestone = ({ idd, onClose }) => {
                         onBlur={() =>
                           setFieldTouched("add_cost_to_project_budget", true)
                         }
-                        className="w-full"
+                        className="w-full mt-1"
                         placeholder="Select Option"
                       >
                         <Option value="no">No</Option>
@@ -275,11 +275,46 @@ const EditMilestone = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
+                  <Col span={12} className="mt-4">
+                <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
+                <DatePicker
+                  className="w-full mt-1"
+                  format="DD-MM-YYYY"
+                  value={values.milestone_start_date ? dayjs(values.milestone_start_date) : null}
+                  onChange={(startDate) =>
+                    setFieldValue("milestone_start_date", startDate)
+                  }
+                  onBlur={() => setFieldTouched("milestone_start_date", true)}
+                />
+                <ErrorMessage
+                  name="milestone_start_date"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
+              </Col>
+
+              <Col span={12} className="mt-4">
+                <label className="font-semibold">End Date <span className="text-red-500">*</span></label>
+                <DatePicker
+                  className="w-full mt-1"
+                  format="DD-MM-YYYY"
+                  value={values.milestone_end_date ? dayjs(values.milestone_end_date) : null}
+                  onChange={(endDate) =>
+                    setFieldValue("milestone_end_date", endDate)
+                  }
+                  onBlur={() => setFieldTouched("milestone_end_date", true)}
+                />
+                <ErrorMessage
+                  name="milestone_end_date"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
+              </Col>
                   <Col span={24} className="mt-4">
                     <div className="form-item">
-                      <label className="font-semibold">Milestone Summary</label>
+                      <label className="font-semibold">Milestone Summary <span className="text-red-500">*</span></label>
                       <ReactQuill
-
+                        className="mt-1"
                         value={values.milestone_summary}
                         onChange={(value) =>
                           setFieldValue("milestone_summary", value)
@@ -315,43 +350,9 @@ const EditMilestone = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col> */}
-                 <Col span={12} className="mt-4">
-                <label className="font-semibold">Start Date</label>
-                <DatePicker
-                  className="w-full"
-                  format="DD-MM-YYYY"
-                  value={values.milestone_start_date ? dayjs(values.milestone_start_date) : null}
-                  onChange={(startDate) =>
-                    setFieldValue("milestone_start_date", startDate)
-                  }
-                  onBlur={() => setFieldTouched("milestone_start_date", true)}
-                />
-                <ErrorMessage
-                  name="milestone_start_date"
-                  component="div"
-                  className="error-message text-red-500 my-1"
-                />
-              </Col>
-
-              <Col span={12} className="mt-4">
-                <label className="font-semibold">End Date</label>
-                <DatePicker
-                  className="w-full"
-                  format="DD-MM-YYYY"
-                  value={values.milestone_end_date ? dayjs(values.milestone_end_date) : null}
-                  onChange={(endDate) =>
-                    setFieldValue("milestone_end_date", endDate)
-                  }
-                  onBlur={() => setFieldTouched("milestone_end_date", true)}
-                />
-                <ErrorMessage
-                  name="milestone_end_date"
-                  component="div"
-                  className="error-message text-red-500 my-1"
-                />
-              </Col>
+                 
                 </Row>
-                <div className="form-buttons text-right py-2">
+                <div className="form-buttons text-right mt-4">
                   <Button type="default" className="mr-2" onClick={onClose}>
                     Cancel
                   </Button>

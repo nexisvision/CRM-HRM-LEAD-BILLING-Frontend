@@ -287,7 +287,7 @@ const ProjectList = () => {
 <Card>
 							<div className='flex items-center justify-between'>
 								<div className='' onClick={() => handleProjectClick(item.id)}>
-									<p className='font-medium'>{item.name}</p>
+									<p className='font-bold text-black cursor-pointer'>{item.name}</p>
 								</div>
 								<div>
 									<p>{item.category}</p>

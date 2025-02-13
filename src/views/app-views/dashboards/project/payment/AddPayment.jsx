@@ -122,29 +122,29 @@ const curren = curr?.filter((item) => item.created_by === user);
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
             <Row gutter={16}>
-              <Col span={6}>
+              <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Project</label>
+                  <label className="font-semibold">Project <span className="text-red-500">*</span></label>
                   <Field
                     name="project_name"
                     as={Input}
                     placeholder="Enter Project"
-                    className=""
+                    className="mt-1"
                     initialValue={fnddata?.project_name}
                     value={fnddata?.project_name} 
                     disabled
                   />
                 </div>
               </Col>
-              <Col span={6}>
+              <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Invoice</label>
+                  <label className="font-semibold">Invoice <span className="text-red-500">*</span></label>
                   <Field name="invoice">
                     {({ field }) => (
                       <Select
                         {...field}
                         placeholder="Select Invoice"
-                        className="w-full"
+                        className="w-full mt-1"
                         onChange={(value) => setFieldValue("invoice", value)}
                         value={values.invoice}
                         onBlur={() => setFieldTouched("invoice", true)}
@@ -165,11 +165,11 @@ const curren = curr?.filter((item) => item.created_by === user);
                   />
                 </div>
               </Col>
-              <Col span={6}>
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Paid On</label>
+                  <label className="font-semibold">Paid On <span className="text-red-500">*</span></label>
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.paidOn}
                     onChange={(date) => setFieldValue("paidOn", date)}
@@ -182,10 +182,10 @@ const curren = curr?.filter((item) => item.created_by === user);
                   />
                 </div>
               </Col>
-              <Col span={6}>
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Amount </label>
-                  <Field name="amount" as={Input} placeholder="Enter Amount" />
+                  <label className="font-semibold">Amount <span className="text-red-500">*</span></label>
+                  <Field name="amount" as={Input} placeholder="Enter Amount" className="mt-1" />
                   <ErrorMessage
                     name="amount"
                     component="div"
@@ -193,15 +193,15 @@ const curren = curr?.filter((item) => item.created_by === user);
                   />
                 </div>
               </Col>
-              <Col span={12} className="">
+              <Col span={12} className="mt-4">
                     <div className="form-item">
-                      <label className="font-semibold mb-2">Currency</label>
+                      <label className="font-semibold">Currency <span className="text-red-500">*</span></label>
                       <div className="flex gap-2">
                         <Field name="currency">
                           {({ field, form }) => (
                             <Select
                               {...field}
-                              className="w-full mt-2"
+                              className="w-full mt-1"
                               placeholder="Select Currency"
                               onChange={(value) => {
                                 const selectedCurrency = curren.find(
@@ -244,9 +244,9 @@ const curren = curr?.filter((item) => item.created_by === user);
                   />
                 </div>
               </Col> */}
-              <Col span={6} className="mt-2">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Transaction Id</label>
+                  <label className="font-semibold">Transaction Id <span className="text-red-500">*</span></label>
                   <Field
                     name="transactionId"
                     type="number"
@@ -260,15 +260,15 @@ const curren = curr?.filter((item) => item.created_by === user);
                   />
                 </div>
               </Col>
-              <Col span={6} className="mt-2">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Payment Gateway</label>
+                  <label className="font-semibold">Payment Gateway <span className="text-red-500">*</span></label>
                   <Field name="paymentMethod">
                     {({ field }) => (
                       <Select
                         {...field}
                         placeholder="Select Payment Gateway"
-                        className="w-full"
+                        className="w-full mt-1"
                         onChange={(value) =>
                           setFieldValue("paymentMethod", value)
                         }
@@ -344,11 +344,12 @@ const curren = curr?.filter((item) => item.created_by === user);
                 </Field>
               </Col>
               </div>
-              <Col span={24} className="mt-2">
+              <Col span={24} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Remark</label>
                   <ReactQuill
                     value={values.remark}
+                    className="mt-1"
                     onChange={(value) => setFieldValue("remark", value)}
                     placeholder="Enter Remark"
                     onBlur={() => setFieldTouched("remark", true)}

@@ -126,7 +126,7 @@ const EditExpenses = ({ idd, onClose }) => {
     currency: Yup.string().required("Currency is required."),
     price: Yup.string().required("Price is required"),
     purchase_date: Yup.mixed().required("Date is required."),
-    description: Yup.string().required("Description is required."),
+    description: Yup.string().optional("Description is required."),
   });
 
   return (
@@ -143,8 +143,8 @@ const EditExpenses = ({ idd, onClose }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">ItemName</label>
-                  <Field name="item" as={Input} placeholder="Enter item" />
+                  <label className="font-semibold">ItemName <span className="text-red-500">*</span></label>
+                  <Field name="item" as={Input} placeholder="Enter item" className="mt-1" />
                   <ErrorMessage
                     name="item"
                     component="div"
@@ -154,13 +154,13 @@ const EditExpenses = ({ idd, onClose }) => {
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Currency</label>
+                  <label className="font-semibold">Currency <span className="text-red-500">*</span></label>
                   <Field name="currency">
                     {({ field, form }) => (
                       <Select
                         {...field}
                         placeholder="Select Currency"
-                        className="w-full"
+                        className="w-full mt-1"
                         onChange={(value) => {
                           const selectedCurrency = currencies?.data?.find(
                             (c) => c.id === value
@@ -192,14 +192,15 @@ const EditExpenses = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12}>
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Price</label>
+                  <label className="font-semibold">Price <span className="text-red-500">*</span></label>
                   <Field
                     name="price"
                     type="number"
                     as={Input}
                     placeholder="Enter price"
+                    className="mt-1"
                   />
                   <ErrorMessage
                     name="price"
@@ -208,11 +209,11 @@ const EditExpenses = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">PurchaseDate</label>
+                  <label className="font-semibold">PurchaseDate <span className="text-red-500">*</span></label>
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.purchase_date}
                     onChange={(date) => setFieldValue("purchase_date", date)}
@@ -225,16 +226,16 @@ const EditExpenses = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold mb-2">Employee</label>
+                  <label className="font-semibold mb-2">Employee <span className="text-red-500">*</span></label>
                   <div className="flex gap-2">
 
                     <Field name="employee">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full mt-2"
+                          className="w-full mt-1"
                           placeholder="Select Employee"
                           onChange={(value) => {
                             const selectedEmployee =
@@ -263,9 +264,9 @@ const EditExpenses = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Project</label>
+                  <label className="font-semibold">Project <span className="text-red-500">*</span></label>
 
                   <Field name="project">
                     {({ field }) => (
@@ -274,6 +275,7 @@ const EditExpenses = ({ idd, onClose }) => {
                         value={fnddata?.project_name || ''}
                         disabled
                         placeholder="Project name will appear here"
+                        className="mt-1"
                       />
                     )}
                   </Field>
@@ -285,14 +287,15 @@ const EditExpenses = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">PurchasedFrom</label>
+                  <label className="font-semibold">PurchasedFrom <span className="text-red-500">*</span></label>
 
                   <Field
                     name="PurchasedFrom"
                     as={Input}
                     placeholder="Enter PurchasedFrom"
+                    className="mt-1"
                   />
                   <ErrorMessage
                     name="PurchasedFrom"
@@ -301,10 +304,11 @@ const EditExpenses = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={24} className="mt-2">
+              <Col span={24} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Description</label>
                   <ReactQuill
+                    className="mt-1"
                     value={values.description}
                     onChange={(value) => setFieldValue("description", value)}
                     placeholder="Enter Description"

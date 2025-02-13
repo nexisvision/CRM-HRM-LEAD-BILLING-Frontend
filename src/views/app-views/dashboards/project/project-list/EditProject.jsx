@@ -33,19 +33,19 @@ const EditProject = ({ id, onClose }) => {
   const dispatch = useDispatch();
 
 
-    const allloggeduser = useSelector((state)=>state.user.loggedInUser.username)
+  const allloggeduser = useSelector((state) => state.user.loggedInUser.username)
 
-    
+
   // const allloggeduser = useSelector((state)=>state.user.loggedInUser.username)
 
 
   const { currencies } = useSelector((state) => state.currencies);
 
   const curr = currencies?.data || [];
-  
+
   const curren = curr?.filter((item) => item.created_by === allloggeduser);
 
-   const AllLoggedData = useSelector((state) => state.user);
+  const AllLoggedData = useSelector((state) => state.user);
 
   const allempdata = useSelector((state) => state.Project);
   const AllEmployee = useSelector((state) => state.employee);
@@ -54,9 +54,9 @@ const EditProject = ({ id, onClose }) => {
   const alluserdatas = useSelector((state) => state.Users);
   const fnadat = alluserdatas?.Users?.data;
 
-  const fnd = fnadat?.filter((item)=>item?.created_by === allloggeduser)
+  const fnd = fnadat?.filter((item) => item?.created_by === allloggeduser)
 
-  const fnd2 = employeedata?.filter((item)=>item?.created_by === allloggeduser)
+  const fnd2 = employeedata?.filter((item) => item?.created_by === allloggeduser)
 
 
 
@@ -85,7 +85,6 @@ const EditProject = ({ id, onClose }) => {
     
     const fnds = fnadat?.filter((item)=>item?.created_by === allloggeduser)
 
-    console.log("fndsssss",fnadat)
 
   const projectdata = allempdata.Project.data;
   const [singleEmp, setSingleEmp] = useState(null);
@@ -114,15 +113,15 @@ const EditProject = ({ id, onClose }) => {
         console.error("Edit API error:", error);
       });
   };
- 
+
 
   useEffect(() => {
     dispatch(GetTagspro());
-  }, [dispatch]); 
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(getcurren());
-}, [dispatch]);
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(GetUsers());
@@ -218,8 +217,8 @@ const EditProject = ({ id, onClose }) => {
     startDate: Yup.date().nullable().required("Start date is required."),
     endDate: Yup.date().nullable().required("End date is required."),
     projectimage: Yup.mixed().optional("Please upload a Project Image."),
-    client: Yup.string().required("Please select Client."),
-    user: Yup.string().required("Please select User."),
+    client: Yup.string().optional("Please select Client."),
+    user: Yup.string().optional("Please select User."),
     budget: Yup.number()
       .required("Please enter a Project Budget.")
       .positive("Budget must be positive."),
@@ -251,10 +250,11 @@ const EditProject = ({ id, onClose }) => {
             <Row gutter={16}>
               <Col span={24}>
                 <div className="form-item">
-                  <label className="font-semibold">Project Name</label>
+                  <label className="font-semibold">Project Name <span className="text-red-500">*</span></label>
                   <Field
                     name="project_name"
                     as={Input}
+                    className="mt-1"
                     placeholder="Enter Project Name"
                     rules={[{ required: true }]}
                   />
@@ -266,11 +266,12 @@ const EditProject = ({ id, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24}>
+              <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Category</label>
+                  <label className="font-semibold">Category <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select or add new category"
                     value={values.project_category}
                     onChange={(value) => setFieldValue("project_category", value)}
@@ -305,9 +306,9 @@ const EditProject = ({ id, onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Start Date</label>
+                  <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.startDate ? moment(values.startDate) : null}
                     onChange={(date) => setFieldValue("startDate", date)}
@@ -323,9 +324,9 @@ const EditProject = ({ id, onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">End Date</label>
+                  <label className="font-semibold">End Date <span className="text-red-500">*</span></label>
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.endDate ? moment(values.endDate) : null}
                     onChange={(date) => setFieldValue("endDate", date)}
@@ -344,6 +345,7 @@ const EditProject = ({ id, onClose }) => {
                   <label className="font-semibold">Client</label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select Client"
                     loading={!fnd}
                     value={values.client} // Bind value to Formik's field
@@ -378,6 +380,7 @@ const EditProject = ({ id, onClose }) => {
                   <label className="font-semibold">User</label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select User"
                     loading={!fnd2}
                     value={values.user} // Bind value to Formik's field
@@ -406,10 +409,11 @@ const EditProject = ({ id, onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Budget</label>
+                  <label className="font-semibold">Budget <span className="text-red-500">*</span></label>
                   <Field
                     name="budget"
                     as={Input}
+                    className="mt-1"
                     type="number"
                     placeholder="Enter Project Budget"
                   />
@@ -421,54 +425,55 @@ const EditProject = ({ id, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12}>
-                                <div className="form-item">
-                                    <label className="font-semibold">Currency</label>
-                                    <Field name="currency">
+              <Col span={12} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">Currency</label>
+                  <Field name="currency">
 
-                                        {({ field, form }) => (
-                                            <Select
-                                                {...field}
-                                                placeholder="Select Currency"
-                                                className="w-full"
-                                                onChange={(value) => {
-                                                    const selectedCurrency = curren.find(
-                                                        (c) => c.id === value
-                                                    );
-                                                    form.setFieldValue(
-                                                        "currency",
-                                                        selectedCurrency?.currencyCode || ""
-                                                    );
-                                                }}
-                                                value={form.values.currency}
-                                                onBlur={() => form.setFieldTouched("currency", true)}
-                                                allowClear={false}
-                                            >
-                                                {Array.isArray(curren) && curren.map((currency) => (
-                                                    <Option 
-                                                        key={currency.id} 
-                                                        value={currency.id}
-                                                    >
-                                                        {currency.currencyCode}
-                                                    </Option>
-                                                ))}
-                                            </Select>
-                                        )}
-                                    </Field>
-                                    <ErrorMessage
-                                        name="currency"
-                                        component="div"
-                                        className="error-message text-red-500 my-1"
-                                    />
-                                </div>
-                            </Col>
+                    {({ field, form }) => (
+                      <Select
+                        {...field}
+                        placeholder="Select Currency"
+                        className="w-full mt-1"
+                        onChange={(value) => {
+                          const selectedCurrency = curren.find(
+                            (c) => c.id === value
+                          );
+                          form.setFieldValue(
+                            "currency",
+                            selectedCurrency?.currencyCode || ""
+                          );
+                        }}
+                        value={form.values.currency}
+                        onBlur={() => form.setFieldTouched("currency", true)}
+                        allowClear={false}
+                      >
+                        {Array.isArray(curren) && curren.map((currency) => (
+                          <Option
+                            key={currency.id}
+                            value={currency.id}
+                          >
+                            {currency.currencyCode}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="currency"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Estimated Months</label>
+                  <label className="font-semibold">Estimated Months <span className="text-red-500">*</span></label>
                   <Field
                     name="estimatedmonths"
                     as={Input}
+                    className="mt-1"
                     type="number"
                     placeholder="Enter Estimated Months"
                   />
@@ -482,10 +487,11 @@ const EditProject = ({ id, onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Estimated Hours</label>
+                  <label className="font-semibold">Estimated Hours <span className="text-red-500">*</span></label>
                   <Field
                     name="estimatedhours"
                     as={Input}
+                    className="mt-1"
                     type="number"
                     placeholder="Enter Estimated Hours"
                   />
@@ -501,6 +507,7 @@ const EditProject = ({ id, onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Description</label>
                   <ReactQuill
+                    className="mt-1"
                     value={values.project_description}
                     onChange={(value) =>
                       setFieldValue("project_description", value)
@@ -516,11 +523,12 @@ const EditProject = ({ id, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24}>
+              <Col span={24} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Tag</label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select or add new tag"
                     value={values.tag}
                     onChange={(value) => setFieldValue("tag", value)}
@@ -549,11 +557,12 @@ const EditProject = ({ id, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24}>
+              <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Status</label>
+                  <label className="font-semibold">Status <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select or add new status"
                     value={values.status}
                     onChange={(value) => setFieldValue("status", value)}

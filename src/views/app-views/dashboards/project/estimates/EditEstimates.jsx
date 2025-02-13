@@ -287,7 +287,7 @@ const EditEstimates = ({ onClose }) => {
                                             rules={[{ required: true, message: "Please select a currency" }]}
                                         >
                                             <Select
-                                                className="w-full mt-2"
+                                                className="w-full"
                                                 placeholder="Select Currency"
                                                 onChange={(value) => {
                                                     const selectedCurrency = currencies.find(c => c.id === value);

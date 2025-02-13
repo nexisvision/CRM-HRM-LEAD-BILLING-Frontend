@@ -378,9 +378,9 @@ const EditProduct = ({ idd, onClose }) => {
     name: Yup.string().required("Please enter Name."),
     price: Yup.number().required("Please enter Price."),
     category: Yup.string().required("Please enter Category."),
-    sku: Yup.string().required("Please enter Sku."),
-    hsn_sac: Yup.string().required("Please enter Hsn/Sac."),
-    description: Yup.string().required("Please enter Description."),
+    sku: Yup.string().optional("Please enter Sku."),
+    hsn_sac: Yup.string().optional("Please enter Hsn/Sac."),
+    description: Yup.string().optional("Please enter Description."),
   });
 
   const onSubmit = (values, { resetForm }) => {
@@ -420,9 +420,9 @@ const EditProduct = ({ idd, onClose }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Name</label>
+                  <label className="font-semibold">Name <span className="text-red-500">*</span></label>
                   <Field
-                    className="mt-2"
+                    className="mt-1"
                     name="name"
                     as={Input}
                     placeholder="Enter Name"
@@ -436,9 +436,9 @@ const EditProduct = ({ idd, onClose }) => {
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Price</label>
+                  <label className="font-semibold">Price <span className="text-red-500">*</span></label>
                   <Field
-                    className="mt-2"
+                    className="mt-1"
                     type="number"
                     name="price"
                     as={Input}
@@ -453,9 +453,10 @@ const EditProduct = ({ idd, onClose }) => {
               </Col>
               <Col span={12} className="mt-4">
                 <div className="form-item mt-2">
-                  <label className="font-semibold">Category</label>
+                  <label className="font-semibold">Category <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
+                    className="mt-1"
                     placeholder="Select or add new category"
                     value={values.category}
                     onChange={(value) => setFieldValue("category", value)}
@@ -492,7 +493,7 @@ const EditProduct = ({ idd, onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Sku</label>
                   <Field
-                    className="mt-2"
+                    className="mt-1"
                     name="sku"
                     as={Input}
                     placeholder="Enter Sku"
@@ -508,7 +509,7 @@ const EditProduct = ({ idd, onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Hsn/Sac </label>
                   <Field
-                    className="mt-2"
+                    className="mt-1"
                     name="hsn_sac"
                     as={Input}
                     placeholder="Enter Hsn/Sac"
@@ -529,7 +530,7 @@ const EditProduct = ({ idd, onClose }) => {
                     onChange={(value) => setFieldValue("description", value)}
                     placeholder="Enter Description"
                     onBlur={() => setFieldTouched("description", true)}
-                    className="mt-2"
+                    className="mt-1"
                   />
                   <ErrorMessage
                     name="description"

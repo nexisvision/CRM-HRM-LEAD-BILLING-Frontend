@@ -220,16 +220,22 @@ export const InvoiceList = () => {
       sorter: (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
     },
     {
+      title: "Tax",
+      dataIndex: "tax",
+      // render: (total) => `$${total.toFixed(2)}`,
+      sorter: (a, b) => a.tax - b.tax,
+    },
+    {
       title: "Total",
       dataIndex: "total",
       // render: (total) => `$${total.toFixed(2)}`,
       sorter: (a, b) => a.total - b.total,
     },
-    {
-      title: "Status",
-      dataIndex: "status",
-      render: (status) => <Tag color={getPaymentStatus(status)}>{status}</Tag>,
-    },
+    // {
+    //   title: "Status",
+    //   dataIndex: "status",
+    //   render: (status) => <Tag color={getPaymentStatus(status)}>{status}</Tag>,
+    // },
     {
       title: "Action",
       dataIndex: "actions",

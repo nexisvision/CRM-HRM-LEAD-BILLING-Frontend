@@ -401,7 +401,7 @@ const AddEstimates = ({ onClose }) => {
                                             ]}
                                         >
                                             <Select
-                                                className="w-full mt-2"
+                                                className="w-full"
                                                 placeholder="Select Currency"
                                                 onChange={(value) => {
                                                     const selectedCurrency = currency.find(
@@ -589,7 +589,7 @@ const AddEstimates = ({ onClose }) => {
                             </div>
                         </div>
 
-                        <Form.Item>
+                        <Form.Item className="mt-4">
                             <Row justify="end" gutter={16}>
                                 <Col>
                                     <Button onClick={() => navigate("/app/dashboards/sales/estimates")}>Cancel</Button>
