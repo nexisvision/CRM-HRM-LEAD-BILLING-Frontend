@@ -223,7 +223,6 @@ const AddInvoice = ({ onClose }) => {
 
         dispatch(AddInvoices(invoiceData))
           .then(() => {
-            message.success("Invoice added successfully");
             dispatch(getInvoice());
             form.resetFields();
             // setDiscountRate(0);

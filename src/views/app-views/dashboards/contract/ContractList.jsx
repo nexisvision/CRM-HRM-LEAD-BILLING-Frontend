@@ -236,7 +236,7 @@ const ContractList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -261,7 +261,7 @@ const ContractList = () => {
             <span className="">View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
       
 
 

@@ -246,7 +246,6 @@ const EditNotes = ({ idd, onClose }) => {
       onClose();
 
       if (result) {
-        message.success("Note updated successfully!");
         resetForm();
       }
     } catch (error) {

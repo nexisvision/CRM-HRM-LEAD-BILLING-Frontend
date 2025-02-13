@@ -64,8 +64,11 @@ const CustomerList = () => {
   }, [dispatch]);
   
   const alldata = useSelector((state) => state.customers);
-  const fnddata = alldata?.customers?.data || [];
-  const loggid = useSelector((state) => state.user.loggedInUser);
+  
+  const fnddata = alldata?.customers?.data || []; 
+  const loggid = useSelector((state)=>state.user.loggedInUser);
+
+  const filterdata = fnddata.filter((item) => item?.created_by === loggid.username);
 
   // Update users state whenever customer data changes
   useEffect(() => {
@@ -74,12 +77,9 @@ const CustomerList = () => {
       setUsers(filterdata);
       console.log("Filtered Customer Data:", filterdata);
     }
-  }, [fnddata, loggid]);
-  
-
+  }, [fnddata]);
   
     //// permission
-  
   
         const roleId = useSelector((state) => state.user.loggedInUser.role_id);
         const roles = useSelector((state) => state.role?.role?.data);
@@ -207,7 +207,7 @@ const CustomerList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -219,7 +219,7 @@ const CustomerList = () => {
             <span className="">View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
      
 
 

@@ -254,7 +254,7 @@ const ClientList = () => {
 
   const dropdownMenu = (user) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -293,7 +293,7 @@ const ClientList = () => {
             Upgrade Plan
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
      
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (

@@ -101,9 +101,8 @@ const AddContract = ({ onClose }) => {
         if (!startDate || !value) return true;
         return moment(value).isAfter(moment(startDate));
       }),
-    zipcode: Yup.string()
-      .required("Please enter a Zip Code.")
-      .matches(/^[0-9]+$/, "Zip Code must be numeric"),
+    zipcode: Yup.number()
+      .required("Please enter a Zip Code."),
     value: Yup.number()
       .required("Please enter a Contract Value.")
       .positive("Contract Value must be positive.")

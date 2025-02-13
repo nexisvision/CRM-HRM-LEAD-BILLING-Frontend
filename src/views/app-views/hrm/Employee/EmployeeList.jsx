@@ -156,6 +156,11 @@ const EmployeeList = () => {
   }, [sub, dispatch]);
 
 
+  useEffect(()=>{
+    dispatch(empdata())
+  },[dispatch])
+
+
 
 
   useEffect(() => {
@@ -171,7 +176,7 @@ const EmployeeList = () => {
         setUsers(filteredData); // Set the filtered users
       }
     }
-  }, [tabledata, user]);
+  }, [tabledata, user,dispatch]);
 
 
 
@@ -198,7 +203,7 @@ const EmployeeList = () => {
   // Dropdown menu component
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -236,7 +241,7 @@ const EmployeeList = () => {
             <span className="">Download CV</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
       
     
 

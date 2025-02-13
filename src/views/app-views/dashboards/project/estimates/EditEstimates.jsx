@@ -108,7 +108,6 @@ const EditEstimates = ({ onClose }) => {
                 data: estimateData 
             }));
 
-            message.success("Invoice updated successfully");
             onClose();
             navigate("/app/dashboards/project/list");
           } catch (error) {

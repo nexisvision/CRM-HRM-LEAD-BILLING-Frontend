@@ -178,24 +178,24 @@ const ExpensesList = () => {
                     <span className="ml-2">View Details</span>
                 </Flex>
             </Menu.Item>
-            <Menu.Item>
+            {/* <Menu.Item>
                 <Flex alignItems="center">
                     <PlusCircleOutlined />
                     <span className="ml-2">Add to remark</span>
                 </Flex>
-            </Menu.Item>
+            </Menu.Item> */}
             <Menu.Item>
                 <Flex alignItems="center" onClick={() => EditFun(row.id)}>
                     <EditOutlined />
                     <span className="ml-2">Edit</span>
                 </Flex>
             </Menu.Item>
-            <Menu.Item>
+            {/* <Menu.Item>
                 <Flex alignItems="center">
                     <TiPinOutline />
                     <span className="ml-2">Pin</span>
                 </Flex>
-            </Menu.Item>
+            </Menu.Item> */}
             <Menu.Item>
                 <Flex alignItems="center" onClick={() => DeleteFun(row.id)}>
                     <DeleteOutlined />
@@ -251,7 +251,7 @@ const ExpensesList = () => {
           },
         // {
         //   title: "Status",
-        //   dataIndex: "status",
+        //   dataIndex: "status",produc
         //   render: (_, record) => <span className="font-weight-semibold"></span>,
         //   sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
         // },

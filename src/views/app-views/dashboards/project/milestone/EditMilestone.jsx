@@ -119,7 +119,6 @@ const EditMilestone = ({ idd, onClose }) => {
       await dispatch(Editmins({ idd, data: formattedValues })).unwrap();
       dispatch(Getmins(id));
       onClose();
-      message.success("Milestone updated successfully!");
     } catch (error) {
       message.error("Failed to update milestone: " + error.message);
     } finally {

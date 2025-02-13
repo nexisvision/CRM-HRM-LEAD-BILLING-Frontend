@@ -154,7 +154,6 @@ const ContractSlice = createSlice({
       .addCase(ContaractData.fulfilled, (state, action) => {
         state.isLoading = false;
         state.Contract = action?.payload;
-        message.success(action.payload?.message);
       })
 
       .addCase(ContaractData.rejected, (state, action) => {

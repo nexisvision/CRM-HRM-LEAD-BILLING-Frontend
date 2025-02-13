@@ -322,7 +322,6 @@ const EditInvoice = ({ idd, onClose }) => {
       };
 
       await dispatch(updateInvoice({ idd, data: invoiceData }));
-      message.success("Invoice updated successfully");
       onClose();
       navigate("/app/dashboards/project/invoice");
     } catch (error) {

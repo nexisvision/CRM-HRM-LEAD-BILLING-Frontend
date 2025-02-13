@@ -408,7 +408,6 @@ const EditInvoice = ({ idd, onClose }) => {
         .then(() => {
           dispatch(getInvoice());
           onClose();
-          message.success("Invoice updated successfully!");
         })
         .catch((error) => {
           console.error("Failed to edit invoice:", error);

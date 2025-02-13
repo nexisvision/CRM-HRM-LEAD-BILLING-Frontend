@@ -154,7 +154,6 @@ const RoleAndPermissionSlice = createSlice({
         state.isLoading = false;
         state.salesInvoices = action?.payload;
         // toast.success(action.payload?.data?.message);
-        message.success(action.payload?.message);
       })
       .addCase(getInvoice.rejected, (state, action) => {
         state.isLoading = false;

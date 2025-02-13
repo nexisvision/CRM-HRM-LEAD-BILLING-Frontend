@@ -211,7 +211,7 @@ const LeadList = () => {
           </Button>
         </Flex>
       </Menu.Item> */}
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -223,7 +223,7 @@ const LeadList = () => {
             <span className="">Send Mail</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
      
       
 

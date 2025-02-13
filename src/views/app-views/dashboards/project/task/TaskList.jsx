@@ -217,13 +217,12 @@ export const TaskList = () => {
           <span className="ml-2">{pinnedTasks.includes(row.id) ? "Unpin" : "Pin"}</span>
         </Flex>
       </Menu.Item>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center" onClick={openViewTaskModal}>
           <EyeOutlined />
-          {/* <EyeOutlined /> */}
           <span className="ml-2">View Details</span>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
      
 
       <Menu.Item>

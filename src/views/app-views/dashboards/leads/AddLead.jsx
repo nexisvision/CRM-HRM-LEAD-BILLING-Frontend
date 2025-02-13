@@ -224,7 +224,7 @@ const currenciesState = useSelector((state) => state.currencies);
     dispatch(LeadsAdd(formData))
       .then(() => {
         dispatch(GetLeads()); // Refresh leave data
-        // message.success("Leads added successfully!");
+        message.success("Leads added successfully!");
         resetForm();
         onClose(); // Close modal
       })

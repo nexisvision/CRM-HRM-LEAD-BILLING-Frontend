@@ -204,7 +204,7 @@ const RevenueList = () => {
 
   const dropdownMenu = (row) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <PlusCircleOutlined />
           <span className="ml-2">Add to remark</span>
@@ -217,7 +217,7 @@ const RevenueList = () => {
           <TiPinOutline />
           <span className="ml-2">Pin</span>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
       
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (

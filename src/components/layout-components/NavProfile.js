@@ -114,7 +114,7 @@ export const NavProfile = ({ mode }) => {
     <Dropdown placement="bottomRight" menu={{ items }} trigger={["click"]}>
       <NavItem mode={mode}>
         <Profile>
-          <Avatar src="/img/avatars/thumb-1.jpg" />
+          <Avatar src={currentuser?.loggedInUser?.profilePic} />
           <UserInfo className="profile-text">
             <Name>{current}</Name>
             <Title>{roleu}</Title>

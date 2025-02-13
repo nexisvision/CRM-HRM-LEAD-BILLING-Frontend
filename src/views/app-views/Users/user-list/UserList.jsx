@@ -164,7 +164,7 @@ const UserList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -188,7 +188,7 @@ const UserList = () => {
             Reset Password
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
     
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (

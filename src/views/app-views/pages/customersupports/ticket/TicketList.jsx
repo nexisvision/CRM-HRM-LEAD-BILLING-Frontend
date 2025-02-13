@@ -191,7 +191,7 @@ export const TicketList = () => {
 
   const dropdownMenu = (row) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -203,7 +203,7 @@ export const TicketList = () => {
             <span className="ml-2">View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item>
         <Flex alignItems="center" onClick={() => togglePinTask(row.id)}>
           {pinnedTasks.includes(row.id) ? (

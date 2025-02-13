@@ -106,7 +106,6 @@ const taxSlice = createSlice({
             .addCase(getAllTaxes.fulfilled, (state, action) => {
                 state.loading = false;
                 state.taxes = action.payload;
-                message.success(action.payload?.message);
             })
             .addCase(getAllTaxes.rejected, (state, action) => {
                 state.loading = false;

@@ -248,7 +248,7 @@ const DealList = () => {
           </Button>
         </Flex>
       </Menu.Item>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -260,7 +260,7 @@ const DealList = () => {
             <span className="">Send Mail</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
      
      
 
@@ -397,7 +397,7 @@ const DealList = () => {
       >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input
+            <Input    
               placeholder="Search"
               prefix={<SearchOutlined />}
               onChange={(e) => onSearch(e)}

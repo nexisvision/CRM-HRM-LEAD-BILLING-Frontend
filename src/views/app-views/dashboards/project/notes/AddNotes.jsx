@@ -57,23 +57,30 @@ const AddNotes = ({ onClose }) => {
 
   const onSubmit = async (values, { resetForm }) => {
     try {
-
-      
       const employeeObject =
         values.employees.length > 0 ? { id: values.employees[0] } : null;
 
       values.employees = employeeObject;
 
       // console.log("Dispatching AddNote with values:", { id, values });
-      const result = await dispatch(AddNote({ id, values })).unwrap();
-      dispatch(GetNote(id));
-      onClose();
-      // console.log("Dispatch result:", result);
+      // const result = await dispatch(AddNote({ id, values })).unwrap();
+      // dispatch(GetNote(id));
+      // onClose();
+      // // console.log("Dispatch result:", result);
 
-      if (result) {
-        // message.success("Note added successfully!");
-        resetForm();
-      }
+      // if (result) {
+      //   // message.success("Note added successfully!");
+      //   resetForm();
+      
+      // }
+
+      dispatch(AddNote({id,values}))
+        .then(()=>{
+          dispatch(GetNote(id))
+          resetForm();
+          onClose();
+        })
+
     } catch (error) {
       console.error("Error adding note:", error);
       // message.error("Failed to add note: " + error.message);

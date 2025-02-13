@@ -37,6 +37,7 @@ import CompanyCard from "./CompanyCard"; // Import the CompanyCard component
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
 import { getsubplandata } from "../subscribeduserplans/subplanReducer/subplanSlice";
+import AvatarStatus from "components/shared-components/AvatarStatus";
 
 const { Option } = Select;
 const VIEW_LIST = "LIST";
@@ -178,13 +179,19 @@ const CompanyList = () => {
   };
 
   const tableColumns = [
+
     {
-      title: "Profile",
-      dataIndex: "profilePic",
-      render: (text, record) => (
-        <img src={`http://localhost:5353/uploads/${text}`} alt="Profile" className="w-10 h-10 rounded-full" />
-      ),
-    },
+          title: "profilePic",
+          dataIndex: 'profilePic',
+          render: (_, record) => (
+            <AvatarStatus
+              src={record.profilePic}
+              name={record.username || record.firstName}
+              size={40}
+            />
+          ),
+        },
+  
     {
       title: "Company",
       dataIndex: "username",

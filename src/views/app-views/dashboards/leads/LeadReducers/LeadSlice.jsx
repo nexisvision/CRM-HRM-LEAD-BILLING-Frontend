@@ -138,7 +138,6 @@ const LeadSlice = createSlice({
       })
       .addCase(LeadsAdd.fulfilled, (state, action) => {
         state.isLoading = false;
-        message.success(action.payload?.data?.message);
       })
       .addCase(LeadsAdd.rejected, (state, action) => {
         state.isLoading = false;

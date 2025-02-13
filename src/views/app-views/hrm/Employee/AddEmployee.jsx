@@ -44,6 +44,10 @@ const AddEmployee = ({ onClose, setSub }) => {
 
   const countries = useSelector((state) => state.countries.countries);
 
+   useEffect(()=>{
+      dispatch(empdata())
+    },[dispatch])
+
   useEffect(() => {
     dispatch(getallcountries());
   }, [dispatch]);
@@ -170,7 +174,7 @@ const AddEmployee = ({ onClose, setSub }) => {
     <div className="add-employee p-6">
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({

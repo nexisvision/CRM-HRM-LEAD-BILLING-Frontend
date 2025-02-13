@@ -187,7 +187,7 @@ const CompanyCard = ({ company }) => {
       </div>
       <div className="flex flex-col items-center">
         <img
-          src={company.image}
+          src={company.profilePic}
           alt={company.name}
           className="rounded-full w-24 h-24 mb-2"
         />

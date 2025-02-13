@@ -123,7 +123,6 @@ export const NotesList = () => {
       const updatedData = await dispatch(GetNote(id));
       setList(list.filter((item) => item.id !== exid));
 
-      message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error.message || error);
     }
@@ -173,13 +172,12 @@ export const NotesList = () => {
           <span className="ml-2">Edit</span>
         </Flex>
       </Menu.Item>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center" onClick={openViewNotesModal}>
           <EyeOutlined />
-          {/* <EditOutlined /> */}
           <span className="ml-2">View</span>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item>
         <Flex alignItems="center" onClick={() => DeleteFun(row.id)}>
           <DeleteOutlined />

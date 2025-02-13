@@ -251,7 +251,6 @@ const sub = subClientsss?.SubClient?.data;
 
             dispatch(createInvoice({ id, invoiceData }))
               .then(() => {
-                message.success("Invoice added successfully");
                 dispatch(getAllInvoices(id));
                 form.resetFields();
                 // setDiscountRate(0);
