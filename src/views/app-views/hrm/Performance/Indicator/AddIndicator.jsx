@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Button, Select, Rate, Row, Col, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,15 +16,29 @@ const AddIndicator = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loggedInUser.username);
+
   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
   const fndbranchdata = branchData.filter((item) => item.created_by === user);
   
+// console.log('fndbranchdata',fndbranchdata);
+
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const fnddepartmentdata = departmentData.filter((item) => item.created_by === user);
+
+// console.log('fnddepartmentdata',fnddepartmentdata);
 
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
   const fnddesignationdata = designationData.filter((item) => item.created_by === user);
 
+
+  const [selectedBranch, setSelectedBranch] = useState(null);
+
+  // Filter departments and designations based on selected branch
+  const filteredDepartments = fnddepartmentdata.filter((dept) => dept.branch === selectedBranch);
+  const filteredDesignations = fnddesignationdata.filter((des) => des.branch === selectedBranch);
+
+
+// console.log('fnddesignationdata',fnddesignationdata);
 
   useEffect(() => {
     dispatch(getBranch());
@@ -83,13 +97,19 @@ const AddIndicator = ({ onClose }) => {
         <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
 
         <Row gutter={16}>
-          <Col span={12}>
+        <Col span={12}>
             <Form.Item
               name="branch"
               label="Branch"
               rules={[{ required: true, message: 'Please select a branch' }]}
             >
-              <Select placeholder="Select Branch">
+              <Select
+                placeholder="Select Branch"
+                onChange={(value) => {
+                  setSelectedBranch(value);
+                  form.setFieldsValue({ department: "", designation: "" }); // Reset department & designation
+                }}
+              >
                 {fndbranchdata.map((branch) => (
                   <Option key={branch.id} value={branch.id}>
                     {branch.branchName}
@@ -99,14 +119,15 @@ const AddIndicator = ({ onClose }) => {
             </Form.Item>
           </Col>
 
+          {/* Department Selection */}
           <Col span={12}>
             <Form.Item
               name="department"
               label="Department"
               rules={[{ required: true, message: 'Please select a department' }]}
             >
-              <Select placeholder="Select Department">
-                {fnddepartmentdata.map((dept) => (
+              <Select placeholder="Select Department" disabled={!selectedBranch}>
+                {filteredDepartments.map((dept) => (
                   <Option key={dept.id} value={dept.id}>
                     {dept.department_name}
                   </Option>
@@ -115,14 +136,15 @@ const AddIndicator = ({ onClose }) => {
             </Form.Item>
           </Col>
 
+          {/* Designation Selection */}
           <Col span={12}>
             <Form.Item
               name="designation"
               label="Designation"
               rules={[{ required: true, message: 'Please select a designation' }]}
             >
-              <Select placeholder="Select Designation">
-                {fnddesignationdata.map((des) => (
+              <Select placeholder="Select Designation" disabled={!selectedBranch}>
+                {filteredDesignations.map((des) => (
                   <Option key={des.id} value={des.id}>
                     {des.designation_name}
                   </Option>

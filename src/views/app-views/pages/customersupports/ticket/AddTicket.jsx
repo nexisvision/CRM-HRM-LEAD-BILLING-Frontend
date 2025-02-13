@@ -58,28 +58,21 @@ const AddTicket = ({ onClose }) => {
 
   const onSubmit = async (values, { resetForm }) => {
     try {
-      const formData = new FormData();
+      // const formData = new FormData();
       
-      // Append all non-file fields
-      Object.keys(values).forEach(key => {
-        if (key !== 'file') {
-          formData.append(key, values[key]);
-        }
-      });
-
-      // Handle file upload
-      if (values.file) {
-        formData.append('file', values.file);
-      }
+      const formData = new FormData();
+    for (const key in values) {
+        formData.append(key, values[key]);
+    }
 
       // Dispatch with proper error handling
       await dispatch(AddTickets(formData)).unwrap();
-      message.success('Ticket created successfully!');
+      // message.success('Ticket created successfully!');
       dispatch(getAllTicket());
       onClose();
       resetForm();
     } catch (error) {
-      message.error(error?.message || 'Failed to create ticket');
+      // message.error(error?.message || 'Failed to create ticket');
     }
   };
 
@@ -279,18 +272,21 @@ const AddTicket = ({ onClose }) => {
 
               {/* Attachment */}
               <Col span={24}>
-                <Field name="file">
-                  {({ field, form }) => (
-                    <Form.Item label="Attachment">
-                      <FileUploadField field={field} form={form} />
-                      <ErrorMessage
-                        name="file"
-                        component="div"
-                        className="text-red-500"
-                      />
-                    </Form.Item>
-                  )}
-                </Field>
+              <Field name="file">
+        {({ field }) => (
+            <Form.Item label="Attachment">
+                <Upload
+                    beforeUpload={(file) => {
+                        setFieldValue("file", file); // Set the uploaded file in Formik state
+                        return false; // Prevent automatic upload
+                    }}
+                    showUploadList={false} // Hide the default upload list
+                >
+                    <Button icon={<UploadOutlined />}>Choose File</Button>
+                </Upload>
+            </Form.Item>
+        )}
+    </Field>
               </Col>
             </Row>
 

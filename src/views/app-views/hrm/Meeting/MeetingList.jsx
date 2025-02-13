@@ -30,7 +30,9 @@ const MeetingList = () => {
   const dispatch = useDispatch();
 
  const user = useSelector((state) => state.user.loggedInUser.username);
-  const tabledata = useSelector((state) => state.Meeting || []);
+  const tabledata = useSelector((state) => state.Meeting?.Meeting?.data || []);
+
+  const filteredData = tabledata.filter((item) => item.created_by === user) || [];
 
   //   const [dealStatisticData] = useState(DealStatisticData);
 
@@ -107,10 +109,10 @@ const MeetingList = () => {
 
       setUsers(users.filter((item) => item.id !== userId));
 
-      // message.success({ content: 'Deleted user successfully.', duration: 2 });
+      message.success({ content: 'Deleted meeting successfully.', duration: 2 });
     } catch (error) {
-      // message.error({ content: 'Failed to delete user', duration: 2 });
-      console.error('Error deleting user:', error);
+      message.error({ content: 'Failed to delete meeting', duration: 2 });
+      console.error('Error deleting meeting:', error);
     }
   };
 
@@ -145,9 +147,8 @@ const MeetingList = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (tabledata && tabledata.Meeting) {
+    if (filteredData) {
       // Filter meetings by created_by matching the logged-in user's username
-      const filteredData = tabledata.Meeting.data.filter((item) => item.created_by === user);
           setUsers(filteredData);
     }
   }, [tabledata]); 

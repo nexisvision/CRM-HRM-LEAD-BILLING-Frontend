@@ -11,7 +11,7 @@ import {
 } from "./otherpaymentReducer/otherpaymentSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
-const AddOtherPayment = ({ onClose }) => {
+const AddOtherPayment = ({ id, onClose }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -19,14 +19,15 @@ const AddOtherPayment = ({ onClose }) => {
   }, [dispatch]);
 
   const alldataemp = useSelector((state) => state.employee);
-  const fnddata = alldataemp.employee.data;
+  const fnddata = alldataemp.employee?.data || [];
+  const filteredEmployees = fnddata?.filter((employee) => employee.id === id);
 
   useEffect(() => {
     dispatch(getcurren());
   }, [dispatch]);
 
   const allempdatass = useSelector((state) => state.currencies);
-  const fnddatass = allempdatass?.currencies;
+  const fnddatass = allempdatass?.currencies?.data;
 
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
     dispatch(addotherpay(values))
@@ -65,11 +66,11 @@ const AddOtherPayment = ({ onClose }) => {
                       onChange={(value) => setFieldValue("employeeId", value)}
                       value={values.employeeId}
                     >
-                      {fnddata && fnddata.length > 0 ? (
-                        fnddata.map((client) => (
-                          <Option key={client.id} value={client.id}>
-                            {client.firstName ||
-                              client.username ||
+                      {filteredEmployees && filteredEmployees.length > 0 ? (
+                        filteredEmployees.map((employee) => (
+                          <Option key={employee.id} value={employee.id}>
+                            {employee.firstName ||
+                              employee.username ||
                               "Unnamed employee"}
                           </Option>
                         ))
@@ -152,7 +153,7 @@ const AddOtherPayment = ({ onClose }) => {
             <div>
               <label className="font-semibold">Amount</label>
               <Field name="amount">
-                {({ field }) => <Input {...field} placeholder="Enter Amount" />}
+                {({ field }) => <Input {...field} placeholder="Enter Amount" type="number" />}
               </Field>
               <ErrorMessage
                 name="amount"

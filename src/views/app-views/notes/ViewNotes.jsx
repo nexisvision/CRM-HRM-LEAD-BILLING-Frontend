@@ -122,24 +122,30 @@ function ViewNotes() {
   return (
     <>
       <div className="grid grid-cols-1 gap-3">
-        <div className="mt-2">
-          <h1 className="text-2xl font-semibold ms-1">Personal Notes</h1>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {fnddata &&
-              fnddata
-                .filter((note) => note.notetype === "Personal")
-                .map((note) => renderNoteCard(note))}
-          </div>
-        </div>
+      <div className="mt-2">
+  <h1 className="text-2xl font-semibold ms-1">Personal Notes</h1>
+  {fnddata && fnddata.some((note) => note.notetype === "Personal") ? (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      {fnddata
+        .filter((note) => note.notetype === "Personal")
+        .map((note) => renderNoteCard(note))}
+    </div>
+  ) : (
+    <p className="text-gray-500 ms-1 mt-2">No notes found</p>
+  )}
+</div>
 
         <div className="mt-2">
           <h1 className="text-2xl font-semibold ms-1">Shared Notes</h1>
+          {fnddata && fnddata.some((note) => note.notetype === "Shared") ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {fnddata &&
-              fnddata
-                .filter((note) => note.notetype === "Shared")
+            {fnddata 
+              .filter((note) => note.notetype === "Shared")
                 .map((note) => renderNoteCard(note))}
           </div>
+          ) : (
+            <p className="text-gray-500 ms-1 mt-2">No notes found</p>
+          )}
         </div>
       </div>
 

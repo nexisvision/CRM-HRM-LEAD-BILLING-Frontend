@@ -3,11 +3,11 @@ import React from 'react';
 import OvertimeList from './OvertimeList';
 // import AddOtherPayment from './AddOtherPayment';
 
-const Overtime = () => (
+const Overtime = ({ id, onClose }) => (
 
 <div className="mail">
 
-<OvertimeList />
+<OvertimeList id={id} onClose={onClose} />
  
 </div>
 

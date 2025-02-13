@@ -263,7 +263,7 @@ const CompanyList = () => {
             onChange={onSearch}
             className="w-60"
           />
-          <Select
+          {/* <Select
             defaultValue="All"
             style={{ width: 180 }}
             onChange={handleShowStatus}
@@ -273,7 +273,7 @@ const CompanyList = () => {
             <Option value="All">All Status</Option>
             <Option value="active">Active</Option>
             <Option value="blocked">Blocked</Option>
-          </Select>
+          </Select> */}
         </div>
 
         <div className="flex gap-4 ">
@@ -298,9 +298,9 @@ const CompanyList = () => {
           >
             New
           </Button>
-          <Button type="primary" icon={<FileExcelOutlined />}>
+          {/* <Button type="primary" icon={<FileExcelOutlined />}>
             Export
-          </Button>
+          </Button> */}
         </div>
       </div>
 

@@ -21,6 +21,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
 import { getallcountries } from "../../setting/countries/countriesreducer/countriesSlice";
+import { getBranch } from "../Branch/BranchReducer/BranchSlice";
 
 const { Option } = Select;
 
@@ -38,8 +39,21 @@ const AddEmployee = ({ onClose, setSub }) => {
   const loggedusername = useSelector((state)=>state.user.loggedInUser.username);
 
 
+
+  const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
+  const fndbranchdata = branchData.filter((item) => item.created_by === loggedusername);
+
+
   const fnddepart =  departmentData.filter((item)=>item.created_by === loggedusername);
   const fnddesi = designationData.filter((item)=>item.created_by === loggedusername);
+
+
+
+  const [selectedBranch, setSelectedBranch] = useState(null);
+
+  // Filter departments and designations based on selected branch
+  const filteredDepartments = fnddepart.filter((dept) => dept.branch === selectedBranch);
+  const filteredDesignations = fnddesi.filter((des) => des.branch === selectedBranch);
 
 
   const countries = useSelector((state) => state.countries.countries);
@@ -52,9 +66,11 @@ const AddEmployee = ({ onClose, setSub }) => {
     dispatch(getallcountries());
   }, [dispatch]);
 
+
   useEffect(() => {
     dispatch(getDept());
     dispatch(getDes());
+    dispatch(getBranch());
   }, [dispatch]);
 
   const otpapi = async (otp) => {
@@ -132,6 +148,7 @@ const AddEmployee = ({ onClose, setSub }) => {
     email: "",
     phone: "",
     address: "",
+    branch: "",
     joiningDate: null,
     leaveDate: null,
     department: "",
@@ -158,6 +175,7 @@ const AddEmployee = ({ onClose, setSub }) => {
       .matches(/^\d{10}$/, "Phone number must be 10 digits.")
       .required("Please enter a phone number."),
     address: Yup.string().required("Please enter an address."),
+    branch: Yup.string().required("Please select a branch."),
     joiningDate: Yup.date().nullable().required("Joining date is required."),
     leaveDate: Yup.date().nullable().required("Leave date is required."),
     department: Yup.string().required("Please select a department."),
@@ -314,52 +332,84 @@ const AddEmployee = ({ onClose, setSub }) => {
                   <ErrorMessage name="leaveDate" component="div" className="text-red-500" />
                 </div>
               </Col>
+              
               <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Department</label>
-                  <Field name="department">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        placeholder="Select Department"
-                        onChange={(value) => setFieldValue("department", value)}
-                      >
-                        {fnddepart.map((dept) => (
-                          <Option key={dept.id} value={dept.id}>
-                            {dept.department_name}
-                          </Option>
-                        ))}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage name="department" component="div" className="text-red-500" />
-                </div>
-              </Col>
-            </Row>
-            <Row gutter={16}>
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Designation</label>
-                  <Field name="designation">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        placeholder="Select Designation"
-                        onChange={(value) => setFieldValue("designation", value)}
-                      >
-                        {fnddesi.map((des) => (
-                          <Option key={des.id} value={des.id}>
-                            {des.designation_name}
-                          </Option>
-                        ))}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage name="designation" component="div" className="text-red-500" />
-                </div>
-              </Col>
+            <div className="form-item">
+              <label className="font-semibold">Branch</label>
+              <Field name="branch">
+                {({ field }) => (
+                  <Select
+                    {...field}
+                    className="w-full mt-1"
+                    placeholder="Select Branch"
+                    onChange={(value) => {
+                      setFieldValue("branch", value);
+                      setFieldValue("department", "");
+                      setFieldValue("designation", "");
+                      setSelectedBranch(value); // Update selected branch
+                    }}
+                  >
+                    {fndbranchdata.map((branch) => (
+                       <Option key={branch.id} value={branch.id}>
+                       {branch.branchName}
+                     </Option>
+                    ))}
+                  </Select>
+                )}
+              </Field>
+              <ErrorMessage name="branch" component="div" className="text-red-500" />
+            </div>
+          </Col>
+
+          {/* Department Selection */}
+          <Col span={12}>
+            <div className="form-item">
+              <label className="font-semibold">Department</label>
+              <Field name="department">
+                {({ field }) => (
+                  <Select
+                    {...field}
+                    className="w-full mt-1"
+                    placeholder="Select Department"
+                    disabled={!selectedBranch}
+                    onChange={(value) => setFieldValue("department", value)}
+                  >
+                    {filteredDepartments.map((dept) => (
+                      <Option key={dept.id} value={dept.id}>
+                        {dept.department_name}
+                      </Option>
+                    ))}
+                  </Select>
+                )}
+              </Field>
+              <ErrorMessage name="department" component="div" className="text-red-500" />
+            </div>
+          </Col>
+
+          {/* Designation Selection */}
+          <Col span={12}>
+            <div className="form-item">
+              <label className="font-semibold">Designation</label>
+              <Field name="designation">
+                {({ field }) => (
+                  <Select
+                    {...field}
+                    className="w-full mt-1"
+                    placeholder="Select Designation"
+                    disabled={!selectedBranch}
+                    onChange={(value) => setFieldValue("designation", value)}
+                  >
+                    {filteredDesignations.map((des) => (
+                      <Option key={des.id} value={des.id}>
+                        {des.designation_name}
+                      </Option>
+                    ))}
+                  </Select>
+                )}
+              </Field>
+              <ErrorMessage name="designation" component="div" className="text-red-500" />
+            </div>
+          </Col>
               <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Salary</label>

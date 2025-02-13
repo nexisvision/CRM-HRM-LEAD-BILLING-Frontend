@@ -94,27 +94,62 @@ const AttendanceList = () => {
         }
       }
 
+      // if (fndattendancedata) {
+      //   fndattendancedata.forEach((attendance) => {
+      //     const attendanceDate = dayjs(attendance.date);
+      //     if (attendanceDate.isSame(selectedMonth, 'month')) {
+      //       const day = attendanceDate.date();
+      //       if (!employeeAttendanceMap[attendance.employee].attendanceByDay[day]) {
+      //         employeeAttendanceMap[attendance.employee].attendanceByDay[day] = {
+      //           status: 'P',
+      //           startTime: attendance.startTime,
+      //           endTime: attendance.endTime,
+      //         };
+      //         const startTime = dayjs(attendance.startTime, "HH:mm:ss");
+      //         const endTime = dayjs(attendance.endTime, "HH:mm:ss");
+      //         const hoursWorked = endTime.diff(startTime, 'hour', true);
+      //         employeeAttendanceMap[attendance.employee].totalWorkingHours += hoursWorked;
+      //         employeeAttendanceMap[attendance.employee].workingDays++;
+      //       }
+      //     }
+      //   });
+      // }
+
+     
       if (fndattendancedata) {
         fndattendancedata.forEach((attendance) => {
           const attendanceDate = dayjs(attendance.date);
           if (attendanceDate.isSame(selectedMonth, 'month')) {
             const day = attendanceDate.date();
+      
+            // Ensure employeeAttendanceMap[attendance.employee] exists
+            if (!employeeAttendanceMap[attendance.employee]) {
+              employeeAttendanceMap[attendance.employee] = {
+                attendanceByDay: {},
+                totalWorkingHours: 0,
+                workingDays: 0,
+              };
+            }
+      
             if (!employeeAttendanceMap[attendance.employee].attendanceByDay[day]) {
               employeeAttendanceMap[attendance.employee].attendanceByDay[day] = {
                 status: 'P',
                 startTime: attendance.startTime,
                 endTime: attendance.endTime,
               };
+      
               const startTime = dayjs(attendance.startTime, "HH:mm:ss");
               const endTime = dayjs(attendance.endTime, "HH:mm:ss");
               const hoursWorked = endTime.diff(startTime, 'hour', true);
+      
               employeeAttendanceMap[attendance.employee].totalWorkingHours += hoursWorked;
               employeeAttendanceMap[attendance.employee].workingDays++;
             }
           }
         });
       }
-
+     
+     
       if (fndleavedata) {
         fndleavedata.forEach((leave) => {
           const leaveStart = dayjs(leave.startDate);

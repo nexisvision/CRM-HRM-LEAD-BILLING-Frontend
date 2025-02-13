@@ -26,7 +26,7 @@ import AddCommission from "./AddCommission";
 import { useDispatch, useSelector } from "react-redux";
 import { delcommi, getcommi } from "./commistionReducer/commitionSlice";
 
-const CommissionList = () => {
+const CommissionList = ({ id, onClose }) => {
   const [salaryData, setSalaryData] = useState(employeeSalaryData); // Salary data
   const [isModalVisible, setIsModalVisible] = useState(false); // Add Salary Modal
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Selected rows for batch actions
@@ -75,11 +75,11 @@ const CommissionList = () => {
   // Dropdown menu for action options
   const dropdownMenu = (record) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Button type="text" icon={<EyeOutlined />} size="small">
           View Details
         </Button>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item>
         <Button
           type="text"
@@ -173,7 +173,7 @@ const CommissionList = () => {
         footer={null}
         width={800}
       >
-        <AddCommission onClose={closeModal} />
+        <AddCommission id={id} onClose={closeModal} />
       </Modal>
     </Card>
   );

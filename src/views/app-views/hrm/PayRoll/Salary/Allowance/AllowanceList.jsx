@@ -26,7 +26,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { FaUserInjured } from "react-icons/fa";
 import { deleteallowan, getallowan } from "./AllowancwReducer/AllowanceSlice";
 
-const AllowanceList = () => {
+const AllowanceList = ({ id, onClose }) => {
   const [salaryData, setSalaryData] = useState(employeeSalaryData); // Salary data
   const [isModalVisible, setIsModalVisible] = useState(false); // Add Salary Modal
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Selected rows for batch actions
@@ -75,11 +75,11 @@ const AllowanceList = () => {
   // Dropdown menu for action options
   const dropdownMenu = (record) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Button type="text" icon={<EyeOutlined />} size="small">
           View Details
         </Button>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item>
         <Button
           type="text"
@@ -177,7 +177,7 @@ const AllowanceList = () => {
         footer={null}
         width={800}
       >
-        <AddAllowance onClose={closeModal} />
+        <AddAllowance id={id} onClose={onClose} />
       </Modal>
     </Card>
   );

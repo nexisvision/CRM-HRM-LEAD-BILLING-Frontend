@@ -39,12 +39,12 @@ const AddLeave = ({ onClose }) => {
     dispatch(CreateL(values))
       .then(() => {
         dispatch(GetLeave()); // Refresh leave data
-        // message.success("Leave added successfully!");
+        message.success("Leave added successfully!");
         form.resetFields(); // Reset form fields
         onClose(); // Close modal
       })
       .catch((error) => {
-        // message.error("Failed to add leave.");
+        message.error("Failed to add leave.");
         console.error("Add API error:", error);
       });
   };

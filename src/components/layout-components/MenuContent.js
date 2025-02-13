@@ -177,7 +177,7 @@ const SideNavContent = (props) => {
 			}
 		});
 	
-		console.log('Relevant HRM Titles:', relevantTitles);
+		// console.log('Relevant HRM Titles:', relevantTitles);
 		return getSideNavMenuItem(relevantNavigation);
 	
 

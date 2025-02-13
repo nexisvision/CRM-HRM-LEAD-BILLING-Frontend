@@ -39,12 +39,13 @@ const PlanList = () => {
 
   const deletePlan = async (planId) => {
     try {
-      await dispatch(DeleteP(planId));
-      await dispatch(GetPlan());
-      setPlans(plans.filter((plan) => plan.id !== planId));
-      message.success({ content: 'Plan deleted successfully', duration: 2 });
+      await dispatch(DeleteP(planId)).then(() => {
+        dispatch(GetPlan());
+        setPlans(plans.filter((plan) => plan.id !== planId));
+      });
+      // message.success({ content: 'Plan deleted successfully', duration: 2 });
     } catch (error) {
-      message.error({ content: 'Failed to delete plan', duration: 2 });
+      // message.error({ content: 'Failed to delete plan', duration: 2 });
       console.error('Error deleting plan:', error);
     }
   };

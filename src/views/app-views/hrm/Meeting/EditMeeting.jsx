@@ -52,8 +52,14 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
 
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data || [];
+
+  
+  const [selectedDept, setSelectedDept] = useState(null);
+
   const filteredEmpData = empData?.filter((item) => item.created_by === user);
 
+
+  const filteredEmpDataa = filteredEmpData.filter((emp) => emp.department === selectedDept);
   const [initialValues, setInitialValues] = useState({
     department: "",
     employee: "",
@@ -127,15 +133,19 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
                   <label className="font-semibold">Department</label>
                   <Field name="department">
                     {({ field, form }) => (
-                      <Select
-                        style={{ width: "100%" }}
-                        {...field}
-                        placeholder="Select Department"
-                        loading={!filteredDept}
-                        value={form.values.department}
-                        onChange={(value) => form.setFieldValue("department", value)}
-                        onBlur={() => form.setFieldTouched("department", true)}
-                      >
+                     <Select
+                     style={{ width: "100%" }}
+                     {...field}
+                     placeholder="Select Department"
+                     loading={!filteredDept}
+                     value={form.values.department}
+                     onChange={(value) => {
+                       form.setFieldValue("department", value);
+                       setSelectedDept(value); // ✅ Set selected department here
+                       form.setFieldValue("employee", ""); // Reset employee field when department changes
+                     }}
+                     onBlur={() => form.setFieldTouched("department", true)}
+                   >
                         {filteredDept && filteredDept.length > 0 ? (
                           filteredDept.map((dept) => (
                             <Option key={dept.id} value={dept.id}>
@@ -163,27 +173,27 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
                   <label className="font-semibold">Employee</label>
                   <Field name="employee">
                     {({ field, form }) => (
-                      <Select
-                        style={{ width: "100%" }}
-                        {...field}
-                        placeholder="Select Employee"
-                        loading={!filteredEmpData}
-                        value={form.values.employee}
-                        onChange={(value) => form.setFieldValue("employee", value)}
-                        onBlur={() => form.setFieldTouched("employee", true)}
-                      >
-                        {filteredEmpData && filteredEmpData.length > 0 ? (
-                          filteredEmpData.map((emp) => (
-                            <Option key={emp.id} value={emp.id}>
-                              {emp.username || "Unnamed Employee"}
-                            </Option>
-                          ))
-                        ) : (
-                          <Option value="" disabled>
-                            No Employees Available
-                          </Option>
-                        )}
-                      </Select>
+                       <Select
+                       style={{ width: "100%" }}
+                       {...field}
+                       placeholder="Select Employee"
+                       loading={!filteredEmpDataa}
+                       value={form.values.employee}
+                       onChange={(value) => form.setFieldValue("employee", value)}
+                       onBlur={() => form.setFieldTouched("employee", true)}
+                     >
+                       {filteredEmpDataa && filteredEmpDataa.length > 0 ? (
+                         filteredEmpDataa.map((emp) => (
+                           <Option key={emp.id} value={emp.id}>
+                             {emp.username || "Unnamed Employee"}
+                           </Option>
+                         ))
+                       ) : (
+                         <Option value="" disabled>
+                           No Employees Available
+                         </Option>
+                       )}
+                     </Select>
                     )}
                   </Field>
                   <ErrorMessage

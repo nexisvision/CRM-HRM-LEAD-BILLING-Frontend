@@ -26,6 +26,8 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
   const allplandata = useSelector((state) => state.Plan);
   const fnsfdtaf = allplandata.Plan;
 
+  console.log(fnsfdtaf, "fnsfdtaf");
+
   // Fetch plan data when component is mounted
   useEffect(() => {
     dispatch(GetPlan());

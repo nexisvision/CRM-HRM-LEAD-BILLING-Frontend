@@ -215,8 +215,8 @@ const EmployeeList = () => {
             <span className="">View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
-      <Menu.Item>
+      </Menu.Item> */}
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""

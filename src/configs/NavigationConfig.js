@@ -88,7 +88,7 @@ const extraNavvTree = [
             path: `${APP_PREFIX_PATH}/hrm/employee`,
             title: 'Employee',
             icon: IdcardOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
           {
@@ -96,7 +96,7 @@ const extraNavvTree = [
             path: `${APP_PREFIX_PATH}/hrm/payroll`, 
             title: 'PayRoll',
             icon: PoundOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: [
               {
                 key: 'extra-hrm-payroll-salary',
@@ -114,7 +114,7 @@ const extraNavvTree = [
             path: `${APP_PREFIX_PATH}/hrm/performance`,
             title: 'Performance',
             icon: BarChartOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: [
               {
                 key: 'extra-hrm-performance-indicator',
@@ -140,7 +140,7 @@ const extraNavvTree = [
             path: `${APP_PREFIX_PATH}/hrm/role`,
             title: 'Role',
             icon: CrownOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
           {
@@ -148,7 +148,7 @@ const extraNavvTree = [
             path: `${APP_PREFIX_PATH}/hrm/branch`,
             title: 'Branch',
             icon: BranchesOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
          
@@ -157,7 +157,7 @@ const extraNavvTree = [
             path: `${APP_PREFIX_PATH}/hrm/designation`,
             title: 'Designation',
             icon: SolutionOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
           {
@@ -165,7 +165,7 @@ const extraNavvTree = [
             path: `${APP_PREFIX_PATH}/hrm/department`,
             title: 'Department',
             icon: BankOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
          
@@ -212,7 +212,7 @@ const extraNavvTree = [
             path: `${APP_PREFIX_PATH}/hrm/meeting`,
             title: 'Meeting',
             icon: AppstoreOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
           {
@@ -220,7 +220,7 @@ const extraNavvTree = [
             path: `${APP_PREFIX_PATH}/hrm/announcement`,
             title: 'Announcement',
             icon: FireOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
           {
@@ -289,7 +289,7 @@ const extraNavvTree = [
         path: `${APP_PREFIX_PATH}/hrm/document`,
         title: 'Document',
         icon: PaperClipOutlined ,
-        breadcrumb: false,
+        breadcrumb: true,
         submenu: []
       },
       {
@@ -297,7 +297,7 @@ const extraNavvTree = [
         path: `${APP_PREFIX_PATH}/hrm/trainingSetup`,
         title: 'TrainingSetup',
         icon: CrownOutlined,
-        breadcrumb: false,
+        breadcrumb: true,
         submenu: []
       },
 
@@ -497,7 +497,7 @@ const dashBoardNavTree = [{
   path: `${APP_PREFIX_PATH}/dashboards`,
   title: 'CRM',
   icon: DashboardOutlined,
-  breadcrumb: false,
+  breadcrumb: true,
   isGroupTitle: true,
   submenu: [
     {
@@ -505,7 +505,7 @@ const dashBoardNavTree = [{
       path: `${APP_PREFIX_PATH}/dashboards/default`,  
       title: 'Contacts',
       icon: DashboardOutlined,
-      breadcrumb: false,
+      breadcrumb: true,
       submenu: []
     },
     {
@@ -513,7 +513,7 @@ const dashBoardNavTree = [{
       path: `${APP_PREFIX_PATH}/dashboards/analytic`,
       title: 'sidenav.dashboard.analytic',
       icon: DotChartOutlined,
-      breadcrumb: false,
+      breadcrumb: true,
       submenu: []
     },
     // {
@@ -525,12 +525,19 @@ const dashBoardNavTree = [{
     //   submenu: []
 
     // },
-   
+    {
+      key: 'extra-pages-profile',
+      path: `${APP_PREFIX_PATH}/pages/profile`,
+      title: 'Dashboard',
+      icon: FileDoneOutlined,
+      breadcrumb: true,
+      submenu: []
+    },
 
     {
             key: 'dashboards-project',
             path: `${APP_PREFIX_PATH}/dashboards/project`,
-            title: 'project',
+            title: 'Project',
             icon: BulbOutlined,
             breadcrumb: true,
             submenu: [
@@ -539,7 +546,7 @@ const dashBoardNavTree = [{
                 path: `${APP_PREFIX_PATH}/dashboards/project/list`,
                 title: 'Projects',
                 icon: FundProjectionScreenOutlined,
-                breadcrumb: false,
+                breadcrumb: true,
                 submenu: []
               },
           
@@ -548,7 +555,7 @@ const dashBoardNavTree = [{
                 path: `${APP_PREFIX_PATH}/dashboards/project/contract`,
                 title: 'Contract',
                 icon: SnippetsOutlined,
-                breadcrumb: false,
+                breadcrumb: true,
                 submenu: []
               },
             
@@ -567,7 +574,7 @@ const dashBoardNavTree = [{
                 path: `${APP_PREFIX_PATH}/dashboards/sales/customer`,
                 title: 'Customer',
                 icon: UsergroupDeleteOutlined,
-                breadcrumb: false,
+                breadcrumb: true,
                 submenu: []
               },
               {
@@ -575,7 +582,7 @@ const dashBoardNavTree = [{
                 path: `${APP_PREFIX_PATH}/dashboards/sales/invoice`,
                 title: 'Invoice',
                 icon: FundProjectionScreenOutlined,
-                breadcrumb: false,
+                breadcrumb: true,
                 submenu: []
               },
               {
@@ -583,7 +590,7 @@ const dashBoardNavTree = [{
                 path: `${APP_PREFIX_PATH}/dashboards/sales/billing`,
                 title: 'Billing',
                 icon: EuroCircleOutlined,
-                breadcrumb: false,
+                breadcrumb: true,
                 submenu: []
               },
              
@@ -592,7 +599,7 @@ const dashBoardNavTree = [{
                 path: `${APP_PREFIX_PATH}/dashboards/sales/revenue`,
                 title: 'Revenue',
                 icon: DollarOutlined,
-                breadcrumb: false,
+                breadcrumb: true,
                 submenu: []
               },
               {
@@ -600,7 +607,7 @@ const dashBoardNavTree = [{
                 path: `${APP_PREFIX_PATH}/dashboards/sales/estimates`,
                 title: 'Estimates',
                 icon: RiseOutlined,
-                breadcrumb: false,
+                breadcrumb: true,
                 submenu: []
               },
              
@@ -609,7 +616,7 @@ const dashBoardNavTree = [{
                 path: `${APP_PREFIX_PATH}/dashboards/sales/creditnotes`,
                 title: 'Credit Notes',
                 icon: EuroCircleOutlined,
-                breadcrumb: false,
+                breadcrumb: true,
                 submenu: []
               },
             ]
@@ -626,9 +633,9 @@ const dashBoardNavTree = [{
           {
             key: 'dashboards-leadcards',
             path: `${APP_PREFIX_PATH}/dashboards/leadcards`,
-            title: 'LeadCards',
+            title: 'Lead Cards',
             icon: RiseOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
           {
@@ -636,7 +643,7 @@ const dashBoardNavTree = [{
             path: `${APP_PREFIX_PATH}/dashboards/lead`,
             title: 'Leads',
             icon: RiseOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
           {
@@ -644,7 +651,7 @@ const dashBoardNavTree = [{
             path: `${APP_PREFIX_PATH}/dashboards/deal`,
             title: 'Deals',
             icon: FundProjectionScreenOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
           {
@@ -652,7 +659,7 @@ const dashBoardNavTree = [{
             path: `${APP_PREFIX_PATH}/dashboards/proposal`,
             title: 'Proposal',
             icon: FundProjectionScreenOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
           {
@@ -660,7 +667,7 @@ const dashBoardNavTree = [{
             path: `${APP_PREFIX_PATH}/dashboards/task`,
             title: 'Task',
             icon: BugOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
           {
@@ -668,7 +675,7 @@ const dashBoardNavTree = [{
             path: `${APP_PREFIX_PATH}/dashboards/taskcalendar`,
             title: 'Task Calendar',
             icon: CalendarOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
           {
@@ -676,7 +683,7 @@ const dashBoardNavTree = [{
             path: `${APP_PREFIX_PATH}/dashboards/systemsetup`,
             title: 'CRM System Setup',
             icon: BugOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
           
@@ -685,7 +692,7 @@ const dashBoardNavTree = [{
             path: `${APP_PREFIX_PATH}/dashboards/mail/inbox`,
             title: 'Mail',
             icon: MailOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
        
@@ -694,7 +701,7 @@ const dashBoardNavTree = [{
             path: `${APP_PREFIX_PATH}/dashboards/chat`,
             title: 'chat',
             icon: MessageOutlined,
-            breadcrumb: false,
+            breadcrumb: true,
             submenu: []
           },
           {
@@ -723,14 +730,7 @@ const dashBoardNavTree = [{
                 breadcrumb: true,
                 submenu: []
               },
-              {
-                key: 'extra-pages-profile',
-                path: `${APP_PREFIX_PATH}/pages/profile`,
-                title: 'sidenav.pages.profile',
-                icon: FileDoneOutlined,
-                breadcrumb: true,
-                submenu: []
-              },
+              
 
             
             ]

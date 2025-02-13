@@ -101,7 +101,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
     dispatch(Deletejobs(userId));
     dispatch(GetJobdata());
     setUsers(list.filter((item) => item.id !== userId));
-    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
 
   const exportToExcel = () => {
@@ -204,7 +204,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -229,7 +229,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
             <span className="">Send Mail</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
     
     
 

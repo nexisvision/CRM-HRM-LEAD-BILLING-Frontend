@@ -7,14 +7,14 @@ import CommissionList from './CommissionList';
 // import InnerAppLayout from 'layouts/inner-app-layout';
 // import EditEmployee from './EditEmployee';
 
-const Commission = () => (
+const Commission = ({ id, onClose }) => (
 	// <Routes>
 	// 	<Route path="*" element={<Navigate to="employee" replace />} />
 	// </Routes>
 
 <div className="mail">
 
-<CommissionList />
+<CommissionList id={id} onClose={onClose} />
     {/* // mainContent={<AddEmployee {...this.props}/>} */}
 
 

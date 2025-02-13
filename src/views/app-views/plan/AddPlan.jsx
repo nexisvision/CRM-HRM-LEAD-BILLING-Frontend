@@ -105,7 +105,7 @@ const AddPlan = ({ onClose }) => {
   const initialValues = {
     name: '',
     price: '',
-    duration: 'Lifetime',
+    duration: '',
     max_users: '',
     max_customers: '',
     max_vendors: '',
@@ -124,12 +124,12 @@ const AddPlan = ({ onClose }) => {
         dispatch(GetPlan());
         onClose();
         setIsTrialEnabled(false);
-        message.success('Plan added successfully!');
+        // message.success('Plan added successfully!');
         resetForm();
         navigate('/app/superadmin/plan');
       })
       .catch((error) => {
-        message.error('Failed to add plan.');
+        // message.error('Failed to add plan.');
         console.error('Add API error:', error);
       });
   };

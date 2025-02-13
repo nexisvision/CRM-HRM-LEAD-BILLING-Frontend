@@ -26,13 +26,21 @@ import { empdata } from "../../Employee/EmployeeReducers/EmployeeSlice";
 const SalaryList = () => {
   const [users, setUsers] = useState(userData);
   const [list, setList] = useState(userData);
+  const [id, setId] = useState(null);
 
+const [userId, setUserId] = useState(null);
   const dispatch = useDispatch();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddSalaryModalVisible, setIsAddSalaryModalVisible] = useState(false);
-  const navigate = useNavigate();
   const [isSetSalaryModalVisible, setIsSetSalaryModalVisible] = useState(false);
+
+  const navigate = useNavigate();
+  // const [isSetSalaryModalVisible, setIsSetSalaryModalVisible] = useState(false);
+  const openSetSalaryModal = () => setIsSetSalaryModalVisible(true);
+  const closeSetSalaryModal = () => setIsSetSalaryModalVisible(false);
+
+
 
   useEffect(() => {
     dispatch(getSalaryss());
@@ -88,12 +96,24 @@ const SalaryList = () => {
     setIsAddSalaryModalVisible(true);
   };
 
-  const handleSetSalary = () => {
-    navigate("/app/hrm/payroll/salary/setsalary", {
-      state: { user: selectedUser },
-    }); // Pass user data as state if needed
-  };
+  // const handleSetSalary = () => {
+  //   navigate("/app/hrm/payroll/salary/setsalary", {
+  //     state: { user: selectedUser },
+  //   }); // Pass user data as state if needed
+  // };
 
+
+  const openSetSalaryModall = (id) => {
+    setId(id); // Store selected user object
+    console.log("userId",id);
+    openSetSalaryModal();
+  };
+  
+  // Close Set Salary Modal
+  // const closeSetSalaryModal = () => {
+  //   setUserId(null);
+  //   setIsSetSalaryModalVisible(false);
+  // };
 
 
   // Close Add Salary Modal
@@ -102,16 +122,16 @@ const SalaryList = () => {
   };
 
   // Open Set Salary Modal
-  const openSetSalaryModal = (user) => {
-    setSelectedUser(user);
-    setIsSetSalaryModalVisible(true);
-  };
+  // const openSetSalaryModal = (user) => {
+  //   setSelectedUser(user);
+  //   setIsSetSalaryModalVisible(true);
+  // };
 
-  // Close Set Salary Modal
-  const closeSetSalaryModal = () => {
-    setSelectedUser(null);
-    setIsSetSalaryModalVisible(false);
-  };
+  // // Close Set Salary Modal
+  // const closeSetSalaryModal = () => {
+  //   setSelectedUser(null);
+  //   setIsSetSalaryModalVisible(false);
+  // };
 
   // Search functionality
   const onSearch = (e) => {
@@ -131,7 +151,7 @@ const SalaryList = () => {
 
   const dropdownMenu = (user) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Button
           type="text"
           icon={<EyeOutlined />}
@@ -139,7 +159,7 @@ const SalaryList = () => {
         >
           View Details
         </Button>
-      </Menu.Item>
+      </Menu.Item> */}
       {/* <Menu.Item>
         <Button type="text" icon={<EyeOutlined />} onClick={() => openSetSalaryModal(user)}>
           Set Salary
@@ -151,7 +171,7 @@ const SalaryList = () => {
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
                             <Menu.Item>
-                            <Button type="text" icon={<EyeOutlined />} onClick={handleSetSalary}>
+                            <Button type="text" icon={<EyeOutlined />} onClick={ () => openSetSalaryModall(user.employeeId)}>
                               Set Salary
                             </Button>
                           </Menu.Item>
@@ -251,7 +271,7 @@ const SalaryList = () => {
         footer={null}
         width={1900}
       >
-        <SetSalary onClose={closeSetSalaryModal} />
+        <SetSalary id={id} onClose={closeSetSalaryModal} />
       </Modal>
     </Card>
   );

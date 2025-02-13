@@ -28,7 +28,7 @@ import {
   getotherpay,
 } from "./otherpaymentReducer/otherpaymentSlice";
 
-const OtherPaymentList = () => {
+const OtherPaymentList = ({ id, onClose }) => {
   const [salaryData, setSalaryData] = useState(employeeSalaryData); // Salary data
   const [isModalVisible, setIsModalVisible] = useState(false); // Add Salary Modal
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Selected rows for batch actions
@@ -77,11 +77,11 @@ const OtherPaymentList = () => {
   // Dropdown menu for action options
   const dropdownMenu = (record) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Button type="text" icon={<EyeOutlined />} size="small">
           View Details
         </Button>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item>
         <Button
           type="text"
@@ -175,7 +175,7 @@ const OtherPaymentList = () => {
         footer={null}
         width={800}
       >
-        <AddOtherPayment onClose={closeModal} />
+        <AddOtherPayment id={id} onClose={closeModal} />
       </Modal>
     </Card>
   );

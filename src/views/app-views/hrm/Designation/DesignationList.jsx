@@ -171,13 +171,13 @@ const DesignationList = () => {
         </Flex>
       </Menu.Item> */}
       
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button type="" icon={<PushpinOutlined />} onClick={() => { showUserProfile(elm) }} size="small">
             <span className="ml-2">Pin</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
      
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (

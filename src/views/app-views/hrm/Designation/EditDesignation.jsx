@@ -66,6 +66,7 @@ const EditDesignation = ({ id, onClose }) => {
       <Formik
         initialValues={{
           designation_name: singleEmp ? singleEmp.designation_name : "",
+          branch: singleEmp ? singleEmp.branch : "",
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}

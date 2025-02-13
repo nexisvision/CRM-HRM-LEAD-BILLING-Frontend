@@ -11,8 +11,8 @@ import {
   Col,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
-import { Field, ErrorMessage } from "formik";
-import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
+import { Field, ErrorMessage, Formik } from "formik";
+import { UploadOutlined } from "@ant-design/icons";
 import moment from "moment";
 import TextArea from "antd/es/input/TextArea";
 import { useSelector } from "react-redux";
@@ -41,9 +41,19 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
     const loggedusername = useSelector((state)=>state.user.loggedInUser.username);
   
   
+    const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
+    const fndbranchdata = branchData.filter((item) => item.created_by === loggedusername);
+
     const fnddepart =  departmentData.filter((item)=>item.created_by === loggedusername);
     const fnddesi = designationData.filter((item)=>item.created_by === loggedusername);
   
+    
+  const [selectedBranch, setSelectedBranch] = useState(null);
+
+  // Filter departments and designations based on selected branch
+  const filteredDepartments = fnddepart.filter((dept) => dept.branch === selectedBranch);
+  const filteredDesignations = fnddesi.filter((des) => des.branch === selectedBranch);
+
 
   const countries = useSelector((state) => state.countries.countries);
   
@@ -175,7 +185,20 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
 
   return (
     <div className="edit-employee">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+       <Formik
+        initialValues={initialValues}
+        // validationSchema={validationSchema}
+        // onSubmit={onSubmit}
+      >
+        {({
+          isSubmitting,
+          resetForm,
+          values,
+          setFieldValue,
+          handleSubmit,
+          setFieldTouched,
+        }) => (
+      // <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
 
       <Form
         layout="vertical"
@@ -187,7 +210,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
       >
         {/* User Information */}
         <h1 className="text-lg font-bold mb-3">Personal Information</h1>
-
+        
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
@@ -353,7 +376,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
                   </Upload>
                 </Form.Item>
               </Col>
-        <Col span={8} className="mt-2">
+        {/* <Col span={8} className="mt-2">
             <Form.Item
               name="department"
               label="Department"
@@ -388,6 +411,82 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
                 ))}
               </Select>
             </Form.Item>
+            </Col> */}
+          <Col span={12}>
+            <div className="form-item">
+              <label className="font-semibold">Branch</label>
+              <Field name="branch">
+                {({ field }) => (
+                  <Select
+                  {...field}
+                  className="w-full mt-1"
+                  placeholder="Select Branch"
+                  onChange={(value) => {
+                    const selectedBranchObj = fndbranchdata.find(branch => branch.id === value);
+                    setFieldValue("branch", selectedBranchObj ? selectedBranchObj.branchName : ""); // Store branch name
+                    setSelectedBranch(value); // Store branch ID for filtering
+                  }}
+                >
+                  {fndbranchdata.map((branch) => (
+                    <Option key={branch.id} value={branch.id}>
+                      {branch.branchName} {/* Display branch name */}
+                    </Option>
+                  ))}
+                </Select>
+                )}
+              </Field>
+              <ErrorMessage name="branch" component="div" className="text-red-500" />
+            </div>
+          </Col>
+
+          {/* Department Selection */}
+          <Col span={12}>
+            <div className="form-item">
+              <label className="font-semibold">Department</label>
+              <Field name="department">
+                {({ field }) => (
+                  <Select
+                    {...field}
+                    className="w-full mt-1"
+                    placeholder="Select Department"
+                    disabled={!selectedBranch}
+                    onChange={(value) => setFieldValue("department", value)}
+                  >
+                    {filteredDepartments.map((dept) => (
+                      <Option key={dept.id} value={dept.id}>
+                        {dept.department_name}
+                      </Option>
+                    ))}
+                  </Select>
+                )}
+              </Field>
+              <ErrorMessage name="department" component="div" className="text-red-500" />
+            </div>
+          </Col>
+
+          {/* Designation Selection */}
+          <Col span={12}>
+            <div className="form-item">
+              <label className="font-semibold">Designation</label>
+              <Field name="designation">
+                {({ field }) => (
+                  <Select
+                    {...field}
+                    className="w-full mt-1"
+                    placeholder="Select Designation"
+                    disabled={!selectedBranch}
+                    onChange={(value) => setFieldValue("designation", value)}
+                  >
+                    {filteredDesignations.map((des) => (
+                      <Option key={des.id} value={des.id}>
+                        {des.designation_name}
+                      </Option>
+                    ))}
+                  </Select>
+                )}
+              </Field>
+              <ErrorMessage name="designation" component="div" className="text-red-500" />
+            </div>
           </Col>
           
 
@@ -447,6 +546,8 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
           </Button>
         </Form.Item>
       </Form>
+         )}
+      </Formik>
 
     </div>
   );

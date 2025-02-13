@@ -28,7 +28,7 @@ import {
   getovertimess,
 } from "./overtimeReducer/overtimeSlice";
 
-const OvertimeList = () => {
+const OvertimeList = ({ id, onClose }) => {
   const [salaryData, setSalaryData] = useState(employeeSalaryData);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -75,11 +75,11 @@ const OvertimeList = () => {
   // Dropdown menu for action options
   const dropdownMenu = (record) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Button type="text" icon={<EyeOutlined />} size="small">
           View Details
         </Button>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item>
         <Button
           type="text"
@@ -172,7 +172,7 @@ const OvertimeList = () => {
         footer={null}
         width={800}
       >
-        <AddOvertime onClose={closeModal} />
+        <AddOvertime id={id} onClose={closeModal} />
       </Modal>
     </Card>
   );

@@ -28,7 +28,7 @@ import {
   getdeducati,
 } from "./deducationReducer/deducationSlice";
 
-const SaturationDeductionList = () => {
+const SaturationDeductionList = ({ id, onClose }) => {
   const dispatch = useDispatch();
   const [salaryData, setSalaryData] = useState(employeeSalaryData); // Salary data
   const [isModalVisible, setIsModalVisible] = useState(false); // Add Salary Modal
@@ -77,11 +77,11 @@ const SaturationDeductionList = () => {
   // Dropdown menu for action options
   const dropdownMenu = (record) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Button type="text" icon={<EyeOutlined />} size="small">
           View Details
         </Button>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item>
         <Button
           type="text"
@@ -180,7 +180,7 @@ const SaturationDeductionList = () => {
         footer={null}
         width={800}
       >
-        <AddSaturationDeduction onClose={closeModal} />
+        <AddSaturationDeduction id={id} onClose={closeModal} />
       </Modal>
     </Card>
   );

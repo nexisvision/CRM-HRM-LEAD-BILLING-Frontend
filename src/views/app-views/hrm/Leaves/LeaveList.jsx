@@ -114,9 +114,9 @@ const LeaveList = () => {
 
       setUsers(users.filter((item) => item.id !== userId));
 
-      // message.success({ content: "Deleted user successfully", duration: 2 });
+      message.success({ content: "Deleted leave successfully", duration: 2 });
     } catch (error) {
-      // message.error({ content: 'Failed to delete user', duration: 2 });
+      message.error({ content: 'Failed to delete leave', duration: 2 });
       console.error("Error deleting user:", error);
     }
   };

@@ -25,7 +25,7 @@ import utils from "utils";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteloans, getloans } from "./loanReducer/loanSlice";
 
-const LoanList = () => {
+const LoanList = ({ id, onClose }) => {
   const [salaryData, setSalaryData] = useState(employeeSalaryData); // Salary data
   const [isModalVisible, setIsModalVisible] = useState(false); // Add Salary Modal
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); // Selected rows for batch actions
@@ -74,11 +74,11 @@ const LoanList = () => {
   // Dropdown menu for action options
   const dropdownMenu = (record) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Button type="text" icon={<EyeOutlined />} size="small">
           View Details
         </Button>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item>
         <Button
           type="text"
@@ -176,7 +176,7 @@ const LoanList = () => {
         footer={null}
         width={800}
       >
-        <AddLoan onClose={closeModal} />
+        <AddLoan id={id} onClose={closeModal} />
       </Modal>
     </Card>
   );

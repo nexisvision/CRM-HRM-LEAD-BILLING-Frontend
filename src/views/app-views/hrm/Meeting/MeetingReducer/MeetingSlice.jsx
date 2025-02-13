@@ -140,11 +140,11 @@ const MeetingSlice = createSlice({
       })
       .addCase(AddMeet.fulfilled, (state, action) => {
         state.isLoading = false;
-        message.success(action.payload?.message);
+        // message.success(action.payload?.message);
       })
       .addCase(AddMeet.rejected, (state, action) => {
         state.isLoading = false;
-        message.error(action.payload?.message);
+        // message.error(action.payload?.message);
       })
 
       .addCase(MeetData.pending, (state) => {
@@ -166,11 +166,11 @@ const MeetingSlice = createSlice({
       })
       .addCase(deleteM.fulfilled, (state, action) => {
         state.isLoading = false;
-        message.success(action.payload?.message);
+        // message.success(action.payload?.message);
       })
       .addCase(deleteM.rejected, (state, action) => {
         state.isLoading = false;
-        message.error(action.payload?.message);
+        // message.error(action.payload?.message);
       })
 
       //update
@@ -181,13 +181,13 @@ const MeetingSlice = createSlice({
       .addCase(EditMeet.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload;
-        message.success(action.payload?.message);
+        // message.success(action.payload?.message);
       })
 
       .addCase(EditMeet.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-        message.error(action.payload?.message);
+        // message.error(action.payload?.message);
       });
   },
 });

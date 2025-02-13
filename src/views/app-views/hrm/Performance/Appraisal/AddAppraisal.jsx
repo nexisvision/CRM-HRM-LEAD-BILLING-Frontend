@@ -22,6 +22,10 @@ const AddAppraisal = ({ onClose }) => {
   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
   const fndbranchdata = branchData.filter((item) => item.created_by === user);
 
+
+  const [selectedBranch, setSelectedBranch] = useState(null);
+
+
   // const employeeData = useSelector((state) => state.employee?.employee?.data || []);
 
   const employeeData = useSelector((state) => 
@@ -31,6 +35,9 @@ const AddAppraisal = ({ onClose }) => {
   const { data: employeee } = useSelector((state) => state.employee.employee);
 
   const employee = employeee.filter((item) => item.created_by === user);
+console.log("sdfsdf",selectedBranch );
+
+  const filteredEmployees = employee.filter((emp) => emp.branch === selectedBranch);
 
   useEffect(() => {
     dispatch(getBranch());
@@ -86,13 +93,19 @@ const AddAppraisal = ({ onClose }) => {
         <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
 
         <Row gutter={16}>
-          <Col span={12}>
+        <Col span={12}>
             <Form.Item
               name="branch"
               label="Branch"
               rules={[{ required: true, message: 'Please select a branch' }]}
             >
-              <Select placeholder="Select Branch">
+              <Select
+                placeholder="Select Branch"
+                onChange={(value) => {
+                  setSelectedBranch(value);
+                  form.setFieldsValue({ employee: "" }); // Reset department & designation
+                }}
+              >
                 {fndbranchdata.map((branch) => (
                   <Option key={branch.id} value={branch.id}>
                     {branch.branchName}
@@ -110,25 +123,12 @@ const AddAppraisal = ({ onClose }) => {
               label="Employee"
               rules={[{ required: true, message: 'Please select a employee' }]}
             >
-              <Select
-                className="w-full"
-                placeholder="Select Employee"
-                onChange={(value) => {
-                  const selectedEmployee =
-                    Array.isArray(employee) &&
-                    employee.find((e) => e.id === value);
-                  form.setFieldValue(
-                    "employee",
-                    selectedEmployee?.username || ""
-                  );
-                }}
-              >
-                {Array.isArray(employee) &&
-                  employee.map((emp) => (
-                    <Option key={emp.id} value={emp.id}>
-                      {emp.username}
-                    </Option>
-                  ))}
+              <Select placeholder="Select Employee" disabled={!selectedBranch}>
+                {filteredEmployees.map((emp) => (
+                  <Option key={emp.id} value={emp.id}>
+                    {emp.username}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>

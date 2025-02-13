@@ -7,7 +7,7 @@ import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeS
 import { Option } from "antd/es/mentions";
 import { adddeducati, getdeducati } from "./deducationReducer/deducationSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
-const AddSaturationDeduction = ({ onClose }) => {
+const AddSaturationDeduction = ({ id, onClose }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -15,14 +15,15 @@ const AddSaturationDeduction = ({ onClose }) => {
   }, [dispatch]);
 
   const alldataemp = useSelector((state) => state.employee);
-  const fnddata = alldataemp.employee.data;
+  const fnddata = alldataemp.employee?.data || [];
+  const filteredEmployees = fnddata?.filter((employee) => employee.id === id);
 
   useEffect(() => {
     dispatch(getcurren());
   }, [dispatch]);
 
   const allempdatass = useSelector((state) => state.currencies);
-  const fnddatass = allempdatass?.currencies;
+  const fnddatass = allempdatass?.currencies?.data;
 
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
     dispatch(adddeducati(values))
@@ -69,8 +70,8 @@ const AddSaturationDeduction = ({ onClose }) => {
                       onChange={(value) => setFieldValue("employeeId", value)}
                       value={values.employeeId}
                     >
-                      {fnddata && fnddata.length > 0 ? (
-                        fnddata.map((client) => (
+                      {filteredEmployees && filteredEmployees.length > 0 ? (
+                        filteredEmployees.map((client) => (
                           <Option key={client.id} value={client.id}>
                             {client.firstName ||
                               client.username ||
@@ -171,7 +172,7 @@ const AddSaturationDeduction = ({ onClose }) => {
             <div>
               <label className="font-semibold">Amount</label>
               <Field name="amount">
-                {({ field }) => <Input {...field} placeholder="Enter Amount" />}
+                {({ field }) => <Input {...field} placeholder="Enter Amount" type="number" />}
               </Field>
               <ErrorMessage
                 name="amount"

@@ -351,12 +351,12 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const ProfileData = () => {
 
 	const dispatch = useDispatch();
-    const [tasks, setTasks] = useState([
-        { id: 1, task: "March Hare moved.", status: "To Do", dueDate: "Sun 06 Oct 2024" },
-        { id: 2, task: "This seemed to be.", status: "Doing", dueDate: "Fri 28 Jun 2024" },
-        { id: 3, task: "Mock Turtle, and.", status: "Doing", dueDate: "Fri 11 Oct 2024" },
-        { id: 4, task: "The moment Alice.", status: "Doing", dueDate: "Wed 14 Feb 2024" },
-    ]);
+    // const [tasks, setTasks] = useState([
+    //     { id: 1, task: "March Hare moved.", status: "To Do", dueDate: "Sun 06 Oct 2024" },
+    //     { id: 2, task: "This seemed to be.", status: "Doing", dueDate: "Fri 28 Jun 2024" },
+    //     { id: 3, task: "Mock Turtle, and.", status: "Doing", dueDate: "Fri 11 Oct 2024" },
+    //     { id: 4, task: "The moment Alice.", status: "Doing", dueDate: "Wed 14 Feb 2024" },
+    // ]);
     // State for managing profile data
     const [openTasks, setOpenTasks] = useState(4);
     const [projects, setProjects] = useState(2);
@@ -605,7 +605,7 @@ const taskfilter = taskdata?.filter((item)=>item?.created_by === loggeddatass)
                 <table className="w-full  ">
                     <thead>
                         <tr>
-                            <th className="border-b p-2 text-center">created_by</th>
+                            {/* <th className="border-b p-2 text-center">created_by</th> */}
                             <th className="border-b p-2 text-center">Task Name</th>
                             <th className="border-b p-2 text-center">Status</th>
                             <th className="border-b p-2 text-center"> description</th>
@@ -614,7 +614,7 @@ const taskfilter = taskdata?.filter((item)=>item?.created_by === loggeddatass)
                     <tbody>
                         {filterdtaa?.map((task) => (
                             <tr key={task.id} className="hover:bg-gray-100">
-                                <td className="border-b p-2 text-center">{task?.created_by}</td>
+                                {/* <td className="border-b p-2 text-center">{task?.created_by}</td> */}
                                 <td className="border-b p-2 text-center">{task?.taskName}</td>
                                 <td className="border-b p-2 flex items-center justify-center">
                                     <span
@@ -641,16 +641,22 @@ const taskfilter = taskdata?.filter((item)=>item?.created_by === loggeddatass)
                         <thead className="border-b">
                             <tr>
                                 <th className=" p-2 text-center">Tickets</th>
-                                <th className=" p-2 text-center">Ticket Subject</th>
+                                <th className="p-2 text-center">Project</th>
+                                {/* <th className=" p-2 text-center">Ticket Subject</th> */}
                                 <th className=" p-2 text-center">Status</th>
-                                <th className=" p-2 text-center">Requested On </th>
+                                <th className=" p-2 text-center">Priority</th>
+                                <th className=" p-2 text-center">Description</th>
+                                {/* <th className=" p-2 text-center">Requested On </th> */}
                             </tr>
                         </thead>
 						<tbody>
-                        {taskfilter?.map((task) => (
+                        {filterdtaa?.map((task) => (
                             <tr key={task.id} className="hover:bg-gray-100">
-                                <td className="border-b p-2 text-center">{task?.created_by}</td>
-                                <td className="border-b p-2 text-center">{task?.taskName}</td>
+                                <td className="border-b p-2 text-center">{task?.ticketSubject}</td>
+
+                                <td className="border-b p-2 text-center">{task?.project}</td>
+                                <td className="border-b p-2 text-center">{task?.status}</td>
+                                {/* <td className="border-b p-2 text-center">{task?.taskName}</td> */}
                                 <td className="border-b p-2 flex items-center justify-center">
                                     <span
                                         className={`inline-block rounded-full w-4 h-4  ${task?.priority === "To Do"
@@ -663,6 +669,7 @@ const taskfilter = taskdata?.filter((item)=>item?.created_by === loggeddatass)
                                         {task?.priority}
                                     </span>
                                 </td>
+
                                 <td className="border-b p-2 text-center">{task?.description}</td>
                             </tr>
                         ))}

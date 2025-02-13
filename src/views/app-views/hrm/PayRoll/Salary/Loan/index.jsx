@@ -2,11 +2,11 @@ import React from 'react';
 
 import LoanList from './LoanList';
 
-const Loan = () => (
+const Loan = ({ id, onClose }) => (
 
 <div className="mail">
 
-<LoanList />
+<LoanList id={id} onClose={onClose} />
  
 </div>
 

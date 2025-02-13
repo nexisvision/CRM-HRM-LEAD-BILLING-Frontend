@@ -6,14 +6,14 @@ import AllowanceList from './AllowanceList';
 // import InnerAppLayout from 'layouts/inner-app-layout';
 // import EditEmployee from './EditEmployee';
 
-const Allowance = () => (
+const Allowance = ({ id, onClose }) => (
 	// <Routes>
 	// 	<Route path="*" element={<Navigate to="employee" replace />} />
 	// </Routes>
 
 <div className="mail">
 
-<AllowanceList />
+<AllowanceList id={id} onClose={onClose} />
     {/* // mainContent={<AddEmployee {...this.props}/>} */}
 
 

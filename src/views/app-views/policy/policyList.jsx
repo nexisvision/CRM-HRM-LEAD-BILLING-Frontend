@@ -236,11 +236,11 @@ const PolicyList = () => {
       ),
       sorter: (a, b) => a.description.length - b.description.length,
     },
-    {
-      title: "Created By",
-      dataIndex: "created_by",
-      sorter: (a, b) => a.created_by.length - b.created_by.length,
-    },
+    // {
+    //   title: "Created By",
+    //   dataIndex: "created_by",
+    //   sorter: (a, b) => a.created_by.length - b.created_by.length,
+    // },
     {
       title: "Action",
       dataIndex: "actions",

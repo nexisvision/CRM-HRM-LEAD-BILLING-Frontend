@@ -139,11 +139,11 @@ const JobSlice = createSlice({
       })
       .addCase(AddJobs.fulfilled, (state, action) => {
         state.isLoading = false;
-        message.success(action.payload?.message);
+        // message.success(action.payload?.message);
       })
       .addCase(AddJobs.rejected, (state, action) => {
         state.isLoading = false;
-        message.error(action.payload?.message);
+        // message.error(action.payload?.message);
       })
 
       .addCase(GetJobdata.pending, (state) => {
@@ -165,11 +165,11 @@ const JobSlice = createSlice({
       })
       .addCase(Deletejobs.fulfilled, (state, action) => {
         state.isLoading = false;
-        message.success(action.payload?.message);
+        // message.success(action.payload?.message);
       })
       .addCase(Deletejobs.rejected, (state, action) => {
         state.isLoading = false;
-        message.error(action.payload?.message);
+        // message.error(action.payload?.message);
       })
       //update
       .addCase(EditJobs.pending, (state) => {
@@ -179,12 +179,12 @@ const JobSlice = createSlice({
       .addCase(EditJobs.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload; // Update the state with the updated employee data
-        message.success(action.payload?.message);
+        // message.success(action.payload?.message);
       })
       .addCase(EditJobs.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-        message.error(action.payload?.message);
+        // message.error(action.payload?.message);
       });
   },
 });

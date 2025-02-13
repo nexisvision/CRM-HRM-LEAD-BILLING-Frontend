@@ -144,11 +144,11 @@ const LeaveSlice = createSlice({
             })
             .addCase(CreateL.fulfilled, (state, action) => {
                 state.isLoading = false;
-                message.success(action.payload?.message);
+                // message.success(action.payload?.message);
             })
             .addCase(CreateL.rejected, (state, action) => {
                 state.isLoading = false;
-                message.error(action.payload?.message);
+                // message.error(action.payload?.message);
             })
 
             .addCase(GetLeave.pending, (state) => {
@@ -170,12 +170,12 @@ const LeaveSlice = createSlice({
             })
             .addCase(DeleteLea.fulfilled, (state, action) => {
                 state.isLoading = false;
-                message.success(action.payload?.message);
+                // message.success(action.payload?.message);
             })
 
             .addCase(DeleteLea.rejected, (state, action) => {
                 state.isLoading = false;
-                message.error(action.payload?.message);
+                // message.error(action.payload?.message);
             })
             //update
 
@@ -186,12 +186,12 @@ const LeaveSlice = createSlice({
               .addCase(EditLeave.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
-                message.success(action.payload?.message);
+                // message.success(action.payload?.message);
               })
               .addCase(EditLeave.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-                message.error(action.payload?.message);
+                // message.error(action.payload?.message);
               });
     },
 });

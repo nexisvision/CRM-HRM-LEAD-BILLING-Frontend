@@ -11,7 +11,7 @@ import {
   Upload,
   Modal,
 } from "antd";
-import { CloudUploadOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+import { CloudUploadOutlined, PlusOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -21,7 +21,9 @@ import { useSelector, useDispatch } from "react-redux";
 // import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 import {
   AddLable,
+  AddLablee,
   GetLable,
+  GetLablee,
 } from "views/app-views/dashboards/project/milestone/LableReducer/LableSlice";
 import { AddJobs, GetJobdata } from "./JobReducer/JobSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
@@ -33,15 +35,21 @@ const { Option } = Select;
 const AddJob = ({ onClose }) => {
   const navigate = useNavigate();
   const [showReceiptUpload, setShowReceiptUpload] = useState(false);
+const [jobCategories, setJobCategories] = useState([]);
+const [jobSkills, setJobSkills] = useState([]);
+const [jobStatuses, setJobStatuses] = useState([]);
+const [isJobCategoryModalVisible, setIsJobCategoryModalVisible] = useState(false);
+const [isJobSkillModalVisible, setIsJobSkillModalVisible] = useState(false);
+const [isJobStatusModalVisible, setIsJobStatusModalVisible] = useState(false);
+const [newJobCategory, setNewJobCategory] = useState("");
+const [newJobSkill, setNewJobSkill] = useState("");
+const [newJobStatus, setNewJobStatus] = useState("");
 
   const { currencies } = useSelector((state) => state.currencies);
   const dispatch = useDispatch();
 
   const AllLoggeddtaa = useSelector((state) => state.user);
-  const [newTag, setNewTag] = useState("");
-  const [tags, setTags] = useState([]);
 
-  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
 
   useEffect(() => {
     dispatch(getcurren());
@@ -103,7 +111,7 @@ const AddJob = ({ onClose }) => {
       onClose();
     })
     // console.log("Submitted values:", transformedValues);
-    // message.success("Job added successfully!");
+    message.success("Job added successfully!");
     resetForm();
   };
 
@@ -112,53 +120,64 @@ const AddJob = ({ onClose }) => {
     GetLable(lid);
   }, []);
 
-  const fetchTags = async () => {
+
+  const fetchLabels = async (lableType, setter) => {
     try {
       const lid = AllLoggeddtaa.loggedInUser.id;
-      const response = await dispatch(GetLable(lid));
-
+      const response = await dispatch(GetLablee(lid));
+  
       if (response.payload && response.payload.data) {
-        const uniqueTags = response.payload.data
-          .filter((label) => label && label.name) // Filter out invalid labels
+        const uniqueLabels = response.payload.data
+          .filter((label) => label && label.name && label.lableType === lableType) // Filter by lableType
           .map((label) => ({
             id: label.id,
             name: label.name.trim(),
           }))
           .filter(
             (label, index, self) =>
-              index === self.findIndex((t) => t.name === label.name)
-          ); // Remove duplicates
-
-        setTags(uniqueTags);
+              index === self.findIndex((t) => t.name === label.name) // Remove duplicates
+          );
+  
+        setter(uniqueLabels);
       }
     } catch (error) {
-      console.error("Failed to fetch tags:", error);
-      message.error("Failed to load tags");
+      console.error(`Failed to fetch ${lableType}:`, error);
+      message.error(`Failed to load ${lableType}`);
     }
   };
+  
+  // Call the function for different label types when the component mounts
+  useEffect(() => {
+    fetchLabels("jobcategory", setJobCategories);
+    fetchLabels("jobskill", setJobSkills);
+    fetchLabels("jobstatus", setJobStatuses);
+  }, []);
 
-  const handleAddNewTag = async () => {
-    if (!newTag.trim()) {
-      message.error("Please enter a tag name");
+
+  const handleAddNewLabel = async (lableType, newValue, setter, modalSetter) => {
+    if (!newValue.trim()) {
+      message.error(`Please enter a ${lableType} name.`);
       return;
     }
-
+  
     try {
       const lid = AllLoggeddtaa.loggedInUser.id;
       const payload = {
-        name: newTag.trim(),
-      };
-
-      await dispatch(AddLable({ lid, payload }));
-      message.success("Tag added successfully");
-      setNewTag("");
-      setIsTagModalVisible(false);
-
-      // Fetch updated tags
-      await fetchTags();
+        name: newValue.trim(),
+        lableType, // Send the correct label type
+      };  
+  
+      await dispatch(AddLablee({ lid, payload }));
+      message.success(`${lableType} added successfully.`);
+      setter(""); // Reset input field
+      modalSetter(false); // Close modal
+  
+      // Re-fetch updated labels
+      await fetchLabels(lableType, lableType === "jobcategory" ? setJobCategories :
+        lableType === "jobskill" ? setJobSkills : setJobStatuses);
     } catch (error) {
-      console.error("Failed to add tag:", error);
-      message.error("Failed to add tag");
+      console.error(`Failed to add ${lableType}:`, error);
+      message.error(`Failed to add ${lableType}`);
     }
   };
   return (
@@ -189,106 +208,70 @@ const AddJob = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Job Category</label>
-                  <div className="flex gap-2">
-                    <Field name="category">
-                      {({ field, form }) => (
-                        <Select
-                          {...field}
-                          className="w-full"
-                          placeholder="Select or add new category"
-                          onChange={(value) => {
-                            form.setFieldValue("category", value);
-                          }}
-                          onBlur={() => form.setFieldTouched("category", true)}
-                          dropdownRender={(menu) => (
-                            <div>
-                              {menu}
-                              <div
-                                style={{
-                                  padding: "8px",
-                                  borderTop: "1px solid #e8e8e8",
-                                }}
-                              >
-                                <Button
-                                  type="link"
-                                  //   icon={<PlusOutlined />}
-                                  onClick={() => setIsTagModalVisible(true)}
-                                  block
-                                >
-                                  Add New Category 
-                                </Button>
-                              </div>
-                            </div>
-                          )}
-                        >
-                          {tags.map((tag) => (
-                            <Option key={tag.id} value={tag.name}>
-                              {tag.name}
-                            </Option>
-                          ))}
-                        </Select>
-                      )}
-                    </Field>
-                  </div>
-                  <ErrorMessage
-                    name="category"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              <Col span={12}>
-                <div className="form-item mt-2">
-                  <label className="font-semibold">Skill</label>
-                  <Field name="skill">
-                    {({ field, form }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-2"
-                        placeholder="Select or add new skill"
-                        onChange={(value) => {
-                          form.setFieldValue("skill", value);
-                        }}
-                        onBlur={() => form.setFieldTouched("skill", true)}
-                        dropdownRender={(menu) => (
-                          <div>
-                            {menu}
-                            <div
-                              style={{
-                                padding: "8px",
-                                borderTop: "1px solid #e8e8e8",
-                              }}
-                            >
-                              <Button
-                                type="link"
-                                //   icon={<PlusOutlined />}
-                                onClick={() => setIsTagModalVisible(true)}
-                                block
-                              >
-                                Add New Skill
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                      >
-                        {tags.map((tag) => (
-                          <Option key={tag.id} value={tag.name}>
-                            {tag.name}
-                          </Option>
-                        ))}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="skill"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+              <Col span={24}>
+  <div className="form-item">
+    <label className="font-semibold">Job Category</label>
+    <Select
+      style={{ width: "100%" }}
+      placeholder="Select or add new job category"
+      value={values.category}
+      onChange={(value) => setFieldValue("category", value)}
+      dropdownRender={(menu) => (
+        <div>
+          {menu}
+          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+            <Button
+              type="link"
+              icon={<PlusOutlined />}
+              onClick={() => setIsJobCategoryModalVisible(true)}
+            >
+              Add New Job Category
+            </Button>
+          </div>
+        </div>
+      )}
+    >
+      {jobCategories.map((category) => (
+        <Option key={category.id} value={category.name}>
+          {category.name}
+        </Option>
+      ))}
+    </Select>
+    <ErrorMessage name="category" component="div" className="error-message text-red-500 my-1" />
+  </div>
+</Col>
+<Col span={24}>
+  <div className="form-item">
+    <label className="font-semibold">Job Skill</label>
+    <Select
+      style={{ width: "100%" }}
+      placeholder="Select or add new job skill"
+      value={values.skillss}
+      onChange={(value) => setFieldValue("skillss", value)}
+      dropdownRender={(menu) => (
+        <div>
+          {menu}
+          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+            <Button
+              type="link"
+              icon={<PlusOutlined />}
+              onClick={() => setIsJobSkillModalVisible(true)}
+            >
+              Add New Job Skill
+            </Button>
+          </div>
+        </div>
+      )}
+    >
+      {jobSkills.map((skill) => (
+        <Option key={skill.id} value={skill.name}>
+          {skill.name}
+        </Option>
+      ))}
+    </Select>
+    <ErrorMessage name="skillss" component="div" className="error-message text-red-500 my-1" />
+  </div>
+</Col>
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold mb-2">Location</label>
@@ -471,55 +454,38 @@ const AddJob = ({ onClose }) => {
                   </Col>
 
              
-                <Col span={12} className="mt-2">
-                  <div className="form-item">
-                    <label className="font-semibold">Status</label>
-                    <Field name="status">
-                      {({ field, form }) => (
-                        <Select
-                          {...field}
-                          className="w-full mt-2"
-                          placeholder="Select or add new status"
-                          onChange={(value) => {
-                            form.setFieldValue("status", value);
-                          }}
-                          onBlur={() => form.setFieldTouched("staus", true)}
-                          dropdownRender={(menu) => (
-                            <div>
-                              {menu}
-                              <div
-                                style={{
-                                  padding: "8px",
-                                  borderTop: "1px solid #e8e8e8",
-                                }}
-                              >
-                                <Button
-                                  type="link"
-                                  //   icon={<PlusOutlined />}
-                                  onClick={() => setIsTagModalVisible(true)}
-                                  block
-                                >
-                                  Add New Status
-                                </Button>
-                              </div>
-                            </div>
-                          )}
-                        >
-                          {tags.map((tag) => (
-                            <Option key={tag.id} value={tag.name}>
-                              {tag.name}
-                            </Option>
-                          ))}
-                        </Select>
-                      )}
-                    </Field>
-                    <ErrorMessage
-                      name="status"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
+                  <Col span={24}>
+  <div className="form-item">
+    <label className="font-semibold">Job Status</label>
+    <Select
+      style={{ width: "100%" }}
+      placeholder="Select or add new job status"
+      value={values.status}
+      onChange={(value) => setFieldValue("status", value)}
+      dropdownRender={(menu) => (
+        <div>
+          {menu}
+          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+            <Button
+              type="link"
+              icon={<PlusOutlined />}
+              onClick={() => setIsJobStatusModalVisible(true)}
+            >
+              Add New Job Status
+            </Button>
+          </div>
+        </div>
+      )}
+    >
+      {jobStatuses.map((status) => (
+        <Option key={status.id} value={status.name}>
+          {status.name}
+        </Option>
+      ))}
+    </Select>
+    <ErrorMessage name="status" component="div" className="error-message text-red-500 my-1" />
+  </div>
+</Col>
 
 
                 <Col span={12} className="mt-2">
@@ -569,44 +535,44 @@ const AddJob = ({ onClose }) => {
         )}
       </Formik>
       <Modal
-        title="Add New Category"
-        open={isTagModalVisible}
-        onCancel={() => setIsTagModalVisible(false)}
-        onOk={handleAddNewTag}
-        okText="Add Category"
-      >
-        <Input
-          placeholder="Enter new category name"
-          value={newTag}
-          onChange={(e) => setNewTag(e.target.value)}
-        />
-      </Modal>
-      <Modal
-        title="Add New Skill"
-        open={isTagModalVisible}
-        onCancel={() => setIsTagModalVisible(false)}
-        onOk={handleAddNewTag}
-        okText="Add Skill"
-      >
-        <Input
-          placeholder="Enter new skill name"
-          value={newTag}
-          onChange={(e) => setNewTag(e.target.value)}
-        />
-      </Modal>
-      <Modal
-        title="Add New Status"
-        open={isTagModalVisible}
-        onCancel={() => setIsTagModalVisible(false)}
-        onOk={handleAddNewTag}
-        okText="Add Status"
-      >
-        <Input
-          placeholder="Enter new status name"
-          value={newTag}
-          onChange={(e) => setNewTag(e.target.value)}
-        />
-      </Modal>
+  title="Add New Job Category"
+  open={isJobCategoryModalVisible}
+  onCancel={() => setIsJobCategoryModalVisible(false)}
+  onOk={() => handleAddNewLabel("jobcategory", newJobCategory, setNewJobCategory, setIsJobCategoryModalVisible)}
+  okText="Add Category"
+>
+  <Input
+    placeholder="Enter new job category name"
+    value={newJobCategory}
+    onChange={(e) => setNewJobCategory(e.target.value)}
+  />
+</Modal>
+<Modal
+  title="Add New Job Skill"
+  open={isJobSkillModalVisible}
+  onCancel={() => setIsJobSkillModalVisible(false)}
+  onOk={() => handleAddNewLabel("jobskill", newJobSkill, setNewJobSkill, setIsJobSkillModalVisible)}
+  okText="Add Skill"
+>
+  <Input
+    placeholder="Enter new job skill name"
+    value={newJobSkill}
+    onChange={(e) => setNewJobSkill(e.target.value)}
+  />
+</Modal>
+<Modal
+  title="Add New Job Status"
+  open={isJobStatusModalVisible}
+  onCancel={() => setIsJobStatusModalVisible(false)}
+  onOk={() => handleAddNewLabel("jobstatus", newJobStatus, setNewJobStatus, setIsJobStatusModalVisible)}
+  okText="Add Status"
+>
+  <Input
+    placeholder="Enter new job status name"
+    value={newJobStatus}
+    onChange={(e) => setNewJobStatus(e.target.value)}
+  />
+</Modal>
     </div>
   );
 };

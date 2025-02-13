@@ -72,12 +72,12 @@ const EditLeave = ({ editid, onClose }) => {
       dispatch(EditLeaveAction({ id, values }))
         .then(() => {
           dispatch(GetLeave());
-          // message.success("Leave details updated successfully!");
+          message.success("Leave details updated successfully!");
           onClose();
           navigate("/app/hrm/leave");
         })
         .catch((error) => {
-          message.error("Failed to update employee.");
+          message.error("Failed to update Leave.");
           console.error("Edit API error:", error);
         });
       const formattedValues = {

@@ -195,7 +195,7 @@ const currenciesState = useSelector((state) => state.currencies);
       is: true,
       then: Yup.string().required("Source is required"),
     }),
-    category: Yup.string().required("Category is required"),
+    // category: Yup.string().required("Category is required"),
     lastContacted: Yup.date().nullable(),
 
     // Info section
@@ -555,56 +555,7 @@ const currenciesState = useSelector((state) => state.currencies);
                   />
                 </div>
               </Col>
-
-              <Col span={24} className="mt-4 ">
-                <div className="flex justify-between items-center">
-                  <label className="font-semibold">Details</label>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={details}
-                      onChange={(e) => setDetails(e.target.checked)}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                  </label>
-                </div>
-
-                {/* Conditionally show Upload field */}
-                {details && (
-                  <>
-                    <Col span={24}>
-                      <div className="mt-2">
-                        <label className="font-semibold">Notes</label>
-                        <ReactQuill
-                          value={values.notes}
-                          onChange={(value) => setFieldValue("notes", value)}
-                          placeholder="Enter Notes"
-                          onBlur={() => setFieldTouched("notes", true)}
-                          className="mt-2 bg-white rounded-md"
-                        />
-                        <ErrorMessage
-                          name="notes"
-                          component="div"
-                          className="error-message text-red-500 my-1"
-                        />
-                      </div>
-                    </Col>
-                    <Col span={24} className="mt-4">
-                      <label className="font-semibold">Source</label>
-                      <Select
-                        placeholder="Select Source"
-                        className="w-full"
-                        onChange={(value) => console.log("Selected:", value)}
-                      >
-                        {datas.map((source) => (
-                          <Option key={source.id} value={source.name}>
-                            {source.name}
-                          </Option>
-                        ))}
-                      </Select>
-                    </Col>
-                    <Col span={24}>
+              <Col span={24}>
                       <div className="form-item mt-2">
                         <label className="font-semibold">Category</label>
                         <Field name="category">
@@ -657,7 +608,7 @@ const currenciesState = useSelector((state) => state.currencies);
                             <Select
                               mode="multiple"
                               style={{ width: "100%" }}
-                              placeholder="Select or add new tags"
+                              // placeholder="Select or add new tags"
                               value={values.tags}
                               onChange={(value) => setFieldValue("tags", value)}
                               dropdownRender={(menu) => (
@@ -691,6 +642,55 @@ const currenciesState = useSelector((state) => state.currencies);
                         />
                       </div>
                     </Col>
+              <Col span={24} className="mt-4 ">
+                <div className="flex justify-between items-center">
+                  <label className="font-semibold">Details</label>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={details}
+                      onChange={(e) => setDetails(e.target.checked)}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                  </label>
+                </div>
+
+                {/* Conditionally show Upload field */}
+                {details && (
+                  <>
+                    <Col span={24}>
+                      <div className="mt-2">
+                        <label className="font-semibold">Notes</label>
+                        <ReactQuill
+                          value={values.notes}
+                          onChange={(value) => setFieldValue("notes", value)}
+                          placeholder="Enter Notes"
+                          onBlur={() => setFieldTouched("notes", true)}
+                          className="mt-2 bg-white rounded-md"
+                        />
+                        <ErrorMessage
+                          name="notes"
+                          component="div"
+                          className="error-message text-red-500 my-1"
+                        />
+                      </div>
+                    </Col>
+                    <Col span={24} className="mt-4">
+                      <label className="font-semibold">Source</label>
+                      <Select
+                        placeholder="Select Source"
+                        className="w-full"
+                        onChange={(value) => console.log("Selected:", value)}
+                      >
+                        {datas.map((source) => (
+                          <Option key={source.id} value={source.name}>
+                            {source.name}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Col>
+                    
                     <Col span={24}>
                       <div className="form-item  mt-2 border-b pb-3">
                         <label className="font-semibold">

@@ -3,11 +3,11 @@ import React from 'react';
 import OtherPaymentList from './OtherPaymentList';
 // import AddOtherPayment from './AddOtherPayment';
 
-const OtherPayment = () => (
+const OtherPayment = ({ id, onClose }) => (
 
 <div className="mail">
 
-<OtherPaymentList />
+<OtherPaymentList id={id} onClose={onClose} />
  
 </div>
 

@@ -6,10 +6,10 @@ import OtherPayment from "./OtherPayment";
 import Overtime from "./Overtime";
 import SaturationDeduction from "./SaturationDeduction";
 
-const SetSalary = () => (
+const SetSalary = ({ id, onClose }) => (
   <div className="p-3 md:p-4 min-h-screen w-full">
     <div className="mt-[-10px] mb-2">
-      <h1 className="text-2xl font-semibold">Set Salary</h1>
+      {/* <h1 className="text-2xl font-semibold">Set Salary</h1> */}
     </div>
     <hr className="mb-6 border-gray-300" />
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 ml-[-12px] mr-[-12px] mb-[-20px] sm:gap-3 md:gap-3">
@@ -20,27 +20,27 @@ const SetSalary = () => (
 
       {/* Allowance Section */}
       <div className=" rounded-lg lg:p-1">
-        <Allowance />
+        <Allowance id={id} onClose={onClose} />
       </div>
 
       {/* Commission Section */}
       <div className=" rounded-lg lg:p-1">
-        <Commission />
+        <Commission id={id} onClose={onClose} />
       </div>
 
       {/* Loan Section */}
       <div className=" rounded-lg lg:p-1">
-        <Loan />
+        <Loan id={id} onClose={onClose} />
       </div>
 
       {/* Other Payment Section */}
       <div className=" rounded-lg lg:p-1">
-        <OtherPayment />
+        <OtherPayment id={id} onClose={onClose} />
       </div>
 
       {/* Saturation Deduction Section */}
       <div className=" rounded-lg lg:p-1">
-        <SaturationDeduction />
+        <SaturationDeduction id={id} onClose={onClose} />
       </div>
 
       {/* Overtime Section */}

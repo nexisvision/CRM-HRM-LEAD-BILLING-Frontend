@@ -37,11 +37,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { getnotess } from "./notesReducer/notesSlice";
 
 const NotesList = () => {
-  const [users, setUsers] = useState(userData);
-  const [list, setList] = useState(OrderListData);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [userProfileVisible, setUserProfileVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  // const [users, setUsers] = useState(userData);
+  // const [list, setList] = useState(OrderListData);
+  // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  // const [userProfileVisible, setUserProfileVisible] = useState(false);
+  // const [selectedUser, setSelectedUser] = useState(null);
   const [isAddNotesModalVisible, setIsAddNotesModalVisible] = useState(false);
   const [isEditNotesModalVisible, setIsEditNotesModalVisible] = useState(false);
   //   const [dealStatisticData] = useState(DealStatisticData);

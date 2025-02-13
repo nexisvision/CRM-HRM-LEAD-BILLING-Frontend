@@ -202,7 +202,7 @@ useEffect(() => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button type="" className="" icon={<EyeOutlined />} onClick={openViewIndicatorModal} size="small">
             <span className="">View Details</span>
@@ -216,7 +216,7 @@ useEffect(() => {
             <span className="ml-2">Pin</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
      
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (

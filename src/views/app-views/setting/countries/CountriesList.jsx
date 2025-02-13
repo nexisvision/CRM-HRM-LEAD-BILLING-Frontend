@@ -118,12 +118,12 @@ export const CountriesList = () => {
                     <span className="ml-2">Edit</span>
                 </Flex>
             </Menu.Item> */}
-            <Menu.Item>
+            {/* <Menu.Item>
                 <Flex alignItems="center" onClick={() => handleDeleteCountry(elm.id)}>
                     <DeleteOutlined />
                     <span className="ml-2">Delete</span>
                 </Flex>
-            </Menu.Item>
+            </Menu.Item> */}
         </Menu>
     );
     const tableColumns = [
@@ -142,15 +142,15 @@ export const CountriesList = () => {
             dataIndex: 'phoneCode',
             sorter: (a, b) => utils.antdTableSorter(a, b, 'phoneCode')
         },
-        {
-            title: 'Action',
-            dataIndex: 'actions',
-            render: (_, elm) => (
-                <div className="text-center">
-                    <EllipsisDropdown menu={dropdownMenu(elm)} />
-                </div>
-            )
-        }
+        // {
+        //     title: 'Action',
+        //     dataIndex: 'actions',
+        //     render: (_, elm) => (
+        //         <div className="text-center">
+        //             <EllipsisDropdown menu={dropdownMenu(elm)} />
+        //         </div>
+        //     )
+        // }
     ];
     // const onSearch = e => {
     //     const value = e.currentTarget.value;
@@ -167,12 +167,12 @@ export const CountriesList = () => {
                             <Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)} />
                         </div>
                     </Flex>
-                    <Flex gap="7px" className="flex">
+                    {/* <Flex gap="7px" className="flex">
                         <Button type="primary" className="flex items-center" onClick={openAddCountriesModal}>
                             <PlusOutlined />
                             <span className="ml-2">New</span>
                         </Button>
-                    </Flex>
+                    </Flex> */}
                 </Flex>
                 <div className="table-responsive">
                     <Table

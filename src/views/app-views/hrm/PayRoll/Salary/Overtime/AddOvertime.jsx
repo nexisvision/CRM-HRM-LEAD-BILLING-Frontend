@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { addovertimess, getovertimess } from "./overtimeReducer/overtimeSlice";
 const { Option } = Select;
-const AddOvertime = ({ onClose }) => {
+const AddOvertime = ({ id, onClose }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -13,7 +13,8 @@ const AddOvertime = ({ onClose }) => {
   }, [dispatch]);
 
   const alldataemp = useSelector((state) => state.employee);
-  const fnddata = alldataemp.employee.data;
+  const fnddata = alldataemp.employee?.data || [];
+  const filteredEmployees = fnddata?.filter((employee) => employee.id === id);
 
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
     dispatch(addovertimess(values))
@@ -53,8 +54,8 @@ const AddOvertime = ({ onClose }) => {
                       onChange={(value) => setFieldValue("employeeId", value)}
                       value={values.employeeId}
                     >
-                      {fnddata && fnddata.length > 0 ? (
-                        fnddata.map((client) => (
+                      {filteredEmployees && filteredEmployees.length > 0 ? (
+                        filteredEmployees.map((client) => (
                           <Option key={client.id} value={client.id}>
                             {client.firstName ||
                               client.username ||
@@ -116,7 +117,7 @@ const AddOvertime = ({ onClose }) => {
             <div>
               <label className="font-semibold">Rate</label>
               <Field name="rate">
-                {({ field }) => <Input {...field} placeholder="Enter Rate" />}
+                {({ field }) => <Input {...field} placeholder="Enter Rate" type="number" />}
               </Field>
               <ErrorMessage
                 name="rate"

@@ -3,11 +3,11 @@ import React from 'react';
 import SaturationDeductionList from './SaturationDeductionList';
 // import AddOtherPayment from './AddOtherPayment';
 
-const SaturationDeduction = () => (
+const SaturationDeduction = ({ id, onClose }) => (
 
 <div className="mail">
 
-<SaturationDeductionList />
+<SaturationDeductionList id={id} onClose={onClose} />
  
 </div>
 

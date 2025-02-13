@@ -23,23 +23,29 @@ const AllowanceSchema = Yup.object().shape({
     .positive("Amount must be positive"),
 });
 
-const AddAllowance = ({ onClose }) => {
+const AddAllowance = ({ id, onClose }) => {
   const [employees, setEmployees] = useState([]);
   const dispatch = useDispatch();
+
+console.log("id",id);
 
   useEffect(() => {
     dispatch(empdata());
   }, []);
 
   const alldataemp = useSelector((state) => state.employee);
-  const fnddata = alldataemp.employee.data;
+  const fnddata = alldataemp.employee?.data || [];
+
+  const filteredEmployees = fnddata?.filter((employee) => employee.id === id);
+
+  console.log("filteredEmployees",filteredEmployees);
 
   useEffect(() => {
     dispatch(getcurren());
   }, []);
 
   const allempdatass = useSelector((state) => state.currencies);
-  const fnddatass = allempdatass?.currencies;
+  const fnddatass = allempdatass?.currencies?.data;
 
   const handleSubmit = async (values, { resetForm }) => {
     try {
@@ -80,21 +86,21 @@ const AddAllowance = ({ onClose }) => {
                     <Select
                       {...field}
                       className="w-full mt-2"
-                      placeholder="Select AddProjectMember"
+                      placeholder="Select Employee"
                       onChange={(value) => setFieldValue("employeeId", value)}
                       value={values.employeeId}
                     >
-                      {fnddata && fnddata.length > 0 ? (
-                        fnddata.map((client) => (
-                          <Option key={client.id} value={client.id}>
-                            {client.firstName ||
-                              client.username ||
+                      {filteredEmployees && filteredEmployees.length > 0 ? (
+                        filteredEmployees.map((employee) => (
+                          <Option key={employee.id} value={employee.id}>
+                            {employee.firstName ||
+                              employee.username ||
                               "Unnamed employee"}
                           </Option>
                         ))
                       ) : (
                         <Option value="" disabled>
-                          No Clients Available
+                          No Employee Available
                         </Option>
                       )}
                     </Select>
@@ -164,7 +170,7 @@ const AddAllowance = ({ onClose }) => {
                     <Select
                       {...field}
                       className="w-full mt-2"
-                      placeholder="Select AddProjectMember"
+                      placeholder="Select Currency"
                       onChange={(value) => setFieldValue("currency", value)}
                       value={values.currency}
                     >
@@ -178,7 +184,7 @@ const AddAllowance = ({ onClose }) => {
                         ))
                       ) : (
                         <Option value="" disabled>
-                          No Clients Available
+                          {/* No Clients Available */}
                         </Option>
                       )}
                     </Select>

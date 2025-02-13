@@ -43,8 +43,8 @@ export const CurrenciesList = () => {
    
 
      useEffect(() => {
-        if (allcurrdata && Array.isArray(allcurrdata)) {
-            setFilteredData(allcurrdata);
+        if (filterdata && Array.isArray(filterdata)) {
+            setFilteredData(filterdata);
         } else {
             setFilteredData([]);
         }
@@ -82,7 +82,7 @@ export const CurrenciesList = () => {
             setFilteredData(allcurrdata);
             return;
         }
-
+        
         // Filter the data based on search value
         const filtered = allcurrdata.filter(item => 
             item.currencyName?.toLowerCase().includes(value) ||
@@ -109,12 +109,12 @@ export const CurrenciesList = () => {
                     <span className="ml-2">Edit</span>
                 </Flex>
             </Menu.Item> */}
-            <Menu.Item>
+            {/* <Menu.Item>
                 <Flex alignItems="center" onClick={() => handleDeleteCurrency(elm.id)}>
                     <DeleteOutlined />
                     <span className="ml-2">Delete</span>
                 </Flex>
-            </Menu.Item>
+            </Menu.Item> */}
         </Menu>
     );
 
@@ -134,15 +134,15 @@ export const CurrenciesList = () => {
             dataIndex: 'currencyCode',
             sorter: (a, b) => utils.antdTableSorter(a, b, 'currencyCode')
         },
-        {
-            title: 'Action',
-            dataIndex: 'actions',
-            render: (_, elm) => (
-                <div className="text-center">
-                    <EllipsisDropdown menu={dropdownMenu(elm)} />
-                </div>
-            )
-        }
+        // {
+        //     title: 'Action',
+        //     dataIndex: 'actions',
+        //     render: (_, elm) => (
+        //         <div className="text-center">
+        //             <EllipsisDropdown menu={dropdownMenu(elm)} />
+        //         </div>
+        //     )
+        // }
     ];
 
     return (
@@ -154,12 +154,12 @@ export const CurrenciesList = () => {
                             <Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)} />
                         </div>
                     </Flex>
-                    <Flex gap="7px" className="flex">
+                    {/* <Flex gap="7px" className="flex">
                         <Button type="primary" className="flex items-center" onClick={openAddCurrenciesModal}>
                             <PlusOutlined />
                             <span className="ml-2">New</span>
                         </Button>
-                    </Flex>
+                    </Flex> */}
                 </Flex>
                 <div className="table-responsive">
                     <Table

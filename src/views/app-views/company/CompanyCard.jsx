@@ -73,7 +73,7 @@ const CompanyCard = ({ company }) => {
 
   const deleteUser = (elmId) => {
     dispatch(deleteClient(elmId));
-    message.success(`Deleted user ${elmId}`);
+    // message.success(`Deleted user ${elmId}`);
   };
 
   useEffect(() => {

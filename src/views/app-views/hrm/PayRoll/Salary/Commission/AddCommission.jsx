@@ -8,7 +8,8 @@ import { useDispatch } from "react-redux";
 import { addcommi, getcommi } from "./commistionReducer/commitionSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 const { Option } = Select;
-const AddCommission = ({ onClose }) => {
+
+const AddCommission = ({ id, onClose }) => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(empdata());
@@ -17,12 +18,14 @@ const AddCommission = ({ onClose }) => {
   const alldataemp = useSelector((state) => state.employee);
   const fnddata = alldataemp.employee.data;
 
+  const filteredEmployees = fnddata?.filter((employee) => employee.id === id);
+
   useEffect(() => {
     dispatch(getcurren());
   }, []);
 
   const allempdatass = useSelector((state) => state.currencies);
-  const fnddatass = allempdatass?.currencies;
+  const fnddatass = allempdatass?.currencies?.data;
 
   const handleSubmit = (values, { resetForm }) => {
     dispatch(addcommi(values)).then(() => {
@@ -48,21 +51,21 @@ const AddCommission = ({ onClose }) => {
                     <Select
                       {...field}
                       className="w-full mt-2"
-                      placeholder="Select AddProjectMember"
+                      placeholder="Select Employee"
                       onChange={(value) => setFieldValue("employeeId", value)}
                       value={values.employeeId}
                     >
-                      {fnddata && fnddata.length > 0 ? (
-                        fnddata.map((client) => (
-                          <Option key={client.id} value={client.id}>
-                            {client.firstName ||
-                              client.username ||
+                      {filteredEmployees && filteredEmployees.length > 0 ? (
+                        filteredEmployees.map((employee) => (
+                          <Option key={employee.id} value={employee.id}>
+                            {employee.firstName ||
+                              employee.username ||
                               "Unnamed employee"}
                           </Option>
                         ))
                       ) : (
                         <Option value="" disabled>
-                          No Clients Available
+                          No Employee Available
                         </Option>
                       )}
                     </Select>
@@ -107,7 +110,7 @@ const AddCommission = ({ onClose }) => {
                     <Select
                       {...field}
                       className="w-full mt-2"
-                      placeholder="Select AddProjectMember"
+                      placeholder="Select Currency"
                       onChange={(value) => setFieldValue("currency", value)}
                       value={values.currency}
                     >
@@ -121,7 +124,7 @@ const AddCommission = ({ onClose }) => {
                         ))
                       ) : (
                         <Option value="" disabled>
-                          No Clients Available
+                          {/* No Clients Available */}
                         </Option>
                       )}
                     </Select>
@@ -138,7 +141,7 @@ const AddCommission = ({ onClose }) => {
             <div>
               <label className="font-semibold">Amount</label>
               <Field name="amount">
-                {({ field }) => <Input {...field} placeholder="Enter Amount" />}
+                {({ field }) => <Input {...field} placeholder="Enter Amount" type="number" />}
               </Field>
               <ErrorMessage
                 name="amount"
