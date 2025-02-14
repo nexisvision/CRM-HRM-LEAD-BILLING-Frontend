@@ -368,7 +368,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
               onChange={onSearch}
             />
           </div>
-          <div className="w-full md:w-48 ">
+          {/* <div className="w-full md:w-48 ">
             <Select
               defaultValue="All"
               className="w-100"
@@ -383,7 +383,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                 </Option>
               ))}
             </Select>
-          </div>
+          </div> */}
         </Flex>
         <Flex gap="7px">
          

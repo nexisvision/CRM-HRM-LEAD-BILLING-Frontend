@@ -16,7 +16,7 @@ const AddTask = ({ onClose }) => {
   const [isWithoutDueDate, setIsWithoutDueDate] = useState(false);
   const [isOtherDetailsVisible, setIsOtherDetailsVisible] = useState(false);
 
-  const { id } = useParams();
+  // const { id } = useParams();
 
   useEffect(() => {
     dispatch(empdata());
@@ -26,13 +26,13 @@ const AddTask = ({ onClose }) => {
   const empData = allempdata?.employee?.data;
 
   const allloggeduserdata = useSelector((state) => state.user);
-  const loggedUserData = allloggeduserdata?.loggedInUser;
+  const loggedUserData = allloggeduserdata?.loggedInUser || [];
 
-  const idd = loggedUserData.id;
+  const id = loggedUserData.id;
 
-  const loggedusername = useSelector((state) => state.user.loggedInUser.username)
+  const loggedusername = useSelector((state) => state.user.loggedInUser.username || [])
 
-  const fndassine = empData.filter(((item)=>item.created_by === loggedusername))
+  const fndassine = empData.filter(((item)=>item.created_by === loggedusername || []))
 
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
@@ -59,10 +59,10 @@ const AddTask = ({ onClose }) => {
     // }
 
     // Dispatch AddTasks with updated values
-    dispatch(AddTasks({ idd, values }))
+    dispatch(AddTasks({ id, values }))
       .then(() => {
         // Fetch updated tasks after successfully adding
-        dispatch(GetTasks(idd))
+        dispatch(GetTasks(id))
           .then(() => {
             // message.success("Expenses added successfully!");
             resetForm();

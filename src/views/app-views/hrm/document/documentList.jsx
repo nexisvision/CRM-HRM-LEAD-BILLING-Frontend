@@ -309,16 +309,17 @@ const DocumentList = () => {
       dataIndex: "name",
       sorter: (a, b) => a.name.length - b.name.length,
     },
-    {
-      title: "role",
-      dataIndex: "role",
-      sorter: (a, b) => a.role.length - b.role.length,
-    },
+    // {
+    //   title: "role",
+    //   dataIndex: "role",
+    //   sorter: (a, b) => a.role.length - b.role.length,
+    // },
     {
       title: "description",
       dataIndex: "description",
       sorter: (a, b) => a.description.length - b.description.length,
-    },
+      render: (text) => <div dangerouslySetInnerHTML={{ __html: text }} /> // Render HTML content
+  },
     //   {
     //     title: "files",
     //     dataIndex: "files",

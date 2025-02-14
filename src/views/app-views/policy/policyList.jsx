@@ -111,7 +111,7 @@ const PolicyList = () => {
       dispatch(getpolicys());
       const updatedUsers = users.filter((item) => item.id !== userId);
       setUsers(updatedUsers);
-      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
+      message.success({ content: `Deleted Policy ${userId}`, duration: 2 });
     });
   };
 

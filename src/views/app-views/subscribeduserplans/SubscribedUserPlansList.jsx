@@ -81,13 +81,13 @@ export const SubscribedUserPlansList = () => {
 
 
   const alldatas = useSelector((state) => state.subplan);
-  const fnddtat = alldatas.subplan.data;
+  const fnddtat = alldatas.subplan.data || [];
 
   const allclient = useSelector((state) => state.ClientData);
-  const fndclient = allclient.ClientData.data;
+  const fndclient = allclient.ClientData.data || [];
 
   const allplan = useSelector((state) => state.Plan);
-  const fndplan = allplan?.Plan;
+  const fndplan = allplan?.Plan || [];
 
 
 

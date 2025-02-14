@@ -136,12 +136,12 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(addinqu.fulfilled, (state, action) => {
         state.isLoading = false;
-        message.success(action.payload?.message);
+        // message.success(action.payload?.message);
       })
 
       .addCase(addinqu.rejected, (state, action) => {
         state.isLoading = false;
-        message.error(action.payload?.message);
+        // message.error(action.payload?.message);
       })
 
 
@@ -166,12 +166,12 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(deleteinqu.fulfilled, (state, action) => {
         state.isLoading = false;
-        message.success(action.payload?.message);
+        // message.success(action.payload?.message);
       })
 
       .addCase(deleteinqu.rejected, (state, action) => {
         state.isLoading = false;
-        message.error(action.payload?.message);
+        // message.error(action.payload?.message);
       })
       //update
 
@@ -182,13 +182,13 @@ const RoleAndPermissionSlice = createSlice({
       .addCase(editinqu.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload;
-        message.success(action.payload?.message);
+        // message.success(action.payload?.message);
       })
 
       .addCase(editinqu.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-        message.error(action.payload?.message);
+        // message.error(action.payload?.message);
       });
   },
 });

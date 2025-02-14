@@ -206,29 +206,36 @@ const AddInterview = ({ onClose, onAddInterview }) => {
             </Col>
             {/* Round Dropdown */}
             <Col span={12} className="mt-2">
-              <div className="form-item">
-                <label className="font-semibold">Round</label>
-                <Field name="round">
-                  {({ field }) => (
-                    <Select
-                      {...field}
-                      className="w-full"
-                      placeholder="Select Round"
-                      onChange={(value) => setFieldValue("round", value)}
-                      onBlur={() => setFieldTouched("round", true)}
-                    >
-                      <Option value="Technical">Technical</Option>
-                      <Option value="HR">HR</Option>
-                    </Select>
-                  )}
-                </Field>
-                <ErrorMessage
-                  name="round"
-                  component="div"
-                  className="error-message text-red-500 my-1"
-                />
-              </div>
-            </Col>
+                <div className="form-item">
+                  <label className="font-semibold mb-2">Round</label>
+                  <Field name="round">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        mode="multiple"
+                        placeholder="Select Round"
+                        className="w-full mt-2"
+                        onChange={(value) =>
+                          setFieldValue("round", value)
+                        }
+                        value={values.round}
+                        onBlur={() => setFieldTouched("round", true)}
+                        allowClear={false}
+                      >
+                        <Option value="HR">HR</Option>
+                        <Option value="Technical">Technical</Option>
+                        <Option value="Prectical">Prectical</Option>
+                        <Option value="Communication">Communication</Option>
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="round"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
             {/* Interview Type Dropdown */}
             <Col span={12} className="mt-2">
               <div className="form-item">

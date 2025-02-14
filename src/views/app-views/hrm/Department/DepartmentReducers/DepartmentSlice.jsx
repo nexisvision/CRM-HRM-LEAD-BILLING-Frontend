@@ -144,11 +144,11 @@ const DepartmentSlice = createSlice({
             })
             .addCase(AddDept.fulfilled, (state, action) => {
                 state.isLoading = false;
-                message.success(action.payload?.message);
+                // message.success(action.payload?.message);
             })
             .addCase(AddDept.rejected, (state, action) => {
                 state.isLoading = false;
-                message.error(action.payload?.message);
+                // message.error(action.payload?.message);
             })
 
 
@@ -171,11 +171,11 @@ const DepartmentSlice = createSlice({
             })
             .addCase(DeleteDept.fulfilled, (state, action) => {
                 state.isLoading = false;
-                message.success(action.payload?.message);
+                // message.success(action.payload?.message);
             })
             .addCase(DeleteDept.rejected, (state, action) => {
                 state.isLoading = false;
-                message.error(action.payload?.message);
+                // message.error(action.payload?.message);
             })
             //update
 
@@ -186,13 +186,13 @@ const DepartmentSlice = createSlice({
               .addCase(EditDept.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
-                message.success(action.payload?.message);
+                // message.success(action.payload?.message);
               })
 
               .addCase(EditDept.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-                message.error(action.payload?.message);
+                // message.error(action.payload?.message);
               });
     },
 });

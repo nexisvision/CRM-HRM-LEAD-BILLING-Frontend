@@ -145,11 +145,11 @@ const PlanSlice = createSlice({
             })
             .addCase(CreatePlan.fulfilled, (state, action) => {
                 state.isLoading = false;
-                message.success(action.payload?.message);
+                // message.success(action.payload?.message);
             })
             .addCase(CreatePlan.rejected, (state, action) => {
                 state.isLoading = false;
-                message.error(action.payload?.message);
+                // message.error(action.payload?.message);
             })
 
             .addCase(GetPlan.pending, (state) => {
@@ -174,23 +174,23 @@ const PlanSlice = createSlice({
               .addCase(Editplan.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
-                message.success(action.payload?.message);
+                // message.success(action.payload?.message);
             })
               .addCase(Editplan.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-                message.error(action.payload?.message);
+                // message.error(action.payload?.message);
               })
               .addCase(DeleteP.pending, (state) => {
                 state.isLoading = true;
               })
               .addCase(DeleteP.fulfilled, (state, action) => {
                 state.isLoading = false;
-                message.success(action.payload?.message);
+                // message.success(action.payload?.message);
               })
               .addCase(DeleteP.rejected, (state, action) => {
                 state.isLoading = false;
-                message.error(action.payload?.message);
+                // message.error(action.payload?.message);
               });
 
     },

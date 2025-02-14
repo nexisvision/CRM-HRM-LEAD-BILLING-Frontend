@@ -253,7 +253,7 @@ const EditJobOnBording = ({ idd, onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Salary</label>
-                  <Field name="salary" as={Input} placeholder="Enter Salary" type="number" />
+                  <Field name="salary" as={Input} placeholder="Enter Salary" />
                   <ErrorMessage
                     name="salary"
                     component="div"

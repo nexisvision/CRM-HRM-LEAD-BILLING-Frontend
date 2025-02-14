@@ -35,13 +35,13 @@ const AddDesignation = ({ onClose }) => {
     dispatch(AddDes(values))
       .then(() => {
         dispatch(getDes());
-        // message.success("Designation added successfully!");
+        message.success("Designation added successfully!");
         resetForm();
         onClose();
         navigate("/app/hrm/designation");
       })
       .catch((error) => {
-        // message.error("Failed to add designation.");
+        message.error("Failed to add designation.");
         console.error("Add API error:", error);
       });
   };

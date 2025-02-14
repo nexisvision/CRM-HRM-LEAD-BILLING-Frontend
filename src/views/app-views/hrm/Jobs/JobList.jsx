@@ -326,7 +326,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
 
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
-      <Row gutter={16}>
+      {/* <Row gutter={16}>
         {annualStatisticData.map((elm, i) => (
           <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
             <StatisticWidget
@@ -337,7 +337,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
             />
           </Col>
         ))}
-      </Row>
+      </Row> */}
       <Flex
         alignItems="center"
         justifyContent="space-between"
@@ -351,7 +351,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
               onChange={(e) => onSearch(e)}
             />
           </div>
-          <div className="w-full md:w-48 ">
+          {/* <div className="w-full md:w-48 ">
             <Select
               defaultValue="All"
               className="w-100"
@@ -366,7 +366,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                 </Option>
               ))}
             </Select>
-          </div>
+          </div> */}
         </Flex>
         <Flex gap="7px">
         

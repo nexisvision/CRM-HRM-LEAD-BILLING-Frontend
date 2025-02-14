@@ -124,7 +124,7 @@ export const NotesList = () => {
       setList(list.filter((item) => item.id !== exid));
 
     } catch (error) {
-      console.error("Error deleting user:", error.message || error);
+      console.error("Error deleting note:", error.message || error);
     }
   };
 

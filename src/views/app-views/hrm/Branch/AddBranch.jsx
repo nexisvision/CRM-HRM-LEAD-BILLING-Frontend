@@ -21,12 +21,12 @@ const AddBranch = ({ onClose }) => {
     dispatch(AddBranchs(values))
       .then(() => {
         dispatch(getBranch());
-        // message.success('Branch added successfully!');
+        message.success('Branch added successfully!');
         resetForm();
         onClose();
       })
       .catch((error) => {
-        // message.error('Failed to add department.');
+        message.error('Failed to add branch.');
         console.error('Add API error:', error);
       });
   };

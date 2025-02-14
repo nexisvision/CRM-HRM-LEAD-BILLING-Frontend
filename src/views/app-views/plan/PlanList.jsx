@@ -43,9 +43,9 @@ const PlanList = () => {
         dispatch(GetPlan());
         setPlans(plans.filter((plan) => plan.id !== planId));
       });
-      // message.success({ content: 'Plan deleted successfully', duration: 2 });
+      message.success({ content: 'Plan deleted successfully', duration: 2 });
     } catch (error) {
-      // message.error({ content: 'Failed to delete plan', duration: 2 });
+      message.error({ content: 'Failed to delete plan', duration: 2 });
       console.error('Error deleting plan:', error);
     }
   };

@@ -128,7 +128,7 @@ const InquiryList = () => {
       dispatch(getinqu());
       const updatedUsers = users.filter((item) => item.id !== userId);
       setUsers(updatedUsers);
-      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
+      message.success({ content: `Deleted inquiry ${userId}`, duration: 2 });
     });
   };
 

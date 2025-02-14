@@ -130,11 +130,11 @@ const BranchList = () => {
     dispatch(deleteBranch(userId))
       .then(() => {
         dispatch(getBranch());
-        // message.success("Department Deleted successfully!");
+        message.success("Branch Deleted successfully!");
         setUsers(users.filter((item) => item.id !== userId));
       })
       .catch((error) => {
-        // message.error("Failed to update department.");
+        message.error("Failed to update branch.");
         console.error("Edit API error:", error);
       });
   };

@@ -27,59 +27,58 @@ const AddJobOnBoarding = ({ onClose }) => {
   const AllLoggedData = useSelector((state) => state.user);
 
   const lid = AllLoggedData.loggedInUser.id;
-
   const fetchLables = async (lableType, setter) => {
     try {
       const lid = AllLoggedData.loggedInUser.id;
       const response = await dispatch(GetLable(lid));
-
+  
       if (response.payload && response.payload.data) {
         const uniqueStatuses = response.payload.data
-          .filter((label) => label && label.name) // Filter out invalid labels
+          .filter((label) => label && label.name && label.lableType === lableType) // Filter by lableType
           .map((label) => ({
             id: label.id,
             name: label.name.trim(),
           }))
           .filter(
             (label, index, self) =>
-              index === self.findIndex((t) => t.name === label.name)
-          ); // Remove duplicates
-
-        setStatuses(uniqueStatuses);
+              index === self.findIndex((t) => t.name === label.name) // Remove duplicates
+          );
+  
+        setter(uniqueStatuses);
       }
     } catch (error) {
-      console.error("Failed to fetch statuses:", error);
-      message.error("Failed to load statuses");
+      console.error(`Failed to fetch ${lableType}:`, error);
+      message.error(`Failed to load ${lableType}`);
     }
   };
-
+  
   useEffect(() => {
-    fetchLables("status", setStatuses);
+    fetchLables("job-on-bording-status", setStatuses);
   }, []);
-
+  
   const handleAddNewStatus = async () => {
     if (!newStatus.trim()) {
-      message.error("Please enter a status name");
+      message.error("Please enter a Job On Boarding Status name");
       return;
     }
-
+  
     try {
       const lid = AllLoggedData.loggedInUser.id;
       const payload = {
         name: newStatus.trim(),
-        labelType: "status",
+        lableType: "job-on-bording-status",
       };
-
+  
       await dispatch(AddLable({ lid, payload }));
-      message.success("Status added successfully");
+      message.success("Job On Boarding Status added successfully");
       setNewStatus("");
       setIsStatusModalVisible(false);
-
+  
       // Fetch updated statuses
-      await fetchLables();
+      await fetchLables("job-on-bording-status", setStatuses);
     } catch (error) {
-      console.error("Failed to add Status:", error);
-      message.error("Failed to add Status");
+      console.error("Failed to add Job On Boarding Status:", error);
+      message.error("Failed to add Job On Boarding Status");
     }
   };
 
@@ -225,7 +224,7 @@ const AddJobOnBoarding = ({ onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Salary</label>
-                  <Field name="salary" as={Input} placeholder="Enter Salary" type="number" />
+                  <Field name="salary" as={Input} placeholder="Enter Salary" />
                   <ErrorMessage
                     name="salary"
                     component="div"

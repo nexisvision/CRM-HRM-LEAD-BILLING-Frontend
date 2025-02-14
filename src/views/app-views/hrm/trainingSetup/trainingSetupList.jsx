@@ -153,10 +153,10 @@ const TrainingSetupList = () => {
                              
                                 if (parsedPermissions["extra-hrm-trainingSetup"] && parsedPermissions["extra-hrm-trainingSetup"][0]?.permissions) {
                                   allpermisson = parsedPermissions["extra-hrm-trainingSetup"][0].permissions;
-                                  console.log('Parsed Permissions:', allpermisson);
+                                  // console.log('Parsed Permissions:', allpermisson);
                                 
                                 } else {
-                                  console.log('extra-hrm-trainingSetup is not available');
+                                  // console.log('extra-hrm-trainingSetup is not available');
                                 }
                                 
                                 const canCreateClient = allpermisson?.includes('create');
@@ -224,7 +224,7 @@ const TrainingSetupList = () => {
         </Flex>
       </Menu.Item>
       
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -249,7 +249,7 @@ const TrainingSetupList = () => {
             <span className="ml-2">Add to Job OnBoard</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
     
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (

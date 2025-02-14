@@ -144,11 +144,11 @@ const DesignationSlice = createSlice({
             })
             .addCase(AddDes.fulfilled, (state, action) => {
                 state.isLoading = false;
-                message.success(action.payload?.message);
+                // message.success(action.payload?.message);
             })
             .addCase(AddDes.rejected, (state, action) => {
                 state.isLoading = false;
-                message.error(action.payload?.message);
+                // message.error(action.payload?.message);
             })
 
 
@@ -172,11 +172,11 @@ const DesignationSlice = createSlice({
             })
             .addCase(DeleteDes.fulfilled, (state, action) => {
                 state.isLoading = false;
-                message.success(action.payload?.message);
+                // message.success(action.payload?.message);
             })
             .addCase(DeleteDes.rejected, (state, action) => {
                 state.isLoading = false;
-                message.error(action.payload?.message);
+                // message.error(action.payload?.message);
             })
             //update
 
@@ -187,13 +187,13 @@ const DesignationSlice = createSlice({
               .addCase(EditDes.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
-                message.success(action.payload?.message);
+                // message.success(action.payload?.message);
               })
 
               .addCase(EditDes.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-                message.error(action.payload?.message);
+                // message.error(action.payload?.message);
               });
     },
 });

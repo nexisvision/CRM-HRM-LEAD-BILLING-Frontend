@@ -139,12 +139,12 @@ const policySlice = createSlice({
       })
       .addCase(Addpolicys.fulfilled, (state, action) => {
         state.isLoading = false;
-        message.success(action.payload?.message);
+        // message.success(action.payload?.message);
       })
 
       .addCase(Addpolicys.rejected, (state, action) => {
         state.isLoading = false;
-        message.error(action.payload?.message);
+        // message.error(action.payload?.message);
       })
 
       .addCase(getpolicys.pending, (state) => {
@@ -208,12 +208,12 @@ const policySlice = createSlice({
       .addCase(editpolicys.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload; // Update the state with the updated employee data
-        message.success(action.payload?.message);
+        // message.success(action.payload?.message);
       })
 
       .addCase(editpolicys.rejected, (state, action) => {
         state.isLoading = false;
-        message.error(action.payload?.message);
+        // message.error(action.payload?.message);
       });
 
   },

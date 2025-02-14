@@ -186,7 +186,7 @@ const JobOnBordingList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -198,9 +198,9 @@ const JobOnBordingList = () => {
             <span className="">View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
      
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -212,7 +212,7 @@ const JobOnBordingList = () => {
             <span className="ml-2">Download OfferLetter</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
     
       
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
@@ -340,7 +340,7 @@ const JobOnBordingList = () => {
               onChange={(e) => onSearch(e)}
             />
           </div>
-          <div className="w-full md:w-48 ">
+          {/* <div className="w-full md:w-48 ">
             <Select
               defaultValue="All"
               className="w-100"
@@ -355,7 +355,7 @@ const JobOnBordingList = () => {
                 </Option>
               ))}
             </Select>
-          </div>
+          </div> */}
         </Flex>
         <Flex gap="7px">
         

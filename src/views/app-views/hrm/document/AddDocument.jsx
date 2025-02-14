@@ -23,7 +23,7 @@ const AddDocument = ({ onClose }) => {
   ]);
   const initialValues = {
     name: "",
-    role: "",
+    role: null,
     description: "",
   };
   const validationSchema = Yup.object({
@@ -94,7 +94,7 @@ const AddDocument = ({ onClose }) => {
       <hr className="mb-4 border border-gray-300" />
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({ handleSubmit, setFieldValue, setFieldTouched, values }) => (
@@ -119,7 +119,7 @@ const AddDocument = ({ onClose }) => {
                   />
                 </Form.Item>
               </Col>
-              <Col span={8} className="">
+              {/* <Col span={8} className="">
                 <div className="form-item">
                   <label className="">Role</label>
                   <Field name="role">
@@ -147,7 +147,7 @@ const AddDocument = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
               <div className="mt-2 w-full">
                 <Col span={24} className="mt-2">
                   <div className="form-item">

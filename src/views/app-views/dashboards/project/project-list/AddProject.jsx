@@ -86,7 +86,7 @@ const AddProject = ({ onClose }) => {
 
   const curr = currencies?.data || [];
   
-  const curren = curr?.filter((item) => item.created_by === allloggeduser);
+  // const curren = curr?.filter((item) => item.created_by === allloggeduser);
 
   const alluserdatas = useSelector((state) => state.Users);
   const fnadat = alluserdatas?.Users?.data;
@@ -354,14 +354,14 @@ const AddProject = ({ onClose }) => {
                     style={{ width: "100%" }}
                     className="mt-1"
                     placeholder="Select Client"
-                    loading={!fnd}
+                    loading={!employeedata}
                     value={values.client} // Bind value to Formik's field
                     // value="sdfsdf"
                     onChange={(value) => setFieldValue("client", value)} // Update Formik's field value
                     onBlur={() => setFieldTouched("client", true)} // Set touched state
                   >
-                    {fnd && fnd?.length > 0 ? (
-                      fnd
+                    {employeedata && employeedata?.length > 0 ? (
+                      employeedata
                         .filter(client => client.created_by === AllLoggedData.loggedInUser.username) // Filter clients based on created_by
                         .map((client) => (
                           <Option key={client.id} value={client.id}>
@@ -389,13 +389,13 @@ const AddProject = ({ onClose }) => {
                     style={{ width: "100%" }}
                     className="mt-1"
                     placeholder="Select User"
-                    loading={!employeedata}
+                    loading={!fnd}
                     value={values.user} // Bind value to Formik's field
                     onChange={(value) => setFieldValue("user", value)} // Update Formik's field value
                     onBlur={() => setFieldTouched("user", true)} // Set touched state
                   >
-                    {employeedata && employeedata.length > 0 ? (
-                      employeedata.map((employee) => (
+                    {fnd && fnd.length > 0 ? (
+                      fnd.map((employee) => (
                         <Option key={employee.id} value={employee.id}>
                           {employee.username || "Unnamed User"}
                         </Option>
@@ -443,7 +443,7 @@ const AddProject = ({ onClose }) => {
                                                 placeholder="Select Currency"
                                                 className="w-full mt-1"
                                                 onChange={(value) => {
-                                                    const selectedCurrency = curren.find(
+                                                    const selectedCurrency = curr.find(
                                                         (c) => c.id === value
                                                     );
                                                     form.setFieldValue(
@@ -455,7 +455,7 @@ const AddProject = ({ onClose }) => {
                                                 onBlur={() => form.setFieldTouched("currency", true)}
                                                 allowClear={false}
                                             >
-                                                {Array.isArray(curren) && curren.map((currency) => (
+                                                {Array.isArray(curr) && curr.map((currency) => (
                                                     <Option 
                                                         key={currency.id} 
                                                         value={currency.id}

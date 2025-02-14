@@ -83,20 +83,20 @@ const EditJob = ({ idd, onClose }) => {
     expectedSalary: singleEmp ? singleEmp.expectedSalary : "", // files: '',
   };
   const validationSchema = Yup.object({
-    title: Yup.string().required("Please enter Job Title."),
-    category: Yup.number().required("Please enter Job Category."),
-    skillss: Yup.string().required("Please enter Skills."),
-    location: Yup.string().required("Please enter Location."),
-    interviewRounds: Yup.array().required("please enter Interview Rounds"),
-    startDate: Yup.string().required("Please enter Satrt Date."),
-    endDate: Yup.string().required("Please enter End Date."),
-    recruiter: Yup.string().required("Please enter Recuiter."),
-    jobType: Yup.string().required("Please enter Job Type."),
-    workExperience: Yup.string().required("Please enter Work Expernce."),
-    currency: Yup.string().required("Please enter Curreney"),
-    description: Yup.string().required("Please enter Job Discription."),
-    status: Yup.string().required("Please enter Status."),
-    expectedSalary: Yup.string().required("Please enter Expect Salary."),
+    title: Yup.string().optional("Please enter Job Title."),
+    category: Yup.number().optional("Please enter Job Category."),
+    skillss: Yup.string().optional("Please enter Skills."),
+    location: Yup.string().optional("Please enter Location."),
+    interviewRounds: Yup.array().optional("please enter Interview Rounds"),
+    startDate: Yup.string().optional("Please enter Satrt Date."),
+    endDate: Yup.string().optional("Please enter End Date."),
+    recruiter: Yup.string().optional("Please enter Recuiter."),
+    jobType: Yup.string().optional("Please enter Job Type."),
+    workExperience: Yup.string().optional("Please enter Work Expernce."),
+    currency: Yup.string().optional("Please enter Curreney"),
+    description: Yup.string().optional("Please enter Job Discription."),
+    status: Yup.string().optional("Please enter Status."),
+    expectedSalary: Yup.string().optional("Please enter Expect Salary."),
 
     // files: Yup.string().required('Please enter Files.'),
   });
@@ -109,7 +109,7 @@ const EditJob = ({ idd, onClose }) => {
       interviewRounds: { InterviewRounds: values.interviewRounds },
     };
 
-    dispatch(EditJobs(idd, transformedValues));
+    dispatch(EditJobs({idd, transformedValues}));
     dispatch(GetJobdata());
     onClose();
     // console.log("Submitted values:", transformedValues);
