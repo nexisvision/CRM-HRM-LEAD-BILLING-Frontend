@@ -41,11 +41,25 @@ const OverViewList = () => {
 
   // Fetch data immediately when component mounts
   useEffect(() => {
-    dispatch(GetProject());
-    dispatch(ClientData());
-    dispatch(GetTasks(id));
-    setIsLoading(false);
-  }, [dispatch]);
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        // Load client data first
+        await dispatch(ClientData());
+        // Then load project and task data
+        await Promise.all([
+          dispatch(GetProject()),
+          dispatch(GetTasks(id))
+        ]);
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [dispatch, id]);
+
 
   // Calculate progress based on date range
   useEffect(() => {
@@ -111,6 +125,13 @@ const OverViewList = () => {
     }
   }, [filterdata]);
 
+  // Update the selector to properly access client data from Redux store
+  const allclient = useSelector((state) => state?.SubClient?.SubClient?.data) || [];
+  
+  // Remove console.logs and add proper error handling
+  const fndpro = filterdata.find((item) => item.id === id);
+  const fndclient = allclient?.find((item) => item?.id === fndpro?.client);
+
   // Safe access to client data with fallbacks
   const Allclientdata = useSelector((state) => state?.SubClient) || {};
   const dataclient = Allclientdata?.SubClient?.data || [];
@@ -147,6 +168,8 @@ const OverViewList = () => {
       return "N/A";
     }
   };
+
+  const logged = useSelector((state)=>state.user.loggedInUser)
 
   const dateendd = filterdata?.[0]?.startDate
     ? formatDate(filterdata[0].startDate)
@@ -295,49 +318,31 @@ const OverViewList = () => {
     setIsTaskModalVisible(false);
   };
 
-  // Task Modal Content
-  // const TaskModal = () => (
-  //   <Modal
-  //     title={`${selectedStatus || ''} Tasks`}
-  //     open={isTaskModalVisible}
-  //     onCancel={() => setIsTaskModalVisible(false)}
-  //     footer={null}
-  //     width={800}
-  //   >
-  //     <div className="max-h-[60vh] overflow-y-auto">
-  //       {selectedStatus && tasksByStatus[selectedStatus]?.map((task) => (
-  //         <div
-  //           key={task.id}
-  //           onClick={() => handleTaskClick(task.id)}
-  //           className="cursor-pointer hover:bg-gray-50 p-4 border-b border-gray-200"
-  //         >
-  //           <div className="flex justify-between items-center">
-  //             <div>
-  //               <h3 className="font-medium text-gray-900">{task.taskName}</h3>
-  //               <p className="text-sm text-gray-500">
-  //                 Due: {new Date(task.dueDate).toLocaleDateString()}
-  //               </p>
-  //             </div>
-  //             <div
-  //               className="px-3 py-1 rounded-full text-sm text-white"
-  //               style={{
-  //                 backgroundColor: getStatusColor(task.status),
-  //                 boxShadow: `0 2px 4px ${getStatusColor(task.status)}40`
-  //               }}
-  //             >
-  //               {task.status}
-  //             </div>
-  //           </div>
-  //           {task.description && (
-  //             <p className="text-sm text-gray-600 mt-2 line-clamp-2">
-  //               {task.description}
-  //             </p>
-  //           )}
-  //         </div>
-  //       ))}
-  //     </div>
-  //   </Modal>
-  // );
+  // Update the clientInfo memo with better error handling
+  const clientInfo = useMemo(() => {
+    // Wait for both project and client data to be available
+    if (!fndpro || !allclient) {
+      return {
+        username: 'Loading...',
+        email: 'Loading...'
+      };
+    }
+
+    // Find the client using the project's client ID
+    const client = allclient.find(item => item.id === fndpro.client);
+    
+    if (!client) {
+      return {
+        username: 'Client Not Found',
+        email: 'No Email Available'
+      };
+    }
+
+    return {
+      username: client.username || 'No Client Name',
+      email: client.email || 'No Email Available'
+    };
+  }, [fndpro, allclient]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -346,15 +351,12 @@ const OverViewList = () => {
   return (
     <>
       <div className="p-2 bg-gray-50">
-        {/* Project Progress Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-medium text-black mb-4">
               Project Progress
             </h2>
 
-            {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center"> */}
-            {/* Progress Circle */}
             <div className="flex flex-col items-center justify-center w-full">
               <div className="relative w-32 h-32">
                 <CircularProgressbar
@@ -432,26 +434,20 @@ const OverViewList = () => {
             </div>
 
           </div>
-          {/* </div> */}
-          {/* Client Section */}
+       
           <div className="bg-white p-6 rounded-lg shadow flex flex-col">
             <h2 className="text-xl font-medium mb-0 text-black">Client</h2>
             <div className="flex items-center gap-4">
-              <img
-                src={updatedList[0]?.profilePic}
-                alt="Client"
-                className="w-16 h-16 rounded-sm object-fit-cover position-relative mt-6"
-              />
+             
               <div>
                 <h3 className="f-18 f-w-500 mb-0 text-black mt-6">
-                  {updatedList[0]?.username || 'No Client Name'}
+                  {/* {clientInfo.username} */}
+                  {logged.username}
                 </h3>
                 <p className="f-14 mb-0 text-lightest">
-                  {updatedList[0]?.email || 'No Email Available'}
+                  {logged.email}
                 </p>
-                {/* <p className="f-14 mb-0 text-lightest">
-                  {updatedList[0]?.created_by || 'No Email Available'}
-                </p> */}
+             
               </div>
             </div>
           </div>
@@ -468,30 +464,8 @@ const OverViewList = () => {
                 options={chartOptions}
               />
             </div>
-            {/* Status Legend */}
-            {/* <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mt-4">
-              {taskStatusData.labels.map((status, index) => (
-                <div 
-                  key={status}
-                  className="flex items-center gap-2 p-2 rounded hover:bg-gray-50 cursor-pointer"
-                  onClick={() => {
-                    setSelectedStatus(status);
-                    setIsTaskModalVisible(true);
-                  }}
-                >
-                  <div 
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: taskStatusData.datasets[0].backgroundColor[index] }}
-                  />
-                  <span className="text-sm text-gray-600 truncate">
-                    {status}
-                  </span>
-                </div>
-              ))}
-            </div> */}
+          
           </div>
-
-          {/* Statistics Section */}
 
           <div className="">
             <div>
@@ -564,7 +538,6 @@ const OverViewList = () => {
           </div>
         </div>
 
-        {/* Charts Section */}
 
         <div className="bg-white p-6 rounded-lg shadow grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {/* Hours Logged Chart */}
@@ -606,28 +579,7 @@ const OverViewList = () => {
           </div>
         </div>
 
-        {/* <div className="bg-white p-6 rounded-lg shadow grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
-                    <div className="w-full">
-                        <h2 className="text-xl font-semibold mb-4">Hours Logged</h2>
-                        <BarChart width={400} height={300} data={hoursData}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Bar dataKey="value" fill="#ef4444" />
-                        </BarChart>
-                    </div>
-                    <div className="">
-                        <h2 className="text-xl font-semibold mb-4">Project Budget</h2>
-                        <BarChart width={400} height={300} data={budgetData}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Bar dataKey="value" fill="#ef4444" />
-                        </BarChart>
-                    </div>
-                </div> */}
-
-        {/* Project Details */}
+       
         <div className=" mb-4 bg-white p-8  rounded-lg shadow">
           <h4 className="text-2xl font-medium text-black ">Project Details</h4>
           <p className="flex justify-start mt-2 text-sm font-medium">
@@ -639,9 +591,9 @@ const OverViewList = () => {
         </div>
       </div>
 
-      {/* <TaskModal /> */}
     </>
   );
 };
 
 export default OverViewList;
+
