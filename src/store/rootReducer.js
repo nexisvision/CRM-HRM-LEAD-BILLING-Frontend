@@ -29,7 +29,7 @@ import Product from "../views/app-views/dashboards/project/product/ProductReduce
 import Tasks from "../views/app-views/dashboards/project/task/TaskReducer/TaskSlice"
 import Lable from "../views/app-views/dashboards/project/milestone/LableReducer/LableSlice"
 import invoice from "../views/app-views/dashboards/project/invoice/invoicereducer/InvoiceSlice"
-import estimate from 'views/app-views/dashboards/sales/estimates/estimatesReducer/EstimatesSlice'
+import estimate from 'views/app-views/dashboards/project/estimates/estimatesReducer/EstimatesSlice'
 import Jobs from "../views/app-views/hrm/Jobs/JobReducer/JobSlice"
 import Training from "../views/app-views/hrm/trainingSetup/TrainingReducer/TrainingSlice"
 import Piplines from "../views/app-views/dashboards/systemsetup/Pipeline/PiplineReducer/piplineSlice"
@@ -66,6 +66,7 @@ import attendance from "../views/app-views/hrm/Attendance/AttendanceReducer/Atte
 import subplan from "../views/app-views/subscribeduserplans/subplanReducer/subplanSlice"
 import notes from "../views/app-views/notes/notesReducer/notesSlice"
 import tax from 'views/app-views/setting/tax/taxreducer/taxSlice'
+import salesquotation from "views/app-views/dashboards/sales/estimates/estimatesReducer/EstimatesSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -136,6 +137,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
         subplan,
         notes,
         tax,
+        salesquotation,
         // employee,
         // department,
         ...asyncReducers,

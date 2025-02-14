@@ -7,6 +7,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { updatequotation, getquotationsById, getallquotations } from './estimatesReducer/EstimatesSlice';
 import dayjs from 'dayjs';
 import * as Yup from 'yup';
+import { Getcus } from '../customer/CustomerReducer/CustomerSlice';
+import { AddLable, GetLable } from '../LableReducer/LableSlice';
 
 const { Option } = Select;
 
@@ -49,6 +51,70 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
             description: "",
         }
     ]);
+
+    // Add new state variables
+    const [isTagModalVisible, setIsTagModalVisible] = useState(false);
+    const [newTag, setNewTag] = useState("");
+    const [tags, setTags] = useState([]);
+    const AllLoggeddtaa = useSelector((state) => state.user);
+
+    // Add useEffect for fetching customers
+    useEffect(() => {
+        dispatch(Getcus());
+    }, []);
+
+    const customerdata = useSelector((state) => state.customers);
+    const fnddata = customerdata.customers.data;
+
+    // Add tag management functions
+    const fetchTags = async () => {
+        try {
+            const lid = AllLoggeddtaa.loggedInUser.id;
+            const response = await dispatch(GetLable(lid));
+
+            if (response.payload && response.payload.data) {
+                const uniqueTags = response.payload.data
+                    .filter((label) => label && label.name)
+                    .map((label) => ({
+                        id: label.id,
+                        name: label.name.trim(),
+                    }))
+                    .filter(
+                        (label, index, self) =>
+                            index === self.findIndex((t) => t.name === label.name)
+                    );
+
+                setTags(uniqueTags);
+            }
+        } catch (error) {
+            console.error("Failed to fetch tags:", error);
+            message.error("Failed to load tags");
+        }
+    };
+
+    const handleAddNewTag = async () => {
+        if (!newTag.trim()) {
+            message.error("Please enter a tag name");
+            return;
+        }
+
+        try {
+            const lid = AllLoggeddtaa.loggedInUser.id;
+            const payload = {
+                name: newTag.trim(),
+                labelType: "status",
+            };
+
+            await dispatch(AddLable({ lid, payload }));
+            message.success("Status added successfully");
+            setNewTag("");
+            setIsTagModalVisible(false);
+            await fetchTags();
+        } catch (error) {
+            console.error("Failed to add Status:", error);
+            message.error("Failed to add Status");
+        }
+    };
 
     // First useEffect to fetch all quotations
     useEffect(() => {
@@ -114,29 +180,48 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
     }, [idd, quotationData, form]);
 
     const handleFinish = async (values) => {
-            // Ensure valid_till is properly formatted
+        try {
+            setLoading(true);
+
+            // Calculate totals
+            const subTotal = calculateSubTotal();
+            const totalTax = calculateTotalTax();
+            const discount = calculateDiscount();
+            const finalTotal = subTotal - discount + totalTax;
+
+            // Format items data similar to AddEstimates
+            const itemsObject = tableData.reduce((acc, item, index) => {
+                acc[`item_${index + 1}`] = {
+                    item: item.item,
+                    discount: Number(totals.discount),
+                    quantity: parseFloat(item.quantity) || 0,
+                    price: parseFloat(item.price) || 0,
+                    tax: parseFloat(item.tax) || 0,
+                    amount: parseFloat(item.amount) || 0,
+                    description: item.description || ''
+                };
+                return acc;
+            }, {});
+
             const updatedValues = {
                 ...values,
-                issueDate: values.issueDate
-                    ? dayjs(values.issueDate).format("YYYY-MM-DD")
-                    : null,
+                issueDate: values.issueDate.format("YYYY-MM-DD"),
+                items: itemsObject,
+                discount: parseFloat(discount.toFixed(2)) || 0,
+                tax: parseFloat(totalTax.toFixed(2)) || 0, 
+                total: parseFloat(finalTotal.toFixed(2)) || 0
             };
-        
-            console.log("Form Values:", values);
-            // console.log("Updated Values:", updatedValues);
-        
-            try {
-                setLoading(true);
-                await dispatch(updatequotation({ id: idd, values: updatedValues })).unwrap();
-                message.success("Estimate updated successfully!");
-                dispatch(getallquotations());
-                onClose();
-            } catch (error) {
-                message.error("Failed to update estimate: " + (error.message || "Unknown error"));
-            } finally {
-                setLoading(false);
-            }
-        };
+
+            await dispatch(updatequotation({ id: idd, values: updatedValues })).unwrap();
+            message.success("Estimate updated successfully!");
+            dispatch(getallquotations());
+            onClose();
+        } catch (error) {
+            message.error("Failed to update estimate: " + (error.message || "Unknown error"));
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const [rows, setRows] = useState([
         {
@@ -262,13 +347,29 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
                             <div className=" p-2">
 
                                 <Row gutter={16}>
-                                    <Col span={12}>
+                                    <Col span={24} className="mt-1">
                                         <Form.Item
+                                            label="Customer"
                                             name="customer"
-                                            label="Customer Name"
-                                            rules={[{ required: true, message: "Please enter the customer name" }]}
+                                            rules={[{ required: true, message: "Please select a customer" }]}
                                         >
-                                            <Input placeholder="Enter customer name" />
+                                            <Select
+                                                style={{ width: "100%" }}
+                                                placeholder="Select Client"
+                                                loading={!fnddata}
+                                            >
+                                                {fnddata && fnddata.length > 0 ? (
+                                                    fnddata.map((client) => (
+                                                        <Option key={client.id} value={client.id}>
+                                                            {client.name || "Unnamed Client"}
+                                                        </Option>
+                                                    ))
+                                                ) : (
+                                                    <Option value="" disabled>
+                                                        No customers available
+                                                    </Option>
+                                                )}
+                                            </Select>
                                         </Form.Item>
                                     </Col>
 
@@ -282,15 +383,31 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
                                         </Form.Item>
                                     </Col>
 
-                                    <Col span={12}>
+                                    <Col span={12} className="">
                                         <Form.Item
-                                            name="category"
                                             label="Category"
-                                            rules={[{ required: true, message: "Please select a Category" }]}
+                                            name="category"
+                                            rules={[{ required: true, message: "Please select or add a category" }]}
                                         >
-                                            <Select placeholder="Select Category">
-                                                <Option value="abc">abc</Option>
-                                                <Option value="xyz">xyz</Option>
+                                            <Select
+                                                placeholder="Select or add new category"
+                                                dropdownRender={(menu) => (
+                                                    <div>
+                                                        {menu}
+                                                        <div style={{ padding: "8px", borderTop: "1px solid #e8e8e8" }}>
+                                                            <Button type="link" onClick={() => setIsTagModalVisible(true)} block>
+                                                                Add New Category
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            >
+                                                {tags &&
+                                                    tags.map((tag) => (
+                                                        <Option key={tag.id} value={tag.name}>
+                                                            {tag.name}
+                                                        </Option>
+                                                    ))}
                                             </Select>
                                         </Form.Item>
                                     </Col>
@@ -475,6 +592,21 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
                     </Form>
                 </div>
             </div>
+
+            {/* Add Modal component at the end of the return statement */}
+            <Modal
+                title="Add New Category"
+                open={isTagModalVisible}
+                onCancel={() => setIsTagModalVisible(false)}
+                onOk={handleAddNewTag}
+                okText="Add Category"
+            >
+                <Input
+                    placeholder="Enter new Category"
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                />
+            </Modal>
         </>
     );
 };

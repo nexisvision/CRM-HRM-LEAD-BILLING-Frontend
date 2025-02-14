@@ -33,12 +33,7 @@ const EditBilling = ({ idd, onClose }) => {
   const lid = AllLoggeddtaa.loggedInUser.id;
   const Tagsdetail = useSelector((state) => state.Lable);
 
-  useEffect(() => {
-    dispatch(getbil(lid));
-  }, []);
-
   const [showTax, setShowTax] = useState(false);
-
   const [discountRate, setDiscountRate] = useState(0);
   const [totals, setTotals] = useState({
     subtotal: "0.00",
@@ -63,88 +58,42 @@ const EditBilling = ({ idd, onClose }) => {
   const fnsdatas = bildata.salesbilling.data;
 
   useEffect(() => {
+    dispatch(getbil(lid));
+    fetchTags();
+  }, []);
+
+  useEffect(() => {
     const fnd = fnsdatas.find((item) => item.id === idd);
     if (fnd) {
       try {
-        // Parse items if they're stored as a string
-        let itemsArray = [];
-        if (fnd.items) {
-          try {
-            itemsArray = typeof fnd.items === 'string' 
-              ? JSON.parse(fnd.items) 
-              : fnd.items;
-          } catch (error) {
-            console.error("Error parsing items:", error);
-            itemsArray = [];
-          }
-        }
-
-        // Set form fields
         form.setFieldsValue({
           vendor: fnd.vendor || "",
           billDate: fnd.billDate ? moment(fnd.billDate) : null,
           status: fnd.status || "",
           billNumber: fnd.billNumber || "",
-          discount: fnd.discount || 0,
-          tax: fnd.tax || 0,
           note: fnd.note || "",
         });
 
-        // Set rows with items data
-        if (itemsArray && Array.isArray(itemsArray) && itemsArray.length > 0) {
-          const formattedRows = itemsArray.map((item) => ({
-            id: Date.now() + Math.random(), // Generate unique ID
+        setDiscountRate(fnd.discount || 0);
+        setShowTax(!!fnd.tax);
+
+        if (fnd.items && Array.isArray(fnd.items)) {
+          const formattedItems = fnd.items.map(item => ({
+            id: Date.now() + Math.random(),
             item: item.item || "",
             quantity: Number(item.quantity) || 1,
             price: Number(item.price) || 0,
-            discount: Number(item.discount) || 0,
             tax: Number(item.tax) || 0,
             amount: calculateAmount({
               quantity: Number(item.quantity) || 1,
               price: Number(item.price) || 0,
-              discount: Number(item.discount) || 0,
               tax: Number(item.tax) || 0
             }),
-            description: item.description || "",
-            category: item.category || "",
-            referenceNumber: item.referenceNumber || "",
+            description: item.description || ""
           }));
-          setRows(formattedRows);
-
-          // For debugging
-          console.log('Loaded Items:', formattedRows);
-        } else {
-          // Set default row if no items exist
-          setRows([{
-            id: Date.now(),
-            item: "",
-            quantity: 1,
-            price: 0,
-            discount: 0,
-            tax: 0,
-            amount: 0,
-            description: "",
-            category: "",
-            referenceNumber: "",
-          }]);
+          setTableData(formattedItems);
+          calculateTotal(formattedItems, fnd.discount || 0);
         }
-
-        // Parse and set description if it exists
-        if (fnd.description) {
-          try {
-            const descriptionObj = typeof fnd.description === 'string'
-              ? JSON.parse(fnd.description)
-              : fnd.description;
-            
-            form.setFieldsValue({
-              description: descriptionObj.description || ""
-            });
-          } catch (error) {
-            console.error("Error parsing description:", error);
-            form.setFieldsValue({ description: "" });
-          }
-        }
-
       } catch (error) {
         console.error("Error setting form data:", error);
         message.error("Error loading bill data");
@@ -152,79 +101,54 @@ const EditBilling = ({ idd, onClose }) => {
     }
   }, [fnsdatas, idd, form]);
 
-  const [rows, setRows] = useState([
-    {
-      id: Date.now(),
-      item: "",
-      quantity: 1,
-      price: 0,
-      discount: 0,
-      tax: 0,
-      amount: 0,
-      description: "",
-      category: "",
-      referenceNumber: "",
-      isNew: true,
-    },
-  ]);
-
-  useEffect(() => {
-    dispatch(Getcus());
-  }, []);
-
-  const customerdata = useSelector((state) => state.customers);
-  const fnddata = customerdata.customers.data;
-
-  const handleAddRow = () => {
-    setRows([
-      ...rows,
-      {
-        id: Date.now(),
-        item: "",
-        quantity: 1,
-        price: 0,
-        discount: 0,
-        tax: 0,
-        amount: 0,
-        description: "",
-        category: "",
-        referenceNumber: "",
-        isNew: true,
-      },
-    ]);
-  };
-
-  const handleDeleteRow = (id) => {
-    const updatedRows = rows.filter((row) => row.id !== id);
-    setRows(updatedRows);
-  };
-
-  const handleFieldChange = (id, field, value) => {
-    const updatedRows = rows.map((row) => {
-      if (row.id === id) {
-        const updatedRow = { ...row, [field]: value };
-        return {
-          ...updatedRow,
-          amount: calculateAmount(updatedRow)
-        };
-      }
-      return row;
-    });
-    setRows(updatedRows);
-  };
-
   const calculateAmount = (row) => {
     const quantity = Number(row.quantity) || 0;
     const price = Number(row.price) || 0;
-    const discount = Number(row.discount) || 0;
-    const tax = Number(row.tax) || 0;
+    const tax = showTax ? (Number(row.tax) || 0) : 0;
+    
+    const baseAmount = quantity * price;
+    const taxAmount = (baseAmount * tax) / 100;
+    
+    return (baseAmount + taxAmount).toFixed(2);
+  };
 
-    const discountAmount = (price * discount) / 100;
-    const priceAfterDiscount = price - discountAmount;
-    const taxAmount = (priceAfterDiscount * tax) / 100;
-    const totalAmount = (priceAfterDiscount + taxAmount) * quantity;
+  const calculateTotal = (data = tableData, discount = discountRate) => {
+    if (!Array.isArray(data)) {
+      console.error('Invalid data passed to calculateTotal');
+      return;
+    }
 
-    return totalAmount.toFixed(2);
+    let subtotal = 0;
+    let totalTax = 0;
+
+    data.forEach((row) => {
+      const quantity = parseFloat(row.quantity) || 0;
+      const price = parseFloat(row.price) || 0;
+      const tax = showTax ? (parseFloat(row.tax) || 0) : 0;
+      
+      const baseAmount = quantity * price;
+      const taxAmount = (baseAmount * tax) / 100;
+      
+      subtotal += baseAmount;
+      totalTax += taxAmount;
+    });
+
+    const discountAmount = (subtotal * (parseFloat(discount) || 0)) / 100;
+    const finalTotal = subtotal - discountAmount + totalTax;
+
+    setTotals({
+      subtotal: subtotal.toFixed(2),
+      discount: discountAmount.toFixed(2),
+      totalTax: totalTax.toFixed(2),
+      finalTotal: finalTotal.toFixed(2),
+    });
+
+    return {
+      subtotal,
+      discount: discountAmount,
+      totalTax,
+      finalTotal
+    };
   };
 
   const handleTableDataChange = (id, field, value) => {
@@ -251,116 +175,78 @@ const EditBilling = ({ idd, onClose }) => {
     calculateTotal(updatedData, discountRate);
   };
 
-  const calculateTotal = (data, discountRate) => {
-    let subtotal = 0;
-    let totalTax = 0;
+  const handleAddRow = () => {
+    setTableData([
+      ...tableData,
+      {
+        id: Date.now(),
+        item: "",
+        quantity: 1,
+        price: 0,
+        tax: 0,
+        amount: 0,
+        description: "",
+      },
+    ]);
+  };
 
-    data.forEach((row) => {
-      const quantity = parseFloat(row.quantity) || 0;
-      const price = parseFloat(row.price) || 0;
-      const tax = showTax ? (parseFloat(row.tax) || 0) : 0;
-      
-      const baseAmount = quantity * price;
-      const taxAmount = (baseAmount * tax) / 100;
-      
-      subtotal += baseAmount;
-      totalTax += taxAmount;
-    });
-
-    const discount = (subtotal * (parseFloat(discountRate) || 0)) / 100;
-    const finalTotal = subtotal - discount + totalTax;
-
-    setTotals({
-      subtotal: subtotal.toFixed(2),
-      discount: discount.toFixed(2),
-      totalTax: totalTax.toFixed(2),
-      finalTotal: finalTotal.toFixed(2),
-    });
+  const handleDeleteRow = (id) => {
+    const updatedData = tableData.filter((row) => row.id !== id);
+    setTableData(updatedData);
+    calculateTotal(updatedData, discountRate);
   };
 
   const handleSubmit = () => {
     form
       .validateFields()
       .then((values) => {
-        const { subtotal, totalDiscount, totalTax, totalAmount } =
-          calculateTotal();
+        const totals = calculateTotal();
 
-        const selectedTag = tags.find((tag) => tag.name === values.status);
+        const itemsDescription = {
+          product: tableData.map(item => item.item).filter(Boolean).join(", "),
+          service: tableData.map(item => item.description).filter(Boolean).join(", ")
+        };
 
-        // Modify prepareInvoiceData to structure discription as an object
-        const prepareInvoiceData = () => {
-          const itemsData = rows.map((row) => ({
+        const invoiceData = {
+          vendor: values.vendor,
+          billDate: values.billDate?.format("YYYY-MM-DD"),
+          discription: itemsDescription,
+          status: values.status,
+          billNumber: values.billNumber,
+          discount: parseFloat(discountRate) || 0,
+          tax: showTax ? parseFloat(totals.totalTax) || 0 : 0,
+          total: parseFloat(totals.finalTotal) || 0,
+          note: values.note || "",
+          items: tableData.map(row => ({
             item: row.item,
-            quantity: Number(row.quantity),
-            price: Number(row.price),
-            discount: Number(row.discount),
-            tax: Number(row.tax),
-            amount: Number(row.amount),
-            description: row.description || "",
-            category: row.category || "",
-            referenceNumber: row.referenceNumber || "",
-          }));
-
-          // Construct the discription as an object
-          let discription = {
-            product: "", // Default or some value based on your requirement
-            service: "", // Default or some value based on your requirement
-          };
-
-          // Check if itemsData has a specific structure to fill product and service fields
-          if (itemsData.length > 0) {
-            // For example, you could concatenate all item names as "product" and "service" based on some logic
-            discription.product = itemsData.map((item) => item.item).join(", ");
-            discription.service = itemsData
-              .map((item) => item.description)
-              .join(", ");
-          }
-
-          return {
-            vendor: values.vendor,
-            billDate: values.billDate?.format("YYYY-MM-DD"),
-            discription, // Pass the structured discription object
-            status: values.status,
-            discount: Number(totalDiscount),
-            tax: Number(totalTax),
-            total: Number(totalAmount),
-            note: values.note || "",
-            
-          };
+            quantity: parseFloat(row.quantity) || 0,
+            price: parseFloat(row.price) || 0,
+            tax: showTax ? parseFloat(row.tax) || 0 : 0,
+            amount: parseFloat(row.amount) || 0,
+            description: row.description || ""
+          }))
         };
 
-        const sendData = async () => {
-          try {
-            if (selectedTag) {
-              const newTagPayload = { name: values.status.trim() };
-              await dispatch(AddLable({ lid, payload: newTagPayload }));
-            }
-
-            const invoiceData = prepareInvoiceData();
-
-            await dispatch(eidtebil({ idd, invoiceData })).then(() => {
-              dispatch(getbil(lid));
-              message.success("Bill added successfully!");
-              onClose();
-            });
-          } catch (error) {
-            console.error("Error during Bill submission:", error);
-            message.error("Failed to add Bill. Please try again.");
-          }
-        };
-
-        sendData();
+        dispatch(eidtebil({ idd, invoiceData }))
+          .then(() => {
+            dispatch(getbil(lid));
+            message.success("Bill updated successfully!");
+            onClose();
+          })
+          .catch((error) => {
+            console.error("Error updating bill:", error);
+            message.error("Failed to update bill");
+          });
       })
       .catch((error) => {
         console.error("Validation failed:", error);
+        message.error("Please fill in all required fields");
       });
   };
 
   const fetchTags = async () => {
     try {
-      const lid = AllLoggeddtaa.loggedInUser.id;
       const response = await dispatch(GetLable(lid));
-
       if (response.payload && response.payload.data) {
         const uniqueTags = response.payload.data
           .filter((label) => label && label.name)
@@ -372,7 +258,6 @@ const EditBilling = ({ idd, onClose }) => {
             (label, index, self) =>
               index === self.findIndex((t) => t.name === label.name)
           );
-
         setTags(uniqueTags);
       }
     } catch (error) {
@@ -383,26 +268,24 @@ const EditBilling = ({ idd, onClose }) => {
 
   const handleAddNewTag = async () => {
     if (!newTag.trim()) {
-      message.error("Please enter a category name");
+      message.error("Please enter a status name");
       return;
     }
 
     try {
-      const lid = AllLoggeddtaa.loggedInUser.id;
       const payload = {
         name: newTag.trim(),
         labelType: "status",
       };
 
       await dispatch(AddLable({ lid, payload }));
-      message.success("Category added successfully");
+      message.success("Status added successfully");
       setNewTag("");
       setIsTagModalVisible(false);
-
       await fetchTags();
     } catch (error) {
-      console.error("Failed to add category:", error);
-      message.error("Failed to add category");
+      console.error("Failed to add status:", error);
+      message.error("Failed to add status");
     }
   };
 
@@ -488,28 +371,6 @@ const EditBilling = ({ idd, onClose }) => {
             </Col>
 
             <Col span={12}>
-              <Form.Item label="Discount" name="discount">
-                <Input
-                  type="number"
-                  placeholder="Enter Discount"
-                  min={0}
-                  max={100}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col span={12}>
-              <Form.Item label="Tax" name="tax">
-                <Input
-                  type="number"
-                  placeholder="Enter Tax"
-                  min={0}
-                  max={100}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col span={12}>
               <Form.Item label="Note" name="note">
                 <Input placeholder="Enter Note (Optional)" />
               </Form.Item>
@@ -542,12 +403,8 @@ const EditBilling = ({ idd, onClose }) => {
 
           <div>
             <div className="form-buttons text-right mb-2">
-              <Button 
-                type="primary" 
-                onClick={handleAddRow}
-                icon={<PlusOutlined />}
-              >
-                Add Items
+              <Button type="primary" onClick={handleAddRow}>
+                <PlusOutlined /> Add Items
               </Button>
             </div>
             <div className="overflow-x-auto">
@@ -584,7 +441,7 @@ const EditBilling = ({ idd, onClose }) => {
                             value={row.item}
                             onChange={(e) => handleTableDataChange(row.id, "item", e.target.value)}
                             placeholder="Item Name"
-                            className="w-full p-2 border rounded"
+                            className="w-full p-2 border rounded-s"
                           />
                         </td>
                         <td className="px-4 py-2 border-b">
@@ -604,7 +461,7 @@ const EditBilling = ({ idd, onClose }) => {
                             value={row.price}
                             onChange={(e) => handleTableDataChange(row.id, "price", e.target.value)}
                             placeholder="Price"
-                            className="w-full p-2 border rounded"
+                            className="w-full p-2 border rounded-s"
                           />
                         </td>
                         <td className="px-4 py-2 border-b">
@@ -634,11 +491,9 @@ const EditBilling = ({ idd, onClose }) => {
                           ₹{row.amount}
                         </td>
                         <td className="px-2 py-1 border-b text-center">
-                          <Button 
-                            danger 
-                            onClick={() => handleDeleteRow(row.id)}
-                            icon={<DeleteOutlined />}
-                          />
+                          <Button danger onClick={() => handleDeleteRow(row.id)}>
+                            <DeleteOutlined />
+                          </Button>
                         </td>
                       </tr>
                       <tr>
@@ -648,7 +503,7 @@ const EditBilling = ({ idd, onClose }) => {
                             value={row.description}
                             onChange={(e) => handleTableDataChange(row.id, "description", e.target.value)}
                             placeholder="Description"
-                            className="w-[70%] p-2 border rounded"
+                            className="w-[70%] p-2 border"
                           />
                         </td>
                       </tr>
@@ -702,21 +557,20 @@ const EditBilling = ({ idd, onClose }) => {
               </tbody>
             </table>
           </div>
-
         </Card>
 
         <div className="mt-3 flex justify-end">
           <Button type="primary" onClick={handleSubmit}>
-            Submit Bill
+            Update Bill
           </Button>
-          <Button type="ghost" onClick={onClose}>
+          <Button type="ghost" onClick={onClose} className="ml-2">
             Cancel
           </Button>
         </div>
       </Form>
 
       <Modal
-        title="Add New Category"
+        title="Add New Status"
         visible={isTagModalVisible}
         onOk={handleAddNewTag}
         onCancel={() => setIsTagModalVisible(false)}
@@ -725,7 +579,7 @@ const EditBilling = ({ idd, onClose }) => {
         <Input
           value={newTag}
           onChange={(e) => setNewTag(e.target.value)}
-          placeholder="Enter new category name"
+          placeholder="Enter new status name"
         />
       </Modal>
     </div>

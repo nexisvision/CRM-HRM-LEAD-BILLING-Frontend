@@ -115,15 +115,15 @@ const LeadCards = () => {
 
   useEffect(() => {
     if (fndata.length > 0) {
-      const leadsGroupedByStage = fndata
-        .filter((stage) => stage.pipeline === selectedPipeline || !selectedPipeline)
-        .map((stage) => ({
-          status: stage.stageName,
-          stageId: stage.id,
-          leads: fndleadadat.filter((lead) => lead.leadStage === stage.id),
-        }));
+      const filteredStages = selectedPipeline === "all" 
+        ? fndata 
+        : fndata.filter((stage) => stage.pipeline === selectedPipeline);
 
-        console.log("mlmlm",leadsGroupedByStage)
+      const leadsGroupedByStage = filteredStages.map((stage) => ({
+        status: stage.stageName,
+        stageId: stage.id,
+        leads: fndleadadat.filter((lead) => lead.leadStage === stage.id),
+      }));
 
       setLeadData(leadsGroupedByStage);
     }
@@ -226,22 +226,6 @@ const LeadCards = () => {
 
   const handlePipelineChange = (value) => {
     setSelectedPipeline(value);
-    if (value === "all") {
-      const leadsGroupedByStage = fndata.map((stage) => ({
-        status: stage.stageName,
-        stageId: stage.id,
-        leads: fndleadadat.filter((lead) => lead.leadStage === stage.id),
-      }));
-      setLeadData(leadsGroupedByStage);
-    } else {
-      const filteredStages = fndata.filter((pipeline) => pipeline.pipeline === value); 
-      const leadsGroupedByStage = filteredStages.map((stage) => ({
-        status: stage.stageName,
-        stageId: stage.id,
-        leads: fndleadadat.filter((lead) => lead.leadStage === stage.id),
-      }));
-      setLeadData(leadsGroupedByStage);
-    }
   };
   
 

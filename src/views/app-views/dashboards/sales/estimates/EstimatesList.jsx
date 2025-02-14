@@ -82,16 +82,19 @@ const EstimatesList = () => {
   // Fetch estimate when component mounts
   useEffect(() => {
     dispatch(getallquotations());
-    dispatch(Getcus());
-  }, [dispatch]);
+    dispatch(Getcus()); // Fetch customer data
+  }, []);
+  // useEffect(() => {
+  //   setList(salesquotations); // Update list when estimates change
+  // }, [salesquotations]);
 
-  // Update filteredData when salesquotations changes
+  const allsdata = useSelector((state)=>state.salesquotation.salesquotations)
+
+
   useEffect(() => {
-    // Ensure salesquotations is an array before setting it
-    setFilteredData(Array.isArray(salesquotations) ? salesquotations : []);
-  }, [salesquotations]);
-
-  // Search function with array check
+    setFilteredData(allsdata);
+  }, [allsdata]);
+  // Search function
   const onSearch = (e) => {
     const value = e.currentTarget.value.toLowerCase();
     
@@ -103,14 +106,15 @@ const EstimatesList = () => {
 
     // If search value is empty, show all data
     if (!value) {
-      setFilteredData(salesquotations);
+      setFilteredData(allsdata);
       return;
     }
 
     // Filter the data based on search value
-    const filtered = salesquotations.filter(item =>
-      item?.customer?.toLowerCase().includes(value) ||
-      item?.category?.toLowerCase().includes(value)
+    const filtered = allsdata.filter(item =>
+      item.customer?.toLowerCase().includes(value) ||
+      item.category?.toLowerCase().includes(value) 
+      // item.phoneCode?.toLowerCase().includes(value)
     );
     setFilteredData(filtered);
   };
@@ -430,7 +434,7 @@ const EstimatesList = () => {
                   style={{ width: "100%" }}
                   onChange={(value) =>
                     setList(
-                      salesquotations.filter(
+                      allsdata.filter(
                         (item) => value === "All" || item.orderStatus === value
                       )
                     )
