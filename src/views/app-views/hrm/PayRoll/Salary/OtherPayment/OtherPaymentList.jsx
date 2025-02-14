@@ -41,11 +41,13 @@ const OtherPaymentList = ({ id, onClose }) => {
   const alldata = useSelector((state) => state.otherpayment);
   const fnddata = alldata.otherpayment.data;
 
+  const fnddatasss = fnddata?.filter((item)=>item?.employeeId === id)
+
   useEffect(() => {
-    if (fnddata) {
-      setSalaryData(fnddata);
+    if (fnddatasss) {
+      setSalaryData(fnddatasss);
     }
-  }, [fnddata]);
+  }, [fnddata,fnddatasss]);
 
   // Open Add Salary Modal
   const openModal = () => {

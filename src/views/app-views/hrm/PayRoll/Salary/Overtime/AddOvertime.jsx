@@ -117,7 +117,7 @@ const AddOvertime = ({ id, onClose }) => {
             <div>
               <label className="font-semibold">Rate</label>
               <Field name="rate">
-                {({ field }) => <Input {...field} placeholder="Enter Rate" type="number" />}
+                {({ field }) => <Input {...field} placeholder="Enter Rate" type="text" />}
               </Field>
               <ErrorMessage
                 name="rate"

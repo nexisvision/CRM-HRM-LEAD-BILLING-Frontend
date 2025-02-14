@@ -45,7 +45,7 @@ const SetSalary = ({ id, onClose }) => (
 
       {/* Overtime Section */}
       <div className=" rounded-lg lg:p-1">
-        <Overtime />
+        <Overtime id={id} onClose={onClose} />
       </div>
     </div>
   </div>

@@ -41,11 +41,14 @@ const SaturationDeductionList = ({ id, onClose }) => {
   const alldata = useSelector((state) => state.deducation);
   const fnddata = alldata.deducation.data;
 
+  
+  const fnddatasss = fnddata?.filter((item)=>item?.employeeId === id)
+
   useEffect(() => {
-    if (fnddata) {
-      setSalaryData(fnddata);
+    if (fnddatasss) {
+      setSalaryData(fnddatasss);
     }
-  }, [fnddata]);
+  }, [fnddata,fnddatasss]);
 
   // Open Add Salary Modal
   const openModal = () => {

@@ -38,11 +38,13 @@ const LoanList = ({ id, onClose }) => {
   const alldata = useSelector((state) => state.loan);
   const fnsdata = alldata.loan.data;
 
+  const fnddatasss = fnsdata?.filter((item)=>item?.employeeId === id)
+
   useEffect(() => {
-    if (fnsdata) {
-      setSalaryData(fnsdata);
+    if (fnddatasss) {
+      setSalaryData(fnddatasss);
     }
-  }, [fnsdata]);
+  }, [fnsdata,fnddatasss]);
 
   // Open Add Salary Modal
   const openModal = () => {

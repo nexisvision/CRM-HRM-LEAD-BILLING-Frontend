@@ -42,11 +42,14 @@ const OvertimeList = ({ id, onClose }) => {
   const alldata = useSelector((state) => state.overtime);
   const fnddata = alldata.overtime.data;
 
+  const fnddatasss = fnddata?.filter((item)=>item?.employeeId === id)
+
+
   useEffect(() => {
-    if (fnddata) {
-      setSalaryData(fnddata);
+    if (fnddatasss) {
+      setSalaryData(fnddatasss);
     }
-  }, [fnddata]);
+  }, [fnddata,fnddatasss]);
 
   const openModal = () => {
     setIsModalVisible(true);

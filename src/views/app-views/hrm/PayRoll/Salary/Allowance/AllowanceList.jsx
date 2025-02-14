@@ -39,11 +39,13 @@ const AllowanceList = ({ id, onClose }) => {
   const alladata = useSelector((state) => state.allowance);
   const fndcdata = alladata.allowance.data;
 
+  const fnddatasss = fndcdata?.filter((item)=>item?.employeeId === id)
+
   useEffect(() => {
-    if (fndcdata) {
-      setSalaryData(fndcdata);
+    if (fnddatasss) {
+      setSalaryData(fnddatasss);
     }
-  }, [fndcdata]);
+  }, [fndcdata,fnddatasss]);
 
   // Open Add Salary Modal
   const openModal = () => {

@@ -23,11 +23,9 @@ const AllowanceSchema = Yup.object().shape({
     .positive("Amount must be positive"),
 });
 
-const AddAllowance = ({ id, onClose }) => {
+const AddAllowance = ({ id, onClose}) => {
   const [employees, setEmployees] = useState([]);
   const dispatch = useDispatch();
-
-console.log("id",id);
 
   useEffect(() => {
     dispatch(empdata());
@@ -52,6 +50,7 @@ console.log("id",id);
       dispatch(addallowan(values)).then(() => {
         dispatch(getallowan());
         resetForm();
+        onClose();
         onClose();
       });
     } catch (error) {
@@ -211,7 +210,7 @@ console.log("id",id);
               )}
             </div>
 
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" onClick={onClose}>
               Add Allowance
             </Button>
           </Form>

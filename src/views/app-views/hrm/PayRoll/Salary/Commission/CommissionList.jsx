@@ -39,11 +39,13 @@ const CommissionList = ({ id, onClose }) => {
   const alaldata = useSelector((state) => state.commistion);
   const fnddata = alaldata.commistion.data;
 
+  const fnddatasss = fnddata?.filter((item)=>item?.employeeId === id)
+
   useEffect(() => {
-    if (fnddata) {
-      setSalaryData(fnddata);
+    if (fnddatasss) {
+      setSalaryData(fnddatasss);
     }
-  }, [fnddata]);
+  }, [fnddata,fnddatasss]);
 
   // Open Add Salary Modal
   const openModal = () => {
