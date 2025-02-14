@@ -23,6 +23,7 @@ import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
 import { getallcountries } from "../../setting/countries/countriesreducer/countriesSlice";
 import {  QuestionCircleOutlined} from "@ant-design/icons";
+import { getBranch } from "../Branch/BranchReducer/BranchSlice";
 
 const { Option } = Select;
 
@@ -73,11 +74,9 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
 
   useEffect(() => {
     dispatch(getDept());
-  }, [])
-
-  useEffect(() => {
     dispatch(getDes());
-  }, [])
+    dispatch(getBranch());
+  }, [dispatch]);
 
 
 
@@ -149,7 +148,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
   const initialValues = {
     firstName: singleEmp?.firstName || "",
     lastName: singleEmp?.lastName || "",
-    username: singleEmp?.username || "",
+    // username: singleEmp?.username || "",
     password: "",
     email: singleEmp?.email || "",
     phone: singleEmp?.phone || "",
@@ -230,7 +229,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
               <Input placeholder="Doe" />
             </Form.Item>
           </Col>
-          <Col span={12}>
+          {/* <Col span={12}>
             <Form.Item
               name="username"
               label="User Name"
@@ -238,7 +237,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             >
               <Input placeholder="john_doe" />
             </Form.Item>
-          </Col>
+          </Col> */}
           <Col span={12}>
             <Form.Item
               name="password"
@@ -412,27 +411,28 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
               </Select>
             </Form.Item>
             </Col> */}
-          <Col span={12}>
+           <Col span={12}>
             <div className="form-item">
               <label className="font-semibold">Branch</label>
               <Field name="branch">
                 {({ field }) => (
                   <Select
-                  {...field}
-                  className="w-full mt-1"
-                  placeholder="Select Branch"
-                  onChange={(value) => {
-                    const selectedBranchObj = fndbranchdata.find(branch => branch.id === value);
-                    setFieldValue("branch", selectedBranchObj ? selectedBranchObj.branchName : ""); // Store branch name
-                    setSelectedBranch(value); // Store branch ID for filtering
-                  }}
-                >
-                  {fndbranchdata.map((branch) => (
-                    <Option key={branch.id} value={branch.id}>
-                      {branch.branchName} {/* Display branch name */}
-                    </Option>
-                  ))}
-                </Select>
+                    {...field}
+                    className="w-full mt-1"
+                    placeholder="Select Branch"
+                    onChange={(value) => {
+                      setFieldValue("branch", value);
+                      setFieldValue("department", "");
+                      setFieldValue("designation", "");
+                      setSelectedBranch(value); // Update selected branch
+                    }}
+                  >
+                    {fndbranchdata.map((branch) => (
+                       <Option key={branch.id} value={branch.id}>
+                       {branch.branchName}
+                     </Option>
+                    ))}
+                  </Select>
                 )}
               </Field>
               <ErrorMessage name="branch" component="div" className="text-red-500" />

@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import * as Yup from "yup";
 import {
   AddTasks,
-  EditTasks,
+  EditTaskss,
   GetTasks,
 } from "../project/task/TaskReducer/TaskSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,7 +23,7 @@ const EditTask = ({ iddd, onClose }) => {
   const [isOtherDetailsVisible, setIsOtherDetailsVisible] = useState(false);
 
   const alltaskdata = useSelector((state) => state.Tasks);
-  const fndatatask = alltaskdata.Tasks.data;
+  const fndatatask = alltaskdata.Tasks.data || [];
 
   const { id } = useParams();
 
@@ -32,14 +32,14 @@ const EditTask = ({ iddd, onClose }) => {
   }, [dispatch]);
 
   const allempdata = useSelector((state) => state.employee);
-  const empData = allempdata?.employee?.data;
+  const empData = allempdata?.employee?.data || [];
 
   const loggedusername = useSelector((state) => state.user.loggedInUser.username)
   
     const fndassine = empData.filter(((item)=>item.created_by === loggedusername))
 
   const allloggeduserdata = useSelector((state) => state.user);
-  const loggedUserData = allloggeduserdata?.loggedInUser;
+  const loggedUserData = allloggeduserdata?.loggedInUser || [];
 
   const idd = loggedUserData.id;
 
@@ -51,7 +51,7 @@ const EditTask = ({ iddd, onClose }) => {
     taskName: "",
     startDate: null,
     dueDate: null,
-    assignTo: {},
+    assignTo: [],
     description: "",
     priority: "",
     status: "",
@@ -95,7 +95,7 @@ const EditTask = ({ iddd, onClose }) => {
           priority: task.priority || "",
         });
 
-        console.log("Parsed assignTo values:", assignToArray);
+        // console.log("Parsed assignTo values:", assignToArray);
       } else {
         message.error("Task not found.");
       }
@@ -111,28 +111,33 @@ const EditTask = ({ iddd, onClose }) => {
   });
 
   const onSubmit = async (values, { resetForm }) => {
-    const payload = {
-      ...values,
-      assignTo: JSON.stringify(values.assignTo)
-    };
+    // Log the values to check the structure
+    console.log("Form Values:", values);
 
-    dispatch(EditTasks({ iddd, values: payload }))
-      .then(() => {
-        dispatch(GetTasks(idd))
-          .then(() => {
-            // message.success("Task updated successfully!");
-            resetForm();
-            onClose();
-          })
-          .catch((error) => {
-            // message.error("Failed to fetch the latest task data.");
-            console.error("GetTasks API error:", error);
-          });
-      })
-      .catch((error) => {
-        // message.error("Failed to update task.");
-        console.error("AddTask API error:", error);
-      });
+    // Ensure assignTo is an array
+    if (!Array.isArray(values.assignTo)) {
+        message.error("AssignTo must be an array.");
+        return; // Prevent submission if assignTo is not an array
+    }
+
+    // Dispatch AddTasks with updated values
+    dispatch(EditTaskss({ iddd, values: values }))
+        .then(() => {
+            message.success("Task updated successfully!");
+            dispatch(GetTasks(idd))
+                .then(() => {
+                    resetForm();
+                    onClose();
+                })
+                .catch((error) => {
+                    message.error("Failed to fetch the latest Task data.");
+                    console.error("MeetData API error:", error);
+                });
+        })
+        .catch((error) => {
+            message.error("Failed to update Task.");
+            console.error("AddTask API error:", error);
+        });
   };
 
   return (
@@ -247,9 +252,9 @@ const EditTask = ({ iddd, onClose }) => {
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full mt-2"
+                        className="w-full mt-1"
                         mode="multiple"
-                        placeholder="Select Assign To"
+                        placeholder="Select AddProjectMember"
                         onChange={(value) => setFieldValue("assignTo", value)}
                         value={values.assignTo}
                         onBlur={() => setFieldTouched("assignTo", true)}
@@ -264,7 +269,7 @@ const EditTask = ({ iddd, onClose }) => {
                           ))
                         ) : (
                           <Option value="" disabled>
-                            No Employees Available
+                            No Employee Available
                           </Option>
                         )}
                       </Select>

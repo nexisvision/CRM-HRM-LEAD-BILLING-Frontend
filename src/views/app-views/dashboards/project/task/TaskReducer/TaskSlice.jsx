@@ -98,6 +98,21 @@ export const EditTasks = createAsyncThunk(
   }
 );
 
+export const EditTaskss = createAsyncThunk(
+  "users/EditTasks",
+  async ({ iddd, values }, thunkAPI) => {
+    try {
+      const response = await UserService.EditTaskss(iddd, values);
+      return response; // Return the updated data
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Error updating employee"
+      );
+    }
+  }
+);
+
+
 // Async thunk for updating a user
 
 const initialUser = () => {

@@ -39,6 +39,8 @@ const getShippingStatus = orderStatus => {
 const orderStatusList = ['Ready', 'Shipped']
 
 const EstimatesList = () => {
+    const [idd, setIdd] = useState("");
+
 	const [annualStatisticData] = useState(AnnualStatisticData);
 	const { estimates, loading, error } = useSelector((state) => state.estimate);
 
@@ -76,12 +78,12 @@ const EstimatesList = () => {
 
 	// Open Add Job Modal
 	const openEditEstimatesModal = () => {
-		setIsEditEstimatesModalVisible(true);
-	};
-
-	const closeEditEstimatesModal = () => {
-		setIsEditEstimatesModalVisible(false);
-	};
+        setIsEditEstimatesModalVisible(true);
+    };
+    // Close Add Job Modal
+    const closeEditEstimatesModal = () => {
+        setIsEditEstimatesModalVisible(false);
+    };
 
 	const openviewEstimatesModal = () => {
 		setIsViewEstimatesModalVisible(true);
@@ -100,6 +102,11 @@ const EstimatesList = () => {
 			setList(OrderListData)
 		}
 	}
+
+	const EditFun = (exid) => {
+        openEditEstimatesModal();
+        setIdd(exid);
+    };
 
 	const delfun = (idd)=>{
 		dispatch(deleteestimate(idd))
@@ -137,7 +144,7 @@ const EstimatesList = () => {
 						type=""
 						className=""
 						icon={<EditOutlined />}
-						onClick={openEditEstimatesModal}
+						onClick={() => EditFun(row.id)}
 						size="small"
 					>
 						<span className="">Edit</span>
@@ -151,9 +158,20 @@ const EstimatesList = () => {
 				</Flex>
 			</Menu.Item> */}
 			<Menu.Item>
-				<Flex alignItems="center" onClick={()=> delfun(row.id)}>
+				{/* <Flex alignItems="center" onClick={()=> delfun(row.id)}>
 					<DeleteOutlined />
 					<span className="ml-2">Delete</span>
+				</Flex> */}
+				<Flex alignItems="center">
+					<Button
+						type=""
+						className=""
+						icon={<DeleteOutlined />}
+						onClick={()=> delfun(row.id)}
+						size="small"
+					>
+						<span className="">Delete</span>
+					</Button>
 				</Flex>
 			</Menu.Item>
 		</Menu>
@@ -261,11 +279,11 @@ const EstimatesList = () => {
 							<Input placeholder="Search" prefix={<SearchOutlined />} onChange={() => onSearch()}
             />
 						</div>
-						<div className="w-full md:w-48 ">
+						{/* <div className="w-full md:w-48 ">
 							<Col span={12}>
         
         </Col>
-						</div>
+						</div> */}
 					</Flex>
 
 					<Flex gap="7px" className="flex">
@@ -311,7 +329,7 @@ const EstimatesList = () => {
 					className='mt-[-70px]'
 
 				>
-					<EditEstimates onClose={closeEditEstimatesModal} />
+					<EditEstimates onClose={closeEditEstimatesModal} idd={idd}/>
 				</Modal>
 
 				<Modal

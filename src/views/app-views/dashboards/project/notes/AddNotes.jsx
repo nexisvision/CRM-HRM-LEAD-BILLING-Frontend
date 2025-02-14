@@ -23,7 +23,7 @@ const AddNotes = ({ onClose }) => {
 
   const { data: employee } = useSelector((state) => state.employee.employee);
 
-  const employeeData = employee?.filter((item) => item.created_by === user);
+  const employeeData = employee?.filter((item) => item.created_by === user) || [];
 
   const navigate = useNavigate();
 
@@ -76,6 +76,7 @@ const AddNotes = ({ onClose }) => {
 
       dispatch(AddNote({id,values}))
         .then(()=>{
+          message.success("Note added successfully!");
           dispatch(GetNote(id))
           resetForm();
           onClose();
@@ -83,7 +84,7 @@ const AddNotes = ({ onClose }) => {
 
     } catch (error) {
       console.error("Error adding note:", error);
-      // message.error("Failed to add note: " + error.message);
+      message.error("Failed to add note: " + error.message);
     }
   };
 
@@ -127,30 +128,25 @@ const AddNotes = ({ onClose }) => {
                           className="w-full mt-1"
                           placeholder="Select Employee"
                           onChange={(value) => {
-                            const selectedEmployee =
-                              Array.isArray(employeeData) &&
-                              employeeData.find((e) => e.id === value);
-                            form.setFieldValue(
-                              "employee",
-                              selectedEmployee?.username || ""
-                            );
+                            const selectedEmployee = employeeData.find((e) => e.id === value);
+                            setFieldValue("employees", selectedEmployee ? [selectedEmployee.id] : []);
                           }}
+                          onBlur={() => setFieldTouched("employees", true)}
                         >
-                          {Array.isArray(employeeData) &&
-                            employeeData.map((emp) => (
-                              <Option key={emp.id} value={emp.id}>
-                                {emp.username}
-                              </Option>
-                            ))}
+                          {Array.isArray(employeeData) && employeeData.map((emp) => (
+                            <Option key={emp.id} value={emp.id}>
+                              {emp.username}
+                            </Option>
+                          ))}
                         </Select>
                       )}
                     </Field>
+                    <ErrorMessage
+                      name="employees"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
                   </div>
-                  <ErrorMessage
-                    name="employees"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
                 </div>
               </Col>
 

@@ -240,8 +240,9 @@ const EditNotes = ({ idd, onClose }) => {
         employees: employeesObject
       };
 
-      console.log("Updating note with values:", { idd, values: payload });
+      // console.log("Updating note with values:", { idd, values: payload });
       const result = await dispatch(EditeNotes({ idd, values: payload })).unwrap();
+      message.success("Note updated successfully!");
       dispatch(GetNote(id));
       onClose();
 

@@ -549,7 +549,7 @@ const fndcom = allcom.ClientData?.data;
 
       // console.log("Editing client with ID:", comnyid);
       const response = await dispatch(Editclients({ comnyid, formData })).unwrap();
-      console.log("Client Data Updated Successfully:", formData);
+      console.log("Company Data Updated Successfully:", formData);
       // message.success("Client data updated successfully!");
       onClose(); // Close the form after successful submission
       await dispatch(ClientData()); // Refresh the client data

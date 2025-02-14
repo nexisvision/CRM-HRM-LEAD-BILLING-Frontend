@@ -67,13 +67,13 @@ const AddCompany = ({ onClose }) => {
       const response = await dispatch(addClient(values)); // Dispatching the addClient action
       if (response.payload?.data?.sessionToken) {
         setOtpToken(response.payload?.data?.sessionToken);
-        message.success("Employee added successfully! Please verify OTP.");
+        message.success("Company added successfully! Please verify OTP.");
         setShowOtpModal(true);
       }
       resetForm();
       onClose();
     } catch (error) {
-      message.error("Failed to add employee. Please try again.");
+      message.error("Failed to add Company. Please try again.");
     } finally {
       setSubmitting(false);
     }

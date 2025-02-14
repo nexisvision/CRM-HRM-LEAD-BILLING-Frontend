@@ -8,21 +8,55 @@ import dayjs from 'dayjs';
 import { getestimateById, updateestimate } from './estimatesReducer/EstimatesSlice';
 import { getcurren } from 'views/app-views/setting/currencies/currenciesSlice/currenciesSlice';
 import * as Yup from 'yup';
+import { GetLeads } from '../../leads/LeadReducers/LeadSlice';
 
 const { Option } = Select;
 
-const EditEstimates = ({ onClose }) => {
+const EditEstimates = ({ idd,onClose }) => {
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [form] = Form.useForm();
 
+    // console.log("sddsdfsd",idd)
+
+    const user = useSelector((state) => state.user.loggedInUser.username);
+
+
     // Get current estimate and currencies from Redux store
-    const { currentEstimate } = useSelector((state) => state.estimate);
+    const currentEstimatee  = useSelector((state) => state.estimate.estimates || []);
+
+
+    const currentEstimate = currentEstimatee.find((item) => item.id === idd);
+
+    // console.log("sdfdsf",currentEstimate);
 
     const { currencies } = useSelector((state) => state.currencies);
     const condata = currencies.data || [];
+
+
+    const subClients = useSelector((state) => state.SubClient);
+    const sub = subClients?.SubClient?.data;
+
+    const allproject = useSelector((state) => state.Project);
+    const fndrewduxxdaa = allproject.Project.data
+    const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
+
+    const client = fnddata?.client;
+
+    const subClientData = sub?.find((subClient) => subClient?.id === client);
+
+
+    const { data: Leads, isLoading: isLeadsLoading, error: leadsError } = useSelector((state) => state.Leads.Leads || []);
+
+    const lead = Leads?.filter((item) => item.created_by === user);
+// console.log("dsffsdfdsfsdfsdf",lead);
+
+    const leadDetails = lead?.find((lead) => lead.id === currentEstimate.lead);
+
+
+    console.log("asdasdsfsdfsddas",leadDetails)
 
     const [tableData, setTableData] = useState([
         {
@@ -53,7 +87,13 @@ const EditEstimates = ({ onClose }) => {
         if (id) {
             dispatch(getestimateById(id));
         }
-    }, [dispatch, id]);
+    }, [dispatch]);
+
+
+    useEffect(() => {
+                 dispatch(GetLeads());
+    }, [dispatch]);
+
 
     // Populate form when currentEstimate changes
     useEffect(() => {
@@ -61,7 +101,7 @@ const EditEstimates = ({ onClose }) => {
             form.setFieldsValue({
                 valid_till: dayjs(currentEstimate.valid_till),
                 currency: currentEstimate.currency,
-                lead: currentEstimate.lead,
+                lead: leadDetails.leadTitle,
                 client: currentEstimate.client,
                 calculatedTax: currentEstimate.calculatedTax,
             });
@@ -161,6 +201,9 @@ const EditEstimates = ({ onClose }) => {
         }
     };
 
+    const itemsArray = Object.values(currentEstimate.items || {});
+
+
     // Handle table data changes
     const handleTableDataChange = (id, field, value) => {
         if (field === 'delete') {
@@ -220,33 +263,66 @@ const EditEstimates = ({ onClose }) => {
                             <div className=" p-2">
 
                                 <Row gutter={16}>
-                                    <Col span={12}>
-                                        <Form.Item
-                                            name="lead"
-                                            label="Lead"
-                                            rules={[{ required: true, message: "Please enter the lead" }]}
-                                        >
-                                            <Input placeholder="Enter lead" />
-                                        </Form.Item>
-                                    </Col>
+                               <Col span={12}>
+    <Form.Item
+        name="lead"
+        label="Lead Title"
+        rules={[
+            {
+                required: true,
+                message: "Please select a Lead Title"
+            }
+        ]}
+    >
+        <Select
+            className="w-full"
+            placeholder="Select Lead Title"
+            // loading={leadsLoading}
+            disabled // Make the field disabled
+            value={leadDetails ? leadDetails.leadTitle : undefined} // Set the leadTitle directly
+        >
+            {/* Optionally, you can still render the options if needed */}
+            {Array.isArray(lead) && lead.map((lead) => (
+                <Option
+                    key={lead.id}
+                    value={lead.id}
+                >
+                    {lead.leadTitle}
+                </Option>
+            ))}
+        </Select>
+    </Form.Item>
+</Col> 
 
                                     <Col span={12}>
                                         <Form.Item
                                             name="client"
                                             label="Client Name"
+                                            initialValue={subClientData?.username}
                                             rules={[{ required: true, message: "Please enter the client name" }]}
                                         >
-                                            <Input placeholder="Enter client name" />
+                                            <Input placeholder="Enter client name" disabled />
+                                        </Form.Item>
+                                        {/* Hidden field to pass the client ID */}
+                                        <Form.Item name="client" initialValue={fnddata?.client} hidden>
+                                            <Input type="hidden" />
                                         </Form.Item>
                                     </Col>
 
                                     <Col span={12}>
+                                        {/* Display the project name */}
                                         <Form.Item
-                                            name="project"
-                                            label="Project"
+                                            name="projectName"
+                                            label="Project Name"
+                                            initialValue={fnddata?.project_name}
                                             rules={[{ required: true, message: "Please enter the project name" }]}
                                         >
-                                            <Input placeholder="Enter project name" />
+                                            <Input placeholder="Enter project name" disabled />
+                                        </Form.Item>
+
+                                        {/* Hidden field to pass the project ID */}
+                                        <Form.Item name="project" initialValue={fnddata?.id} hidden>
+                                            <Input type="hidden" />
                                         </Form.Item>
                                     </Col>
 
@@ -325,7 +401,7 @@ const EditEstimates = ({ onClose }) => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {tableData.map((row) => (
+                                        {itemsArray.map((row) => (
                                             <React.Fragment key={row.id}>
                                                 <tr>
                                                     <td className="px-4 py-2 border-b">

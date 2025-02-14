@@ -46,6 +46,8 @@ const AddEstimates = ({ onClose }) => {
 
     const subClientData = sub?.find((subClient) => subClient?.id === client);
 
+    // console.log("sdsdfdf",subClientData);
+
     const [discountRate, setDiscountRate] = useState(10);
     const dispatch = useDispatch();
     const [form] = Form.useForm();
@@ -208,18 +210,16 @@ const AddEstimates = ({ onClose }) => {
 
     // Function to handle adding a new row
     const handleAddRow = () => {
-        setRows([
-            ...rows,
+        setTableData((prevData) => [
+            ...prevData,
             {
-                id: Date.now(),
+                id: Date.now(), // Unique ID for the new item
                 item: "",
-                quantity: "",
+                quantity: 1,
                 price: "",
-                discount: "",
-                tax: "",
+                tax: 0,
                 amount: "0",
                 description: "",
-                isNew: true,
             },
         ]);
     };
@@ -321,7 +321,7 @@ const AddEstimates = ({ onClose }) => {
                                         <Form.Item
                                             name="client"
                                             label="Client Name"
-                                            initialValue={fnddata?.client}
+                                            initialValue={subClientData?.username}
                                             rules={[{ required: true, message: "Please enter the client name" }]}
                                         >
                                             <Input placeholder="Enter client name" disabled />
@@ -412,16 +412,17 @@ const AddEstimates = ({ onClose }) => {
                                                 className="w-full"
                                                 placeholder="Select Currency"
                                                 onChange={(value) => {
-                                                    form.setFieldsValue({
-                                                        currency: value
-                                                    });
+                                                    const selectedCurrency = condata.find(
+                                                        (c) => c.id === value
+                                                    );
+                                                    form.setFieldValue(
+                                                        "currency",
+                                                        selectedCurrency?.currencyCode || ""
+                                                    );
                                                 }}
                                             >
                                                 {condata.map((currency) => (
-                                                    <Option 
-                                                        key={currency.id} 
-                                                        value={currency.currencyCode}
-                                                    >
+                                                    <Option key={currency.id} value={currency.id}>
                                                         {currency.currencyCode}
                                                     </Option>
                                                 ))}
@@ -445,7 +446,7 @@ const AddEstimates = ({ onClose }) => {
                                         </Form.Item>
                                     </Col>
 
-                                    <Col span={12}>
+                                    {/* <Col span={12}>
                                         <Form.Item
                                             name="quotationNumber"
                                             label="Quotation Number"
@@ -453,7 +454,7 @@ const AddEstimates = ({ onClose }) => {
                                         >
                                             <Input placeholder="Auto-generated"  />
                                         </Form.Item>
-                                    </Col>
+                                    </Col> */}
 
                                     <Col span={12}>
                                         <Form.Item
@@ -567,7 +568,7 @@ const AddEstimates = ({ onClose }) => {
                             </div>
                             <div className="form-buttons text-left mt-2">
                                 <Button className='border-0 text-blue-500' onClick={handleAddRow}>
-                                    <PlusOutlined />  Add Items
+                                    <PlusOutlined /> Add Items
                                 </Button>
                             </div>
 

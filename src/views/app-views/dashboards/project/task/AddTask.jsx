@@ -25,11 +25,14 @@ import { useDispatch, useSelector } from "react-redux";
 import useSelection from "antd/es/table/hooks/useSelection";
 import { assign, values } from "lodash";
 import { AddLable, GetLable } from "./LableReducer/LableSlice";
+import { GetLeads } from '../../leads/LeadReducers/LeadSlice';
+
 
 
 const { Option } = Select;
 
 const AddTask = ({ onClose }) => {
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isWithoutDueDate, setIsWithoutDueDate] = useState(false);
@@ -53,6 +56,10 @@ const AddTask = ({ onClose }) => {
 
   const user = useSelector((state) => state.user.loggedInUser.username);
 
+  const { data: Leads, isLoading: isLeadsLoading, error: leadsError } = useSelector((state) => state.Leads.Leads || []);
+
+  const lead = Leads?.filter((item) => item.created_by === user);
+
   const allproject = useSelector((state) => state.Project);
   const fndrewduxxdaa = allproject.Project.data
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
@@ -68,6 +75,7 @@ const AddTask = ({ onClose }) => {
 
   const fnduserdatas = empData.filter((item)=>item.created_by === loggeduser);
 
+  const [selectedLead, setSelectedLead] = useState(null);
 
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
@@ -75,6 +83,7 @@ const AddTask = ({ onClose }) => {
     taskName: "",
     category: "",
     project: fnddata?.id || "", 
+    lead:"",
     startDate: null,
     dueDate: null,
     assignTo: [],
@@ -86,11 +95,18 @@ const AddTask = ({ onClose }) => {
     category: Yup.string().required("Please enter TaskCategory."),
     project: Yup.string().required("Please enter Project."),
     startDate: Yup.date().nullable().required("Date is required."),
+    lead : Yup.string().required("lead required"),
     dueDate: Yup.date().nullable().required("Date is required."),
     assignTo: Yup.array().min(1, "Please select at least one AssignTo."),
     description: Yup.string().required("Please enter a Description."),
   });
 
+
+   useEffect(() => {
+      
+         dispatch(GetLeads());
+
+    }, [dispatch]);
 
 
   const fetchLables = async (lableType, setter) => {
@@ -152,12 +168,11 @@ const AddTask = ({ onClose }) => {
     // }
 
     // Dispatch AddTasks with updated values
-    dispatch(AddTaskk({ id, values }))
-      .then(() => {
+    dispatch(AddTaskk({ id, values })).then(() => {
+      message.success("Task added successfully!");
         // Fetch updated tasks after successfully adding
         dispatch(GetTasks(id))
           .then(() => {
-            message.success("Task added successfully!");
             resetForm();
             onClose();
           })
@@ -315,24 +330,39 @@ const AddTask = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
-                <label className="font-semibold">Lead <span className="text-red-500">*</span></label>
-                <Field name="lead">
-                  {({ field }) => (
-                    <Select
-                      {...field}
-                      className="w-full mt-1"
-                      placeholder="Select Lead"
-                      onChange={(value) => setFieldValue("lead", value)}
-                      value={values.lead}
-                      onBlur={() => setFieldTouched("lead", true)}
-                    >
-                      <Option value="1">Lead 1</Option>
-                      <Option value="2">Lead 2</Option>
-                    </Select>
-                  )}
-                </Field>
-              </Col>
+             {/* <Col span={12}>
+  <div className="form-item">
+    <label className="font-semibold">Lead Title</label>
+    <Field name="lead">
+      {({ field, form }) => ( // Destructure form here
+        <Select
+          className="w-full"
+          placeholder="Select Lead Title"
+          onChange={(value) => {
+            if (value) {
+              const selectedLead = lead?.find(
+                (lead) => lead.id === value
+              );
+              setSelectedLead(selectedLead);
+              form.setFieldsValue({
+                lead: value
+              });
+            }
+          }}
+        >
+          {Array.isArray(lead) && lead.map((lead) => (
+            <Option
+              key={lead.id}
+              value={lead.id}
+            >
+              {lead.leadTitle}
+            </Option>
+          ))}
+        </Select>
+      )}
+    </Field>
+  </div>
+</Col> */}
 
               <Col span={12} className="mt-4">
                 <div className="form-item">

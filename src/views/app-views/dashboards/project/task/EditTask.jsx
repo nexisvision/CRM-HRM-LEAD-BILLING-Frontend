@@ -75,18 +75,18 @@ const EditTask = ({ idd, onClose }) => {
   const allempdata = useSelector((state) => state.Tasks);
   const Expensedata = allempdata?.Tasks?.data || [];
 
-  const AllLoggedData = useSelector((state) => state.user);
+  const AllLoggedData = useSelector((state) => state.user || []);
 
   const allempdatass = useSelector((state) => state.employee);
-  const empData = allempdatass?.employee?.data;
+  const empData = allempdatass?.employee?.data || [];
 
-  const loggeduser = useSelector((state) => state.user.loggedInUser.username);
+  const loggeduser = useSelector((state) => state.user.loggedInUser.username || []);
 
   const fnduserdatas = empData.filter((item) => item.created_by === loggeduser);
 
 
   const allproject = useSelector((state) => state.Project);
-  const fndrewduxxdaa = allproject.Project.data
+  const fndrewduxxdaa = allproject.Project.data || [];
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
 
 

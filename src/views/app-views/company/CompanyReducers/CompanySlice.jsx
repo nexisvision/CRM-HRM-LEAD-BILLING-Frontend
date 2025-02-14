@@ -164,11 +164,11 @@ const CompanySlice = createSlice({
       })
       .addCase(addClient.fulfilled, (state, action) => {
         state.isLoading = false;
-        message.success(action.payload?.message);
+        // message.success(action.payload?.message);
       })
       .addCase(addClient.rejected, (state, action) => {
         state.isLoading = false;
-        message.error(action.payload?.message);
+        // message.error(action.payload?.message);
       })
 
       .addCase(ClientData.pending, (state) => {
@@ -217,11 +217,11 @@ const CompanySlice = createSlice({
       })
       .addCase(deleteClient.fulfilled, (state, action) => {
         state.isLoading = false;
-        message.success(action.payload?.message);
+        // message.success(action.payload?.message);
       })
       .addCase(deleteClient.rejected, (state, action) => {
         state.isLoading = false;
-        message.error(action.payload?.message);
+        // message.error(action.payload?.message);
       })
       //update
       .addCase(Editclients.pending, (state) => {
@@ -231,12 +231,12 @@ const CompanySlice = createSlice({
       .addCase(Editclients.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload;
-        message.success(action.payload?.message);
+        // message.success(action.payload?.message);
       })
       .addCase(Editclients.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-        message.error(action.payload?.message);
+        // message.error(action.payload?.message);
       });
   },
 });

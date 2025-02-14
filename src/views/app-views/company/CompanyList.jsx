@@ -100,18 +100,18 @@ const CompanyList = () => {
 
   const deleteUser = (userId) => {
     dispatch(deleteClient(userId));
-    message.success(`Deleted user ${userId}`);
+    message.success(`Deleted Company successfully`);
   };
 
   const dropdownMenu = (user) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button type="" className="" icon={<EyeOutlined />} size="small">
             <span>View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
 
       <Menu.Item>
         <Flex alignItems="center">
@@ -130,7 +130,7 @@ const CompanyList = () => {
         </Flex>
       </Menu.Item>
 
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -142,7 +142,7 @@ const CompanyList = () => {
             <span>Reset Password</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
 
       <Menu.Item>
         <Flex alignItems="center">

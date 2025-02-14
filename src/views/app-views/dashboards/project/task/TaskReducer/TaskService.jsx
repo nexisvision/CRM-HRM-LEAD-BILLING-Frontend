@@ -1,4 +1,5 @@
 import axios from "axios";
+import { EditTasks } from "./TaskSlice";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -82,6 +83,27 @@ const EditTask = async (idd, values) => {
   }
 };
 
+
+
+const EditTaskss = async (iddd, values) => {
+  const token = localStorage.getItem("auth_token");
+  try {
+    const res = await axios.put(
+      `http://localhost:5353/api/v1/tasks/${iddd}`,
+      values,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.error("Error updating employee data:", error);
+    throw error;
+  }
+};
+
 // const getAllUsers = async () => {
 //     const res = await axios.get(`${baseUrl}users/all`, getToken());
 //     return res.data
@@ -108,6 +130,7 @@ const UserService = {
   Addtask,
   Deletetask,
   EditTask,
+  EditTaskss,
   // getAllUsers,
   // getUserById,
   // deleteUser,
