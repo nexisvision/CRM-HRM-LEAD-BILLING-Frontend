@@ -73,6 +73,7 @@ const EstimatesList = () => {
     useState(false);
   const dispatch = useDispatch();
   const [idd, setIdd] = useState("");
+  const [selectedQuotationId, setSelectedQuotationId] = useState(null);
 
   const customerData = useSelector((state) => state.customers);
   const fnddataCustomers = customerData.customers.data;
@@ -81,32 +82,39 @@ const EstimatesList = () => {
   // Fetch estimate when component mounts
   useEffect(() => {
     dispatch(getallquotations());
-    dispatch(Getcus()); // Fetch customer data
-  }, []);
-  console.log("salesquotations", salesquotations);
-  // useEffect(() => {
-  //   setList(salesquotations); // Update list when estimates change
-  // }, [salesquotations]);
+    dispatch(Getcus());
+  }, [dispatch]);
 
+  // Update filteredData when salesquotations changes
   useEffect(() => {
-    setFilteredData(salesquotations);
+    // Ensure salesquotations is an array before setting it
+    setFilteredData(Array.isArray(salesquotations) ? salesquotations : []);
   }, [salesquotations]);
-  // Search function
+
+  // Search function with array check
   const onSearch = (e) => {
     const value = e.currentTarget.value.toLowerCase();
+    
+    // If no salesquotations data, return empty array
+    if (!Array.isArray(salesquotations)) {
+      setFilteredData([]);
+      return;
+    }
+
     // If search value is empty, show all data
     if (!value) {
       setFilteredData(salesquotations);
       return;
     }
+
     // Filter the data based on search value
     const filtered = salesquotations.filter(item =>
-      item.customer?.toLowerCase().includes(value) ||
-      item.category?.toLowerCase().includes(value) 
-      // item.phoneCode?.toLowerCase().includes(value)
+      item?.customer?.toLowerCase().includes(value) ||
+      item?.category?.toLowerCase().includes(value)
     );
     setFilteredData(filtered);
   };
+
   // Open Add Job Modal
   const openAddEstimatesModal = () => {
     setIsAddEstimatesModalVisible(true);
@@ -208,60 +216,52 @@ const EstimatesList = () => {
 
   const dropdownMenu = (row) => (
     <Menu>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EyeOutlined />}
-            onClick={openviewEstimatesModal}
-            size="small"
-          >
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <PlusCircleOutlined />
-          <span className="ml-2">Add to remark</span>
-        </Flex>
-      </Menu.Item>
-     
-      <Menu.Item>
-        <Flex alignItems="center">
-          <TiPinOutline />
-          <span className="ml-2">Pin</span>
-        </Flex>
-      </Menu.Item> */}
-     
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        <Menu.Item onClick={() => {
+                              console.log("View Quotation:", row); // Debug log
+                              setSelectedQuotationId(row.id);
+                              openviewEstimatesModal();
+                          }}>
+            <Flex alignItems="center">
+                <EyeOutlined />
+                <span className="ml-2">View Details</span>
+            </Flex>
+        </Menu.Item>
+        ) : null}
+        <Menu.Item>
+            <Flex alignItems="center">
+                <PlusCircleOutlined />
+                <span className="ml-2">Add to remark</span>
+            </Flex>
+        </Menu.Item>
+       
+        <Menu.Item>
+            <Flex alignItems="center">
+                <TiPinOutline />
+                <span className="ml-2">Pin</span>
+            </Flex>
+        </Menu.Item>
+       
 
-      
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                           <Menu.Item>
-                           <Flex alignItems="center">
-                             <Button
-                               type=""
-                               className=""
-                               icon={<EditOutlined />}
-                               onClick={() => EditFun(row.id)}
-                               size="small"
-                             >
-                               <span className="">Edit</span>
-                             </Button>
-                           </Flex>
-                         </Menu.Item>
-                    ) : null}
-      
-      
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                      <Menu.Item>
-                      <Flex alignItems="center" onClick={() => DeleteFun(row.id)}>
-                        <DeleteOutlined />
-                        <span className="ml-2" >Delete</span>
-                      </Flex>
-                    </Menu.Item>
-                    ) : null}
+        
+        {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
+           <Menu.Item onClick={() => EditFun(row.id)}>
+           <Flex alignItems="center">
+               <EditOutlined />
+               <span className="ml-2">Edit</span>
+           </Flex>
+       </Menu.Item>
+                      ) : null}
+        
+        
+        {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                        <Menu.Item>
+                        <Flex alignItems="center" onClick={() => DeleteFun(row.id)}>
+                          <DeleteOutlined />
+                          <span className="ml-2" >Delete</span>
+                        </Flex>
+                      </Menu.Item>
+                      ) : null}
 
 
     </Menu>
@@ -381,6 +381,16 @@ const EstimatesList = () => {
   //   setList(data);
   //   setSelectedRowKeys([]);
   // };
+
+  // Ensure filteredData is always an array
+  const safeFilteredData = React.useMemo(() => {
+    if (!Array.isArray(filteredData)) {
+      console.warn('filteredData is not an array:', filteredData);
+      return [];
+    }
+    return filteredData;
+  }, [filteredData]);
+
   return (
     <>
       <Card>
@@ -463,15 +473,10 @@ const EstimatesList = () => {
             {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                                               <Table
                                                               columns={tableColumns}
-                                                              dataSource={filteredData}
+                                                              dataSource={safeFilteredData}
                                                               rowKey="id"
                                                               scroll={{ x: 1200 }}
-                                                            // rowSelection={{
-                                                            //  selectedRowKeys: selectedRowKeys,
-                                                            //  type: 'checkbox',
-                                                            //  preserveSelectedRowKeys: false,
-                                                            //  ...rowSelection,
-                                                            // }}
+                                                              loading={loading}
                                                             />
                                                               ) : null}
 
@@ -503,12 +508,20 @@ const EstimatesList = () => {
         <Modal
           title="View Estimate"
           visible={isViewEstimatesModalVisible}
-          onCancel={closeViewEstimatesModal}
+          onCancel={() => {
+            setSelectedQuotationId(null);
+            closeViewEstimatesModal();
+          }}
           footer={null}
           width={1000}
           className="mt-[-70px]"
         >
-          <ViewEstimates onClose={closeViewEstimatesModal} />
+          {selectedQuotationId && (
+            <ViewEstimates 
+              quotationId={selectedQuotationId} 
+              onClose={closeViewEstimatesModal} 
+            />
+          )}
         </Modal>
       </Card>
     </>

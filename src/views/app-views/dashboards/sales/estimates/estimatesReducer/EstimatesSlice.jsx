@@ -28,9 +28,9 @@ export const getquotationsById = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await QuotationsService.getQuotationsById(id);
-      return response;
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || 'Failed to fetch Quotations');
+      return rejectWithValue(error.response?.data || 'Failed to fetch Quotation');
     }
   }
 );
@@ -68,18 +68,19 @@ export const deletequotations = createAsyncThunk(
   }
 );
 // Slice
-const quotationsSlice = createSlice({
-  name: 'salesquotation',
-  initialState: {
+const initialState = {
     salesquotations: [],
-    editItem: {},
+    currentQuotation: null,  // Add this for single quotation
     loading: false,
     error: null,
     success: false,
     addModel: false,
     editModal: false,
-    // selectedMilestone: null,
-  },
+};
+
+const quotationsSlice = createSlice({
+  name: 'estimate',
+  initialState,
   reducers: {
     clearError: (state) => {
       state.error = null;
@@ -92,39 +93,40 @@ const quotationsSlice = createSlice({
       state.editItem = {};
     },
     resetEstimateState: (state) => {
-      // state.currentEstimates = null;
       state.error = null;
       state.success = false;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch all invoices
+      // Get all quotations
       .addCase(getallquotations.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(getallquotations.fulfilled, (state, action) => {
         state.loading = false;
-        state.salesquotations = action.payload; // Populate the estimates
+        state.salesquotations = action.payload;
       })
       .addCase(getallquotations.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload; // Store the error
+        state.error = action.payload;
       })
-      // Fetch single quotations
-        .addCase(getquotationsById.pending, (state) => {
-          state.loading = true;
-          state.error = null;
-        })
-        .addCase(getquotationsById.fulfilled, (state, action) => {
-          state.loading = false;
-          state.salesquotations = action.payload;
-        })
-        .addCase(getquotationsById.rejected, (state, action) => {
-          state.loading = false;
-          state.error = action.payload;
-        })
+      // Get single quotation
+      .addCase(getquotationsById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getquotationsById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentQuotation = action.payload; // Store in currentQuotation
+        state.error = null;
+      })
+      .addCase(getquotationsById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.currentQuotation = null;
+      })
       // Create invoice
       .addCase(createquotations.pending, (state) => {
         state.loading = true;

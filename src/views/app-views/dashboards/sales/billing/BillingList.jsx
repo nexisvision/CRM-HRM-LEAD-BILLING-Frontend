@@ -102,6 +102,8 @@ export const BillingList = () => {
   const alldata = useSelector((state) => state.salesbilling);
   const fnddata = alldata.salesbilling.data;
 
+  const [selectedBillingId, setSelectedBillingId] = useState(null);
+
   const handleShowStatus = (value) => {
     if (value !== "All") {
       const key = "paymentStatus";
@@ -238,7 +240,10 @@ export const BillingList = () => {
   const dropdownMenu = (row) => (
     <Menu>
       <Menu.Item>
-        <Flex alignItems="center" onClick={openViewBillingModal}>
+        <Flex alignItems="center" onClick={() => {
+          setSelectedBillingId(row.id);
+          openViewBillingModal();
+        }}>
           <EyeOutlined />
           <span className="ml-2">View Details</span>
         </Flex>
@@ -263,7 +268,6 @@ export const BillingList = () => {
                       <Menu.Item>
                       <Flex alignItems="center" onClick={() => editfun(row.id)}>
                         <EditOutlined />
-                        {/* <EditOutlined /> */}
                         <span className="ml-2">Edit</span>
                       </Flex>
                     </Menu.Item>
@@ -447,7 +451,10 @@ export const BillingList = () => {
           width={1000}
           className="mt-[-70px]"
         >
-          <ViewBilling onClose={closeViewBillingModal} />
+          <ViewBilling 
+            onClose={closeViewBillingModal} 
+            billingId={selectedBillingId} 
+          />
         </Modal>
       </Card>
     </div>

@@ -87,60 +87,44 @@ const AddEstimates = ({ onClose }) => {
     try {
       setLoading(true);
   
-      const subTotal = calculateSubTotal();
-      const totalTax = calculateTotalTax();
-      const discount = calculateDiscount();
-      const finalTotal = subTotal - discount + totalTax;
-  
-      const itemsObject = tableData.reduce((acc, item, index) => {
-        acc[`item_${index + 1}`] = {
+      // Create items object
+      const items = {};
+      
+      tableData.forEach((item, index) => {
+        const baseAmount = parseFloat(item.quantity) * parseFloat(item.price);
+        
+        items[`item_${index + 1}`] = {
           item: item.item,
-          discount: Number(totals.discount),
+          description: item.description || '',
           quantity: parseFloat(item.quantity) || 0,
           price: parseFloat(item.price) || 0,
           tax: parseFloat(item.tax) || 0,
           amount: parseFloat(item.amount) || 0,
+          discount: parseFloat(discountRate) || 0  // Store the discount rate here
         };
-        return acc;
-      }, {});
-  
-      // Check if the selected tag (category) exists
-      const selectedTag = tags.find((tag) => tag.name === values.category);
-  
-      const prepareQuotationData = () => ({
-        issueDate: values.issueDate.format("YYYY-MM-DD"), // Ensure date format
-        customer: values.customer,
-        category: values.category,
-        items: itemsObject,
-        discount: parseFloat(discount.toFixed(2)) || 0,
-        tax: parseFloat(totalTax.toFixed(2)) || 0,
-        total: parseFloat(finalTotal.toFixed(2)) || 0,
       });
   
-      if (!selectedTag) {
-        // If the tag (category) doesn't exist, add it first
-        const newTagPayload = { name: values.category.trim() };
+      // Calculate the actual discount amount
+      const subtotal = calculateSubTotal();
+      const discountAmount = (subtotal * discountRate) / 100;
   
-        await dispatch(AddLable({ lid, payload: newTagPayload }));
-        message.success("Category added successfully!");
+      const quotationData = {
+        customer: values.customer,
+        issueDate: values.issueDate.format('YYYY-MM-DD'),
+        category: values.category,
+        items: items,
+        total: totals.finalTotal,
+        tax: totals.totalTax,
+        discount: discountAmount, // Store the calculated discount amount
+        discountRate: discountRate // Optionally store the rate separately if needed
+      };
   
-        // After adding the tag, create the quotation
-        const quotationData = prepareQuotationData();
-        await dispatch(createquotations(quotationData));
-        message.success("Quotation created successfully!");
-      } else {
-        // If the tag exists, directly create the quotation
-        const quotationData = prepareQuotationData();
-        await dispatch(createquotations(quotationData));
-        message.success("Quotation created successfully!");
-      }
-  
-      // Close the modal and navigate after successful creation
+      await dispatch(createquotations(quotationData));
+      message.success('Quotation created successfully!');
       onClose();
-      navigate("/app/dashboards/sales/estimates");
     } catch (error) {
-      console.error("Estimate Creation Error:", error);
-      message.error("Failed to create Quotation: " + error.message);
+      console.error('Error creating quotation:', error);
+      message.error('Failed to create quotation');
     } finally {
       setLoading(false);
     }
@@ -218,7 +202,7 @@ const AddEstimates = ({ onClose }) => {
     }, 0);
   };
 
-  const calculateTotal = (data, discountRate) => {
+  const calculateTotal = (data, discountPercentage) => {
     if (!Array.isArray(data)) {
       console.error('Invalid data passed to calculateTotal');
       return;
@@ -239,12 +223,14 @@ const AddEstimates = ({ onClose }) => {
       totalTax += taxAmount;
     });
 
-    const discount = (subtotal * (parseFloat(discountRate) || 0)) / 100;
-    const finalTotal = subtotal - discount + totalTax;
+    // Calculate discount amount from percentage
+    const discountAmount = (subtotal * discountPercentage) / 100;
+    const finalTotal = subtotal - discountAmount + totalTax;
 
     setTotals({
       subtotal: parseFloat(subtotal.toFixed(2)),
-      discount: parseFloat(discount.toFixed(2)),
+      discount: parseFloat(discountAmount.toFixed(2)), // Store the actual discount amount
+      discountPercentage: discountPercentage,
       totalTax: parseFloat(totalTax.toFixed(2)),
       finalTotal: parseFloat(finalTotal.toFixed(2))
     });

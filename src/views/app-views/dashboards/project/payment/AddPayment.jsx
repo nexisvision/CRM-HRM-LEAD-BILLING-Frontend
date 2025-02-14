@@ -320,13 +320,13 @@ const curren = curr?.filter((item) => item.created_by === user);
               </Col> */}
 
               <div className="mt-4 w-full">
-                <span className="block  font-semibold p-2">
+                <span className="block  font-semibold ps-1">
                   Receipt <QuestionCircleOutlined />
                 </span>
-                <Col span={24} className="mt-4">
-                <span className="block font-semibold p-2">
+                <Col span={24} className="mt-1">
+                {/* <span className="block font-semibold p-2">
                   Add <QuestionCircleOutlined />
-                </span>
+                </span> */}
                 <Field name="receipt">
                   {({ field }) => (
                     <div>

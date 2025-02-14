@@ -42,7 +42,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
 
 
     const clientDataa = allclient.find((SubClient) => SubClient.id === invoiceDataa?.client);
-    
+
 
     // console.log("ppppppppppppp", clientDataa, "clientDataa");
     // const clientDataa = allclient.find((SubClient) => SubClient.id === id);
@@ -70,7 +70,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                     ...invoiceData,
                     items: Object.values(items),
                     discount: invoiceData.discount || 0,
-                    tax: invoiceData.tax ?? 0 
+                    tax: invoiceData.tax ?? 0
                 });
             } catch (error) {
                 console.error('Error parsing items:', error);
@@ -177,32 +177,32 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     };
 
 
-   // Update the calculateTotalDiscount function
-   const calculateTotalDiscount = (subtotal, discountPercentage) => {
-    if (!subtotal || !discountPercentage) return 0;
-    return (subtotal * discountPercentage) / 100;
-};
+    // Update the calculateTotalDiscount function
+    const calculateTotalDiscount = (subtotal, discountPercentage) => {
+        if (!subtotal || !discountPercentage) return 0;
+        return (subtotal * discountPercentage) / 100;
+    };
 
 
-// Function to calculate subtotal (before tax and discount)
-const calculateSubtotal = () => {
-    if (!parsedInvoice?.items) return 0;
-    return Object.values(parsedInvoice.items).reduce((sum, item) => 
-        sum + parseFloat(item.final_amount || 0), 0
-    );
-};
+    // Function to calculate subtotal (before tax and discount)
+    const calculateSubtotal = () => {
+        if (!parsedInvoice?.items) return 0;
+        return Object.values(parsedInvoice.items).reduce((sum, item) =>
+            sum + parseFloat(item.final_amount || 0), 0
+        );
+    };
 
-// Update the calculateTotalTax function to use tax from database
-const calculateTotalTax = (subtotal) => {
-    if (!parsedInvoice) return 0;
-    const taxRate = invoiceData.tax ?? 0;
-    return (subtotal * taxRate) / 100;
-};
+    // Update the calculateTotalTax function to use tax from database
+    const calculateTotalTax = (subtotal) => {
+        if (!parsedInvoice) return 0;
+        const taxRate = invoiceData.tax ?? 0;
+        return (subtotal * taxRate) / 100;
+    };
 
-// Function to calculate final total (subtotal + total tax - total discount)
-const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
-    return subtotal - totalDiscount + totalTax;
-};
+    // Function to calculate final total (subtotal + total tax - total discount)
+    const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
+        return subtotal - totalDiscount + totalTax;
+    };
 
     const subtotal = calculateSubtotal(parsedInvoice.items);
     const totalDiscount = calculateTotalDiscount(subtotal, parsedInvoice.discount);
@@ -233,16 +233,16 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                         <p className="text-gray-600">Address: 15 Hodges Mews,High Wycomb HP123JL,United Kingdom</p>
                     </div> */}
                     <div>
-                        <div className='flex'>
-                            <span className="mb-1 me-2 font-weight-semibold">Invoice Num:</span>
+                        <div className='flex items-center'>
+                            <span className=" me-2 font-weight-semibold ">Invoice Num:</span>
                             <p className='text-right'>{invoiceDataa?.invoiceNumber}</p>
                         </div>
-                        <div className='flex'>
-                            <span className="mb-1 me-2 font-weight-semibold">Issue Date:</span>
+                        <div className='flex items-center'>
+                            <span className="me-2 font-weight-semibold">Issue Date:</span>
                             <p>{invoiceDataa?.issueDate ? dayjs(invoiceDataa.issueDate).format('DD MMMM, YYYY') : ''}</p>
                         </div>
-                        <div className='flex'>
-                            <span className="mb-1 me-2 font-weight-semibold">Due Date:</span>
+                        <div className='flex items-center'>
+                            <span className="me-2 font-weight-semibold">Due Date:</span>
                             <p>{invoiceDataa?.dueDate ? dayjs(invoiceDataa.dueDate).format('DD MMMM, YYYY') : ''}</p>
                         </div>
                     </div>
@@ -255,13 +255,16 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                         <div className='text-left'>
                             <address>
                                 <p>
-                                    <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
+
+                                    <span className="font-weight-semibold text-dark font-size-lg">Billed By:</span><br />
                                     {allloggeduser ? (
                                         <>
-                                            <span>created_by:{allloggeduser?.created_by}</span><br />
-                                            <span>username:{allloggeduser?.username}</span><br />
-                                            <p>Email: {allloggeduser?.email}</p>
-                                            <p>Phone: {allloggeduser?.phone}</p>
+                                            <span> <span className="font-weight-semibold ">Address: </span>{allloggeduser?.address}</span><br />
+                                            {/* <span>City:{allloggeduser?.city}</span><br /> */}
+                                            <p> <span className="font-weight-semibold ">Email: </span> {allloggeduser?.email}</p>
+                                            <p> <span className="font-weight-semibold ">Website: </span> {allloggeduser?.website}</p>
+                                            <p> <span className="font-weight-semibold ">Phone: </span> {allloggeduser?.phone}</p>
+                                            <p> <span className="font-weight-semibold ">GstIn: </span> {allloggeduser?.gstIn}</p>
                                         </>
                                     ) : (
                                         <>
@@ -277,48 +280,49 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
 
                         {/* Company Details Section */}
                         <div>
-                            <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />
+                            <span className="font-weight-bold text-dark font-size-lg">Billed To:</span><br />
                             {clientDataa ? (
                                 <address>
                                     <p>
-                                        <span>Created By: {clientDataa.created_by}</span><br />
-                                        <span>Username: {clientDataa.username}</span><br />
-                                        <p>Email: {clientDataa.email}</p>
-                                        <p>Phone: {clientDataa.phone}</p>
+                                        <span> <span className="font-medium  ">Address: </span> {clientDataa.address}</span><br />
 
-
+                                        <span> <span className="font-weight-semibold  ">Name: </span>{clientDataa.username}</span><br />
+                                        <p> <span className="font-weight-semibold">Email: </span> {clientDataa.email}</p>
+                                        <p> <span className="font-weight-semibold  ">Phone: </span> {clientDataa.phone}</p>
+                                        <p> <span className="font-weight-semibold  ">GstIn: </span> {clientDataa.gstIn}</p>
                                     </p>
                                 </address>
                             ) : (
                                 <p>Loading client data...</p>
                             )}
                         </div>
-                
+
                     </div>
                 </div>
 
                 {/* Items Table */}
                 <div className="">
                     {parsedInvoice && parsedInvoice.items && (
-                        <Table 
-                            dataSource={parsedInvoice.items} 
-                            pagination={false} 
+                        <Table
+                            dataSource={parsedInvoice.items}
+                            pagination={false}
                             className="mb-2"
+                        // scroll={{ x: 1000 }}
                         >
-                            <Table.Column 
-                                title="No." 
-                                key="key" 
-                                render={(text, record, index) => index + 1} 
+                            <Table.Column
+                                title="No."
+                                key="key"
+                                render={(text, record, index) => index + 1}
                             />
-                            <Table.Column 
-                                title="Product" 
-                                dataIndex="item" 
-                                key="item" 
+                            <Table.Column
+                                title="Product"
+                                dataIndex="item"
+                                key="item"
                             />
-                            <Table.Column 
-                                title="Quantity" 
-                                dataIndex="quantity" 
-                                key="quantity" 
+                            <Table.Column
+                                title="Quantity"
+                                dataIndex="quantity"
+                                key="quantity"
                             />
                             <Table.Column
                                 title="Original Price"
@@ -326,12 +330,27 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                                     <NumberFormat
                                         displayType="text"
                                         value={Math.round(record.price * 100) / 100}
-                                        prefix="$"
+                                        // prefix="$"
                                         thousandSeparator={true}
                                     />
                                 )}
                                 key="price"
                             />
+                            <Table.Column
+                                title="HSN/SAC"
+                                key="hsn_sac"
+                                render={(record) => {
+                                    return `${record?.hsn_sac || 0}`;
+                                }}
+                            />
+                            <Table.Column
+                                title="GST Name"
+                                key="tax_name"
+                                render={(record) => {
+                                    return record?.tax_name || 'N/A';
+                                }}
+                            />
+
                             <Table.Column
                                 title="Discount (%)"
                                 render={(record) => `${record.discount_percentage || 0}%`}
@@ -348,7 +367,7 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                                     <NumberFormat
                                         displayType="text"
                                         value={Math.round((record.final_amount || 0))}
-                                        prefix="$"
+                                        // prefix="$"
                                         thousandSeparator={true}
                                     />
                                 )}
@@ -359,48 +378,48 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
 
                     {/* Invoice Summary */}
                     {parsedInvoice && (
-                        <div className="d-flex justify-content-end mb-3">
+                        <div className="d-flex justify-content-end mb-3 mt-3">
                             <div className="text-center">
                                 <div className="border-bottom">
-                                    <p className="mb-2">
-                                        <span>Sub-Total : </span>
+                                    <p >
+                                        <span className="font-weight-semibold ">Sub-Total : </span>
                                         <NumberFormat
                                             displayType="text"
                                             value={calculateSubtotal()}
-                                            prefix="$"
-                                            thousandSeparator={true}
-                                        />
-                                    </p>
-                                    <p className="mb-2">
-                                        <span>Total Discount : </span>
-                                        {`${parsedInvoice.discount || 0}%`}
-                                    </p>
-                                    <p className="mb-2">
-                                        <span>Total Discount Amount: </span>
-                                        <NumberFormat
-                                            displayType="text"
-                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
-                                            prefix="₹"
+                                            // prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
                                     <p>
-                                        <span>Total Tax Amount: </span>
+                                        <span className="font-weight-semibold ">Total Discount : </span>
+                                        {`${parsedInvoice.discount || 0}%`}
+                                    </p>
+                                    <p>
+                                        <span className="font-weight-semibold ">Total Discount Amount: </span>
+                                        <NumberFormat
+                                            displayType="text"
+                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
+                                            // prefix="₹"
+                                            thousandSeparator={true}
+                                        />
+                                    </p>
+                                    <p>
+                                        <span className="font-weight-semibold ">Total Tax Amount: </span>
                                         <NumberFormat
                                             displayType="text"
                                             value={parsedInvoice.tax
                                                 || 0}
-                                            prefix="$"
+                                            // prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
                                 </div>
-                                <h2 className="font-weight-semibold mt-3">
-                                    <span className="mr-1">Final Total: </span>
+                                <h2 className="mt-3">
+                                    <span className="mr-1 font-weight-semibold ">Final Total: </span>
                                     <NumberFormat
                                         displayType="text"
                                         value={parsedInvoice.total}
-                                        prefix="₹"
+                                        // prefix="₹"
                                         thousandSeparator={true}
                                     />
                                 </h2>
@@ -416,26 +435,26 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                             {/* <img src={Qr} alt="Image not show" className='w-28 h-28' /> */}
                         </div>
                         <div>
-                            <h4 className="font-medium mb-2">Payment Info:</h4>
+                            <h4 className="font-weight-semibold text-lg mb-2">Payment Info:</h4>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>Account Holder Name : </p>
+                                <p className='font-weight-semibold'>Account Holder Name : </p>
                                 <p>{clientDataa?.accountholder || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
 
-                                <p className='font-normal text-black'>Account Number : </p>
+                                <p className='font-weight-semibold'>Account Number : </p>
                                 <p>{clientDataa?.accountnumber || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>IFSC : </p>
+                                <p className='font-weight-semibold'>IFSC : </p>
                                 <p>{clientDataa?.ifsc || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>Account Type : </p>
+                                <p className='font-weight-semibold'>Account Type : </p>
                                 <p>{clientDataa?.branch || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>Bank Name : </p>
+                                <p className='font-weight-semibold'>Bank Name : </p>
                                 <p>{clientDataa?.bankname || 'N/A'}</p>
                             </div>
                             {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
@@ -443,7 +462,7 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                         </div>
                     </div>
                     <div>
-                        <h4 className="font-medium mb-2">Terms & Conditions:</h4>
+                        <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
                             <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
                             <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
@@ -473,13 +492,15 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                         <address>
                             <p>
 
-                                <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
+                                <span className="font-weight-semibold text-dark font-size-lg">Billed By:</span><br />
                                 {allloggeduser ? (
                                     <>
-                                        <span>created_by:{allloggeduser?.created_by}</span><br />
-                                        <span>username:{allloggeduser?.username}</span><br />
-                                        <p>Email: {allloggeduser?.email}</p>
-                                        <p>Phone: {allloggeduser?.phone}</p>
+                                        <span> <span className="font-weight-semibold ">Address: </span>{allloggeduser?.address}</span><br />
+                                        {/* <span>City:{allloggeduser?.city}</span><br /> */}
+                                        <p> <span className="font-weight-semibold ">Email: </span> {allloggeduser?.email}</p>
+                                        <p> <span className="font-weight-semibold ">Website: </span> {allloggeduser?.website}</p>
+                                        <p> <span className="font-weight-semibold ">Phone: </span> {allloggeduser?.phone}</p>
+                                        <p> <span className="font-weight-semibold">GstIn: </span> {allloggeduser?.gstIn}</p>
                                     </>
                                 ) : (
                                     <>
@@ -494,16 +515,16 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                     </div>
                     {/* Client Details Section */}
                     <div>
-                        <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />
+                        <span className="font-weight-bold text-dark font-size-lg">Billed To:</span><br />
                         {clientDataa ? (
                             <address>
                                 <p>
-                                    <span>Created By: {clientDataa.created_by}</span><br />
-                                    <span>Username: {clientDataa.username}</span><br />
-                                    <p>Email: {clientDataa.email}</p>
-                                    <p>Phone: {clientDataa.phone}</p>
+                                    <span> <span className="font-weight-semibold">Address: </span> {clientDataa.address}</span><br />
 
-
+                                    <span> <span className="font-weight-semibold  ">Name: </span>{clientDataa.username}</span><br />
+                                    <p> <span className="font-weight-semibold ">Email: </span> {clientDataa.email}</p>
+                                    <p> <span className="font-weight-semibold  ">Phone: </span> {clientDataa.phone}</p>
+                                    <p> <span className="font-weight-semibold  ">GstIn: </span> {clientDataa.gstIn}</p>
                                 </p>
                             </address>
                         ) : (
@@ -513,42 +534,42 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
 
                     {/* Invoice Details Section */}
                     <div>
-                        <div className='flex'>
-                            <span className="mb-1 me-2 font-weight-semibold">Invoice Num:</span>
+                        <div className='flex items-center'>
+                            <span className=" me-2 font-weight-semibold">Invoice Num:</span>
                             <p className='text-right'>{invoiceDataa?.invoiceNumber}</p>
                         </div>
-                        <div className='flex'>
-                            <span className="mb-1 me-2 font-weight-semibold">Issue Date:</span>
+                        <div className='flex items-center'>
+                            <span className="me-2 font-weight-semibold ">Issue Date:</span>
                             <p>{invoiceDataa?.issueDate ? dayjs(invoiceDataa.issueDate).format('DD MMMM, YYYY') : ''}</p>
                         </div>
-                        <div className='flex'>
-                            <span className="mb-1 me-2 font-weight-semibold">Due Date:</span>
+                        <div className='flex items-center'>
+                            <span className="me-2 font-weight-semibold ">Due Date:</span>
                             <p>{invoiceDataa?.dueDate ? dayjs(invoiceDataa.dueDate).format('DD MMMM, YYYY') : ''}</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="">
+                <div className="mt-4">
                     {parsedInvoice && parsedInvoice.items && (
-                        <Table 
-                            dataSource={parsedInvoice.items} 
-                            pagination={false} 
+                        <Table
+                            dataSource={parsedInvoice.items}
+                            pagination={false}
                             className="mb-2"
                         >
-                            <Table.Column 
-                                title="No." 
-                                key="key" 
-                                render={(text, record, index) => index + 1} 
+                            <Table.Column
+                                title="No."
+                                key="key"
+                                render={(text, record, index) => index + 1}
                             />
-                            <Table.Column 
-                                title="Product" 
-                                dataIndex="item" 
-                                key="item" 
+                            <Table.Column
+                                title="Product"
+                                dataIndex="item"
+                                key="item"
                             />
-                            <Table.Column 
-                                title="Quantity" 
-                                dataIndex="quantity" 
-                                key="quantity" 
+                            <Table.Column
+                                title="Quantity"
+                                dataIndex="quantity"
+                                key="quantity"
                             />
                             <Table.Column
                                 title="Original Price"
@@ -556,11 +577,25 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                                     <NumberFormat
                                         displayType="text"
                                         value={Math.round(record.price * 100) / 100}
-                                        prefix="$"
+                                        // prefix="$"
                                         thousandSeparator={true}
                                     />
                                 )}
                                 key="price"
+                            />
+                            <Table.Column
+                                title="HSN/SAC"
+                                key="hsn_sac"
+                                render={(record) => {
+                                    return `${record?.hsn_sac || 0}`;
+                                }}
+                            />
+                            <Table.Column
+                                title="GST Name"
+                                key="tax_name"
+                                render={(record) => {
+                                    return record?.tax_name || 'N/A';
+                                }}
                             />
                             <Table.Column
                                 title="Discount (%)"
@@ -578,7 +613,7 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                                     <NumberFormat
                                         displayType="text"
                                         value={Math.round((record.final_amount || 0))}
-                                        prefix="$"
+                                        // prefix="$"
                                         thousandSeparator={true}
                                     />
                                 )}
@@ -589,48 +624,48 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
 
                     {/* Invoice Summary */}
                     {parsedInvoice && (
-                        <div className="d-flex justify-content-end mb-3">
+                        <div className="d-flex justify-content-end mb-3 mt-3">
                             <div className="text-center">
                                 <div className="border-bottom">
-                                    <p className="mb-2">
-                                        <span>Sub-Total : </span>
+                                    <p >
+                                        <span className="font-weight-semibold ">Sub-Total : </span>
                                         <NumberFormat
                                             displayType="text"
                                             value={calculateSubtotal()}
-                                            prefix="$"
-                                            thousandSeparator={true}
-                                        />
-                                    </p>
-                                    <p className="mb-2">
-                                        <span>Total Discount : </span>
-                                        {`${parsedInvoice.discount || 0}%`}
-                                    </p>
-                                    <p className="mb-2">
-                                        <span>Total Discount Amount: </span>
-                                        <NumberFormat
-                                            displayType="text"
-                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
-                                            prefix="₹"
+                                            // prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
                                     <p>
-                                        <span>Total Tax Amount: </span>
+                                        <span className="font-weight-semibold ">Total Discount : </span>
+                                        {`${parsedInvoice.discount || 0}%`}
+                                    </p>
+                                    <p>
+                                        <span className="font-weight-semibold ">Total Discount Amount: </span>
+                                        <NumberFormat
+                                            displayType="text"
+                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
+                                            // prefix="₹"
+                                            thousandSeparator={true}
+                                        />
+                                    </p>
+                                    <p>
+                                        <span className="font-weight-semibold ">Total Tax Amount: </span>
                                         <NumberFormat
                                             displayType="text"
                                             value={parsedInvoice.tax
                                                 || 0}
-                                            prefix="$"
+                                            // prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
                                 </div>
-                                <h2 className="font-weight-semibold mt-3">
-                                    <span className="mr-1">Final Total: </span>
+                                <h2 className="mt-3">
+                                    <span className="mr-1 font-weight-semibold ">Final Total: </span>
                                     <NumberFormat
                                         displayType="text"
                                         value={parsedInvoice.total}
-                                        prefix="₹"
+                                        // prefix="₹"
                                         thousandSeparator={true}
                                     />
                                 </h2>
@@ -646,26 +681,26 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                             {/* <img src={Qr} alt="Image not show" className='w-28 h-28' /> */}
                         </div>
                         <div>
-                            <h4 className="font-medium mb-2">Payment Info:</h4>
+                            <h4 className="font-weight-semibold text-lg mb-2">Payment Info:</h4>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>Account Holder Name : </p>
+                                <p className='font-weight-semibold'>Account Holder Name : </p>
                                 <p>{clientDataa?.accountholder || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
 
-                                <p className='font-normal text-black'>Account Number : </p>
+                                <p className='font-weight-semibold'>Account Number : </p>
                                 <p>{clientDataa?.accountnumber || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>IFSC : </p>
+                                <p className='font-weight-semibold'>IFSC : </p>
                                 <p>{clientDataa?.ifsc || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>Account Type : </p>
+                                <p className='font-weight-semibold'>Account Type : </p>
                                 <p>{clientDataa?.branch || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>Bank Name : </p>
+                                <p className='font-weight-semibold'>Bank Name : </p>
                                 <p>{clientDataa?.bankname || 'N/A'}</p>
                             </div>
                             {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
@@ -673,7 +708,7 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                         </div>
                     </div>
                     <div>
-                        <h4 className="font-medium mb-2">Terms & Conditions:</h4>
+                        <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
                             <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
                             <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
@@ -697,16 +732,16 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                 <div className="flex flex-col items-center mb-8 text-center">
                     <span className="text-2xl font-bold text-indigo-600">Nexis Vision</span>
                     <div className="text-gray-600 mt-2">
-                    <div className='flex'>
-                            <span className="mb-1 me-2 font-weight-semibold">Invoice Num:</span>
+                        <div className='flex items-center'>
+                            <span className=" me-2 font-weight-semibold ">Invoice Num:</span>
                             <p className='text-right'>{invoiceDataa?.invoiceNumber}</p>
                         </div>
-                        <div className='flex'>
-                            <span className="mb-1 me-2 font-weight-semibold">Issue Date:</span>
+                        <div className='flex items-center'>
+                            <span className="me-2 font-weight-semibold ">Issue Date:</span>
                             <p>{invoiceDataa?.issueDate ? dayjs(invoiceDataa.issueDate).format('DD MMMM, YYYY') : ''}</p>
                         </div>
-                        <div className='flex'>
-                            <span className="mb-1 me-2 font-weight-semibold">Due Date:</span>
+                        <div className='flex items-center'>
+                            <span className="me-2 font-weight-semibold ">Due Date:</span>
                             <p>{invoiceDataa?.dueDate ? dayjs(invoiceDataa.dueDate).format('DD MMMM, YYYY') : ''}</p>
                         </div>
                     </div>
@@ -716,57 +751,59 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                 {/* Address Grid */}
                 <div className="grid grid-cols-2 gap-8 mb-8">
                     <div className="border-r pr-8 text-left">
-                    <div className='text-left'>
-                        <address>
-                            <p>
+                        <div className='text-left'>
+                            <address>
+                                <p>
 
-                                <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
-                                {allloggeduser ? (
-                                    <>
-                                        <span>created_by:{allloggeduser?.created_by}</span><br />
-                                        <span>username:{allloggeduser?.username}</span><br />
-                                        <p>Email: {allloggeduser?.email}</p>
-                                        <p>Phone: {allloggeduser?.phone}</p>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>Address not found</span><br />
-                                        <span>City not found</span><br />
-                                        <p>Email: Email not found</p>
-                                        <p>Phone: Phone not found</p>
-                                    </>
-                                )}
-                            </p>
-                        </address>
-                    </div>
+                                    <span className="font-weight-semibold text-dark font-size-lg">Billed By:</span><br />
+                                    {allloggeduser ? (
+                                        <>
+                                            <span> <span className="font-weight-semibold ">Address: </span>{allloggeduser?.address}</span><br />
+                                            {/* <span>City:{allloggeduser?.city}</span><br /> */}
+                                            <p> <span className="font-weight-semibold ">Email: </span> {allloggeduser?.email}</p>
+                                            <p> <span className="font-weight-semibold ">Website: </span> {allloggeduser?.website}</p>
+                                            <p> <span className="font-weight-semibold ">Phone: </span> {allloggeduser?.phone}</p>
+                                            <p> <span className="font-weight-semibold ">GstIn: </span> {allloggeduser?.gstIn}</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>Address not found</span><br />
+                                            <span>City not found</span><br />
+                                            <p>Email: Email not found</p>
+                                            <p>Phone: Phone not found</p>
+                                        </>
+                                    )}
+                                </p>
+                            </address>
+                        </div>
 
 
                     </div>
                     <div className="text-left">
                         {/* Company Details Section */}
                         <div>
-                        <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />
-                        {clientDataa ? (
-                            <address>
-                                <p>
-                                    <span>Created By: {clientDataa.created_by}</span><br />
-                                    <span>Username: {clientDataa.username}</span><br />
-                                    <p>Email: {clientDataa.email}</p>
-                                    <p>Phone: {clientDataa.phone}</p>
+                            <span className="font-weight-bold text-dark font-size-lg">Billed To:</span><br />
+                            {clientDataa ? (
+                                <address>
+                                    <p>
+                                        <span> <span className="font-medium  ">Address: </span> {clientDataa.address}</span><br />
 
-
-                                </p>
-                            </address>
-                        ) : (
-                            <p>Loading client data...</p>
-                        )}
-                    </div>
+                                        <span> <span className="font-weight-semibold ">Name: </span>{clientDataa.username}</span><br />
+                                        <p> <span className="font-weight-semibold ">Email: </span> {clientDataa.email}</p>
+                                        <p> <span className="font-weight-semibold  ">Phone: </span> {clientDataa.phone}</p>
+                                        <p> <span className="font-weight-semibold  ">GstIn: </span> {clientDataa.gstIn}</p>
+                                    </p>
+                                </address>
+                            ) : (
+                                <p>Loading client data...</p>
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 <div className="">
-                <div className="">
-                <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
+                    <div className="">
+                        <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
                             <Table.Column title="No." key="key" render={(text, record, index) => index + 1} />
                             <Table.Column title="Product" dataIndex="item" key="item" />
                             <Table.Column title="Quantity" dataIndex="quantity" key="quantity" />
@@ -776,18 +813,32 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                                     <NumberFormat
                                         displayType="text"
                                         value={Math.round(record.price * 100) / 100}
-                                        prefix="$"
+                                        // prefix="$"
                                         thousandSeparator={true}
                                     />
                                 )}
                                 key="price"
                             />
                             <Table.Column
+                                title="HSN/SAC"
+                                key="hsn_sac"
+                                render={(record) => {
+                                    return `${record?.hsn_sac || 0}`;
+                                }}
+                            />
+                            <Table.Column
+                                title="GST Name"
+                                key="tax_name"
+                                render={(record) => {
+                                    return record?.tax_name || 'N/A';
+                                }}
+                            />
+                            <Table.Column
                                 title="Discount (%)"
                                 render={(record) => `${record.discount_percentage || 0}%`}
                                 key="discount_percentage"
                             />
-                            
+
                             <Table.Column
                                 title="Tax (%)"
                                 render={(record) => `${record.tax_percentage || 0}%`}
@@ -800,7 +851,7 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                                         displayType="text"
                                         // value={Math.round((record.price - (record.price * (record.discount || 0)) / 100) * record.quantity * 100) / 100}
                                         value={Math.round((record.final_amount))}
-                                        prefix="$"
+                                        // prefix="$"
                                         thousandSeparator={true}
                                     />
                                 )}
@@ -808,57 +859,57 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                             />
                         </Table>
 
-                    {/* Invoice Summary */}
-                    <div className="d-flex justify-content-end mb-3">
-                    <div className="text-center">
+                        {/* Invoice Summary */}
+                        {parsedInvoice && (
+                        <div className="d-flex justify-content-end mb-3 mt-3">
+                            <div className="text-center">
                                 <div className="border-bottom">
-                                    <p className="mb-2">
-                                        <span>Sub-Total : </span>
-                                        <NumberFormat
-                                        displayType="text"
-                                        // value={Math.round((record.price - (record.price * (record.discount || 0)) / 100) * record.quantity * 100) / 100}
-                                        value={calculateSubtotal()}
-                                        prefix="$"
-                                        thousandSeparator={true}
-                                    />
-                                    </p>
-
-                                    <p className="mb-2">
-                                        <span>Total Discount : </span>
-                                        {`${parsedInvoice.discount || 0}%`}
-                                    </p>
-                                    <p className="mb-2">
-                                        <span>Total Discount Amount: </span>
+                                    <p >
+                                        <span className="font-weight-semibold ">Sub-Total : </span>
                                         <NumberFormat
                                             displayType="text"
-                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
-                                            prefix="₹"
+                                            value={calculateSubtotal()}
+                                            // prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
                                     <p>
-                                        <span>Total Tax Amount: </span>
+                                        <span className="font-weight-semibold ">Total Discount : </span>
+                                        {`${parsedInvoice.discount || 0}%`}
+                                    </p>
+                                    <p>
+                                        <span className="font-weight-semibold ">Total Discount Amount: </span>
+                                        <NumberFormat
+                                            displayType="text"
+                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
+                                            // prefix="₹"
+                                            thousandSeparator={true}
+                                        />
+                                    </p>
+                                    <p>
+                                        <span className="font-weight-semibold ">Total Tax Amount: </span>
                                         <NumberFormat
                                             displayType="text"
                                             value={parsedInvoice.tax
-                                                || 0}  // Using the tax field directly
-                                            prefix="₹"
+                                                || 0}
+                                            // prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
                                 </div>
-                                <h2 className="font-weight-semibold mt-3">
-                                    <span className="mr-1">Final Total: </span>
+                                <h2 className="mt-3">
+                                    <span className="mr-1 font-weight-semibold ">Final Total: </span>
                                     <NumberFormat
                                         displayType="text"
                                         value={parsedInvoice.total}
-                                        prefix="₹"
+                                        // prefix="₹"
                                         thousandSeparator={true}
                                     />
                                 </h2>
                             </div>
+                        </div>
+                    )}
                     </div>
-                </div>
                 </div>
                 <div className="grid grid-cols-2 gap-8">
                     <div className="flex gap-4">
@@ -866,26 +917,26 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                             {/* <img src={Qr} alt="Image not show" className='w-28 h-28' /> */}
                         </div>
                         <div>
-                            <h4 className="font-medium mb-2">Payment Info:</h4>
+                            <h4 className="font-weight-semibold text-lg mb-2">Payment Info:</h4>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>Account Holder Name : </p>
+                                <p className='font-weight-semibold'>Account Holder Name : </p>
                                 <p>{clientDataa?.accountholder || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
 
-                                <p className='font-normal text-black'>Account Number : </p>
+                                <p className='font-weight-semibold'>Account Number : </p>
                                 <p>{clientDataa?.accountnumber || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>IFSC : </p>
+                                <p className='font-weight-semibold'>IFSC : </p>
                                 <p>{clientDataa?.ifsc || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>Account Type : </p>
+                                <p className='font-weight-semibold'>Account Type : </p>
                                 <p>{clientDataa?.branch || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>Bank Name : </p>
+                                <p className='font-weight-semibold'>Bank Name : </p>
                                 <p>{clientDataa?.bankname || 'N/A'}</p>
                             </div>
                             {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
@@ -893,7 +944,7 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                         </div>
                     </div>
                     <div>
-                        <h4 className="font-medium mb-2">Terms & Conditions:</h4>
+                        <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
                             <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
                             <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
@@ -917,16 +968,16 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                     <div className='text-left'>
                         <h1 className="text-3xl font-light text-gray-700">INVOICE</h1>
                         <div className="text-gray-600 mt-2">
-                        <div className='flex'>
-                            <span className="mb-1 me-2 font-weight-semibold">Invoice Num:</span>
+                        <div className='flex items-center'>
+                            <span className=" me-2 font-weight-semibold ">Invoice Num:</span>
                             <p className='text-right'>{invoiceDataa?.invoiceNumber}</p>
                         </div>
-                        <div className='flex'>
-                            <span className="mb-1 me-2 font-weight-semibold">Issue Date:</span>
+                        <div className='flex items-center'>
+                            <span className="me-2 font-weight-semibold ">Issue Date:</span>
                             <p>{invoiceDataa?.issueDate ? dayjs(invoiceDataa.issueDate).format('DD MMMM, YYYY') : ''}</p>
                         </div>
-                        <div className='flex'>
-                            <span className="mb-1 me-2 font-weight-semibold">Due Date:</span>
+                        <div className='flex items-center'>
+                            <span className="me-2 font-weight-semibold ">Due Date:</span>
                             <p>{invoiceDataa?.dueDate ? dayjs(invoiceDataa.dueDate).format('DD MMMM, YYYY') : ''}</p>
                         </div>
                         </div>
@@ -936,56 +987,58 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                 {/* Dates & Addresses */}
                 <div className="grid grid-cols-2 gap-12 mb-12">
                     <div className="border-r pr-8 text-left">
-                    <div className='text-left'>
-                        <address>
-                            <p>
+                        <div className='text-left'>
+                            <address>
+                                <p>
 
-                                <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
-                                {allloggeduser ? (
-                                    <>
-                                        <span>created_by:{allloggeduser?.created_by}</span><br />
-                                        <span>username:{allloggeduser?.username}</span><br />
-                                        <p>Email: {allloggeduser?.email}</p>
-                                        <p>Phone: {allloggeduser?.phone}</p>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span>Address not found</span><br />
-                                        <span>City not found</span><br />
-                                        <p>Email: Email not found</p>
-                                        <p>Phone: Phone not found</p>
-                                    </>
-                                )}
-                            </p>
-                        </address>
-                    </div>
+                                    <span className="font-weight-semibold text-dark font-size-lg">Billed By:</span><br />
+                                    {allloggeduser ? (
+                                        <>
+                                            <span> <span className="font-weight-semibold">Address: </span>{allloggeduser?.address}</span><br />
+                                            {/* <span>City:{allloggeduser?.city}</span><br /> */}
+                                            <p> <span className="font-weight-semibold ">Email: </span> {allloggeduser?.email}</p>
+                                            <p> <span className="font-weight-semibold ">Website: </span> {allloggeduser?.website}</p>
+                                            <p> <span className="font-weight-semibold ">Phone: </span> {allloggeduser?.phone}</p>
+                                            <p> <span className="font-weight-semibold ">GstIn: </span> {allloggeduser?.gstIn}</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>Address not found</span><br />
+                                            <span>City not found</span><br />
+                                            <p>Email: Email not found</p>
+                                            <p>Phone: Phone not found</p>
+                                        </>
+                                    )}
+                                </p>
+                            </address>
+                        </div>
 
                     </div>
                     <div className="text-left">
                         {/* Client Details Section */}
                         <div>
-                        <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />
-                        {clientDataa ? (
-                            <address>
-                                <p>
-                                    <span>Created By: {clientDataa.created_by}</span><br />
-                                    <span>Username: {clientDataa.username}</span><br />
-                                    <p>Email: {clientDataa.email}</p>
-                                    <p>Phone: {clientDataa.phone}</p>
+                            <span className="font-weight-bold text-dark font-size-lg">Billed To:</span><br />
+                            {clientDataa ? (
+                                <address>
+                                    <p>
+                                        <span> <span className="font-medium ">Address: </span> {clientDataa.address}</span><br />
 
-
-                                </p>
-                            </address>
-                        ) : (
-                            <p>Loading client data...</p>
-                        )}
-                    </div>
+                                        <span> <span className="font-weight-semibold">Name: </span>{clientDataa.username}</span><br />
+                                        <p> <span className="font-weight-semibold">Email: </span> {clientDataa.email}</p>
+                                        <p> <span className="font-weight-semibold">Phone: </span> {clientDataa.phone}</p>
+                                        <p> <span className="font-weight-semibold">GstIn: </span> {clientDataa.gstIn}</p>
+                                    </p>
+                                </address>
+                            ) : (
+                                <p>Loading client data...</p>
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 <div className="">
-                <div className="">
-                <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
+                    <div className="">
+                        <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
                             <Table.Column title="No." key="key" render={(text, record, index) => index + 1} />
                             <Table.Column title="Product" dataIndex="item" key="item" />
                             <Table.Column title="Quantity" dataIndex="quantity" key="quantity" />
@@ -995,18 +1048,32 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                                     <NumberFormat
                                         displayType="text"
                                         value={Math.round(record.price * 100) / 100}
-                                        prefix="$"
+                                        // prefix="$"
                                         thousandSeparator={true}
                                     />
                                 )}
                                 key="price"
                             />
                             <Table.Column
+                                title="HSN/SAC"
+                                key="hsn_sac"
+                                render={(record) => {
+                                    return `${record?.hsn_sac || 0}`;
+                                }}
+                            />
+                            <Table.Column
+                                title="GST Name"
+                                key="tax_name"
+                                render={(record) => {
+                                    return record?.tax_name || 'N/A';
+                                }}
+                            />
+                            <Table.Column
                                 title="Discount (%)"
                                 render={(record) => `${record.discount_percentage || 0}%`}
                                 key="discount_percentage"
                             />
-                            
+
                             <Table.Column
                                 title="Tax (%)"
                                 render={(record) => `${record.tax_percentage || 0}%`}
@@ -1019,7 +1086,7 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                                         displayType="text"
                                         // value={Math.round((record.price - (record.price * (record.discount || 0)) / 100) * record.quantity * 100) / 100}
                                         value={Math.round((record.final_amount))}
-                                        prefix="$"
+                                        // prefix="$"
                                         thousandSeparator={true}
                                     />
                                 )}
@@ -1027,58 +1094,58 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                             />
                         </Table>
 
-                    {/* Invoice Summary */}
-                        <div className="d-flex justify-content-end mb-3">
-                        <div className="text-center">
+                        {/* Invoice Summary */}
+                        {parsedInvoice && (
+                        <div className="d-flex justify-content-end mb-3 mt-3">
+                            <div className="text-center">
                                 <div className="border-bottom">
-                                    <p className="mb-2">
-                                        <span>Sub-Total : </span>
-                                        <NumberFormat
-                                        displayType="text"
-                                        // value={Math.round((record.price - (record.price * (record.discount || 0)) / 100) * record.quantity * 100) / 100}
-                                        value={calculateSubtotal()}
-                                        // prefix="$"
-                                        thousandSeparator={true}
-                                    />
-                                    </p>
-
-                                    <p className="mb-2">
-                                        <span>Total Discount : </span>
-                                        {`${parsedInvoice.discount || 0}%`}
-                                    </p>
-                                    <p className="mb-2">
-                                        <span>Total Discount Amount: </span>
+                                    <p >
+                                        <span className="font-weight-semibold ">Sub-Total : </span>
                                         <NumberFormat
                                             displayType="text"
-                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
-                                            prefix="₹"
+                                            value={calculateSubtotal()}
+                                            // prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
                                     <p>
-                                        <span>Total Tax Amount: </span>
+                                        <span className="font-weight-semibold ">Total Discount : </span>
+                                        {`${parsedInvoice.discount || 0}%`}
+                                    </p>
+                                    <p>
+                                        <span className="font-weight-semibold ">Total Discount Amount: </span>
+                                        <NumberFormat
+                                            displayType="text"
+                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
+                                            // prefix="₹"
+                                            thousandSeparator={true}
+                                        />
+                                    </p>
+                                    <p>
+                                        <span className="font-weight-semibold ">Total Tax Amount: </span>
                                         <NumberFormat
                                             displayType="text"
                                             value={parsedInvoice.tax
-                                                || 0}  // Using the tax field directly
-                                            prefix="₹"
+                                                || 0}
+                                            // prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
                                 </div>
-                                <h2 className="font-weight-semibold mt-3">
-                                    <span className="mr-1">Final Total: </span>
+                                <h2 className="mt-3">
+                                    <span className="mr-1 font-weight-semibold ">Final Total: </span>
                                     <NumberFormat
                                         displayType="text"
                                         value={parsedInvoice.total}
-                                        prefix="₹"
+                                        // prefix="₹"
                                         thousandSeparator={true}
                                     />
                                 </h2>
                             </div>
                         </div>
+                    )}
                     </div>
-                {/* </div> */}
+                    {/* </div> */}
                 </div>
                 <div className="grid grid-cols-2 gap-8">
                     <div className="flex gap-4">
@@ -1086,26 +1153,26 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                             {/* <img src={Qr} alt="Image not show" className='w-28 h-28' /> */}
                         </div>
                         <div>
-                            <h4 className="font-medium mb-2">Payment Info:</h4>
+                            <h4 className="font-weight-semibold text-lg mb-2">Payment Info:</h4>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>Account Holder Name : </p>
+                                <p className='font-weight-semibold'>Account Holder Name : </p>
                                 <p>{clientDataa?.accountholder || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
 
-                                <p className='font-normal text-black'>Account Number : </p>
+                                <p className='font-weight-semibold'>Account Number : </p>
                                 <p>{clientDataa?.accountnumber || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>IFSC : </p>
+                                <p className='font-weight-semibold'>IFSC : </p>
                                 <p>{clientDataa?.ifsc || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>Account Type : </p>
+                                <p className='font-weight-semibold'>Account Type : </p>
                                 <p>{clientDataa?.branch || 'N/A'}</p>
                             </div>
                             <div className='flex gap-2'>
-                                <p className='font-normal text-black'>Bank Name : </p>
+                                <p className='font-weight-semibold'>Bank Name : </p>
                                 <p>{clientDataa?.bankname || 'N/A'}</p>
                             </div>
                             {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
@@ -1113,7 +1180,7 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                         </div>
                     </div>
                     <div>
-                        <h4 className="font-medium mb-2">Terms & Conditions:</h4>
+                        <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
                             <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
                             <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
@@ -1158,7 +1225,7 @@ const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
                     {template === 'rendertemplate' && renderTemplate()}
                     {template === 'modern' && renderModernTemplate()}
                     {template === 'classic' && renderClassicTemplate()}
-                   {template === 'minimal' && renderMinimalTemplate()}
+                    {template === 'minimal' && renderMinimalTemplate()}
                 </div>
             </div>
         </div>

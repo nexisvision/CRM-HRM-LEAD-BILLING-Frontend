@@ -566,7 +566,7 @@ const AddProject = ({ onClose }) => {
 
               <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Status<span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Status <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
                     className="mt-1"

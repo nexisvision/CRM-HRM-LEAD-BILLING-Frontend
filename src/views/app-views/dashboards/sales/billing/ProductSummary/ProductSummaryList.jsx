@@ -1,122 +1,204 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 // import { DealStatisticViewData } from '../../../dashboards/default/DefaultDashboardData';
 import { Card, Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+import NumberFormat from 'react-number-format';
+import { useSelector } from 'react-redux';
 
+function ProductSummaryList({ billingId }) {
+    const [billingData, setBillingData] = useState([]);
+    const [totals, setTotals] = useState({
+        subtotal: 0,
+        discount: 0,
+        tax: 0,
+        total: 0
+    });
 
-function ProductSummaryList() {
+    // Get billing data from Redux store
+    const allBillingItems = useSelector((state) => state.salesbilling?.salesbilling?.data || []);
+
+    useEffect(() => {
+        if (billingId && allBillingItems.length > 0) {
+            // Find the specific billing item
+            const selectedBilling = allBillingItems.find(item => item.id === billingId);
+            
+            if (selectedBilling) {
+                try {
+                    // Parse description if it's a string
+                    const description = typeof selectedBilling.discription === 'string' 
+                        ? JSON.parse(selectedBilling.discription) 
+                        : selectedBilling.discription;
+
+                    // Check if description and items exist
+                    if (description && Array.isArray(description.items)) {
+                        const items = description.items.map((item, index) => ({
+                            id: index,
+                            billNumber: selectedBilling.billNumber,
+                            billDate: selectedBilling.billDate,
+                            vendor: selectedBilling.vendor,
+                            product: item.name,
+                            quantity: item.quantity,
+                            unitPrice: item.unitPrice,
+                            tax: item.tax,
+                            amount: item.amount
+                        }));
+                        
+                        setBillingData(items);
+                        calculateTotals(selectedBilling);
+                    } else {
+                        // If no items, set empty array
+                        setBillingData([]);
+                        console.warn('No items found in billing description');
+                    }
+                } catch (error) {
+                    console.error('Error processing billing data:', error);
+                    setBillingData([]);
+                }
+            }
+        }
+    }, [billingId, allBillingItems]);
+
+    const calculateTotals = (billing) => {
+        if (!billing) return;
+
+        setTotals({
+            subtotal: billing.total + billing.discount || 0,
+            discount: billing.discount || 0,
+            tax: billing.tax || 0,
+            total: billing.total || 0
+        });
+    };
+
+    const columns = [
+        {
+            title: "No.",
+            key: "index",
+            render: (text, record, index) => index + 1
+        },
+        {
+            title: "Bill Number",
+            dataIndex: "billNumber",
+            key: "billNumber"
+        },
+        {
+            title: "Bill Date",
+            dataIndex: "billDate",
+            key: "billDate",
+            render: (date) => dayjs(date).format('DD/MM/YYYY')
+        },
+        // {
+        //     title: "Vendor",
+        //     dataIndex: "vendor",
+        //     key: "vendor"
+        // },
+        {
+            title: "Product",
+            dataIndex: "product",
+            key: "product"
+        },
+        {
+            title: "Quantity",
+            dataIndex: "quantity",
+            key: "quantity"
+        },
+        {
+            title: "Unit Price",
+            dataIndex: "unitPrice",
+            key: "unitPrice",
+            render: (price) => (
+                <NumberFormat
+                    displayType="text"
+                    value={price || 0}
+                    prefix="₹"
+                    thousandSeparator={true}
+                />
+            )
+        },
+        {
+            title: "Tax (%)",
+            dataIndex: "tax",
+            key: "tax",
+            render: (tax) => `${tax || 0}%`
+        },
+        {
+            title: "Amount",
+            dataIndex: "amount",
+            key: "amount",
+            render: (amount) => (
+                <NumberFormat
+                    displayType="text"
+                    value={amount || 0}
+                    prefix="₹"
+                    thousandSeparator={true}
+                />
+            )
+        }
+    ];
 
     return (
-        <>
-            <Card className='border-0'>
+      
+            <div className="p-2">
+                <h1 className="text-sm font-medium mb-1">Product Summary</h1>
+                {/* <p className="text-xs text-gray-500 mb-2">
+                    Billing details for selected item
+                </p> */}
 
-                <div className="p-2">
-                    {/* Heading */}
-                    <h1 className="text-sm font-medium mb-1">Product Summary</h1>
-                    <p className="text-xs text-gray-500 mb-2">
-                        All items here cannot be deleted.
-                    </p>
+                <div className="">
+                    <Table 
+                        dataSource={billingData} 
+                        columns={columns}
+                        pagination={false} 
+                        className="mb-2"
+                        rowKey="id"
+                    />
 
-                    {/* Table */}
-                    <div className="overflow-x-auto">
-                        <table className="w-full border border-gray-300 bg-white text-center text-xs">
-                            <thead className="bg-gray-100">
-                                <tr>
-                                    <th className="px-4 py-2">#</th>
-                                    <th className="px-4 py-2">Product</th>
-                                    <th className="px-4 py-2">Quantity</th>
-                                    <th className="px-4 py-2">Rate</th>
-                                    <th className="px-4 py-2">Discount</th>
-                                    <th className="px-4 py-2">Tax</th>
-                                    <th className="px-4 py-2">Chart Of Account</th>
-                                    <th className="px-4 py-2">Account Amount</th>
-                                    <th className="px-4 py-2">Description</th>
-                                    <th className="px-4 py-2">
-                                        <span>Price</span>
-                                        <br />
-                                        <span className="text-red-500">(after tax & discount)</span>
-
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {/* Row 1 */}
-                                <tr>
-                                    <td className="px-4 py-2">1</td>
-                                    <td className="px-4 py-2">Refrigerator</td>
-                                    <td className="px-4 py-2">1 (Piece)</td>
-                                    <td className="px-4 py-2">USD 60.000,00</td>
-                                    <td className="px-4 py-2">USD 0.00</td>
-                                    <td className="px-4 py-2 text-center">
-                                        <tr><p className='flex'>CGST (10%):USD  6.000,00</p></tr>
-                                        <tr><p>SGST (5%):USD  3.000,00</p></tr>
-                                    </td>
-                                    <td className="px-4 py-2">Petty Cash</td>
-                                    <td className="px-4 py-2">USD 120,00</td>
-                                    <td className="border px-4 py-2">
-                                        Giving information on its origins.
-                                    </td>
-                                    <td className="px-4 py-2">USD 69.000,00</td>
-                                </tr>
-                                {/* Total Row */}
-                                <tr className="bg-gray-100 font-semibold">
-                                    <td className="px-4 py-2 text-center" colSpan="3">
-                                        Total
-                                    </td>
-                                    <td className="px-4 py-2">1</td>
-                                    <td className="px-4 py-2">USD 60.000,00	</td>
-                                    <td className="px-4 py-2">USD 0,00</td>
-                                    <td className="px-4 py-2">USD 9.000,00</td>
-                                    <td className="px-4 py-2"></td>
-                                    <td className="px-4 py-2"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Summary Details */}
-                    <div className="mt-3 flex flex-col items-end space-y-2 text-xs">
-                        <div className="flex justify-between w-full sm:w-1/3 border-b pb-2">
-                            <span className="text-gray-700">Sub Total</span>
-                            <span className="text-gray-700">USD 60.000,00</span>
-                        </div>
-                        <div className="flex justify-between w-full sm:w-1/3 border-b pb-2">
-                            <span className="text-gray-700">Discount</span>
-                            <span className="text-gray-700">USD 0,00</span>
-                        </div>
-                        <div className="flex justify-between w-full sm:w-1/3 border-b pb-2">
-                            <span className="text-gray-700">CGST</span>
-                            <span className="text-gray-700">USD 6.000,00</span>
-                        </div>
-                        <div className="flex justify-between w-full sm:w-1/3 border-b pb-2">
-                            <span className="text-gray-700">SGST</span>
-                            <span className="text-gray-700">USD 3.000,00</span>
-                        </div>
-                        <div className="flex justify-between w-full sm:w-1/3 border-b pb-2">
-                            <span className="text-gray-700">Total</span>
-                            <span className="text-gray-700">USD 69.000,00</span>
-                        </div>
-                        <div className="flex justify-between w-full sm:w-1/3 border-b pb-2">
-                            <span className="text-gray-700">Paid</span>
-                            <span className="text-gray-700">USD 0,00</span>
-                        </div>
-                        <div className="flex justify-between w-full sm:w-1/3 border-b pb-2">
-                            <span className="text-gray-700">Debit Note</span>
-                            <span className="text-gray-700">USD 595,00</span>
-                        </div>
-                        <div className="flex justify-between w-full sm:w-1/3">
-                            <span className="text-gray-700">Due</span>
-                            <span className="text-gray-700">USD 68.405,00</span>
+                    {/* Summary Section */}
+                    <div className="d-flex justify-content-end mb-3">
+                        <div className="text-center">
+                            <div className="border-bottom">
+                                <p className="mb-2">
+                                    <span className='font-weight-semibold'>Sub-Total : </span>
+                                    <NumberFormat
+                                        displayType="text"
+                                        value={totals.subtotal}
+                                        prefix="₹"
+                                        thousandSeparator={true}
+                                    />
+                                </p>
+                                <p className="mb-2">
+                                    <span className='font-weight-semibold'>Total Discount : </span>
+                                    <NumberFormat
+                                        displayType="text"
+                                        value={totals.discount}
+                                        suffix="%"
+                                        thousandSeparator={true}
+                                    />
+                                </p>
+                                <p>
+                                    <span className='font-weight-semibold'>Total Tax : </span>
+                                    <NumberFormat
+                                        displayType="text"
+                                        value={totals.tax}
+                                        prefix="₹"
+                                        thousandSeparator={true}
+                                    />
+                                </p>
+                            </div>
+                            <h2 className=" mt-3">
+                                <span className="mr-1 font-weight-semibold">Final Total: </span>
+                                <NumberFormat
+                                    displayType="text"
+                                    value={totals.total}
+                                    prefix="₹"
+                                    thousandSeparator={true}
+                                />
+                            </h2>
                         </div>
                     </div>
                 </div>
-            </Card>
-
-           
-
-        
-        </>
-    )
+            </div>
+    );
 }
 
 export default ProductSummaryList;

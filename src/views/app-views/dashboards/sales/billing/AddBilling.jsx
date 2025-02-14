@@ -101,14 +101,14 @@ const AddBilling = ({ onClose }) => {
     setRows(updatedRows);
   };
 
-  const handleFieldChange = (id, field, value) => {
-    const updatedRows = rows.map((row) =>
-      row.id === id
-        ? { ...row, [field]: value, amount: calculateAmount(row) }
-        : row
-    );
-    setRows(updatedRows);
-  };
+  // const handleFieldChange = (id, field, value) => {
+  //   const updatedRows = rows.map((row) =>
+  //     row.id === id
+  //       ? { ...row, [field]: value, amount: calculateAmount(row) }
+  //       : row
+  //   );
+  //   setRows(updatedRows);
+  // };
 
   const calculateAmount = (row) => {
     const { quantity, price, discount, tax } = row;
@@ -119,31 +119,31 @@ const AddBilling = ({ onClose }) => {
     return totalAmount.toFixed(2);
   };
 
-  const calculateTotals = () => {
-    let subtotal = 0;
-    let totalDiscount = 0;
-    let totalTax = 0;
+  // const calculateTotals = () => {
+  //   let subtotal = 0;
+  //   let totalDiscount = 0;
+  //   let totalTax = 0;
 
-    rows.forEach((row) => {
-      const { quantity, price, discount, tax } = row;
-      const discountAmount = (price * discount) / 100;
-      const priceAfterDiscount = price - discountAmount;
-      const taxAmount = (priceAfterDiscount * tax) / 100;
+  //   rows.forEach((row) => {
+  //     const { quantity, price, discount, tax } = row;
+  //     const discountAmount = (price * discount) / 100;
+  //     const priceAfterDiscount = price - discountAmount;
+  //     const taxAmount = (priceAfterDiscount * tax) / 100;
 
-      subtotal += priceAfterDiscount * quantity;
-      totalDiscount += discountAmount * quantity;
-      totalTax += taxAmount * quantity;
-    });
+  //     subtotal += priceAfterDiscount * quantity;
+  //     totalDiscount += discountAmount * quantity;
+  //     totalTax += taxAmount * quantity;
+  //   });
 
-    const totalAmount = subtotal + totalTax - totalDiscount;
+  //   const totalAmount = subtotal + totalTax - totalDiscount;
 
-    return {
-      subtotal: subtotal.toFixed(2),
-      totalDiscount: totalDiscount.toFixed(2),
-      totalTax: totalTax.toFixed(2),
-      totalAmount: totalAmount.toFixed(2),
-    };
-  };
+  //   return {
+  //     subtotal: subtotal.toFixed(2),
+  //     totalDiscount: totalDiscount.toFixed(2),
+  //     totalTax: totalTax.toFixed(2),
+  //     totalAmount: totalAmount.toFixed(2),
+  //   };
+  // };
 
   const lid = AllLoggeddtaa.loggedInUser.id;
 
@@ -153,29 +153,32 @@ const AddBilling = ({ onClose }) => {
       return;
     }
 
-    let subtotal = 0;
-    let totalTax = 0;
+    // Calculate subtotal (sum of all item amounts)
+    const subtotal = data.reduce((sum, row) => {
+      return sum + (parseFloat(row.amount) || 0);
+    }, 0);
 
-    data.forEach((row) => {
+    // Calculate discount amount
+    const discountAmount = (subtotal * (parseFloat(discount) || 0)) / 100;
+
+    // Calculate total tax (for display purposes)
+    const totalTax = data.reduce((sum, row) => {
       const quantity = parseFloat(row.quantity) || 0;
       const price = parseFloat(row.price) || 0;
       const tax = showTax ? (parseFloat(row.tax) || 0) : 0;
-      
       const baseAmount = quantity * price;
       const taxAmount = (baseAmount * tax) / 100;
-      
-      subtotal += baseAmount;
-      totalTax += taxAmount;
-    });
+      return sum + taxAmount;
+    }, 0);
 
-    const discountAmount = (subtotal * (parseFloat(discount) || 0)) / 100;
-    const finalTotal = subtotal - discountAmount + totalTax;
+    // Calculate final total: subtotal - discount
+    const finalTotal = subtotal - discountAmount;
 
     setTotals({
       subtotal: subtotal.toFixed(2),
       discount: discountAmount.toFixed(2),
       totalTax: totalTax.toFixed(2),
-      finalTotal: finalTotal.toFixed(2),
+      finalTotal: finalTotal.toFixed(2)
     });
 
     return {
@@ -196,6 +199,7 @@ const AddBilling = ({ onClose }) => {
           const price = parseFloat(field === 'price' ? value : row.price) || 0;
           const tax = showTax ? (parseFloat(field === 'tax' ? value : row.tax) || 0) : 0;
           
+          // Calculate amount: unit price * quantity + tax
           const baseAmount = quantity * price;
           const taxAmount = (baseAmount * tax) / 100;
           updatedRow.amount = (baseAmount + taxAmount).toFixed(2);
@@ -216,47 +220,78 @@ const AddBilling = ({ onClose }) => {
       .then((values) => {
         const totals = calculateTotal(); // Get current totals
 
-        const itemsDescription = {
+        // Format items data
+        const items = tableData.map(row => ({
+          item: row.item,
+          quantity: parseFloat(row.quantity) || 0,
+          price: parseFloat(row.price) || 0,
+          tax: showTax ? parseFloat(row.tax) || 0 : 0,
+          amount: parseFloat(row.amount) || 0,
+          description: row.description || ""
+        }));
+
+        // Create description object without JSON.stringify
+        const discription = {
           product: tableData.map(item => item.item).filter(Boolean).join(", "),
-          service: tableData.map(item => item.description).filter(Boolean).join(", ")
+          service: tableData.map(item => item.discription).filter(Boolean).join(", "),
+          items: tableData.map(item => ({
+            name: item.item,
+            quantity: parseFloat(item.quantity) || 0,
+            unitPrice: parseFloat(item.price) || 0,
+            tax: showTax ? parseFloat(item.tax) || 0 : 0,
+            amount: parseFloat(item.amount) || 0
+          }))
         };
 
+        // Create invoice data object with description as an object
         const invoiceData = {
+          billNumber: values.billNumber,
           vendor: values.vendor,
           billDate: values.billDate?.format("YYYY-MM-DD"),
-          discription: itemsDescription,
+          discription: discription, // Remove JSON.stringify
           status: values.status,
-          discount: parseFloat(discountRate),
-          tax: showTax ? parseFloat(totals.totalTax) : 0,
-          total: parseFloat(totals.finalTotal),
+          discount: parseFloat(discountRate) || 0,
+          tax: totals.totalTax,
+          total: totals.finalTotal,
           note: values.note || "",
-          items: tableData.map(row => ({
-            item: row.item,
+          items: items,
+          itemDetails: tableData.map(row => ({
+            productName: row.item,
+            unitPrice: parseFloat(row.price) || 0,
             quantity: parseFloat(row.quantity) || 0,
-            price: parseFloat(row.price) || 0,
             tax: showTax ? parseFloat(row.tax) || 0 : 0,
-            amount: parseFloat(row.amount) || 0,
-            description: row.description || ""
+            lineTotal: parseFloat(row.amount) || 0
           }))
         };
 
         const lid = AllLoggeddtaa.loggedInUser.id;
         const payload = { lid, invoiceData };
 
-        const sendData = async () => {
-          try {
-            await dispatch(addbil(payload)).then(() => {
-              dispatch(getbil(lid));
+        // Send data to backend
+        dispatch(addbil(payload))
+          .then((response) => {
+            if (response.payload) {
               message.success("Bill added successfully!");
+              dispatch(getbil(lid));
+              form.resetFields();
+              setTableData([{
+                id: Date.now(),
+                item: "",
+                quantity: 1,
+                price: 0,
+                tax: 0,
+                amount: 0,
+                description: "",
+              }]);
+              setDiscountRate(0);
+              setShowTax(false);
               onClose();
-            });
-          } catch (error) {
-            console.error("Error during Bill submission:", error);
-            message.error("Failed to add Bill. Please try again.");
-          }
-        };
-
-        sendData();
+            }
+          })
+          .catch((error) => {
+            console.error("Error adding bill:", error);
+            message.error("Failed to add bill. Please try again.");
+          });
       })
       .catch((error) => {
         console.error("Validation failed:", error);
@@ -395,28 +430,6 @@ const AddBilling = ({ onClose }) => {
             <Col span={24}>
               <Form.Item label="Description" name="description">
                 <Input.TextArea placeholder="Enter Description" />
-              </Form.Item>
-            </Col>
-
-            <Col span={12}>
-              <Form.Item label="Discount" name="discount">
-                <Input
-                  type="number"
-                  placeholder="Enter Discount"
-                  min={0}
-                  max={100}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col span={12}>
-              <Form.Item label="Tax" name="tax">
-                <Input
-                  type="number"
-                  placeholder="Enter Tax"
-                  min={0}
-                  max={100}
-                />
               </Form.Item>
             </Col>
 

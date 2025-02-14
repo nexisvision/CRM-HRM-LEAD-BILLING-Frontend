@@ -48,19 +48,19 @@ const BillingDetailsList = () => {
                                     <ClockCircleOutlined className="mr-1" />
                                     Created on 05-01-2024
                                 </p>
-                                <Button type="primary" className="mt-4 px-4 bg-blue-500 text-white rounded-md text-sm" onClick= {openEditBillingModal}>
+                                {/* <Button type="primary" className="mt-4 px-4 bg-blue-500 text-white rounded-md text-sm" onClick= {openEditBillingModal}>
                                     <span className="ml-2">Edit</span>
-                                </Button>
+                                </Button> */}
                                 {/* <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md text-sm">
                 Edit
               </button> */}
                             </div>
 
                             {/* Connector Line */}
-                            <div className="hidden md:block w-56 h-0.5 bg-gray-300"></div>
+                            <div className="hidden md:block lg:block w-0 h-0 md:w-56 md:h-0.5 bg-gray-300"></div>
 
                             {/* Send Bill Stage */}
-                            <div className="flex flex-col items-center text-center md:w-1/3 pb-16 ">
+                            <div className="flex flex-col items-center text-center md:w-1/3">
                                 <div className="text-orange-500 mb-2 text-3xl mt-2">
                                     <MailOutlined />
                                 </div>
@@ -81,10 +81,10 @@ const BillingDetailsList = () => {
                                 </div>
                                 <h3 className="text-cyan-500 font-medium text-lg mt-2">Get Paid</h3>
                                 <p className="text-sm text-gray-500 mt-2">Status: Awaiting payment</p>
-                                <Button type="primary" className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md text-sm" onClick={openAddBillingModal}>
+                                {/* <Button type="primary" className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md text-sm" onClick={openAddBillingModal}>
                                     <PlusOutlined />
                                     <span className="ml-2">Add Payment</span>
-                                </Button>
+                                </Button> */}
                                 {/* <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md text-sm">
                                     Add Payment
                                 </button> */}

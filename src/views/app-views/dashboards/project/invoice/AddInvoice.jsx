@@ -131,6 +131,12 @@ const sub = subClientsss?.SubClient?.data;
     // Handle product selection
     const handleProductChange = (productId) => {
         if (productId) {
+            // Clear milestone selection when product is selected
+            setSelectedMilestone(null);
+            form.setFieldsValue({
+                milestone: undefined
+            });
+
             const selectedProd = products.find(p => p.id === productId);
             if (selectedProd) {
                 // Update the current row with product details
@@ -153,7 +159,7 @@ const sub = subClientsss?.SubClient?.data;
         if (value) {
             const selectedMile = milestones?.find(m => m.id === value);
             setSelectedMilestone(value);
-            setSelectedProduct(null); // Reset product selection when milestone is selected
+            setSelectedProduct(null); // Reset product selection
 
             if (selectedMile) {
                 // Update table data with milestone information
@@ -165,7 +171,8 @@ const sub = subClientsss?.SubClient?.data;
                         price: selectedMile.milestone_cost,
                         tax: 0,
                         amount: selectedMile.milestone_cost.toString(),
-                        description: selectedMile.milestone_summary
+                        description: selectedMile.milestone_summary,
+                        hsn_sac: "" // Reset HSN/SAC
                     }
                 ]);
                 calculateTotal([{
@@ -174,9 +181,14 @@ const sub = subClientsss?.SubClient?.data;
                     tax: 0,
                     discount: 0
                 }], discountRate);
+
+                // Clear product selection in the Select component
+                form.setFieldsValue({
+                    product: undefined
+                });
             }
         } else {
-            // If deselecting milestone, clear the table data
+            // If deselecting milestone, clear everything
             setSelectedMilestone(null);
             setTableData([{
                 id: Date.now(),
@@ -186,6 +198,7 @@ const sub = subClientsss?.SubClient?.data;
                 tax: 0,
                 amount: "0",
                 description: "",
+                hsn_sac: ""
             }]);
         }
     };
@@ -244,7 +257,7 @@ const sub = subClientsss?.SubClient?.data;
                 discount: discountRate,
                 global_discount_amount: totals.globalDiscount,
                 total_item_discount: totals.itemDiscount,
-                total_tax: totals.totalTax,
+                tax: totals.totalTax,
                 total: totals.finalTotal,
                 status: "pending"
             };
@@ -476,7 +489,7 @@ const sub = subClientsss?.SubClient?.data;
                                 onChange={(e) => handleTableDataChange(row.id, "item", e.target.value)}
                                 placeholder="Item Name"
                                 className="w-full p-2 border rounded-s"
-                                readOnly={selectedProduct !== null}
+                                // readOnly={selectedProduct !== null}
                             />
                         </td>
                         
@@ -519,7 +532,7 @@ const sub = subClientsss?.SubClient?.data;
                                 onChange={(e) => handleTableDataChange(row.id, "hsn_sac", e.target.value)}
                                 placeholder="HSN/SAC"
                                 className="w-full p-2 border rounded"
-                                readOnly={selectedProduct !== null}
+                                // readOnly={selectedProduct !== null}
                             />
                         </td>
                         

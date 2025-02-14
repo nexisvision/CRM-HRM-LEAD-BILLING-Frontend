@@ -12,6 +12,7 @@ import {
 import { FaCoins } from "react-icons/fa";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import dayjs from 'dayjs';
 import { TbClockHour3Filled } from "react-icons/tb";
 import { GetProject } from "../project-list/projectReducer/ProjectSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,7 +33,7 @@ const OverViewList = () => {
   const [isTaskModalVisible, setIsTaskModalVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(null);
 
-  
+
 
   // Safe access to Redux state with multiple fallback checks
   const allempdata = useSelector((state) => state?.Project) || {};
@@ -72,13 +73,13 @@ const OverViewList = () => {
 
       // Calculate total project duration in milliseconds
       const totalDuration = endDate.getTime() - startDate.getTime();
-      
+
       // Calculate elapsed time in milliseconds
       const elapsedTime = currentDate.getTime() - startDate.getTime();
 
       // Calculate progress percentage
       let progressPercentage;
-      
+
       if (currentDate < startDate) {
         // Project hasn't started yet
         progressPercentage = 0;
@@ -147,14 +148,14 @@ const OverViewList = () => {
     }
   };
 
-  const dateendd = filterdata?.[0]?.startDate 
-    ? formatDate(filterdata[0].startDate) 
+  const dateendd = filterdata?.[0]?.startDate
+    ? formatDate(filterdata[0].startDate)
     : "N/A";
-     
+
   // const subclient = useSelector((state)=>state.SubClient.SubClient.data)
 
-  const datestartt = filterdata?.[0]?.endDate 
-    ? formatDate(filterdata[0].endDate) 
+  const datestartt = filterdata?.[0]?.endDate
+    ? formatDate(filterdata[0].endDate)
     : "N/A";
 
   const progress = 50;
@@ -162,7 +163,7 @@ const OverViewList = () => {
   const deadline = "Sun 24 Nov 2024";
 
   const taskData = useSelector((state) => state?.Tasks?.Tasks?.data) || [];
-  
+
   // Define status colors mapping with more color options
   const statusColors = {
     'To Do': '#FF6B6B',        // Red
@@ -268,7 +269,7 @@ const OverViewList = () => {
       },
       tooltip: {
         callbacks: {
-          label: function(context) {
+          label: function (context) {
             const label = context.label || '';
             const value = context.raw || 0;
             const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
@@ -352,84 +353,86 @@ const OverViewList = () => {
               Project Progress
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
-              {/* Progress Circle */}
-              <div className="flex justify-center sm:justify-start">
-                <div className="relative w-24 h-24 sm:w-32 sm:h-32">
-                  <CircularProgressbar
-                    value={parseFloat(proo)}
-                    text={`${proo}%`}
-                    circleRatio={0.5}
-                    rotation={0.50}
-                    styles={{
-                      root: {
-                        transform: "rotate(0.50turn)",
-                      },
-                      path: {
-                        stroke: `${
-                          parseFloat(proo) < 50
-                            ? "#FFA500"  // Orange for less than 50%
-                            : parseFloat(proo) < 80
+            {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center"> */}
+            {/* Progress Circle */}
+            <div className="flex flex-col items-center justify-center w-full">
+              <div className="relative w-32 h-32">
+                <CircularProgressbar
+                  value={parseFloat(proo)}
+                  text={`${proo}%`}
+                  circleRatio={0.5}
+                  rotation={0.50}
+                  styles={{
+                    root: {
+                      transform: "rotate(0.50turn)",
+                    },
+                    path: {
+                      stroke: `${parseFloat(proo) < 50
+                          ? "#FFA500"  // Orange for less than 50%
+                          : parseFloat(proo) < 80
                             ? "#2E8B57"  // Sea Green for 50-80%
                             : "#008000"  // Green for above 80%
                         }`,
-                        strokeLinecap: "round",
-                        strokeWidth: "6",
-                        transition: "stroke-dashoffset 0.5s ease 0s",
-                        transform: "rotate(0.50turn)",
-                        transformOrigin: "center center",
-                      },
-                      trail: {
-                        stroke: "#edf2f7",
-                        strokeLinecap: "round",
-                        strokeWidth: "6",
-                        transform: "rotate(0.25turn)",
-                        transformOrigin: "center center",
-                      },
-                      text: {
-                        fill: "#333",
-                        fontSize: "14px",
-                        fontWeight: 500,
-                        transform: "rotate(0.50turn)",
-                        transformOrigin: "center center",
-                        dominantBaseline: "middle",
-                        textAnchor: "middle",
-                      },
-                    }}
-                  />
-                  {/* Scale markers */}
-                  <div className="relative mt-2">
-                    <span className="absolute left-0 top-[-73px] sm:top-[-60px] text-xs text-gray-500">
-                      0%
-                    </span>
-                    <span className="absolute right-[-12px] top-[-73px] sm:top-[-60px] text-xs text-gray-500">
-                      100%
-                    </span>
-                  </div>
+                      strokeLinecap: "round",
+                      strokeWidth: "6",
+                      transition: "stroke-dashoffset 0.5s ease 0s",
+                      transform: "rotate(0.50turn)",
+                      transformOrigin: "center center",
+                    },
+                    trail: {
+                      stroke: "#edf2f7",
+                      strokeLinecap: "round",
+                      strokeWidth: "6",
+                      transform: "rotate(0.25turn)",
+                      transformOrigin: "center center",
+                    },
+                    text: {
+                      fill: "#333",
+                      fontSize: "14px",
+                      fontWeight: 500,
+                      transform: "rotate(0.50turn)",
+                      transformOrigin: "center center",
+                      dominantBaseline: "middle",
+                      textAnchor: "middle",
+                    },
+                  }}
+                />
+                {/* Scale markers */}
+                <div className="relative mt-2">
+                  <span className="absolute left-0 top-[-73px] sm:top-[-60px] text-xs text-gray-500">
+                    0%
+                  </span>
+                  <span className="absolute right-[-12px] top-[-73px] sm:top-[-60px] text-xs text-gray-500">
+                    100%
+                  </span>
                 </div>
               </div>
+            </div>
 
+            <div className="flex justify-between">
               {/* Start Date */}
               <div className="flex flex-col items-center sm:items-start">
-                <span className="text-gray-500 text-sm mb-1">Start Date</span>
+                <span className="text-gray-500 font-weight-bold text-lg mb-1">Start Date</span>
                 <span className="text-gray-800 text-sm sm:text-base">
                   {filterdata?.[0]?.startDate
-                    ? new Date(filterdata[0].startDate).toLocaleDateString()
+                    ? dayjs(filterdata[0].startDate).format('DD/MM/YYYY')  // Changed format here
                     : "N/A"}
                 </span>
               </div>
 
               {/* End Date */}
               <div className="flex flex-col items-center sm:items-start">
-                <span className="text-gray-500 text-sm mb-1">End Date</span>
+                <span className="text-gray-500 font-weight-bold text-lg mb-1">End Date</span>
                 <span className="text-gray-800 text-sm sm:text-base">
                   {filterdata?.[0]?.endDate
-                    ? new Date(filterdata[0].endDate).toLocaleDateString()
+                    ? dayjs(filterdata[0].endDate).format('DD/MM/YYYY')  // Changed format here
                     : "N/A"}
                 </span>
               </div>
             </div>
+
           </div>
+          {/* </div> */}
           {/* Client Section */}
           <div className="bg-white p-6 rounded-lg shadow flex flex-col">
             <h2 className="text-xl font-medium mb-0 text-black">Client</h2>
@@ -460,7 +463,7 @@ const OverViewList = () => {
           <div className="bg-white rounded-lg shadow p-6 w-full h-full flex flex-col items-center justify-center">
             <h2 className="text-xl font-semibold mb-4">Tasks Status</h2>
             <div className="flex justify-center items-center w-[300px] h-[300px]">
-              <Pie 
+              <Pie
                 data={taskStatusData}
                 options={chartOptions}
               />

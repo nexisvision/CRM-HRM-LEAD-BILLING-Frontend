@@ -70,7 +70,7 @@ const ExpensesList = () => {
         useState(false);
     const [isViewExpensesModalVisible, setIsViewExpensesModalVisible] =
         useState(false);
-    // Open Add Job Modal
+    const [selectedExpense, setSelectedExpense] = useState(null);
 
     const allempdata = useSelector((state) => state.Expense);
     const filtermin = allempdata.Expense.data;
@@ -173,7 +173,10 @@ const ExpensesList = () => {
     const dropdownMenu = (row) => (
         <Menu>
             <Menu.Item>
-                <Flex alignItems="center" onClick={openviewExpensesModal}>
+                <Flex alignItems="center" onClick={() => {
+                    setSelectedExpense(row);
+                    openviewExpensesModal();
+                }}>
                     {<EyeOutlined />}
                     <span className="ml-2">View Details</span>
                 </Flex>
@@ -378,12 +381,15 @@ const ExpensesList = () => {
                 <Modal
                     title="Expenses"
                     visible={isViewExpensesModalVisible}
-                    onCancel={closeViewExpensesModal}
+                    onCancel={() => {
+                        closeViewExpensesModal();
+                        setSelectedExpense(null);
+                    }}
                     footer={null}
-                    width={1000}
+                    width={800}
                     className='mt-[-70px]'
                 >
-                    <ViewExpenss onClose={closeViewExpensesModal} />
+                    <ViewExpenss data={selectedExpense} onClose={closeViewExpensesModal} />
                 </Modal>
             </Card>
         </>

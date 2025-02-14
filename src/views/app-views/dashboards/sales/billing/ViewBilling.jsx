@@ -10,7 +10,7 @@ import AddDebitBill from './AddDebitBill';
 import axios from 'axios';
 import html2pdf from 'html2pdf.js';
 
-function ViewBilling() {
+function ViewBilling({ billingId }) {
     const [isAddBillingModalVisible, setIsAddBillingModalVisible] = useState(false);
     const [isResending, setIsResending] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
@@ -107,78 +107,35 @@ function ViewBilling() {
 
     return (
         <>
-            <div className='bg-gray-50 ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg pt-3'>
-                <h2 className="mb-4 border-b pb-[30px] font-medium"></h2>
+            <div className='bg-gray-50 ml-[-51px] mr-[-24px] mt-[-52px] mb-[-30px] rounded-t-lg rounded-b-lg p-10'>
+                <h2 className="mb-6 border-b pb-[30px] font-medium"></h2>
 
-                <div className='p-10 pt-3 pb-3'>
-                    <BillingDetailsList />
-                </div>
-
-                <div className="flex justify-end space-x-4 mb-2 mr-10">
-                    {/* Add Debit Note Button */}
-                    <button 
-                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors" 
-                        onClick={openAddBillingModal}
-                    >
-                        Add Debit Note
-                    </button>
-
-                    {/* Resend Button */}
-                    <button
-                        onClick={showResendConfirmation}
-                        disabled={isResending}
-                        className={`
-                            px-4 py-2 rounded-md
-                            flex items-center space-x-2
-                            ${isResending 
-                                ? 'bg-gray-400 cursor-not-allowed' 
-                                : 'bg-blue-500 hover:bg-blue-600'
-                            }
-                            text-white transition-colors duration-200
-                        `}
-                    >
-                        <MailOutlined className={`${isResending ? 'animate-spin' : ''}`} />
-                        <span>{isResending ? 'Resending...' : 'Resend Bill'}</span>
-                    </button>
-
-                    {/* Download Information Button */}
-                    <button
-                        onClick={handleDownloadPDF}
-                        disabled={isDownloading}
-                        className={`
-                            px-4 py-2 rounded-md
-                            flex items-center space-x-2
-                            ${isDownloading 
-                                ? 'bg-gray-400 cursor-not-allowed' 
-                                : 'bg-blue-500 hover:bg-blue-600'
-                            }
-                            text-white transition-colors duration-200
-                        `}
-                    >
-                        <span>{isDownloading ? 'Downloading...' : 'Download Bill & Products'}</span>
-                    </button>
-                </div>
+                {/* <div className='p-10 pt-3 pb-3'>
+                    <BillingDetailsList billingId={billingId} />
+                </div> */}
 
                 {/* Container for sections to be downloaded */}
+                <Card className=''>
                 <div id="download-sections">
                     {/* Billing Information Section */}
-                    <div className='p-10 pt-3 pb-3'>
-                        <BillInformationList />
+                    <div className=' pt-3 pb-3'>
+                        <BillInformationList billingId={billingId} />
                     </div>
 
                     {/* Product Summary Section */}
-                    <div className='p-10 pt-3 pb-3'>
-                        <ProductSummaryList />
+                    <div className=' pb-3'>
+                        <ProductSummaryList billingId={billingId} />
                     </div>
                 </div>
+                </Card>
 
-                <div className='px-10 pb-3'>
+                {/* <div className='px-10 pb-3'>
                     <PaymentSummaryList />
-                </div>
+                </div> */}
 
-                <div className='px-10 pb-3'>
+                {/* <div className='px-10 pb-3'>
                     <DebitSummaryList />
-                </div>
+                </div> */}
             </div>
 
             {/* Add Billing Modal */}

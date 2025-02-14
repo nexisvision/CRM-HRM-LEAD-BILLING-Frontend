@@ -85,6 +85,8 @@ const PaymentList = () => {
   const invoicesData = useSelector((state) => state.invoice);
   const tabledata = useSelector((state) => state.Payment);
 
+  const [selectedPayment, setSelectedPayment] = useState(null);
+
   // Open Add Job Modal
   const openAddPaymentModal = () => {
     setIsAddPaymentModalVisible(true);
@@ -174,7 +176,10 @@ const PaymentList = () => {
   const dropdownMenu = (row) => (
     <Menu>
       <Menu.Item>
-        <Flex alignItems="center" onClick={openViewPaymentModal}>
+        <Flex alignItems="center" onClick={() => {
+          setSelectedPayment(row);
+          openViewPaymentModal();
+        }}>
           <EyeOutlined />
           <span className="ml-2">View Details</span>
         </Flex>
@@ -192,11 +197,11 @@ const PaymentList = () => {
   const tableColumns = [
     {
       title: "Project",
-      dataIndex: "project",
-      render: (_, record) => getProjectName(record.project),
+      dataIndex: "project_name",
+      render: (_, record) => getProjectName(record.project_name),
       sorter: (a, b) => {
-        const nameA = getProjectName(a.project);
-        const nameB = getProjectName(b.project);
+        const nameA = getProjectName(a.project_name);
+        const nameB = getProjectName(b.project_name);
         return nameA.localeCompare(nameB);
       },
 
@@ -334,7 +339,7 @@ const PaymentList = () => {
           </Button>
         </Flex>
       </Flex>
-      <Card>
+      {/* <Card> */}
         <div className="table-responsive">
           <Table
             columns={tableColumns}
@@ -349,7 +354,7 @@ const PaymentList = () => {
             // }}
           />
         </div>
-      </Card>
+      {/* </Card> */}
       <Card>
         <Modal
           title="Add Payment"
@@ -377,12 +382,15 @@ const PaymentList = () => {
         <Modal
           title="Payment Details"
           visible={isViewPaymentModalVisible}
-          onCancel={closeViewPaymentModal}
+          onCancel={() => {
+            closeViewPaymentModal();
+            setSelectedPayment(null);
+          }}
           footer={null}
           width={800}
           className="mt-[-70px]"
         >
-          <ViewPayment onClose={closeViewPaymentModal} />
+          <ViewPayment data={selectedPayment} onClose={closeViewPaymentModal} />
         </Modal>
       </Card>
     </>

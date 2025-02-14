@@ -307,11 +307,13 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                         <div className='text-left'>
                         <address>
                             <p>
-                                <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
-                                        <span>created_by:{loggedInUser?.created_by}</span><br />
-                                        <span>Name:{loggedInUser?.username}</span><br />
-                                        <p>Email: {loggedInUser?.email}</p>
-                                        <p>Phone: {loggedInUser?.phone}</p>
+                                <span className="font-weight-semibold text-dark font-size-md">
+                                    Billed By:</span><br />
+                                        <span>
+                                            <span className="font-weight-semibold">created_by:</span> {loggedInUser?.created_by}</span><br />  
+                                        <span><span className="font-weight-semibold">Name:</span> {loggedInUser?.username}</span><br />
+                                        <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
+                                        <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
                             </p>
                         </address>
                         </div>
@@ -320,20 +322,21 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                         <div>
                             <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />
                             <address>
-                                <p>
-                                    <span>Name: {customerData.name}</span><br />
-                                    <span>customerNumber: {customerData.customerNumber}</span><br />
                                     <p>
-                                     Address: {cleanStreet}, <br />
-                                        City: {billingAddress.city}, <br />
-                                        State: {billingAddress.state}, <br />
-                                        Zip: {billingAddress.zip}, <br />
-                                        Country: {billingAddress.country}
+                                    <p>
+                                        <span className="font-weight-semibold">Address:</span> {cleanStreet}, <br />
+                                        <span className="font-weight-semibold">City:</span> {billingAddress.city}, <br />
+                                        <span className="font-weight-semibold">State:</span> {billingAddress.state}, <br />
+                                        <span className="font-weight-semibold">Zip:</span> {billingAddress.zip}, <br />
+                                        <span className="font-weight-semibold">Country:</span> {billingAddress.country}
                                     </p>
-                                    <p>Email: {customerData.email}</p>
-                                    <p>Phone: {customerData.contact}</p>
-                                </p>
-                            </address>
+
+                                        <span> <span className="font-weight-semibold  ">Name: </span>{customerData.username}</span><br />
+                                        <p> <span className="font-weight-semibold">Email: </span> {customerData.email}</p>
+                                        <p> <span className="font-weight-semibold  ">Phone: </span> {customerData.phone}</p>
+                                        <p> <span className="font-weight-semibold  ">GstIn: </span> {customerData.gstIn}</p>
+                                    </p>
+                                </address>
                         </div>
 
                     </div>
@@ -389,7 +392,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                         <div className="text-center">
                                 <div className="border-bottom">
                                     <p className="mb-2">
-                                        <span>Sub-Total : </span>
+                                        <span className="font-weight-semibold">Sub-Total : </span>
                                         <NumberFormat
                                         displayType="text"
                                         // value={Math.round((record.price - (record.price * (record.discount || 0)) / 100) * record.quantity * 100) / 100}
@@ -400,11 +403,11 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                     </p>
 
                                     <p className="mb-2">
-                                        <span>Discount : </span>
+                                        <span className="font-weight-semibold">Discount : </span>
                                         {`${parsedInvoice.discount || 0}%`}
                                     </p>
                                     <p className="mb-2">
-                                        <span>Total Discount Amount: </span>
+                                        <span className="font-weight-semibold">Total Discount Amount: </span>
                                         <NumberFormat
                                             displayType="text"
                                             value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
@@ -413,7 +416,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                         />
                                     </p>
                                     <p>
-                                        <span>Total Tax Amount: </span>
+                                        <span className="font-weight-semibold">Total Tax Amount: </span>
                                         <NumberFormat
                                             displayType="text"
                                             value={parsedInvoice.tax
@@ -437,7 +440,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     </div>
                 {/* </div> */}
                 <div>
-                        <h4 className="font-medium mb-2">Terms & Conditions:</h4>
+                        <h4 className="font-semibold text-lg mb-2">Terms & Conditions:</h4>
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
                             <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
                             <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
@@ -466,11 +469,11 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             <p>
 
                                 <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
-                                        <span>created_by:{loggedInUser?.created_by}</span><br />
-                                        <span>Name:{loggedInUser?.username}</span><br />
-                                        <p>Email: {loggedInUser?.email}</p>
-                                        <p>Phone: {loggedInUser?.phone}</p>
-                                        <p>GstNum: {loggedInUser?.gstIn}</p>
+                                        <span><span className="font-weight-semibold">created_by:</span> {loggedInUser?.created_by}</span><br />
+                                        <span><span className="font-weight-semibold">Name:</span> {loggedInUser?.username}</span><br />
+                                        <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
+                                        <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
+                                        <p><span className="font-weight-semibold">GstNum:</span> {loggedInUser?.gstIn}</p>
                             </p>
                         </address>
                     </div>
@@ -479,18 +482,18 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                         <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />   
                             <address>
                                 <p>
-                                    <span>Name: {customerData.name}</span><br/>
-                                    <span>customerNumber: {customerData.customerNumber}</span><br />
+                                    <span><span className="font-weight-semibold">Name:</span> {customerData.name}</span><br/>
+                                    {/* <span><span className="font-weight-semibold">customerNumber:</span> {customerData.customerNumber}</span><br /> */}
                                     {/* <p>Address: {customerData.billing_address}</p> */}
                                     <p>
-                                     Address: {cleanStreet}, <br />
-                                        City: {billingAddress.city}, <br />
-                                        State: {billingAddress.state}, <br />
-                                        Zip: {billingAddress.zip}, <br />
-                                        Country: {billingAddress.country}
+                                        <span className="font-weight-semibold">Address:</span> {cleanStreet}, <br />
+                                        <span className="font-weight-semibold">City:</span> {billingAddress.city}, <br />
+                                        <span className="font-weight-semibold">State:</span> {billingAddress.state}, <br />
+                                        <span className="font-weight-semibold">Zip:</span> {billingAddress.zip}, <br />
+                                        <span className="font-weight-semibold">Country:</span> {billingAddress.country}
                                     </p>
-                                    <p>Email: {customerData.email}</p>
-                                    <p>Phone: {customerData.contact}</p>
+                                    <p><span className="font-weight-semibold">Email:</span> {customerData.email}</p>
+                                    <p><span className="font-weight-semibold">Phone:</span> {customerData.contact}</p>
                                 </p>
                             </address>
                     </div>
@@ -561,7 +564,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             <div className="text-center">
                                 <div className="border-bottom">
                                     <p className="mb-2">
-                                        <span>Sub-Total : </span>
+                                        <span className="font-weight-semibold">Sub-Total : </span>
                                         <NumberFormat
                                         displayType="text"
                                         // value={Math.round((record.price - (record.price * (record.discount || 0)) / 100) * record.quantity * 100) / 100}
@@ -572,11 +575,11 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                     </p>
 
                                     <p className="mb-2">
-                                        <span>Discount : </span>
+                                        <span className="font-weight-semibold">Discount : </span>
                                         {`${parsedInvoice.discount || 0}%`}
                                     </p>
                                     <p className="mb-2">
-                                        <span>Total Discount Amount: </span>
+                                        <span className="font-weight-semibold">Total Discount Amount: </span>
                                         <NumberFormat
                                             displayType="text"
                                             value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
@@ -585,7 +588,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                         />
                                     </p>
                                     <p>
-                                        <span>Total Tax Amount: </span>
+                                        <span className="font-weight-semibold">Total Tax Amount: </span>
                                         <NumberFormat
                                             displayType="text"
                                             value={parsedInvoice.tax
@@ -596,7 +599,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                     </p>
                                 </div>
                                 <h2 className="font-weight-semibold mt-3">
-                                    <span className="mr-1">Final Total: </span>
+                                    <span className="mr-1"><span className="font-weight-semibold">Final Total: </span></span>
                                     <NumberFormat
                                         displayType="text"
                                         value={parsedInvoice.total}
@@ -609,7 +612,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     </div>
                     {/* </div> */}
                     <div>
-                        <h4 className="font-medium mb-2">Terms & Conditions:</h4>
+                        <h4><span className="font-weight-semibold text-lg">Terms & Conditions:</span></h4>
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
                             <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
                             <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
@@ -657,10 +660,10 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             <p>
 
                                 <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
-                                        <span>created_by:{loggedInUser?.created_by}</span><br />
-                                        <span>Name:{loggedInUser?.username}</span><br />
-                                        <p>Email: {loggedInUser?.email}</p>
-                                        <p>Phone: {loggedInUser?.phone}</p>
+                                        <span><span className="font-weight-semibold">created_by:</span> {loggedInUser?.created_by}</span><br />
+                                        <span><span className="font-weight-semibold">Name:</span> {loggedInUser?.username}</span><br />
+                                        <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
+                                        <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
                             </p>
                         </address>
                         </div>
@@ -673,17 +676,17 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />
                             <address>
                                 <p>
-                                    <span>Name: {customerData.name}</span><br />
-                                    <span>customerNumber: {customerData.customerNumber}</span><br />
+                                    <span><span className="font-weight-semibold">Name:</span> {customerData.name}</span><br />
+                                    <span><span className="font-weight-semibold">customerNumber:</span> {customerData.customerNumber}</span><br />
                                     <p>
-                                     Address: {cleanStreet}, <br />
-                                        City: {billingAddress.city}, <br />
-                                        State: {billingAddress.state}, <br />
-                                        Zip: {billingAddress.zip}, <br />
-                                        Country: {billingAddress.country}
+                                        <span className="font-weight-semibold">Address:</span> {cleanStreet}, <br />
+                                        <span className="font-weight-semibold">City:</span> {billingAddress.city}, <br />
+                                        <span className="font-weight-semibold">State:</span> {billingAddress.state}, <br />
+                                        <span className="font-weight-semibold">Zip:</span> {billingAddress.zip}, <br />
+                                        <span className="font-weight-semibold">Country:</span> {billingAddress.country}
                                     </p>
-                                    <p>Email: {customerData.email}</p>
-                                    <p>Phone: {customerData.contact}</p>
+                                    <p><span className="font-weight-semibold">Email:</span> {customerData.email}</p>
+                                    <p><span className="font-weight-semibold">Phone:</span> {customerData.contact}</p>
                                 </p>
                             </address>
                         </div>
@@ -739,7 +742,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     <div className="text-center">
                                 <div className="border-bottom">
                                     <p className="mb-2">
-                                        <span>Sub-Total : </span>
+                                        <span className="font-weight-semibold">Sub-Total : </span>
                                         <NumberFormat
                                         displayType="text"
                                         // value={Math.round((record.price - (record.price * (record.discount || 0)) / 100) * record.quantity * 100) / 100}
@@ -750,11 +753,11 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                     </p>
 
                                     <p className="mb-2">
-                                        <span>Discount : </span>
+                                        <span className="font-weight-semibold">Discount : </span>
                                         {`${parsedInvoice.discount || 0}%`}
                                     </p>
                                     <p className="mb-2">
-                                        <span>Total Discount Amount: </span>
+                                        <span className="font-weight-semibold">Total Discount Amount: </span>
                                         <NumberFormat
                                             displayType="text"
                                             value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
@@ -763,7 +766,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                         />
                                     </p>
                                     <p>
-                                        <span>Total Tax Amount: </span>
+                                        <span className="font-weight-semibold">Total Tax Amount: </span>
                                         <NumberFormat
                                             displayType="text"
                                             value={parsedInvoice.tax
@@ -774,7 +777,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                     </p>
                                 </div>
                                 <h2 className="font-weight-semibold mt-3">
-                                    <span className="mr-1">Final Total: </span>
+                                    <span className="mr-1"><span className="font-weight-semibold">Final Total: </span></span>
                                     <NumberFormat
                                         displayType="text"
                                         value={parsedInvoice.total}
@@ -786,7 +789,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     </div>
                 </div>
                     <div>
-                        <h4 className="font-medium mb-2">Terms & Conditions:</h4>
+                        <h4 className=""><span className="font-weight-semibold text-lg">Terms & Conditions:</span></h4>
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
                             <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
                             <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
@@ -834,10 +837,10 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             <p>
 
                                 <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
-                                        <span>created_by:{loggedInUser?.created_by}</span><br />
-                                        <span>Name:{loggedInUser?.username}</span><br />
-                                        <p>Email: {loggedInUser?.email}</p>
-                                        <p>Phone: {loggedInUser?.phone}</p>
+                                        <span><span className="font-weight-semibold">created_by:</span> {loggedInUser?.created_by}</span><br />
+                                        <span><span className="font-weight-semibold">Name:</span> {loggedInUser?.username}</span><br />
+                                        <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
+                                        <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
                             </p>
                         </address>
                         </div>
@@ -849,17 +852,17 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             <span className="font-weight-semibold text-dark font-size-md">Billed To:</span><br />
                             <address>
                                 <p>
-                                    <span>Name: {customerData.name}</span><br />
-                                    <span>customerNumber: {customerData.customerNumber}</span><br />
+                                    <span><span className="font-weight-semibold">Name:</span> {customerData.name}</span><br />
+                                    <span><span className="font-weight-semibold">customerNumber:</span> {customerData.customerNumber}</span><br />
                                     <p>
-                                     Address: {cleanStreet}, <br />
-                                        City: {billingAddress.city}, <br />
-                                        State: {billingAddress.state}, <br />
-                                        Zip: {billingAddress.zip}, <br />
-                                        Country: {billingAddress.country}
+                                     <span className="font-weight-semibold">Address:</span> {cleanStreet}, <br />
+                                        <span className="font-weight-semibold">City:</span> {billingAddress.city}, <br />
+                                        <span className="font-weight-semibold">State:</span> {billingAddress.state}, <br />
+                                        <span className="font-weight-semibold">Zip:</span> {billingAddress.zip}, <br />
+                                        <span className="font-weight-semibold">Country:</span> {billingAddress.country}
                                     </p>
-                                    <p>Email: {customerData.email}</p>
-                                    <p>Phone: {customerData.contact}</p>
+                                    <p><span className="font-weight-semibold">  Email:</span> {customerData.email}</p>
+                                    <p><span className="font-weight-semibold">Phone:</span> {customerData.contact}</p>
                                 </p>
                             </address>
                         </div>
@@ -867,8 +870,8 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                 </div>
 
                 <div className="">
-                <div className="">
-                <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
+                    <div className="">
+                        <Table dataSource={parsedInvoice.items} pagination={false} className="mb-2">
                             <Table.Column title="No." key="key" render={(text, record, index) => index + 1} />
                             <Table.Column title="Product" dataIndex="item" key="item" />
                             <Table.Column title="Quantity" dataIndex="quantity" key="quantity" />
@@ -889,7 +892,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                 render={(record) => `${record.discount_percentage || 0}%`}
                                 key="discount_percentage"
                             />
-                            
+
                             <Table.Column
                                 title="Tax (%)"
                                 render={(record) => `${record.tax_percentage || 0}%`}
@@ -910,27 +913,27 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             />
                         </Table>
 
-                    {/* Invoice Summary */}
+                        {/* Invoice Summary */}
                         <div className="d-flex justify-content-end mb-3">
-                        <div className="text-center">
+                            <div className="text-center">
                                 <div className="border-bottom">
                                     <p className="mb-2">
-                                        <span>Sub-Total : </span>
+                                        <span className="font-weight-semibold">Sub-Total : </span>
                                         <NumberFormat
-                                        displayType="text"
-                                        // value={Math.round((record.price - (record.price * (record.discount || 0)) / 100) * record.quantity * 100) / 100}
-                                        value={calculateSubtotal()}
-                                        // prefix="$"
-                                        thousandSeparator={true}
-                                    />
+                                            displayType="text"
+                                            // value={Math.round((record.price - (record.price * (record.discount || 0)) / 100) * record.quantity * 100) / 100}
+                                            value={calculateSubtotal()}
+                                            // prefix="$"
+                                            thousandSeparator={true}
+                                        />
                                     </p>
 
                                     <p className="mb-2">
-                                        <span>Discount : </span>
+                                        <span className="font-weight-semibold">Discount : </span>
                                         {`${parsedInvoice.discount || 0}%`}
                                     </p>
                                     <p className="mb-2">
-                                        <span>Total Discount Amount: </span>
+                                        <span className="font-weight-semibold">Total Discount Amount: </span>
                                         <NumberFormat
                                             displayType="text"
                                             value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
@@ -939,7 +942,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                         />
                                     </p>
                                     <p>
-                                        <span>Total Tax Amount: </span>
+                                        <span className="font-weight-semibold">Total Tax Amount: </span>
                                         <NumberFormat
                                             displayType="text"
                                             value={parsedInvoice.tax
@@ -950,7 +953,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                     </p>
                                 </div>
                                 <h2 className="font-weight-semibold mt-3">
-                                    <span className="mr-1">Final Total: </span>
+                                    <span className="mr-1"><span className="font-weight-semibold">Final Total: </span></span>
                                     <NumberFormat
                                         displayType="text"
                                         value={parsedInvoice.total}
@@ -963,7 +966,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     </div>
                 {/* </div> */}
                 <div>
-                        <h4 className="font-medium mb-2">Terms & Conditions:</h4>
+                        <h4><span className="font-weight-semibold text-lg">Terms & Conditions:</span></h4>
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
                             <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
                             <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
