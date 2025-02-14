@@ -102,10 +102,10 @@ const PlanList = () => {
           <Col>
             <Button
               type="primary"
-              size="large"
+              // size="large"
               onClick={openAddPlanModal}
               icon={<PlusOutlined />}
-              className="hover:shadow-lg transition-shadow duration-300"
+              // className="hover:shadow-lg transition-shadow duration-300"
             >
               Add New Plan
             </Button>

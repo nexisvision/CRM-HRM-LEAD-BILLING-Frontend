@@ -5,28 +5,25 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { editinqu, getinqu } from "./inquiryReducer/inquirySlice";
 
+const validationSchema = Yup.object({
+  name: Yup.string().required("Please enter a Name."),
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Please enter an Email."),
+  phone: Yup.string().required("Please enter a Phone number."),
+  subject: Yup.string().required("Please enter a Subject."),
+  message: Yup.string().required("Please enter a Message."),
+});
+
 const EditInquiry = ({ idd, onClose }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getinqu());
-  }, []);
+  }, [dispatch]);
 
   const allbranch = useSelector((state) => state.inquiry);
   const fndbranch = allbranch.inquiry.data;
-
-  useEffect(() => {
-    if (fndbranch) {
-      const ffd = fndbranch.find((item) => item.id === idd);
-      setInitialValues({
-        name: ffd.name,
-        email: ffd.email,
-        phone: ffd.phone,
-        subject: ffd.subject,
-        message: ffd.message,
-      });
-    }
-  }, [fndbranch]);
 
   const [initialValues, setInitialValues] = useState({
     name: "",
@@ -36,101 +33,99 @@ const EditInquiry = ({ idd, onClose }) => {
     message: "",
   });
 
-  const validationSchema = Yup.object({
-    name: Yup.string().required("Please enter a Name."),
-    email: Yup.string()
-      .email("Invalid email address")
-      .required("Please enter an Email."),
-    phone: Yup.string().required("Please enter a Phone number."),
-    subject: Yup.string().required("Please enter a Subject."),
-    message: Yup.string().required("Please enter a Message."),
-  });
+  useEffect(() => {
+    if (fndbranch) {
+      const ffd = fndbranch.find((item) => item.id === idd);
+      if (ffd) {
+        setInitialValues({
+          name: ffd.name || "",
+          email: ffd.email || "",
+          phone: ffd.phone || "",
+          subject: ffd.subject || "",
+          message: ffd.message || "",
+        });
+      }
+    }
+  }, [fndbranch, idd]);
 
-  // onSubmit function
-  const onSubmit = (values, { resetForm }) => {
-    dispatch(editinqu({ idd, values })).then(() => {
-      dispatch(getinqu());
-      message.success("Inquiry updated successfully");
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      await dispatch(editinqu({ idd, values })).unwrap();
+      await dispatch(getinqu());
+      message.success("Inquiry updated successfully!");
       onClose();
-      resetForm();
-    });
+    } catch (error) {
+      message.error(error.message || "Failed to update inquiry");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div>
-      <hr style={{ marginBottom: "15px", border: "1px solid #E8E8E8" }} />
+      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
 
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
         enableReinitialize
       >
-        {({ values, handleSubmit }) => (
-          <Form
-            onSubmit={handleSubmit}
-            style={{
-              padding: "20px",
-              background: "#fff",
-              borderRadius: "8px",
-            }}
-          >
+        {({ isSubmitting }) => (
+          <Form>
             <Row gutter={16}>
-              <Col span={12} className="mb-4">
-                <div>
-                  <label>Name</label>
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block mb-1 font-semibold">Name <span className="text-red-500">*</span></label>
                   <Field
                     name="name"
                     as={Input}
                     placeholder="Enter Name"
-                    className="mt-2"
                   />
                   <ErrorMessage
                     name="name"
                     component="div"
-                    className="error-message text-red-500 my-1"
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
               </Col>
 
               <Col span={12}>
-                <div className="form-item">
-                  <label>Email</label>
+                <div className="mb-4">
+                  <label className="block mb-1 font-semibold">Email <span className="text-red-500">*</span></label>
                   <Field
                     name="email"
                     as={Input}
                     placeholder="Enter Email"
-                    className="mt-2"
                   />
                   <ErrorMessage
                     name="email"
                     component="div"
-                    className="error-message text-red-500 my-1"
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
               </Col>
 
               <Col span={12}>
-                <div className="form-item mt-2">
-                  <label>Phone</label>
+                <div className="mb-4">
+                  <label className="block mb-1 font-semibold">Phone <span className="text-red-500">*</span></label>
                   <Field
                     name="phone"
                     as={Input}
                     placeholder="Enter Phone"
                     type="number"
-                    className="mt-2"
                   />
                   <ErrorMessage
                     name="phone"
                     component="div"
-                    className="error-message text-red-500 my-1"
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
               </Col>
 
               <Col span={12}>
-                <div className="w-full">
-                  <label className="block p-2">Subject</label>
+                <div className="mb-4">
+                  <label className="block mb-1 font-semibold">Subject <span className="text-red-500">*</span></label>
                   <Field
                     name="subject"
                     as={Input}
@@ -139,34 +134,44 @@ const EditInquiry = ({ idd, onClose }) => {
                   <ErrorMessage
                     name="subject"
                     component="div"
-                    className="error-message text-red-500 my-1"
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
               </Col>
 
               <Col span={24}>
-                <div className="mt-4 w-full">
-                  <label className="block p-2">Message</label>
+                <div className="mb-4">
+                  <label className="block mb-1 font-semibold">Message <span className="text-red-500">*</span></label>
                   <Field
                     name="message"
                     as={Input.TextArea}
                     placeholder="Enter Message"
+                    rows={4}
                   />
                   <ErrorMessage
                     name="message"
                     component="div"
-                    className="error-message text-red-500 my-1"
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
               </Col>
             </Row>
 
-            <div style={{ textAlign: "right", marginTop: "16px" }}>
-              <Button style={{ marginRight: 8 }} onClick={onClose}>
+            <div className="flex justify-end gap-2 mt-4">
+              <Button
+                type="default"
+                onClick={onClose}
+                style={{ marginRight: '8px' }}
+                disabled={isSubmitting}
+              >
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit">
-                Submit
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isSubmitting}
+              >
+                Update
               </Button>
             </div>
           </Form>

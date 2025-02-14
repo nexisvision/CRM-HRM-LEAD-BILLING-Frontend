@@ -1,24 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Select, Switch, Row, Col, message } from 'antd';
+import { Input, Button, Select, Switch, Row, Col, message } from 'antd';
 import { Editplan, GetPlan } from './PlanReducers/PlanSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import { getcurren } from '../setting/currencies/currenciesSlice/currenciesSlice';
-// import { getallcurrencies } from '../setting/currencies/currenciesreducer/currenciesSlice';
+import { Formik, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
 const { Option } = Select;
 
-const EditPlan = ({ planData, onUpdate,id,onClose }) => {
-  const [form] = Form.useForm();
+const EditPlan = ({ planData, onUpdate, id, onClose }) => {
   const [isTrialEnabled, setIsTrialEnabled] = useState(planData?.trial || false);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    form.setFieldsValue(planData);
-  }, [planData, form]);
 
   useEffect(() => {
     dispatch(getcurren());
@@ -26,221 +21,249 @@ const EditPlan = ({ planData, onUpdate,id,onClose }) => {
 
   const allempdatass = useSelector((state) => state.currencies);
   const fnddatass = allempdatass?.currencies;
+  const alldept = useSelector((state) => state.Plan);
+  const alldept2 = alldept.Plan.data;
+
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required('Please enter the plan name!'),
+    price: Yup.string().required('Please enter the plan price!'),
+    duration: Yup.string().required('Please select a duration!'),
+    max_users: Yup.string().required('Please enter the maximum users!'),
+    max_customers: Yup.string().required('Please enter the maximum customers!'),
+    max_vendors: Yup.string().required('Please enter the maximum vendors!'),
+    max_clients: Yup.string().required('Please enter the maximum clients!'),
+    storage_limit: Yup.string().required('Please enter the storage limit!'),
+    currency: Yup.string().required('Please select a currency!'),
+    description: Yup.string().required('Please enter a description!'),
+    trial: Yup.boolean(),
+    trialDays: Yup.string().when('trial', {
+      is: true,
+      then: (schema) => schema.required('Please enter the number of trial days!'),
+      otherwise: (schema) => schema.notRequired(),
+    })
+  });
+
+  const initialValues = {
+    name: '',
+    price: '',
+    duration: '',
+    max_users: '',
+    max_customers: '',
+    max_vendors: '',
+    max_clients: '',
+    storage_limit: '',
+    currency: '',
+    description: '',
+    trial: false,
+    trialDays: '',
+    ...planData
+  };
 
   const handleSubmit = (values) => {
+    const submitValues = {
+      ...values,
+      trialDays: values.trial ? values.trialDays : ''
+    };
 
-    dispatch(Editplan({ id, values }))
-        .then(() => {
-          dispatch(GetPlan());
-          message.success("Plan details updated successfully!");
-          onClose();
-          navigate('/app/superadmin/plan');
-        })
-        .catch((error) => {
-          message.error('Failed to update plan.');
-          console.error('Edit API error:', error);
-        });
-    onUpdate(values); 
+    dispatch(Editplan({ id, values: submitValues }))
+      .then(() => {
+        dispatch(GetPlan());
+        message.success("Plan details updated successfully!");
+        onClose();
+        navigate('/app/superadmin/plan');
+      })
+      .catch((error) => {
+        message.error('Failed to update plan.');
+        console.error('Edit API error:', error);
+      });
+    onUpdate(submitValues);
   };
-  
-
-  const alldept = useSelector((state) => state.Plan);
-
-    const alldept2 = alldept.Plan.data;
-
-    useEffect(() => {
-      if (id && alldept2) {
-        const data = alldept2.find((item) => item.id === id);
-        if (data) {
-          console.log("iiiiiiiiibbbbbb",data)
-          form.setFieldsValue({
-            ...data,
-            startDate: data.startDate ? moment(data.startDate, 'DD-MM-YYYY') : null,
-            endDate: data.endDate ? moment(data.endDate, 'DD-MM-YYYY') : null,
-          });
-        }
-      }
-    }, [id, alldept2, form]);
-    
-
-
-  const handleTrialToggle = (checked) => {
-    setIsTrialEnabled(checked);
-  };
-
-  const cancel = () =>{
-    onClose()
-  }
 
   return (
     <div>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        onValuesChange={(changedValues) => {
-          if ('trial' in changedValues) {
-            handleTrialToggle(changedValues.trial);
-          }
-        }}
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
       >
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+        {({ values, handleSubmit, setFieldValue, errors, touched }) => (
+          <form onSubmit={handleSubmit}>
+            <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
 
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="name"
-              label="Name"
-              rules={[{ required: true, message: 'Please enter the plan name!' }]}
-            >
-              <Input placeholder="Enter Plan Name" />
-            </Form.Item>
-          </Col>
+            <Row gutter={16}>
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block mb-1">Name <span className="text-red-500">*</span></label>
+                  <Field
+                    name="name"
+                    as={Input}
+                    placeholder="Enter Plan Name"
+                  />
+                  <ErrorMessage name="name" component="div" className="text-red-500" />
+                </div>
+              </Col>
 
-          <Col span={12}>
-            <Form.Item
-              name="price"
-              label="Price"
-              rules={[{ required: true, message: 'Please enter the plan price!' }]}
-            >
-              <Input placeholder="Enter Plan Price" />
-            </Form.Item>
-          </Col>
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block mb-1">Price <span className="text-red-500">*</span></label>
+                  <Field
+                    name="price"
+                    as={Input}
+                    placeholder="Enter Plan Price"
+                  />
+                  <ErrorMessage name="price" component="div" className="text-red-500" />
+                </div>
+              </Col>
 
-          <Col span={12}>
-            <Form.Item
-              name="duration"
-              label="Duration"
-              rules={[{ required: true, message: 'Please select a duration!' }]}
-            >
-              <Select>
-                <Option value="Lifetime">Lifetime</Option>
-                <Option value="Yearly">Yearly</Option>
-                <Option value="Monthly">Monthly</Option>
-              </Select>
-            </Form.Item>
-          </Col>
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block mb-1">Duration <span className="text-red-500">*</span></label>
+                  <Field name="duration">
+                    {({ field }) => (
+                      <Select {...field} className="w-full">
+                        <Option value="Lifetime">Lifetime</Option>
+                        <Option value="Yearly">Yearly</Option>
+                        <Option value="Monthly">Monthly</Option>
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage name="duration" component="div" className="text-red-500" />
+                </div>
+              </Col>
 
-          <Col span={12}>
-            <Form.Item
-              name="max_users"
-              label="Maximum Users"
-              rules={[{ required: true, message: 'Please enter the maximum users!' }]}
-            >
-              <Input placeholder="Enter Maximum Users" />
-            </Form.Item>
-          </Col>
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block mb-1">Maximum Users <span className="text-red-500">*</span></label>
+                  <Field
+                    name="max_users"
+                    as={Input}
+                    placeholder="Enter Maximum Users"
+                  />
+                  <ErrorMessage name="max_users" component="div" className="text-red-500" />
+                </div>
+              </Col>
 
-          <Col span={12}>
-            <Form.Item
-              name="max_customers"
-              label="Maximum Customers"
-              rules={[{ required: true, message: 'Please enter the maximum customers!' }]}
-            >
-              <Input placeholder="Enter Maximum Customers" />
-            </Form.Item>
-          </Col>
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block mb-1">Maximum Customers <span className="text-red-500">*</span></label>
+                  <Field
+                    name="max_customers"
+                    as={Input}
+                    placeholder="Enter Maximum Customers"
+                  />
+                  <ErrorMessage name="max_customers" component="div" className="text-red-500" />
+                </div>
+              </Col>
 
-          <Col span={12}>
-            <Form.Item
-              name="max_vendors"
-              label="Maximum Vendors"
-              rules={[{ required: true, message: 'Please enter the maximum vendors!' }]}
-            >
-              <Input placeholder="Enter Maximum Vendors" />
-            </Form.Item>
-          </Col>
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block mb-1">Maximum Vendors <span className="text-red-500">*</span></label>
+                  <Field
+                    name="max_vendors"
+                    as={Input}
+                    placeholder="Enter Maximum Vendors"
+                  />
+                  <ErrorMessage name="max_vendors" component="div" className="text-red-500" />
+                </div>
+              </Col>
 
-          <Col span={12}>
-            <Form.Item
-              name="max_clients"
-              label="Maximum Clients"
-              rules={[{ required: true, message: 'Please enter the maximum clients!' }]}
-            >
-              <Input placeholder="Enter Maximum Clients" />
-            </Form.Item>
-          </Col>
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block mb-1">Maximum Clients <span className="text-red-500">*</span></label>
+                  <Field
+                    name="max_clients"
+                    as={Input}
+                    placeholder="Enter Maximum Clients"
+                  />
+                  <ErrorMessage name="max_clients" component="div" className="text-red-500" />
+                </div>
+              </Col>
 
-          <Col span={12}>
-            <Form.Item
-              name="storage_limit"
-              label="Storage Limit (MB)"
-              rules={[{ required: true, message: 'Please enter the storage limit!' }]}
-            >
-              <Input placeholder="Maximum Storage Limit" suffix="MB" />
-            </Form.Item>
-          </Col>
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block mb-1">Storage Limit (MB) <span className="text-red-500">*</span></label>
+                  <Field
+                    name="storage_limit"
+                    as={Input}
+                    placeholder="Maximum Storage Limit"
+                    suffix="MB"
+                  />
+                  <ErrorMessage name="storage_limit" component="div" className="text-red-500" />
+                </div>
+              </Col>
 
-          <Col span={24} className="mt-4">
-            <Form.Item
-              name="currency"
-              label="Currency"
-              rules={[{ required: true, message: 'Please select a currency!' }]}
-            >
-              <Select
-                className="w-full"
-                placeholder="Select Currency"
-              >
-                {fnddatass && fnddatass?.length > 0 ? (
-                  fnddatass?.map((client) => (
-                    <Option key={client.id} value={client?.id}>
-                      {client?.currencyIcon || client?.currencyCode || "Unnamed currency"}
-                    </Option>
-                  ))
-                ) : (
-                  <Option value="" disabled>
-                    No Currencies Available
-                  </Option>
+              <Col span={24}>
+                <div className="mb-4">
+                  <label className="block mb-1">Currency <span className="text-red-500">*</span></label>
+                  <Field name="currency">
+                    {({ field }) => (
+                      <Select {...field} className="w-full" placeholder="Select Currency">
+                        {fnddatass && fnddatass?.length > 0 ? (
+                          fnddatass?.map((client) => (
+                            <Option key={client.id} value={client?.id}>
+                              {client?.currencyIcon || client?.currencyCode || "Unnamed currency"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>No Currencies Available</Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage name="currency" component="div" className="text-red-500" />
+                </div>
+              </Col>
+            </Row>
+
+            <div className="mb-4">
+              <label className="block mb-1">Description <span className="text-red-500">*</span></label>
+              <Field
+                name="description"
+                as={Input.TextArea}
+                rows={4}
+                placeholder="Enter Description"
+              />
+              <ErrorMessage name="description" component="div" className="text-red-500" />
+            </div>
+
+            <div className="mb-4">
+              <label className="block mb-1">Trial is enabled (on/off)</label>
+              <Field name="trial">
+                {({ field }) => (
+                  <Switch
+                    checked={field.value}
+                    onChange={(checked) => {
+                      setFieldValue('trial', checked);
+                      setIsTrialEnabled(checked);
+                    }}
+                  />
                 )}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
+              </Field>
+            </div>
 
-        <Form.Item
-          name="description"
-          label="Description"
-          rules={[{ required: true, message: 'Please enter a description!' }]}
-        >
-          <Input.TextArea placeholder="Enter Description" rows={4} />
-        </Form.Item>
+            {isTrialEnabled && (
+              <div className="mb-4">
+                <label className="block mb-1">Trial Days <span className="text-red-500">*</span></label>
+                <Field
+                  name="trialDays"
+                  as={Input}
+                  placeholder="Enter Number of Trial Days"
+                />
+                <ErrorMessage name="trialDays" component="div" className="text-red-500" />
+              </div>
+            )}
 
-        <Form.Item name="trial" label="Trial is enabled (on/off)" valuePropName="checked">
-          <Switch />
-        </Form.Item>
-
-        {isTrialEnabled && (
-          <Form.Item
-            name="trialDays"
-            label="Trial Days"
-            rules={[{ required: true, message: 'Please enter the number of trial days!' }]}
-          >
-            <Input placeholder="Enter Number of Trial Days" />
-          </Form.Item>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button style={{ marginRight: '8px' }} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="primary" htmlType="submit">
+             Save Changes
+              </Button>
+            </div>
+          </form>
         )}
-
-        {/* <Form.Item label="Modules"> */}
-          {/* <Row gutter={16}>
-            <Col span={4}><Switch checked={planData?.modules?.CRM} /> CRM</Col>
-            <Col span={4}><Switch checked={planData?.modules?.Project} /> Project</Col>
-            <Col span={4}><Switch checked={planData?.modules?.HRM} /> HRM</Col>
-            <Col span={4}><Switch checked={planData?.modules?.Account} /> Account</Col>
-            <Col span={4}><Switch checked={planData?.modules?.POS} /> POS</Col>
-            <Col span={4}><Switch checked={planData?.modules?.ChatGPT} /> Chat GPT</Col>
-          </Row> */}
-        {/* </Form.Item> */}
-
-        <Form.Item>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button style={{ marginRight: '8px' }} onClick={() => cancel()}>
-              Cancel
-            </Button>
-            <Button type="primary" htmlType="submit">
-              Save Changes
-            </Button>
-          </div>
-        </Form.Item>
-      </Form>
+      </Formik>
     </div>
   );
 };

@@ -1,85 +1,129 @@
 import React from "react";
-import { Card, Form, Input, Button, notification } from "antd";
+import { Input, Button, notification } from "antd";
 import { useDispatch } from 'react-redux';
-// import { addCurrency, getallcurrencies } from './currenciesreducer/currenciesSlice';
 import { addcurren, getcurren } from "./currenciesSlice/currenciesSlice";
+import { Formik, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
+import { Row, Col } from 'antd';
+
+const validationSchema = Yup.object().shape({
+  currencyName: Yup.string().required('Please enter currency name'),
+  currencyIcon: Yup.string().required('Please enter currency icon'),
+  currencyCode: Yup.string().required('Please enter currency code')
+});
 
 const AddCurrencies = ({ onClose }) => {
   const dispatch = useDispatch();
-  const [form] = Form.useForm();
 
-  const onFinish = async (values) => {
+  const initialValues = {
+    currencyName: '',
+    currencyIcon: '',
+    currencyCode: ''
+  };
+
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      await dispatch(addcurren(values)).unwrap()
-        .then(() => {
-          dispatch(getcurren());
-          // notification.success({
-          //   message: 'Success',
-          //   description: 'Currency added successfully.',
-          // });
-          onClose();
-          form.resetFields();
-        });
+      await dispatch(addcurren(values)).unwrap();
+      await dispatch(getcurren());
+      notification.success({
+        message: 'Success',
+        description: 'Currency added successfully.',
+      });
+      resetForm();
+      onClose();
     } catch (error) {
-      // notification.error({
-      //   message: 'Error',
-      //   description: error.message || 'Failed to add currency.',
-      // });
+      notification.error({
+        message: 'Error',
+        description: error.message || 'Failed to add currency.',
+      });
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <div>
-    <hr style={{ marginBottom: "15px", border: "1px solid #E8E8E8" }} />
+      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
 
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
       >
-        <Form.Item
-          label="Currency Name"
-          name="currencyName"
-          rules={[{ required: true, message: 'Please enter currency name' }]}
-        >
-          <Input placeholder="Enter currency name" />
-        </Form.Item>
+        {({ handleSubmit, isSubmitting }) => (
+          <form onSubmit={handleSubmit}>
+            <Row gutter={16}>
+              <Col span={24}>
+                <div className="mb-4">
+                  <label className="block mb-1 font-semibold">Currency Name <span className="text-red-500">*</span></label>
+                  <Field
+                    name="currencyName"
+                    as={Input}
+                    placeholder="Enter currency name"
+                  />
+                  <ErrorMessage
+                    name="currencyName"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+              </Col>
 
-        <Form.Item
-          label="Currency Icon"
-          name="currencyIcon"
-          rules={[{ required: true, message: 'Please enter currency icon' }]}
-        >
-          <Input placeholder="Enter currency icon" />
-        </Form.Item>
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block mb-1 font-semibold">Currency Icon <span className="text-red-500">*</span></label>
+                  <Field
+                    name="currencyIcon"
+                    as={Input}
+                    placeholder="Enter currency icon"
+                  />
+                  <ErrorMessage
+                    name="currencyIcon"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+              </Col>
 
-        <Form.Item
-          label="Currency Code"
-          name="currencyCode"
-          rules={[{ required: true, message: 'Please enter currency code' }]}
-        >
-          <Input placeholder="Enter currency code" />
-        </Form.Item>
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block mb-1 font-semibold">Currency Code <span className="text-red-500">*</span></label>
+                  <Field
+                    name="currencyCode"
+                    as={Input}
+                    placeholder="Enter currency code"
+                  />
+                  <ErrorMessage
+                    name="currencyCode"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+              </Col>
+            </Row>
 
-        <Form.Item className="text-right">
-          <Button
-            type="default"
-            style={{ marginRight: 8 }}
-            onClick={onClose}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="primary"
-            htmlType="submit"
-          >
-            Submit
-          </Button>
-        </Form.Item>
-      </Form>
+            <div className="flex justify-end gap-2 mt-4">
+              <Button
+                type="default"
+                onClick={onClose}
+                style={{ marginRight: '8px' }}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isSubmitting}
+              >
+                Create
+              </Button>
+            </div>
+          </form>
+        )}
+      </Formik>
     </div>
   );
 };
-
 
 export default AddCurrencies;

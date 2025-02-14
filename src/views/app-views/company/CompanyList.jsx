@@ -38,6 +38,7 @@ import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
 import { getsubplandata } from "../subscribeduserplans/subplanReducer/subplanSlice";
 import AvatarStatus from "components/shared-components/AvatarStatus";
+import AddUpgradePlan from './AddUpgradePlan';
 
 const { Option } = Select;
 const VIEW_LIST = "LIST";
@@ -150,7 +151,10 @@ const CompanyList = () => {
             type=""
             className=""
             icon={<RocketOutlined />}
-            onClick={() => setIsUpgradePlanModalVisible(true)}
+            onClick={() => {
+              setIsUpgradePlanModalVisible(true);
+              setCompnyid(user.id);
+            }}
             size="small"
           >
             <span>Upgrade Plans</span>
@@ -370,8 +374,12 @@ const CompanyList = () => {
         visible={isUpgradePlanModalVisible}
         onCancel={() => setIsUpgradePlanModalVisible(false)}
         footer={null}
+        width={800}
       >
-        <PlanUpgrade onClose={() => setIsUpgradePlanModalVisible(false)} />
+        <AddUpgradePlan 
+          onClose={() => setIsUpgradePlanModalVisible(false)}
+          comnyid={comnyid}
+        />
       </Modal>
     </div>
   );

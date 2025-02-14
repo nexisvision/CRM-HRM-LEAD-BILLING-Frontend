@@ -206,10 +206,10 @@ const AddRevenue = ({ onClose }) => {
               <Form className="formik-form" onSubmit={handleSubmit}>
                 <Row gutter={16}>
                   <Col span={12} className="">
-                    <div className="form-item">
-                      <label className="font-semibold"> Date</label>
+                    <div className="form-item mt-3">
+                      <label className="font-semibold"> Date <span className="text-red-500">*</span></label>
                       <DatePicker
-                        className="w-full"
+                        className="w-full mt-1"
                         format="DD-MM-YYYY"
                         value={values.date}
                         onChange={(date) => setFieldValue("date", date)}
@@ -223,12 +223,13 @@ const AddRevenue = ({ onClose }) => {
                     </div>
                   </Col>
                   <Col span={12} className="">
-                    <div className="form-item">
-                      <label className="font-semibold">Amount</label>
+                    <div className="form-item mt-3">
+                      <label className="font-semibold">Amount <span className="text-red-500">*</span></label>
                       <Field
                         name="amount"
                         type="number"
                         step="0.01"
+                        className="mt-1"
                         min="0"
                         as={Input}
                         placeholder="Enter Amount"
@@ -248,14 +249,15 @@ const AddRevenue = ({ onClose }) => {
                     </div>
                   </Col>
                   <Col span={12} className="mt-2">
-                    <div className="form-item">
-                      <label className="font-semibold">Account</label>
+                    <div className="form-item mt-3">
+                      <label className="font-semibold">Account <span className="text-red-500">*</span></label>
                       <Field name="account">
                         {({ field }) => (
                           <Input
                             {...field}
                             placeholder="Select Account"
                             maxLength={18}
+                            className="mt-1"
                             // onChange={(e) => {
                             //   const value = e.target.value.replace(/\D/g, '');
                             //   setFieldValue("accountNumber", value);
@@ -275,12 +277,13 @@ const AddRevenue = ({ onClose }) => {
                     </div>
                   </Col>
                   <Col span={12} className="mt-2">
-                    <div className="form-item">
-                      <label className="font-semibold">Account Number</label>
+                    <div className="form-item mt-3">
+                      <label className="font-semibold">Account Number <span className="text-red-500">*</span></label>
                       <Field name="accountNumber">
                         {({ field }) => (
                           <Input
                             {...field}
+                            className="mt-1"
                             placeholder="Enter Account Number"
                             maxLength={18}
                             // onChange={(e) => {
@@ -299,12 +302,13 @@ const AddRevenue = ({ onClose }) => {
                     </div>
                   </Col>
                   <Col span={12} className="mt-2">
-                    <div className="form-item">
-                      <label className="font-semibold">Bank Name</label>
+                    <div className="form-item mt-3">
+                      <label className="font-semibold">Bank Name <span className="text-red-500">*</span></label>
                       <Field
                         name="bankName"
                         as={Input}
                         placeholder="Enter Bank Name"
+                        className="mt-1"
                       />
                       <ErrorMessage
                         name="bankName"
@@ -314,12 +318,13 @@ const AddRevenue = ({ onClose }) => {
                     </div>
                   </Col>
                   <Col span={12} className="mt-2">
-                    <div className="form-item">
-                      <label className="font-semibold">Branch Name</label>
+                    <div className="form-item mt-3">
+                      <label className="font-semibold">Branch Name <span className="text-red-500">*</span></label>
                       <Field
                         name="branchName"
                         as={Input}
                         placeholder="Enter Branch Name"
+                        className="mt-1"
                       />
                       <ErrorMessage
                         name="branchName"
@@ -328,14 +333,14 @@ const AddRevenue = ({ onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-2">
-                    <div className="form-item">
-                      <label className="font-semibold">Customer</label>
+                  <Col span={12} className="">
+                    <div className="form-item mt-3">
+                      <label className="font-semibold">Customer <span className="text-red-500">*</span></label>
                       <Field name="name">
                         {({ field }) => (
                           <Select
                             {...field}
-                            className="w-full"
+                            className="w-full mt-2"
                             placeholder="Select Customer"
                             loading={!fnddata} // Loading state
                             onChange={(value) =>
@@ -365,38 +370,11 @@ const AddRevenue = ({ onClose }) => {
                       />
                     </div>
                   </Col>
-
-                  {/* <Col span={12} className="mt-2">
-                    <div className="form-item">
-                      <label className="font-semibold">Category</label>
-                      <Field name="category">
-                        {({ field }) => (
-                          <Select
-                            {...field}
-                            className="w-full"
-                            placeholder="Select Category"
-                            onChange={(value) =>
-                              setFieldValue("category", value)
-                            }
-                            value={values.category}
-                            onBlur={() => setFieldTouched("category", true)}
-                          >
-                            <Option value="xyz">XYZ</Option>
-                            <Option value="abc">ABC</Option>
-                          </Select>
-                        )}
-                      </Field>
-                      <ErrorMessage
-                        name="category"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
-                    </div>
-                  </Col> */}
-                  <Col span={24}>
-                    <div className="form-item mt-2">
-                      <label className="font-semibold">Category</label>
+                  <Col span={12}>
+                    <div className="form-item mt-3">
+                      <label className="font-semibold">Category <span className="text-red-500">*</span></label>
                       <Select
+                        className="mt-2"
                         style={{ width: "100%" }}
                         placeholder="Select or add new category"
                         value={values.category}
@@ -431,15 +409,15 @@ const AddRevenue = ({ onClose }) => {
                     </div>
                   </Col>
 
-                  <Col span={12} className="mt-2">
-                    <div className="form-item">
-                      <label className="font-semibold">Currency</label>
+                  <Col span={12} className="">
+                    <div className="form-item mt-3">
+                      <label className="font-semibold">Currency <span className="text-red-500">*</span> </label>
                       <div className="flex gap-2">
                         <Field name="currency">
                           {({ field, form }) => (
                             <Select
                               {...field}
-                              className="w-full"
+                              className="w-full mt-1  "
                               placeholder="Select Currency"
                               onChange={(value) => {
                                 const selectedCurrency = Array.isArray(currencies) && currencies.find(
@@ -487,14 +465,15 @@ const AddRevenue = ({ onClose }) => {
                       />
                     </div>
                   </Col> */}
-                  <Col span={24} className="mt-2">
+                  <Col span={12} className="mt-3">
                     <div className="form-item">
-                      <label className="font-semibold">Payment Receipt</label>
+                      <label className="font-semibold">Payment Receipt <span className="text-red-500">*</span></label>
                       <Field
                         name="paymentReceipt"
                         type="file"
-                        as={Input}
+                        // as={Input}
                         placeholder="Enter payment receipt"
+                        className="mt-2.5"
                       />
                       <ErrorMessage
                         name="paymentReceipt"
@@ -503,13 +482,14 @@ const AddRevenue = ({ onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={24} className="mt-2">
-                    <div className="form-item">
-                      <label className="font-semibold">Description</label>
-                      <Field name="description">
+                    <Col span={24} className="">
+                    <div className="form-item mt-3">
+                      <label className="font-semibold">Description <span className="text-red-500">*</span>  </label>
+                      <Field name="description" >
                         {({ field }) => (
                           <ReactQuill
                             {...field}
+                            className="mt-2"
                             placeholder="Enter Description"
                             value={values.description}
                             onChange={(value) =>

@@ -246,6 +246,7 @@ import {
   Switch,
   Upload,
   Modal,
+  Space,
 } from "antd";
 import { CloudUploadOutlined, QuestionCircleOutlined, PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
@@ -384,27 +385,16 @@ const EditProduct = ({ idd, onClose }) => {
   });
 
   const onSubmit = (values, { resetForm }) => {
-    // dispatch(EditProdu({ idd, values }))
-    //   .then(() => {
-    //     dispatch(GetProdu(id));
-    //     // message.success("Product updated successfully!");
-    //     onClose();
-    //   })
-    //   .catch((error) => {
-    //     // message.error("Failed to update Employee.");
-    //     console.error("Edit API error:", error);
-    //   });
-
-       const formData = new FormData();
-          for (const key in values) {
-            formData.append(key, values[key]);
-          }
-      
-          dispatch(EditProdu({ idd, formData })).then(() => {
-            dispatch(GetProdu(id));
-            onClose();
-          });
-  };     
+    const formData = new FormData();
+    for (const key in values) {
+      formData.append(key, values[key]);
+    }
+    
+    dispatch(EditProdu({ idd, formData })).then(() => {
+      dispatch(GetProdu(id));
+      onClose();
+    });
+  };
 
   return (
     <div className="add-expenses-form">
@@ -491,7 +481,7 @@ const EditProduct = ({ idd, onClose }) => {
               </Col>
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Sku</label>
+                  <label className="font-semibold">Sku <span className="text-red-500">*</span></label>
                   <Field
                     className="mt-1"
                     name="sku"
@@ -507,7 +497,7 @@ const EditProduct = ({ idd, onClose }) => {
               </Col>
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Hsn/Sac </label>
+                  <label className="font-semibold">Hsn/Sac <span className="text-red-500">*</span></label>
                   <Field
                     className="mt-1"
                     name="hsn_sac"
@@ -524,7 +514,7 @@ const EditProduct = ({ idd, onClose }) => {
 
               <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Description</label>
+                    <label className="font-semibold">Description</label>
                   <ReactQuill
                     value={values.description}
                     onChange={(value) => setFieldValue("description", value)}
@@ -563,14 +553,35 @@ const EditProduct = ({ idd, onClose }) => {
                 </Field>
               </Col>
 
-              <div className="form-buttons text-right mt-4">
-                <Button type="default" className="mr-2" onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button type="primary" htmlType="submit">
-                  Update
-                </Button>
-              </div>
+              <Row justify="end" className="mt-6">
+                <Col>
+                  <Space className="flex justify-end">
+                    <Button 
+                      onClick={onClose}
+                      className="px-4"
+                      style={{ 
+                        borderRadius: '6px',
+                        color: '#666666',
+                        borderColor: '#d9d9d9',
+                        backgroundColor: '#ffffff'
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      type="primary" 
+                      htmlType="submit"
+                      className="px-4 "
+                      style={{ 
+                        borderRadius: '6px',
+                        backgroundColor: '#3366FF'
+                      }}
+                    >
+                      Update
+                    </Button>
+                  </Space>
+                </Col>
+              </Row>
             </Row>
           </Form>
         )}

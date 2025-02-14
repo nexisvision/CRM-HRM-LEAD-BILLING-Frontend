@@ -51,16 +51,17 @@ const AddLeadStages = ({ onClose }) => {
   const dispatch = useDispatch();
 
   const allpipline = useSelector((state) => state.Piplines);
-  const fndpip = allpipline.Piplines.data;
+  const fndpip = allpipline?.Piplines?.data || [];
 
-  const loggd = useSelector((state)=>state.user.loggedInUser.username)
+  const loggd = useSelector((state) => state.user?.loggedInUser?.username);
 
-  const fnddd = fndpip.filter((item)=>item.created_by === loggd)
-
+  const fnddd = Array.isArray(fndpip) && loggd
+    ? fndpip.filter((item) => item?.created_by === loggd)
+    : [];
 
   useEffect(() => {
     dispatch(GetPip());
-  }, []);
+  }, [dispatch]);
 
   const onSubmit = (values, { resetForm }) => {
     const payload = { ...values, stageType: "lead" };

@@ -99,7 +99,7 @@ const AddCompany = ({ onClose }) => {
   });
 
   return (
-    <div className="add-employee p-6">
+    <div className="add-employee ">
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -109,8 +109,8 @@ const AddCompany = ({ onClose }) => {
           <Form className="space-y-4">
             <Row gutter={16}>
               <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Username</label>
+                <div className="form-item mt-2">
+                <label className="font-semibold">Username <span className="text-red-500">*</span></label>
                   <Field
                     name="username"
                     as={Input}
@@ -125,8 +125,8 @@ const AddCompany = ({ onClose }) => {
                 </div>
               </Col>
               <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Password</label>
+                <div className="form-item mt-2">
+                <label className="font-semibold">Password <span className="text-red-500">*</span></label>
                   <Field
                     name="password"
                     as={Input.Password}
@@ -142,8 +142,8 @@ const AddCompany = ({ onClose }) => {
               </Col>
 
               <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Email</label>
+                <div className="form-item mt-2">
+                <label className="font-semibold">Email <span className="text-red-500">*</span></label>
                   <Field
                     name="email"
                     as={Input}

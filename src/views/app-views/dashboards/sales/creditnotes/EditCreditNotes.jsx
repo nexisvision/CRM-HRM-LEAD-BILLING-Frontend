@@ -72,9 +72,9 @@ const EditCrediteNotes = ({ idd, onClose }) => {
           {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
             <Form className="formik-form" onSubmit={handleSubmit}>
               <Row gutter={16}>
-                <Col span={12} className="mt-2">
+                <Col span={12} className="">
                   <div className="form-item">
-                    <label className="font-semibold">Amount</label>
+                    <label className="font-semibold  mt-1">Amount <span className="text-red-500">*</span></label>
                     <Field
                       name="amount"
                       as={Input}
@@ -89,9 +89,9 @@ const EditCrediteNotes = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Issue Date</label>
+                    <label className="font-semibold  mt-1">Issue Date <span className="text-red-500">*</span></label>
                     <DatePicker
                       className="w-full"
                       format="DD-MM-YYYY"
@@ -107,9 +107,9 @@ const EditCrediteNotes = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={24} className="mt-2">
+                <Col span={24} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Description</label>
+                    <label className="font-semibold mt-1">Description <span className="text-red-500">*</span></label>
                     <Field name="description">
                       {({ field }) => (
                         <ReactQuill

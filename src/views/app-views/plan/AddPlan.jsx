@@ -7,13 +7,11 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { getcurren } from '../setting/currencies/currenciesSlice/currenciesSlice';
 // import { getallcurrencies } from '../setting/currencies/currenciesreducer/currenciesSlice';
-
 const { Option } = Select;
-
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Please enter the plan name!'),
   price: Yup.string().required('Please enter the plan price!'),
-  duration: Yup.string().required('Please select a duration!'),
+  // duration: Yup.string().required('Please select a duration!'),
   max_users: Yup.string().required('Please enter the maximum users!'),
   max_customers: Yup.string().required('Please enter the maximum customers!'),
   max_vendors: Yup.string().required('Please enter the maximum vendors!'),
@@ -25,10 +23,8 @@ const validationSchema = Yup.object().shape({
     then: Yup.string().required('Please enter trial period!')
   })
 });
-
 const AddPlan = ({ onClose }) => {
   const [isTrialEnabled, setIsTrialEnabled] = useState(false);
-
   const [featureStates, setFeatureStates] = useState({
     CRM: false,
     Project: false,
@@ -37,70 +33,17 @@ const AddPlan = ({ onClose }) => {
     POS: false,
     ChatGPT: false,
   });
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const [durationType, setDurationType] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedYear, setSelectedYear] = useState(null);
 
-  const handleMenuClick = (e) => {
-    if (e.key === 'Lifetime') {
-      setDurationType('Lifetime');
-      setSelectedMonth(null);
-      setSelectedYear(null);
-    }
-  };
-
   useEffect(() => {
     dispatch(getcurren());
   }, []);
-
   const allempdatass = useSelector((state) => state.currencies);
   const fnddatass = allempdatass?.currencies?.data;
-
-
-  const yearlyMenu = (
-    <Menu onClick={({ key }) => {
-      setDurationType('Yearly');
-      setSelectedYear(key);
-    }}>
-      <Menu.Item className='w-full'>
-        <Input 
-          placeholder="Enter years"
-          type="number"
-          onChange={(e) => {
-            const value = e.target.value;
-            setSelectedYear(value);
-          }}
-        />
-      </Menu.Item>
-    </Menu>
-  );
-
-  const monthlyMenu = (
-    <Menu onClick={({ key }) => {
-      setDurationType('Monthly');
-      setSelectedMonth(key);
-    }}>
-      {Array.from({ length: 12 }, (_, i) => (
-        <Menu.Item key={i + 1}>{`${i + 1} Month${i + 1 > 1 ? 's' : ''}`}</Menu.Item>
-      ))}
-    </Menu>
-  );
-
-  const mainMenu = (
-    <Menu onClick={handleMenuClick}>
-      <Menu.Item key="Lifetime">Lifetime</Menu.Item>
-      <Menu.SubMenu key="Yearly" title="Yearly">
-        {yearlyMenu}
-      </Menu.SubMenu>
-      <Menu.SubMenu key="Monthly" title="Monthly">
-        {monthlyMenu}
-      </Menu.SubMenu>
-    </Menu>
-  );
 
   const initialValues = {
     name: '',
@@ -115,33 +58,35 @@ const AddPlan = ({ onClose }) => {
     trial: false,
     trial_period: ''
   };
-
   const handleSubmit = (values, { resetForm }) => {
-    const payload = { ...values, features: featureStates };
+    const formattedDuration = values.duration === 'Monthly' ? 'Per Month' : 
+                             values.duration === 'Yearly' ? 'Per Year' : 
+                             'Lifetime';
+                            
+    const payload = { 
+      ...values, 
+      duration: formattedDuration,
+      features: featureStates 
+    };
 
     dispatch(CreatePlan(payload))
       .then(() => {
         dispatch(GetPlan());
         onClose();
         setIsTrialEnabled(false);
-        message.success('Plan added successfully!');
         resetForm();
         navigate('/app/superadmin/plan');
       })
       .catch((error) => {
-        message.error('Failed to add plan.');
         console.error('Add API error:', error);
       });
   };
-
   const handleTrialToggle = (checked) => {
     setIsTrialEnabled(checked);
   };
-
   const handleFeatureToggle = (feature, checked) => {
     setFeatureStates((prev) => ({ ...prev, [feature]: checked }));
   };
-
   return (
     <div>
       <Formik
@@ -150,24 +95,73 @@ const AddPlan = ({ onClose }) => {
         onSubmit={handleSubmit}
       >
         {({ values, errors, touched, setFieldValue, handleChange }) => {
+          const handleMenuClick = (e) => {
+            if (e.key === 'Lifetime') {
+              setDurationType('Lifetime');
+              setSelectedMonth(null);
+              setSelectedYear(null);
+              setFieldValue('duration', 'Lifetime');
+            }
+          };
+
+          const yearlyMenu = (
+            <Menu onClick={({ key }) => {
+              setDurationType('Yearly');
+              setSelectedYear(key);
+              setFieldValue('duration', 'Per Year');
+            }}>
+              <Menu.Item className='w-full'>
+                <Input 
+                  placeholder="Enter years"
+                  type="number"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setSelectedYear(value);
+                  }}
+                />
+              </Menu.Item>
+            </Menu>
+          );
+
+          const monthlyMenu = (
+            <Menu onClick={({ key }) => {
+              setDurationType('Monthly');
+              setSelectedMonth(key);
+              setFieldValue('duration', 'Per Month');
+            }}>
+              {Array.from({ length: 12 }, (_, i) => (
+                <Menu.Item key={i + 1}>{`${i + 1} Month${i + 1 > 1 ? 's' : ''}`}</Menu.Item>
+              ))}
+            </Menu>
+          );
+
+          const mainMenu = (
+            <Menu onClick={handleMenuClick}>
+              <Menu.Item key="Lifetime">Lifetime</Menu.Item>
+              <Menu.SubMenu key="Yearly" title="Yearly">
+                {yearlyMenu}
+              </Menu.SubMenu>
+              <Menu.SubMenu key="Monthly" title="Monthly">
+                {monthlyMenu}
+              </Menu.SubMenu>
+            </Menu>
+          );
+
           const handleMonthlySelect = ({ key }) => {
             setDurationType('Monthly');
             setSelectedMonth(key);
             setFieldValue('duration', 'Monthly');
             setFieldValue('monthCount', key);
           };
-
           const handleYearlyInputChange = ({ key }) => {
             setDurationType('Yearly');
             setSelectedYear(key);
             setFieldValue('duration', 'Yearly');
             setFieldValue('yearCount', key);
           };
-
           return (
             <Form>
               <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
-
               <Row gutter={16}>
                 <Col span={12}>
                   <div className="form-group">
@@ -185,7 +179,6 @@ const AddPlan = ({ onClose }) => {
                     )}
                   </div>
                 </Col>
-
                 <Col span={12}>
                   <div className="form-group">
                     <label>Price</label>
@@ -202,7 +195,6 @@ const AddPlan = ({ onClose }) => {
                     )}
                   </div>
                 </Col>
-
                 <Col span={12}>
                   <div className="form-group">
                     <label>Duration</label>
@@ -226,7 +218,6 @@ const AddPlan = ({ onClose }) => {
                     )}
                   </div>
                 </Col>
-
                 <Col span={12}>
                   <div className="form-group">
                     <label>Maximum Users</label>
@@ -243,7 +234,6 @@ const AddPlan = ({ onClose }) => {
                     )}
                   </div>
                 </Col>
-
                 <Col span={12}>
                   <div className="form-group">
                     <label>Maximum Customers</label>
@@ -260,7 +250,6 @@ const AddPlan = ({ onClose }) => {
                     )}
                   </div>
                 </Col>
-
                 <Col span={12}>
                   <div className="form-group">
                     <label>Maximum Vendors</label>
@@ -277,7 +266,6 @@ const AddPlan = ({ onClose }) => {
                     )}
                   </div>
                 </Col>
-
                 <Col span={12}>
                   <div className="form-group">
                     <label>Maximum Clients</label>
@@ -294,7 +282,6 @@ const AddPlan = ({ onClose }) => {
                     )}
                   </div>
                 </Col>
-
                 <Col span={12}>
                   <div className="form-group">
                     <label>Storage Limit (MB)</label>
@@ -312,7 +299,6 @@ const AddPlan = ({ onClose }) => {
                     )}
                   </div>
                 </Col>
-
                 <Col span={24} className="mt-4">
                   <div className="form-item">
                     <label className="font-semibold">currency</label>
@@ -349,7 +335,6 @@ const AddPlan = ({ onClose }) => {
                   </div>
                 </Col>
               </Row>
-
               <div className="form-group">
                 <label>Description</label>
                 <Field name="description">
@@ -365,7 +350,6 @@ const AddPlan = ({ onClose }) => {
                   <div className="error-message">{errors.description}</div>
                 )}
               </div>
-
               <div className="form-group">
                 <label>Trial is enabled (on/off)</label>
                 <Field name="trial">
@@ -380,7 +364,6 @@ const AddPlan = ({ onClose }) => {
                   )}
                 </Field>
               </div>
-
               {isTrialEnabled && durationType !== 'Lifetime' && (
                 <div className="form-group">
                   <label>Trial Days</label>
@@ -397,7 +380,6 @@ const AddPlan = ({ onClose }) => {
                   )}
                 </div>
               )}
-
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Button style={{ marginRight: '8px' }} onClick={() => {
                   onClose();
@@ -416,5 +398,4 @@ const AddPlan = ({ onClose }) => {
     </div>
   );
 };
-
 export default AddPlan;

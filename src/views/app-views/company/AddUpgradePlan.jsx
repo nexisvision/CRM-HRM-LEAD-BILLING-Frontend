@@ -76,7 +76,7 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
   return (
     <div>
       <div className="ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4">
-        <h2 className="mb-4 border-b pb-[30px] font-medium"></h2>
+
         <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
@@ -91,16 +91,17 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
             setFieldTouched,
           }) => (
             <Form layout="vertical" onFinish={handleSubmit}>
+               <div className="border-t border-gray-200 my-6 "></div>
               <div className="p-2">
                 <Row gutter={16}>
-                  <Col span={12} className="mt-2">
+                  <Col span={12} className="">
                     <div className="form-item">
-                      <label className="">Plan</label>
+                      <label className="font-semibold">Plan <span className="text-red-500">*</span></label>
                       <Field name="plan_id">
                         {({ field, form }) => (
                           <Select
                             {...field}
-                            className="w-full mt-2"
+                            className="w-full mt-1"
                             placeholder="Select Plan"
                             loading={!fnsfdtaf}
                             onChange={(value) =>
@@ -125,11 +126,11 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                     </div>
                   </Col>
 
-                  <Col span={12} className="mt-4">
+                  <Col span={12} className="">
                     <div className="form-item">
-                      <label className="">Start Date</label>
+                      <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
                       <DatePicker
-                        className="w-full"
+                        className="w-full mt-1"
                         format="DD-MM-YYYY"
                         value={values.start_date}
                         onChange={(date) => setFieldValue("start_date", date)}
@@ -142,11 +143,11 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                     </div>
                   </Col>
 
-                  <Col span={12} className="mt-4">
+                  <Col span={12} className="mt-3">
                     <div className="form-item">
-                      <label className="font-semibold">End Date</label>
+                      <label className="font-semibold">End Date <span className="text-red-500">*</span> </label>
                       <DatePicker
-                        className="w-full"
+                        className="w-full mt-2"
                         format="DD-MM-YYYY"
                         value={values.endDate}
                         onChange={(date) => setFieldValue("end_date", date)}
@@ -160,14 +161,14 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                     </div>
                   </Col>
 
-                  <Col span={12}>
+                  <Col span={12} className="mt-3">
                     <Form.Item
-                      label="Status"
-                      validateStatus={values.status ? "" : "error"}
-                      help={values.status ? "" : "Please select Status"}
+                      
+                      className="font-semibold mt-2"
                     >
+                      <label className="font-semibold ">Status <span className="text-red-500">*</span></label>
                       <Select
-                        name="status"
+                       
                         onChange={(value) =>
                           handleChange({
                             target: { name: "status", value },
@@ -175,26 +176,28 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                         }
                         onBlur={handleBlur}
                         value={values.status}
+                        // className="mt-1"
                         placeholder="Select status"
                       >
                         <Option value="active">Active</Option>
                         <Option value="trial">Trial</Option>
                       </Select>
+                      <ErrorMessage
+                        name="status"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
                     </Form.Item>
                   </Col>
 
-                  <Col span={12}>
+                  <Col span={12} className="">
                     <Form.Item
-                      label="Payment Status"
-                      validateStatus={values.payment_status ? "" : "error"}
-                      help={
-                        values.payment_status
-                          ? ""
-                          : "Please select Payment Status"
-                      }
+                     
+                      className=" font-semibold mt-2"
                     >
+                      <label className="font-semibold">Payment Status <span className="text-red-500">*</span></label>
                       <Select
-                        name="payment_status"
+                       
                         onChange={(value) =>
                           handleChange({
                             target: { name: "payment_status", value },
@@ -207,6 +210,11 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                         <Option value="paid">Paid</Option>
                         <Option value="unpaid">Unpaid</Option>
                       </Select>
+                      <ErrorMessage
+                        name="payment_status"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
                     </Form.Item>
                   </Col>
                 </Row>

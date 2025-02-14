@@ -122,14 +122,14 @@ const AddCrediteNotes = ({ onClose }) => {
                   <Form className="formik-form" onSubmit={handleSubmit}>
                     <Row gutter={16}>
                       
-                      <Col span={24} className="mt-2">
+                      <Col span={24} className="">
                         <div className="form-item">
-                          <label className="font-semibold">invoice</label>
+                          <label className="font-semibold">Invoice <span className="text-red-500">*</span></label>
                           <Field name="invoice">
                             {({ field }) => (
                               <Select
                                 {...field}
-                                className="w-full"
+                                className="w-full mt-1"
                                 placeholder="Select invoice"
                                 onChange={(value) =>
                                   setFieldValue("invoice", value)
@@ -159,12 +159,13 @@ const AddCrediteNotes = ({ onClose }) => {
                         </div>
                       </Col>
 
-                      <Col span={12} className="mt-2">
+                      <Col span={12} className="mt-3">
                         <div className="form-item">
-                          <label className="font-semibold">Amount</label>
+                          <label className="font-semibold">Amount <span className="text-red-500">*</span></label>
                           <Field
                             name="amount"
                             as={Input}
+                            className="mt-1"
                             placeholder="Enter Amount"
                             type="number"
                           />
@@ -176,11 +177,11 @@ const AddCrediteNotes = ({ onClose }) => {
                         </div>
                       </Col>
 
-                      <Col span={12} className="mt-2">
+                      <Col span={12} className="mt-3">
                         <div className="form-item">
-                          <label className="font-semibold">Issue Date</label>
+                          <label className="font-semibold">Issue Date <span className="text-red-500">*</span></label>
                           <DatePicker
-                            className="w-full"
+                            className="w-full mt-1"
                             format="DD-MM-YYYY"
                             value={values.date}
                             onChange={(date) => setFieldValue("date", date)}
@@ -194,15 +195,16 @@ const AddCrediteNotes = ({ onClose }) => {
                         </div>
                       </Col>
 
-                      <Col span={24} className="mt-2">
+                      <Col span={24} className="mt-3">
                         <div className="form-item">
-                          <label className="font-semibold">Description</label>
+                          <label className="font-semibold">Description <span className="text-red-500">*</span>  </label>
                           <Field name="description">
                             {({ field }) => (
                               <ReactQuill
                                 {...field}
                                 placeholder="Enter Description"
                                 value={values.description}
+                                className="mt-1"
                                 onChange={(value) =>
                                   setFieldValue("description", value)
                                 }

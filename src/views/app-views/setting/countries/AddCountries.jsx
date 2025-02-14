@@ -3,87 +3,127 @@ import { Card, Form, Input, Button, notification } from "antd";
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { addCountry, getallcountries } from './countriesreducer/countriesSlice';
+import { Formik, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
+import { Row, Col } from 'antd';
+
+const validationSchema = Yup.object().shape({
+  countryName: Yup.string().required('Please enter country name'),
+  countryCode: Yup.string().required('Please enter country code'),
+  phoneCode: Yup.string().required('Please enter phone code')
+});
 
 const AddCountries = ({onClose}) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [form] = Form.useForm();
 
-  const onFinish = async (values) => {
+  const initialValues = {
+    countryName: '',
+    countryCode: '',
+    phoneCode: ''
+  };
+
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      await dispatch(addCountry(values)).unwrap()
-        .then(()=>{
-          dispatch(getallcountries())
-          // notification.success({
-            // message: 'Success',
-            // description: 'Country added successfully.',
-          // });
-          onClose();
-          form.resetFields();
-        })
-   
+      await dispatch(addCountry(values)).unwrap();
+      await dispatch(getallcountries());
+      notification.success({
+        message: 'Success',
+        description: 'Country added successfully.',
+      });
+      resetForm();
+      onClose();
     } catch (error) {
-      // notification.error({
-        // message: 'Error',
-        // description: error.message || 'Failed to add country.',
-      // });
+      notification.error({
+        message: 'Error',
+        description: error.message || 'Failed to add country.',
+      });
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <div>
-      <hr style={{ marginBottom: "15px", border: "1px solid #E8E8E8" }} />
+      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
 
-    {/* <Card title=""> */}
-
-
-      <Form
-
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
       >
-        <Form.Item
-          label="Country Name"
-          name="countryName"
-          rules={[{ required: true, message: 'Please enter country name' }]}
-        >
-          <Input placeholder="Enter country name" />
-        </Form.Item>
+        {({ handleSubmit, isSubmitting }) => (
+          <form onSubmit={handleSubmit}>
+            <Row gutter={16}>
+              <Col span={24}>
+                <div className="mb-4">
+                  <label className="block mb-1 font-semibold">Country Name <span className="text-red-500">*</span></label>
+                  <Field
+                    name="countryName"
+                    as={Input}
+                    placeholder="Enter country name"
+                  />
+                  <ErrorMessage
+                    name="countryName"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+              </Col>
 
-        <Form.Item
-          label="Country Code"
-          name="countryCode"
-          rules={[{ required: true, message: 'Please enter country code' }]}
-        >
-          <Input placeholder="Enter country code" />
-        </Form.Item>
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block mb-1 font-semibold">Country Code <span className="text-red-500">*</span></label>
+                  <Field
+                    name="countryCode"
+                    as={Input}
+                    placeholder="Enter country code"
+                  />
+                  <ErrorMessage
+                    name="countryCode"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+              </Col>
 
-        <Form.Item
-          label="Phone Code"
-          name="phoneCode"
-          rules={[{ required: true, message: 'Please enter phone code' }]}
-        >
-          <Input placeholder="Enter phone code" />
-        </Form.Item>
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block mb-1 font-semibold">Phone Code <span className="text-red-500">*</span></label>
+                  <Field
+                    name="phoneCode"
+                    as={Input}
+                    placeholder="Enter phone code"
+                  />
+                  <ErrorMessage
+                    name="phoneCode"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+              </Col>
+            </Row>
 
-        <Form.Item className="text-right">
-          <Button
-            type="default"
-            style={{ marginRight: 8 }}
-            onClick={() => navigate(-1)}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="primary"
-            htmlType="submit"
-          >
-            Submit
-          </Button>
-        </Form.Item>
-      </Form>
-    {/* </Card> */}
+            <div className="flex justify-end gap-2 mt-4">
+              <Button
+                type="default"
+                onClick={onClose}
+                style={{ marginRight: '8px' }}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isSubmitting}
+              >
+                Create
+              </Button>
+            </div>
+          </form>
+        )}
+      </Formik>
     </div>
   );
 };

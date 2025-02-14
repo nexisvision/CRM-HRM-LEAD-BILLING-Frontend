@@ -70,79 +70,53 @@ const AddNotes = ({ onClose }) => {
   };
 
   return (
-    <div className="add-job-form">
+    <div className="add-notes-form">
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({
-          values,
-          setFieldValue,
-          isSubmitting,
-          errors,
-          touched,
-          resetForm,
-        }) => (
+        {({ values, setFieldValue, isSubmitting, errors, touched }) => (
           <Form>
             <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+            
             <Row gutter={16}>
               <Col span={24}>
                 <div className="mb-4">
-                  <label htmlFor="title" className="block mb-2">
-                    Title
-                  </label>
-                  <Field name="title">
-                    {({ field }) => (
-                      <Input
-                        {...field}
-                        placeholder="Enter Title"
-                        className={
-                          errors.title && touched.title ? "border-red-500" : ""
-                        }
-                      />
-                    )}
-                  </Field>
-                  <ErrorMessage
+                  <label className="block mb-1 font-semibold">Title <span className="text-red-500">*</span></label>
+                  <Field
                     name="title"
-                    component="div"
-                    className="text-red-500 text-sm mt-1"
+                    as={Input}
+                    placeholder="Enter Title"
                   />
+                  <ErrorMessage name="title" component="div" className="text-red-500" />
                 </div>
               </Col>
 
               <Col span={24}>
                 <div className="mb-4">
-                  <label htmlFor="description" className="block mb-2">
-                    Description
-                  </label>
+                  <label className="block mb-1 font-semibold">Description <span className="text-red-500">*</span></label>
                   <Field name="description">
                     {({ field }) => (
                       <ReactQuill
                         value={field.value}
-                        onChange={(content) =>
-                          setFieldValue("description", content)
-                        }
+                        onChange={(content) => setFieldValue("description", content)}
+                        placeholder="Enter Description"
                       />
                     )}
                   </Field>
-                  <ErrorMessage
-                    name="description"
-                    component="div"
-                    className="text-red-500 text-sm mt-1"
-                  />
+                  <ErrorMessage name="description" component="div" className="text-red-500" />
                 </div>
               </Col>
 
               <Col span={12}>
                 <div className="mb-4">
-                  <label htmlFor="type" className="block mb-2">
-                    Type
-                  </label>
+                  <label className="block mb-1 font-semibold">Type <span className="text-red-500">*</span></label>
                   <Field name="type">
                     {({ field }) => (
                       <Select
                         {...field}
+                        className="w-full"
                         placeholder="Select Type"
                         onChange={(value) => {
                           setFieldValue("type", value);
@@ -151,75 +125,61 @@ const AddNotes = ({ onClose }) => {
                             setFieldValue("assignto", []);
                           }
                         }}
-                        value={field.value}
-                        className={
-                          errors.type && touched.type ? "border-red-500" : ""
-                        }
                       >
                         <Option value="Personal">Personal</Option>
                         <Option value="Shared">Shared</Option>
                       </Select>
                     )}
                   </Field>
-                  <ErrorMessage
-                    name="type"
-                    component="div"
-                    className="text-red-500 text-sm mt-1"
-                  />
+                  <ErrorMessage name="type" component="div" className="text-red-500" />
                 </div>
-
-                {values.type === "Shared" && (
-                  <Col span={24} className="mt-4">
-                    <div className="form-item">
-                      <label className="font-semibold">AssignTo</label>
-                      <Field name="assignto">
-                        {({ field }) => (
-                          <Select
-                            {...field}
-                            className="w-full mt-2"
-                            mode="multiple"
-                            placeholder="Select AddProjectMember"
-                            onChange={(value) =>
-                              setFieldValue("assignto", value)
-                            }
-                            value={values.assignto}
-                          >
-                            {empData && empData.length > 0 ? (
-                              empData.map((client) => (
-                                <Option key={client.id} value={client.id}>
-                                  {client.firstName ||
-                                    client.username ||
-                                    "Unnamed Client"}
-                                </Option>
-                              ))
-                            ) : (
-                              <Option value="" disabled>
-                                No Clients Available
-                              </Option>
-                            )}
-                          </Select>
-                        )}
-                      </Field>
-                      <ErrorMessage
-                        name="assignto"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
-                    </div>
-                  </Col>
-                )}
               </Col>
+
+              {values.type === "Shared" && (
+                <Col span={12}>
+                  <div className="mb-4">
+                    <label className="block mb-1 font-semibold">Assign To <span className="text-red-500">*</span></label>
+                    <Field name="assignto">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="w-full"
+                          mode="multiple"
+                          placeholder="Select Members"
+                          onChange={(value) => setFieldValue("assignto", value)}
+                          value={values.assignto}
+                        >
+                          {empData && empData.length > 0 ? (
+                            empData.map((client) => (
+                              <Option key={client.id} value={client.id}>
+                                {client.firstName || client.username || "Unnamed Client"}
+                              </Option>
+                            ))
+                          ) : (
+                            <Option value="" disabled>No Members Available</Option>
+                          )}
+                        </Select>
+                      )}
+                    </Field>
+                    <ErrorMessage name="assignto" component="div" className="text-red-500" />
+                  </div>
+                </Col>
+              )}
             </Row>
 
-            <div className="form-buttons text-right">
-              <Button
-                type="default"
-                className="mr-2"
-                onClick={() => navigate("/app/hrm/jobs")}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+              <Button 
+                type="default" 
+                onClick={onClose}
+                style={{ marginRight: '8px' }}
               >
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit" disabled={isSubmitting}>
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                disabled={isSubmitting}
+              >
                 Create
               </Button>
             </div>

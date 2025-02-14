@@ -21,27 +21,22 @@ const AddDeal = ({ onClose }) => {
   const dispatch = useDispatch();
   const tabledata = useSelector((state) => state?.SubClient);
   const { currencies } = useSelector((state) => state.currencies);
-  const { data: Piplines, isLoading } = useSelector(
-    (state) => state.Piplines.Piplines
-  );
+  const { data: Piplines = [] } = useSelector((state) => state.Piplines.Piplines || {});
+  const allpipline = Piplines || [];
 
-  useEffect(()=>{
-    dispatch(GetPip())
-  },[dispatch])
-
-  const allpipline = useSelector((state) => state.Piplines.Piplines.data);
-
-   const logged = useSelector((state)=>state.user.loggedInUser.username)
+  const logged = useSelector((state) => state.user?.loggedInUser?.username);
   
-    const fnddatas = allpipline.filter((item)=>item.created_by === logged)
+  const fnddatas = logged && Array.isArray(allpipline) 
+    ? allpipline.filter((item) => item?.created_by === logged)
+    : [];
 
-  const { data: StagesLeadsDeals } = useSelector(
-    (state) => state.StagesLeadsDeals.StagesLeadsDeals
+  const { data: StagesLeadsDeals = [] } = useSelector(
+    (state) => state.StagesLeadsDeals.StagesLeadsDeals || {}
   );
-  const { data: Leads } = useSelector((state) => state.Leads.Leads);
-  const { data: Project } = useSelector((state) => state.Project.Project);
-  const clientdata = tabledata?.SubClient?.data;
-  const countries = useSelector((state) => state.countries.countries);
+  const { data: Leads = [] } = useSelector((state) => state.Leads.Leads || {});
+  const { data: Project = [] } = useSelector((state) => state.Project.Project || {});
+  const clientdata = tabledata?.SubClient?.data || [];
+  const countries = useSelector((state) => state.countries?.countries?.data || []);
 
   useEffect(() => {
     dispatch(getallcountries());
@@ -134,7 +129,7 @@ const AddDeal = ({ onClose }) => {
     price: Yup.string().required("Please enter a Price."),
     leadTitle: Yup.string().required("Please select a Lead Title."),
     currency: Yup.string().required("Please select a Currency."),
-    category: Yup.string().required("Please select a Category."),
+    category: Yup.string().optional ("Please select a Category."),
     pipeline: Yup.string().required("Please select a Pipeline."),
     stage: Yup.string().required("Please select a Stage."),
     closedDate: Yup.date().required("Please select a Closed Date."),
@@ -185,10 +180,10 @@ const AddDeal = ({ onClose }) => {
             {/* <h2 className="mb-4 border-b pb-2 font-medium">Add Deal</h2> */}
             <Row gutter={16}>
               <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Deal Name</label>
+                <div className="form-item mt-3">
+                  <label className="font-semibold">Deal Name <span className="text-rose-500">*</span></label>
                   <Field
-                    className="mt-2"
+                    className="mt-1"
                     name="dealName"
                     as={Input}
                     placeholder="Enter Deal Name"
@@ -200,14 +195,15 @@ const AddDeal = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Phone</label>
+                  <label className="font-semibold">Phone <span className="text-rose-500">*</span></label>
                   <div className="flex">
                     <Select
                       style={{ width: '30%', marginRight: '8px' }}
                       placeholder="Code"
                       name="phoneCode"
+                      className="mt-1"
                       value={values.phoneCode}
                       onChange={(value) => setFieldValue('phoneCode', value)}
                     >
@@ -234,11 +230,11 @@ const AddDeal = ({ onClose }) => {
                       )}
                     </Field>
                   </div>
-                  <ErrorMessage
+                  {/* <ErrorMessage
                     name="phoneCode"
                     component="div"
                     className="error-message text-red-500 my-1"
-                  />
+                  /> */}
                   <ErrorMessage
                     name="phoneNumber"
                     component="div"
@@ -246,13 +242,13 @@ const AddDeal = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-4 mb-4">
+              <Col span={12} className="mt-3 mb-3">
                 <div className="form-item">
-                  <label className="font-semibold">Price</label>
+                  <label className="font-semibold">Price <span className="text-rose-500">*</span></label>
                   <Field
                     name="price"
                     as={Input}
-                    className="mt-2"
+                    className="mt-1"
                     placeholder="Enter Price"
                   />
                   <ErrorMessage
@@ -262,15 +258,15 @@ const AddDeal = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold mb-2">Currency</label>
+                  <label className="font-semibold mb-2">Currency <span className="text-rose-500">*</span></label>
                   <div className="flex gap-2">
                     <Field name="currency">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full mt-2"
+                          className="w-full mt-1"
                           placeholder="Select Currency"
                           onChange={(value) => {
                             const selectedCurrency = Array.isArray(currencies?.data) && 
@@ -302,12 +298,13 @@ const AddDeal = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="">
+              <Col span={12} className="mt-3">
                     <div className="form-item">
-                      <label className="font-semibold">Category</label>
+                      <label className="font-semibold">Category <span className="text-rose-500">*</span></label>
                       <Select
+                        name="category"
                         style={{ width: "100%" }}
-                        className="w-full mt-2"
+                        className="w-full mt-1"
                         placeholder="Select or add new category"
                         value={values.category}
                         onChange={(value) => setFieldValue("category", value)}
@@ -318,7 +315,7 @@ const AddDeal = ({ onClose }) => {
                               <Button
                                 type="link"
                                 icon={<PlusOutlined />}
-                                className="w-full mt-2"
+                                className="w-full mt-1"
                                 onClick={() => setIsCategoryModalVisible(true)}
                               >
                                 Add New Category
@@ -341,15 +338,15 @@ const AddDeal = ({ onClose }) => {
                     </div>
                   </Col>
               
-              <Col span={12} className="">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Lead Title</label>
+                  <label className="font-semibold">Lead Title <span className="text-rose-500">*</span></label>
                   <div className="flex gap-2">
                     <Field name="leadTitle">
                       {({ field, form }) => (
                         <Select
                           {...field} // Spread Formik field props to manage the value
-                          className="w-full mt-2"
+                          className="w-full mt-1"
                           placeholder="Select Lead Title"
                           value={field.value || ""} // Ensure the select value is controlled by Formik
                           onChange={(value) => {
@@ -382,15 +379,15 @@ const AddDeal = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+                <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Pipeline</label>
+                  <label className="font-semibold">Pipeline <span className="text-rose-500">*</span></label>
                   <div className="flex gap-2">
                     <Field name="pipeline">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full mt-2"
+                          className="w-full mt-1"
                           placeholder="Select Pipeline"
                           onChange={(value) => {
                             const selectedPipeline =
@@ -419,15 +416,15 @@ const AddDeal = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Stage</label>
+                  <label className="font-semibold">Stage <span className="text-rose-500">*</span></label>
                   <div className="flex gap-2">
                     <Field name="stage">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full mt-2"
+                          className="w-full mt-1"
                           placeholder="Select Stage"
                           value={field.value} // Ensure the select value is controlled
                           onChange={(value) => {
@@ -459,14 +456,14 @@ const AddDeal = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Closed Date</label>
+                  <label className="font-semibold">Closed Date <span className="text-rose-500">*</span></label>
                   <Field name="closedDate">
                     {({ field }) => (
                       <DatePicker
                         {...field}
-                        className="mt-2"
+                        className="mt-1"
                         style={{ width: "100%" }}
                         onChange={(date) => setFieldValue("closedDate", date)}
                       />
@@ -480,15 +477,15 @@ const AddDeal = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Project</label>
+                  <label className="font-semibold">Project <span className="text-rose-500">*</span> </label>
                   <div className="flex gap-2">
                     <Field name="project">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full mt-2"
+                          className="w-full mt-1"
                           placeholder="Select Project"
                           onChange={(value) => {
                             const selectedProject =

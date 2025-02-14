@@ -7,15 +7,26 @@ import ReactQuill from "react-quill";
 import { Addpolicys, getpolicys } from "./policyReducer/policySlice";
 import { getBranch } from "../hrm/Branch/BranchReducer/BranchSlice";
 import { UploadOutlined } from "@ant-design/icons";
+import "react-quill/dist/quill.snow.css";
 
 const { Option } = Select;
+
+const validationSchema = Yup.object({
+  branch: Yup.string().required("Branch is required"),
+  title: Yup.string()
+    .required("Title is required")
+    .max(100, "Title must not exceed 100 characters"),
+  description: Yup.string()
+    .required("Description is required")
+    .min(10, "Description must be at least 10 characters"),
+  file: Yup.mixed().nullable()
+});
 
 const AddpolicyList = ({ onClose }) => {
   const dispatch = useDispatch();
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch branches on component mount
   useEffect(() => {
     dispatch(getBranch())
       .unwrap()
@@ -31,23 +42,10 @@ const AddpolicyList = ({ onClose }) => {
     file: null
   };
 
-  const validationSchema = Yup.object({
-    branch: Yup.string().required("Branch is required"),
-    title: Yup.string()
-      .required("Title is required")
-      .max(100, "Title must not exceed 100 characters"),
-    description: Yup.string()
-      .required("Description is required")
-      .min(10, "Description must be at least 10 characters"),
-    file: Yup.mixed().nullable()
-  });
-
   const handleSubmit = async (values, { resetForm }) => {
     setLoading(true);
     try {
       const formData = new FormData();
-
-      // Add form fields to formData
       formData.append("branch", values.branch);
       formData.append("title", values.title);
       formData.append("description", values.description);
@@ -71,7 +69,7 @@ const AddpolicyList = ({ onClose }) => {
   };
 
   return (
-    <div className="p-4">
+    <div className="">
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -79,10 +77,12 @@ const AddpolicyList = ({ onClose }) => {
       >
         {({ setFieldValue }) => (
           <Form>
+            <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
             <Row gutter={16}>
               <Col span={12}>
                 <div className="mb-4">
-                  <label className="block font-medium mb-1">Branch</label>
+                  <label className="block mb-1 font-semibold">Branch <span className="text-red-500">*</span></label>
                   <Field name="branch">
                     {({ field }) => (
                       <Select
@@ -109,7 +109,7 @@ const AddpolicyList = ({ onClose }) => {
 
               <Col span={12}>
                 <div className="mb-4">
-                  <label className="block font-medium mb-1">Title</label>
+                  <label className="block mb-1 font-semibold">Title <span className="text-red-500">*</span></label>
                   <Field
                     name="title"
                     as={Input}
@@ -125,7 +125,7 @@ const AddpolicyList = ({ onClose }) => {
 
               <Col span={24}>
                 <div className="mb-4">
-                  <label className="block font-medium mb-1">Description</label>
+                  <label className="block mb-1 font-semibold">Description <span className="text-red-500">*</span></label>
                   <Field name="description">
                     {({ field }) => (
                       <ReactQuill
@@ -145,7 +145,7 @@ const AddpolicyList = ({ onClose }) => {
 
               <Col span={24}>
                 <div className="mb-4">
-                  <label className="block font-medium mb-1">Upload File</label>
+                  <label className="block mb-1 font-semibold ">Upload File <span className="text-red-500">*</span></label>
                   <Upload
                     fileList={fileList}
                     beforeUpload={(file) => {
@@ -162,16 +162,29 @@ const AddpolicyList = ({ onClose }) => {
                       Select File
                     </Button>
                   </Upload>
+                  <ErrorMessage
+                    name="file"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
                 </div>
               </Col>
             </Row>
 
             <div className="flex justify-end gap-2 mt-4">
-              <Button onClick={onClose} disabled={loading}>
+              <Button 
+                onClick={onClose} 
+                disabled={loading}
+                style={{ marginRight: '8px' }}
+              >
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit" loading={loading}>
-                Submit
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                loading={loading}
+              >
+                Create
               </Button>
             </div>
           </Form>

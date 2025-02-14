@@ -1,96 +1,110 @@
-import React, { useState } from 'react';
-import { Modal, Form, Input, Button, message } from 'antd';
+import React from 'react';
+import { Input, Button, Row, Col } from 'antd';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
-const ResetPassword = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [form] = Form.useForm();
-
-  const showModal = () => {
-    setIsModalVisible(true);
+const ResetPassword = ({ onClose }) => {
+  const initialValues = {
+    password: '',
+    confirmPassword: '',
   };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
-    form.resetFields();
-  };
+  const validationSchema = Yup.object({
+    password: Yup.string()
+      .min(8, 'Password must be at least 8 characters')
+      .matches(/\d/, 'Password must have at least one number')
+      .required('Password is required'),
+    confirmPassword: Yup.string()
+      .oneOf([Yup.ref('password'), null], 'Passwords must match')
+      .required('Please confirm your password'),
+  });
 
-  const handleReset = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        if (values.password !== values.confirmPassword) {
-          message.error('Passwords do not match');
-          return;
-        }
-        // Logic for resetting the password goes here
-        message.success('Password reset successfully!');
-        setIsModalVisible(false);
-        form.resetFields();
-      })
-      .catch((error) => {
-        console.error('Validation failed:', error);
-      });
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    try {
+      // Logic for resetting the password goes here
+      console.log('Password reset values:', values);
+      resetForm();
+    } catch (error) {
+      console.error('Reset password failed:', error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <div>
-      {/* <Button type="primary" onClick={showModal}>
-        Reset Password
-      </Button> */}
-{/* 
-      <Modal
-        title="Reset Password"
-        visible={isModalVisible}
-        onCancel={handleCancel}
-        footer={null}
-        centered
-      > */}
-        <Form
-          form={form}
-          layout="vertical"
-          name="reset_password_form"
-          initialValues={{ remember: true }}
-        >
-                  <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+    <div className=" bg-white max-w-2xl mx-auto">
+      {/* <h1 className="text-2xl font-bold mb-6">Reset Password</h1> */}
+      
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ isSubmitting }) => (
+          <Form className="space-y-6">
+            <div className="border-t border-gray-200 my-6"></div>
 
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[{ required: true, message: 'Please enter a password!' }]}
-          >
-            <Input.Password placeholder="Enter Password" />
-          </Form.Item>
+            <Row gutter={[24, 24]}>
+                <Col xs={24} sm={24} >
+                <div className="form-item">
+                <label className="font-semibold">New Password <span className="text-red-500">*</span></label>
+                  <Field name="password">
+                    {({ field }) => (
+                      <Input.Password
+                        {...field}
+                        placeholder="Enter new password"
+                        className="w-full rounded-md mt-1"
+                        size="large"
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="mt-1 text-sm text-red-600"
+                  />
+                </div>
+              </Col>
 
-          <Form.Item
-            name="confirmPassword"
-            label="Confirm Password"
-            rules={[
-              { required: true, message: 'Please confirm your password!' },
-            ]}
-          >
-            <Input.Password placeholder="Enter Confirm Password" />
-          </Form.Item>
+              <Col xs={24} sm={24} >
+                <div className="form-item">
+                <label className="font-semibold">Confirm Password <span className="text-red-500">*</span></label>
+                  <Field name="confirmPassword">
+                    {({ field }) => (
+                      <Input.Password
+                        {...field}
+                        placeholder="Confirm new password"
+                        className="w-full rounded-md mt-1"
+                        size="large"
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="confirmPassword"
+                    component="div"
+                    className="mt-1 text-sm text-red-600"
+                  />
+                </div>
+              </Col>
+            </Row>
 
-          <Form.Item>
-            <div className="form-buttons text-right">
-              <Button
-                type="default"
-                onClick={handleCancel}
-                style={{ marginRight: '10px' }}
-              >
+            <div className="flex justify-end space-x-4 mt-6">
+            <Button type="default" className="mr-2" onClick={onClose}>
                 Cancel
               </Button>
               <Button
                 type="primary"
-                onClick={handleReset}
-                // style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+                htmlType="submit"
+                loading={isSubmitting}
+                // size="large"
+                className="mr-2"
               >
-                Reset
+                Reset Password
               </Button>
             </div>
-          </Form.Item>
-        </Form>
-      {/* </Modal> */}
+          </Form>
+        )}
+      </Formik>
     </div>
   );
 };

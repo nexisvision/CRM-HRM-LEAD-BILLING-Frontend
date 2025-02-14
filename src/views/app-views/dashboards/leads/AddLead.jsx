@@ -74,7 +74,7 @@ const currenciesState = useSelector((state) => state.currencies);
 
   const AllLoggedData = useSelector((state) => state.user);
   const loggedInUserId = AllLoggedData?.loggedInUser?.id;
-  const countries = useSelector((state) => state.countries.countries);
+  const countries = useSelector((state) => state.countries.countries?.data || []);
 
   const fetchLables = async (lableType, setter) => {
     try {
@@ -146,6 +146,7 @@ const currenciesState = useSelector((state) => state.currencies);
     lastName: "",
     telephone: "",
     email: "",
+    leadStage: "",
     leadValue: "",
     currencyIcon: "",
     assigned: "",
@@ -178,12 +179,15 @@ const currenciesState = useSelector((state) => state.currencies);
     firstName: Yup.string().required("First name is required"),
     lastName: Yup.string().required("Last Name is required"),
     telephone: Yup.string()
-      .typeError("Please enter a valid number")
+      .required("Please enter a valid number")
       .nullable(),
-    email: Yup.string().email("Please enter a valid email address").nullable(),
+    email: Yup.string().required("Please enter a valid email address").nullable(),
+    leadStage: Yup.string().required("Lead Stage is required"),
     leadValue: Yup.number().typeError("Lead Value must be a number").nullable(),
     currencyIcon: Yup.string().nullable(),
     employee: Yup.string().required("Employee is required"),
+    category: Yup.string().required("Category is required"),
+    assigned: Yup.string().required("Assigned is required"),
     status: Yup.string().required("Status is required"),
 
     // Details section
@@ -310,12 +314,13 @@ const currenciesState = useSelector((state) => state.currencies);
             <Row gutter={16}>
               <Col span={24}>
                 <div className="form-item">
-                  <label className="font-semibold flex">
+                  <label className="font-semibold flex mt-3">
                     Lead Title <h1 className="text-rose-500">*</h1>
                   </label>
                   <Field
                     name="leadTitle"
                     as={Input}
+                    className="mt-1"
                     placeholder="Enter Lead Title"
                   />
                   <ErrorMessage
@@ -325,7 +330,7 @@ const currenciesState = useSelector((state) => state.currencies);
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold flex">
                     First Name<h1 className="text-rose-500">*</h1>
@@ -333,6 +338,7 @@ const currenciesState = useSelector((state) => state.currencies);
                   <Field
                     name="firstName"
                     as={Input}
+                    className="mt-1"
                     placeholder="Enter First Name"
                   />
                   <ErrorMessage
@@ -342,7 +348,7 @@ const currenciesState = useSelector((state) => state.currencies);
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold flex">
                     Last Name<h1 className="text-rose-500">*</h1>
@@ -350,6 +356,7 @@ const currenciesState = useSelector((state) => state.currencies);
                   <Field
                     name="lastName"
                     as={Input}
+                    className="mt-1"
                     placeholder="Enter Last Name"
                   />
                   <ErrorMessage
@@ -359,21 +366,28 @@ const currenciesState = useSelector((state) => state.currencies);
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Telephone</label>
+                  <label className="font-semibold">Telephone
+                    <span className="text-rose-500">*</span>
+                  </label>
                   <div className="flex">
                     <Select
                       style={{ width: '30%', marginRight: '8px' }}
                       placeholder="Code"
                       name="phoneCode"
+                      className="mt-1"
                       onChange={(value) => setFieldValue('phoneCode', value)}
                     >
-                      {countries.map((country) => (
-                        <Option key={country.id} value={country.phoneCode}>
-                          (+{country.phoneCode})
-                        </Option>
-                      ))}
+                      {Array.isArray(countries) && countries.length > 0 ? (
+                        countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            (+{country.phoneCode})
+                          </Option>
+                        ))
+                      ) : (
+                        <Option value="" disabled>Loading country codes...</Option>
+                      )}
                     </Select>
                     <Field
                       name="telephone"
@@ -391,13 +405,14 @@ const currenciesState = useSelector((state) => state.currencies);
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label
                     htmlFor="leadStage"
                     className="block text-sm font-medium text-gray-700"
                   >
                     Lead Stage
+                    <span className="text-rose-500">*</span>
                   </label>
                   <div className="flex gap-2">
                     {fndata ? (
@@ -406,7 +421,7 @@ const currenciesState = useSelector((state) => state.currencies);
                           <Select
                             {...field}
                             id="leadStage"
-                            className="w-full"
+                            className="w-full mt-1"
                             placeholder="Select Lead Stage"
                             onChange={(value) =>
                               form.setFieldValue("leadStage", value)
@@ -439,12 +454,13 @@ const currenciesState = useSelector((state) => state.currencies);
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Email Address</label>
+                  <label className="font-semibold">Email Address <span className="text-rose-500">*</span></label>
                   <Field
                     name="email"
                     as={Input}
+                    className="mt-2"
                     placeholder="Enter Email Address"
                   />
                   <ErrorMessage
@@ -455,10 +471,10 @@ const currenciesState = useSelector((state) => state.currencies);
                 </div>
               </Col>
 
-              <Col span={12} className="">
-                              <div className="form-item">
-                                <label className="font-semibold">Lead Value</label>
-                                <Field name="leadValue" component={LeadValueField} />
+              <Col span={12} className="mt-3">
+                              <div className="form-item ">
+                                <label className="font-semibold">Lead Value <span className="text-rose-500">*</span></label>
+                                <Field name="leadValue" component={LeadValueField}  className="mt-1"/>
                                 <ErrorMessage
                                   name="leadValue.amount"
                                   component="div"
@@ -472,15 +488,15 @@ const currenciesState = useSelector((state) => state.currencies);
                               </div>
                             </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={24} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold mb-2">Assigned</label>
+                  <label className="font-semibold mb-2">Assigned <span className="text-rose-500">*</span></label>
                   <div className="flex gap-2">
-                    <Field name="employee">
+                    <Field name="assigned">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full mt-2"
+                          className="w-full mt-1"
                           placeholder="Select Employee"
                           onChange={(value) => {
                             const selectedEmployee =
@@ -503,14 +519,14 @@ const currenciesState = useSelector((state) => state.currencies);
                     </Field>
                   </div>
                   <ErrorMessage
-                    name="employee"
+                    name="assigned"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
                 </div>
               </Col>
 
-              <Col span={24} className="mt-2">
+              <Col span={24} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold flex">
                     Status <h1 className="text-rose-500">*</h1>
@@ -519,7 +535,7 @@ const currenciesState = useSelector((state) => state.currencies);
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-1  "
                         placeholder="Select or add new status"
                         onChange={(value) => setFieldValue("status", value)}
                         value={values.status}
@@ -556,13 +572,13 @@ const currenciesState = useSelector((state) => state.currencies);
                 </div>
               </Col>
               <Col span={24}>
-                      <div className="form-item mt-2">
-                        <label className="font-semibold">Category</label>
+                      <div className="form-item mt-3">
+                        <label className="font-semibold">Category <span className="text-rose-500">*</span></label>
                         <Field name="category">
                           {({ field }) => (
                             <Select
                               {...field}
-                              className="w-full"
+                              className="w-full mt-1"
                               placeholder="Select or add new category"
                               onChange={(value) =>
                                 setFieldValue("category", value)
@@ -601,13 +617,14 @@ const currenciesState = useSelector((state) => state.currencies);
                       </div>
                     </Col>
                     <Col span={24}>
-                      <div className="form-item mt-2">
-                        <label className="font-semibold">Tags</label>
+                      <div className="form-item mt-3">
+                        <label className="font-semibold">Tags <span className="text-rose-500">*</span></label>
                         <Field name="tags">
                           {({ field }) => (
                             <Select
                               mode="multiple"
                               style={{ width: "100%" }}
+                              className="mt-1"
                               // placeholder="Select or add new tags"
                               value={values.tags}
                               onChange={(value) => setFieldValue("tags", value)}
@@ -660,14 +677,14 @@ const currenciesState = useSelector((state) => state.currencies);
                 {details && (
                   <>
                     <Col span={24}>
-                      <div className="mt-2">
-                        <label className="font-semibold">Notes</label>
+                      <div className="mt-3">
+                        <label className="font-semibold">Notes <span className="text-rose-500">*</span></label>
                         <ReactQuill
                           value={values.notes}
                           onChange={(value) => setFieldValue("notes", value)}
                           placeholder="Enter Notes"
                           onBlur={() => setFieldTouched("notes", true)}
-                          className="mt-2 bg-white rounded-md"
+                          className="mt-1 bg-white rounded-md"
                         />
                         <ErrorMessage
                           name="notes"
@@ -676,11 +693,11 @@ const currenciesState = useSelector((state) => state.currencies);
                         />
                       </div>
                     </Col>
-                    <Col span={24} className="mt-4">
-                      <label className="font-semibold">Source</label>
+                    <Col span={24} className="mt-3">
+                      <label className="font-semibold">Source <span className="text-rose-500">*</span></label>
                       <Select
                         placeholder="Select Source"
-                        className="w-full"
+                        className="w-full mt-1"
                         onChange={(value) => console.log("Selected:", value)}
                       >
                         {datas.map((source) => (
@@ -692,12 +709,12 @@ const currenciesState = useSelector((state) => state.currencies);
                     </Col>
                     
                     <Col span={24}>
-                      <div className="form-item  mt-2 border-b pb-3">
+                      <div className="form-item  mt-3 border-b pb-3">
                         <label className="font-semibold">
-                          Last lastContacted
+                          Last Contacted <span className="text-rose-500">*</span>
                         </label>
                         <DatePicker
-                          className="w-full"
+                          className="w-full mt-1"
                           format="DD-MM-YYYY"
                           value={values.lastContacted}
                           onChange={(date) =>
@@ -754,13 +771,14 @@ const currenciesState = useSelector((state) => state.currencies);
                       </Col>
                     </div>
                     <div className="mt-2">
-                      <Col span={24} className="mt-2">
+                      <Col span={24} className="mt-3">
                         <div className="form-item">
-                          <label className="font-semibold">Total Budget</label>
+                          <label className="font-semibold">Total Budget <span className="text-rose-500">*</span></label>
                           <Field
                             name="totalBudget"
                             as={Input}
-                            placeholder="Enter Total Budget"
+                                placeholder="Enter Total Budget"
+                            className="mt-1"
                           />
                           <ErrorMessage
                             name="totalBudget"
@@ -772,10 +790,10 @@ const currenciesState = useSelector((state) => state.currencies);
                     </div>
                     <div className="mt-2">
                       <Col span={24}>
-                        <div className="form-item mt-2">
-                          <label className="font-semibold">Target Date</label>
+                        <div className="form-item mt-3  ">
+                          <label className="font-semibold">Target Date <span className="text-rose-500">*</span></label>
                           <DatePicker
-                            className="w-full"
+                            className="w-full mt-1"
                             format="DD-MM-YYYY"
                             value={values.targetDate}
                             onChange={(date) =>
@@ -792,14 +810,14 @@ const currenciesState = useSelector((state) => state.currencies);
                       </Col>
                     </div>
                     <div>
-                      <Col span={24} className="mt-2">
-                        <div className="form-item mt-2">
-                          <label className="font-semibold">Content Type</label>
+                      <Col span={24} className="mt-3">
+                        <div className="form-item mt-3">
+                          <label className="font-semibold">Content Type <span className="text-rose-500">*</span></label>
                           <Field name="contentType">
                             {({ field }) => (
                               <Select
                                 {...field}
-                                className="w-full"
+                                className="w-full mt-1"
                                 placeholder="Select Content Type"
                                 onChange={(value) =>
                                   setFieldValue("contentType", value)
@@ -824,14 +842,14 @@ const currenciesState = useSelector((state) => state.currencies);
                       </Col>
                     </div>
                     <div className="mt-2">
-                      <Col span={24} className="mt-2 border-b pb-3">
+                      <Col span={24} className="mt-3 border-b pb-3">
                         <div className="form-item">
-                          <label className="font-semibold">Brand Name</label>
+                          <label className="font-semibold">Brand Name <span className="text-rose-500">*</span></label>
                           <Field
                             name="brandName"
                             as={Input}
                             placeholder="Enter Brand Name"
-                            className="w-full"
+                            className="w-full mt-1"
                           />
                           <ErrorMessage
                             name="brandName"
@@ -862,7 +880,7 @@ const currenciesState = useSelector((state) => state.currencies);
                 Cancel
               </Button>
               <Button type="primary" htmlType="submit">
-                Create
+                Update
               </Button>
             </div>
 

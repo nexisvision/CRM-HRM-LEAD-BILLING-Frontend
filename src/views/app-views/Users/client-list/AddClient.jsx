@@ -1,16 +1,26 @@
 import React, { useState } from "react";
-import { Modal, Form, Input, Switch, Button, Row, Col, message } from "antd";
+import { Modal, Input, Switch, Button, Row, Col, message } from "antd";
 import { useDispatch } from "react-redux";
-import { addClient, ClientData, empdata } from "./CompanyReducers/CompanySlice";
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
+import { addClient, ClientData } from "./CompanyReducers/CompanySlice";
 import axios from "axios";
 
 const AddClient = ({ visible, onClose, onCreate }) => {
-  const [form] = Form.useForm();
   const dispatch = useDispatch();
   const [showOtpModal, setShowOtpModal] = useState(false);
-
   const [otpToken, setOtpToken] = useState(null);
   const [otp, setOtp] = useState("");
+
+  const validationSchema = Yup.object().shape({
+    username: Yup.string()
+      .required('Please enter the client name'),
+    email: Yup.string()
+      .email('Please enter a valid email address')
+      .required('Please enter the client email'),
+    password: Yup.string()
+      .required('Please enter the client password')
+  });
 
   const otpapi = async (otp) => {
     try {
@@ -51,18 +61,18 @@ const AddClient = ({ visible, onClose, onCreate }) => {
     }
   };
 
-  const handleFinish = async (values) => {
+  const handleFinish = async (values, { resetForm }) => {
     try {
       const response = await dispatch(addClient(values));
       if (response.payload?.data?.sessionToken) {
         setOtpToken(response.payload?.data?.sessionToken);
         message.success("Employee added successfully! Please verify OTP.");
-        setShowOtpModal(true); // Show OTP modal when user is added
-        onClose(); // Close the form modal
+        setShowOtpModal(true);
+        onClose();
       }
-      onCreate(values); // Callback after user creation
-      form.resetFields();
-      dispatch(ClientData()); // Refetch user list after addition
+      onCreate(values);
+      resetForm();
+      dispatch(ClientData());
     } catch (error) {
       message.error("Failed to add employee. Please try again.");
     }
@@ -77,59 +87,92 @@ const AddClient = ({ visible, onClose, onCreate }) => {
 
   return (
     <div>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleFinish}
+      <Formik
         initialValues={{
-          loginEnabled: true,
+          username: '',
+          email: '',
+          password: '',
+          loginEnabled: true
         }}
+        validationSchema={validationSchema}
+        onSubmit={handleFinish}
       >
-        <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+        {({ errors, touched }) => (
+          <Form>
+            <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+            
+            <Row gutter={16}>
+              <Col span={12}>
+                <div className="form-group">
+                  <label htmlFor="username" className="font-semibold">Name <span className="text-red-500">*</span></label>
+                  <Field name="username">
+                    {({ field }) => (
+                      <Input 
+                        {...field} 
+                        placeholder="Enter client Name"
+                        className="mt-1"
+                        status={errors.username && touched.username ? "error" : ""}
+                      />
+                    )}
+                  </Field>
+                  {errors.username && touched.username && (
+                    <div className="error-message">{errors.username}</div>
+                  )}
+                </div>
+              </Col>
 
-        <Form.Item
-          name="username"
-          label="Name"
-          rules={[{ required: true, message: "Please enter the client name" }]}
-        >
-          <Input placeholder="Enter client Name" />
-        </Form.Item>
+              <Col span={12}  >
+                <div className="form-group">
+                  <label htmlFor="email" className="font-semibold">Email Address <span className="text-red-500">*</span></label>
+                  <Field name="email">
+                    {({ field }) => (
+                      <Input 
+                        {...field} 
+                        placeholder="Enter Client Email"
+                        className="mt-1"
+                        status={errors.email && touched.email ? "error" : ""}
+                      />
+                    )}
+                  </Field>
+                  {errors.email && touched.email && (
+                    <div className="error-message">{errors.email}</div>
+                  )}
+                </div>
+              </Col>
 
-        <Form.Item
-          name="email"
-          label="E-Mail Address"
-          rules={[
-            { required: true, message: "Please enter the client email" },
-            { type: "email", message: "Please enter a valid email address" },
-          ]}
-        >
-          <Input placeholder="Enter Client Email" />
-        </Form.Item>
-        <Form.Item
-          name="password"
-          label="Password"
-          rules={[
-            {
-              message: "Please enter the client password",
-            },
-          ]}
-        >
-          <Input.Password placeholder="Enter Client Password" />
-        </Form.Item>
+                <Col span={12} className="mt-3">
+                <div className="form-group">
+                  <label htmlFor="password" className="font-semibold">Password <span className="text-red-500">*</span></label>
+                  <Field name="password">
+                    {({ field }) => (
+                      <Input.Password 
+                        {...field} 
+                        placeholder="Enter Client Password"
+                        className="mt-1"
+                        status={errors.password && touched.password ? "error" : ""}
+                      />
+                    )}
+                  </Field>
+                  {errors.password && touched.password && (
+                    <div className="error-message">{errors.password}</div>
+                  )}
+                </div>
+              </Col>
+            </Row>
 
-        <Form.Item>
-          <Row justify="end" gutter={16}>
-            <Col>
-              <Button onClick={onClose}>Cancel</Button>
-            </Col>
-            <Col>
-              <Button type="primary" htmlType="submit" onClick={onOpenOtpModal}>
-                Create
-              </Button>
-            </Col>
-          </Row>
-        </Form.Item>
-      </Form>
+            <Row justify="end" gutter={16} style={{ marginTop: '20px' }}>
+              <Col>
+                <Button onClick={onClose}>Cancel</Button>
+              </Col>
+              <Col>
+                <Button type="primary" htmlType="submit">
+                  Create
+                </Button>
+              </Col>
+            </Row>
+          </Form>
+        )}
+      </Formik>
       <Modal
         title="Verify OTP"
         visible={showOtpModal} // Control visibility based on showOtpModal state
@@ -163,179 +206,3 @@ const AddClient = ({ visible, onClose, onCreate }) => {
 };
 
 export default AddClient;
-
-// import React, { useState } from "react";
-// import { Modal, Form, Input, Switch, Button, Row, Col } from "antd";
-
-// const AddClient = ({ visible, onCancel, onCreate }) => {
-//   const [form] = Form.useForm();
-//   const [loginEnabled, setLoginEnabled] = useState(true); // State for tracking the Switch
-
-//   const handleFinish = (values) => {
-//     console.log("Client Data:", values);
-//     onCreate(values); // Pass form values to the parent component
-//     form.resetFields();
-//   };
-
-//   const handleSwitchChange = (checked) => {
-//     setLoginEnabled(checked); // Update the loginEnabled state based on Switch toggle
-//   };
-
-//   return (
-//     <Form
-//       form={form}
-//       layout="vertical"
-//       onFinish={handleFinish}
-//       initialValues={{
-//         loginEnabled: true,
-//       }}
-//     >
-//       <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
-
-//       <Form.Item
-//         name="name"
-//         label="Name"
-//         rules={[{ required: true, message: "Please enter the client name" }]}
-//       >
-//         <Input placeholder="Enter client Name" />
-//       </Form.Item>
-
-//       <Form.Item
-//         name="email"
-//         label="E-Mail Address"
-//         rules={[
-//           { required: true, message: "Please enter the client email" },
-//           { type: "email", message: "Please enter a valid email address" },
-//         ]}
-//       >
-//         <Input placeholder="Enter Client Email" />
-//       </Form.Item>
-
-//       <Form.Item
-//         name="loginEnabled"
-//         label="Login is enabled"
-//         valuePropName="checked"
-//       >
-//         <Switch onChange={handleSwitchChange} />
-//       </Form.Item>
-
-//       {/* Conditionally render password field based on loginEnabled state */}
-//       {loginEnabled && (
-//         <Form.Item
-//           name="password"
-//           label="Password"
-//           rules={[
-//             {
-//               required: loginEnabled,
-//               message: "Please enter the client password",
-//             },
-//           ]}
-//         >
-//           <Input.Password placeholder="Enter Client Password" />
-//         </Form.Item>
-//       )}
-
-//       <Form.Item>
-//         <Row justify="end" gutter={16}>
-//           <Col>
-//             <Button onClick={onCancel}>Cancel</Button>
-//           </Col>
-//           <Col>
-//             <Button type="primary" htmlType="submit">
-//               Create
-//             </Button>
-//           </Col>
-//         </Row>
-//       </Form.Item>
-//     </Form>
-//   );
-// };
-
-// export default AddClient;
-
-// import React from "react";
-// import { Modal, Form, Input, Switch, Button, Row, Col } from "antd";
-
-// const AddClient = ({ visible, onCancel, onCreate }) => {
-//   const [form] = Form.useForm();
-
-//   const handleFinish = (values) => {
-//     console.log("Client Data:", values);
-//     onCreate(values); // Pass form values to the parent component
-//     form.resetFields();
-//   };
-
-//   return (
-//     // <Modal
-//     //   title="Create"
-//     //   visible={visible}
-//     //   onCancel={onCancel}
-//     //   footer={null}
-//     //   centered
-//     //   destroyOnClose
-//     // >
-//       <Form
-//         form={form}
-//         layout="vertical"
-//         onFinish={handleFinish}
-//         initialValues={{
-//           loginEnabled: true,
-//         }}
-//       >
-//         <Form.Item
-//           name="name"
-//           label="Name"
-//           rules={[
-//             { required: true, message: "Please enter the client name" },
-//           ]}
-//         >
-//           <Input placeholder="Enter client Name" />
-//         </Form.Item>
-
-//         <Form.Item
-//           name="email"
-//           label="E-Mail Address"
-//           rules={[
-//             { required: true, message: "Please enter the client email" },
-//             { type: "email", message: "Please enter a valid email address" },
-//           ]}
-//         >
-//           <Input placeholder="Enter Client Email" />
-//         </Form.Item>
-
-//         <Form.Item
-//           name="loginEnabled"
-//           label="Login is enable"
-//           valuePropName="checked"
-//         >
-//           <Switch />
-//         </Form.Item>
-
-//         <Form.Item
-//           name="password"
-//           label="Password"
-//           rules={[
-//             { required: true, message: "Please enter the client password" },
-//           ]}
-//         >
-//           <Input.Password placeholder="Enter Client Password" />
-//         </Form.Item>
-
-//         <Form.Item>
-//           <Row justify="end" gutter={16}>
-//             <Col>
-//               <Button onClick={onCancel}>Cancel</Button>
-//             </Col>
-//             <Col>
-//               <Button type="primary" htmlType="submit">
-//                 Create
-//               </Button>
-//             </Col>
-//           </Row>
-//         </Form.Item>
-//       </Form>
-//     // </Modal>
-//   );
-// };
-
-// export default AddClient;

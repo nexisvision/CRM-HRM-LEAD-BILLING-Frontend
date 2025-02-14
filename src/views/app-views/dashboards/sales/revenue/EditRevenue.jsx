@@ -196,11 +196,11 @@ const EditRevenue = ({ idd, onClose }) => {
             {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
               <Form className="formik-form" onSubmit={handleSubmit}>
                 <Row gutter={16}>
-                  <Col span={12} className="mt-2">
+                  <Col span={12} className="">
                     <div className="form-item">
                       <label className="font-semibold"> Date</label>
                       <DatePicker
-                        className="w-full"
+                        className="w-full mt-1"
                         format="DD-MM-YYYY"
                         value={values.date}
                         onChange={(date) => setFieldValue("date", date)}
@@ -213,7 +213,7 @@ const EditRevenue = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-2">
+                  <Col span={12} className="">
                     <div className="form-item">
                       <label className="font-semibold">Amount</label>
                       <Field
@@ -221,6 +221,7 @@ const EditRevenue = ({ idd, onClose }) => {
                         type="number"
                         step="0.01"
                         min="0"
+                        className="mt-1"
                         as={Input}
                         placeholder="Enter Amount"
                         onChange={(e) => {
@@ -238,13 +239,14 @@ const EditRevenue = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-2">
+                  <Col span={12} className="mt-3">
                     <div className="form-item">
                       <label className="font-semibold">Account</label>
                       <Field name="account">
                         {({ field }) => (
                           <Input
                             {...field}
+                            className="mt-1"
                             placeholder="Select Account"
                             maxLength={18}
                             // onChange={(e) => {
@@ -265,14 +267,14 @@ const EditRevenue = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-2">
+                  <Col span={12} className="mt-3">
                     <div className="form-item">
                       <label className="font-semibold">Customer</label>
                       <Field name="customer">
                         {({ field }) => (
                           <Select
                             {...field}
-                            className="w-full"
+                            className="w-full mt-1"
                             placeholder="Select Customer"
                             loading={!fnddatas} // Loading state
                             onChange={(value) =>
@@ -302,13 +304,14 @@ const EditRevenue = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={24} className="mt-2">
+                  <Col span={24} className="mt-3">
                     <div className="form-item">
                       <label className="font-semibold">Description</label>
                       <Field name="description">
                         {({ field }) => (
                           <ReactQuill
                             {...field}
+                            className="mt-1"
                             value={values.description}
                             onChange={(value) =>
                               setFieldValue("description", value)
@@ -325,10 +328,11 @@ const EditRevenue = ({ idd, onClose }) => {
                     </div>
                   </Col>
                   <Col span={24}>
-                    <div className="form-item mt-2">
+                    <div className="form-item mt-3">
                       <label className="font-semibold">Category</label>
                       <Select
                         style={{ width: "100%" }}
+                        className="mt-1"
                         placeholder="Select or add new category"
                         value={values.category}
                         onChange={(value) => setFieldValue("category", value)}
@@ -361,7 +365,7 @@ const EditRevenue = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-2">
+                  <Col span={12} className="mt-3">
                     <div className="form-item">
                       <label className="font-semibold">Currency</label>
                       <div className="flex gap-2">
@@ -369,7 +373,7 @@ const EditRevenue = ({ idd, onClose }) => {
                           {({ field, form }) => (
                             <Select
                               {...field}
-                              className="w-full"
+                              className="w-full mt-1"
                               placeholder="Select Currency"
                               loading={!Array.isArray(currencies)}
                               onChange={(value) => {
@@ -403,14 +407,15 @@ const EditRevenue = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-2">
+                  <Col span={12} className="mt-3">
                     <div className="form-item">
                       <label className="font-semibold">Payment Receipt</label>
                       <Field
                         name="paymentReceipt"
                         type="file"
-                        as={Input}
+                        // as={Input}
                         placeholder="Enter payment receipt"
+                        className="mt-2"
                       />
                       <ErrorMessage
                         name="paymentReceipt"

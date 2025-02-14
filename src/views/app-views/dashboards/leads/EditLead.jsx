@@ -1,36 +1,67 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Input,
   Button,
   DatePicker,
   Select,
+  message,
   Row,
   Col,
-  message,
+  Switch,
+  Upload,
   Card,
   Modal,
 } from "antd";
-import { useNavigate } from "react-router-dom";
-import ReactQuill from "react-quill";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
+import { useNavigate, useParams } from "react-router-dom";
 import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import "react-quill/dist/quill.snow.css";
-import moment from "moment";
-import { useSelector } from "react-redux";
-import { GetLeads, LeadsEdit } from "./LeadReducers/LeadSlice";
-import { useDispatch } from "react-redux";
+import ReactQuill from "react-quill";
+import utils from "utils";
+import OrderListData from "assets/data/order-list.data.json";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import { GetLeads, LeadsAdd } from "./LeadReducers/LeadSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
-import { GetLable,AddLable } from "../project/milestone/LableReducer/LableSlice";
+import { GetLable, AddLable } from "../project/milestone/LableReducer/LableSlice";
+import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
+
 const { Option } = Select;
 
-const EditLead = ({ onUpdateLead, id, onClose }) => {
+const EditLead = ({ onClose }) => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const [details, setDetails] = useState(false);
   const [info, setInfo] = useState(false);
   const [organisation, setorganisation] = useState(false);
+  const dispatch = useDispatch();
+ 
+//  const { currencies } = useSelector((state) => state.currencies);
+const currenciesState = useSelector((state) => state.currencies);
+  const currencies = currenciesState?.currencies?.data || [];
+  // 
+  // const { data: employee } = useSelector((state) => state.employee.employee);
+  
+  useEffect(()=>{
+    dispatch(empdata())
+  },[dispatch])
+
+
+  const filterdata = useSelector((state)=>state.employee.employee.data || []);
+
+  const loggeduser = useSelector((state)=>state.user.loggedInUser.username);
+
+  const employee = filterdata.filter((item)=>item.created_by === loggeduser)
+
+
+  const [selectedCurrency, setSelectedCurrency] = useState(null);
+  const alltagdata = useSelector((state) => state.Lable);
+  const datas = alltagdata.Lable.data || [];
+  const user = useSelector((state) => state.user.loggedInUser);
+
+  // Updated state variables
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
@@ -41,223 +72,9 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
   const [categories, setCategories] = useState([]);
   const [statuses, setStatuses] = useState([]);
 
-  const dispatch = useDispatch();
-
-  const allempdata = useSelector((state) => state.Leads);
-  const datleads = allempdata.Leads.data;
-
-  const project = datleads.find((item) => item.id === id);
-  const currenciesState = useSelector((state) => state.currencies);
-  const currencies = currenciesState?.currencies?.data || [];
-
-  const countries = useSelector((state) => state.countries.countries);
-  const alltagdata = useSelector((state) => state.Lable);
-  const datas = alltagdata.Lable.data || [];
-  const user = useSelector((state) => state.user.loggedInUser);
-  const lid = user?.id;
-
-  // Add state for lead value and currency
-  const [selectedCurrency, setSelectedCurrency] = useState(null);
-
   const AllLoggedData = useSelector((state) => state.user);
   const loggedInUserId = AllLoggedData?.loggedInUser?.id;
-
-    
-    useEffect(()=>{
-      dispatch(empdata())
-    },[dispatch])
-
-
-    const filterdata = useSelector((state)=>state.employee.employee.data || []);
-  
-    const loggeduser = useSelector((state)=>state.user.loggedInUser.username);
-  
-    const employee = filterdata.filter((item)=>item.created_by === loggeduser)
-
-  // Define initialValues using the project data
-  const initialValues = {
-    leadTitle: project?.leadTitle || "",
-    firstName: project?.firstName || "",
-    lastName: project?.lastName || "",
-    phoneCode: project?.phoneCode || "",
-    telephone: project?.telephone || "",
-    email: project?.email || "",
-    leadValue: project?.leadValue || "",
-    currencyId: project?.currencyId || "",
-    employee: project?.employee || "",
-    status: project?.status || "",
-    notes: project?.notes || "",
-    source: project?.source || "",
-    category: project?.category || "",
-    tags: project?.tags || [],
-    lastContacted: project?.lastContacted ? moment(project.lastContacted) : null,
-    totalBudget: project?.totalBudget || "",
-    targetDate: project?.targetDate ? moment(project.targetDate) : null,
-    contentType: project?.contentType || "",
-    brandName: project?.brandName || "",
-    companyName: project?.companyName || "",
-    street: project?.street || "",
-    city: project?.city || "",
-    state: project?.state || ""
-  };
-
-  // Define validation schema
-  const validationSchema = Yup.object({
-    leadTitle: Yup.string().required("Lead Title is required"),
-    firstName: Yup.string().required("First Name is required"),
-    lastName: Yup.string().required("Last Name is required"),
-    telephone: Yup.string()
-      .typeError("Please enter a valid number")
-      .nullable(),
-    email: Yup.string().email("Invalid email format"),
-    leadValue: Yup.number().nullable(),
-    currencyId: Yup.string().nullable(),
-    employee: Yup.string(),
-    status: Yup.string().required("Status is required"),
-    notes: Yup.string(),
-    source: Yup.string(),
-    category: Yup.string(),
-    tags: Yup.array(),
-    lastContacted: Yup.date().nullable(),
-    totalBudget: Yup.string(),
-    targetDate: Yup.date().nullable(),
-    contentType: Yup.string(),
-    brandName: Yup.string(),
-    companyName: Yup.string(),
-    street: Yup.string(),
-    city: Yup.string(),
-    state: Yup.string()
-  });
-
-  useEffect(() => {
-    if (project) {
-      setDetails(
-        !!project.notes ||
-        !!project.source ||
-        !!project.category ||
-        !!project.lastContacted
-      );
-      setInfo(
-        !!project.totalBudget ||
-        !!project.targetDate ||
-        !!project.contentType ||
-        !!project.brandName
-      );
-      setorganisation(
-        !!project.companyName ||
-        !!project.street ||
-        !!project.city ||
-        !!project.state
-      );
-    }
-  }, [project]);
-
-  useEffect(() => {
-    dispatch(getcurren());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(getallcountries());
-  }, [dispatch]);
-
-
-  useEffect(() => {
-    dispatch(empdata());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (lid) {
-      dispatch(GetLable(lid));
-    }
-  }, [dispatch, lid]);
-
-  useEffect(() => {
-    if (loggedInUserId) {
-      fetchLables("tag", setTags);
-      fetchLables("category", setCategories);
-      fetchLables("status", setStatuses);
-    }
-  }, [loggedInUserId]);
-
-  const onSubmit = (values) => {
-    const formData = {
-      ...values,
-      leadValue: values.leadValue ? String(values.leadValue) : null,
-      currencyId: values.currencyId || null,
-      currencyIcon: selectedCurrency?.currencyIcon || null,
-    };
-    dispatch(LeadsEdit({ id, values: formData }))
-      .then(() => {
-        dispatch(GetLeads());
-        // message.success("Lead updated successfully!");
-        onClose();
-      })
-      .catch((error) => {
-        // message.error("Failed to update Employee.");
-        console.error("Edit API error:", error);
-      });
-    const updatedLead = {
-      ...project,
-      ...values,
-    };
-    onUpdateLead(updatedLead);
-  };
-
-  const LeadValueField = ({ field, form }) => (
-    <Col span={24} className="mt-2">
-      <div className="form-item">
-        <div className="flex gap-2">
-          <Field
-            name="leadValue"
-            type="number"
-            as={Input}
-            placeholder="Enter Lead Value"
-            className="w-full"
-          />
-          <Field name="currencyId">
-            {({ field, form }) => (
-              <Select
-                {...field}
-                className="w-full"
-                placeholder="Currency"
-                onChange={(value) => {
-                  form.setFieldValue("currencyId", value);
-                  const selected = currencies.find(c => c.id === value);
-                  setSelectedCurrency(selected);
-                }}
-                value={field.value}
-              >
-                {Array.isArray(currencies) && currencies.length > 0 ? (
-                  currencies.map((currency) => (
-                    <Option
-                      key={currency.id}
-                      value={currency.id}
-                    >
-                      {currency.currencyCode} ({currency.currencyIcon})
-                    </Option>
-                  ))
-                ) : (
-                  <Option value="" disabled>
-                    Loading currencies...
-                  </Option>
-                )}
-              </Select>
-            )}
-          </Field>
-        </div>
-        <ErrorMessage
-          name="leadValue"
-          component="div"
-          className="error-message text-red-500 my-1"
-        />
-        <ErrorMessage
-          name="currencyId"
-          component="div"
-          className="error-message text-red-500 my-1"
-        />
-      </div>
-    </Col>
-  );
+  const countries = useSelector((state) => state.countries.countries?.data || []);
 
   const fetchLables = async (lableType, setter) => {
     try {
@@ -273,6 +90,14 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
       message.error(`Failed to load ${lableType}`);
     }
   };
+
+  useEffect(() => {
+    if (loggedInUserId) {
+      fetchLables("tag", setTags);
+      fetchLables("category", setCategories);
+      fetchLables("status", setStatuses);
+    }
+  }, [loggedInUserId]);
 
   const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
     if (!newValue.trim()) {
@@ -297,27 +122,205 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
     }
   };
 
+  useEffect(() => {
+    dispatch(getcurren());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getstages());
+    dispatch(getallcountries());
+  }, []);
+
+  const allstagedata = useSelector((state) => state.StagesLeadsDeals);
+  const fndata = allstagedata?.StagesLeadsDeals?.data || [];
+
+  const allcurrency = useSelector((state) => state.currencies);
+  const fndcurr = allcurrency?.currencies?.data || [];
+
+  const allcountry = useSelector((state) => state.countries);
+  const fndcountry = allcountry?.countries?.data || [];
+
+  const initialValues = {
+    leadTitle: "",
+    firstName: "",
+    lastName: "",
+    telephone: "",
+    email: "",
+    leadStage: "",
+    leadValue: "",
+    currencyIcon: "",
+    assigned: "",
+    status: "",
+    notes: "",
+    source: "",
+    category: "",
+    lastContacted: null,
+    totalBudget: "",
+    targetDate: null,
+    contentType: "",
+    brandName: "",
+    tags: [],
+  };
+
+  useEffect(() => {
+    dispatch(getcurren());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getallcountries());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(empdata());
+  }, [dispatch]);
+
+  const validationSchema = Yup.object({
+    leadTitle: Yup.string().required("Lead Title is required"),
+    firstName: Yup.string().required("First name is required"),
+    lastName: Yup.string().required("Last Name is required"),
+    telephone: Yup.string()
+      .required("Please enter a valid number")
+      .nullable(),
+    email: Yup.string().required("Please enter a valid email address").nullable(),
+    leadStage: Yup.string().required("Lead Stage is required"),
+    leadValue: Yup.number().typeError("Lead Value must be a number").nullable(),
+    currencyIcon: Yup.string().nullable(),
+    employee: Yup.string().required("Employee is required"),
+    category: Yup.string().required("Category is required"),
+    assigned: Yup.string().required("Assigned is required"),
+    status: Yup.string().required("Status is required"),
+
+    // Details section
+    notes: Yup.string().when("details", {
+      is: true,
+      then: Yup.string().required("Notes are required"),
+    }),
+    source: Yup.string().when("details", {
+      is: true,
+      then: Yup.string().required("Source is required"),
+    }),
+    // category: Yup.string().required("Category is required"),
+    lastContacted: Yup.date().nullable(),
+
+    // Info section
+    totalBudget: Yup.string().when("info", {
+      is: true,
+      then: Yup.string().required("Total Budget is required"),
+    }),
+    targetDate: Yup.date().nullable(),
+    contentType: Yup.string().when("info", {
+      is: true,
+      then: Yup.string().required("Content type is required"),
+    }),
+    brandName: Yup.string().when("info", {
+      is: true,
+      then: Yup.string().required("Brand name is required"),
+    }),
+    tags: Yup.array().min(1, "At least one tag is required"),
+  });
+
+  const onSubmit = (values, { resetForm }) => {
+    const formData = {
+      ...values,
+      leadValue: values.leadValue ? String(values.leadValue) : null,
+      currencyIcon: values.currencyIcon || null,
+    };
+    dispatch(LeadsAdd(formData))
+      .then(() => {
+        dispatch(GetLeads()); // Refresh leave data
+        message.success("Leads added successfully!");
+        resetForm();
+        onClose(); // Close modal
+      })
+      .catch((error) => {
+        // message.error("Failed to add Leads.");
+        console.error("Add API error:", error);
+      });
+  };
+
+ const LeadValueField = ({ field, form }) => (
+     <Col span={24} className="mt-2">
+       <div className="form-item">
+         <div className="flex gap-2">
+           <Field
+             name="leadValue"
+             type="number"
+             as={Input}
+             placeholder="Enter Lead Value"
+             className="w-full"
+           />
+           <Field name="currencyId">
+             {({ field, form }) => (
+               <Select
+                 {...field}
+                 className="w-full"
+                 placeholder="Currency"
+                 onChange={(value) => {
+                   form.setFieldValue("currencyId", value);
+                   const selected = currencies.find(c => c.id === value);
+                   setSelectedCurrency(selected);
+                 }}
+                 value={field.value}
+               >
+                 {Array.isArray(currencies) && currencies.length > 0 ? (
+                   currencies.map((currency) => (
+                     <Option
+                       key={currency.id}
+                       value={currency.id}
+                     >
+                       {currency.currencyCode} ({currency.currencyIcon})
+                     </Option>
+                   ))
+                 ) : (
+                   <Option value="" disabled>
+                     Loading currencies...
+                   </Option>
+                 )}
+               </Select>
+             )}
+           </Field>
+         </div>
+         <ErrorMessage
+           name="leadValue"
+           component="div"
+           className="error-message text-red-500 my-1"
+         />
+         <ErrorMessage
+           name="currencyId"
+           component="div"
+           className="error-message text-red-500 my-1"
+         />
+       </div>
+     </Col>
+   );
+
   return (
-    <div className="edit-lead-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+    <div className="add-job-form">
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
-        enableReinitialize
       >
-        {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
-          <Form onSubmit={handleSubmit}>
+        {({
+          values,
+          setFieldValue,
+          handleSubmit,
+          setFieldTouched,
+          resetForm,
+        }) => (
+          <Form className="formik-form" onSubmit={handleSubmit}>
+            <h2 className="mb-2 border-b font-medium"></h2>
 
             <Row gutter={16}>
               <Col span={24}>
                 <div className="form-item">
-                  <label className="font-semibold flex">
+                  <label className="font-semibold flex mt-3">
                     Lead Title <h1 className="text-rose-500">*</h1>
                   </label>
                   <Field
                     name="leadTitle"
                     as={Input}
+                    className="mt-1"
                     placeholder="Enter Lead Title"
                   />
                   <ErrorMessage
@@ -327,7 +330,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold flex">
                     First Name<h1 className="text-rose-500">*</h1>
@@ -335,6 +338,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                   <Field
                     name="firstName"
                     as={Input}
+                    className="mt-1"
                     placeholder="Enter First Name"
                   />
                   <ErrorMessage
@@ -344,7 +348,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold flex">
                     Last Name<h1 className="text-rose-500">*</h1>
@@ -352,6 +356,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                   <Field
                     name="lastName"
                     as={Input}
+                    className="mt-1"
                     placeholder="Enter Last Name"
                   />
                   <ErrorMessage
@@ -361,21 +366,28 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Telephone</label>
+                  <label className="font-semibold">Telephone
+                    <span className="text-rose-500">*</span>
+                  </label>
                   <div className="flex">
                     <Select
                       style={{ width: '30%', marginRight: '8px' }}
                       placeholder="Code"
                       name="phoneCode"
+                      className="mt-1"
                       onChange={(value) => setFieldValue('phoneCode', value)}
                     >
-                      {countries.map((country) => (
-                        <Option key={country.id} value={country.phoneCode}>
-                          (+{country.phoneCode})
-                        </Option>
-                      ))}
+                      {Array.isArray(countries) && countries.length > 0 ? (
+                        countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            (+{country.phoneCode})
+                          </Option>
+                        ))
+                      ) : (
+                        <Option value="" disabled>Loading country codes...</Option>
+                      )}
                     </Select>
                     <Field
                       name="telephone"
@@ -384,7 +396,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                       style={{ width: '70%' }}
                       placeholder="Enter Telephone"
                     />
-                  </div>
+                  </div> 
                   <ErrorMessage
                     name="telephone"
                     component="div"
@@ -393,12 +405,62 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Email Address</label>
+                  <label
+                    htmlFor="leadStage"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Lead Stage
+                    <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="flex gap-2">
+                    {fndata ? (
+                      <Field name="leadStage">
+                        {({ field, form }) => (
+                          <Select
+                            {...field}
+                            id="leadStage"
+                            className="w-full mt-1"
+                            placeholder="Select Lead Stage"
+                            onChange={(value) =>
+                              form.setFieldValue("leadStage", value)
+                            }
+                          >
+                            {fndata.map((currency) => (
+                              <Option key={currency.id} value={currency.id}>
+                                {currency.stageName}
+                              </Option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
+                    ) : (
+                      <Field
+                        name="leadStage"
+                        type="string"
+                        as={Input}
+                        id="leadStage"
+                        placeholder="Enter Lead Value"
+                        className="w-full"
+                      />
+                    )}
+                  </div>
+                  <ErrorMessage
+                    name="leadStage"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Email Address <span className="text-rose-500">*</span></label>
                   <Field
                     name="email"
                     as={Input}
+                    className="mt-2"
                     placeholder="Enter Email Address"
                   />
                   <ErrorMessage
@@ -409,32 +471,32 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="">
-                <div className="form-item">
-                  <label className="font-semibold">Lead Value</label>
-                  <Field name="leadValue" component={LeadValueField} />
-                  <ErrorMessage
-                    name="leadValue.amount"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                  <ErrorMessage
-                    name="leadValue.currencyId"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+              <Col span={12} className="mt-3">
+                              <div className="form-item ">
+                                <label className="font-semibold">Lead Value <span className="text-rose-500">*</span></label>
+                                <Field name="leadValue" component={LeadValueField}  className="mt-1"/>
+                                <ErrorMessage
+                                  name="leadValue.amount"
+                                  component="div"
+                                  className="error-message text-red-500 my-1"
+                                />
+                                <ErrorMessage
+                                  name="leadValue.currencyId"
+                                  component="div"
+                                  className="error-message text-red-500 my-1"
+                                />
+                              </div>
+                            </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={24} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold mb-2">Assigned</label>
+                  <label className="font-semibold mb-2">Assigned <span className="text-rose-500">*</span></label>
                   <div className="flex gap-2">
-                    <Field name="employee">
+                    <Field name="assigned">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full mt-2"
+                          className="w-full mt-1"
                           placeholder="Select Employee"
                           onChange={(value) => {
                             const selectedEmployee =
@@ -457,14 +519,14 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                     </Field>
                   </div>
                   <ErrorMessage
-                    name="employee"
+                    name="assigned"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
                 </div>
               </Col>
 
-              <Col span={24} className="mt-2">
+              <Col span={24} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold flex">
                     Status <h1 className="text-rose-500">*</h1>
@@ -473,7 +535,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-1  "
                         placeholder="Select or add new status"
                         onChange={(value) => setFieldValue("status", value)}
                         value={values.status}
@@ -495,7 +557,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                         )}
                       >
                         {statuses.map((status) => (
-                          <Option key={status.id} value={status.id}>
+                          <Option key={status.id} value={status.name}>
                             {status.name}
                           </Option>
                         ))}
@@ -509,62 +571,14 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                   />
                 </div>
               </Col>
-
-              <Col span={24} className="mt-4 ">
-                <div className="flex justify-between items-center">
-                  <label className="font-semibold">Details</label>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={details}
-                      onChange={(e) => setDetails(e.target.checked)}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                  </label>
-                </div>
-
-                {details && (
-                  <>
-                    <Col span={24}>
-                      <div className="mt-2">
-                        <label className="font-semibold">Notes</label>
-                        <ReactQuill
-                          value={values.notes}
-                          onChange={(value) => setFieldValue("notes", value)}
-                          placeholder="Enter Notes"
-                          onBlur={() => setFieldTouched("notes", true)}
-                          className="mt-2 bg-white rounded-md"
-                        />
-                        <ErrorMessage
-                          name="notes"
-                          component="div"
-                          className="error-message text-red-500 my-1"
-                        />
-                      </div>
-                    </Col>
-                    <Col span={24} className="mt-4">
-                      <label className="font-semibold">Source</label>
-                      <Select
-                        placeholder="Select Source"
-                        className="w-full"
-                        onChange={(value) => console.log("Selected:", value)}
-                      >
-                        {datas.map((source) => (
-                          <Option key={source.id} value={source.name}>
-                            {source.name}
-                          </Option>
-                        ))}
-                      </Select>
-                    </Col>
-                    <Col span={24}>
-                      <div className="form-item mt-2">
-                        <label className="font-semibold">category</label>
+              <Col span={24}>
+                      <div className="form-item mt-3">
+                        <label className="font-semibold">Category <span className="text-rose-500">*</span></label>
                         <Field name="category">
                           {({ field }) => (
                             <Select
                               {...field}
-                              className="w-full"
+                              className="w-full mt-1"
                               placeholder="Select or add new category"
                               onChange={(value) =>
                                 setFieldValue("category", value)
@@ -603,18 +617,17 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                       </div>
                     </Col>
                     <Col span={24}>
-                      <div className="form-item mt-2">
-                        <label className="font-semibold">Tags</label>
+                      <div className="form-item mt-3">
+                        <label className="font-semibold">Tags <span className="text-rose-500">*</span></label>
                         <Field name="tags">
                           {({ field }) => (
                             <Select
                               mode="multiple"
-                              {...field}
-                              className="w-full"
-                              placeholder="Select or add new tags"
-                              onChange={(value) => setFieldValue("tags", value)}
+                              style={{ width: "100%" }}
+                              className="mt-1"
+                              // placeholder="Select or add new tags"
                               value={values.tags}
-                              onBlur={() => setFieldTouched("tags", true)}
+                              onChange={(value) => setFieldValue("tags", value)}
                               dropdownRender={(menu) => (
                                 <div>
                                   {menu}
@@ -632,7 +645,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                               )}
                             >
                               {tags.map((tag) => (
-                                <Option key={tag.id} value={tag.id}>
+                                <Option key={tag.id} value={tag.name}>
                                   {tag.name}
                                 </Option>
                               ))}
@@ -646,13 +659,62 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                         />
                       </div>
                     </Col>
+              <Col span={24} className="mt-4 ">
+                <div className="flex justify-between items-center">
+                  <label className="font-semibold">Details</label>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={details}
+                      onChange={(e) => setDetails(e.target.checked)}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+                  </label>
+                </div>
+
+                {/* Conditionally show Upload field */}
+                {details && (
+                  <>
                     <Col span={24}>
-                      <div className="form-item  mt-2 border-b pb-3">
+                      <div className="mt-3">
+                        <label className="font-semibold">Notes <span className="text-rose-500">*</span></label>
+                        <ReactQuill
+                          value={values.notes}
+                          onChange={(value) => setFieldValue("notes", value)}
+                          placeholder="Enter Notes"
+                          onBlur={() => setFieldTouched("notes", true)}
+                          className="mt-1 bg-white rounded-md"
+                        />
+                        <ErrorMessage
+                          name="notes"
+                          component="div"
+                          className="error-message text-red-500 my-1"
+                        />
+                      </div>
+                    </Col>
+                    <Col span={24} className="mt-3">
+                      <label className="font-semibold">Source <span className="text-rose-500">*</span></label>
+                      <Select
+                        placeholder="Select Source"
+                        className="w-full mt-1"
+                        onChange={(value) => console.log("Selected:", value)}
+                      >
+                        {datas.map((source) => (
+                          <Option key={source.id} value={source.name}>
+                            {source.name}
+                          </Option>
+                        ))}
+                      </Select>
+                    </Col>
+                    
+                    <Col span={24}>
+                      <div className="form-item  mt-3 border-b pb-3">
                         <label className="font-semibold">
-                          Last lastContacted
+                          Last Contacted <span className="text-rose-500">*</span>
                         </label>
                         <DatePicker
-                          className="w-full"
+                          className="w-full mt-1"
                           format="DD-MM-YYYY"
                           value={values.lastContacted}
                           onChange={(date) =>
@@ -685,6 +747,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                   </label>
                 </div>
 
+                {/* Conditionally show Upload field */}
                 {info && (
                   <>
                     <div className="mt-2">
@@ -708,13 +771,14 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                       </Col>
                     </div>
                     <div className="mt-2">
-                      <Col span={24} className="mt-2">
+                      <Col span={24} className="mt-3">
                         <div className="form-item">
-                          <label className="font-semibold">Total Budget</label>
+                          <label className="font-semibold">Total Budget <span className="text-rose-500">*</span></label>
                           <Field
                             name="totalBudget"
                             as={Input}
-                            placeholder="Enter Total Budget"
+                                placeholder="Enter Total Budget"
+                            className="mt-1"
                           />
                           <ErrorMessage
                             name="totalBudget"
@@ -726,10 +790,10 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                     </div>
                     <div className="mt-2">
                       <Col span={24}>
-                        <div className="form-item mt-2">
-                          <label className="font-semibold">Target Date</label>
+                        <div className="form-item mt-3  ">
+                          <label className="font-semibold">Target Date <span className="text-rose-500">*</span></label>
                           <DatePicker
-                            className="w-full"
+                            className="w-full mt-1"
                             format="DD-MM-YYYY"
                             value={values.targetDate}
                             onChange={(date) =>
@@ -746,14 +810,14 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                       </Col>
                     </div>
                     <div>
-                      <Col span={24} className="mt-2">
-                        <div className="form-item mt-2">
-                          <label className="font-semibold">Content Type</label>
+                      <Col span={24} className="mt-3">
+                        <div className="form-item mt-3">
+                          <label className="font-semibold">Content Type <span className="text-rose-500">*</span></label>
                           <Field name="contentType">
                             {({ field }) => (
                               <Select
                                 {...field}
-                                className="w-full"
+                                className="w-full mt-1"
                                 placeholder="Select Content Type"
                                 onChange={(value) =>
                                   setFieldValue("contentType", value)
@@ -778,14 +842,14 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                       </Col>
                     </div>
                     <div className="mt-2">
-                      <Col span={24} className="mt-2 border-b pb-3">
+                      <Col span={24} className="mt-3 border-b pb-3">
                         <div className="form-item">
-                          <label className="font-semibold">Brand Name</label>
+                          <label className="font-semibold">Brand Name <span className="text-rose-500">*</span></label>
                           <Field
                             name="brandName"
                             as={Input}
                             placeholder="Enter Brand Name"
-                            className="w-full"
+                            className="w-full mt-1"
                           />
                           <ErrorMessage
                             name="brandName"
@@ -809,20 +873,18 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
             <div className="form-buttons text-right mt-4">
               <Button
                 type="default"
+                htmlType="submit"
                 className="mr-2"
-                onClick={() => navigate("/leads")}
+                onClick={() => navigate("/app/apps/project/lead")}
               >
                 Cancel
               </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                onClick={handleSubmit}
-              >
+              <Button type="primary" htmlType="submit">
                 Update
               </Button>
             </div>
 
+            {/* Modals */}
             <Modal
               title="Add New Tag"
               open={isTagModalVisible}
@@ -864,6 +926,7 @@ const EditLead = ({ onUpdateLead, id, onClose }) => {
                 onChange={(e) => setNewStatus(e.target.value)}
               />
             </Modal>
+
           </Form>
         )}
       </Formik>

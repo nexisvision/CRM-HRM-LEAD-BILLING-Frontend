@@ -175,69 +175,72 @@ const EditCustomer = ({ idd, onClose }) => {
             resetForm,
           }) => (
             <Form className="formik-form" onSubmit={handleSubmit}>
-              <Row gutter={16} className="mt-4">
+             <Row gutter={16} className="mt-4">
                 <Col span={24}>
                   <h1 className="font-semibold text-lg">Basic Info</h1>
                 </Col>
 
-                <Col span={8} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Name</label>
-                    <Field name="name" as={Input} placeholder="Enter Name" />
+                    <label className="font-semibold">Name <span className="text-red-500">*</span></label>
+                    <Field name="name" as={Input} placeholder="Enter Name" className="mt-1" />
                     <ErrorMessage
                       name="name"
                       component="div"
-                      className="error-message text-red-500 my-1"
+                      className="error-message text-red-500 my-1 "
                     />
                   </div>
                 </Col>
 
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Contact</label>
+                      <label className="font-semibold">Contact <span className="text-red-500">*</span></label>
                     <div className="flex">
                       <Select
+                        className="mt-1"
                         style={{ width: '30%', marginRight: '8px' }}
                         placeholder="Code"
-                        name="phoneCode"
-                        value={values.phoneCode}
-                        onChange={(value) => setFieldValue('phoneCode', value)}
+                        name="country_code"
+                        onChange={(value) => setFieldValue('country_code', value)}
+                        value={values.country_code}
                       >
                         {countries.map((country) => (
                           <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
+                            +{country.phoneCode}
                           </Option>
                         ))}
                       </Select>
-                      <Field name="contact">
-                        {({ field }) => (
-                          <Input
-                            {...field}
-                            type="number"
-                            style={{ width: '70%' }}
-                            placeholder="Enter Contact"
-                            onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'contact')}
-                            onKeyPress={(e) => {
-                              if (!/[0-9]/.test(e.key)) {
-                                e.preventDefault();
-                              }
-                            }}
-                          />
-                        )}
-                      </Field>
+                      <Field
+                        name="contact"
+                        as={Input}
+                        type="number"
+                        className="mt-1"
+                        maxLength={10}
+                        style={{ width: '70%' }}
+                        placeholder="Enter Contact"
+                        onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'contact')}
+
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                      
                     </div>
                     <ErrorMessage
-                      name="contact"
+                      name="country_code"
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
+                   
                   </div>
                 </Col>
 
-                <Col span={8} className="mt-2">
+                <Col span={8} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Email</label>
-                    <Field name="email" as={Input} placeholder="Enter Email" />
+                    <label className="font-semibold">Email <span className="text-red-500">*</span></label>
+                    <Field name="email" as={Input} placeholder="Enter Email" className="mt-1" />
                     <ErrorMessage
                       name="email"
                       component="div"
@@ -246,13 +249,14 @@ const EditCustomer = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={8} className="mt-2">
+                  <Col span={8} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Tax Number</label>
+                    <label className="font-semibold">Tax Number <span className="text-red-500">*</span> </label>
                     <Field
                       name="taxnumber"
                       as={Input}
                       placeholder="Enter Tax Number"
+                      className="mt-1"
                     />
                     <ErrorMessage
                       name="taxnumber"
@@ -262,31 +266,33 @@ const EditCustomer = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={8} className="mt-2">
+                <Col span={8} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Alternate Mobile Number</label>
                     <div className="flex">
                       <Select
+                        className="mt-1"
                         style={{ width: '30%', marginRight: '8px' }}
                         placeholder="Code"
-                        name="alternate_code"
-                        value={values.alternate_code}
-                        onChange={(value) => setFieldValue('alternate_code', value)}
+                        name="alternate_country_code"
+                        onChange={(value) => setFieldValue('alternate_country_code', value)}
                       >
                         {countries.map((country) => (
                           <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
+                            +{country.phoneCode}
                           </Option>
                         ))}
                       </Select>
-                      <Field name="alternate_number">
+                      <Field name="alternatemobilenumber">
                         {({ field }) => (
                           <Input
                             {...field}
                             type="number"
+                            className="mt-1"
                             style={{ width: '70%' }}
-                            placeholder="Enter Alternate Number"
-                            onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'alternate_number')}
+                            placeholder="Enter Alternate Mobile Number"
+                            maxLength={10}
+                            onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'alternatemobilenumber')}
                             onKeyPress={(e) => {
                               if (!/[0-9]/.test(e.key)) {
                                 e.preventDefault();
@@ -297,7 +303,7 @@ const EditCustomer = ({ idd, onClose }) => {
                       </Field>
                     </div>
                     <ErrorMessage
-                      name="alternate_number"
+                      name="alternatemobilenumber"
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
@@ -308,13 +314,14 @@ const EditCustomer = ({ idd, onClose }) => {
                   <h1 className="font-semibold text-lg">Billing Address</h1>
                 </Col>
 
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Name</label>
+                    <label className="font-semibold">Name <span className="text-red-500">*</span></label>
                     <Field
                       name="billing_name"
                       as={Input}
                       placeholder="Enter Name"
+                      className="mt-1"
                     />
                     <ErrorMessage
                       name="billing_name"
@@ -324,39 +331,39 @@ const EditCustomer = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Billing Phone</label>
+                    <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
                     <div className="flex">
                       <Select
+                        className="mt-1"
                         style={{ width: '30%', marginRight: '8px' }}
                         placeholder="Code"
-                        name="billing_code"
-                        value={values.billing_code}
-                        onChange={(value) => setFieldValue('billing_code', value)}
+                        name="billing_country_code"
+                        onChange={(value) => setFieldValue('billing_country_code', value)}
+                        value={values.billing_country_code}
                       >
                         {countries.map((country) => (
                           <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
+                            +{country.phoneCode}
                           </Option>
                         ))}
                       </Select>
-                      <Field name="billing_phone">
-                        {({ field }) => (
-                          <Input
-                            {...field}
-                            type="number"
-                            style={{ width: '70%' }}
-                            placeholder="Enter Billing Phone"
-                            onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'billing_phone')}
-                            onKeyPress={(e) => {
-                              if (!/[0-9]/.test(e.key)) {
-                                e.preventDefault();
-                              }
-                            }}
-                          />
-                        )}
-                      </Field>
+                      <Field
+                        name="billing_phone"
+                        as={Input}
+                        type="number"
+                        className="mt-1"
+                        maxLength={10}
+                        style={{ width: '70%' }}
+                        placeholder="Enter phone"
+                        onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'billing_phone')}
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
                     </div>
                     <ErrorMessage
                       name="billing_phone"
@@ -366,26 +373,26 @@ const EditCustomer = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={24} className="mt-2 ">
+                <Col span={24} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Address</label>
-                    <Field name="billing_address" as={Input} placeholder="Enter Address" className="h-24" />
+                    <label className="font-semibold">Address <span className="text-red-500">*</span></label>
+                    <Field name="billing_address" as={Input} placeholder="Enter Address" className="mt-1" />
                     <ErrorMessage
                       name="billing_address"
-
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
                   </div>
                 </Col>
 
-                <Col span={12}  className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">City</label>
+                    <label className="font-semibold">City <span className="text-red-500">*</span></label>
                     <Field
                       name="billing_city"
                       as={Input}
                       placeholder="Enter City"
+                      className="mt-1"
                     />
                     <ErrorMessage
                       name="billing_city"
@@ -395,13 +402,14 @@ const EditCustomer = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">State</label>
+                    <label className="font-semibold">State <span className="text-red-500">*</span></label>
                     <Field
                       name="billing_state"
                       as={Input}
                       placeholder="Enter State"
+                      className="mt-1"
                     />
 
                     <ErrorMessage
@@ -412,11 +420,11 @@ const EditCustomer = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Country</label>
+                    <label className="font-semibold">Country <span className="text-red-500">*</span></label>
                     <Select
-                      className="w-full"
+                      className="mt-1 w-full"
                       placeholder="Select Country"
                       name="billing_country"
                       onChange={(value) => setFieldValue('billing_country', value)}
@@ -436,13 +444,14 @@ const EditCustomer = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={12} className="mt-2 mb-4">
+                <Col span={12} className="mt-3 mb-4">
                   <div className="form-item">
-                    <label className="font-semibold">Zip Code</label>
+                    <label className="font-semibold">Zip Code <span className="text-red-500">*</span></label>
                     <Field
                       name="billing_zipcode"
                       as={Input}
                       placeholder="Enter Zip Code"
+                      className="mt-1"
                     />
 
                     <ErrorMessage
@@ -459,13 +468,14 @@ const EditCustomer = ({ idd, onClose }) => {
                   </h1>
                 </Col>
 
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Name</label>
+                    <label className="font-semibold">Name <span className="text-red-500">*</span></label>
                     <Field
                       name="shipping_name"
                       as={Input}
                       placeholder="Enter Name"
+                      className="mt-1"
                     />
                     <ErrorMessage
                       name="shipping_name"
@@ -475,54 +485,61 @@ const EditCustomer = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Shipping Phone</label>
+                    <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
                     <div className="flex">
-                      <Select
+                        <Select
+                        className="mt-1"
                         style={{ width: '30%', marginRight: '8px' }}
                         placeholder="Code"
-                        name="shipping_code"
-                        value={values.shipping_code}
-                        onChange={(value) => setFieldValue('shipping_code', value)}
+                        name="shipping_country_code"
+                        onChange={(value) => setFieldValue('shipping_country_code', value)}
+                        value={values.shipping_country_code}
                       >
                         {countries.map((country) => (
                           <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
+                            +{country.phoneCode}
                           </Option>
                         ))}
                       </Select>
-                      <Field name="shipping_phone">
-                        {({ field }) => (
-                          <Input
-                            {...field}
-                            type="number"
-                            style={{ width: '70%' }}
-                            placeholder="Enter Shipping Phone"
-                            onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'shipping_phone')}
-                            onKeyPress={(e) => {
-                              if (!/[0-9]/.test(e.key)) {
-                                e.preventDefault();
-                              }
-                            }}
-                          />
-                        )}
-                      </Field>
+                      <Field
+                        name="shipping_phone"
+                        as={Input}
+                        type="number"
+                        className="mt-1"
+                        maxLength={10}
+                        style={{ width: '70%' }}
+                        placeholder="Enter phone"
+                        onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'shipping_phone')}
+
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
                     </div>
                     <ErrorMessage
+                      name="shipping_country_code"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                    {/* <ErrorMessage
                       name="shipping_phone"
                       component="div"
                       className="error-message text-red-500 my-1"
-                    />
+                    /> */}
                   </div>
                 </Col>
 
-                <Col span={24} className="mt-2">
+                <Col span={24} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Address</label>
-                    <Field name="shipping_address" as={Input} placeholder="Enter Address" />
+                    <label className="font-semibold">Address <span className="text-red-500">*</span></label>
+                    <Field name="shipping_address" as={Input} placeholder="Enter Address" className="mt-1" />
                     <ErrorMessage
                       name="shipping_address"
+
 
                       component="div"
                       className="error-message text-red-500 my-1"
@@ -530,13 +547,14 @@ const EditCustomer = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">City</label>
+                    <label className="font-semibold">City <span className="text-red-500">*</span></label>
                     <Field
                       name="shipping_city"
                       as={Input}
                       placeholder="Enter City"
+                      className="mt-1"
                     />
 
                     <ErrorMessage
@@ -547,13 +565,14 @@ const EditCustomer = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">State</label>
+                    <label className="font-semibold">State <span className="text-red-500">*</span></label>
                     <Field
                       name="shipping_state"
                       as={Input}
                       placeholder="Enter State"
+                      className="mt-1"
                     />
 
                     <ErrorMessage
@@ -564,11 +583,11 @@ const EditCustomer = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Country</label>
+                    <label className="font-semibold">Country <span className="text-red-500">*</span></label>
                     <Select
-                      className="w-full"
+                      className="mt-1 w-full"
                       placeholder="Select Country"
                       name="shipping_country"
                       onChange={(value) => setFieldValue('shipping_country', value)}
@@ -588,13 +607,14 @@ const EditCustomer = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Zip Code</label>
+                    <label className="font-semibold">Zip Code <span className="text-red-500">*</span>   </label>
                     <Field
                       name="shipping_zipcode"
                       as={Input}
-                      placeholder="Enter Zip Code"
+                        placeholder="Enter Zip Code"
+                      className="mt-1"
                     />
 
                     <ErrorMessage

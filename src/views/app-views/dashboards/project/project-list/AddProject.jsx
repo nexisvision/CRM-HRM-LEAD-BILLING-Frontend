@@ -133,13 +133,13 @@ const AddProject = ({ onClose }) => {
 
   const validationSchema = Yup.object({
     project_name: Yup.string().required("Please enter a Project Name."),
-    currency: Yup.string().optional("Please select Currency."),
     project_category: Yup.string().required("Please enter a Category."),
     startDate: Yup.date().nullable().required("Start date is required."),
     endDate: Yup.date().nullable().required("End date is required."),
+    currency: Yup.string().required("Please select Currency."),
     // projectimage: Yup.mixed().required("Please upload a Project Image."),
-    client: Yup.string().optional("Please select Client."),
-    user: Yup.string().optional("Please select User."),
+    client: Yup.string().required("Please select Client."),
+    user: Yup.string().required("Please select User."),
     budget: Yup.number()
       .required("Please enter a Project Budget.")
       .positive("Budget must be positive."),
@@ -155,7 +155,7 @@ const AddProject = ({ onClose }) => {
       "Please enter a Project Description."
     ),
     tag: Yup.string().required("Please enter a Tag."),
-    status: Yup.string().optional("Please select Status."),
+    status: Yup.string().required("Please select Status."),
   });
 
   const onSubmit = (values, { resetForm }) => {
@@ -195,7 +195,7 @@ const AddProject = ({ onClose }) => {
       }
     } catch (error) {
       console.error(`Failed to fetch ${lableType}:`, error);
-      message.error(`Failed to load ${lableType}`);
+      message.error(`Failed to load $ {lableType}`);
     }
   };
 
@@ -349,7 +349,7 @@ const AddProject = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Client</label>
+                  <label className="font-semibold">Client <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
                     className="mt-1"
@@ -384,7 +384,7 @@ const AddProject = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">User</label>
+                  <label className="font-semibold">User <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
                     className="mt-1"
@@ -434,7 +434,7 @@ const AddProject = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                                 <div className="form-item">
-                                    <label className="font-semibold">Currency</label>
+                                    <label className="font-semibold">Currency <span className="text-red-500">*</span></label>
                                     <Field name="currency">
 
                                         {({ field, form }) => (
@@ -512,7 +512,7 @@ const AddProject = ({ onClose }) => {
 
               <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Description</label>
+                  <label className="font-semibold">Description <span className="text-red-500">*</span></label>
                   <ReactQuill
                     className="mt-1"
                     value={values.project_description}
@@ -532,7 +532,7 @@ const AddProject = ({ onClose }) => {
 
               <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Tag</label>
+                  <label className="font-semibold"> Tag <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
                     className="mt-1"

@@ -49,7 +49,7 @@ const AddLeadCards = ({ onClose }) => {
   const lid = user?.id;
   const dispatch = useDispatch();
 
-  const countries = useSelector((state) => state.countries.countries);
+  const countries = useSelector((state) => state.countries.countries?.data || []);
 
   useEffect(() => {
     dispatch(getallcountries());
@@ -74,6 +74,7 @@ const AddLeadCards = ({ onClose }) => {
     status: "",
     notes: "",
     source: "",
+    leadStage: "",
     category: "",
     lastContacted: null,
     totalBudget: "",
@@ -113,12 +114,13 @@ const AddLeadCards = ({ onClose }) => {
     telephone: Yup.string()
       .matches(/^\d{10}$/, "telephone number must be exactly 10 digits")
       .nullable(),
-    email: Yup.string().email("Please enter a valid email address").nullable(),
     leadValue: Yup.number().typeError("Lead Value must be a number").nullable(),
     currencyIcon: Yup.string().nullable(),
     employee: Yup.string().required("Employee is required"),
     status: Yup.string().required("Status is required"),
-
+    leadStage: Yup.string().required("Lead Stage is required"),
+    email: Yup.string().required("Email is required"),
+    assigned: Yup.string().required("Assigned is required"),
     // Details section
     notes: Yup.string().when("details", {
       is: true,
@@ -227,17 +229,18 @@ const AddLeadCards = ({ onClose }) => {
           resetForm,
         }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
-            <h2 className="mb-4 border-b pb-2 font-medium"></h2>
+            <h2 className=" border-b pb-2 font-medium"></h2>
 
             <Row gutter={16}>
-              <Col span={24} className="mt-2">
-                <div className="form-item">
+              <Col span={24} className="mt-3">
+                <div className="form-item ">
                   <label className="font-semibold flex">
                     Lead Title <h1 className="text-rose-500">*</h1>
                   </label>
                   <Field
                     name="leadTitle"
                     as={Input}
+                    className="mt-1"
                     placeholder="Enter Lead Title"
                   />
                   <ErrorMessage
@@ -247,7 +250,7 @@ const AddLeadCards = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold flex">
                     First Name<h1 className="text-rose-500">*</h1>
@@ -255,6 +258,7 @@ const AddLeadCards = ({ onClose }) => {
                   <Field
                     name="firstName"
                     as={Input}
+                    className="mt-1"
                     placeholder="Enter First Name"
                   />
                   <ErrorMessage
@@ -264,7 +268,7 @@ const AddLeadCards = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold flex">
                     Last Name<h1 className="text-rose-500">*</h1>
@@ -272,6 +276,7 @@ const AddLeadCards = ({ onClose }) => {
                   <Field
                     name="lastName"
                     as={Input}
+                    className="mt-1"
                     placeholder="Enter Last Name"
                   />
                   <ErrorMessage
@@ -281,7 +286,7 @@ const AddLeadCards = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-2">
+                <Col span={24} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Telephone</label>
                     <div className="flex">
@@ -289,15 +294,19 @@ const AddLeadCards = ({ onClose }) => {
                         style={{ width: '30%', marginRight: '8px' }}
                         placeholder="Code"
                         name="phoneCode"
+                        className="mt-1"
                         onChange={(value) => setFieldValue('phoneCode', value)}
                         value={values.phoneCode}
                       >
-
-                        {countries.map((country) => (
-                          <Option key={country.id} value={country.phoneCode}>
-                            +{country.phoneCode}
-                          </Option>
-                        ))}
+                        {Array.isArray(countries) && countries.length > 0 ? (
+                          countries.map((country) => (
+                            <Option key={country.id} value={country.phoneCode}>
+                              +{country.phoneCode}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>No country codes available</Option>
+                        )}
                       </Select>
                       <Field
                         name="telephone"
@@ -331,7 +340,7 @@ const AddLeadCards = ({ onClose }) => {
                   </div>
                 </Col>
 
-              <Col span={24} className="mt-2">
+              <Col span={24} className="mt-3">
                 <div className="form-item">
                   <label
                     htmlFor="leadStage"
@@ -346,7 +355,7 @@ const AddLeadCards = ({ onClose }) => {
                           <Select
                             {...field}
                             id="leadStage"
-                            className="w-full"
+                            className="w-full mt-1"
                             placeholder="Select Lead Stage"
                             onChange={(value) =>
                               form.setFieldValue("leadStage", value)
@@ -379,12 +388,13 @@ const AddLeadCards = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">Email Address</label>
                   <Field
                     name="email"
                     as={Input}
+                    className="mt-2"
                     placeholder="Enter Email Address"
                   />
                   <ErrorMessage
@@ -395,32 +405,36 @@ const AddLeadCards = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Lead Value</label>
-                  <Field name="leadValue" component={LeadValueField} />
+                  <label className="font-semibold mb-2">Lead Value</label>
+                  <Field 
+                    name="leadValue" 
+                    component={LeadValueField} 
+                    className="w-full mt-1"
+                  />
                   <ErrorMessage
                     name="leadValue.amount"
-                    component="div"
-                    className="error-message text-red-500 my-1"
+                    component="div" 
+                    className="text-red-500 text-sm mt-1"
                   />
                   <ErrorMessage
                     name="leadValue.currencyId"
                     component="div"
-                    className="error-message text-red-500 my-1"
+                    className="text-red-500 text-sm mt-1" 
                   />
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold mb-2">Assigned</label>
                   <div className="flex gap-2">
-                    <Field name="employee">
+                    <Field name="assigned">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full mt-2"
+                          className="w-full mt-1"
                           placeholder="Select Employee"
                           onChange={(value) => {
                             const selectedEmployee =
@@ -443,14 +457,14 @@ const AddLeadCards = ({ onClose }) => {
                     </Field>
                   </div>
                   <ErrorMessage
-                    name="employee"
+                    name="assigned"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
                 </div>
               </Col>
 
-              <Col span={24} className="mt-2">
+              <Col span={24} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold flex">
                     Status <h1 className="text-rose-500">*</h1>
@@ -459,7 +473,7 @@ const AddLeadCards = ({ onClose }) => {
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-1"
                         placeholder="Select Status"
                         onChange={(value) => setFieldValue("status", value)}
                         value={values.status}
@@ -482,13 +496,13 @@ const AddLeadCards = ({ onClose }) => {
 
               {/* Toggle button for Receipt Upload */}
 
-              <Col span={24} className="mt-4 ">
+              <Col span={24} className="mt-3 ">
                 <div className="flex justify-between items-center">
                   <label className="font-semibold">Details</label>
                   <label className="relative inline-flex items-center cursor-pointer">
                     <input
                       type="checkbox"
-                      className="sr-only peer"
+                      className="sr-only peer mt-1"
                       checked={details}
                       onChange={(e) => setDetails(e.target.checked)}
                     />
@@ -500,14 +514,15 @@ const AddLeadCards = ({ onClose }) => {
                 {details && (
                   <>
                     <Col span={24}>
-                      <div className="mt-2">
-                        <label className="font-semibold">Notes</label>
+                      <div className="mt-3">
+                        <label className="font-semibold">Notes <span className="text-rose-500">*</span></label>
                         <ReactQuill
+                          name="notes"
                           value={values.notes}
                           onChange={(value) => setFieldValue("notes", value)}
                           placeholder="Enter Notes"
                           onBlur={() => setFieldTouched("notes", true)}
-                          className="mt-2 bg-white rounded-md"
+                          className="mt-1 bg-white rounded-md"
                         />
                         <ErrorMessage
                           name="notes"
@@ -516,11 +531,12 @@ const AddLeadCards = ({ onClose }) => {
                         />
                       </div>
                     </Col>
-                    <Col span={24} className="mt-4">
-                      <label className="font-semibold">Source</label>
+                    <Col span={24} className="mt-3">
+                      <label className="font-semibold">Source <span className="text-rose-500">*</span></label>
                       <Select
+                        name="source" 
                         placeholder="Select Source"
-                        className="w-full"
+                        className="w-full mt-1"
                         // loading={loading}
                         onChange={(value) => console.log("Selected:", value)}
                       >
@@ -532,13 +548,13 @@ const AddLeadCards = ({ onClose }) => {
                       </Select>
                     </Col>
                     <Col span={24}>
-                      <div className="form-item mt-2">
-                        <label className="font-semibold">category</label>
+                      <div className="form-item mt-3">
+                        <label className="font-semibold">category <span className="text-rose-500">*</span></label>
                         <Field name="category">
                           {({ field }) => (
                             <Select
                               {...field}
-                              className="w-full"
+                              className="w-full mt-1"
                               placeholder="Select category"
                               onChange={(value) =>
                                 setFieldValue("category", value)
@@ -562,13 +578,13 @@ const AddLeadCards = ({ onClose }) => {
                       </div>
                     </Col>
                     <Col span={24}>
-                      <div className="form-item mt-2">
-                        <label className="font-semibold">Tags</label>
+                      <div className="form-item mt-3">
+                        <label className="font-semibold">Tags <span className="text-rose-500">*</span></label>
                         <Field name="tags">
                           {({ field }) => (
                             <Select
                               {...field}
-                              className="w-full"
+                              className="w-full mt-1"
                               placeholder="Select Tags"
                               onChange={(value) => setFieldValue("tags", value)}
                               onBlur={() => setFieldTouched("tags", true)}
@@ -588,12 +604,12 @@ const AddLeadCards = ({ onClose }) => {
                       </div>
                     </Col>
                     <Col span={24}>
-                      <div className="form-item  mt-2 border-b pb-3">
+                      <div className="form-item  mt-3 border-b pb-3">
                         <label className="font-semibold">
-                          Last lastContacted
+                          Last Contacted <span className="text-rose-500">*</span>
                         </label>
                         <DatePicker
-                          className="w-full"
+                          className="w-full mt-1"
                           format="DD-MM-YYYY"
                           value={values.lastContacted}
                           onChange={(date) =>
@@ -650,13 +666,14 @@ const AddLeadCards = ({ onClose }) => {
                       </Col>
                     </div>
                     <div className="mt-2">
-                      <Col span={24} className="mt-2">
+                      <Col span={24} className="mt-3">
                         <div className="form-item">
-                          <label className="font-semibold">Total Budget</label>
+                          <label className="font-semibold">Total Budget <span className="text-rose-500">*</span></label>
                           <Field
                             name="totalBudget"
                             as={Input}
                             placeholder="Enter Total Budget"
+                            className="mt-1"
                           />
                           <ErrorMessage
                             name="totalBudget"
@@ -668,10 +685,10 @@ const AddLeadCards = ({ onClose }) => {
                     </div>
                     <div className="mt-2">
                       <Col span={24}>
-                        <div className="form-item mt-2">
-                          <label className="font-semibold">Target Date</label>
+                        <div className="form-item mt-3">
+                          <label className="font-semibold">Target Date <span className="text-rose-500">*</span></label>
                           <DatePicker
-                            className="w-full"
+                            className="w-full mt-1"
                             format="DD-MM-YYYY"
                             value={values.targetDate}
                             onChange={(date) =>
@@ -688,14 +705,14 @@ const AddLeadCards = ({ onClose }) => {
                       </Col>
                     </div>
                     <div>
-                      <Col span={24} className="mt-2">
-                        <div className="form-item mt-2">
-                          <label className="font-semibold">Content Type</label>
+                      <Col span={24} className="mt-3">
+                        <div className="form-item mt-3">
+                          <label className="font-semibold">Content Type <span className="text-rose-500">*</span></label>
                           <Field name="contentType">
                             {({ field }) => (
                               <Select
                                 {...field}
-                                className="w-full"
+                                className="w-full mt-1"
                                 placeholder="Select Content Type"
                                 onChange={(value) =>
                                   setFieldValue("contentType", value)
@@ -719,15 +736,15 @@ const AddLeadCards = ({ onClose }) => {
                         </div>
                       </Col>
                     </div>
-                    <div className="mt-2">
+                    <div className="mt-3">
                       <Col span={24} className="mt-2 border-b pb-3">
                         <div className="form-item">
-                          <label className="font-semibold">Brand Name</label>
+                          <label className="font-semibold">Brand Name <span className="text-rose-500">*</span></label>
                           <Field
                             name="brandName"
                             as={Input}
                             placeholder="Enter Brand Name"
-                            className="w-full"
+                            className="w-full mt-1"
                           />
                           <ErrorMessage
                             name="brandName"

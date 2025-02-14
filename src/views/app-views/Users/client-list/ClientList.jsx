@@ -464,7 +464,7 @@ const ClientList = () => {
         visible={isAddCompanyModalVisible}
         onCancel={closeAddCompanyModal}
         footer={null}
-        width={1100}
+        width={800}
       >
         <AddClient onClose={closeAddCompanyModal} />
       </Modal>

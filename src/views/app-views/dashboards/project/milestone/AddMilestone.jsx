@@ -36,7 +36,7 @@ const AddMilestone = ({ onClose }) => {
   const { currencies } = useSelector((state) => state.currencies);
 const curr = currencies?.data || [];
 
-const curren = curr?.filter((item) => item.created_by === user);
+// const curren = curr?.filter((item) => item.created_by === user);
   const { id } = useParams();
   // console.log("Milestone ID:", id);
   useEffect(() => {
@@ -196,7 +196,7 @@ const curren = curr?.filter((item) => item.created_by === user);
                               className="w-full mt-1"
                               placeholder="Select Currency"
                               onChange={(value) => {
-                                const selectedCurrency = curren.find(
+                                const selectedCurrency = curr.find(
                                   (c) => c.id === value
                                 );
                                 form.setFieldValue(
@@ -205,7 +205,7 @@ const curren = curr?.filter((item) => item.created_by === user);
                                 );
                               }}
                             >
-                              {curren.map((currency) => (
+                              {curr.map((currency) => (
                                 <Option key={currency.id} value={currency.id}>
                                   {currency.currencyCode}
                                 </Option>

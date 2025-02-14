@@ -28,9 +28,29 @@ const validationSchema = Yup.object().shape({
         .required('Plan expiration notification days is required'),
     address: Yup.string()
         .required('Address is required'),
+    defaultLanguage: Yup.string()
+        .required('Default language is required'),
+    userDefaultLanguage: Yup.string()
+        .required('User default language is required'),
+    defaultCountryCode: Yup.string()
+        .required('Default country code is required'),
+    defaultCurrencyFormat: Yup.string()
+        .required('Default currency format is required'),
     affiliationAmount: Yup.number()
         .min(0, 'Must be a positive number')
-        .required('Affiliation amount is required')
+        .required('Affiliation amount is required'),
+    affiliationType: Yup.string()
+        .required('Affiliation type is required'),
+    timezone: Yup.string()
+        .required('Timezone is required'),
+    dateTimeFormat: Yup.string()
+        .required('Date-time format is required'),
+    showCurrencyBehind: Yup.boolean()
+        .required('Show currency behind is required'),
+    enablePhoneValidation: Yup.boolean()
+        .required('Enable phone validation is required'),
+    allowEditVCardURL: Yup.boolean()
+        .required('Allow edit vCard URL is required'),
 });
 
 const GeneralList = () => {
@@ -75,51 +95,51 @@ const GeneralList = () => {
                             <Row gutter={[16, 16]}>
 
                                 <Col span={8}>
-                                    <div className="form-item">
+                                    <div className="form-item mt-2">
                                         <label className="font-semibold">App Name</label>
-                                        <Field name="appName" as={Input} placeholder="Enter App Name" />
+                                        <Field name="appName" as={Input} placeholder="Enter App Name" className='mt-2'/>
                                         <ErrorMessage name="appName" component="div" className="error-message text-red-500 my-1" />
                                     </div>
                                 </Col>
 
                                 <Col span={8}>
-                                    <div className="form-item">
+                                    <div className="form-item mt-2">
                                         <label className="font-semibold">Email</label>
-                                        <Field name="email" as={Input} placeholder="Enter Email" />
+                                        <Field name="email" as={Input} placeholder="Enter Email" className='mt-2'/>
                                         <ErrorMessage name="email" component="div" className="error-message text-red-500 my-1" />
                                     </div>
                                 </Col>
 
                                 <Col span={8}>
-                                    <div className="form-item">
+                                    <div className="form-item mt-2">
                                         <label className="font-semibold">Phone</label>
-                                        <Field name="phone" as={Input} placeholder="Enter Phone" />
+                                        <Field name="phone" as={Input} placeholder="Enter Phone" className='mt-2'/>
                                         <ErrorMessage name="phone" component="div" className="error-message text-red-500 my-1" />
                                     </div>
                                 </Col>
 
                                 <Col span={12}>
-                                    <div className="form-item">
+                                    <div className="form-item mt-2">
                                         <label className="font-semibold">Plan Expire Notification (in Days)</label>
-                                        <Field name="planExpireNotification" as={Input} type="number" placeholder="Enter Days" />
+                                        <Field name="planExpireNotification" as={Input} type="number" placeholder="Enter Days" className='mt-2'/>
                                         <ErrorMessage name="planExpireNotification" component="div" className="error-message text-red-500 my-1" />
                                     </div>
                                 </Col>
 
-                                <Col span={24}>
-                                    <div className="form-item">
+                                <Col span={12}>
+                                    <div className="form-item mt-2">
                                         <label className="font-semibold">Address</label>
-                                        <Field name="address" as={Input} placeholder="Enter Address" />
+                                        <Field name="address" as={Input} placeholder="Enter Address" className='mt-2'/>
                                         <ErrorMessage name="address" component="div" className="error-message text-red-500 my-1" />
                                     </div>
                                 </Col>
 
                                 <Col span={8}>
-                                    <div className="form-item">
+                                    <div className="form-item mt-2  ">
                                         <label className="font-semibold">Default Language</label>
                                         <Field name="defaultLanguage">
                                             {({ field }) => (
-                                                <Select {...field} className="w-full"
+                                                <Select {...field} className="w-full mt-2"
                                                 placeholder="Select Default Language"
                                                 onChange={(value) => setFieldValue('defaultLanguage', value)}
                                                 value={values.defaultLanguage}
@@ -135,13 +155,13 @@ const GeneralList = () => {
                                 </Col>
 
                                 <Col span={8} className='mt-2'>
-                                    <div className="form-item">
+                                    <div className="form-item ">
                                         <label className='font-semibold'>User Default Language</label>
                                         <Field name="userDefaultLanguage">
                                             {({ field }) => (
                                                 <Select
                                                     {...field}
-                                                    className="w-full"
+                                                    className="w-full mt-2"
                                                     placeholder="Select User Default Language"
                                                     onChange={(value) => setFieldValue('userDefaultLanguage', value)}
                                                     value={values.userDefaultLanguage}
@@ -174,11 +194,11 @@ const GeneralList = () => {
                 </Col> */}
 
                                 <Col span={8}>
-                                    <div className="form-item">
+                                    <div className="form-item mt-2">
                                         <label className="font-semibold">Default Country Code</label>
                                         <Field name="defaultCountryCode">
                                             {({ field }) => (
-                                                <Select {...field} className="w-full"
+                                                <Select {...field} className="w-full mt-2"
                                                 placeholder="Select Default Country Code"
                                                 onChange={(value) => setFieldValue('defaultCountryCode', value)}
                                                 value={values.defaultCountryCode}
@@ -195,11 +215,11 @@ const GeneralList = () => {
                                 </Col>
 
                                 <Col span={8}>
-                                    <div className="form-item">
+                                    <div className="form-item mt-2">
                                         <label className="font-semibold">Default Currency Format</label>
                                         <Field name="defaultCurrencyFormat">
                                             {({ field }) => (
-                                                <Select {...field} className="w-full"
+                                                <Select {...field} className="w-full mt-2"
                                                 placeholder="Select Default Currency Format"
                                                 onChange={(value) => setFieldValue('defaultCurrencyFormat', value)}
                                                 value={values.defaultCurrencyFormat}
@@ -215,19 +235,19 @@ const GeneralList = () => {
                                 </Col>
 
                                 <Col span={8}>
-                                    <div className="form-item">
+                                    <div className="form-item mt-2">
                                         <label className="font-semibold">Affiliation Amount Or Percentage</label>
-                                        <Field name="affiliationAmount" as={Input} type="number" placeholder="Enter Amount" />
+                                        <Field name="affiliationAmount" as={Input} type="number" placeholder="Enter Amount" className='mt-2'/>
                                         <ErrorMessage name="affiliationAmount" component="div" className="error-message text-red-500 my-1" />
                                     </div>
                                 </Col>
 
                                 <Col span={8}>
-                                    <div className="form-item">
+                                    <div className="form-item mt-2">
                                         <label className="font-semibold">Affiliation Type</label>
                                         <Field name="affiliationType">
                                             {({ field }) => (
-                                                <Select {...field} className="w-full"
+                                                <Select {...field} className="w-full mt-2"
                                                 placeholder="Select Affiliation Type"
                                                 onChange={(value) => setFieldValue('affiliationType', value)}
                                                 value={values.affiliationType}
@@ -242,11 +262,11 @@ const GeneralList = () => {
                                 </Col>
 
                                 <Col span={8}>
-                                    <div className="form-item">
+                                    <div className="form-item mt-2">
                                         <label className="font-semibold">Timezone</label>
                                         <Field name="timezone">
                                             {({ field }) => (
-                                                <Select {...field} className="w-full"
+                                                <Select {...field} className="w-full mt-2"
                                                 placeholder="Select Timezone"
                                                 onChange={(value) => setFieldValue('timezone', value)}
                                                 value={values.timezone}
@@ -262,11 +282,11 @@ const GeneralList = () => {
                                 </Col>
 
                                 <Col span={8}>
-                                    <div className="form-item">
+                                    <div className="form-item mt-2">
                                         <label className="font-semibold">Date-Time Format</label>
                                         <Field name="dateTimeFormat">
                                             {({ field }) => (
-                                                <Select {...field} className="w-full"
+                                                <Select {...field} className="w-full mt-2"
                                                 placeholder="Select Date-Time Format"
                                                 onChange={(value) => setFieldValue('dateTimeFormat', value)}
                                                 value={values.dateTimeFormat}
@@ -282,7 +302,7 @@ const GeneralList = () => {
                                 </Col>
 
                                 <Col span={12}>
-                                    <div className="form-item">
+                                    <div className="form-item mt-2">
                                         <Switch
                                             checked={values.showCurrencyBehind}
                                             onChange={(checked) => setFieldValue('showCurrencyBehind', checked)}
@@ -292,7 +312,7 @@ const GeneralList = () => {
                                 </Col>
 
                                 <Col span={12}>
-                                    <div className="form-item">
+                                    <div className="form-item mt-2">
                                         <Switch
                                             checked={values.enablePhoneValidation}
                                             onChange={(checked) => setFieldValue('enablePhoneValidation', checked)}
@@ -302,7 +322,7 @@ const GeneralList = () => {
                                 </Col>
 
                                 <Col span={12}>
-                                    <div className="form-item">
+                                    <div className="form-item mt-2">
                                         <Switch
                                             checked={values.allowEditVCardURL}
                                             onChange={(checked) => setFieldValue('allowEditVCardURL', checked)}
@@ -312,7 +332,7 @@ const GeneralList = () => {
                                 </Col>
 
                                 <Col span={12}>
-                                    <div className="form-item">
+                                    <div className="form-item mt-2">
                                         <Switch
                                             checked={values.hideDecimalValues}
                                             onChange={(checked) => setFieldValue('hideDecimalValues', checked)}

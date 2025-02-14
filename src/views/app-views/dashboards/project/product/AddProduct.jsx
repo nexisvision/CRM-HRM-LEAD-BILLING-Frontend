@@ -181,21 +181,21 @@ const AddProduct = ({ idd, onClose }) => {
               </Col>
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Sku</label>
+                  <label className="font-semibold">Sku <span className="text-red-500">*</span></label>
                   <Field className="mt-2" name="sku" as={CustomInput} placeholder="Enter Sku" />
                   <ErrorMessage name="sku" component="div" className="error-message text-red-500 my-1" />
                 </div>
               </Col>
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Hsn/Sac</label>
+                  <label className="font-semibold">Hsn/Sac <span className="text-red-500">*</span></label>
                   <Field className="mt-2" name="hsn_sac" as={CustomInput} placeholder="Enter Hsn/Sac" />
                   <ErrorMessage name="hsn_sac" component="div" className="error-message text-red-500 my-1" />
                 </div>
               </Col>
               <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Description</label>
+                    <label className="font-semibold">Description <span className="text-red-500">*</span></label>
                   <ReactQuill
                     className="mt-1"
                     value={values.description}
