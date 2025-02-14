@@ -44,12 +44,12 @@ import { deleteDocu, getDocu } from "./DocumentReducers/documentSlice";
 const { Option } = Select;
 
 const DocumentList = () => {
-  const [users, setUsers] = useState(userData);
+  const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   // const [viewApplicationVisible, setViewApplicationVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddTrainingSetupModalVisible, setIsAddTrainingSetupModalVisible] =
     useState(false);
@@ -115,7 +115,7 @@ const DocumentList = () => {
   };
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
+    const searchArray = value ? list : [];
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);
@@ -204,10 +204,10 @@ const DocumentList = () => {
   const handleShowStatus = (value) => {
     if (value !== "All") {
       const key = "status";
-      const data = utils.filterArray(userData, key, value);
+      const data = utils.filterArray(users, key, value);
       setUsers(data);
     } else {
-      setUsers(userData);
+      setUsers(users);
     }
   };
 

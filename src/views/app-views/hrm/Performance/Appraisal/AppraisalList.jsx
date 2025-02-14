@@ -7,8 +7,6 @@ import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import { useNavigate } from 'react-router-dom';
 import AddAppraisal from './AddAppraisal';
-import userData from "assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
 import EditAppraisal from './EditAppraisal';
 import { Model } from 'miragejs';
@@ -18,10 +16,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getBranch } from '../../Branch/BranchReducer/BranchSlice';
 import { deleteAppraisal, getAppraisals } from './AppraisalReducers/AppraisalSlice';
 const AppraisalList = () => {
-  const [users, setUsers] = useState(userData);
+  const [users, setUsers] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
     const [id, setId] = useState(null);
    const navigate = useNavigate();
   const [isAddAppraisalModalVisible, setIsAddAppraisalModalVisible] = useState(false);
@@ -129,7 +127,7 @@ useEffect(() => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
+    const searchArray = value ? list : [];
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
   };

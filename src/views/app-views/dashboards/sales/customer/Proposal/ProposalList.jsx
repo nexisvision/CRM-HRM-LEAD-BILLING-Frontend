@@ -5,8 +5,7 @@ import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import AvatarStatus from 'components/shared-components/AvatarStatus';
-import userData from 'assets/data/user-list.data.json';
-import OrderListData from '../../../../../../assets/data/order-list.data.json';
+// import OrderListData from 'assets/data/order-list.data.json';
 // import OrderListData from 'assets/data/order-list.data.json';
 import { IoCopyOutline } from "react-icons/io5";
 import utils from 'utils';
@@ -15,8 +14,8 @@ import AddInvoice from '../../invoice/AddInvoice';
 
 const { Option } = Select
 function ProposalList() {
-   const [users, setUsers] = useState(userData);
-   const [list, setList] = useState(OrderListData);
+   const [users, setUsers] = useState([]);
+   const [list, setList] = useState([]);
    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
    const [userProfileVisible, setUserProfileVisible] = useState(false);
    //   const [customerVisible,setCustomerVisible] = useState(false)
@@ -62,7 +61,7 @@ function ProposalList() {
    // Search functionality
    const onSearch = (e) => {
       const value = e.currentTarget.value;
-      const searchArray = value ? list : OrderListData;
+      const searchArray = list;
       const data = utils.wildCardSearch(searchArray, value);
       setList(data);
       setSelectedRowKeys([]);
@@ -110,10 +109,10 @@ function ProposalList() {
 	const handleViewStatus = value => {
 		if (value !== 'All') {
 			const key = 'status';
-			const data = utils.filterArray(OrderListData, key, value)
+			const data = utils.filterArray(list, key, value)
 			setList(data)
 		} else {
-			setList(OrderListData)
+			setList([])
 		}
 	}
 

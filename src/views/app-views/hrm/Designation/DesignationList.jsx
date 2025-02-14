@@ -6,8 +6,6 @@ import Flex from 'components/shared-components/Flex';
 import { useNavigate } from 'react-router-dom';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import AddDesignation from './AddDesignation';
-import userData from "assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
 import ParticularDesignation from './ParticularDesignation';
 import EditDesignation from './EditDesignation';
@@ -15,66 +13,62 @@ import { useDispatch, useSelector } from 'react-redux';
 import { DeleteDes, getDes } from './DesignationReducers/DesignationSlice';
 
 const DesignationList = () => {
-  const [users, setUsers] = useState(userData);
+  const [users, setUsers] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddDesignationModalVisible, setIsAddDesignationModalVisible] = useState(false);
   const [isEditDesignationModalVisible, setIsEditDesignationModalVisible] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-
   const user = useSelector((state) => state.user.loggedInUser.username);
-    const tabledata = useSelector((state) => state.Designation);
+  const tabledata = useSelector((state) => state.Designation);
 
-    const [id,setId]=useState("");
+  const [id,setId]=useState("");
 
-    useEffect(()=>{
-      dispatch(getDes())
-    },[dispatch])
+  useEffect(()=>{
+    dispatch(getDes())
+  },[dispatch])
 
-     //// permission
+  //// permission
                         
-          const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-          const roles = useSelector((state) => state.role?.role?.data);
-          const roleData = roles?.find(role => role.id === roleId);
-       
-          const whorole = roleData.role_name;
-       
-          const parsedPermissions = Array.isArray(roleData?.permissions)
-          ? roleData.permissions
-          : typeof roleData?.permissions === 'string'
-          ? JSON.parse(roleData.permissions)
-          : [];
-        
-          let allpermisson;  
-       
-          if (parsedPermissions["extra-hrm-designation"] && parsedPermissions["extra-hrm-designation"][0]?.permissions) {
-            allpermisson = parsedPermissions["extra-hrm-designation"][0].permissions;
-            // console.log('Parsed Permissions:', allpermisson);
-          
-          } else {
-            // console.log('extra-hrm-designation is not available');
-          }
-          
-          const canCreateClient = allpermisson?.includes('create');
-          const canEditClient = allpermisson?.includes('edit');
-          const canDeleteClient = allpermisson?.includes('delete');
-          const canViewClient = allpermisson?.includes('view');
-       
-          ///endpermission
-  
-  
-      useEffect(() => {
-        if (tabledata && tabledata.Designation && tabledata.Designation.data) {
-          const filteredData = tabledata.Designation.data.filter((item) => item.created_by === user);
-          setUsers(filteredData);
-        }
-      }, [tabledata]);
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
 
+  const whorole = roleData.role_name;
 
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+    ? JSON.parse(roleData.permissions)
+    : [];
+  
+  let allpermisson;  
+
+  if (parsedPermissions["extra-hrm-designation"] && parsedPermissions["extra-hrm-designation"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-designation"][0].permissions;
+    // console.log('Parsed Permissions:', allpermisson);
+  
+  } else {
+    // console.log('extra-hrm-designation is not available');
+  }
+  
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+  ///endpermission
+
+  useEffect(() => {
+    if (tabledata && tabledata.Designation && tabledata.Designation.data) {
+      const filteredData = tabledata.Designation.data.filter((item) => item.created_by === user);
+      setUsers(filteredData);
+    }
+  }, [tabledata]);
 
   // Open Add Employee Modal
   const openAddDesignationModal = () => {
@@ -86,51 +80,41 @@ const DesignationList = () => {
     setIsAddDesignationModalVisible(false);
   };
 
+  // Open Add Employee Modal
+  const openEditDesignationModal = () => {
+    setIsEditDesignationModalVisible(true);
+  };
 
-
-    // Open Add Employee Modal
-    const openEditDesignationModal = () => {
-      setIsEditDesignationModalVisible(true);
-    };
-  
-    // Close Add Employee Modal
-    const closeEditDesignationModal = () => {
-      setIsEditDesignationModalVisible(false);
-    };
-
+  // Close Add Employee Modal
+  const closeEditDesignationModal = () => {
+    setIsEditDesignationModalVisible(false);
+  };
 
   // Open Add Employee Modal
   const handleParticularDesignationModal = () => {
     navigate('/app/hrm/designation/particulardesignation', { state: { user: selectedUser } });
   };
 
-
-
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
+    const searchArray = value ? list : users;
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);
   };
 
   const deleteUser = (userId) => {
-    // setUsers(users.filter(item => item.id !== userId));
-    // dispatch(DeleteDes(userId));
-    // dispatch(getDes())
-    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
-
-      dispatch(DeleteDes( userId ))
-                .then(() => {
-                  dispatch(getDes());
-                  message.success('designation Deleted successfully!');
-                  setUsers(users.filter(item => item.id !== userId));
-                  navigate('/app/hrm/designation');
-                })
-                .catch((error) => {
-                  message.error('Failed to delete designation.');
-                  console.error('Edit API error:', error);
-                });
+    dispatch(DeleteDes(userId))
+      .then(() => {
+        dispatch(getDes());
+        message.success('designation Deleted successfully!');
+        setUsers(users.filter(item => item.id !== userId));
+        navigate('/app/hrm/designation');
+      })
+      .catch((error) => {
+        message.error('Failed to delete designation.');
+        console.error('Edit API error:', error);
+      });
   };
 
   const exportToExcel = () => {
@@ -163,43 +147,25 @@ const DesignationList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" icon={<EyeOutlined />} onClick={handleParticularDesignationModal} size="small">
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-      
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" icon={<PushpinOutlined />} onClick={() => { showUserProfile(elm) }} size="small">
-            <span className="ml-2">Pin</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-     
-
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                <Menu.Item>
-                                <Flex alignItems="center">
-                                  <Button type="" icon={<EditOutlined />} onClick={()=>{editfun(elm.id)}} size="small">
-                                    <span className="">Edit</span>
-                                  </Button>
-                                </Flex>
-                              </Menu.Item>
-                          ) : null}
-            
-            
-            {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                           <Menu.Item>
-                           <Flex alignItems="center">
-                             <Button type="" icon={<DeleteOutlined />} onClick={() => { deleteUser(elm.id) }} size="small">
-                               <span className="">Delete</span>
-                             </Button>
-                           </Flex>
-                         </Menu.Item>
-                          ) : null}
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button type="" icon={<EditOutlined />} onClick={()=>{editfun(elm.id)}} size="small">
+              <span className="">Edit</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
+      
+      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button type="" icon={<DeleteOutlined />} onClick={() => { deleteUser(elm.id) }} size="small">
+              <span className="">Delete</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
     </Menu>
   );
 
@@ -232,13 +198,11 @@ const DesignationList = () => {
         </Flex>
         <Flex gap="7px">
      
-
-           {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                                          <Button type="primary" className="ml-2" onClick={openAddDesignationModal}>
                                                          <PlusOutlined />
                                                          <span>New</span>
                                                        </Button>                                                                                                                                              
-                                                                                                                                                                                    
                                                                   ) : null}
           <Button
                 type="primary"
@@ -251,9 +215,8 @@ const DesignationList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-
-          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                                                                  
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+                                      
                                        <Table columns={tableColumns} dataSource={users} rowKey="id" />
 
         

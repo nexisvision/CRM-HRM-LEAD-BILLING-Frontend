@@ -6,20 +6,18 @@ import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import { useDispatch, useSelector } from 'react-redux';
 import utils from 'utils';
-import userData from "assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
 import AddRole from './AddRole';
 import { deleteRole, getRoles } from '../RoleAndPermissionReducers/RoleAndPermissionSlice';
 import EditRole from './EditRole';
 
 const RoleList = () => {
-  const [users, setUsers] = useState(userData);
+  const [users, setUsers] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [isEditRoleModalVisible, setIsEditRoleModalVisible] = useState(false);
   const [id, setId] = useState(null);
 
   const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddRoleModalVisible, setIsAddRoleModalVisible] = useState(false);
   const dispatch = useDispatch();
@@ -53,7 +51,7 @@ const RoleList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
+    const searchArray = value ? list : [];
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);

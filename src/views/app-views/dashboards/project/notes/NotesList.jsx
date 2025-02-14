@@ -1,8 +1,6 @@
 import React, { Component, useEffect } from "react";
 import { useState } from "react";
 // import { PrinterOutlined } from '@ant-design/icons';
-import StatisticWidget from "components/shared-components/StatisticWidget";
-import { AnnualStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import {
   Row,
   Card,
@@ -22,7 +20,6 @@ import {
 import NumberFormat from "react-number-format";
 // import React, {useState} from 'react'
 // import { Card, Table, Select, Input, Button, Badge, Menu, Tag } from 'antd';
-import OrderListData from "../../../../../assets/data/order-list.data.json";
 import {
   EyeOutlined,
   FileExcelOutlined,
@@ -79,23 +76,21 @@ const notesStatusList = ["Paid", "Pending", "Expired"];
 
 export const NotesList = () => {
   const dispatch = useDispatch();
-  const [annualStatisticData] = useState(AnnualStatisticData);
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [AddNotesModalVisible, setAddNotesModalVisible] = useState(false);
   const [EditNotesModalVisible, setEditNotesModalVisible] = useState(false);
   const [ViewNotesModalVisible, setViewNotesModalVisible] = useState(false);
   const [idd, setIdd] = useState("");
-
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const handleShowStatus = (value) => {
     if (value !== "All") {
       const key = "milestoneStatus";
-      const data = utils.filterArray(OrderListData, key, value);
+      const data = utils.filterArray(list, key, value);
       setList(data);
     } else {
-      setList(OrderListData);
+      dispatch(GetNote(id));
     }
   };
 
@@ -227,7 +222,7 @@ export const NotesList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : OrderListData;
+    const searchArray = e.currentTarget.value ? list : [];
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);

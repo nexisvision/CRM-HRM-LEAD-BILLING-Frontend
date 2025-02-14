@@ -54,12 +54,9 @@ const JobList = () => {
 
   const [annualStatisticData] = useState(AnnualStatisticData);
 
-const user = useSelector((state) => state.user.loggedInUser.username);
-
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const allempdata = useSelector((state) => state.Jobs);
-
   const filtermin = allempdata.Jobs.data || [];
-
   const filteredData = filtermin.filter((item) => item.created_by === user);
 
   // console.log("filteredData", filteredData);
@@ -90,7 +87,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
   // Search functionality
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
+    const searchArray = value ? filteredData : filtermin;
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);
@@ -190,7 +187,6 @@ const user = useSelector((state) => state.user.loggedInUser.username);
 
   useEffect(() => {
     if (filtermin) {
-      // console.log("aaaaaa", filtermin);
       setList(filteredData);
     }
   }, [filtermin]);

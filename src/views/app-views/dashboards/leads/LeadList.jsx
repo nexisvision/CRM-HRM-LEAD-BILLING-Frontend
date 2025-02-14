@@ -28,8 +28,6 @@ import StatisticWidget from "components/shared-components/StatisticWidget";
 import { DealStatisticData } from "../../dashboards/default/DefaultDashboardData";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddLead from "./AddLead";
-import userData from "../../../../assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
 import EditLead from "./EditLead";
 import ViewLead from "./ViewLead";
@@ -39,8 +37,8 @@ import { useNavigate } from "react-router-dom";
 // import LeadCardsList from './LeadCards/LeadCardsList'; // Adjust the import path as necessary
 
 const LeadList = () => {
-  const [users, setUsers] = useState(userData);
-  const [list, setList] = useState(OrderListData);
+  const [users, setUsers] = useState([]);
+  const [list, setList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -92,9 +90,16 @@ const LeadList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
+    if (value) {
+      const filteredData = users.filter(item => 
+        Object.values(item).some(val => 
+          val?.toString().toLowerCase().includes(value.toLowerCase())
+        )
+      );
+      setList(filteredData);
+    } else {
+      setList([]);
+    }
     setSelectedRowKeys([]);
   };
 

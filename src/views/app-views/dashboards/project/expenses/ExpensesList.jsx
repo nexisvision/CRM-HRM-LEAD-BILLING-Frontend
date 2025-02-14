@@ -13,7 +13,6 @@ import {
     Modal,
     message,
 } from "antd";
-import OrderListData from "../../../../../assets/data/order-list.data.json";
 import {
     EyeOutlined,
     FileExcelOutlined,
@@ -25,7 +24,6 @@ import {
 } from "@ant-design/icons";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import StatisticWidget from "components/shared-components/StatisticWidget";
-import { AnnualStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import { TiPinOutline } from "react-icons/ti";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
@@ -40,9 +38,6 @@ import AddExpenses from "./AddExpenss";
 import EditExpenses from "./EditExpenss";
 import ViewExpenss from "./ViewExpenss";
 
-// import AddExpenses from "./AddExpenses";
-// import EditExpenses from "./EditExpenses"
-// import ViewExpenses from './ViewExpenses';
 const { Option } = Select;
 const getShippingStatus = (orderStatus) => {
     if (orderStatus === "Ready") {
@@ -56,10 +51,9 @@ const getShippingStatus = (orderStatus) => {
 const expenseStatusList = ["Ready", "Shipped"];
 const ExpensesList = () => {
     const dispatch = useDispatch();
-
     const { id } = useParams();
-    const [annualStatisticData] = useState(AnnualStatisticData);
-    const [list, setList] = useState(OrderListData);
+    
+    const [list, setList] = useState([]);
     const [selectedRows, setSelectedRows] = useState([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
@@ -96,15 +90,6 @@ const ExpensesList = () => {
     // Close Add Job Modal
     const closeViewExpensesModal = () => {
         setIsViewExpensesModalVisible(false);
-    };
-    const handleShowStatus = (value) => {
-        // if (value !== "All") {
-        //     const key = "orderStatus";
-        //     const data = utils.filterArray(OrderListData, key, value);
-        //     setList(data);
-        // } else {
-        //     setList(OrderListData);
-        // }
     };
 
     useEffect(() => {
@@ -284,8 +269,7 @@ const ExpensesList = () => {
     };
     const onSearch = (e) => {
         const value = e.currentTarget.value;
-        const searchArray = e.currentTarget.value ? list : OrderListData;
-        const data = utils.wildCardSearch(searchArray, value);
+        const data = utils.wildCardSearch(list, value);
         setList(data);
         setSelectedRowKeys([]);
     };

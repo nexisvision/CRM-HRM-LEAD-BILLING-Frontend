@@ -14,7 +14,6 @@ import {
   Col,
   message,
 } from "antd";
-import OrderListData from "../../../../../assets/data/order-list.data.json";
 import {
   EyeOutlined,
   FileExcelOutlined,
@@ -35,7 +34,6 @@ import utils from "utils";
 import AddPayment from "./AddPayment";
 // import EditPayment from './EditPayment';
 import ViewPayment from "./ViewPayment";
-import { PaymentStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import { deletePay, Getpay } from "./PaymentReducer/paymentSlice";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -58,7 +56,7 @@ const getPaymentStatus = (method) => {
 const paymentStatusList = ["Normal", "Expired"];
 
 const PaymentList = () => {
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddPaymentModalVisible, setIsAddPaymentModalVisible] =
@@ -73,8 +71,6 @@ const PaymentList = () => {
 
   const allempdata = useSelector((state) => state.Payment);
   const filtermin = allempdata.Payment.data;
-
-  const [paymentStatisticData] = useState(PaymentStatisticData);
 
   // Add new states for projects and invoices
   const [projectsList, setProjectsList] = useState([]);
@@ -120,10 +116,9 @@ const PaymentList = () => {
   const handleShowStatus = (value) => {
     if (value !== "All") {
       const key = "status";
-      const data = utils.filterArray(OrderListData, key, value);
-      setList(data);
+      const data = utils.filterArray(list, value);
     } else {
-      setList(OrderListData);
+      setList(list);
     }
   };
 
@@ -283,7 +278,7 @@ const PaymentList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : OrderListData;
+    const searchArray = e.currentTarget.value ? list : list;
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);

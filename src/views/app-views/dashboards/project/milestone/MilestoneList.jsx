@@ -98,15 +98,15 @@ export const MilestoneList = () => {
 
   const dispatch = useDispatch();
 
-  const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "milestone_status";
-      const data = utils.filterArray(OrderListData, key, value);
-      setList(data);
-    } else {
-      setList(OrderListData);
-    }
-  };
+  // const handleShowStatus = (value) => {
+  //   if (value !== "All") { 
+  //     const key = "milestone_status";
+  //     const data = utils.filterArray(OrderListData, key, value);
+  //     setList(data);
+  //   } else {
+  //     setList(OrderListData);
+  //   }
+  // };
 
   // Open Add Job Modal
   const openAddMilestoneModal = () => {

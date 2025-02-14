@@ -1,7 +1,6 @@
 import React, { Component, useEffect, useState } from "react";
 import Flex from "components/shared-components/Flex";
 import StatisticWidget from "components/shared-components/StatisticWidget";
-import { AnnualStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import {
   Row,
   Card,
@@ -17,7 +16,6 @@ import {
   message,
 } from "antd";
 import NumberFormat from "react-number-format";
-import OrderListData from "assets/data/order-list.data.json";
 import {
   EyeOutlined,
   FileExcelOutlined,
@@ -71,8 +69,7 @@ const getShippingStatus = (status) => {
 const paymentStatusList = ["Normal", "UNNormal", "Expired"];
 
 export const TicketList = () => {
-  const [annualStatisticData] = useState(AnnualStatisticData);
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [pinnedTasks, setPinnedTasks] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -92,8 +89,6 @@ export const TicketList = () => {
   const loggeddata = useSelector((state) => state?.user?.loggedInUser.username);
 
   const finddata = fnddata?.filter((item) => item.created_by === loggeddata);
-
-  // console.log(",mm,,m,m", fnddata);
 
   useEffect(() => {
     // Load pinned tasks from local storage on component mount
@@ -133,10 +128,10 @@ export const TicketList = () => {
   const handleShowStatus = (value) => {
     if (value !== "All") {
       const key = "priority";
-      const data = utils.filterArray(OrderListData, key, value);
+      const data = utils.filterArray(list, key, value);
       setList(data);
     } else {
-      setList(OrderListData);
+      setList(finddata);
     }
   };
 
@@ -334,7 +329,7 @@ export const TicketList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : OrderListData;
+    const searchArray = e.currentTarget.value ? list : finddata;
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);
@@ -342,18 +337,6 @@ export const TicketList = () => {
 
   return (
     <div className="container">
-      {/* <Row gutter={16}>
-        {annualStatisticData.map((elm, i) => (
-          <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-            <StatisticWidget
-              title={elm.title}
-              value={elm.value}
-              status={elm.status}
-              subtitle={elm.subtitle}
-            />
-          </Col>
-        ))}
-      </Row> */}
       <Card>
         <Flex
           alignItems="center"

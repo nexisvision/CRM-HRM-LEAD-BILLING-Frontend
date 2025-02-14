@@ -1,15 +1,11 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import { Card, Table, Select, Input, Row, Col, Button, Badge, Menu, Tag, Modal, message } from 'antd';
-import OrderListData from "../../../../../assets/data/order-list.data.json"
 // import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 // import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import AvatarStatus from 'components/shared-components/AvatarStatus';
 import StatisticWidget from 'components/shared-components/StatisticWidget';
-import {
-	AnnualStatisticData,
-} from '../../../dashboards/default/DefaultDashboardData';
 import { TiPinOutline } from "react-icons/ti";
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import Flex from 'components/shared-components/Flex'
@@ -41,7 +37,6 @@ const orderStatusList = ['Ready', 'Shipped']
 const EstimatesList = () => {
     const [idd, setIdd] = useState("");
 
-	const [annualStatisticData] = useState(AnnualStatisticData);
 	const { estimates, loading, error } = useSelector((state) => state.estimate);
 
 	const [list, setList] = useState([])
@@ -58,14 +53,11 @@ const EstimatesList = () => {
 		dispatch(getallestimate(id));
 	}, [dispatch, id]);
 
-
-	const estdatas = useSelector((state)=>state.estimate)
-
 	useEffect(() => {
-		if(estdatas){
-		setList(estdatas);
+		if(estimates){
+		setList(estimates);
 		}
-	  }, [estdatas]);
+	  }, [estimates]);
 
 	const openAddEstimatesModal = () => {
 		setIsAddEstimatesModalVisible(true);
@@ -96,10 +88,10 @@ const EstimatesList = () => {
 	const handleShowStatus = value => {
 		if (value !== 'All') {
 			const key = 'orderStatus'
-			const data = utils.filterArray(OrderListData, key, value)
+			const data = utils.filterArray(estimates, key, value)
 			setList(data)
 		} else {
-			setList(OrderListData)
+			setList(estimates)
 		}
 	}
 
@@ -263,7 +255,7 @@ const EstimatesList = () => {
 
 	const onSearch = e => {
 		const value = e.currentTarget.value
-		const searchArray = e.currentTarget.value ? list : OrderListData
+		const searchArray = e.currentTarget.value ? list : estimates
 		const data = utils.wildCardSearch(searchArray, value)
 		setList(data)
 		setSelectedRowKeys([])

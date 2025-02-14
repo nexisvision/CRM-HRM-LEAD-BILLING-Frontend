@@ -23,8 +23,8 @@ import { getDept } from '../../Department/DepartmentReducers/DepartmentSlice';
 import { getDes } from '../../Designation/DesignationReducers/DesignationSlice';
 
 const IndicatorList = () => {
-  const [users, setUsers] = useState(userData);
-  const [list, setList] = useState(OrderListData);
+  const [users, setUsers] = useState([]);
+  const [list, setList] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [id, setId] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -147,7 +147,7 @@ useEffect(() => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
+    const searchArray = value ? list : [];
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
   };

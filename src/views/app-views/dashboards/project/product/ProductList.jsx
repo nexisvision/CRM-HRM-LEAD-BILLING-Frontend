@@ -14,7 +14,6 @@ import {
   Col,
   message,
 } from "antd";
-import OrderListData from "../../../../../assets/data/order-list.data.json";
 import {
   EyeOutlined,
   FileExcelOutlined,
@@ -59,7 +58,7 @@ const ProductList = () => {
   const allempdata = useSelector((state) => state.Product);
 
   const filtermin = allempdata.Product.data;
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
 
   const [idd, setIdd] = useState("");
@@ -115,10 +114,10 @@ const ProductList = () => {
   const handleShowStatus = (value) => {
     if (value !== "All") {
       const key = "status";
-      const data = utils.filterArray(OrderListData, key, value);
+      const data = utils.filterArray(list, key, value);
       setList(data);
     } else {
-      setList(OrderListData);
+      setList(filtermin);
     }
   };
 
@@ -264,7 +263,7 @@ const ProductList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : OrderListData;
+    const searchArray = e.currentTarget.value ? list : filtermin;
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);

@@ -31,8 +31,6 @@ import AvatarStatus from "components/shared-components/AvatarStatus";
 // import userData from "assets/data/user-list.data.json";
 import AddTrainingSetup from "./AddTrainingSetup";
 import EditTrainingSetup from "./EditTrainingSetup";
-import userData from "../../../../assets/data/user-list.data.json";
-import OrderListData from "../../../../assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
 import { Deletetrainng, GetallTrainng } from "./TrainingReducer/TrainingSlice";
 import useSelection from "antd/es/table/hooks/useSelection";
@@ -44,12 +42,12 @@ import ViewTrainingSetup from "./ViewTrainingSetup";
 const { Option } = Select;
 
 const TrainingSetupList = () => {
-  const [users, setUsers] = useState(userData);
+  const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   // const [viewApplicationVisible, setViewApplicationVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddTrainingSetupModalVisible, setIsAddTrainingSetupModalVisible] =
     useState(false);
@@ -89,7 +87,7 @@ const TrainingSetupList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
+    const searchArray = value ? list : [];
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);
@@ -190,10 +188,10 @@ const TrainingSetupList = () => {
   const handleShowStatus = (value) => {
     if (value !== "All") {
       const key = "status";
-      const data = utils.filterArray(userData, key, value);
+      const data = utils.filterArray([], key, value);
       setUsers(data);
     } else {
-      setUsers(userData);
+      setUsers([]);
     }
   };
 

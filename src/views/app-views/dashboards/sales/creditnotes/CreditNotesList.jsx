@@ -14,7 +14,6 @@ import {
   Modal,
   message,
 } from "antd";
-import OrderListData from "../../../../../assets/data/order-list.data.json";
 // import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 // import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
 import {
@@ -295,7 +294,7 @@ const CreditNotesList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : OrderListData;
+    const searchArray = list;
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);

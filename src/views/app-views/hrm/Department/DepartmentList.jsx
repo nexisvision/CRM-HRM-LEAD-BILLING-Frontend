@@ -9,65 +9,49 @@ import { useNavigate } from 'react-router-dom';
 import AvatarStatus from 'components/shared-components/AvatarStatus';
 import AddDepartment from './AddDepartment';
 import EditDepartment from './EditDepartment';
-
-import userData from "assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
 import { useDispatch, useSelector } from 'react-redux';
 import { DeleteDept, getDept } from './DepartmentReducers/DepartmentSlice';
 
 const DepartmentList = () => {
-  const [users, setUsers] = useState(userData);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [userProfileVisible, setUserProfileVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState(OrderListData);
+  const [users, setUsers] = useState([]);
+  const [list, setList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddDepartmentModalVisible, setIsAddDepartmentModalVisible] = useState(false);
   const [isEditDepartmentModalVisible, setIsEditDepartmentModalVisible] = useState(false);
   const  [dept,setDept] = useState("");
-
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [userProfileVisible, setUserProfileVisible] = useState(false);
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Department);
 
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
 
-  // const navigate = useNavigate();
+  const whorole = roleData.role_name;
 
-    //// permission
-                          
-            const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-            const roles = useSelector((state) => state.role?.role?.data);
-            const roleData = roles?.find(role => role.id === roleId);
-         
-            const whorole = roleData.role_name;
-         
-            const parsedPermissions = Array.isArray(roleData?.permissions)
-            ? roleData.permissions
-            : typeof roleData?.permissions === 'string'
-            ? JSON.parse(roleData.permissions)
-            : [];
-          
-            let allpermisson;  
-         
-            if (parsedPermissions["extra-hrm-department"] && parsedPermissions["extra-hrm-department"][0]?.permissions) {
-              allpermisson = parsedPermissions["extra-hrm-department"][0].permissions;
-              // console.log('Parsed Permissions:', allpermisson);
-            
-            } else {
-              // console.log('extra-hrm-department is not available');
-            }
-            
-            const canCreateClient = allpermisson?.includes('create');
-            const canEditClient = allpermisson?.includes('edit');
-            const canDeleteClient = allpermisson?.includes('delete');
-            const canViewClient = allpermisson?.includes('view');
-         
-            ///endpermission
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+    ? JSON.parse(roleData.permissions)
+    : [];
 
+  let allpermisson;  
 
+  if (parsedPermissions["extra-hrm-department"] && parsedPermissions["extra-hrm-department"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-department"][0].permissions;
+  } else {
+  }
+  
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
 
   const openAddDepartmentModal = () => {
     setIsAddDepartmentModalVisible(true);
@@ -77,8 +61,6 @@ const DepartmentList = () => {
     setIsAddDepartmentModalVisible(false);
   };
 
-
-
   const openEditDepartmentModal = () => {
     setIsEditDepartmentModalVisible(true);
   };
@@ -87,14 +69,13 @@ const DepartmentList = () => {
     setIsEditDepartmentModalVisible(false);
   };
 
-
   const handleParticularDepartmentModal = () => {
     navigate('/app/hrm/department/particulardepartment', { state: { user: selectedUser } });
   };
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
+    const searchArray = value ? list : users;
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);
@@ -104,31 +85,25 @@ const DepartmentList = () => {
     dispatch(getDept())
   },[dispatch]);
 
-    useEffect(() => {
-      if (tabledata && tabledata.Department && tabledata.Department.data) {
-        const filteredData = tabledata.Department.data.filter((item) => item.created_by === user);
-        setUsers(filteredData);
-      }
-    }, [tabledata]);
-
+  useEffect(() => {
+    if (tabledata && tabledata.Department && tabledata.Department.data) {
+      const filteredData = tabledata.Department.data.filter((item) => item.created_by === user);
+      setUsers(filteredData);
+    }
+  }, [tabledata]);
 
   const deleteUser = (userId) => {
-    // dispatch(DeleteDept());
-    // dispatch(getDept());
-    // setUsers(users.filter(item => item.id !== userId));
-    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
-
-      dispatch(DeleteDept( userId ))
-            .then(() => {
-              dispatch(getDept());
-              message.success('Department Deleted successfully!');
-              setUsers(users.filter(item => item.id !== userId));
-              navigate('/app/hrm/department');
-            })
-            .catch((error) => {
-              message.error('Failed to delete department.');
-              console.error('Edit API error:', error);
-            });
+    dispatch(DeleteDept( userId ))
+      .then(() => {
+        dispatch(getDept());
+        message.success('Department Deleted successfully!');
+        setUsers(users.filter(item => item.id !== userId));
+        navigate('/app/hrm/department');
+      })
+      .catch((error) => {
+        message.error('Failed to delete department.');
+        console.error('Edit API error:', error);
+      });
   };
 
   const exportToExcel = () => {
@@ -158,24 +133,16 @@ const DepartmentList = () => {
   const editDept = (Deptid) =>{
     openEditDepartmentModal();
     setDept(Deptid)
-
   }
 
   const dropdownMenu = (elm) => (
     <Menu>
-      {/* <Menu.Item>
-        <Button type="" icon={<EyeOutlined />} onClick={handleParticularDepartmentModal} size="small">
-          <span>View Details</span>
-        </Button>
-      </Menu.Item> */}
-     
       <Menu.Item>
         <Button type="" icon={<PushpinOutlined />} onClick={() => showUserProfile(elm)} size="small">
           <span>Pin</span>
         </Button>
       </Menu.Item>
     
-
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                 <Menu.Item>
                                 <Button type="" icon={<EditOutlined />} onClick={() => editDept(elm.id)} size="small">

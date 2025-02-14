@@ -17,21 +17,17 @@ import { deleteM, MeetData } from './MeetingReducer/MeetingSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 const MeetingList = () => {
-  const [users, setUsers] = useState(userData);
-  const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddMeetingModalVisible, setIsAddMeetingModalVisible] = useState(false);
   const [isEditMeetingModalVisible, setIsEditMeetingModalVisible] = useState(false);
-
   const [meetid, setMeetid] = useState("");
 
   const dispatch = useDispatch();
 
- const user = useSelector((state) => state.user.loggedInUser.username);
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Meeting?.Meeting?.data || []);
-
   const filteredData = tabledata.filter((item) => item.created_by === user) || [];
 
   //   const [dealStatisticData] = useState(DealStatisticData);
@@ -94,9 +90,12 @@ const MeetingList = () => {
   // Search functionality
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
+    const data = value ? 
+      filteredData.filter(item => 
+        item.title.toLowerCase().includes(value.toLowerCase()) ||
+        item.date.toLowerCase().includes(value.toLowerCase())
+      ) : 
+      filteredData;
     setSelectedRowKeys([]);
   };
 
@@ -107,7 +106,8 @@ const MeetingList = () => {
 
       const updatedData = await dispatch(MeetData());
 
-      setUsers(users.filter((item) => item.id !== userId));
+      setSelectedUser(null);
+      setUserProfileVisible(false);
 
       message.success({ content: 'Deleted meeting successfully.', duration: 2 });
     } catch (error) {
@@ -130,15 +130,14 @@ const MeetingList = () => {
 
   const exportToExcel = () => {
     try {
-      const ws = utils.json_to_sheet(users); // Convert JSON data to a sheet
-      const wb = utils.book_new(); // Create a new workbook
-      utils.book_append_sheet(wb, ws, "Meeting"); // Append the sheet to the workbook
-
-      writeFile(wb, "MeetingData.xlsx"); // Save the file as ProposalData.xlsx
-      message.success("Data exported successfully!"); // Show success message
+      const ws = utils.json_to_sheet(filteredData);
+      const wb = utils.book_new();
+      utils.book_append_sheet(wb, ws, "Meeting");
+      writeFile(wb, "MeetingData.xlsx");
+      message.success("Data exported successfully!");
     } catch (error) {
       console.error("Error exporting to Excel:", error);
-      message.error("Failed to export data. Please try again."); // Show error message
+      message.error("Failed to export data. Please try again.");
     }
   };
 
@@ -149,7 +148,7 @@ const MeetingList = () => {
   useEffect(() => {
     if (filteredData) {
       // Filter meetings by created_by matching the logged-in user's username
-          setUsers(filteredData);
+          setSelectedUser(filteredData[0]);
     }
   }, [tabledata]); 
 
@@ -269,7 +268,7 @@ const MeetingList = () => {
          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                    <Table
                                    columns={tableColumns}
-                                   dataSource={users}
+                                   dataSource={filteredData}
                                    rowKey="id"
                                    scroll={{ x: 1200 }}
                                  />

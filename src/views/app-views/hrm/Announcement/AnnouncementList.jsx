@@ -186,35 +186,6 @@ const AnnouncementList = () => {
   );
 
   const tableColumns = [
-    // {
-    //   title: 'User',
-    //   dataIndex: 'name',
-    //   render: (_, record) => (
-    //     <div className="d-flex">
-    //       <AvatarStatus src={record.img} name={record.name} subTitle={record.email} />
-    //     </div>  
-    //   ),
-    //   sorter: {
-    //     compare: (a, b) => {
-    //       a = a.name.toLowerCase();
-    //       b = b.name.toLowerCase();
-    //       return a > b ? -1 : b > a ? 1 : 0;
-    //     },
-    //   },
-    // },
-    // {
-    //   title: 'In Time',
-    //   dataIndex: 'intime',
-    //   sorter: {
-    //     compare: (a, b) => a.intime.length - b.intime.length,
-    //   },
-    // },
-    // {
-    //   title: 'Out Time',
-    //   dataIndex: 'outtime',
-    //   render: (date) => <span>{dayjs.unix(date).format("MM/DD/YYYY")}</span>,
-    //   sorter: (a, b) => dayjs(a.outtime).unix() - dayjs(b.outtime).unix(),
-    // },
     {
       title: 'Titile',
       dataIndex: 'title',
@@ -229,20 +200,6 @@ const AnnouncementList = () => {
         compare: (a, b) => a.description.length - b.description.length,
       },
     },
-    // {
-    //   title: 'Total Hour',
-    //   dataIndex: 'totalhour',
-    //   sorter: {
-    //     compare: (a, b) => a.totalhour.length - b.totalhour.length,
-    //   },
-    // },
-    // {
-    //   title: 'Punch By',
-    //   dataIndex: 'punchby',
-    //   sorter: {
-    //     compare: (a, b) => a.punchby.length - b.punchby.length,
-    //   },
-    // },
     {
       title: 'Action',
       dataIndex: 'actions',

@@ -18,8 +18,6 @@ import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddEmployee from "./AddEmployee";
 import EditEmployee from "./EditEmployee";
 import ViewEmployee from "./ViewEmployee";
-import userData from "assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,11 +26,11 @@ import { roledata } from "../RoleAndPermission/RoleAndPermissionReducers/RoleAnd
 
 const EmployeeList = () => {
   // State declarations
-  const [users, setUsers] = useState(userData);
+  const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddEmployeeModalVisible, setIsAddEmployeeModalVisible] =
     useState(false);
@@ -105,7 +103,7 @@ const EmployeeList = () => {
   // Search handler
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
+    const searchArray = value ? list : [];
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);

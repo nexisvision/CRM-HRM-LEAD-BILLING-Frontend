@@ -12,7 +12,6 @@ import {
   Modal,
   message,
 } from "antd";
-import OrderListData from "assets/data/order-list.data.json";
 import {
   EyeOutlined,
   FileExcelOutlined,
@@ -64,7 +63,7 @@ const getRevenueStatus = (status) => {
 const revenueStatusList = ["Paid", "Pending", "Expired"];
 
 const RevenueList = () => {
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddRevenueModalVisible, setIsAddRevenueModalVisible] =
@@ -115,10 +114,10 @@ const RevenueList = () => {
   const handleShowStatus = (value) => {
     if (value !== "All") {
       const key = "revenueStatus";
-      const data = utils.filterArray(OrderListData, key, value);
+      const data = utils.filterArray(list, key, value);
       setList(data);
     } else {
-      setList(OrderListData);
+      setList(fnddata);
     }
   };
 
@@ -320,7 +319,7 @@ const RevenueList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : OrderListData;
+    const searchArray = e.currentTarget.value ? list : fnddata;
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);

@@ -1,8 +1,6 @@
 import React, { Component, useEffect } from "react";
 import { useState } from "react";
 // import { PrinterOutlined } from '@ant-design/icons';
-import StatisticWidget from "components/shared-components/StatisticWidget";
-import { AnnualStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import {
   Row,
   Card,
@@ -22,7 +20,6 @@ import NumberFormat from "react-number-format";
 import ViewInvoice from "./ViewInvoice";
 // import React, {useState} from 'react'
 // import { Card, Table, Select, Input, Button, Badge, Menu, Tag } from 'antd';
-import OrderListData from "../../../../../assets/data/order-list.data.json";
 import {
   EyeOutlined,
   FileExcelOutlined,
@@ -59,8 +56,7 @@ const getPaymentStatus = (status) => {
 };
 const paymentStatusList = ["paid", "pending"];
 export const InvoiceList = () => {
-  const [annualStatisticData] = useState(AnnualStatisticData);
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isAddInvoiceModalVisible, setIsAddInvoiceModalVisible] =
     useState(false);
@@ -94,10 +90,10 @@ export const InvoiceList = () => {
   const handleShowStatus = (value) => {
     if (value !== "All") {
       const key = "paymentStatus";
-      const data = utils.filterArray(OrderListData, key, value);
+      const data = utils.filterArray(fnddata, key, value);
       setList(data);
     } else {
-      setList(OrderListData);
+      setList(fnddata);
     }
   };
 
@@ -307,7 +303,7 @@ export const InvoiceList = () => {
   };
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : OrderListData;
+    const searchArray = e.currentTarget.value ? list : fnddata;
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);
@@ -322,18 +318,6 @@ export const InvoiceList = () => {
   // render() {
   return (
     <div className="container">
-      {/* <Row gutter={16}>
-        {annualStatisticData.map((elm, i) => (
-          <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-            <StatisticWidget
-              title={elm.title}
-              value={elm.value}
-              status={elm.status}
-              subtitle={elm.subtitle}
-            />
-          </Col>
-        ))}
-      </Row> */}
       <Card>
         <Flex
           alignItems="center"

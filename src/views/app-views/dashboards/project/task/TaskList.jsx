@@ -2,7 +2,6 @@ import React, { Component, useEffect } from "react";
 import { useState } from "react";
 // import { PrinterOutlined } from '@ant-design/icons';
 import StatisticWidget from "components/shared-components/StatisticWidget";
-import { AnnualStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import {
   Row,
   Card,
@@ -22,7 +21,6 @@ import {
 import NumberFormat from "react-number-format";
 // import React, {useState} from 'react'
 // import { Card, Table, Select, Input, Button, Badge, Menu, Tag } from 'antd';
-import OrderListData from "../../../../../assets/data/order-list.data.json";
 import {
   EyeOutlined,
   FileExcelOutlined,
@@ -47,6 +45,7 @@ import EditTask from "./EditTask";
 import TaskView from "./TaskView";
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteTasks, GetTasks } from "./TaskReducer/TaskSlice";
+import { AnnualStatisticData } from "../../default/DefaultDashboardData";
 
 const { Column } = Table;
 
@@ -78,10 +77,9 @@ const getShippingStatus = (status) => {
 const paymentStatusList = ["Paid", "Pending", "Expired"];
 
 export const TaskList = () => {
+  const [list, setList] = useState([]);
   const [annualStatisticData] = useState(AnnualStatisticData);
   const [pinnedTasks, setPinnedTasks] = useState([]);
-
-  const [list, setList] = useState(OrderListData);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isAddTaskModalVisible, setIsAddTaskModalVisible] = useState(false);
   const [isEditTaskModalVisible, setIsEditTaskModalVisible] = useState(false);
@@ -97,16 +95,6 @@ export const TaskList = () => {
 
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
-  const handleShowStatus = (value) => {
-    // if (value !== "All") {
-    //   const key = "paymentStatus";
-    //   const data = utils.filterArray(OrderListData, key, value);
-    //   setList(data);
-    // } else {
-    //   setList([]);
-    // }
-  };
 
   // Open Add Job Modal
   const openAddTaskModal = () => {
@@ -129,9 +117,6 @@ export const TaskList = () => {
   };
 
   // Open Add Job Modal
-  // const openViewTaskModal = () => {
-  //     setIsViewTaskModalVisible(true);
-  // };
   const openViewTaskModal = () => {
     navigate("/app/dashboards/project/task/TaskView", {
       state: { user: selectedUser },
@@ -341,8 +326,7 @@ export const TaskList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : OrderListData;
-    const data = utils.wildCardSearch(searchArray, value);
+    const data = utils.wildCardSearch(list, value);
     setList(data);
     setSelectedRowKeys([]);
   };

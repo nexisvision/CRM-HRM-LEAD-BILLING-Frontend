@@ -12,7 +12,6 @@ import { getcurren } from "../setting/currencies/currenciesSlice/currenciesSlice
 const { Title, Text } = Typography;
 
 const PlanList = () => {
-  const [plans, setPlans] = useState([]);
   const [isAddPlanModalVisible, setIsAddPlanModalVisible] = useState(false);
   const [isEditPlanModalVisible, setIsEditPlanModalVisible] = useState(false);
   const [idd, setIdd] = useState("");
@@ -23,8 +22,6 @@ const PlanList = () => {
   const allempdatass = useSelector((state) => state.currencies);
   const currencyData = allempdatass?.currencies?.data || [];
 
-
-
   useEffect(() => {
     dispatch(getcurren())
   }, [])
@@ -33,15 +30,10 @@ const PlanList = () => {
     dispatch(GetPlan());
   }, [dispatch]);
 
-  useEffect(() => {
-    setPlans(allPlans || []);
-  }, [allPlans]);
-
   const deletePlan = async (planId) => {
     try {
       await dispatch(DeleteP(planId)).then(() => {
         dispatch(GetPlan());
-        setPlans(plans.filter((plan) => plan.id !== planId));
       });
       message.success({ content: 'Plan deleted successfully', duration: 2 });
     } catch (error) {
@@ -56,12 +48,8 @@ const PlanList = () => {
   const closeEditPlanModal = () => setIsEditPlanModalVisible(false);
 
   const togglePlan = (id) => {
-    setPlans((prevPlans) =>
-      prevPlans.map((plan) =>
-        plan.id === id ? { ...plan, status: !plan.status } : plan
-      )
-    );
-    message.success({ content: `Plan status updated`, duration: 2 });
+    message.info({ content: 'Plan status toggle functionality needs to be implemented', duration: 2 });
+    // TODO: Implement plan status toggle through Redux
   };
 
   const EditP = (id) => {
@@ -112,11 +100,11 @@ const PlanList = () => {
           </Col>
         </Row>
 
-        {plans.length === 0 ? (
+        {allPlans?.length === 0 ? (
           <Empty description="No plans found" className="my-12" />
         ) : (
           <Row gutter={[24, 24]}>
-            {plans.map((plan) => (
+            {allPlans?.map((plan) => (
               <Col xs={24} sm={24} md={12} lg={8} xl={6} key={plan.id}>
                 <Card
                   className="plan-card h-full  rounded-xl"

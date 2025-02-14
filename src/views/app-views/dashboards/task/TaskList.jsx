@@ -14,7 +14,7 @@ import {
   Modal,
   message,
 } from "antd";
-import OrderListData from "../../../../assets/data/order-list.data.json";
+// import OrderListData from "../../../../assets/data/order-list.data.json";
 // import OrderListData from "assets/data/order-list.data.json"
 import {
   EyeOutlined,
@@ -74,7 +74,7 @@ const stripHtmlTags = (html) => {
 const TaskList = () => {
   // const [annualStatisticData] = useState(AnnualStatisticData);
 
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [pinnedTasks, setPinnedTasks] = useState([]);
@@ -173,10 +173,10 @@ const TaskList = () => {
   const handleShowStatus = (value) => {
     if (value !== "All") {
       const key = "status";
-      const data = utils.filterArray(OrderListData, key, value);
+      const data = utils.filterArray(list, key, value);
       setList(data);
     } else {
-      setList(OrderListData);
+      dispatch(GetTasks(idd));
     }
   };
 
@@ -372,7 +372,7 @@ const TaskList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : OrderListData;
+    const searchArray = e.currentTarget.value ? list : fnddata;
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);

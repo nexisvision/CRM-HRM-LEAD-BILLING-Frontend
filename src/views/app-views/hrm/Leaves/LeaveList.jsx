@@ -26,15 +26,14 @@ import { useDispatch } from "react-redux";
 import { DeleteLea, GetLeave } from "./LeaveReducer/LeaveSlice";
 import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
 const LeaveList = () => {
-  const [users, setUsers] = useState(userData);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState(OrderListData); // Initialize with OrderListData
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [isAddLeaveModalVisible, setIsAddLeaveModalVisible] = useState(false); // State to toggle Add Employee Modal
+  const [isAddLeaveModalVisible, setIsAddLeaveModalVisible] = useState(false);
   const [isViewLeaveModalVisible, setIsViewLeaveModalVisible] = useState(false);
-  const [isEditLeaveModalVisible, setIsEditLeaveModalVisible] = useState(false); // State to toggle Add Employee Modal
+  const [isEditLeaveModalVisible, setIsEditLeaveModalVisible] = useState(false);
   const [editid, setEditid] = useState(null);
+  const [users, setUsers] = useState([]);  // Changed to empty array instead of userData
   const dispatch = useDispatch();
   // console.log("xiiiii", editid);
 
@@ -68,10 +67,20 @@ const LeaveList = () => {
   };
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    if (value) {
+      const filteredData = users.filter(item => 
+        item.name?.toLowerCase().includes(value.toLowerCase()) ||
+        item.leaveType?.toLowerCase().includes(value.toLowerCase()) ||
+        item.reason?.toLowerCase().includes(value.toLowerCase())
+      );
+      setUsers(filteredData);
+    } else {
+      // If search is empty, reset to the original data from redux
+      if (tabledata && tabledata.Leave && tabledata.Leave.data) {
+        const filteredData = tabledata.Leave.data.filter(item => item.created_by === user);
+        setUsers(filteredData);
+      }
+    }
   };
 
    //// permission

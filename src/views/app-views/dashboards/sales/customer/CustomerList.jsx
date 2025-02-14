@@ -28,12 +28,8 @@ import ViewCustomer from "../customer/ViewCustomer";
 import Flex from "components/shared-components/Flex";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import StatisticWidget from "components/shared-components/StatisticWidget";
-// import { DealStatisticData } from '../../dashboards/default/DefaultDashboardData';
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddCustomer from "./AddCustomer";
-import userData from "../../../../../assets/data/user-list.data.json";
-// import userData from 'assets/data/user-list.data.json';
-import OrderListData from "../../../../../assets/data/order-list.data.json";
 import { IoCopyOutline } from "react-icons/io5";
 import { utils, writeFile } from "xlsx";
 import EditCustomer from "./EditCustomer";
@@ -42,12 +38,10 @@ import { useDispatch, useSelector } from "react-redux";
 import useSelection from "antd/es/table/hooks/useSelection";
 
 const CustomerList = () => {
-  const [users, setUsers] = useState([]);  // Initialize as empty array
+  const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
-  const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
-  //   const [customerVisible,setCustomerVisible] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] =
     useState(false);
@@ -141,13 +135,19 @@ const CustomerList = () => {
     setIsViewCustomerModalVisible(false);
   };
 
-  // Search functionality
+  // Update search functionality to use users instead of list
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    if (!value) {
+      setUsers(filterdata); // Reset to original filtered data
+      return;
+    }
+    const filteredUsers = filterdata.filter(user => 
+      Object.values(user).some(val => 
+        val && val.toString().toLowerCase().includes(value.toLowerCase())
+      )
+    );
+    setUsers(filteredUsers);
   };
 
   // Delete user function update
@@ -161,15 +161,14 @@ const CustomerList = () => {
         console.error('Delete error:', error);
       });
   };
+
+  // Update export function to use users instead of list
   const exportToExcel = () => {
     try {
-     
-      const ws = utils.json_to_sheet(list);
-      const wb = utils.book_new(); // Create a new workbook
-      utils.book_append_sheet(wb, ws, "Customer"); // Append the worksheet to the workbook
-
-      // Write the workbook to a file
-      writeFile(wb, "CoustomerData.xlsx");
+      const ws = utils.json_to_sheet(users);
+      const wb = utils.book_new();
+      utils.book_append_sheet(wb, ws, "Customer");
+      writeFile(wb, "CustomerData.xlsx");
       message.success("Data exported successfully!");
     } catch (error) {
       console.error("Error exporting to Excel:", error);
@@ -183,21 +182,11 @@ const CustomerList = () => {
     setUserProfileVisible(true);
   };
 
-  //   const showCustomerView = (userInfo) => {
-  //     setSelectedUser(userInfo);
-  //     setCustomerVisible(true);
-  //   };
-
   // Close user profile
   const closeUserProfile = () => {
     setSelectedUser(null);
     setUserProfileVisible(false);
   };
-
-  //   const closeCustomerView = () => {
-  //     setSelectedUser(null);
-  //     setCustomerVisible(false);
-  //   };
 
   const editfun = (idd) => {
     openEditCustomerModal();
@@ -206,23 +195,6 @@ const CustomerList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EyeOutlined />}
-            onClick={() => openviewCustomerModal(elm)}
-            size="small"
-          >
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-     
-
-
-
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
                      <Menu.Item>
                      <Flex alignItems="center">
@@ -255,23 +227,6 @@ const CustomerList = () => {
                      </Flex>
                    </Menu.Item>
                     ) : null}
-
-
-                    
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<PushpinOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span className="ml-2">Pin</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-     
     </Menu>
   );
 

@@ -38,14 +38,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { getjobapplication } from "../JobApplication/JobapplicationReducer/JobapplicationSlice";
 
 const JobCandidateList = () => {
-  const [users, setUsers] = useState(userData);
-  const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddJobCandidateModalVisible, setIsAddJobCandidateModalVisible] =
     useState(false);
   const [annualStatisticData] = useState(AnnualStatisticData);
+  const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
@@ -76,7 +75,7 @@ const JobCandidateList = () => {
   };
 
   const exportToExcel = () => {
-    const ws = utils.json_to_sheet(users);
+    const ws = utils.json_to_sheet(filteredData);
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, "Candidates");
     writeFile(wb, "JobCandidates.xlsx");
@@ -90,16 +89,15 @@ const JobCandidateList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
+    const searchArray = filteredData;
     const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
+    setUsers(data);
     setSelectedRowKeys([]);
   };
 
   // Delete user
   const deleteUser = (userId) => {
-    setUsers(users.filter((item) => item.id !== userId));
-    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    setUsers(filteredData.filter((item) => item.id !== userId));
   };
 
   // Show user profile
@@ -298,16 +296,14 @@ const JobCandidateList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                   <Table
-                                                   columns={tableColumns}
-                                                   dataSource={users}
-                                                   rowKey="id"
-                                                   scroll={{ x: 1200 }}
-                                                 />
-                                                     ) : null}
-
-       
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          <Table
+            columns={tableColumns}
+            dataSource={filteredData}
+            rowKey="id"
+            scroll={{ x: 1200 }}
+          />
+        ) : null}
       </div>
       <UserView
         data={selectedUser}

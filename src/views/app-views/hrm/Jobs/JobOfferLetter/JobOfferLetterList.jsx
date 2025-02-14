@@ -27,8 +27,6 @@ import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddJobOfferLetter from "./AddJobOfferLetter";
 import EditJobOfferLetter from "./EditJobOfferLetter";
-import userData from "assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -45,11 +43,11 @@ const { Option } = Select;
 
 const JobOfferLetterList = () => {
   const dispatch = useDispatch();
-  const [users, setUsers] = useState(userData);
+  const [users, setUsers] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   // const [viewApplicationVisible, setViewApplicationVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddJobOfferLetterModalVisible, setIsAddJobOfferLetterModalVisible] =
     useState(false);
@@ -142,7 +140,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
+    const searchArray = value ? list : [];
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
     setSelectedRowKeys([]);
@@ -203,10 +201,10 @@ const user = useSelector((state) => state.user.loggedInUser.username);
   const handleShowStatus = (value) => {
     if (value !== "All") {
       const key = "status";
-      const data = utils.filterArray(userData, key, value);
+      const data = utils.filterArray(users, key, value);
       setUsers(data);
     } else {
-      setUsers(userData);
+      setUsers(users);
     }
   };
 

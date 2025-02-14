@@ -1,34 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Menu, Input, message, Button, Modal } from "antd";
+import { Card, Table, Menu, Input, message, Button, Modal, Space } from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
   PlusOutlined,
-  FileExcelOutlined,
 } from "@ant-design/icons";
-import UserView from "../../../Users/user-list/UserView";
-import Flex from "components/shared-components/Flex";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddSalary from "./AddSalary";
-import { useNavigate } from "react-router-dom";
-// import setsalary from './setsalary';
-import userData from "assets/data/user-list.data.json";
-import utils from "utils";
-import Allowance from "./Allowance";
-import Commission from "./Commission";
 import SetSalary from "./SetSalary";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteSalaryss, getSalaryss } from "./SalaryReducers/SalarySlice";
 import { empdata } from "../../Employee/EmployeeReducers/EmployeeSlice";
+import { useNavigate } from "react-router-dom";
 
 const SalaryList = () => {
-  const [users, setUsers] = useState(userData);
-  const [list, setList] = useState(userData);
+  const [list, setList] = useState([]);
   const [id, setId] = useState(null);
-
-const [userId, setUserId] = useState(null);
+  const [userId, setUserId] = useState(null);
   const dispatch = useDispatch();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -36,11 +25,8 @@ const [userId, setUserId] = useState(null);
   const [isSetSalaryModalVisible, setIsSetSalaryModalVisible] = useState(false);
 
   const navigate = useNavigate();
-  // const [isSetSalaryModalVisible, setIsSetSalaryModalVisible] = useState(false);
   const openSetSalaryModal = () => setIsSetSalaryModalVisible(true);
   const closeSetSalaryModal = () => setIsSetSalaryModalVisible(false);
-
-
 
   useEffect(() => {
     dispatch(getSalaryss());
@@ -55,140 +41,87 @@ const [userId, setUserId] = useState(null);
     }
   }, [dfnddata]);
 
- useEffect(() => {
+  useEffect(() => {
     dispatch(empdata());
   }, [dispatch]);
 
-   //// permission
-                 
-   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-   const roles = useSelector((state) => state.role?.role?.data);
-   const roleData = roles?.find(role => role.id === roleId);
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
 
-   const whorole = roleData.role_name;
+  const whorole = roleData.role_name;
 
-   const parsedPermissions = Array.isArray(roleData?.permissions)
-   ? roleData.permissions
-   : typeof roleData?.permissions === 'string'
-   ? JSON.parse(roleData.permissions)
-   : [];
- 
- 
-   let allpermisson;  
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+    ? JSON.parse(roleData.permissions)
+    : [];
 
-   if (parsedPermissions["extra-hrm-payroll-salary"] && parsedPermissions["extra-hrm-payroll-salary"][0]?.permissions) {
-     allpermisson = parsedPermissions["extra-hrm-payroll-salary"][0].permissions;
-    //  console.log('Parsed Permissions:', allpermisson);
-   
-   } else {
-    //  console.log('extra-hrm-payroll-salary is not available');
-   }
-   
-   const canCreateClient = allpermisson?.includes('create');
-   const canEditClient = allpermisson?.includes('edit');
-   const canDeleteClient = allpermisson?.includes('delete');
-   const canViewClient = allpermisson?.includes('view');
+  let allpermisson;
 
-   ///endpermission
+  if (parsedPermissions["extra-hrm-payroll-salary"] && parsedPermissions["extra-hrm-payroll-salary"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-payroll-salary"][0].permissions;
+  } else {
+  }
 
-  // Open Add Salary Modal
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
   const openAddSalaryModal = () => {
     setIsAddSalaryModalVisible(true);
   };
 
-  // const handleSetSalary = () => {
-  //   navigate("/app/hrm/payroll/salary/setsalary", {
-  //     state: { user: selectedUser },
-  //   }); // Pass user data as state if needed
-  // };
-
-
   const openSetSalaryModall = (id) => {
-    setId(id); // Store selected user object
+    setId(id);
     console.log("userId",id);
     openSetSalaryModal();
   };
-  
-  // Close Set Salary Modal
-  // const closeSetSalaryModal = () => {
-  //   setUserId(null);
-  //   setIsSetSalaryModalVisible(false);
-  // };
 
-
-  // Close Add Salary Modal
   const closeAddSalaryModal = () => {
     setIsAddSalaryModalVisible(false);
   };
 
-  // Open Set Salary Modal
-  // const openSetSalaryModal = (user) => {
-  //   setSelectedUser(user);
-  //   setIsSetSalaryModalVisible(true);
-  // };
-
-  // // Close Set Salary Modal
-  // const closeSetSalaryModal = () => {
-  //   setSelectedUser(null);
-  //   setIsSetSalaryModalVisible(false);
-  // };
-
-  // Search functionality
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const filteredUsers = utils.wildCardSearch(userData, value);
-    setList(filteredUsers);
+    const searchStr = value.toLowerCase();
+    const filteredData = dfnddata.filter(item => 
+      Object.values(item).some(val => 
+        val?.toString().toLowerCase().includes(searchStr)
+      )
+    );
+    setList(filteredData);
   };
 
-  // Delete user
   const deleteUser = (userId) => {
     dispatch(deleteSalaryss(userId)).then(() => {
       dispatch(getSalaryss());
-      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
       setList(list.filter((item) => item.id !== userId));
     });
   };
 
   const dropdownMenu = (user) => (
     <Menu>
-      {/* <Menu.Item>
-        <Button
-          type="text"
-          icon={<EyeOutlined />}
-          onClick={() => setUserProfileVisible(true)}
-        >
-          View Details
-        </Button>
-      </Menu.Item> */}
-      {/* <Menu.Item>
-        <Button type="text" icon={<EyeOutlined />} onClick={() => openSetSalaryModal(user)}>
-          Set Salary
-        </Button>
-      </Menu.Item> */}
-
-     
-     
-
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                            <Menu.Item>
-                            <Button type="text" icon={<EyeOutlined />} onClick={ () => openSetSalaryModall(user.employeeId)}>
-                              Set Salary
-                            </Button>
-                          </Menu.Item>
-                    ) : null}
-      
+        <Menu.Item>
+          <Button type="text" icon={<EyeOutlined />} onClick={ () => openSetSalaryModall(user.employeeId)}>
+            Set Salary
+          </Button>
+        </Menu.Item>
+      ) : null}
       
       {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                      <Menu.Item>
-                      <Button
-                        type="text"
-                        icon={<DeleteOutlined />}
-                        onClick={() => deleteUser(user.id)}
-                      >
-                        Delete
-                      </Button>
-                    </Menu.Item>
-                    ) : null}
+        <Menu.Item>
+          <Button
+            type="text"
+            icon={<DeleteOutlined />}
+            onClick={() => deleteUser(user.id)}
+          >
+            Delete
+          </Button>
+        </Menu.Item>
+      ) : null}
     </Menu>
   );
 
@@ -197,17 +130,6 @@ const [userId, setUserId] = useState(null);
       title: "salary",
       dataIndex: "salary",
     },
-    // {
-    //   title: "Name",
-    //   dataIndex: "name",
-    //   render: (_, record) => (
-    //     <AvatarStatus
-    //       src={record.img}
-    //       name={record.name}
-    //       subTitle={record.email}
-    //     />
-    //   ),
-    // },
     {
       title: "PayRoll Type",
       dataIndex: "payslipType",
@@ -232,27 +154,23 @@ const [userId, setUserId] = useState(null);
 
   return (
     <Card>
-      <Flex alignItems="center" justifyContent="space-between">
+      <Space style={{ width: '100%', justifyContent: 'space-between' }}>
         <Input
           placeholder="Search"
           prefix={<SearchOutlined />}
           onChange={onSearch}
         />
    
-
         {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                                                                        <Button type="primary" className="ml-2" onClick={openAddSalaryModal}>
-                                                                                                                                                                        <PlusOutlined /> Add Salary
-                                                                                                                                                                      </Button>
-                                                                                                                                                      
-                                                                                                                                                          ) : null}
-      </Flex>
+          <Button type="primary" className="ml-2" onClick={openAddSalaryModal}>
+            <PlusOutlined /> Add Salary
+          </Button>
+        ) : null}
+      </Space>
 
-       {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                                           <Table columns={tableColumns} dataSource={list} rowKey="id" />
-
-      
-                                                                                                                                ) : null}
+      {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        <Table columns={tableColumns} dataSource={list} rowKey="id" />
+      ) : null}
 
       <Modal
         title="Add Salary"

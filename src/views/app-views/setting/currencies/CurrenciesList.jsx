@@ -5,7 +5,6 @@ import Flex from 'components/shared-components/Flex'
 import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils'
-import userData from '../../../../assets/data/user-list.data.json';
 import { useDispatch, useSelector } from 'react-redux';
 // import { getallcurrencies } from './currenciesreducer/currenciesSlice';
 import AddCurrencies from './AddCurrencies';
@@ -18,16 +17,12 @@ const { Column } = Table;
 const { Option } = Select
 
 export const CurrenciesList = () => {
-    const [users, setUsers] = useState(userData);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [isAddCurrenciesModalVisible, setIsAddCurrenciesModalVisible] = useState(false);
     const [isEditCurrenciesModalVisible, setIsEditCurrenciesModalVisible] = useState(false);
     const [selectedCurrency, setSelectedCurrency] = useState(null);
     const dispatch = useDispatch();
-    // const { currencies } = useSelector(
-    //     (state) => state.currencies.currencies
-    // );
     const filterdata = useSelector((state) => state.currencies?.currencies?.data);
         
     // Get logged-in username
@@ -92,14 +87,6 @@ export const CurrenciesList = () => {
         
         setFilteredData(filtered);
     }
-
-    // const onSearch = e => {
-    //     const value = e.currentTarget.value
-    //     const searchArray = e.currentTarget.value ? users : userData
-    //     const data = utils.wildCardSearch(searchArray, value)
-    //     setUsers(data)
-    //     setSelectedRowKeys([])
-    // }
 
     const dropdownMenu = (elm) => (
         <Menu>
