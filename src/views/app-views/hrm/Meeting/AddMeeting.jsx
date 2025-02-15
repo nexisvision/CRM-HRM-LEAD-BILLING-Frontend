@@ -122,7 +122,7 @@ const AddMeeting = ({ onClose }) => {
               {/* Department Field */}
               <Col span={24} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Department</label>
+                  <label className="font-semibold">Department <span className="text-red-500">*</span></label>
                   <Field name="department">
                     {({ field, form }) => (
                       <Select
@@ -130,6 +130,7 @@ const AddMeeting = ({ onClose }) => {
                       {...field}
                       placeholder="Select Department"
                       loading={!filteredDept}
+                      className="w-full mt-1"
                       value={form.values.department}
                       onChange={(value) => {
                         form.setFieldValue("department", value);
@@ -162,9 +163,9 @@ const AddMeeting = ({ onClose }) => {
               </Col>
 
               {/* Employee Field */}
-              <Col span={24} className="mt-2">
+              <Col span={24} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Employee</label>
+                  <label className="font-semibold">Employee <span className="text-red-500">*</span></label>
                   <Field name="employee">
                     {({ field, form }) => (
                      <Select
@@ -173,6 +174,7 @@ const AddMeeting = ({ onClose }) => {
                      placeholder="Select Employee"
                      loading={!filteredEmpDataa}
                      value={form.values.employee}
+                     className="w-full mt-1"
                      onChange={(value) => form.setFieldValue("employee", value)}
                      onBlur={() => form.setFieldTouched("employee", true)}
                    >
@@ -199,10 +201,10 @@ const AddMeeting = ({ onClose }) => {
               </Col>
 
               {/* Meeting Title Field */}
-              <Col span={24} className="mt-2">
+              <Col span={24} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Meeting Title</label>
-                  <Field name="title" as={Input} placeholder="Event Title" />
+                  <label className="font-semibold">Meeting Title <span className="text-red-500">*</span></label>
+                  <Field name="title" as={Input} placeholder="Event Title" className="w-full mt-1" />
                   <ErrorMessage
                     name="title"
                     component="div"
@@ -212,11 +214,11 @@ const AddMeeting = ({ onClose }) => {
               </Col>
 
               {/* Meeting Date Field */}
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Meeting Date</label>
+                  <label className="font-semibold">Meeting Date <span className="text-red-500">*</span></label>
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.date}
                     onChange={(date) => setFieldValue("date", date)}
@@ -231,11 +233,11 @@ const AddMeeting = ({ onClose }) => {
               </Col>
 
               {/* Meeting Time Field */}
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Meeting Time</label>
+                  <label className="font-semibold">Meeting Time <span className="text-red-500">*</span></label>
                   <TimePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="HH:mm"
                     value={values.startTime}
                     onChange={(startTime) =>
@@ -251,11 +253,11 @@ const AddMeeting = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Meeting end Time</label>
+                  <label className="font-semibold">Meeting end Time <span className="text-red-500">*</span></label>
                   <TimePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="HH:mm"
                     value={values.endTime}
                     onChange={(endTime) =>
@@ -271,14 +273,14 @@ const AddMeeting = ({ onClose }) => {
                 </div>
               </Col>
               <Col span={12}>
-                <div className="form-item mt-2">
-                  <label className="font-semibold">Status</label>
+                <div className="form-item mt-3">
+                  <label className="font-semibold">Status <span className="text-red-500">*</span> </label>
                   <Select
                     placeholder="Select Status"
                     value={values.status}
                     onChange={(value) => setFieldValue("status", value)}
 
-                     className="w-full mt-2"
+                     className="w-full mt-1"
                   >
                     <Option value="scheduled">scheduled</Option>
                     <Option value="completed">completed</Option>
@@ -292,14 +294,15 @@ const AddMeeting = ({ onClose }) => {
                 </div>
               </Col>
               {/* Meeting Notes Field */}
-              <Col span={24} className="mt-2">
+                <Col span={24} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Meeting Note</label>
+                  <label className="font-semibold">Meeting Note <span className="text-red-500">*</span></label>
                   <Field name="description">
                     {({ field }) => (
                       <ReactQuill
                         {...field}
                         value={values.description}
+                        className="w-full mt-1"
                         onChange={(value) =>
                           setFieldValue("description", value)
                         }
@@ -316,13 +319,12 @@ const AddMeeting = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24} className="mt-2">
+              <Col span={24} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">meetingLink Title</label>
-                  <Field name="meetingLink" as={Input} placeholder="Event meetingLink" />
+                    <label className="font-semibold">meetingLink Title <span className="text-red-500">*</span></label>
+                  <Field name="meetingLink" as={Input} placeholder="Event meetingLink" className="w-full mt-1" />
                   <ErrorMessage
                     name="meetingLink"
-
                     component="div"
                     className="error-message text-red-500 my-1"
                   />

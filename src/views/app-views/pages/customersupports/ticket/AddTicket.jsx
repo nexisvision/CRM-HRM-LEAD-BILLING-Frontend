@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 
 const { Option } = Select;
+const { TextArea } = Input;
 
 const AddTicket = ({ onClose }) => {
   const navigate = useNavigate();
@@ -44,268 +45,249 @@ const AddTicket = ({ onClose }) => {
     status: "Open",
     endDate: null,
     description: "",
-    file: '',
+    file: null,
   };
 
-  const validationSchema = Yup.object({
-    ticketSubject: Yup.string().required("Please enter a subject."),
-    requestor: Yup.string().required("Please select a user."),
-    priority: Yup.string().required("Please select priority."),
-    status: Yup.string().required("Please select status."),
-    endDate: Yup.date().required("Please select an end date."),
-    description: Yup.string().required("Please enter a description."),
+  const validationSchema = Yup.object().shape({
+    ticketSubject: Yup.string().required("Subject is required"),
+    requestor: Yup.string().required("Employee selection is required"),
+    priority: Yup.string().required("Priority is required"),
+    status: Yup.string().required("Status is required"),
+    endDate: Yup.date().required("End date is required"),
+    description: Yup.string().required("Description is required"),
   });
 
-  const onSubmit = async (values, { resetForm }) => {
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      // const formData = new FormData();
-      
       const formData = new FormData();
-    for (const key in values) {
-        formData.append(key, values[key]);
-    }
+      Object.keys(values).forEach(key => {
+        if (values[key] !== null) {
+          if (key === 'endDate') {
+            formData.append(key, values[key].format('YYYY-MM-DD'));
+          } else {
+            formData.append(key, values[key]);
+          }
+        }
+      });
 
-      // Dispatch with proper error handling
       await dispatch(AddTickets(formData)).unwrap();
-      // message.success('Ticket created successfully!');
+      message.success('Ticket created successfully!');
       dispatch(getAllTicket());
       onClose();
       resetForm();
     } catch (error) {
-      // message.error(error?.message || 'Failed to create ticket');
+      message.error(error?.message || 'Failed to create ticket');
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  // Update the file upload component
-  const FileUploadField = ({ field, form }) => {
-    const handleFileChange = (info) => {
-      if (info.file) {
-        form.setFieldValue('file', info.file);
-      }
-    };
-
-    return (
-      <Upload
-        beforeUpload={(file) => {
-          // Validate file type and size if needed
-          const isValidFile = file.size < 5000000; // 5MB limit example
-          if (!isValidFile) {
-            message.error('File must be smaller than 5MB!');
-            return false;
-          }
-          return false; // Return false to prevent auto upload
-        }}
-        onChange={handleFileChange}
-        maxCount={1}
-        showUploadList={true}
-      >
-        <Button icon={<UploadOutlined />}>Select File</Button>
-      </Upload>
-    );
-  };
-
   return (
-    <div className="create-ticket-form">
-      {/* <h2>Create Support Ticket</h2> */}
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
-
+    <div className="">
+      <div className="border-b border-gray-200 mb-2"></div>
+      
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
       >
-        {({ setFieldValue, values, resetForm }) => (
-          <FormikForm>
-            <Row gutter={[16, 16]}>
+        {({ values, handleSubmit, setFieldValue, isSubmitting }) => (
+          <Form layout="vertical" onFinish={handleSubmit} className="space-y-4">
+            <Row gutter={16}>
               {/* Subject */}
               <Col span={24}>
-                <Field name="ticketSubject">
-                  {({ field }) => (
-                    <Form.Item label="Subject" required>
-                      <Input {...field} placeholder="Enter Subject" />
-                    </Form.Item>
-                  )}
-                </Field>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Subject <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="ticketSubject">
+                    {({ field }) => (
+                      <Input 
+                        {...field} 
+                        placeholder="Enter subject" 
+                        className="w-full rounded-md"
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="ticketSubject"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
               </Col>
 
-              {/* <Col span={12}>
-                <Field name="requestor">
-                  {({ field }) => (
-                    <Form.Item label="Support for Employee" required>
-                      <Select
-                        {...field}
-                        onChange={(value) => setFieldValue("requestor", value)}
-                        placeholder="Select User"
-                      >
-                        <Option value="Buffy Walter">Buffy Walter</Option>
-                        <Option value="John Doe">John Doe</Option>
-                      </Select>
-                    </Form.Item>
-                  )}
-                </Field>
-              </Col> */}
-
+              {/* Employee Selection */}
               <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Employee</label>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Employee <span className="text-red-500">*</span>
+                  </label>
                   <Field name="requestor">
                     {({ field }) => (
                       <Select
                         {...field}
                         className="w-full"
-                        placeholder="Select requestor"
-                        loading={!fnddatass} // Loading state
+                        placeholder="Select employee"
                         onChange={(value) => setFieldValue("requestor", value)}
-                        value={values.customer}
                       >
-                        {fnddatass && fnddatass.length > 0 ? (
-                          fnddatass.map((client) => (
-                            <Option key={client.id} value={client.id}>
-                              {client.username || "Unnamed requestor"}
-                            </Option>
-                          ))
-                        ) : ( 
-                          <Option value="" disabled>
-                            No Employee available
+                        {fnddatass?.map((employee) => (
+                          <Option key={employee.id} value={employee.id}>
+                            {employee.username || "Unnamed Employee"}
                           </Option>
-                        )}
+                        ))}
                       </Select>
                     )}
                   </Field>
                   <ErrorMessage
                     name="requestor"
                     component="div"
-                    className="error-message text-red-500 my-1"
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
               </Col>
 
               {/* Priority */}
               <Col span={12}>
-                <Field name="priority">
-                  {({ field }) => (
-                    <Form.Item label="Priority" required>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Priority <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="priority">
+                    {({ field }) => (
                       <Select
                         {...field}
+                        className="w-full"
                         onChange={(value) => setFieldValue("priority", value)}
-                        placeholder="Select Priority"
                       >
                         <Option value="Low">Low</Option>
                         <Option value="Medium">Medium</Option>
                         <Option value="High">High</Option>
                       </Select>
-                    </Form.Item>
-                  )}
-                </Field>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="priority"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
               </Col>
 
               {/* Status */}
               <Col span={12}>
-                <Field name="status">
-                  {({ field }) => (
-                    <Form.Item label="Status" required>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Status <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="status">
+                    {({ field }) => (
                       <Select
                         {...field}
+                        className="w-full"
                         onChange={(value) => setFieldValue("status", value)}
-                        placeholder="Select Status"
                       >
                         <Option value="Open">Open</Option>
                         <Option value="In Progress">In Progress</Option>
                         <Option value="Closed">Closed</Option>
                       </Select>
-                    </Form.Item>
-                  )}
-                </Field>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="status"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
               </Col>
 
               {/* End Date */}
-              {/* <Col span={12}>
-                <Field name="endDate">
-                  {({ field }) => (
-                    <Form.Item label="End Date" required>
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    End Date <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="endDate">
+                    {({ field }) => (
                       <DatePicker
                         {...field}
-                        style={{ width: "100%" }}
+                        className="w-full"
                         format="DD-MM-YYYY"
-                        onChange={(date, dateString) =>
-                          setFieldValue("endDate", dateString)
-                        }
+                        onChange={(date) => setFieldValue("endDate", date)}
                       />
-                    </Form.Item>
-                  )}
-                </Field>
-              </Col> */}
-
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">End Date</label>
-
-
-                  <DatePicker
-                    className="w-full mt-2"
-                    format="DD-MM-YYYY"
-                    value={values.endDate}
-                    onChange={(date) => setFieldValue("endDate", date)}
-                  />
+                    )}
+                  </Field>
                   <ErrorMessage
                     name="endDate"
                     component="div"
-                    className="error-message text-red-500 my-1"
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
               </Col>
 
               {/* Description */}
               <Col span={24}>
-                <Field name="description">
-                  {({ field }) => (
-                    <Form.Item label="Description" required>
-                      <Input.TextArea
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="description">
+                    {({ field }) => (
+                      <TextArea
                         {...field}
                         rows={4}
-                        placeholder="Enter Description"
+                        className="w-full rounded-md"
+                        placeholder="Enter description"
                       />
-                    </Form.Item>
-                  )}
-                </Field>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="description"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
               </Col>
 
-              {/* Attachment */}
+              {/* File Upload */}
               <Col span={24}>
-              <Field name="file">
-        {({ field }) => (
-            <Form.Item label="Attachment">
-                <Upload
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Attachment
+                  </label>
+                  <Upload
                     beforeUpload={(file) => {
-                        setFieldValue("file", file); // Set the uploaded file in Formik state
-                        return false; // Prevent automatic upload
+                      setFieldValue("file", file);
+                      return false;
                     }}
-                    showUploadList={false} // Hide the default upload list
-                >
-                    <Button icon={<UploadOutlined />}>Choose File</Button>
-                </Upload>
-            </Form.Item>
-        )}
-    </Field>
+                    maxCount={1}
+                  >
+                    <Button icon={<UploadOutlined />} className="bg-white">
+                      Select File
+                    </Button>
+                  </Upload>
+                </div>
               </Col>
             </Row>
 
             {/* Form Actions */}
-            <Form.Item>
-              <div style={{ textAlign: "right" }}>
-                <Button
-                  type="default"
-                  onClick={onClose}
-                  style={{ marginRight: 10 }}
-                >
-                  Cancel
-                </Button>
-                <Button type="primary" htmlType="submit">
-                  Create
-                </Button>
-              </div>
-            </Form.Item>
-          </FormikForm>
+            <div className="flex justify-end space-x-2 mt-6">
+              <Button 
+                onClick={onClose}
+                className="bg-gray-100 hover:bg-gray-200"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="primary" 
+                htmlType="submit"
+                loading={isSubmitting}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Create Ticket
+              </Button>
+            </div>
+          </Form>
         )}
       </Formik>
     </div>

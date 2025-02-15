@@ -162,14 +162,14 @@ const SalaryList = () => {
         />
    
         {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-          <Button type="primary" className="ml-2" onClick={openAddSalaryModal}>
+          <Button type="primary" className="mt-4" onClick={openAddSalaryModal}>
             <PlusOutlined /> Add Salary
           </Button>
         ) : null}
       </Space>
 
       {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Table columns={tableColumns} dataSource={list} rowKey="id" />
+        <Table columns={tableColumns} className="mt-4" dataSource={list} rowKey="id" />
       ) : null}
 
       <Modal

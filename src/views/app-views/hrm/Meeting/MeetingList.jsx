@@ -277,7 +277,7 @@ const MeetingList = () => {
 
        
       </div>
-      <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+      {/* <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} /> */}
 
       {/* Add Job Modal */}
       <Modal

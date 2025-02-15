@@ -45,7 +45,7 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
   const dataM = tabledata.Meeting.data.find((item) => item.id === meetid);
 
   const user = useSelector((state) => state.user.loggedInUser.username);
-  
+
   const AllDepart = useSelector((state) => state.Department);
   const datadept = AllDepart.Department.data || [];
   const filteredDept = datadept?.filter((item) => item.created_by === user);
@@ -53,7 +53,7 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data || [];
 
-  
+
   const [selectedDept, setSelectedDept] = useState(null);
 
   const filteredEmpData = empData?.filter((item) => item.created_by === user);
@@ -130,22 +130,23 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
             <Row gutter={16}>
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Department</label>
+                  <label className="font-semibold">Department <span className="text-red-500">*</span></label>
                   <Field name="department">
                     {({ field, form }) => (
-                     <Select
-                     style={{ width: "100%" }}
-                     {...field}
-                     placeholder="Select Department"
-                     loading={!filteredDept}
-                     value={form.values.department}
-                     onChange={(value) => {
-                       form.setFieldValue("department", value);
-                       setSelectedDept(value); // ✅ Set selected department here
-                       form.setFieldValue("employee", ""); // Reset employee field when department changes
-                     }}
-                     onBlur={() => form.setFieldTouched("department", true)}
-                   >
+                      <Select
+                        style={{ width: "100%" }}
+                        {...field}
+                        placeholder="Select Department"
+                        className="w-full mt-1"
+                        loading={!filteredDept}
+                        value={form.values.department}
+                        onChange={(value) => {
+                          form.setFieldValue("department", value);
+                          setSelectedDept(value); // ✅ Set selected department here
+                          form.setFieldValue("employee", ""); // Reset employee field when department changes
+                        }}
+                        onBlur={() => form.setFieldTouched("department", true)}
+                      >
                         {filteredDept && filteredDept.length > 0 ? (
                           filteredDept.map((dept) => (
                             <Option key={dept.id} value={dept.id}>
@@ -170,30 +171,31 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Employee</label>
+                  <label className="font-semibold">Employee <span className="text-red-500">*</span></label>
                   <Field name="employee">
                     {({ field, form }) => (
-                       <Select
-                       style={{ width: "100%" }}
-                       {...field}
-                       placeholder="Select Employee"
-                       loading={!filteredEmpDataa}
-                       value={form.values.employee}
-                       onChange={(value) => form.setFieldValue("employee", value)}
-                       onBlur={() => form.setFieldTouched("employee", true)}
-                     >
-                       {filteredEmpDataa && filteredEmpDataa.length > 0 ? (
-                         filteredEmpDataa.map((emp) => (
-                           <Option key={emp.id} value={emp.id}>
-                             {emp.username || "Unnamed Employee"}
-                           </Option>
-                         ))
-                       ) : (
-                         <Option value="" disabled>
-                           No Employees Available
-                         </Option>
-                       )}
-                     </Select>
+                      <Select
+                        style={{ width: "100%" }}
+                        {...field}
+                        placeholder="Select Employee"
+                        className="w-full mt-1"
+                        loading={!filteredEmpDataa}
+                        value={form.values.employee}
+                        onChange={(value) => form.setFieldValue("employee", value)}
+                        onBlur={() => form.setFieldTouched("employee", true)}
+                      >
+                        {filteredEmpDataa && filteredEmpDataa.length > 0 ? (
+                          filteredEmpDataa.map((emp) => (
+                            <Option key={emp.id} value={emp.id}>
+                              {emp.username || "Unnamed Employee"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Employees Available
+                          </Option>
+                        )}
+                      </Select>
                     )}
                   </Field>
                   <ErrorMessage
@@ -206,8 +208,8 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
 
               <Col span={24} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Meeting Title</label>
-                  <Field name="title" as={Input} placeholder="Meeting Title" />
+                  <label className="font-semibold">Meeting Title <span className="text-red-500">*</span></label>
+                  <Field name="title" as={Input} placeholder="Meeting Title" className="w-full mt-1" />
                   <ErrorMessage
                     name="title"
                     component="div"
@@ -217,28 +219,30 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
               </Col>
 
               <Col span={12} className="mt-2">
-                <label className="font-semibold">Meeting Date</label>
-                <DatePicker
-                  className="w-full"
-                  format="DD-MM-YYYY"
-                  value={values.date ? dayjs(values.date) : null}
-                  onChange={(date) =>
-                    setFieldValue("date", date)
-                  }
-                  onBlur={() => setFieldTouched("date", true)}
-                />
-                <ErrorMessage
-                  name="date"
-                  component="div"
-                  className="error-message text-red-500 my-1"
-                />
+                <div className="form-item">
+                  <label className="font-semibold">Meeting Date <span className="text-red-500">*</span></label>
+                  <DatePicker
+                    className="w-full mt-1"
+                    format="DD-MM-YYYY"
+                    value={values.date ? dayjs(values.date) : null}
+                    onChange={(date) =>
+                      setFieldValue("date", date)
+                    }
+                    onBlur={() => setFieldTouched("date", true)}
+                  />
+                  <ErrorMessage
+                    name="date"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
               </Col>
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Meeting Time</label>
+                  <label className="font-semibold">Meeting Time <span className="text-red-500">*</span></label>
                   <TimePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="HH:mm"
                     value={values.startTime}
                     onChange={(time) => setFieldValue("startTime", time)}
@@ -254,9 +258,9 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Meeting End Time</label>
+                  <label className="font-semibold">Meeting End Time <span className="text-red-500">*</span></label>
                   <TimePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="HH:mm"
                     value={values.endTime}
                     onChange={(time) => setFieldValue("endTime", time)}
@@ -271,13 +275,13 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
               </Col>
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Status</label>
+                  <label className="font-semibold">Status <span className="text-red-500">*</span></label>
                   <Select
                     placeholder="Select Status"
                     value={values.status}
                     onChange={(value) => setFieldValue("status", value)}
 
-                     className="w-full"
+                    className="w-full mt-1"
                   >
                     <Option value="scheduled">scheduled</Option>
                     <Option value="completed">completed</Option>
@@ -292,12 +296,13 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
               </Col>
               <Col span={24} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Meeting Note</label>
+                  <label className="font-semibold">Meeting Note <span className="text-red-500">*</span></label>
                   <Field name="description">
                     {({ field }) => (
                       <ReactQuill
                         {...field}
                         value={values.description}
+                        className="w-full mt-1"
                         onChange={(value) =>
                           setFieldValue("description", value)
                         }
@@ -316,8 +321,8 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
 
               <Col span={24} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Meeting Link</label>
-                  <Field name="meetingLink" as={Input} placeholder="Meeting Link" />
+                  <label className="font-semibold">Meeting Link <span className="text-red-500">*</span></label>
+                  <Field name="meetingLink" as={Input} placeholder="Meeting Link" className="w-full mt-1" />
                   <ErrorMessage
                     name="meetingLink"
                     component="div"

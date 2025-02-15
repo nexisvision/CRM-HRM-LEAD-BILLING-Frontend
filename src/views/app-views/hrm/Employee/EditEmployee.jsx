@@ -24,8 +24,24 @@ import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
 import { getallcountries } from "../../setting/countries/countriesreducer/countriesSlice";
 import {  QuestionCircleOutlined} from "@ant-design/icons";
 import { getBranch } from "../Branch/BranchReducer/BranchSlice";
+import * as Yup from "yup";
 
 const { Option } = Select;
+
+const validationSchema = Yup.object().shape({
+  firstName: Yup.string().required("First Name is required"),
+  lastName: Yup.string().required("Last Name is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  phone: Yup.object().shape({
+    code: Yup.string().required("Code is required"),
+    number: Yup.string().required("Number is required")
+  }),
+  address: Yup.string().required("Address is required"),
+  branch: Yup.string().required("Branch is required"),
+  leaveDate: Yup.date().required("Leave Date is required"),
+  department: Yup.string().required("Department is required"),
+  designation: Yup.string().required("Designation is required"),
+});
 
 const EditEmployee = ({ employeeIdd, onClose }) => {
   const [form] = Form.useForm();
@@ -177,10 +193,13 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
     // username: singleEmp?.username || "",
     password: "",
     email: singleEmp?.email || "",
-    phone: singleEmp?.phone || "",
+    phone: {
+      code: singleEmp?.phone?.code || "",
+      number: singleEmp?.phone?.number || ""
+    },
     address: singleEmp?.address || "",
-    joiningDate: singleEmp?.joiningDate || null,
-    leaveDate: singleEmp?.leaveDate || null,
+    joiningDate: singleEmp?.joiningDate ? moment(singleEmp.joiningDate) : null,
+    leaveDate: singleEmp?.leaveDate ? moment(singleEmp.leaveDate) : null,
     // employeeId: "",
     department: singleEmp?.department || "",
     designation: singleEmp?.designation || "",
@@ -213,7 +232,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
        <Formik
         initialValues={initialValues}
         // validationSchema={validationSchema}
-        // onSubmit={onSubmit}
+        onSubmit={onFinish}
       >
         {({
           isSubmitting,
@@ -229,16 +248,19 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
         layout="vertical"
         form={form}
         name="edit-employee"
-        onFinish={onFinish}
+        onFinish={handleSubmit}
         initialValues={initialValues}
         onFinishFailed={onFinishFailed}
       >
         {/* User Information */}
-        <h1 className="text-lg font-bold mb-3">Personal Information</h1>
+        <h1 className="border-b-2 border-gray-300 pb-2"></h1>
+
+        <h1 className="text-lg font-bold mt-3">Personal Information</h1>
         
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
+              className="mt-2 font-semibold"
               name="firstName"
               label="First Name"
               rules={[{ required: true, message: "First Name is required" }]}
@@ -248,6 +270,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
           </Col>
           <Col span={12}>
             <Form.Item
+              className="mt-2 font-semibold "
               name="lastName"
               label="Last Name"
               rules={[{ required: true, message: "Last Name is required" }]}
@@ -268,6 +291,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             <Form.Item
               name="password"
               label="Password"
+              className=" font-semibold"
               rules={[{ required: true, message: "Password is required" }]}
             >
               <Input.Password placeholder="Strong Password" />
@@ -277,6 +301,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             <Form.Item
               name="email"
               label="Email"
+              className=" font-semibold"
               rules={[
                 { required: true, message: "Email is required" },
                 {
@@ -293,13 +318,14 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
   <Form.Item
     name="phone"
     label="Phone"
+    className=" font-semibold"
     rules={[{ required: true, message: "Phone number is required" }]}
   >
     <Input.Group compact>
       <Form.Item
         name={['phone', 'code']}
         noStyle
-        rules={[{ required: true, message: 'Code is required' }]}
+        // rules={[{ required: true, message: 'Code is required' }]}
       >
         <Select
           style={{ width: '30%' }}
@@ -341,6 +367,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             <Form.Item
               name="address"
               label="Address"
+              className=" font-semibold"
               rules={[{ required: true, message: "Address is required" }]}
             >
               <TextArea placeholder="123 Main Street" />
@@ -354,6 +381,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             <Form.Item
               name="joiningDate"
               label="Joining Date"
+              className=" font-semibold"
               rules={[{ required: true, message: "Joining Date is required" }]}
             >
               <DatePicker style={{ width: "100%" }} />
@@ -361,7 +389,10 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
           </Col>
 
           <Col span={12}>
-            <Form.Item name="leaveDate" label="Leave Date">
+            <Form.Item name="leaveDate" 
+            label="Leave Date"
+             className=" font-semibold"
+              rules={[{ required: true, message: "Leave Date is required" }]}>
               <DatePicker style={{ width: "100%" }} />
             </Form.Item>
           </Col>
@@ -439,7 +470,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             </Col> */}
            <Col span={12}>
             <div className="form-item">
-              <label className="font-semibold">Branch</label>
+              <label className="font-semibold">Branch <span className="text-red-500">*</span></label>
               <Field name="branch">
                 {({ field }) => (
                   <Select
@@ -468,7 +499,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
           {/* Department Selection */}
           <Col span={12}>
             <div className="form-item">
-              <label className="font-semibold">Department</label>
+              <label className="font-semibold">Department <span className="text-red-500">*</span></label>
               <Field name="department">
                 {({ field }) => (
                   <Select
@@ -492,8 +523,8 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
 
           {/* Designation Selection */}
           <Col span={12}>
-            <div className="form-item">
-              <label className="font-semibold">Designation</label>
+            <div className="form-item mt-2">
+              <label className="font-semibold">Designation <span className="text-red-500">*</span></label>
               <Field name="designation">
                 {({ field }) => (
                   <Select
@@ -518,11 +549,12 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
 
         </Row>
 
-        <h1 className="text-lg font-bold mb-3">Bank Details</h1>
+        <h1 className="text-lg font-bold mt-3">Bank Details</h1>
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
               name="accountholder"
+              className="mt-2 font-semibold"
               label="Account Holder Name"
               rules={[
                 { required: true, message: "Account Holder Name is required" },
@@ -535,6 +567,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             <Form.Item
               name="accountnumber"
               label="Account Number"
+              className="mt-2 font-semibold "
               rules={[
                 { required: true, message: "Account Number is required" },
               ]}
@@ -546,13 +579,14 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             <Form.Item
               name="bankName"
               label="Bank Name"
+              className=" font-semibold "
               rules={[{ required: true, message: "Bank Name is required" }]}
             >
               <Input placeholder="Bank of Example" />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item name="file" label="Upload CV">
+            <Form.Item name="file" label="Upload CV" className=" font-semibold ">
               <Upload
                 action="http://localhost:3000/api/users/upload-cv"
                 listType="picture"
@@ -560,7 +594,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
                 maxCount={1}
                 showUploadList={{ showRemoveIcon: true }}
               >
-                <Button icon={<UploadOutlined />}>Upload</Button>
+                <Button icon={<UploadOutlined />}>Upload </Button>
               </Upload>
             </Form.Item>
           </Col>

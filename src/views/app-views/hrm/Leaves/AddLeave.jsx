@@ -9,22 +9,32 @@ import {
   Row,
   Col,
 } from "antd";
+import { Formik, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { CreateL, GetLeave } from "./LeaveReducer/LeaveSlice";
 import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
 const { Option } = Select;
 const { TextArea } = Input;
+
+const validationSchema = Yup.object().shape({
+  employeeId: Yup.string().required("Employee is required"),
+  leaveType: Yup.string().required("Leave type is required"),
+  startDate: Yup.date().required("Start date is required"),
+  endDate: Yup.date()
+    .required("End date is required")
+    .min(Yup.ref('startDate'), "End date must be after start date"),
+  reason: Yup.string().required("Leave reason is required"),
+  remark: Yup.string().required("Remark is required"),
+});
+
 const AddLeave = ({ onClose }) => {
-  const [form] = Form.useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(empdata()); // Fetch employee data
-  }, [dispatch]);
-
-  useEffect(() => {
+    dispatch(empdata());
     dispatch(GetLeave());
   }, [dispatch]);
 
@@ -35,137 +45,245 @@ const AddLeave = ({ onClose }) => {
 
   const filteredEmpData = empData?.filter((item) => item.created_by === user);
   // Extract employee data
-  const onFinish = (values) => {
-    dispatch(CreateL(values))
-      .then(() => {
-        dispatch(GetLeave()); // Refresh leave data
-        message.success("Leave added successfully!");
-        form.resetFields(); // Reset form fields
-        onClose(); // Close modal
-      })
-      .catch((error) => {
-        message.error("Failed to add leave.");
-        console.error("Add API error:", error);
-      });
+  const initialValues = {
+    employeeId: "",
+    leaveType: "",
+    startDate: null,
+    endDate: null,
+    reason: "",
+    remark: "",
   };
-  const onFinishFailed = (errorInfo) => {
-    console.error("Form submission failed:", errorInfo);
-    message.error("Please fill out all required fields.");
+
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    try {
+      await dispatch(CreateL(values)).unwrap();
+      dispatch(GetLeave());
+      message.success("Leave added successfully!");
+      resetForm();
+      onClose();
+    } catch (error) {
+      message.error(error?.message || "Failed to add leave");
+    } finally {
+      setSubmitting(false);
+    }
   };
+
   return (
-    <div className="add-leave-form">
-      <Form
-        layout="vertical"
-        form={form}
-        name="add-leave"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+    <div className="">
+   <h1 className="border-b border-gray-200 mb-4"></h1>
+      
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
       >
-        <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
-        <Row gutter={16}>
-          {/* Employee */}
-          <Col span={24}>
-            <Form.Item
-              name="employeeId"
-              label="Employee"
-              rules={[
-                { required: true, message: "Please select an employee." },
-              ]}
-            >
-              <Select placeholder="Select Employee" loading={!filteredEmpData}>
-                {filteredEmpData && filteredEmpData.length > 0 ? (
-                  filteredEmpData.map((emp) => (
-                    <Option key={emp.id} value={emp.id}>
+        {({ values, handleSubmit, setFieldValue, isSubmitting }) => (
+          <Form 
+            layout="vertical" 
+            onFinish={handleSubmit} 
+            className="space-y-6"
+          >
+            <Row gutter={[16, 16]}>
+              {/* Employee Selection */}
+              <Col span={24}>
+                <div className="space-y-2">
+                  <label 
+                    htmlFor="employeeId" 
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Employee <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="employeeId">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        id="employeeId"
+                        className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        placeholder="Select Employee"
+                        onChange={(value) => setFieldValue("employeeId", value)}
+                      >
+                        {filteredEmpData.map((emp) => (
+                          <Option key={emp.id} value={emp.id}>
+                            {emp.username || "Unnamed Employee"}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage 
+                    name="employeeId" 
+                    component="div" 
+                    className="text-sm text-red-600"
+                  />
+                </div>
+              </Col>
 
-                      {emp.username || "Unnamed Employee"}
-                    </Option>
-                  ))
-                ) : (
-                  <Option value="" disabled>
-                    No Employees Available
-                  </Option>
-                )}
-              </Select>
-            </Form.Item>
-          </Col>
+              {/* Leave Type */}
+              <Col span={24}>
+                <div className="space-y-2">
+                  <label 
+                    htmlFor="leaveType" 
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Leave Type <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="leaveType">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        id="leaveType"
+                        className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        placeholder="Select Leave Type"
+                        onChange={(value) => setFieldValue("leaveType", value)}
+                      >
+                        <Option value="sick">Sick Leave</Option>
+                        <Option value="casual">Casual Leave</Option>
+                        <Option value="annual">Annual Leave</Option>
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage 
+                    name="leaveType" 
+                    component="div" 
+                    className="text-sm text-red-600"
+                  />
+                </div>
+              </Col>
 
-          {/* Leave Type */}
-          <Col span={24}>
-            <Form.Item
-              name="leaveType"
-              label="Leave Type"
-              rules={[{ required: true, message: "Please select leave type." }]}
-            >
-              <Select placeholder="Select Leave Type">
-                <Option value="sick">Sick Leave</Option>
-                <Option value="casual">Casual Leave</Option>
-                <Option value="annual">Annual Leave</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          {/* Start and End Date */}
-          <Col span={12}>
-            <Form.Item
-              name="startDate"
-              label="Start Date"
-              rules={[{ required: true, message: "Start Date is required." }]}
-            >
-              <DatePicker
-                style={{ width: "100%" }}
-                format="DD-MM-YYYY"
-                placeholder="dd-mm-yyyy"
-              />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="endDate"
-              label="End Date"
-              rules={[{ required: true, message: "End Date is required." }]}
-            >
-              <DatePicker
-                style={{ width: "100%" }}
-                format="DD-MM-YYYY"
-                placeholder="dd-mm-yyyy"
-              />
-            </Form.Item>
-          </Col>
-          {/* Leave Reason */}
-          <Col span={24}>
-            <Form.Item
-              name="reason"
-              label="Leave Reason"
-              rules={[
-                { required: true, message: "Please provide a leave reason." },
-              ]}
-            >
-              <TextArea rows={4} placeholder="Leave Reason" />
-            </Form.Item>
-          </Col>
-          {/* Remark */}
-          <Col span={24}>
-            <Form.Item
-              name="remark"
-              label="Remark"
-              rules={[{ required: true, message: "Please provide a remark." }]}
-            >
-              <TextArea rows={4} placeholder="Leave Remark" />
-            </Form.Item>
-          </Col>
-        </Row>
-        {/* Form Buttons */}
-        <Form.Item>
-          <div className="form-buttons text-right">
-            <Button type="default" className="mr-2" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="primary" htmlType="submit">
-              Create
-            </Button>
-          </div>
-        </Form.Item>
-      </Form>
+              {/* Date Range */}
+              <Col span={12}>
+                <div className="space-y-2">
+                  <label 
+                    htmlFor="startDate" 
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Start Date <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="startDate">
+                    {({ field }) => (
+                      <DatePicker
+                        {...field}
+                        id="startDate"
+                        className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        format="DD-MM-YYYY"
+                        onChange={(date) => setFieldValue("startDate", date)}
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage 
+                    name="startDate" 
+                    component="div" 
+                    className="text-sm text-red-600"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12}>
+                <div className="space-y-2">
+                  <label 
+                    htmlFor="endDate" 
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    End Date <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="endDate">
+                    {({ field }) => (
+                      <DatePicker
+                        {...field}
+                        id="endDate"
+                        className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        format="DD-MM-YYYY"
+                        onChange={(date) => setFieldValue("endDate", date)}
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage 
+                    name="endDate" 
+                    component="div" 
+                    className="text-sm text-red-600"
+                  />
+                </div>
+              </Col>
+
+              {/* Reason */}
+              <Col span={24}>
+                <div className="space-y-2">
+                  <label 
+                    htmlFor="reason" 
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Leave Reason <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="reason">
+                    {({ field }) => (
+                      <TextArea
+                        {...field}
+                        id="reason"
+                        rows={4}
+                        className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        placeholder="Enter leave reason"
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage 
+                    name="reason" 
+                    component="div" 
+                    className="text-sm text-red-600"
+                  />
+                </div>
+              </Col>
+
+              {/* Remark */}
+              <Col span={24}>
+                <div className="space-y-2">
+                  <label 
+                    htmlFor="remark" 
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Remark <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="remark">
+                    {({ field }) => (
+                      <TextArea
+                        {...field}
+                        id="remark"
+                        rows={4}
+                        className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        placeholder="Enter remark"
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage 
+                    name="remark" 
+                    component="div" 
+                    className="text-sm text-red-600"
+                  />
+                </div>
+              </Col>
+            </Row>
+
+            {/* Form Actions */}
+            <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+              <Button 
+                onClick={onClose}
+                className="px-4 py-2 text-gray-700 bg-gray-50 hover:bg-gray-100 border border-gray-300 rounded-md transition-colors duration-200"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="primary" 
+                htmlType="submit"
+                loading={isSubmitting}
+                className="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors duration-200 disabled:opacity-50"
+              >
+                Submit Leave Request
+              </Button>
+            </div>
+          </Form>
+        )}
+      </Formik>
     </div>
   );
 };
+
 export default AddLeave;

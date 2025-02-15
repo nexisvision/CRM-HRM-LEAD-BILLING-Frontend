@@ -16,301 +16,300 @@ import { useNavigate, useParams } from "react-router-dom";
 import { UploadOutlined } from "@ant-design/icons";
 import moment from "moment";
 import dayjs from "dayjs";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Editicket, getAllTicket } from "./TicketReducer/TicketSlice";
-import { useDispatch } from "react-redux";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 
 const { Option } = Select;
+const { TextArea } = Input;
+
+const validationSchema = Yup.object().shape({
+  ticketSubject: Yup.string().required("Subject is required"),
+  requestor: Yup.string().required("Employee selection is required"),
+  priority: Yup.string().required("Priority is required"),
+  status: Yup.string().required("Status is required"),
+  endDate: Yup.date().required("End date is required"),
+  description: Yup.string().required("Description is required"),
+});
 
 const EditTicket = ({ idd, onClose }) => {
   const navigate = useNavigate();
   const { ticketId } = useParams();
 
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(empdata());
-  }, []);
+  const [fileList, setFileList] = useState([]);
 
   const alldata = useSelector((state) => state.employee);
   const fnddatas = alldata.employee.data;
-
   const alldatat = useSelector((state) => state.Ticket);
   const fndfdata = alldatat.Ticket.data;
-
-    const llogedid = useSelector((state) => state.user.loggedInUser.username);
-  
-    const fnddatass = fnddatas?.filter((item)=>item?.created_by === llogedid);
+  const llogedid = useSelector((state) => state.user.loggedInUser.username);
+  const fnddatass = fnddatas?.filter((item) => item?.created_by === llogedid);
 
   useEffect(() => {
-    const perfectdata = fndfdata.find((item) => item.id === idd);
+    dispatch(empdata());
+  }, [dispatch]);
 
-    if (perfectdata) {
-      setInitialValues({
-        ticketSubject: perfectdata.ticketSubject,
-        requestor: perfectdata.requestor,
-        priority: perfectdata.priority,
-        status: perfectdata.status,
-        endDate: moment(perfectdata.endDate),
-        description: perfectdata.description,
-        attachment: perfectdata.attachment,
-      });
-    }
-  }, []);
+  const perfectdata = fndfdata.find((item) => item.id === idd);
 
-  const [initialValues, setInitialValues] = useState({
-    ticketSubject: "",
-    requestor: "",
-    priority: "Low",
-    status: "Open",
-    endDate: null,
-    description: "",
-    attachment: null,
-  });
+  const initialValues = {
+    ticketSubject: perfectdata?.ticketSubject || "",
+    requestor: perfectdata?.requestor || "",
+    priority: perfectdata?.priority || "Low",
+    status: perfectdata?.status || "Open",
+    endDate: perfectdata?.endDate ? moment(perfectdata.endDate) : null,
+    description: perfectdata?.description || "",
+    file: null
+  };
 
-  const validationSchema = Yup.object({
-    ticketSubject: Yup.string().required("Please enter a subject."),
-    requestor: Yup.string().required("Please select a user."),
-    priority: Yup.string().required("Please select priority."),
-    status: Yup.string().required("Please select status."),
-    endDate: Yup.date().required("Please select an end date."),
-    description: Yup.string().required("Please enter a description."),
-  });
-
-  useEffect(() => {
-    dispatch(getAllTicket());
-  }, []);
-
-  const onSubmit = (values, { resetForm }) => {
-    // dispatch(Editicket({ idd, values }))
-    //   .then(() => {
-    //     dispatch(getAllTicket());
-    //     // message.success("Expenses added successfully!");
-    //     onClose();
-    //   })
-    //   .catch((error) => {
-    //     // message.error("Failed to update Employee.");
-    //     console.error("Edit API error:", error);
-    //   });
-
-        const formData = new FormData();
-          for (const key in values) {
-              formData.append(key, values[key]);
-          }
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      const formData = new FormData();
       
-          
-          dispatch(Editicket({idd,formData})).then((res)=>{
-           
-            dispatch(getAllTicket());
-            onClose();
-            resetForm();
-          })
+      // Handle file upload
+      if (values.file) {
+        formData.append('file', values.file);
+      }
+
+      // Add other form values
+      Object.keys(values).forEach(key => {
+        if (key !== 'file' && values[key] !== null) {
+          if (key === 'endDate') {
+            formData.append(key, values[key].format('YYYY-MM-DD'));
+          } else {
+            formData.append(key, values[key]);
+          }
+        }
+      });
+
+      await dispatch(Editicket({ idd, formData })).unwrap();
+      message.success('Ticket updated successfully!');
+      dispatch(getAllTicket());
+      onClose();
+    } catch (error) {
+      message.error(error?.message || 'Failed to update ticket');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <div className="edit-ticket-form">
-      {/* <h2>Edit Support Ticket</h2> */}
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
-
+    <div className="">
+      <div className="border-b border-gray-200 mb-2"></div>
+      
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={onSubmit}
-        enableReinitialize // Allows reinitialization when initial values change
+        onSubmit={handleSubmit}
+        enableReinitialize
       >
-        {({ setFieldValue, values }) => (
-          <FormikForm>
-            <Row gutter={[16, 16]}>
+        {({ values, handleSubmit, setFieldValue, isSubmitting }) => (
+          <Form layout="vertical" onFinish={handleSubmit} className="space-y-4">
+            <Row gutter={16}>
               {/* Subject */}
               <Col span={24}>
-                <Field name="ticketSubject">
-                  {({ field }) => (
-                    <Form.Item label="Subject" required>
-                      <Input {...field} placeholder="Enter Subject" />
-                    </Form.Item>
-                  )}
-                </Field>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Subject <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="ticketSubject">
+                    {({ field }) => (
+                      <Input 
+                        {...field} 
+                        placeholder="Enter subject" 
+                        className="w-full rounded-md"
+                      />
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="ticketSubject"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
               </Col>
 
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Employee</label>
+              {/* Employee Selection */}
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Employee <span className="text-red-500">*</span>
+                  </label>
                   <Field name="requestor">
                     {({ field }) => (
                       <Select
                         {...field}
                         className="w-full"
-                        placeholder="Select requestor"
-                        loading={!fnddatass} // Loading state
+                        placeholder="Select employee"
                         onChange={(value) => setFieldValue("requestor", value)}
-                        value={values.customer}
                       >
-                        {fnddatass && fnddatass.length > 0 ? (
-                          fnddatass.map((client) => (
-                            <Option key={client.id} value={client.id}>
-                              {client.username || "Unnamed requestor"}
-                            </Option>
-                          ))
-                        ) : (
-                          <Option value="" disabled>
-                            No Employee available
+                        {fnddatass?.map((employee) => (
+                          <Option key={employee.id} value={employee.id}>
+                            {employee.username || "Unnamed Employee"}
                           </Option>
-                        )}
+                        ))}
                       </Select>
                     )}
                   </Field>
                   <ErrorMessage
                     name="requestor"
                     component="div"
-                    className="error-message text-red-500 my-1"
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
               </Col>
 
               {/* Priority */}
               <Col span={12}>
-                <Field name="priority">
-                  {({ field }) => (
-                    <Form.Item label="Priority" required>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Priority <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="priority">
+                    {({ field }) => (
                       <Select
                         {...field}
+                        className="w-full"
                         onChange={(value) => setFieldValue("priority", value)}
-                        placeholder="Select Priority"
                       >
                         <Option value="Low">Low</Option>
                         <Option value="Medium">Medium</Option>
                         <Option value="High">High</Option>
                       </Select>
-                    </Form.Item>
-                  )}
-                </Field>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="priority"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
               </Col>
 
               {/* Status */}
               <Col span={12}>
-                <Field name="status">
-                  {({ field }) => (
-                    <Form.Item label="Status" required>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Status <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="status">
+                    {({ field }) => (
                       <Select
                         {...field}
+                        className="w-full"
                         onChange={(value) => setFieldValue("status", value)}
-                        placeholder="Select Status"
                       >
                         <Option value="Open">Open</Option>
                         <Option value="In Progress">In Progress</Option>
                         <Option value="Closed">Closed</Option>
                       </Select>
-                    </Form.Item>
-                  )}
-                </Field>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="status"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
               </Col>
 
               {/* End Date */}
-              {/* <Col span={12}>
-                         <Field name="endDate">
-                           {({ field }) => (
-                             <Form.Item label="End Date" required>
-                               <DatePicker
-                                 {...field}
-                                 style={{ width: "100%" }}
-                                 format="DD-MM-YYYY"
-                                 onChange={(date, dateString) =>
-                                   setFieldValue("endDate", dateString)
-                                 }
-                               />
-                             </Form.Item>
-                           )}
-                         </Field>
-                       </Col> */}
-
-              {/* <Col span={8} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">End Date</label>
-
+              <Col span={12}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    End Date <span className="text-red-500">*</span>
+                  </label>
                   <DatePicker
-                    className="w-full mt-2"
+                    className="w-full"
                     format="DD-MM-YYYY"
-                    value={values.endDate}
+                    value={values.endDate ? dayjs(values.endDate) : null}
                     onChange={(date) => setFieldValue("endDate", date)}
                   />
                   <ErrorMessage
                     name="endDate"
                     component="div"
-                    className="error-message text-red-500 my-1"
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
-              </Col> */}
-
-              <Col span={12} className="mt-4">
-                <label className="font-semibold">End Date</label>
-                <DatePicker
-                  className="w-full"
-                  format="DD-MM-YYYY"
-                  value={values.endDate ? dayjs(values.endDate) : null}
-                  onChange={(endDate) => setFieldValue("endDate", endDate)}
-                  // onBlur={() => setFieldTouched("endDate", true)}
-
-                />
-                <ErrorMessage
-                  name="endDate"
-                  component="div"
-                  className="error-message text-red-500 my-1"
-
-                />
               </Col>
 
               {/* Description */}
               <Col span={24}>
-                <Field name="description">
-                  {({ field }) => (
-                    <Form.Item label="Description" required>
-                      <Input.TextArea
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="description">
+                    {({ field }) => (
+                      <TextArea
                         {...field}
                         rows={4}
-                        placeholder="Enter Description"
+                        className="w-full rounded-md"
+                        placeholder="Enter description"
                       />
-                    </Form.Item>
-                  )}
-                </Field>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="description"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
               </Col>
 
-              {/* Attachment */}
+              {/* File Upload */}
               <Col span={24}>
-                <Field name="file">
-                       {({ field }) => (
-                           <Form.Item label="Attachment">
-                               <Upload
-                                   beforeUpload={(file) => {
-                                       setFieldValue("file", file); // Set the uploaded file in Formik state
-                                       return false; // Prevent automatic upload
-                                   }}
-                                   showUploadList={false} // Hide the default upload list
-                               >
-                                   <Button icon={<UploadOutlined />}>Choose File</Button>
-                               </Upload>
-                           </Form.Item>
-                       )}
-                   </Field>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Attachment
+                  </label>
+                  <Upload
+                    fileList={fileList}
+                    beforeUpload={(file) => {
+                      setFieldValue("file", file);
+                      setFileList([{
+                        uid: '-1',
+                        name: file.name,
+                        status: 'done',
+                        originFileObj: file
+                      }]);
+                      return false;
+                    }}
+                    onRemove={() => {
+                      setFieldValue("file", null);
+                      setFileList([]);
+                    }}
+                  >
+                    <Button 
+                      icon={<UploadOutlined />} 
+                      className="bg-white"
+                      disabled={fileList.length > 0}
+                    >
+                      Select File
+                    </Button>
+                  </Upload>
+                </div>
               </Col>
             </Row>
 
             {/* Form Actions */}
-            <Form.Item>
-              <div style={{ textAlign: "right" }}>
-                <Button
-                  type="default"
-                  onClick={onClose}
-                  style={{ marginRight: 10 }}
-                >
-                  Cancel
-                </Button>
-                <Button type="primary" htmlType="submit">
-                  Update
-                </Button>
-              </div>
-            </Form.Item>
-          </FormikForm>
+            <div className="flex justify-end space-x-2 mt-6">
+              <Button 
+                onClick={onClose}
+                className="bg-gray-100 hover:bg-gray-200"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="primary" 
+                htmlType="submit"
+                loading={isSubmitting}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Update Ticket
+              </Button>
+            </div>
+          </Form>
         )}
       </Formik>
     </div>

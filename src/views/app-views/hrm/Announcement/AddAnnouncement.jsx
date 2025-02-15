@@ -56,11 +56,12 @@ const AddAnnouncement = ({onClose}) => {
               <Col span={12}>
                 {/* title Field */}
                 <div style={{ marginBottom: '16px' }}>
-                  <label>title*</label>
+                  <label className="font-semibold">Title <span className="text-red-500">*</span></label>
                   <Field
                     as={Input}
                     name="title"
                     placeholder="Enter title"
+                    className="w-full mt-1"
                   />
                   {errors.title && touched.title && (
                     <div style={{ color: 'red', fontSize: '12px' }}>{errors.title}</div>
@@ -71,11 +72,12 @@ const AddAnnouncement = ({onClose}) => {
               <Col span={12}>
                 {/* description Field */}
                 <div style={{ marginBottom: '16px' }}>
-                  <label>description*</label>
+                  <label className="font-semibold">Description <span className="text-red-500">*</span></label>
                   <Field
                     as={Input}
                     name="description"
                     placeholder="Enter description"
+                    className="w-full mt-1"
                   />
                   {errors.description && touched.description && (
                     <div style={{ color: 'red', fontSize: '12px' }}>{errors.description}</div>

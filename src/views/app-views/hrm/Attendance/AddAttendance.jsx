@@ -97,12 +97,13 @@ const AddAttendance = ({ onClose }) => {
             <Row gutter={16}>
               <Col span={24}>
                 <div style={{ marginBottom: "16px" }}>
-                  <label>Employee</label>
+                  <label className="font-semibold">Employee <span className="text-red-500">*</span></label>
                   <Field
                     as={Select}
                     name="employee"
                     placeholder="Select employee"
                     style={{ width: "100%" }}
+                    className="w-full mt-1"
                     onChange={(value) => setFieldValue("employee", value)}
                   >
                     {employeeData.map((emp) => (
@@ -122,9 +123,10 @@ const AddAttendance = ({ onClose }) => {
               {/* Start Date and Start Time */}
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
-                  <label>Start Date</label>
+                  <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
                   <DatePicker
                     style={{ width: "100%" }}
+                    className="w-full mt-1"
                     placeholder="Select date"
                     onChange={(date) => setFieldValue("date", date)}
                   />
@@ -137,10 +139,11 @@ const AddAttendance = ({ onClose }) => {
               </Col>
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
-                  <label>Start Time</label>
+                  <label className="font-semibold">Start Time <span className="text-red-500">*</span></label>
                   <TimePicker
                     style={{ width: "100%" }}
                     placeholder="Select time"
+                    className="w-full mt-1"
                     defaultValue={moment("09:00", "HH:mm")}
                     onChange={(time) => setFieldValue("startTime", time)}
                   />
@@ -155,10 +158,11 @@ const AddAttendance = ({ onClose }) => {
               {/* End Time */}
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
-                  <label>End Time</label>
+                  <label className="font-semibold">End Time <span className="text-red-500">*</span></label>
                   <TimePicker
                     style={{ width: "100%" }}
                     placeholder="Select time"
+                    className="w-full mt-1"
                     defaultValue={moment("18:00", "HH:mm")}
                     onChange={(time) => setFieldValue("endTime", time)}
                   />
@@ -173,11 +177,12 @@ const AddAttendance = ({ onClose }) => {
               {/* Late Field */}
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
-                  <label>Late</label>
+                  <label className="font-semibold">Late <span className="text-red-500">*</span></label>
                   <Field
                     as={Input}
                     name="late"
                     placeholder="Enter Late Time"
+                    className="w-full mt-1"
                     onChange={(e) => setFieldValue("late", e.target.value)}
                   />
                   {errors.late && touched.late && (
@@ -191,12 +196,13 @@ const AddAttendance = ({ onClose }) => {
               {/* Half Day Dropdown */}
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
-                  <label>Half Day</label>
+                  <label className="font-semibold">Half Day <span className="text-red-500">*</span></label>
                   <Field
                     as={Select}
                     name="halfDay"
                     placeholder="Select Yes or No"
                     style={{ width: "100%" }}
+                    className="w-full mt-1"
                     onChange={(value) => setFieldValue("halfDay", value)}
                   >
                     <Option value="yes">Yes</Option>
@@ -213,12 +219,13 @@ const AddAttendance = ({ onClose }) => {
               {/* Comment Field */}
               <Col span={24}>
                 <div style={{ marginBottom: "16px" }}>
-                  <label>Comment</label>
+                  <label className="font-semibold">Comment <span className="text-red-500">*</span>  </label>
                   <Field
                     as={Input.TextArea}
                     name="comment"
                     placeholder="Add a comment (optional)"
                     rows={3}
+                    className="w-full mt-1"
                     onChange={(e) => setFieldValue("comment", e.target.value)}
                   />
                 </div>

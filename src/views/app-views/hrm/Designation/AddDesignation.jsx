@@ -67,10 +67,11 @@ const AddDesignation = ({ onClose }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
-                  <label>Designation*</label>
+                  <label className="font-semibold">Designation <span className="text-red-500">*</span></label>
                   <Field
                     as={Input}
                     name="designation_name"
+                    className="w-full mt-1"
                     placeholder="Enter Designation Name"
                     onChange={(e) =>
                       setFieldValue("designation_name", e.target.value)
@@ -86,12 +87,12 @@ const AddDesignation = ({ onClose }) => {
 
               <Col span={12} className="mb-4">
                 <div className="form-item">
-                  <label>Branch</label>
+                  <label className="font-semibold">Branch <span className="text-red-500">*</span></label>
                   <Field name="branch">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-1"
                         placeholder="Select Branch"
                         onChange={(value) => setFieldValue("branch", value)}
                         value={values.branch}

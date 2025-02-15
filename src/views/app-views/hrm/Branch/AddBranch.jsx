@@ -46,11 +46,12 @@ const AddBranch = ({ onClose }) => {
           <FormikForm>
             <Row gutter={16}>
               <Col span={12}>
-                <div style={{ marginBottom: '16px' }}>
-                  <label>Branch</label>
+                <div style={{ marginBottom: '16px'}}>
+                  <label className="font-semibold">Branch <span className="text-red-500">*</span></label>
                   <Field
                     as={Input}
                     name="branchName"
+                    className="w-full mt-1  "
                     placeholder="Enter Branch Name"
                     onChange={(e) => setFieldValue('branchName', e.target.value)}
                   />

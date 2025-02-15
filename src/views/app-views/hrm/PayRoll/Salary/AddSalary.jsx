@@ -179,7 +179,7 @@ const AddSalary = ({ onClose }) => {
             <Row gutter={16}>
               <Col span={24}>
                 <div className="form-item">
-                  <label className="font-semibold">User</label>
+                  <label className="font-semibold">employee <span className="text-red-500">*</span></label>
                   <Field name="employeeId">
                     {({ field }) => (
                       <Select
@@ -214,14 +214,14 @@ const AddSalary = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Payroll Type</label>
+                  <label className="font-semibold">Payroll Type <span className="text-red-500">*</span></label>
                   <Field name="payslipType">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-1"
                         placeholder="Select Payroll Type"
                         onChange={(value) =>
                           setFieldValue("payslipType", value)
@@ -242,15 +242,15 @@ const AddSalary = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Currency</label>
+                  <label className="font-semibold">Currency <span className="text-red-500">*</span></label>
                   <div className="flex gap-2">
                     <Field name="currency">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full"
+                          className="w-full mt-1"
                           placeholder="Select Currency"
                           onChange={(value) => {
                             const selectedCurrency = currencies?.data?.find(
@@ -279,13 +279,14 @@ const AddSalary = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Salary</label>
+                  <label className="font-semibold">Salary <span className="text-red-500">*</span></label>
                   <Field
                     name="salary"
                     as={Input}
                     type="string"
+                    className="w-full mt-1"
                     placeholder="Enter Salary Amount"
                   />
                   <ErrorMessage
@@ -296,13 +297,14 @@ const AddSalary = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Net Salary</label>
+                  <label className="font-semibold">Net Salary <span className="text-red-500">*</span></label>
                   <Field
                     name="netSalary"
                     as={Input}
                     type="string"
+                    className="w-full mt-1"
                     placeholder="Enter Net Salary Amount"
                   />
                   <ErrorMessage
@@ -313,9 +315,9 @@ const AddSalary = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12}>
-                <div className="form-item mt-2">
-                  <label className="font-semibold">Status</label>
+              <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Status <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
                     placeholder="Select or add new status"
@@ -351,9 +353,9 @@ const AddSalary = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Bank Account</label>
+                  <label className="font-semibold">Bank Account <span className="text-red-500">*</span></label>
                   <Field name="bankAccount">
                     {({ field }) => (
                       <Input

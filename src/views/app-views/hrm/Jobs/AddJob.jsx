@@ -193,7 +193,7 @@ const [newJobStatus, setNewJobStatus] = useState("");
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Job Title</label>
+                  <label className="font-semibold">Job Title  </label>
                   <Field
                     className="mt-2"
                     name="title"

@@ -209,14 +209,7 @@ export const TicketList = () => {
           <span className="ml-2">{pinnedTasks.includes(row.id) ? "Unpin" : "Pin"}</span>
         </Flex>
       </Menu.Item>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <PlusCircleOutlined />
-          <span className="ml-2">Add to remark</span>
-        </Flex>
-      </Menu.Item> */}
-
-      <Menu.Item>
+     {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -228,8 +221,15 @@ export const TicketList = () => {
             <span className="ml-2">Edit</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
       
+      <Menu.Item>
+        <Flex alignItems="center" onClick={() => editfun(row.id)}>
+          <EditOutlined />
+          <span className="ml-2">Edit</span>
+        </Flex>
+      </Menu.Item>
+
       <Menu.Item>
         <Flex alignItems="center" onClick={() => deletfun(row.id)}>
           <DeleteOutlined />

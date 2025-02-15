@@ -10,7 +10,7 @@ import { getIndicators, addIndicator } from './IndicatorReducers/indicatorSlice'
 
 const { Option } = Select;
 
-/*************  ✨ Codeium Command ⭐  *************/
+
 const AddIndicator = ({ onClose }) => {
   const [form] = Form.useForm(); // Ensure this is called at the top
   const navigate = useNavigate();

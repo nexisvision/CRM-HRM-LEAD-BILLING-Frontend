@@ -202,6 +202,7 @@ const EditClient = ({ comnyid, onClose }) => {
                   <Field
                     name="ifsc"
                     as={Input}
+                    className="w-full mt-2"
                     placeholder="Enter IFSC"
                     type="string"
                   />
@@ -219,6 +220,7 @@ const EditClient = ({ comnyid, onClose }) => {
                   <Field
                     name="banklocation"
                     as={Input}
+                    className="w-full mt-2"
                     placeholder="Enter Bank Location"
                   />
                   <ErrorMessage
@@ -235,6 +237,7 @@ const EditClient = ({ comnyid, onClose }) => {
                   <Field
                     name="accountholder"
                     as={Input}
+                    className="w-full mt-2"
                     placeholder="Enter Account Holder"
                   />
                   <ErrorMessage
@@ -251,6 +254,7 @@ const EditClient = ({ comnyid, onClose }) => {
                   <Field
                     name="accountnumber"
                     as={Input}
+                    className="w-full mt-2"
                     placeholder="Enter Account Number"
                     type="number"
                   />
@@ -268,6 +272,7 @@ const EditClient = ({ comnyid, onClose }) => {
                   <Field
                     name="e_signature"
                     as={Input}
+                    className="w-full mt-2"
                     placeholder="Enter Signature"
                   />
                   <ErrorMessage
@@ -284,6 +289,7 @@ const EditClient = ({ comnyid, onClose }) => {
                   <Field
                     name="gstIn"
                     as={Input}
+                    className="w-full mt-2"
                     placeholder="Enter GSTIN"
                   />
                   <ErrorMessage
@@ -300,6 +306,7 @@ const EditClient = ({ comnyid, onClose }) => {
                   <Field
                     name="city"
                     as={Input}
+                    className="w-full mt-2"
                     placeholder="Enter City"
                   />
                   <ErrorMessage
@@ -316,6 +323,7 @@ const EditClient = ({ comnyid, onClose }) => {
                   <Field
                     name="state"
                     as={Input}
+                    className="w-full mt-2"
                     placeholder="Enter State"
                   />
                   <ErrorMessage
@@ -332,6 +340,7 @@ const EditClient = ({ comnyid, onClose }) => {
                   <Field
                     name="country"
                     as={Input}
+                    className="w-full mt-2"
                     placeholder="Enter Country"
                   />
                   <ErrorMessage
@@ -348,6 +357,7 @@ const EditClient = ({ comnyid, onClose }) => {
                   <Field
                     name="zipcode"
                     as={Input}
+                    className="w-full mt-2"
                     placeholder="Enter Zipcode"
                     type="string"
                   />
@@ -364,7 +374,8 @@ const EditClient = ({ comnyid, onClose }) => {
                   <label className="font-semibold">Address <span className="text-red-500">*</span>    </label>
                   <Field
                     name="address"
-                    as={Input}
+                      as={Input}
+                    className="w-full mt-2"
                     placeholder="Enter Address"
                   />
                   <ErrorMessage

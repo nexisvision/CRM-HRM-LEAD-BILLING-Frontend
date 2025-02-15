@@ -1,211 +1,226 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import moment from "moment";
-import {
-  Form,
-  Input,
-  Button,
-  DatePicker,
-  Select,
-  message,
-  Row,
-  Col,
-} from "antd";
+import { Button, DatePicker, Select, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
 import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
-import {
-  EditLeave as EditLeaveAction,
-  GetLeave,
-} from "./LeaveReducer/LeaveSlice"; // Fixed import
+import { EditLeave as EditLeaveAction, GetLeave } from "./LeaveReducer/LeaveSlice";
+
 const { Option } = Select;
-const { TextArea } = Input;
+
+// Validation Schema
+const LeaveSchema = Yup.object().shape({
+  employeeId: Yup.string().required("Employee is required"),
+  leaveType: Yup.string().required("Leave type is required"),
+  startDate: Yup.date().required("Start date is required"),
+  endDate: Yup.date()
+    .required("End date is required")
+    .min(Yup.ref("startDate"), "End date must be after start date"),
+  reason: Yup.string().required("Reason is required"),
+  remark: Yup.string().required("Remark is required"),
+});
+
 const EditLeave = ({ editid, onClose }) => {
-  const [form] = Form.useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const leaveData = useSelector((state) => state.Leave);
   const empData = useSelector((state) => state.employee || []);
-
-  // console.log("bbbb", leaveData);
-  // console.log("vvvv", empData);
   const employeedata = empData.employee.data;
-
   const filteredEmpData = employeedata?.filter((item) => item.created_by === user);
-  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   useEffect(() => {
     dispatch(GetLeave());
   }, [dispatch]);
 
+  const initialValues = {
+    employeeId: "",
+    leaveType: "",
+    startDate: null,
+    endDate: null,
+    reason: "",
+    remark: "",
+  };
+
   useEffect(() => {
-    if (
-      editid &&
-      leaveData?.Leave?.data.length > 0 &&
-      filteredEmpData.length > 0
-    ) {
+    if (editid && leaveData?.Leave?.data.length > 0 && filteredEmpData.length > 0) {
       const leave = leaveData.Leave.data.find((item) => item.id === editid);
-
-
       if (leave) {
-        form.setFieldsValue({
-          employeeId: leave.employeeId,
-          leaveType: leave.leaveType,
-          startDate: leave.startDate
-            ? moment(leave.startDate, "DD-MM-YYYY")
-            : null,
-          endDate: leave.endDate ? moment(leave.endDate, "DD-MM-YYYY") : null,
-          reason: leave.reason,
-          remark: leave.remark,
-        });
-        setIsDataLoaded(true);
+        // Set initial values for Formik
+        initialValues.employeeId = leave.employeeId;
+        initialValues.leaveType = leave.leaveType;
+        initialValues.startDate = leave.startDate ? moment(leave.startDate, "DD-MM-YYYY") : null;
+        initialValues.endDate = leave.endDate ? moment(leave.endDate, "DD-MM-YYYY") : null;
+        initialValues.reason = leave.reason;
+        initialValues.remark = leave.remark;
       }
     }
-  }, [editid, leaveData, filteredEmpData, form]);
+  }, [editid, leaveData, filteredEmpData]);
 
-
-  const onFinish = async (values) => {
+  const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const id = editid;
-      dispatch(EditLeaveAction({ id, values }))
-        .then(() => {
-          dispatch(GetLeave());
-          message.success("Leave details updated successfully!");
-          onClose();
-          navigate("/app/hrm/leave");
-        })
-        .catch((error) => {
-          message.error("Failed to update Leave.");
-          console.error("Edit API error:", error);
-        });
       const formattedValues = {
-        id: editid.id,
         ...values,
         startDate: values.startDate.format("DD-MM-YYYY"),
         endDate: values.endDate.format("DD-MM-YYYY"),
       };
+
+      await dispatch(EditLeaveAction({ id: editid, values: formattedValues }));
+      await dispatch(GetLeave());
+      message.success("Leave details updated successfully!");
+      onClose();
+      navigate("/app/hrm/leave");
     } catch (error) {
-      message.error("Failed to update leave: " + error.message);
+      message.error("Failed to update leave: " + (error.message || "Unknown error"));
+    } finally {
+      setSubmitting(false);
     }
-  };
-  const onFinishFailed = (errorInfo) => {
-    message.error("Please check all required fields");
-  };
-  const onCloseHandler = () => {
-    form.resetFields(); // Reset form fields on close
-    onClose(); // Close the modal
   };
 
   return (
-    <div className="edit-leave-form">
-      <Form
-        layout="vertical"
-        form={form}
-        name="edit-leave"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
+    <div className="">
+      <h1 className="border-b border-gray-200 mb-4"></h1>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={LeaveSchema}
+        onSubmit={handleSubmit}
+        enableReinitialize
       >
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              name="employeeId"
-              label="Employee"
-              rules={[{ required: true, message: "Please select an employee" }]}
-            >
-              <Select placeholder="Select Employee">
-                {filteredEmpData.map((emp) => (
-                  <Option key={emp.id} value={emp.id}>
-                    {emp.username}
-                  </Option>
-                ))}
+        {({ errors, touched, setFieldValue, values, isSubmitting }) => (
+          <Form className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Employee Selection */}
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Employee <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  className="w-full"
+                  placeholder="Select Employee"
+                  onChange={(value) => setFieldValue("employeeId", value)}
+                  value={values.employeeId}
+                >
+                  {filteredEmpData.map((emp) => (
+                    <Option key={emp.id} value={emp.id}>
+                      {emp.username}
+                    </Option>
+                  ))}
+                </Select>
+                {errors.employeeId && touched.employeeId && (
+                  <div className="text-red-500 text-sm mt-1">{errors.employeeId}</div>
+                )}
+              </div>
 
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col span={24}>
-            <Form.Item
-              name="leaveType"
-              label="Leave Type"
-              rules={[{ required: true, message: "Please select leave type" }]}
-            >
-              <Select placeholder="Select Leave Type">
-                <Option value="sick">Sick Leave</Option>
-                <Option value="casual">Casual Leave</Option>
-                <Option value="annual">Annual Leave</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          {/* <Col span={12}>
-            <Form.Item
-              name="startDate"
-              label="Start Date"
-              rules={[{ required: true, message: "Start date is required" }]}
-            >
-              <DatePicker style={{ width: "100%" }} format="DD-MM-YYYY" />
-            </Form.Item>
-          </Col> */}
-           <Col span={12}>
-           <Form.Item
-              name="startDate"
-              rules={[{ required: true, message: "Start date is required" }]}
-            >
-                <label>Start Date</label>
+              {/* Leave Type */}
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Leave Type <span className="text-red-500">*</span>
+                </label>
+                <Select
+                  className="w-full"
+                  placeholder="Select Leave Type"
+                  onChange={(value) => setFieldValue("leaveType", value)}
+                  value={values.leaveType}
+                >
+                  <Option value="sick">Sick Leave</Option>
+                  <Option value="casual">Casual Leave</Option>
+                  <Option value="annual">Annual Leave</Option>
+                </Select>
+                {errors.leaveType && touched.leaveType && (
+                  <div className="text-red-500 text-sm mt-1">{errors.leaveType}</div>
+                )}
+              </div>
+
+              {/* Date Pickers */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date <span className="text-red-500">*</span>
+                </label>
                 <DatePicker
                   className="w-full"
                   format="DD-MM-YYYY"
+                  value={values.startDate}
+                  onChange={(date) => setFieldValue("startDate", date)}
                 />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-           <Form.Item
-              name="endDate"
-              rules={[{ required: true, message: "End date is required" }]}
-            >
-                <label className="flex items-center"><h4 className="text-red-500 h-4 w-4">*</h4>End Date</label>
+                {errors.startDate && touched.startDate && (
+                  <div className="text-red-500 text-sm mt-1">{errors.startDate}</div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date <span className="text-red-500">*</span>
+                </label>
                 <DatePicker
                   className="w-full"
                   format="DD-MM-YYYY"
+                  value={values.endDate}
+                  onChange={(date) => setFieldValue("endDate", date)}
                 />
-                </Form.Item>
-              </Col>
-        
-          <Col span={24}>
-            <Form.Item
-              name="reason"
-              label="Leave Reason"
-              rules={[{ required: true, message: "Please provide a reason" }]}
-            >
-              <TextArea rows={4} />
-            </Form.Item>
-          </Col>
-          <Col span={24}>
-            <Form.Item
-              name="remark"
-              label="Remark"
-              rules={[{ required: true, message: "Please provide a remark" }]}
-            >
-              <TextArea rows={4} />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Form.Item>
-          <div className="form-buttons" style={{ textAlign: "right" }}>
-            <Button
-              type="default"
-              onClick={onCloseHandler}
-              style={{ marginRight: 8 }}
-            >
-              Cancel
-            </Button>
-            <Button type="primary" htmlType="submit">
-              Update
-            </Button>
-          </div>
-        </Form.Item>
-      </Form>
+                {errors.endDate && touched.endDate && (
+                  <div className="text-red-500 text-sm mt-1">{errors.endDate}</div>
+                )}
+              </div>
+
+              {/* Reason and Remark */}
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Reason <span className="text-red-500">*</span>
+                </label>
+                <Field
+                  as="textarea"
+                  name="reason"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  rows="4"
+                />
+                {errors.reason && touched.reason && (
+                  <div className="text-red-500 text-sm mt-1">{errors.reason}</div>
+                )}
+              </div>
+
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Remark <span className="text-red-500">*</span>
+                </label>
+                <Field
+                  as="textarea"
+                  name="remark"
+                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  rows="4"
+                />
+                {errors.remark && touched.remark && (
+                  <div className="text-red-500 text-sm mt-1">{errors.remark}</div>
+                )}
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-end space-x-4 mt-6">
+              <Button
+                type="default"
+                onClick={onClose}
+                className="px-4 py-2"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isSubmitting}
+                className="px-4 py-2"
+              >
+                Update
+              </Button>
+            </div>
+          </Form>
+        )}
+      </Formik>
     </div>
   );
 };
+
 export default EditLeave;
+  
