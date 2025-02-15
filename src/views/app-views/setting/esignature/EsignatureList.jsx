@@ -1,10 +1,13 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SignatureCanvas from "react-signature-canvas";
 import { UndoOutlined, RedoOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Input, Table, Modal, notification, Popconfirm, Button } from 'antd';
+import { addesig, deletesigssss, getsignaturesss } from "./EsignatureReducers/EsignatureSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const ESignaturePage = () => {
   const sigPadRef = useRef(null);
+  const dispatch = useDispatch()
   const [undoStack, setUndoStack] = useState([]);
   const [redoStack, setRedoStack] = useState([]);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -37,6 +40,27 @@ const ESignaturePage = () => {
     }
   };
 
+  useEffect(()=>{
+    dispatch(getsignaturesss())
+  },[dispatch])
+
+  const alldatass = useSelector((state)=>state.esignature.esignature.data)
+
+  useEffect(() => {
+    if (alldatass) {
+      // Transform the API data to match table structure
+      const formattedData = alldatass.map((item, index) => ({
+        key: index + 1,
+        id: item.id,
+        name: item.esignature_name,
+        signature: item.e_signatures,
+        created_at: item.createdAt,
+        created_by: item.created_by
+      }));
+      setSavedSignatures(formattedData);
+    }
+  }, [alldatass]);
+
   const columns = [
     {
       title: 'Sr No.',
@@ -58,23 +82,34 @@ const ESignaturePage = () => {
       ),
     },
     {
+      title: 'Created By',
+      dataIndex: 'created_by',
+      key: 'created_by',
+    },
+    {
+      title: 'Created At',
+      dataIndex: 'created_at',
+      key: 'created_at',
+      render: (date) => new Date(date).toLocaleDateString(),
+    },
+    {
       title: 'Actions',
       key: 'actions',
       width: '200px',
       render: (_, record) => (
         <div className="flex gap-2">
-          <Button
+          {/* <Button
             type="primary"
             icon={<EditOutlined />}
             className="flex items-center bg-blue-500"
             onClick={() => handleEdit(record)}
           >
             Edit
-          </Button>
+          </Button> */}
           <Popconfirm
             title="Delete Signature"
             description="Are you sure you want to delete this signature?"
-            onConfirm={() => handleDelete(record.key)}
+            onConfirm={() => handleDelete(record)}
             okText="Yes"
             cancelText="No"
             okButtonProps={{ className: 'bg-blue-500' }}
@@ -199,67 +234,111 @@ const ESignaturePage = () => {
     const dataURL = sigPadRef.current.getTrimmedCanvas().toDataURL("image/png");
     setTempSignature(dataURL);
     setIsModalVisible(true);
+    // dispatch(addesig(dataURL))
   };
 
-  const handleModalOk = () => {
-    if (!signatureName.trim()) {
+  const handleModalOk = async () => {
+    if (!signatureName.trim() || !tempSignature) {
       notification.error({
         message: 'Error',
-        description: 'Please enter a signature name.',
+        description: 'Please provide both signature name and draw a signature.',
       });
       return;
     }
 
-    if (isEditMode && editingSignature) {
-      // Update existing signature
-      setSavedSignatures(prev =>
-        prev.map(sig =>
-          sig.key === editingSignature.key
-            ? { ...sig, name: signatureName, signature: tempSignature }
-            : sig
-        )
-      );
-      notification.success({
-        message: 'Success',
-        description: 'Signature updated successfully!',
+    try {
+      // Get token from localStorage
+      const token = localStorage.getItem('auth_token');
+      
+      if (!token) {
+        throw new Error('Authentication token not found');
+      }
+
+      // Convert base64 to blob
+      const base64Data = tempSignature.split(',')[1];
+      const binaryData = atob(base64Data);
+      const array = new Uint8Array(binaryData.length);
+      for (let i = 0; i < binaryData.length; i++) {
+        array[i] = binaryData.charCodeAt(i);
+      }
+      const blob = new Blob([array], { type: 'image/png' });
+      
+      // Create file object from blob
+      const file = new File([blob], `${signatureName.trim()}.png`, { type: 'image/png' });
+
+      // Create FormData and append all values
+      const formData = new FormData();
+      formData.append('esignature_name', signatureName.trim());
+      formData.append('e_signatures', file);
+
+      // Make API call with authorization header
+      const saveResponse = await fetch('/api/v1/esignatures', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          // Note: Don't set Content-Type when sending FormData
+          // browser will automatically set the correct boundary
+        },
+        body: formData,
       });
-    } else {
-      // Add new signature
-      const newSignature = {
-        key: savedSignatures.length + 1,
-        name: signatureName,
-        signature: tempSignature
-      };
-      setSavedSignatures(prev => [...prev, newSignature]);
+
+      if (!saveResponse.ok) {
+        throw new Error('Failed to save signature');
+      }
+
+      const savedData = await saveResponse.json();
+
+      dispatch(getsignaturesss())
+
+      // Add the new signature to the table
+      setSavedSignatures(prev => [
+        ...prev,
+        {
+          key: prev.length + 1,
+          name: signatureName.trim(),
+          signature: savedData.fileUrl,
+        }
+      ]);
+
+      // Reset states
+      clearSignature();
+      setSignatureName("");
+      setIsModalVisible(false);
+      setIsEditMode(false);
+      setEditingSignature(null);
+
       notification.success({
         message: 'Success',
         description: 'Signature saved successfully!',
       });
-    }
 
-    // Reset states
-    clearSignature();
-    setSignatureName("");
-    setIsModalVisible(false);
-    setIsEditMode(false);
-    setEditingSignature(null);
+    } catch (error) {
+      console.error('Error saving signature:', error);
+      notification.error({
+        message: 'Error',
+        description: error.message || 'Failed to save signature.',
+      });
+    }
   };
 
   // Handle delete signature
-  const handleDelete = (key) => {
+  const handleDelete = (record) => {
+    dispatch(deletesigssss(record.key))
+    dispatch(getsignaturesss())
     setSavedSignatures(prev => {
-      const updatedSignatures = prev.filter(sig => sig.key !== key);
-      // Reorder the keys after deletion
+      const updatedSignatures = prev.filter(sig => sig.key !== record.key);
       return updatedSignatures.map((sig, index) => ({
         ...sig,
         key: index + 1
       }));
+
+     
     });
     
-    notification.success({
-      message: 'Success',
-      description: 'Signature deleted successfully!',
-    });
+    // notification.success({
+    //   message: 'Success',
+    //   description: 'Signature deleted successfully!',
+    // });
   };
 
   // Modified save button text based on mode

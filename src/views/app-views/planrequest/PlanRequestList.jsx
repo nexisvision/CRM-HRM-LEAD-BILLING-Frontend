@@ -17,7 +17,7 @@ import utils from 'utils'
 // import AddInvoice from './AddInvoice';
 // import EditInvoice from './EditInvoice';
 // import ViewInvoice from './ViewInvoice';
-import userData from '../../../assets/data/user-list.data.json';
+// import userData from '../../../assets/data/user-list.data.json';
 // import ViewSubscribedUserPlans from './ViewSubscribedUserPlans';
 // import EditSubscribedUserPlans from './EditSubscribedUserPlans';
 
@@ -30,7 +30,7 @@ const { Option } = Select
 
 
 export const PlanRequestList = () => {
-    const [users, setUsers] = useState(userData);
+    const [users, setUsers] = useState([]);
     // const [list, setList] = useState(OrderListData)
     const [selectedRows, setSelectedRows] = useState([])
     const [isAddSubscribedUserPlansModalVisible, setIsAddSubscribedUserPlansModalVisible] = useState(false);
@@ -43,10 +43,10 @@ export const PlanRequestList = () => {
     const handleShowStatus = value => {
         if (value !== 'All') {
             const key = 'paymentStatus'
-            const data = utils.filterArray(userData, key, value)
+            const data = utils.filterArray(users, key, value)
             setUsers(data)
         } else {
-            setUsers(userData)
+            setUsers([])
         }
     }
 
@@ -185,7 +185,7 @@ const handleStatusChange = (checked, userId) => {
 
     const onSearch = e => {
         const value = e.currentTarget.value
-        const searchArray = e.currentTarget.value ? users : userData
+        const searchArray = e.currentTarget.value ? users : []
         const data = utils.wildCardSearch(searchArray, value)
         setUsers(data)
         setSelectedRowKeys([])

@@ -67,6 +67,7 @@ import subplan from "../views/app-views/subscribeduserplans/subplanReducer/subpl
 import notes from "../views/app-views/notes/notesReducer/notesSlice"
 import tax from 'views/app-views/setting/tax/taxreducer/taxSlice'
 import salesquotation from "views/app-views/dashboards/sales/estimates/estimatesReducer/EstimatesSlice"
+import esignature from "views/app-views/setting/esignature/EsignatureReducers/EsignatureSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -138,6 +139,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
         notes,
         tax,
         salesquotation,
+        esignature,
         // employee,
         // department,
         ...asyncReducers,

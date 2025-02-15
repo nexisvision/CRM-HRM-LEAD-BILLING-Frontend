@@ -52,9 +52,8 @@ const { Column } = Table;
 const { Option } = Select;
 
 export const SubscribedUserPlansList = () => {
-  const [users, setUsers] = useState(userData);
+  const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
-  // const [list, setList] = useState(OrderListData)
   const [selectedRows, setSelectedRows] = useState([]);
   const [
     isAddSubscribedUserPlansModalVisible,
@@ -269,7 +268,7 @@ export const SubscribedUserPlansList = () => {
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? users : userData;
+    const searchArray = e.currentTarget.value ? users : [];
     const data = utils.wildCardSearch(searchArray, value);
     setUsers(data);
     setSelectedRowKeys([]);

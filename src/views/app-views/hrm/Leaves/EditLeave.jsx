@@ -49,30 +49,39 @@ const EditLeave = ({ editid, onClose }) => {
     if (editid && leaveData?.Leave?.data.length > 0 && filteredEmpData.length > 0) {
       const leave = leaveData.Leave.data.find((item) => item.id === editid);
       if (leave) {
-        // Set initial values for Formik
-        initialValues.employeeId = leave.employeeId;
-        initialValues.leaveType = leave.leaveType;
-        initialValues.startDate = leave.startDate ? moment(leave.startDate, "DD-MM-YYYY") : null;
-        initialValues.endDate = leave.endDate ? moment(leave.endDate, "DD-MM-YYYY") : null;
-        initialValues.reason = leave.reason;
-        initialValues.remark = leave.remark;
+        form.setFieldsValue({
+          employeeId: leave.employeeId,
+          leaveType: leave.leaveType,
+          startDate: leave.startDate ? moment(leave.startDate) : null,
+          endDate: leave.endDate ? moment(leave.endDate) : null,
+          reason: leave.reason,
+          remark: leave.remark,
+        });
+        setIsDataLoaded(true);
       }
     }
   }, [editid, leaveData, filteredEmpData]);
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
+      const id = editid;
+      // Format the values to ISO date strings
       const formattedValues = {
         ...values,
-        startDate: values.startDate.format("DD-MM-YYYY"),
-        endDate: values.endDate.format("DD-MM-YYYY"),
+        startDate: values.startDate.toISOString(),
+        endDate: values.endDate.toISOString(),
       };
 
-      await dispatch(EditLeaveAction({ id: editid, values: formattedValues }));
-      await dispatch(GetLeave());
-      message.success("Leave details updated successfully!");
-      onClose();
-      navigate("/app/hrm/leave");
+      dispatch(EditLeaveAction({ id, values: formattedValues }))
+        .then(() => {
+          dispatch(GetLeave());
+          onClose();
+          navigate("/app/hrm/leave");
+        })
+        .catch((error) => {
+          message.error("Failed to update Leave.");
+          console.error("Edit API error:", error);
+        });
     } catch (error) {
       message.error("Failed to update leave: " + (error.message || "Unknown error"));
     } finally {
@@ -141,9 +150,8 @@ const EditLeave = ({ editid, onClose }) => {
                 </label>
                 <DatePicker
                   className="w-full"
-                  format="DD-MM-YYYY"
-                  value={values.startDate}
-                  onChange={(date) => setFieldValue("startDate", date)}
+                  format="YYYY-MM-DD"
+                  disabledDate={(current) => current && current < moment().startOf('day')}
                 />
                 {errors.startDate && touched.startDate && (
                   <div className="text-red-500 text-sm mt-1">{errors.startDate}</div>
@@ -156,9 +164,8 @@ const EditLeave = ({ editid, onClose }) => {
                 </label>
                 <DatePicker
                   className="w-full"
-                  format="DD-MM-YYYY"
-                  value={values.endDate}
-                  onChange={(date) => setFieldValue("endDate", date)}
+                  format="YYYY-MM-DD"
+                  disabledDate={(current) => current && current < moment().startOf('day')}
                 />
                 {errors.endDate && touched.endDate && (
                   <div className="text-red-500 text-sm mt-1">{errors.endDate}</div>
