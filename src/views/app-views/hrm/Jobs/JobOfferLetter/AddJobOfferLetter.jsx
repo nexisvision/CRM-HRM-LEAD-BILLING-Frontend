@@ -112,12 +112,12 @@ const AddJobOfferLetter = ({ onClose }) => {
             <Row gutter={16}>
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Job Application</label>
+                  <label className="font-semibold">Job Application <span className="text-red-500">*</span></label>
                   <Field name="job">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full mt-2"
+                        className="w-full mt-1"
                         placeholder="Select job"
                         loading={!fnddtaa}
                         onChange={(value) => setFieldValue("job", value)}
@@ -147,12 +147,12 @@ const AddJobOfferLetter = ({ onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Job</label>
+                  <label className="font-semibold">Job <span className="text-red-500">*</span></label>
                   <Field name="job_applicant">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full mt-2"
+                        className="w-full mt-1"
                         placeholder="Select job"
                         loading={!fnd}
                         onChange={(value) => setFieldValue("job_applicant", value)}
@@ -200,9 +200,9 @@ const AddJobOfferLetter = ({ onClose }) => {
 
               <Col span={12} className='mt-2'>
                 <div className="form-item">
-                  <label className='font-semibold'>Offer Expire On</label>
+                  <label className='font-semibold'>Offer Expire On <span className="text-red-500">*</span></label>
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.offer_expiry}
                     onChange={(offer_expiry) => setFieldValue('offer_expiry', offer_expiry)}
@@ -214,9 +214,9 @@ const AddJobOfferLetter = ({ onClose }) => {
 
               <Col span={12} className='mt-2'>
                 <div className="form-item">
-                  <label className='font-semibold'>Expected Joining Date</label>
+                  <label className='font-semibold'>Expected Joining Date <span className="text-red-500">*</span></label>
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.expected_joining_date}
                     onChange={(expected_joining_date) => setFieldValue('expected_joining_date', expected_joining_date)}
@@ -246,11 +246,11 @@ const AddJobOfferLetter = ({ onClose }) => {
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label className="font-semibold">Salary</label>
+                  <label className="font-semibold">Salary <span className="text-red-500">*</span></label>
                   <Field
                     name="salary"
                     as={Input}
-                    className="mt-2"
+                    className="mt-1 w-full"
                     placeholder="Enter Salary"
                   />
                   <ErrorMessage
@@ -263,11 +263,11 @@ const AddJobOfferLetter = ({ onClose }) => {
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label className="font-semibold">Rate</label>
+                  <label className="font-semibold">Rate <span className="text-red-500">*</span></label>
                   <Field
                     name="rate"
                     as={Input}
-                    className="mt-2 w-full"
+                    className="mt-1 w-full"
                     placeholder="Enter Rate"
                   />
                   <ErrorMessage
@@ -280,10 +280,10 @@ const AddJobOfferLetter = ({ onClose }) => {
 
               <Col span={24}>
                 <div className="form-item mt-2">
-                  <label className="font-semibold">Description</label>
+                  <label className="font-semibold">Description <span className="text-red-500">*</span></label>
                   <ReactQuill
                     theme="snow"
-                    className="mt-2"
+                    className="mt-1 w-full"
                     value={values.description}
                     onChange={(value) => setFieldValue("description", value)}
                     onBlur={() => setFieldTouched("description", true)}

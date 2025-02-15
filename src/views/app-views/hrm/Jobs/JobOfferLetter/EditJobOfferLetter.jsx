@@ -212,12 +212,12 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
             <Row gutter={16}>
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Job Application</label>
+                  <label className="font-semibold">Job Application <span className="text-red-500">*</span></label>
                   <Field name="job">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-1"
                         placeholder="Select job"
                         loading={!fnddtaa}
                         onChange={(value) => setFieldValue("job", value)}
@@ -248,12 +248,12 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Job</label>
+                  <label className="font-semibold">Job <span className="text-red-500">*</span></label>
                   <Field name="job_applicant">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-1"
                         placeholder="Select job application"
                         loading={!fnd}
                         onChange={(value) =>
@@ -303,9 +303,9 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
               </Col> */}
               <Col span={12} className='mt-2'>
                 <div className="form-item">
-                  <label className='font-semibold'>Offer Expire On</label>
+                  <label className='font-semibold'>Offer Expire On <span className="text-red-500">*</span></label>
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.offer_expiry ? dayjs(values.offer_expiry) : null}
                     onChange={(date) => setFieldValue('offer_expiry', date)}
@@ -348,9 +348,9 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Expected Joining Date</label>
+                  <label className="font-semibold">Expected Joining Date <span className="text-red-500">*</span></label>
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.expected_joining_date ? dayjs(values.expected_joining_date) : null}
                     onChange={(date) => setFieldValue("expected_joining_date", date)}
@@ -378,9 +378,9 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label >Salary</label>
+                  <label className="font-semibold">Salary <span className="text-red-500">*</span></label>
                   <Field
-                    className="mt-2"
+                    className="mt-1 w-full"
                     name="salary"
                     as={Input}
                     placeholder="Enter Salary"
@@ -395,9 +395,9 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label>Rate</label>
+                  <label className="font-semibold">Rate <span className="text-red-500">*</span></label>
                   <Field
-                    className="mt-2"
+                    className="mt-1 w-full"
                     name="rate"
                     as={Input}
                     placeholder="Enter Rate"
@@ -412,9 +412,9 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
 
               <Col span={24}>
                 <div className="form-item mt-2">
-                  <label >Description</label>
+                  <label className="font-semibold">Description <span className="text-red-500">*</span></label>
                   <ReactQuill
-                    className="mt-2"
+                    className="mt-1 w-full"
                     value={values.description}
                     onChange={(value) => setFieldValue("description", value)}
                     onBlur={() => setFieldTouched("description", true)}

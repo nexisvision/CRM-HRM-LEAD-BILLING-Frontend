@@ -90,8 +90,8 @@ const AddDocument = ({ onClose }) => {
   };
 
   return (
-    <div className="add-trainingSetup p-4">
-      <hr className="mb-4 border border-gray-300" />
+    <div className="add-trainingSetup">
+      <hr className="mt-3 border border-gray-300" />
       <Formik
         initialValues={initialValues}
         // validationSchema={validationSchema}
@@ -105,9 +105,9 @@ const AddDocument = ({ onClose }) => {
             onFinish={handleSubmit}
           >
             <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item label="Name" name="name">
-                  <Field name="name">
+              <Col span={12} className="mt-3">
+              <label className="font-semibold">Name <span className="text-red-500">*</span></label>
+                  <Field name="name" className="w-full mt-2">
                     {({ field }) => (
                       <Input placeholder="Enter Name" {...field} />
                     )}
@@ -117,7 +117,7 @@ const AddDocument = ({ onClose }) => {
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
-                </Form.Item>
+             
               </Col>
               {/* <Col span={8} className="">
                 <div className="form-item">
@@ -148,14 +148,15 @@ const AddDocument = ({ onClose }) => {
                   />
                 </div>
               </Col> */}
-              <div className="mt-2 w-full">
-                <Col span={24} className="mt-2">
+              <div className=" w-full">
+                <Col span={24} className="mt-3">
                   <div className="form-item">
-                    <label className="">Description</label>
+                    <label className="font-semibold">Description <span className="text-red-500">*</span></label>
                     <ReactQuill
                       value={values.description}
                       onChange={(value) => setFieldValue("description", value)}
                       placeholder="Enter description"
+                      className="mt-2"
                       onBlur={() => setFieldTouched("description", true)}
                     />
                     <ErrorMessage
@@ -169,7 +170,7 @@ const AddDocument = ({ onClose }) => {
               <Col span={24}>
                 <Field name="file">
                        {({ field }) => (
-                           <Form.Item label="Attachment">
+                           <Form.Item label="Attachment" className="mt-3 font-semibold">
                                <Upload
                                    beforeUpload={(file) => {
                                        setFieldValue("file", file); // Set the uploaded file in Formik state

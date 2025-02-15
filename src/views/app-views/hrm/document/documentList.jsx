@@ -139,36 +139,36 @@ const DocumentList = () => {
     setSelectedUser(null);
   };
 
-   //// permission
-                                            
-                              const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                              const roles = useSelector((state) => state.role?.role?.data);
-                              const roleData = roles?.find(role => role.id === roleId);
-                           
-                              const whorole = roleData.role_name;
-                           
-                              const parsedPermissions = Array.isArray(roleData?.permissions)
-                              ? roleData.permissions
-                              : typeof roleData?.permissions === 'string'
-                              ? JSON.parse(roleData.permissions)
-                              : [];
-                            
-                              let allpermisson;  
-                           
-                              if (parsedPermissions["extra-hrm-document"] && parsedPermissions["extra-hrm-document"][0]?.permissions) {
-                                allpermisson = parsedPermissions["extra-hrm-document"][0].permissions;
-                                console.log('Parsed Permissions:', allpermisson);
-                              
-                              } else {
-                                console.log('extra-hrm-document is not available');
-                              }
-                              
-                              const canCreateClient = allpermisson?.includes('create');
-                              const canEditClient = allpermisson?.includes('edit');
-                              const canDeleteClient = allpermisson?.includes('delete');
-                              const canViewClient = allpermisson?.includes('view');
-                           
-                              ///endpermission
+  //// permission
+
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+  let allpermisson;
+
+  if (parsedPermissions["extra-hrm-document"] && parsedPermissions["extra-hrm-document"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-document"][0].permissions;
+    console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    console.log('extra-hrm-document is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+  ///endpermission
 
 
   //   useEffect(() => {
@@ -224,21 +224,21 @@ const DocumentList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
             className=""
             icon={<EyeOutlined />}
             size="small"
-            // onClick={() => viewfun(elm.id)}
+          // onClick={() => viewfun(elm.id)}
           >
             <span>View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
-     
-      <Menu.Item>
+      </Menu.Item> */}
+
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -250,8 +250,8 @@ const DocumentList = () => {
             <span>Send Mail</span>
           </Button>
         </Flex>
-      </Menu.Item>
-      <Menu.Item>
+      </Menu.Item> */}
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -263,41 +263,41 @@ const DocumentList = () => {
             <span className="ml-2">Add to Job OnBoard</span>
           </Button>
         </Flex>
-      </Menu.Item>
-     
+      </Menu.Item> */}
+
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                  <Menu.Item>
-                                  <Flex alignItems="center">
-                                    <Button
-                                      type=""
-                                      className=""
-                                      icon={<EditOutlined />}
-                                      size="small"
-                                      onClick={() => editfun(elm.id)}
-                                    >
-                                      <span>Edit</span>
-                                    </Button>
-                                  </Flex>
-                                </Menu.Item>
-                                ) : null}
-                  
-                  
-                  {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                   <Menu.Item>
-                                   <Flex alignItems="center">
-                                     <Button
-                                       type=""
-                                       className=""
-                                       icon={<DeleteOutlined />}
-                                       onClick={() => deleteUser(elm.id)}
-                                       size="small"
-                                     >
-                                       <span>Delete</span>
-                                     </Button>
-                                   </Flex>
-                                 </Menu.Item>
-                                ) : null}
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              className=""
+              icon={<EditOutlined />}
+              size="small"
+              onClick={() => editfun(elm.id)}
+            >
+              <span>Edit</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
+
+
+      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              className=""
+              icon={<DeleteOutlined />}
+              onClick={() => deleteUser(elm.id)}
+              size="small"
+            >
+              <span>Delete</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
 
 
     </Menu>
@@ -319,7 +319,7 @@ const DocumentList = () => {
       dataIndex: "description",
       sorter: (a, b) => a.description.length - b.description.length,
       render: (text) => <div dangerouslySetInnerHTML={{ __html: text }} /> // Render HTML content
-  },
+    },
     //   {
     //     title: "files",
     //     dataIndex: "files",
@@ -362,42 +362,42 @@ const DocumentList = () => {
           </div> */}
         </Flex>
         <Flex gap="7px">
-         
 
-            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                                      <Button
-                                                                                                                                      type="primary"
-                                                                                                                                      className="ml-2"
-                                                                                                                                      onClick={openAddTrainingSetupModal}
-                                                                                                                                    >
-                                                                                                                                      <PlusOutlined />
-                                                                                                                                      <span>New</span>
-                                                                                                                                    </Button>                                                                                                                  
-                                                                                                                                                                                                                                                                    
-                                                                                                                                                  ) : null}
-          
+
+          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Button
+              type="primary"
+              className="ml-2"
+              onClick={openAddTrainingSetupModal}
+            >
+              <PlusOutlined />
+              <span>New</span>
+            </Button>
+
+          ) : null}
+
           <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel} // Call export function when the button is clicked
+            block
+          >
+            Export All
+          </Button>
         </Flex>
       </Flex>
       <div className="table-responsive mt-4">
 
-          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                          <Table
-                                                                          columns={tableColumns}
-                                                                          dataSource={users}
-                                                                          rowKey="id"
-                                                                          scroll={{ x: 1200 }}
-                                                                        />
-                                                                             ) : null}
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          <Table
+            columns={tableColumns}
+            dataSource={users}
+            rowKey="id"
+            scroll={{ x: 1200 }}
+          />
+        ) : null}
 
-       
+
       </div>
       {/* <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} /> */}
 

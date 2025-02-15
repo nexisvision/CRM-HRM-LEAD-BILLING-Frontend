@@ -92,7 +92,7 @@ const AddTrainingSetup = ({ onClose }) => {
           >
             <Row gutter={16}>
               <Col span={24}>
-                <Form.Item label="Category" name="category">
+                <Form.Item label="Category" name="category" className="mt-3 font-semibold">
                   <Input
                     placeholder="Enter Category"
                     value={values.category}

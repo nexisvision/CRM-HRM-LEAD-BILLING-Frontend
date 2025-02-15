@@ -74,7 +74,7 @@ const CreditNotesList = () => {
     useState(false);
   const [isViewCreditNotesModalVisible, setIsViewCreditNotesModalVisible] =
     useState(false);
-    const [selectedCreditNoteId, setSelectedCreditNoteId] = useState(null);
+  const [selectedCreditNoteId, setSelectedCreditNoteId] = useState(null);
 
   const [idd, setIdd] = useState("");
 
@@ -90,7 +90,7 @@ const CreditNotesList = () => {
   const handleView = (creditNoteId) => {
     setSelectedCreditNoteId(creditNoteId);
     setIsViewCreditNotesModalVisible(true);
-};
+  };
 
   useEffect(() => {
     if (creditNotesData && invoicesData) {
@@ -134,7 +134,7 @@ const CreditNotesList = () => {
   const closeViewCreditNotesModal = () => {
     setSelectedCreditNoteId(null);
     setIsViewCreditNotesModalVisible(false);
-};
+  };
 
   const deletefun = (userId) => {
     dispatch(deletecreditnote(userId)).then(() => {
@@ -161,42 +161,42 @@ const CreditNotesList = () => {
     setIdd(idd);
   };
 
-   //// permission
-        
-                  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                  const roles = useSelector((state) => state.role?.role?.data);
-                  const roleData = roles?.find(role => role.id === roleId);
-              
-                  const whorole = roleData.role_name;
-              
-                  const parsedPermissions = Array.isArray(roleData?.permissions)
-                  ? roleData.permissions
-                  : typeof roleData?.permissions === 'string'
-                  ? JSON.parse(roleData.permissions)
-                  : [];
-                
-                
-                  let allpermisson;  
-              
-                  if (parsedPermissions["dashboards-sales-creditnotes"] && parsedPermissions["dashboards-sales-creditnotes"][0]?.permissions) {
-                    allpermisson = parsedPermissions["dashboards-sales-creditnotes"][0].permissions;
-                    console.log('Parsed Permissions:', allpermisson);
-                  
-                  } else {
-                    console.log('dashboards-sales-creditnotes is not available');
-                  }
-                  
-                  const canCreateClient = allpermisson?.includes('create');
-                  const canEditClient = allpermisson?.includes('edit');
-                  const canDeleteClient = allpermisson?.includes('delete');
-                  const canViewClient = allpermisson?.includes('view');
-        
-                  ///endpermission
+  //// permission
+
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+
+  let allpermisson;
+
+  if (parsedPermissions["dashboards-sales-creditnotes"] && parsedPermissions["dashboards-sales-creditnotes"][0]?.permissions) {
+    allpermisson = parsedPermissions["dashboards-sales-creditnotes"][0].permissions;
+    console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    console.log('dashboards-sales-creditnotes is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+  ///endpermission
 
 
   const dropdownMenu = (row) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -208,28 +208,34 @@ const CreditNotesList = () => {
             <span className="">View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
-     
-   
+      </Menu.Item> */}
+
+<Menu.Item>
+          <Flex alignItems="center" onClick={() => handleView(row.id)}>
+            <EyeOutlined />
+            <span className="ml-2">View</span>
+          </Flex>
+        </Menu.Item>
+
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                           <Menu.Item>
-                           <Flex alignItems="center" onClick={() => edtfun(row.id)}>
-                             <EditOutlined />
-                             <span className="ml-2">Edit</span>
-                           </Flex>
-                         </Menu.Item>
-                    ) : null}
-      
-      
+        <Menu.Item>
+          <Flex alignItems="center" onClick={() => edtfun(row.id)}>
+            <EditOutlined />
+            <span className="ml-2">Edit</span>
+          </Flex>
+        </Menu.Item>
+      ) : null}
+
+
       {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                       <Menu.Item>
-                       <Flex alignItems="center" onClick={() => deletefun(row.id)}>
-                         <DeleteOutlined />
-                         <span className="ml-2">Delete</span>
-                       </Flex>
-                     </Menu.Item>
-                    ) : null}
+        <Menu.Item>
+          <Flex alignItems="center" onClick={() => deletefun(row.id)}>
+            <DeleteOutlined />
+            <span className="ml-2">Delete</span>
+          </Flex>
+        </Menu.Item>
+      ) : null}
 
 
     </Menu>
@@ -330,41 +336,41 @@ const CreditNotesList = () => {
           </Flex>
 
           <Flex gap="7px" className="flex">
-       
-             {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                              <Button
-                                                                                              type="primary"
-                                                                                              className="flex items-center"
-                                                                                              onClick={openAddCreditNotesModal}
-                                                                                            >
-                                                                                              <PlusOutlined />
-                                                                                              <span className="ml-2">New</span>
-                                                                                            </Button>
-                                                                                
-                                                                                    ) : null}
+
+            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+              <Button
+                type="primary"
+                className="flex items-center"
+                onClick={openAddCreditNotesModal}
+              >
+                <PlusOutlined />
+                <span className="ml-2">New</span>
+              </Button>
+
+            ) : null}
 
 
           </Flex>
         </Flex>
         <div className="table-responsive">
 
-           {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                        <Table
-                                                                        columns={tableColumns}
-                                                                        dataSource={list}
-                                                                        rowKey="id"
-                                                                        scroll={{ x: 1200 }}
-                                                                        // rowSelection={{
-                                                                        // 	selectedRowKeys: selectedRowKeys,
-                                                                        // 	type: 'checkbox',
-                                                                        // 	preserveSelectedRowKeys: false,
-                                                                        // 	...rowSelection,
-                                                                        // }}
-                                                                      />
-                                                                        ) : null}
+          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Table
+              columns={tableColumns}
+              dataSource={list}
+              rowKey="id"
+              scroll={{ x: 1200 }}
+            // rowSelection={{
+            // 	selectedRowKeys: selectedRowKeys,
+            // 	type: 'checkbox',
+            // 	preserveSelectedRowKeys: false,
+            // 	...rowSelection,
+            // }}
+            />
+          ) : null}
 
 
-        
+
         </div>
       </Card>
 
