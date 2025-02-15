@@ -80,12 +80,14 @@ const AddSources = ({ onClose }) => {
                 }) => (
                   <Form className="formik-form" onSubmit={handleSubmit}>
                     <Row gutter={16}>
-                      <Col span={24} className="mt-2">
+                      <Col span={24} className="">
+                      <h2 className="mb-4 border-b pb-2 font-medium"></h2>
                         <div className="form-item">
-                          <label className="font-semibold">Source Name</label>
+                          <label className="font-semibold">Source Name <span className="text-rose-500">*</span></label>
                           <Field
                             name="name"
                             as={Input}
+                            className="w-full mt-1"
                             placeholder="Enter Source Name"
                           />
                           <ErrorMessage
@@ -96,7 +98,7 @@ const AddSources = ({ onClose }) => {
                         </div>
                       </Col>
                     </Row>
-                    <div className="form-buttons text-right mt-4">
+                    <div className="form-buttons text-right mt-3">
                       <Button type="default" className="mr-2" onClick={onClose}>
                         Cancel
                       </Button>

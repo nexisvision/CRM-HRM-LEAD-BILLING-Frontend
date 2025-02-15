@@ -20,19 +20,20 @@ const AddTask = ({ onClose }) => {
 
   useEffect(() => {
     dispatch(empdata());
-  }, []);
+  }, [dispatch]);
 
   const allempdata = useSelector((state) => state.employee);
-  const empData = allempdata?.employee?.data;
+  const empData = allempdata?.employee?.data || [];
 
   const allloggeduserdata = useSelector((state) => state.user);
-  const loggedUserData = allloggeduserdata?.loggedInUser || [];
+  const loggedUserData = allloggeduserdata?.loggedInUser || {};
+  const id = loggedUserData?.id;
 
-  const id = loggedUserData.id;
+  const loggedusername = useSelector((state) => state.user?.loggedInUser?.username);
 
-  const loggedusername = useSelector((state) => state.user.loggedInUser.username || [])
-
-  const fndassine = empData.filter(((item)=>item.created_by === loggedusername || []))
+  const fndassine = Array.isArray(empData) && loggedusername
+    ? empData.filter((item) => item?.created_by === loggedusername)
+    : [];
 
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
@@ -40,6 +41,8 @@ const AddTask = ({ onClose }) => {
     taskName: "",
     startDate: null,
     dueDate: null,
+    status: "",
+    priority: "",
     assignTo: [],
     description: "",
   };
@@ -48,6 +51,8 @@ const AddTask = ({ onClose }) => {
     taskName: Yup.string().required("Please enter TaskName."),
     startDate: Yup.date().nullable().required("Date is required."),
     dueDate: Yup.date().nullable().required("Date is required."),
+    status: Yup.string().required("Please select status."),
+    priority: Yup.string().required("Please select priority."),
     assignTo: Yup.array().min(1, "Please select at least one AssignTo."),
     description: Yup.string().required("Please enter a Description."),
   });
@@ -100,12 +105,12 @@ const AddTask = ({ onClose }) => {
             <Row gutter={16}>
               <Col span={24}>
                 <div className="form-item">
-                  <label className="font-semibold">Task Name</label>
+                  <label className="font-semibold">Task Name <span className="text-rose-500">*</span></label>
                   <Field
                     name="taskName"
                     as={Input}
                     placeholder="Enter task Title"
-                    className="mt-2"
+                    className="mt-1"
                   />
                   <ErrorMessage
                     name="taskName"
@@ -115,31 +120,31 @@ const AddTask = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold ">StartDate</label>
+                  <label className="font-semibold ">StartDate <span className="text-rose-500">*</span></label>
                   <DatePicker
                     name="startDate"
-                    className="w-full mt-2"
+                    className="w-full mt-1"
                     placeholder="Select startDate"
                     onChange={(value) => setFieldValue("startDate", value)}
                     value={values.startDate}
                     onBlur={() => setFieldTouched("startDate", true)}
                   />
                   <ErrorMessage
-                    name="taskDate"
+                    name="startDate"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold ">DueDate</label>
+                  <label className="font-semibold ">DueDate <span className="text-rose-500">*</span></label>
                   <DatePicker
                     name="dueDate"
-                    className="w-full mt-2"
+                    className="w-full mt-1"
                     placeholder="Select DueDate"
                     onChange={(value) => setFieldValue("dueDate", value)}
                     value={values.dueDate}
@@ -153,31 +158,29 @@ const AddTask = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24} className="mt-4">
+              <Col span={24} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">AssignTo</label>
+                  <label className="font-semibold">AssignTo <span className="text-rose-500">*</span></label>
                   <Field name="assignTo">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full mt-2"
+                        className="w-full mt-1"
                         mode="multiple"
                         placeholder="Select AddProjectMember"
                         onChange={(value) => setFieldValue("assignTo", value)}
                         value={values.assignTo}
                         onBlur={() => setFieldTouched("assignTo", true)}
                       >
-                        {fndassine && fndassine.length > 0 ? (
+                        {Array.isArray(fndassine) && fndassine.length > 0 ? (
                           fndassine.map((client) => (
                             <Option key={client.id} value={client.id}>
-                              {client.firstName ||
-                                client.username ||
-                                "Unnamed Client"}
+                              {client.firstName || client.username || "Unnamed Client"}
                             </Option>
                           ))
                         ) : (
                           <Option value="" disabled>
-                            No Clients Available
+                            No Members Available
                           </Option>
                         )}
                       </Select>
@@ -191,14 +194,14 @@ const AddTask = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={9} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold mb-2">Status</label>
+                  <label className="font-semibold mb-2">Status <span className="text-rose-500">*</span></label>
                   <Field name="status">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full mt-2"
+                        className="w-full mt-1"
                         onChange={(value) => setFieldValue("status", value)}
                         value={values.status}
                       >
@@ -215,17 +218,22 @@ const AddTask = ({ onClose }) => {
                       </Select>
                     )}
                   </Field>
+                  <ErrorMessage
+                    name="status"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 
-              <Col span={10} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Priority</label>
+                  <label className="font-semibold">Priority <span className="text-rose-500">*</span></label>
                   <Field name="priority">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full mt-2"
+                        className="w-full mt-1"
                         onChange={(value) => setFieldValue("priority", value)}
                         value={values.priority}
                       >
@@ -240,16 +248,22 @@ const AddTask = ({ onClose }) => {
                       </Select>
                     )}
                   </Field>
+                  <ErrorMessage
+                    name="priority"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 
-              <Col span={24} className="mt-2">
+              <Col span={24} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Description</label>
+                  <label className="font-semibold">Description <span className="text-rose-500">*</span></label>
                   <ReactQuill
                     value={values.description}
                     onChange={(value) => setFieldValue("description", value)}
                     placeholder="Enter description"
+                    className="mt-1"
                     onBlur={() => setFieldTouched("description", true)}
                   />
                   <ErrorMessage

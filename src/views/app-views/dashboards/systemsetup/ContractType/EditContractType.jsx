@@ -118,11 +118,12 @@ const EditContractType = ({ idd, onClose }) => {
                     <Row gutter={16}>
                       <Col span={24} className="mt-2">
                         <div className="form-item">
-                          <label className="font-semibold">Source Name</label>
+                          <label className="font-semibold">Contract Type Name <span className="text-rose-500">*</span></label>
                           <Field
                             name="name"
                             as={Input}
-                            placeholder="Enter Source Name"
+                            className="w-full mt-1"
+                            placeholder="Enter Contract Type Name"
                           />
                           <ErrorMessage
                             name="name"
@@ -132,7 +133,7 @@ const EditContractType = ({ idd, onClose }) => {
                         </div>
                       </Col>
                     </Row>
-                    <div className="form-buttons text-right mt-4">
+                    <div className="form-buttons text-right mt-3">
                       <Button type="default" className="mr-2" onClick={onClose}>
                         Cancel
                       </Button>

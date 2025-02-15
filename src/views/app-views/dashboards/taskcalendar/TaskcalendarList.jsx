@@ -166,6 +166,7 @@ const TaskModal = ({ open, addTask, cancel }) => {
         </Row>
 
         <Form.Item name="taskDescription" label="Task Description">
+          
           <Input autoComplete="off" />
         </Form.Item>
         <Form.Item name="bullet" label="Label">

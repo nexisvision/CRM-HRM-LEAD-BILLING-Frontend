@@ -1,46 +1,61 @@
 import React, { useState, useEffect } from "react"; // React and hooks
 import { useDispatch, useSelector } from "react-redux"; // Redux hooks
-import { Form, Input, Select, Row, Col, Button, Modal, message } from "antd"; // Ant Design components
+import { Modal, Select, Row, Col, Button, message, Input } from "antd"; // Ant Design components
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import { AddUserss, GetUsers } from "../UserReducers/UserSlice"; // Custom Redux actions
 import { roledata } from "views/app-views/hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice"; // Role data action
 import axios from "axios"; // Axios for HTTP requests
 
 const { Option } = Select;
 
-const AddUser = ({ visible, onClose, onCreate }) => {
-  const [form] = Form.useForm();
-  const [showOtpModal, setShowOtpModal] = useState(false);
+const validationSchema = Yup.object().shape({
+  username: Yup.string()
+    .required('Username is required'),
+  email: Yup.string()
+    .email('Invalid email address')
+    .required('Email is required'),
+  role_id: Yup.string()
+    .required('Role is required'),
+  password: Yup.string()
+    .min(6, 'Password must be at least 6 characters')
+    .required('Password is required')
+});
+
+const initialValues = {
+  username: '',
+  email: '',
+  role_id: '',
+  password: ''
+};
+
+const AddUser = ({ visible, onClose }) => {
   const dispatch = useDispatch();
-  const [showPassword, setShowPassword] = useState(false);
-
-const user = useSelector((state)=>state.user.loggedInUser.username)
-
-  const getalllrole = useSelector((state) => state.role);
-  const fnddata = getalllrole.role.data;
-
-  const loggeduser = useSelector((state)=>state?.user?.loggedInUser?.username);
-
-
-  const rolefnd = fnddata?.filter((item)=>item?.created_by === loggeduser)
-
+  const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpToken, setOtpToken] = useState(null);
   const [otp, setOtp] = useState("");
 
-  const otpapi = async (otp) => {
+  const user = useSelector((state) => state.user?.loggedInUser?.username);
+  const getalllrole = useSelector((state) => state.role);
+  const fnddata = getalllrole.role?.data || [];
+  const rolefnd = fnddata?.filter((item) => item?.created_by === user) || [];
+
+  useEffect(() => {
+    dispatch(roledata());
+  }, [dispatch]);
+
+  const handleSubmit = async (values, { resetForm }) => {
     try {
-      const res = await axios.post(
-        "http://localhost:5353/api/v1/auth/verify-signup",
-        { otp },
-        {
-          headers: {
-            Authorization: `Bearer ${otpToken}`,
-          },
-        }
-      );
-      return res.data;
+      const response = await dispatch(AddUserss(values));
+      if (response.payload?.data?.sessionToken) {
+        setOtpToken(response.payload.data.sessionToken);
+        setShowOtpModal(true);
+        onClose();
+        resetForm();
+        dispatch(GetUsers());
+      }
     } catch (error) {
-      console.error("Error verifying OTP:", error);
-      throw error;
+      message.error("Failed to add user. Please try again.");
     }
   };
 
@@ -51,12 +66,20 @@ const user = useSelector((state)=>state.user.loggedInUser.username)
     }
 
     try {
-      const response = await otpapi(otp);
-      if (response.success) {
+      const response = await axios.post(
+        "http://localhost:5353/api/v1/auth/verify-signup",
+        { otp },
+        {
+          headers: {
+            Authorization: `Bearer ${otpToken}`,
+          },
+        }
+      );
+      
+      if (response.data.success) {
         message.success("OTP Verified Successfully");
         setShowOtpModal(false);
-        dispatch(GetUsers()); // Re-fetch the users after success
-        onCloseOtpModal();
+        dispatch(GetUsers());
       } else {
         message.error("Invalid OTP. Please try again.");
       }
@@ -65,154 +88,149 @@ const user = useSelector((state)=>state.user.loggedInUser.username)
     }
   };
 
-  const handleFinish = async (values) => {
-    try {
-      const response = await dispatch(AddUserss(values));
-      if (response.payload?.data?.sessionToken) {
-        setOtpToken(response.payload?.data?.sessionToken);
-        // message.success("Employee added successfully! Please verify OTP.");
-        setShowOtpModal(true); // Show OTP modal when user is added
-        onClose(); // Close the form modal
-      }
-      onCreate(values); // Callback after user creation
-      form.resetFields();
-      dispatch(GetUsers()); // Refetch user list after addition
-    } catch (error) {
-      // message.error("Failed to add employee. Please try again.");
-    }
-  };
-
-  const handleToggleChange = (checked) => {
-    setShowPassword(checked); // Show or hide password field based on toggle state
-    if (!checked) {
-      form.setFieldsValue({ password: undefined }); // Clear the password field if toggled off
-    }
-  };
-
-  useEffect(() => {
-    dispatch(roledata());
-  }, [dispatch]);
-
-  const onOpenOtpModal = () => {
-    setShowOtpModal(true);
-  };
-  const onCloseOtpModal = () => {
-    setShowOtpModal(false);
-  };
-
   return (
     <div>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleFinish}
-        initialValues={{
-          userRole: "accountant",
-          loginEnabled: false,
-        }}
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
       >
-        <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+        {({ errors, touched, setFieldValue }) => (
+          <Form className="space-y-4">
+            <div className="border-b border-gray-200 mb-6"></div>
 
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="username"
-              label="Name"
-              rules={[
-                { required: true, message: "Please enter the user name" },
-              ]}
-            >
-              <Input placeholder="Enter User Name" />
-            </Form.Item>
-          </Col>
-          <Col span={12}>
-            <Form.Item
-              name="email"
-              label="Email"
-              rules={[
-                { required: true, message: "Please enter the user email" },
-                { type: "email", message: "Please enter a valid email" },
-              ]}
-            >
-              <Input placeholder="Enter User Email" />
-            </Form.Item>
-          </Col>
-        </Row>
+            <Row gutter={[16, 16]}>
+              <Col span={12}>
+                <div className="space-y-2">
+                <div className="form-item">
+                  <label className="font-semibold">Name <span className="text-red-500">*</span></label>
+                  <Field
+                    name="username"
+                    as={Input}
+                    placeholder="Enter Name"
+                    className="w-full mt-2"
+                    rules={[{ required: true }]}
+                  />
+                  <ErrorMessage
+                    name="username"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+                </div>
+              </Col>
+              <Col span={12}>
+                <div className="space-y-2">
+                <div className="form-item">
+                  <label className="font-semibold">Email <span className="text-red-500">*</span></label>
+                  <Field
+                    name="email"
+                    as={Input}
+                    className="w-full mt-2"
+                    placeholder="Enter Email"
+                    rules={[{ required: true }]}
+                  />
+                  <ErrorMessage
+                    name="email"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+                </div>
+              </Col>
+            </Row>
 
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="role_id"
-              label="User Role"
-              rules={[{ required: true, message: "Please select a user role" }]}
-            >
-              <Select placeholder="Select Role">
-                {rolefnd?.map((tag) => (
-                  <Option key={tag?.id} value={tag?.id}>
-                    {tag?.role_name}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
+            <Row gutter={[16, 16]}>
+              <Col span={12}>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    User Role <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    className="w-full"
+                    placeholder="Select Role"
+                    onChange={(value) => setFieldValue('role_id', value)}
+                    status={errors.role_id && touched.role_id ? 'error' : ''}
+                  >
+                    {rolefnd.map((tag) => (
+                      <Option key={tag?.id} value={tag?.id}>
+                        {tag?.role_name}
+                      </Option>
+                    ))}
+                  </Select>
+                  {errors.role_id && touched.role_id && (
+                    <div className="text-red-500 text-sm mt-1">{errors.role_id}</div>
+                  )}
+                </div>
+              </Col>
+              <Col span={12}>
+                <div className="space-y-2">
+                <div className="form-item">
+                  <label className="font-semibold">Password <span className="text-red-500">*</span> </label>
+                  <Field
+                    name="password"
+                    as={Input}
+                    placeholder="Enter Password"
+                    className="w-full mt-2"
+                    rules={[{ required: true }]}
+                  />
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+                </div>
+              </Col>
+            </Row>
 
-        <Row gutter={16}>
-          <Col span={12}>
-            <Form.Item
-              name="password"
-              label="Password"
-              rules={[
-                { required: true, message: "Please enter the password" },
-                { min: 6, message: "Password must be at least 6 characters" },
-              ]}
-            >
-              <Input.Password placeholder="Enter Password" />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Form.Item>
-          <Row justify="end" gutter={16}>
-            <Col>
-              <Button onClick={onClose}>Cancel</Button>
-            </Col>
-            <Col>
-              <Button type="primary" htmlType="submit">
+            <div className="flex justify-end gap-2 mt-6">
+              <Button 
+                onClick={onClose}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md"
+              >
                 Create
               </Button>
-            </Col>
-          </Row>
-        </Form.Item>
-      </Form>
+            </div>
+          </Form>
+        )}
+      </Formik>
 
       {/* OTP Modal */}
       <Modal
         title="Verify OTP"
-        visible={showOtpModal} // Control visibility based on showOtpModal state
-        onCancel={() => setShowOtpModal(false)} // Close OTP modal
-        footer={null} // Remove footer buttons
+        visible={showOtpModal}
+        onCancel={() => setShowOtpModal(false)}
+        footer={null}
         centered
+        className="rounded-lg"
       >
-        <div className="p-4 rounded-lg bg-white">
-          <h2 className="text-xl font-semibold mb-4">OTP Page</h2>
-          <p>
-            An OTP has been sent to your registered email. Please enter the OTP
-            below to verify your account.
+        <div className="p-4 space-y-4">
+          <h2 className="text-xl font-semibold">OTP Verification</h2>
+          <p className="text-gray-600">
+            An OTP has been sent to your registered email. Please enter the OTP below to verify your account.
           </p>
-          <Input
+          <input
             type="number"
             placeholder="Enter OTP"
-            className="mt-4 p-3 border border-gray-300 rounded-md"
-            style={{ width: "100%" }}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
           />
-          <div className="mt-4">
-            <Button type="primary" className="w-full" onClick={handleOtpVerify}>
-              Verify OTP
-            </Button>
-          </div>
+          <Button
+            type="primary"
+            onClick={handleOtpVerify}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-md"
+          >
+            Verify OTP
+          </Button>
         </div>
       </Modal>
     </div>

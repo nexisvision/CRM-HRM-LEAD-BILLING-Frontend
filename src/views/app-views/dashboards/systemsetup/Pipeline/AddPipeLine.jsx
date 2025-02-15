@@ -80,12 +80,14 @@ const AddPipeLine = ({ onClose }) => {
         {({ values, handleSubmit, isSubmitting, resetForm }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
             <Row gutter={16}>
-              <Col span={24} className="mt-2">
+              <Col span={24} className="">
+              <h2 className="mb-4 border-b pb-2 font-medium"></h2>
                 <div className="form-item">
-                  <label className="font-semibold">Pipeline Name</label>
+                  <label className="font-semibold">Pipeline Name <span className="text-rose-500">*</span></label>
                   <Field
                     name="pipeline_name"
                     as={Input}
+                    className="w-full mt-1"
                     placeholder="Enter Pipeline Name"
                   />
                   <ErrorMessage
@@ -97,7 +99,7 @@ const AddPipeLine = ({ onClose }) => {
               </Col>
             </Row>
 
-            <div className="form-buttons text-right">
+            <div className="form-buttons text-right mt-3">
               <Button type="default" onClick={onClose} className="mr-2">
                 Cancel
               </Button>

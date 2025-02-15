@@ -123,10 +123,11 @@ const EditLabels = ({ idd, onClose }) => {
                   {/* Editable Stage Name Field */}
                   <Col span={24} className="mt-2">
                     <div className="form-item">
-                      <label className="font-semibold">Lead Stage Name</label>
+                      <label className="font-semibold">Label Name <span className="text-rose-500">*</span></label>
                       <Field
                         name="stageName"
                         as={Input}
+                        className="w-full mt-1"
                         placeholder="Enter Lead Stage Name"
                         value={values.stageName} // Controlled by Formik
                         onChange={(e) =>
@@ -144,12 +145,12 @@ const EditLabels = ({ idd, onClose }) => {
                   {/* Editable Pipeline Field */}
                   <Col span={24} className="mt-2">
                     <div className="form-item">
-                      <label className="font-semibold">Pipeline</label>
+                      <label className="font-semibold">Pipeline <span className="text-rose-500">*</span></label>
                       <Field name="pipeline">
                         {({ field }) => (
                           <Select
                             {...field}
-                            className="w-full"
+                            className="w-full mt-1"
                             placeholder="Select Pipeline"
                             value={values.pipeline} // Controlled by Formik
                             onChange={(value) =>
@@ -181,7 +182,7 @@ const EditLabels = ({ idd, onClose }) => {
                 </Row>
 
                 {/* Form Buttons */}
-                <div className="form-buttons text-right">
+                <div className="form-buttons text-right mt-3">
                   <Button type="default" className="mr-2" onClick={onClose}>
                     Cancel
                   </Button>

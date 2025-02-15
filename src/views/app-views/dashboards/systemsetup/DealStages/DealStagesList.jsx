@@ -160,7 +160,7 @@ const DealStagesList = () => {
       </div>
 
       <Modal
-        title="Add Lead Stages"
+        title="Add Deal Stages"
         visible={isAddLeadStagesModalVisible}
         onCancel={closeAddLeadStagesModal}
         footer={null}
@@ -171,7 +171,7 @@ const DealStagesList = () => {
       </Modal>
 
       <Modal
-        title="Edit Lead Stages"
+        title="Edit Deal Stages"
         visible={isEditLeadStagesModalVisible}
         onCancel={closeEditLeadStagesModal}
         footer={null}

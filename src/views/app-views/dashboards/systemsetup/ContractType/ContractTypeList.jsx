@@ -259,7 +259,7 @@ const ContractTypeList = () => {
       </Card>
 
       <Modal
-        title="Add Sources"
+        title="Add Contract Type"
         visible={isAddSourcesModalVisible}
         onCancel={closeAddSourcesModal}
         footer={null}
@@ -269,7 +269,7 @@ const ContractTypeList = () => {
         <AddContractType onClose={closeAddSourcesModal} />
       </Modal>
       <Modal
-        title="Edit Sources"
+        title="Edit Contract Type"
         visible={isEditSourcesModalVisible}
         onCancel={closeEditSourcesModal}
         footer={null}

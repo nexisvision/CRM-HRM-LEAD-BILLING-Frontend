@@ -165,7 +165,7 @@ const LabelsList = () => {
       </div>
 
       <Modal
-        title="Add Lead Stages"
+        title="Add Labels"
         visible={isAddLeadStagesModalVisible}
         onCancel={closeAddLeadStagesModal}
         footer={null}
@@ -176,7 +176,7 @@ const LabelsList = () => {
       </Modal>
 
       <Modal
-        title="Edit Lead Stages"
+        title="Edit Labels"
         visible={isEditLeadStagesModalVisible}
         onCancel={closeEditLeadStagesModal}
         footer={null}

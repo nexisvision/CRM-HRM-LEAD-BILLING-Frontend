@@ -1,153 +1,161 @@
 import React, { useEffect } from "react";
-import {
-  Modal,
-  Form,
-  Input,
-  Select,
-  DatePicker,
-  Switch,
-  Button,
-  Row,
-  Col,
-} from "antd";
-import dayjs from "dayjs";
-import { roledata } from "views/app-views/hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice";
+import { Row, Col, Button, Select } from "antd";
+import { Formik, Form, Field } from 'formik';
+import * as Yup from 'yup';
+import { useDispatch, useSelector } from "react-redux";
 import { Edituser, GetUsers } from "../UserReducers/UserSlice";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+import { roledata } from "views/app-views/hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice";
 
 const { Option } = Select;
 
-const EditUser = ({ idd, visible, onClose, onUpdate, userData }) => {
-  const [form] = Form.useForm();
+const validationSchema = Yup.object().shape({
+  username: Yup.string()
+    .required('Username is required'),
+  email: Yup.string()
+    .email('Invalid email')
+    .required('Email is required'),
+  role_id: Yup.string()
+    .required('Role is required')
+});
+
+const EditUser = ({ idd, visible, onClose, onUpdate }) => {
   const dispatch = useDispatch();
 
   const getalllrole = useSelector((state) => state.role);
-  const fnddata = getalllrole.role.data;
-
-    const loggeduser = useSelector((state)=>state?.user?.loggedInUser?.username);
-  
-  
-    const rolefnd = fnddata?.filter((item)=>item?.created_by === loggeduser)
-
+  const fnddata = getalllrole.role?.data || [];
+  const loggeduser = useSelector((state) => state?.user?.loggedInUser?.username);
+  const rolefnd = fnddata?.filter((item) => item?.created_by === loggeduser) || [];
   const Getalluser = useSelector((state) => state.Users);
-  const fnduset = Getalluser.Users.data;
-
-  useEffect(() => {
-    const finddata = fnduset.find((item) => item.id === idd);
-
-    const fndroleee = fnddata.find((item) => item.id === finddata.role_id)
-
-    if (finddata) {
-      form.setFieldsValue({
-        username: finddata.username,
-        email: finddata.email,
-        role_id: fndroleee,
-      });
-    }
-  }, [fnduset]);
+  const fnduset = Getalluser.Users?.data || [];
 
   useEffect(() => {
     dispatch(roledata());
     dispatch(GetUsers());
-  }, []);
+  }, [dispatch]);
 
-  const handleFinish = (values) => {
-    dispatch(Edituser({ idd, values }));
-    dispatch(GetUsers());
-    onClose();
-    // console.log("Updated Values:", values);
-    onUpdate(values);
-    form.resetFields();
+  const finddata = fnduset.find((item) => item.id === idd);
+  const fndroleee = fnddata.find((item) => item.id === finddata?.role_id);
+
+  const initialValues = {
+    username: finddata?.username || '',
+    email: finddata?.email || '',
+    role_id: fndroleee?.id || ''
   };
 
-  // Set initial values if userData is available
-  const initialValues = {
-    username: userData?.username || "",
-    email: userData?.email || "",
-    role_id: userData?.role_id || "",
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      const updateData = {
+        username: values.username,
+        email: values.email,
+        role_id: values.role_id
+      };
+      
+      await dispatch(Edituser({ idd, values: updateData }));
+      dispatch(GetUsers());
+      onClose();
+      onUpdate(updateData);
+    } catch (error) {
+      console.error('Error updating user:', error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    // <Modal
-    //   title="Edit User"
-    //   visible={visible}
-    //   onClose={onClose}
-    //   footer={null}
-    //   centered
-    //   destroyOnClose
-    // >
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={handleFinish}
-      initialValues={initialValues}
-    >
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+    <div className="p-4">
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+        enableReinitialize
+      >
+        {({ errors, touched, setFieldValue, values }) => (
+          <Form className="space-y-4">
+            <div className="border-b border-gray-200 mb-6"></div>
 
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            name="username"
-            label="Name"
-            rules={[{ required: true, message: "Please enter the user name" }]}
-          >
-            <Input placeholder="Enter User Name" />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              { required: true, message: "Please enter the user email" },
-              { type: "email", message: "Please enter a valid email" },
-            ]}
-          >
-            <Input placeholder="Enter User Email" />
-          </Form.Item>
-        </Col>
-      </Row>
-      <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item
-            name="role_id"
-            label="User Role"
-            rules={[{ required: true, message: "Please select a user role" }]}
-          >
-            <Select placeholder="Select Role">
-              {rolefnd?.map((tag) => (
-                <Option key={tag?.id} value={tag?.id}>
-                  {tag?.role_name}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-        </Col>
-      </Row>
-      {/* <Form.Item
-          name="dob"
-          label="Date Of Birth"
-          rules={[
-            { required: true, message: "Please select the date of birth" },
-          ]}
-        >
-          <DatePicker format="DD-MM-YYYY" style={{ width: "100%" }} />
-        </Form.Item> */}
-      <Form.Item>
-        <Row justify="end" gutter={16}>
-          <Col>
-            <Button onClick={onClose}>Cancel</Button>
-          </Col>
-          <Col>
-            <Button type="primary" htmlType="submit">
-              Update
-            </Button>
-          </Col>
-        </Row>
-      </Form.Item>
-    </Form>
-    // </Modal>
+            <Row gutter={[16, 16]}>
+              <Col span={12}>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Name <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    name="username"
+                    className={`w-full px-3 py-2 border rounded-md  focus:ring-blue-500 focus:border-blue-500 ${
+                      errors.username && touched.username ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="Enter User Name"
+                  />
+                  {errors.username && touched.username && (
+                    <div className="text-red-500 text-sm mt-1">{errors.username}</div>
+                  )}
+                </div>
+              </Col>
+              <Col span={12}>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Email <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    name="email"
+                    type="email"
+                    className={`w-full px-3 py-2 border rounded-md  focus:ring-blue-500 focus:border-blue-500 ${
+                      errors.email && touched.email ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="Enter User Email"
+                  />
+                  {errors.email && touched.email && (
+                    <div className="text-red-500 text-sm mt-1">{errors.email}</div>
+                  )}
+                </div>
+              </Col>
+            </Row>
+
+            <Row gutter={[16, 16]}>
+              <Col span={12}>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    User Role <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    className="w-full"
+                    placeholder="Select Role"
+                    value={values.role_id}
+                    onChange={(value) => setFieldValue('role_id', value)}
+                    status={errors.role_id && touched.role_id ? 'error' : ''}
+                  >
+                    {rolefnd.map((tag) => (
+                      <Option key={tag?.id} value={tag?.id}>
+                        {tag?.role_name}
+                      </Option>
+                    ))}
+                  </Select>
+                  {errors.role_id && touched.role_id && (
+                    <div className="text-red-500 text-sm mt-1">{errors.role_id}</div>
+                  )}
+                </div>
+              </Col>
+            </Row>
+
+            <div className="flex justify-end gap-2 mt-6">
+              <Button 
+                onClick={onClose}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md"
+              >
+                Update
+              </Button>
+            </div>
+          </Form>
+        )}
+      </Formik>
+    </div>
   );
 };
 

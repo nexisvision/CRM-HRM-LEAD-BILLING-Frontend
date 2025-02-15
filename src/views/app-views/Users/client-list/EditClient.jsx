@@ -147,10 +147,11 @@ const EditClient = ({ comnyid, onClose }) => {
             <Row gutter={16}>
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">First Name</label>
+                  <label className="font-semibold">First Name <span className="text-red-500">*</span></label>
                   <Field
                     name="firstName"
                     as={Input}
+                    className="w-full mt-2"
                     placeholder="Enter First Name"
                   />
                   <ErrorMessage
@@ -163,10 +164,11 @@ const EditClient = ({ comnyid, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Last Name</label>
+                  <label className="font-semibold">Last Name <span className="text-red-500">*</span></label>
                   <Field
                     name="lastName"
                     as={Input}
+                    className="w-full mt-2"
                     placeholder="Enter Last Name"
                   />
                   <ErrorMessage
@@ -179,10 +181,11 @@ const EditClient = ({ comnyid, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Bank Name</label>
+                  <label className="font-semibold">Bank Name <span className="text-red-500">*</span></label>
                   <Field
                     name="bankname"
                     as={Input}
+                    className="w-full mt-2"
                     placeholder="Enter Bank Name"
                   />
                   <ErrorMessage
@@ -195,7 +198,7 @@ const EditClient = ({ comnyid, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">IFSC</label>
+                  <label className="font-semibold">IFSC <span className="text-red-500">*</span></label>
                   <Field
                     name="ifsc"
                     as={Input}
@@ -212,7 +215,7 @@ const EditClient = ({ comnyid, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Bank Location</label>
+                  <label className="font-semibold">Bank Location <span className="text-red-500">*</span></label>
                   <Field
                     name="banklocation"
                     as={Input}
@@ -228,7 +231,7 @@ const EditClient = ({ comnyid, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Account Holder</label>
+                  <label className="font-semibold">Account Holder <span className="text-red-500">*</span></label>
                   <Field
                     name="accountholder"
                     as={Input}
@@ -244,7 +247,7 @@ const EditClient = ({ comnyid, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Account Number</label>
+                  <label className="font-semibold">Account Number <span className="text-red-500">*</span></label>
                   <Field
                     name="accountnumber"
                     as={Input}
@@ -261,7 +264,7 @@ const EditClient = ({ comnyid, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Signature</label>
+                  <label className="font-semibold">Signature <span className="text-red-500">*</span></label>
                   <Field
                     name="e_signature"
                     as={Input}
@@ -277,7 +280,7 @@ const EditClient = ({ comnyid, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">GSTIN</label>
+                  <label className="font-semibold">GSTIN <span className="text-red-500">*</span></label>
                   <Field
                     name="gstIn"
                     as={Input}
@@ -293,7 +296,7 @@ const EditClient = ({ comnyid, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">City</label>
+                  <label className="font-semibold">City <span className="text-red-500">*</span></label>
                   <Field
                     name="city"
                     as={Input}
@@ -309,7 +312,7 @@ const EditClient = ({ comnyid, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">State</label>
+                  <label className="font-semibold">State <span className="text-red-500">*</span></label>
                   <Field
                     name="state"
                     as={Input}
@@ -325,7 +328,7 @@ const EditClient = ({ comnyid, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Country</label>
+                  <label className="font-semibold">Country <span className="text-red-500">*</span></label>
                   <Field
                     name="country"
                     as={Input}
@@ -341,7 +344,7 @@ const EditClient = ({ comnyid, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Zipcode</label>
+                  <label className="font-semibold">Zipcode <span className="text-red-500">*</span></label>
                   <Field
                     name="zipcode"
                     as={Input}
@@ -358,7 +361,7 @@ const EditClient = ({ comnyid, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Address</label>
+                  <label className="font-semibold">Address <span className="text-red-500">*</span>    </label>
                   <Field
                     name="address"
                     as={Input}

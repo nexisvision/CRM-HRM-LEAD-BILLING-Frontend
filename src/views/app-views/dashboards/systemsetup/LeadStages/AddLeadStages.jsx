@@ -109,11 +109,12 @@ const AddLeadStages = ({ onClose }) => {
                       <Col span={24} className="mt-2">
                         <div className="form-item">
                           <label className="font-semibold">
-                            Lead Stage Name
+                            Lead Stage Name <span className="text-rose-500">*</span>  
                           </label>
                           <Field
                             name="stageName"
                             as={Input}
+                            className="w-full mt-1"
                             placeholder="Enter Lead Stage Name"
                           />
                           <ErrorMessage
@@ -123,14 +124,14 @@ const AddLeadStages = ({ onClose }) => {
                           />
                         </div>
                       </Col>
-                      <Col span={24} className="mt-2">
+                      <Col span={24} className="mt-3">
                         <div className="form-item">
-                          <label className="font-semibold">Pipeline</label>
+                          <label className="font-semibold">Pipeline <span className="text-rose-500">*</span></label>
                           <Field name="pipeline">
                             {({ field }) => (
                               <Select
                                 {...field}
-                                className="w-full"
+                                className="w-full mt-1"
                                 placeholder="Select Pipeline"
                                 onChange={(value) =>
                                   setFieldValue("pipeline", value)
@@ -160,7 +161,7 @@ const AddLeadStages = ({ onClose }) => {
                         </div>
                       </Col>
                     </Row>
-                    <div className="form-buttons text-right">
+                    <div className="form-buttons text-right mt-3">
                       <Button type="default" className="mr-2" onClick={onClose}>
                         Cancel
                       </Button>

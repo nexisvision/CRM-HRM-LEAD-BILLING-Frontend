@@ -492,7 +492,7 @@ const currenciesState = useSelector((state) => state.currencies);
                 <div className="form-item">
                   <label className="font-semibold mb-2">Assigned <span className="text-rose-500">*</span></label>
                   <div className="flex gap-2">
-                    <Field name="assigned">
+                    <Field name="employee">
                       {({ field, form }) => (
                         <Select
                           {...field}
@@ -519,7 +519,7 @@ const currenciesState = useSelector((state) => state.currencies);
                     </Field>
                   </div>
                   <ErrorMessage
-                    name="assigned"
+                    name="employee"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />

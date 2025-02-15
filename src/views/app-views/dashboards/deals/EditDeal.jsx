@@ -129,7 +129,7 @@ const EditDeal = ({ onClose, id }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Deal Name</label>
+                  <label className="font-semibold">Deal Name <span className="text-rose-500">*</span></label>
                   <Field
                     name="dealName"
                     className="mt-2"
@@ -144,14 +144,15 @@ const EditDeal = ({ onClose, id }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Phone</label>
+                  <label className="font-semibold">Phone <span className="text-rose-500">*</span></label>
                   <div className="flex">
                     <Select
                       style={{ width: '30%', marginRight: '8px' }}
                       placeholder="Code"
                       name="phoneCode"
+                      className="mt-1"  
                       onChange={(value) => setFieldValue('phoneCode', value)}
                     >
                       {countries.map((country) => (
@@ -184,12 +185,13 @@ const EditDeal = ({ onClose, id }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Price</label>
+                  <label className="font-semibold">Price <span className="text-rose-500">*</span></label>
                   <Field
                     name="price"
                     as={Input}
+                    className="mt-1"
                     placeholder="Enter Price"
                     rules={[{ required: true }]}
                   />
@@ -200,14 +202,14 @@ const EditDeal = ({ onClose, id }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Clients</label>
+                  <label className="font-semibold">Clients <span className="text-rose-500">*</span></label>
                   <Field name="clients">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full mt-2"
+                        className="w-full mt-1"
                         placeholder="Select User"
                         loading={!clientdata}
                         value={values.clients} // Ensure this matches the `clients` field
@@ -237,15 +239,15 @@ const EditDeal = ({ onClose, id }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Lead Title</label>
+                  <label className="font-semibold">Lead Title <span className="text-rose-500">*</span></label>
                   <div className="flex gap-2">
                     <Field name="leadTitle">
                       {({ field, form }) => (
                         <Select
                           {...field} // Spread Formik field props to manage the value
-                          className="w-full mt-2"
+                          className="w-full mt-1"
                           placeholder="Select Lead Title"
                           value={field.value || ""} // Ensure the select value is controlled by Formik
                           onChange={(value) => {
@@ -288,15 +290,15 @@ const EditDeal = ({ onClose, id }) => {
                   />
                 </div>
               </Col> */}
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Pipeline</label>
+                  <label className="font-semibold">Pipeline <span className="text-rose-500">*</span></label>
                   <div className="flex gap-2">
                     <Field name="pipeline">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full mt-2"
+                          className="w-full mt-1"
                           placeholder="Select Pipeline"
                           onChange={(value) => {
                             const selectedPipeline =
@@ -325,15 +327,15 @@ const EditDeal = ({ onClose, id }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Stage</label>
+                  <label className="font-semibold">Stage <span className="text-rose-500">*</span></label>
                   <div className="flex gap-2">
                     <Field name="stage">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full mt-2"
+                          className="w-full mt-1"
                           placeholder="Select Stage"
                           value={field.value} // Ensure the select value is controlled
                           onChange={(value) => {
@@ -362,13 +364,13 @@ const EditDeal = ({ onClose, id }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Closed Date</label>
+                  <label className="font-semibold">Closed Date <span className="text-rose-500">*</span></label>
                   <Field name="closedDate">
                     {({ field, form }) => (
                       <DatePicker
-                        className="mt-2"
+                        className="mt-1"
                         style={{ width: "100%" }}
                         value={field.value ? dayjs(field.value) : null}
                         onChange={(date) => {
@@ -384,15 +386,15 @@ const EditDeal = ({ onClose, id }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Project</label>
+                  <label className="font-semibold">Project <span className="text-rose-500">*</span> </label>
                   <div className="flex gap-2">
                     <Field name="project">
                       {({ field, form }) => (
                         <Select
                           {...field}
-                          className="w-full mt-2"
+                            className="w-full mt-1"
                           placeholder="Select Project"
                           onChange={(value) => {
                             const selectedProject =
