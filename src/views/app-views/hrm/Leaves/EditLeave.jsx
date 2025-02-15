@@ -45,19 +45,21 @@ const EditLeave = ({ editid, onClose }) => {
     remark: "",
   };
 
+  const formikRef = React.useRef();
+
   useEffect(() => {
     if (editid && leaveData?.Leave?.data.length > 0 && filteredEmpData.length > 0) {
       const leave = leaveData.Leave.data.find((item) => item.id === editid);
-      if (leave) {
-        form.setFieldsValue({
+      if (leave && formikRef.current) {
+        const { setFieldValue } = formikRef.current;
+        Object.entries({
           employeeId: leave.employeeId,
           leaveType: leave.leaveType,
           startDate: leave.startDate ? moment(leave.startDate) : null,
           endDate: leave.endDate ? moment(leave.endDate) : null,
           reason: leave.reason,
           remark: leave.remark,
-        });
-        setIsDataLoaded(true);
+        }).forEach(([field, value]) => setFieldValue(field, value));
       }
     }
   }, [editid, leaveData, filteredEmpData]);
@@ -93,6 +95,7 @@ const EditLeave = ({ editid, onClose }) => {
     <div className="">
       <h1 className="border-b border-gray-200 mb-4"></h1>
       <Formik
+        innerRef={formikRef}
         initialValues={initialValues}
         validationSchema={LeaveSchema}
         onSubmit={handleSubmit}
