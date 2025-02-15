@@ -122,12 +122,12 @@ const EditJobApplication = ({ idd, onClose }) => {
               {/* Job */}
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">job</label>
+                  <label className="font-semibold">job <span className="text-red-500">*</span></label>
                   <Field name="job">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-1"
                         placeholder="Select job"
                         loading={!fnddataa} // Loading state
                         onChange={(value) => setFieldValue("job", value)}
@@ -158,8 +158,8 @@ const EditJobApplication = ({ idd, onClose }) => {
               {/* Name */}
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Name</label>
-                  <Field name="name" as={Input} placeholder="Enter Name" />
+                  <label className="font-semibold">Name <span className="text-red-500">*</span></label>
+                  <Field name="name" as={Input} placeholder="Enter Name"  className="w-full mt-1"/>
                   <ErrorMessage
                     name="name"
                     component="div"
@@ -170,8 +170,8 @@ const EditJobApplication = ({ idd, onClose }) => {
               {/* Email */}
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Email</label>
-                  <Field name="email" as={Input} placeholder="Enter Email" />
+                  <label className="font-semibold">Email <span className="text-red-500">*</span></label>
+                  <Field name="email" as={Input} placeholder="Enter Email"  className="w-full mt-1"/>
                   <ErrorMessage
                     name="email"
                     component="div"
@@ -182,12 +182,13 @@ const EditJobApplication = ({ idd, onClose }) => {
               {/* Phone */}
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Phone</label>
+                  <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
                   <div className="flex">
                     <Select
                       style={{ width: '30%', marginRight: '8px' }}
                       placeholder="Code"
                       name="phoneCode"
+                      className="w-full mt-1"
                       onChange={(value) => setFieldValue('phoneCode', value)}
                     >
                       {countries.map((country) => (
@@ -214,11 +215,12 @@ const EditJobApplication = ({ idd, onClose }) => {
               {/* Location */}
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Location</label>
+                  <label className="font-semibold">Location <span className="text-red-500">*</span></label>
                   <Field
                     name="location"
                     as={Input}
                     placeholder="Enter Location"
+                    className="w-full mt-1"
                   />
                   <ErrorMessage
                     name="location"
@@ -230,14 +232,14 @@ const EditJobApplication = ({ idd, onClose }) => {
               {/* Total Experience */}
               <Col span={12}  className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Total Experience</label>
+                  <label className="font-semibold">Total Experience <span className="text-red-500">*</span></label>
                   <Select
                     placeholder="Select Total Experience"
                     value={values.total_experience}
                     onChange={(value) =>
                       setFieldValue("total_experience", value)
                     }
-                    className="w-full"
+                    className="w-full mt-1"
                   >
                     <Option value="0-1">0-1 Years</Option>
                     <Option value="1-3">1-3 Years</Option>
@@ -254,11 +256,12 @@ const EditJobApplication = ({ idd, onClose }) => {
               {/* Current Location */}
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Current Location</label>
+                  <label className="font-semibold">Current Location <span className="text-red-500">*</span></label>
                   <Field
                     name="current_location"
                     as={Input}
                     placeholder="Enter Current Location"
+                    className="w-full mt-1"
                   />
                   <ErrorMessage
                     name="current_location"
@@ -270,7 +273,7 @@ const EditJobApplication = ({ idd, onClose }) => {
               {/* Notice Period */}
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Notice Period</label>
+                  <label className="font-semibold">Notice Period <span className="text-red-500">*</span></label>
                   <Select
                     placeholder="Select Notice Period"
                     value={values.notice_period}
@@ -292,7 +295,7 @@ const EditJobApplication = ({ idd, onClose }) => {
               {/* Status */}
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Status</label><br/>
+                  <label className="font-semibold">Status <span className="text-red-500">*</span></label><br/>
                   <Radio.Group
                     value={values.status}
                     onChange={(e) => setFieldValue("status", e.target.value)}
@@ -310,11 +313,12 @@ const EditJobApplication = ({ idd, onClose }) => {
               {/* Applied Source */}
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Applied Sources</label>
+                  <label className="font-semibold">Applied Sources <span className="text-red-500">*</span></label>
                   <Field
                     name="applied_source"
                     as={Input}
                     placeholder="Enter Applied Sources"
+                    className="w-full mt-1"
                   />
                   <ErrorMessage
                     name="applied_source"
@@ -330,7 +334,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                   <Field name="cv">
                     {({ field, form }) => (
                       <Upload
-                        className="w-full mt-2"
+                        className="w-full mt-1"
                         action="http://localhost:5500/api/users/upload-cv"
                         accept=".pdf"
                         maxCount={1}
@@ -353,8 +357,9 @@ const EditJobApplication = ({ idd, onClose }) => {
               {/* Cover Letter */}
               <Col span={24} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Cover Letter</label>
+                  <label className="font-semibold">Cover Letter <span className="text-red-500">*</span></label>
                   <ReactQuill
+                    className="w-full mt-1"
                     value={values.cover_letter}
                     onChange={(value) => setFieldValue("cover_letter", value)}
                     onBlur={() => setFieldTouched("cover_letter", true)}

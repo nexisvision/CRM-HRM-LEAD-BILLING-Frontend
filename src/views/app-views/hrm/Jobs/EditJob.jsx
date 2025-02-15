@@ -42,7 +42,7 @@ const EditJob = ({ idd, onClose }) => {
   const [newJobCategory, setNewJobCategory] = useState("");
   const [newJobSkill, setNewJobSkill] = useState("");
   const [newJobStatus, setNewJobStatus] = useState("");
-  
+
   const { currencies } = useSelector((state) => state.currencies);
   const dispatch = useDispatch();
 
@@ -51,7 +51,7 @@ const EditJob = ({ idd, onClose }) => {
   const [tags, setTags] = useState([]);
 
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
-  
+
   const alldept = useSelector((state) => state.Jobs);
   const [singleEmp, setSingleEmp] = useState(null);
 
@@ -109,7 +109,7 @@ const EditJob = ({ idd, onClose }) => {
       interviewRounds: { InterviewRounds: values.interviewRounds },
     };
 
-    dispatch(EditJobs({idd, transformedValues}));
+    dispatch(EditJobs({ idd, transformedValues }));
     dispatch(GetJobdata());
     onClose();
     // console.log("Submitted values:", transformedValues);
@@ -126,7 +126,7 @@ const EditJob = ({ idd, onClose }) => {
     try {
       const lid = AllLoggeddtaa.loggedInUser.id;
       const response = await dispatch(GetLablee(lid));
-  
+
       if (response.payload && response.payload.data) {
         const uniqueLabels = response.payload.data
           .filter((label) => label && label.name && label.lableType === lableType) // Filter by lableType
@@ -138,7 +138,7 @@ const EditJob = ({ idd, onClose }) => {
             (label, index, self) =>
               index === self.findIndex((t) => t.name === label.name) // Remove duplicates
           );
-  
+
         setter(uniqueLabels);
       }
     } catch (error) {
@@ -146,7 +146,7 @@ const EditJob = ({ idd, onClose }) => {
       message.error(`Failed to load ${lableType}`);
     }
   };
-  
+
   // Call the function for different label types when the component mounts
   useEffect(() => {
     fetchLabels("jobcategory", setJobCategories);
@@ -160,19 +160,19 @@ const EditJob = ({ idd, onClose }) => {
       message.error(`Please enter a ${lableType} name.`);
       return;
     }
-  
+
     try {
       const lid = AllLoggeddtaa.loggedInUser.id;
       const payload = {
         name: newValue.trim(),
         lableType, // Send the correct label type
-      };  
-  
+      };
+
       await dispatch(AddLablee({ lid, payload }));
       message.success(`${lableType} added successfully.`);
       setter(""); // Reset input field
       modalSetter(false); // Close modal
-  
+
       // Re-fetch updated labels
       await fetchLabels(lableType, lableType === "jobcategory" ? setJobCategories :
         lableType === "jobskill" ? setJobSkills : setJobStatuses);
@@ -195,9 +195,9 @@ const EditJob = ({ idd, onClose }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Job Title</label>
+                  <label className="font-semibold">Job Title <span className="text-red-500">*</span></label>
                   <Field
-                    className="mt-2"
+                    className="mt-1"
                     name="title"
                     as={Input}
                     placeholder="Enter title"
@@ -210,80 +210,82 @@ const EditJob = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-               <Col span={24}>
-  <div className="form-item">
-    <label className="font-semibold">Job Category</label>
-    <Select
-      style={{ width: "100%" }}
-      placeholder="Select or add new job category"
-      value={values.category}
-      onChange={(value) => setFieldValue("category", value)}
-      dropdownRender={(menu) => (
-        <div>
-          {menu}
-          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-            <Button
-              type="link"
-              icon={<PlusOutlined />}
-              onClick={() => setIsJobCategoryModalVisible(true)}
-            >
-              Add New Job Category
-            </Button>
-          </div>
-        </div>
-      )}
-    >
-      {jobCategories.map((category) => (
-        <Option key={category.id} value={category.name}>
-          {category.name}
-        </Option>
-      ))}
-    </Select>
-    <ErrorMessage name="category" component="div" className="error-message text-red-500 my-1" />
-  </div>
-</Col>
-<Col span={24}>
-  <div className="form-item">
-    <label className="font-semibold">Job Skill</label>
-    <Select
-      style={{ width: "100%" }}
-      placeholder="Select or add new job skill"
-      value={values.skillss}
-      onChange={(value) => setFieldValue("skillss", value)}
-      dropdownRender={(menu) => (
-        <div>
-          {menu}
-          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-            <Button
-              type="link"
-              icon={<PlusOutlined />}
-              onClick={() => setIsJobSkillModalVisible(true)}
-            >
-              Add New Job Skill
-            </Button>
-          </div>
-        </div>
-      )}
-    >
-      {jobSkills.map((skill) => (
-        <Option key={skill.id} value={skill.name}>
-          {skill.name}
-        </Option>
-      ))}
-    </Select>
-    <ErrorMessage name="skillss" component="div" className="error-message text-red-500 my-1" />
-  </div>
-</Col>
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">Job Category <span className="text-red-500">*</span></label>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new job category"
+                    value={values.category}
+                    className="w-full mt-1"
+                    onChange={(value) => setFieldValue("category", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsJobCategoryModalVisible(true)}
+                          >
+                            Add New Job Category
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  >
+                    {jobCategories.map((category) => (
+                      <Option key={category.id} value={category.name}>
+                        {category.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage name="category" component="div" className="error-message text-red-500 my-1" />
+                </div>
+              </Col>
+              <Col span={12}>
+                <div className="form-item mt-2">
+                  <label className="font-semibold">Job Skill <span className="text-red-500">*</span></label>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new job skill"
+                    className="w-full mt-1"
+                    value={values.skillss}
+                    onChange={(value) => setFieldValue("skillss", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsJobSkillModalVisible(true)}
+                          >
+                            Add New Job Skill
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  >
+                    {jobSkills.map((skill) => (
+                      <Option key={skill.id} value={skill.name}>
+                        {skill.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage name="skillss" component="div" className="error-message text-red-500 my-1" />
+                </div>
+              </Col>
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold mb-2">Location</label>
+                  <label className="font-semibold mb-2">Location <span className="text-red-500">*</span></label>
                   <Field
-                    className="mt-2"
+                    className="mt-1"
                     name="location"
                     as={Input}
                     placeholder="Enter location"
                   />
-                  
+
                   <ErrorMessage
                     name="invoiceDate"
                     component="div"
@@ -293,14 +295,14 @@ const EditJob = ({ idd, onClose }) => {
               </Col>
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold mb-2">Interview Rounds</label>
+                  <label className="font-semibold mb-2">Interview Rounds <span className="text-red-500">*</span></label>
                   <Field name="interview rounds">
                     {({ field }) => (
                       <Select
                         {...field}
                         mode="multiple"
                         placeholder="Select InterviewRounds"
-                        className="w-full mt-2"
+                        className="w-full mt-1"
                         onChange={(value) =>
                           setFieldValue("interviewRounds", value)
                         }
@@ -324,9 +326,9 @@ const EditJob = ({ idd, onClose }) => {
               </Col>
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Start Date </label>
+                  <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
                   <DatePicker
-                    className="w-full mt-2"
+                    className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.startDate}
                     onChange={(date) => setFieldValue("startDate", date)}
@@ -342,10 +344,10 @@ const EditJob = ({ idd, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">End Date</label>
+                  <label className="font-semibold">End Date <span className="text-red-500">*</span></label>
 
                   <DatePicker
-                    className="w-full mt-2"
+                    className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.endDate}
                     onChange={(date) => setFieldValue("endDate", date)}
@@ -361,9 +363,9 @@ const EditJob = ({ idd, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Recruiter</label>
+                  <label className="font-semibold">Recruiter <span className="text-red-500">*</span></label>
                   <Field
-                    className="mt-2"
+                    className="mt-1"
                     name="recruiter"
                     as={Input}
                     placeholder="Enter recruiter"
@@ -381,10 +383,10 @@ const EditJob = ({ idd, onClose }) => {
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
-                  <label className="font-semibold">Job Type</label>
+                  <label className="font-semibold">Job Type <span className="text-red-500">*</span></label>
                   <Field
 
-                    className="mt-2"
+                    className="mt-1"
                     name="jobType"
                     as={Input}
                     placeholder="Enter job type"
@@ -401,14 +403,14 @@ const EditJob = ({ idd, onClose }) => {
               <Col span={12} className="mt-2">
                 <div className="form-item">
                   <div className="form-item">
-                    <label className="font-semibold">Work Experence</label>
+                    <label className="font-semibold">Work Experience <span className="text-red-500">*</span></label>
                     <Field
-                    className="mt-2"
-                    name="work experence"
-                    as={Input}
+                      className="mt-1"
+                      name="workExperience"
+                      as={Input}
 
-                    placeholder="Enter work experence"
-                  />
+                      placeholder="Enter workExperience"
+                    />
                     <ErrorMessage
                       name="workExperience"
                       component="div"
@@ -419,106 +421,107 @@ const EditJob = ({ idd, onClose }) => {
               </Col>
 
               <Col span={12} className="mt-2">
-                    <div className="form-item">
-                      <label className="font-semibold mb-2">Currency</label>
-                      <div className="flex gap-2">
-                        <Field name="currency">
-                          {({ field, form }) => (
-                            <Select
-                              {...field}
-                              className="w-full mt-2"
-                              placeholder="Select Currency"
-                              onChange={(value) => {
-                                const selectedCurrency = currencies?.data?.find(
-                                  (c) => c.id === value
-                                );
-                                form.setFieldValue(
-                                  "currency",
-                                  selectedCurrency?.currencyCode || ""
-                                );
-                              }}
-                            >
-                              {currencies?.data?.map((currency) => (
-                                <Option key={currency.id} value={currency.id}>
-                                  {currency.currencyCode}
-                                </Option>
-                              ))}
-                            </Select>
-                          )}
-                        </Field>
-                      </div>
-                      <ErrorMessage
-                        name="currency"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
-                    </div>
-                  </Col>
-
-             
-                  <Col span={24}>
-  <div className="form-item">
-    <label className="font-semibold">Job Status</label>
-    <Select
-      style={{ width: "100%" }}
-      placeholder="Select or add new job status"
-      value={values.status}
-      onChange={(value) => setFieldValue("status", value)}
-      dropdownRender={(menu) => (
-        <div>
-          {menu}
-          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-            <Button
-              type="link"
-              icon={<PlusOutlined />}
-              onClick={() => setIsJobStatusModalVisible(true)}
-            >
-              Add New Job Status
-            </Button>
-          </div>
-        </div>
-      )}
-    >
-      {jobStatuses.map((status) => (
-        <Option key={status.id} value={status.name}>
-          {status.name}
-        </Option>
-      ))}
-    </Select>
-    <ErrorMessage name="status" component="div" className="error-message text-red-500 my-1" />
-  </div>
-</Col>
-             
-
-             
-                <Col span={12} className="mt-2">
-                  <div className="form-item">
-                    <label className="font-semibold">Expect Salary</label>
-                    <Field
-                      className="mt-2"
-                      name="expectedSalary"
-                      as={Input}
-                      placeholder="Enter expectedSalary"
-                    />
-                    <ErrorMessage
-                      name="expectedSalary"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
+                <div className="form-item">
+                  <label className="font-semibold mb-2">Currency <span className="text-red-500">*</span></label>
+                  <div className="flex gap-2">
+                    <Field name="currency">
+                      {({ field, form }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-1"
+                          placeholder="Select Currency"
+                          onChange={(value) => {
+                            const selectedCurrency = currencies?.data?.find(
+                              (c) => c.id === value
+                            );
+                            form.setFieldValue(
+                              "currency",
+                              selectedCurrency?.currencyCode || ""
+                            );
+                          }}
+                        >
+                          {currencies?.data?.map((currency) => (
+                            <Option key={currency.id} value={currency.id}>
+                              {currency.currencyCode}
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
                   </div>
-                </Col>
+                  <ErrorMessage
+                    name="currency"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+
+              <Col span={12}>
+                <div className="form-item mt-2">
+                  <label className="font-semibold">Job Status <span className="text-red-500">*</span></label>
+                  <Select
+                    style={{ width: "100%" }}
+                    placeholder="Select or add new job status"
+                    value={values.status}
+                    className="w-full mt-1"
+                    onChange={(value) => setFieldValue("status", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsJobStatusModalVisible(true)}
+                          >
+                            Add New Job Status
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  >
+                    {jobStatuses.map((status) => (
+                      <Option key={status.id} value={status.name}>
+                        {status.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage name="status" component="div" className="error-message text-red-500 my-1" />
+                </div>
+              </Col>
+
+
+
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Expect Salary <span className="text-red-500">*</span></label>
+                  <Field
+                    className="mt-1"
+                    name="expectedSalary"
+                    as={Input}
+                    placeholder="Enter expectedSalary"
+                  />
+                  <ErrorMessage
+                    name="expectedSalary"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
 
               <div className="mt-2 w-full">
                 <Col span={24} className="mt-2">
                   <div className="form-item">
-                    <label className="font-semibold">Job Discription</label>
+                    <label className="font-semibold">Job Discription <span className="text-red-500">*</span></label>
 
                     <ReactQuill
                       value={values.endDate}
                       onChange={(value) => setFieldValue("description", value)}
                       placeholder="Enter discription"
                       onBlur={() => setFieldTouched("description", true)}
-                      className="mt-2"
+                        className="mt-1"
                     />
                     <ErrorMessage
                       name="description"
@@ -541,44 +544,44 @@ const EditJob = ({ idd, onClose }) => {
         )}
       </Formik>
       <Modal
-  title="Add New Job Category"
-  open={isJobCategoryModalVisible}
-  onCancel={() => setIsJobCategoryModalVisible(false)}
-  onOk={() => handleAddNewLabel("jobcategory", newJobCategory, setNewJobCategory, setIsJobCategoryModalVisible)}
-  okText="Add Category"
->
-  <Input
-    placeholder="Enter new job category name"
-    value={newJobCategory}
-    onChange={(e) => setNewJobCategory(e.target.value)}
-  />
-</Modal>
-<Modal
-  title="Add New Job Skill"
-  open={isJobSkillModalVisible}
-  onCancel={() => setIsJobSkillModalVisible(false)}
-  onOk={() => handleAddNewLabel("jobskill", newJobSkill, setNewJobSkill, setIsJobSkillModalVisible)}
-  okText="Add Skill"
->
-  <Input
-    placeholder="Enter new job skill name"
-    value={newJobSkill}
-    onChange={(e) => setNewJobSkill(e.target.value)}
-  />
-</Modal>
-<Modal
-  title="Add New Job Status"
-  open={isJobStatusModalVisible}
-  onCancel={() => setIsJobStatusModalVisible(false)}
-  onOk={() => handleAddNewLabel("jobstatus", newJobStatus, setNewJobStatus, setIsJobStatusModalVisible)}
-  okText="Add Status"
->
-  <Input
-    placeholder="Enter new job status name"
-    value={newJobStatus}
-    onChange={(e) => setNewJobStatus(e.target.value)}
-  />
-</Modal>
+        title="Add New Job Category"
+        open={isJobCategoryModalVisible}
+        onCancel={() => setIsJobCategoryModalVisible(false)}
+        onOk={() => handleAddNewLabel("jobcategory", newJobCategory, setNewJobCategory, setIsJobCategoryModalVisible)}
+        okText="Add Category"
+      >
+        <Input
+          placeholder="Enter new job category name"
+          value={newJobCategory}
+          onChange={(e) => setNewJobCategory(e.target.value)}
+        />
+      </Modal>
+      <Modal
+        title="Add New Job Skill"
+        open={isJobSkillModalVisible}
+        onCancel={() => setIsJobSkillModalVisible(false)}
+        onOk={() => handleAddNewLabel("jobskill", newJobSkill, setNewJobSkill, setIsJobSkillModalVisible)}
+        okText="Add Skill"
+      >
+        <Input
+          placeholder="Enter new job skill name"
+          value={newJobSkill}
+          onChange={(e) => setNewJobSkill(e.target.value)}
+        />
+      </Modal>
+      <Modal
+        title="Add New Job Status"
+        open={isJobStatusModalVisible}
+        onCancel={() => setIsJobStatusModalVisible(false)}
+        onOk={() => handleAddNewLabel("jobstatus", newJobStatus, setNewJobStatus, setIsJobStatusModalVisible)}
+        okText="Add Status"
+      >
+        <Input
+          placeholder="Enter new job status name"
+          value={newJobStatus}
+          onChange={(e) => setNewJobStatus(e.target.value)}
+        />
+      </Modal>
     </div>
   );
 };

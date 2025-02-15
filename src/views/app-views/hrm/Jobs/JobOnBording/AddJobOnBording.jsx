@@ -161,12 +161,12 @@ const AddJobOnBoarding = ({ onClose }) => {
               {/* Interviewer */}
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Interviewer</label>
+                  <label className="font-semibold">Interviewer <span className="text-red-500">*</span></label>
                   <Field name="interviewer">
                     {({ field }) => (
                       <Input
                         {...field}
-                        className="w-full"
+                        className="w-full mt-1"
                         placeholder="Enter Interviewer Name"
                         onChange={(e) => setFieldValue("interviewer", e.target.value)}
                         onBlur={() => setFieldTouched("interviewer", true)}
@@ -185,9 +185,9 @@ const AddJobOnBoarding = ({ onClose }) => {
               {/* Joining Date */}
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Joining Date</label>
+                  <label className="font-semibold">Joining Date <span className="text-red-500">*</span></label>
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.joiningDate}
                     onChange={(joiningDate) =>
@@ -204,12 +204,13 @@ const AddJobOnBoarding = ({ onClose }) => {
               </Col>
 
               {/* Days of Week */}
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Days Of Week</label>
+                  <label className="font-semibold">Days Of Week <span className="text-red-500">*</span></label>
                   <Field
                     name="daysOfWeek"
                     as={Input}
+                    className="w-full mt-1"
                     placeholder="Enter Days Of Week"
                   />
                   <ErrorMessage
@@ -221,10 +222,10 @@ const AddJobOnBoarding = ({ onClose }) => {
               </Col>
 
               {/* Salary */}
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Salary</label>
-                  <Field name="salary" as={Input} placeholder="Enter Salary" />
+                  <label className="font-semibold">Salary <span className="text-red-500">*</span></label>
+                  <Field name="salary" as={Input} placeholder="Enter Salary" className="w-full mt-1" />
                   <ErrorMessage
                     name="salary"
                     component="div"
@@ -234,14 +235,14 @@ const AddJobOnBoarding = ({ onClose }) => {
               </Col>
 
               {/* Salary Type */}
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Salary Type</label>
+                  <label className="font-semibold">Salary Type <span className="text-red-500">*</span></label>
                   <Field name="salaryType">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-1"
                         placeholder="Select Salary Type"
                         onChange={(value) => setFieldValue("salaryType", value)}
                         value={values.salaryType}
@@ -261,14 +262,14 @@ const AddJobOnBoarding = ({ onClose }) => {
               </Col>
 
               {/* Salary Duration */}
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Salary Duration</label>
+                  <label className="font-semibold">Salary Duration <span className="text-red-500">*</span></label>
                   <Field name="salaryDuration">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-1"
                         placeholder="Select Salary Duration"
                         onChange={(value) =>
                           setFieldValue("salaryDuration", value)
@@ -291,14 +292,14 @@ const AddJobOnBoarding = ({ onClose }) => {
               </Col>
 
               {/* Job Type */}
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Job Type</label>
+                  <label className="font-semibold">Job Type <span className="text-red-500">*</span></label>
                   <Field name="jobType">
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="w-full"
+                        className="w-full mt-1"
                         placeholder="Select Job Type"
                         onChange={(value) => setFieldValue("jobType", value)}
                         value={values.jobType}
@@ -319,12 +320,13 @@ const AddJobOnBoarding = ({ onClose }) => {
 
               {/* Status */}
               <Col span={12}>
-                <div className="form-item mt-2">
-                  <label className="font-semibold">Status</label>
+                  <div className="form-item mt-3">
+                  <label className="font-semibold">Status <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
                     placeholder="Select or add new status"
                     value={values.status}
+                    className="w-full mt-1"
                     onChange={(value) => setFieldValue("status", value)}
                     dropdownRender={(menu) => (
                       <div>
@@ -333,7 +335,7 @@ const AddJobOnBoarding = ({ onClose }) => {
                           <Button
                             type="link"
                             icon={<PlusOutlined />}
-                            className="w-full mt-2"
+                            className="w-full mt-1"
                             onClick={() => setIsStatusModalVisible(true)}
                           >
                             Add New Status
