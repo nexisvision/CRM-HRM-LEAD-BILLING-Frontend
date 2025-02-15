@@ -1,343 +1,140 @@
-import React, { useEffect } from "react";
-import {
-  Input,
-  Button,
-  DatePicker,
-  Select,
-  TimePicker,
-  message,
-  Row,
-  Col,
-} from "antd";
-import { useDispatch, useSelector } from "react-redux";
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
-import { AddInterviews, getInterview } from "./interviewReducer/interviewSlice";
-import { GetJobdata } from "../JobReducer/JobSlice";
-import { getjobapplication } from "../JobApplication/JobapplicationReducer/JobapplicationSlice";
+import React, { useEffect } from 'react';
+import { Modal, Form, Input, Select, Button, DatePicker, TimePicker, message } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
+import { AddInterviews, getInterview } from './interviewReducer/interviewSlice';
+import { GetJobdata } from '../JobReducer/JobSlice';
+import { getjobapplication } from '../JobApplication/JobapplicationReducer/JobapplicationSlice';
+import moment from 'moment';
+
 const { Option } = Select;
-const AddInterview = ({ onClose, onAddInterview }) => {
+
+const AddInterviewModal = ({ open, onCancel, onAddInterview, initialDate }) => {
+  const [form] = Form.useForm();
   const dispatch = useDispatch();
 
+  // Get jobs and job applications from Redux store
+  const jobsData = useSelector((state) => state.Jobs.Jobs.data) || [];
+  const jobApplications = useSelector((state) => state.jobapplications.jobapplications.data) || [];
+
+  // Fetch jobs and job applications when component mounts
   useEffect(() => {
     dispatch(GetJobdata());
-  }, []);
-
-  const user = useSelector((state) => state.auth.user);
-  const customerdata = useSelector((state) => state.Jobs);
-  const fnddata = customerdata.Jobs.data || [];
-
-  const fnddataa = fnddata.filter((item) => item.created_by === user);
- 
-  useEffect(() => {
     dispatch(getjobapplication());
-  }, []);
+  }, [dispatch]);
 
-  const allappdata = useSelector((state) => state.jobapplications);
-  const datafnd = allappdata.jobapplications.data || [];
+  useEffect(() => {
+    if (open && initialDate) {
+      form.setFieldsValue({
+        startOn: moment(initialDate),
+      });
+    }
+  }, [open, initialDate, form]);
 
-  const fnddataaa = datafnd.filter((item) => item.created_by === user);
+  const handleFinish = async (values) => {
+    try {
 
-  const onSubmit = (values, { resetForm }) => {
-    const formattedData = {
-      id: Date.now(),
-      job: values.job,
-      candidate: values.candidate,
-      interviewer: values.interviewer,
-      round: values.round,
-      interviewType: values.interviewType,
-      startOn: values.startOn.format("YYYY-MM-DD"),
-      startTime: values.startTime.format("HH:mm"),
-      commentForInterviewer: values.commentForInterviewer,
-      commentForCandidate: values.commentForCandidate,
-    };
-    onAddInterview(formattedData);
-    dispatch(AddInterviews(formattedData)).then(() => {
-      dispatch(getInterview());
-      resetForm();
-      onClose();
-      message.success("Interview scheduled successfully!");
-    });
-    message.success("Interview scheduled successfully!");
+      const dataa = {
+        ...values,
+        startOn: moment(values.startOn).format('YYYY-MM-DD'),
+        startTime: moment(values.startTime).format('HH:mm'),
+      };
+      await dispatch(AddInterviews(dataa)).then(() => {
+        message.success('Interview added successfully');
+        dispatch(getInterview());
+        onAddInterview(); // Call the function to refresh the interview list
+        onCancel(); // Close the modal
+      });
+    } catch (error) {
+      // console.error('Failed to add interview:', error);
+    }
   };
-  const initialValues = {
-    job: "",
-    candidate: "",
-    interviewer: "",
-    round: "",
-    interviewType: "",
-    startOn: null,
-    startTime: null,
-    commentForInterviewer: "",
-    commentForCandidate: "",
-  };
-  const validationSchema = Yup.object({
-    job: Yup.string().required("Please select a job."),
-    candidate: Yup.string().required("Please select a candidate."),
-    interviewer: Yup.string().required("Please select an interviewer."),
-    round: Yup.string().required("Please select a round."),
-    interviewType: Yup.string().required("Please select an interview type."),
-    startOn: Yup.date().nullable().required("Start date is required."),
-    startTime: Yup.date().nullable().required("Start time is required."),
-    commentForInterviewer: Yup.string().required(
-      "Please enter a comment for the interviewer."
-    ),
-    commentForCandidate: Yup.string().required(
-      "Please enter a comment for the candidate."
-    ),
-  });
+
   return (
-    <Formik
-      initialValues={initialValues}
-      validationSchema={validationSchema}
-      onSubmit={onSubmit}
+    <Modal
+      title="Add Interview"
+      visible={open}
+      onCancel={onCancel}
+      footer={null}
     >
-      {({
-        values,
-        setFieldValue,
-        handleSubmit,
-        setFieldTouched,
-        resetForm,
-      }) => (
-        <Form onSubmit={handleSubmit}>
-          <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
-          <Row gutter={16}>
-            {/* Job Dropdown */}
-
-
-
-            <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Job</label>
-                  <Field name="job_applicant">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-2"
-                        placeholder="Select job application"
-                        loading={!fnddataa}
-                        onChange={(value) =>
-                          setFieldValue("job_applicant", value)
-                        }
-                        value={values.job_applicant}
-                        onBlur={() => setFieldTouched("job_applicant", true)}
-                      >
-                        {fnddataa && fnddataa.length > 0 ? (
-                          fnddataa.map((client) => (
-                            <Option key={client.id} value={client.id}>
-                              {client.title || "Unnamed job application"}
-                            </Option>
-                          ))
-                        ) : (
-                          <Option value="" disabled>
-                            No jobs available
-                          </Option>
-                        )}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="job_applicant"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Candidate</label>
-                  <Field name="job">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-2"
-                        placeholder="Select candidate"
-                        loading={!fnddataaa}
-                        onChange={(value) => setFieldValue("job", value)}
-                        value={values.job}
-                        onBlur={() => setFieldTouched("job", true)}
-                      >
-                        {fnddataaa && fnddataaa.length > 0 ? (
-                          fnddataaa.map((client) => (
-                            <Option key={client.id} value={client.id}>
-                              {client.name || "Unnamed job"}
-                            </Option>
-                          ))
-                        ) : (
-                          <Option value="" disabled>
-                            No job Application available
-                          </Option>
-                        )}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="job"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-            {/* Interviewer Dropdown */}
-            <Col span={12} className="mt-2">
-              <div className="form-item">
-                <label className="font-semibold">Interviewer</label>
-                <Field name="interviewer">
-                  {({ field }) => (
-                    <Select
-                      {...field}
-                      className="w-full"
-                      placeholder="Select Interviewer"
-                      onChange={(value) => setFieldValue("interviewer", value)}
-                      onBlur={() => setFieldTouched("interviewer", true)}
-                    >
-                      <Option value="John">John</Option>
-                      <Option value="Jane">Jane</Option>
-                    </Select>
-                  )}
-                </Field>
-                <ErrorMessage
-                  name="interviewer"
-                  component="div"
-                  className="error-message text-red-500 my-1"
-                />
-              </div>
-            </Col>
-            {/* Round Dropdown */}
-            <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold mb-2">Round</label>
-                  <Field name="round">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        mode="multiple"
-                        placeholder="Select Round"
-                        className="w-full mt-2"
-                        onChange={(value) =>
-                          setFieldValue("round", value)
-                        }
-                        value={values.round}
-                        onBlur={() => setFieldTouched("round", true)}
-                        allowClear={false}
-                      >
-                        <Option value="HR">HR</Option>
-                        <Option value="Technical">Technical</Option>
-                        <Option value="Prectical">Prectical</Option>
-                        <Option value="Communication">Communication</Option>
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="round"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-            {/* Interview Type Dropdown */}
-            <Col span={12} className="mt-2">
-              <div className="form-item">
-                <label className="font-semibold">Interview Type</label>
-                <Field name="interviewType">
-                  {({ field }) => (
-                    <Select
-                      {...field}
-                      className="w-full"
-                      placeholder="Select Interview Type"
-                      onChange={(value) =>
-                        setFieldValue("interviewType", value)
-                      }
-                      onBlur={() => setFieldTouched("interviewType", true)}
-                    >
-                      <Option value="In-Person">In-Person</Option>
-                      <Option value="Virtual">Virtual</Option>
-                    </Select>
-                  )}
-                </Field>
-                <ErrorMessage
-                  name="interviewType"
-                  component="div"
-                  className="error-message text-red-500 my-1"
-                />
-              </div>
-            </Col>
-            {/* Start On */}
-            <Col span={12} className="mt-2">
-              <div className="form-item">
-                <label className="font-semibold">Start On</label>
-                <DatePicker
-                  className="w-full"
-                  format="DD-MM-YYYY"
-                  value={values.startOn}
-                  onChange={(date) => setFieldValue("startOn", date)}
-                  onBlur={() => setFieldTouched("startOn", true)}
-                />
-                <ErrorMessage
-                  name="startOn"
-                  component="div"
-                  className="error-message text-red-500 my-1"
-                />
-              </div>
-            </Col>
-            {/* Start Time */}
-            <Col span={12} className="mt-2">
-              <div className="form-item">
-                <label className="font-semibold">Start Time</label>
-                <TimePicker
-                  className="w-full"
-                  format="HH:mm"
-                  value={values.startTime}
-                  onChange={(time) => setFieldValue("startTime", time)}
-                  onBlur={() => setFieldTouched("startTime", true)}
-                />
-                <ErrorMessage
-                  name="startTime"
-                  component="div"
-                  className="error-message text-red-500 my-1"
-                />
-              </div>
-            </Col>
-            {/* Comment for Interviewer */}
-            <Col span={12} className="mt-2">
-              <div className="form-item">
-                <label className="font-semibold">Comment for Interviewer</label>
-                <Field
-                  name="commentForInterviewer"
-                  as={Input.TextArea}
-                  placeholder="Enter comment for interviewer"
-                />
-                <ErrorMessage
-                  name="commentForInterviewer"
-                  component="div"
-                  className="error-message text-red-500 my-1"
-                />
-              </div>
-            </Col>
-            {/* Comment for Candidate */}
-            <Col span={12} className="mt-2">
-              <div className="form-item">
-                <label className="font-semibold">Comment for Candidate</label>
-                <Field
-                  name="commentForCandidate"
-                  as={Input.TextArea}
-                  placeholder="Enter comment for candidate"
-                />
-                <ErrorMessage
-                  name="commentForCandidate"
-                  component="div"
-                  className="error-message text-red-500 my-1"
-                />
-              </div>
-            </Col>
-          </Row>
-          <Button type="primary" htmlType="submit" className="mt-3">
+      <Form form={form} onFinish={handleFinish} layout="vertical">
+        <Form.Item
+          name="job"
+          label="Job"
+          rules={[{ required: true, message: 'Please select a job!' }]}
+        >
+          <Select placeholder="Select a job">
+            {jobsData.map((job) => (
+              <Option key={job.id} value={job.id}>
+                {job.title}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="candidate"
+          label="Candidate"
+          rules={[{ required: true, message: 'Please select a candidate!' }]}
+        >
+          <Select placeholder="Select a Candidate">
+            {jobApplications.map((application) => (
+              <Option key={application.id} value={application.id}>
+                {application.name}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="interviewer"
+          label="Interviewer"
+          rules={[{ required: true, message: 'Please input the interviewer!' }]}
+        >
+          <Input autoComplete="off" />
+        </Form.Item>
+        <Form.Item
+          name="round"
+          label="Round"
+          rules={[{ required: true, message: 'Please input the round!' }]}
+        >
+          <Input autoComplete="off" />
+        </Form.Item>
+        <Form.Item
+          name="interviewType"
+          label="Interview Type"
+          rules={[{ required: true, message: 'Please select the interview type!' }]}
+        >
+          <Select placeholder="Select interview type">
+            <Option value="Online">Online</Option>
+            <Option value="Offline">Offline</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="startOn"
+          label="Start On"
+          rules={[{ required: true, message: 'Please select start date!' }]}
+        >
+          <DatePicker format="DD-MM-YYYY" />
+        </Form.Item>
+        <Form.Item
+          name="startTime"
+          label="Start Time"
+          rules={[{ required: true, message: 'Please select start time!' }]}
+        >
+          <TimePicker format="HH:mm" />
+        </Form.Item>
+        <Form.Item name="commentForInterviewer" label="Comment For Interviewer">
+          <Input autoComplete="off" />
+        </Form.Item>
+        <Form.Item name="commentForCandidate" label="Comment For Candidate">
+          <Input autoComplete="off" />
+        </Form.Item>
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
             Add Interview
           </Button>
-        </Form>
-      )}
-    </Formik>
+        </Form.Item>
+      </Form>
+    </Modal>
   );
 };
-export default AddInterview;
+
+export default AddInterviewModal;

@@ -62,6 +62,14 @@ const EditTask = ({ onClose }) => {
     // if (Array.isArray(values.AssignTo) && values.AssignTo.length > 0) {
     //   values.AssignTo = { AssignTo: [...values.AssignTo] };
     // }
+    // Log the values to check the structure
+    // console.log("Form Values:", values);
+
+    // Ensure assignTo is an array
+    if (!Array.isArray(values.assignTo)) {
+        message.error("AssignTo must be an array.");
+        return; // Prevent submission if assignTo is not an array
+    }
 
     // Dispatch AddTasks with updated values
     dispatch(AddTasks({ id, values }))

@@ -130,7 +130,7 @@ const EstimatesList = () => {
 				</Flex>
 			</Menu.Item> */}
 
-			<Menu.Item>
+			{/* <Menu.Item>
 				<Flex alignItems="center">
 					<Button
 						type=""
@@ -142,7 +142,7 @@ const EstimatesList = () => {
 						<span className="">Edit</span>
 					</Button>
 				</Flex>
-			</Menu.Item>
+			</Menu.Item> */}
 			{/* <Menu.Item>
 				<Flex alignItems="center">
 					<TiPinOutline />

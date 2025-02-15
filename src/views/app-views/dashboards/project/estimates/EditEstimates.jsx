@@ -13,7 +13,7 @@ import { GetLeads } from '../../leads/LeadReducers/LeadSlice';
 const { Option } = Select;
 
 const EditEstimates = ({ idd,onClose }) => {
-    const { id } = useParams();
+    const { id } = useParams(); 
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -51,12 +51,13 @@ const EditEstimates = ({ idd,onClose }) => {
     const { data: Leads, isLoading: isLeadsLoading, error: leadsError } = useSelector((state) => state.Leads.Leads || []);
 
     const lead = Leads?.filter((item) => item.created_by === user);
+
 // console.log("dsffsdfdsfsdfsdf",lead);
 
     const leadDetails = lead?.find((lead) => lead.id === currentEstimate.lead);
 
 
-    console.log("asdasdsfsdfsddas",leadDetails)
+    // console.log("asdasdsfsdfsddas",leadDetails)
 
     const [tableData, setTableData] = useState([
         {
@@ -101,7 +102,7 @@ const EditEstimates = ({ idd,onClose }) => {
             form.setFieldsValue({
                 valid_till: dayjs(currentEstimate.valid_till),
                 currency: currentEstimate.currency,
-                lead: leadDetails.leadTitle,
+                // lead: leadDetails.leadTitle,
                 client: currentEstimate.client,
                 calculatedTax: currentEstimate.calculatedTax,
             });
@@ -177,7 +178,7 @@ const EditEstimates = ({ idd,onClose }) => {
             const estimateData = {
                 valid_till: values.valid_till.format('YYYY-MM-DD'),
                 currency: values.currency,
-                lead: values.lead,
+                lead: leadDetails.leadTitle,
                 client: values.client,
                 calculatedTax: parseFloat(values.calculatedTax) || 0,
                 items: formattedItems,

@@ -247,14 +247,14 @@ const LeadCards = () => {
                 ))}
               </Select>
             </div>
-      <Button
+      {/* <Button
         type="primary"
         icon={<PlusOutlined />}
         onClick={handleAddLeadCardsClick}
         style={{ marginBottom: "16px" }}
       >
         Add Lead
-      </Button>
+      </Button> */}
 
       {/* <Select
         placeholder="Select a pipeline"

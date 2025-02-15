@@ -423,9 +423,9 @@ const DealList = () => {
               >
                 Export All
               </Button>
-          <Button type="primary" icon={<FileAddOutlined />} block>
+          {/* <Button type="primary" icon={<FileAddOutlined />} block>
             Import All
-          </Button>
+          </Button> */}
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">

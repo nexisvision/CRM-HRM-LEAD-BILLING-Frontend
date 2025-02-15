@@ -32,6 +32,10 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+
+  // console.log("employeeIdd", employeeIdd);
+
+
   // Add state for file handling
   const [fileList, setFileList] = useState([]);
 
@@ -68,7 +72,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
   }, [dispatch]);
 
 
-  const allempdata = useSelector((state) => state.emp);
+  const allempdata = useSelector((state) => state.employee);
   const [singleEmp, setSingleEmp] = useState(null);
 
 
@@ -81,9 +85,15 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
 
 
   useEffect(() => {
-    const empData = allempdata?.emp?.data || [];
+    const empData = allempdata?.employee?.data || [];
+
+    // console.log("empData", empData); 
+
     const data = empData.find((item) => item.id === employeeIdd);
     setSingleEmp(data || null);
+
+
+    console.log("data", data);
 
     // Update form fields with the employee's data once it's available
     if (data) {
@@ -91,10 +101,26 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
         firstName: data.firstName,
         lastName: data.lastName,
         username: data.username,
+        password: data.password,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        joiningDate: data.joiningDate ? moment(data.joiningDate) : null,
+        leaveDate: data.leaveDate ? moment(data.leaveDate) : null,
+        department: data.department,
+        designation: data.designation,
+        salary: data.salary,
+        accountholder: data.accountholder,
+        accountnumber: data.accountnumber,
+        bankname: data.bankname,
+        banklocation: data.banklocation,
+        profilePic: data.profilePic,
+        branch: data.branch,
         // Add other fields as needed
       });
     }
   }, [allempdata, employeeIdd, form]);
+
 
   // useEffect(() => {
   //   if (singleEmp) {
@@ -247,7 +273,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
               <Input.Password placeholder="Strong Password" />
             </Form.Item>
           </Col>
-          <Col span={12}>
+          {/* <Col span={12}>
             <Form.Item
               name="email"
               label="Email"
@@ -262,7 +288,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             >
               <Input placeholder="johndoe@example.com" />
             </Form.Item>
-          </Col>
+          </Col> */}
           <Col span={12}>
   <Form.Item
     name="phone"

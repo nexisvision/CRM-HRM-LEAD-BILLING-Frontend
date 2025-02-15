@@ -448,7 +448,7 @@ const taskfilter = taskdata?.filter((item)=>item?.created_by === loggeddatass)
                             <p className="text-xl font-semibold text-black">{length}</p>
                         </div>
                     </div> 
-					 <div className="bg-white p-6 rounded-lg shadow">
+					 {/* <div className="bg-white p-6 rounded-lg shadow">
                         <h3 className="text-gray-600 mb-2 text-lg font-semibold ">
                         Total Projects
                         </h3>
@@ -471,7 +471,7 @@ const taskfilter = taskdata?.filter((item)=>item?.created_by === loggeddatass)
                         <p className="text-xl font-medium md:text-base text-blue-500">
                         67991
                         </p>
-                    </div>
+                    </div> */}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="bg-white p-6 rounded-lg shadow flex flex-col">

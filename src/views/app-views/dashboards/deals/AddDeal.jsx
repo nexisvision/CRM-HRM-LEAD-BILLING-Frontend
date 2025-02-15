@@ -36,7 +36,8 @@ const AddDeal = ({ onClose }) => {
   const { data: Leads = [] } = useSelector((state) => state.Leads.Leads || {});
   const { data: Project = [] } = useSelector((state) => state.Project.Project || {});
   const clientdata = tabledata?.SubClient?.data || [];
-  const countries = useSelector((state) => state.countries?.countries?.data || []);
+
+  const countries = useSelector((state) => state.countries?.countries || []);
 
   useEffect(() => {
     dispatch(getallcountries());

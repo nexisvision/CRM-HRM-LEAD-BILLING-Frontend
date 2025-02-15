@@ -164,8 +164,8 @@ const AddPlan = ({ onClose }) => {
               <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
               <Row gutter={16}>
                 <Col span={12}>
-                  <div className="form-group">
-                    <label>Name</label>
+                  <div className="form-group" style={{ marginBottom: '16px' }}>
+                    <label>Name <span style={{ color: 'red' }}>*</span></label>
                     <Field name="name">
                       {({ field }) => (
                         <Input 
@@ -180,8 +180,8 @@ const AddPlan = ({ onClose }) => {
                   </div>
                 </Col>
                 <Col span={12}>
-                  <div className="form-group">
-                    <label>Price</label>
+                  <div className="form-group" style={{ marginBottom: '16px' }}>
+                    <label>Price <span style={{ color: 'red' }}>*</span></label>
                     <Field name="price">
                       {({ field }) => (
                         <Input 
@@ -196,8 +196,8 @@ const AddPlan = ({ onClose }) => {
                   </div>
                 </Col>
                 <Col span={12}>
-                  <div className="form-group">
-                    <label>Duration</label>
+                  <div className="form-group" style={{ marginBottom: '16px' }}>
+                    <label>Duration <span style={{ color: 'red' }}>*</span></label>
                     <Dropdown 
                       overlay={mainMenu} 
                       trigger={['click']} 
@@ -219,8 +219,8 @@ const AddPlan = ({ onClose }) => {
                   </div>
                 </Col>
                 <Col span={12}>
-                  <div className="form-group">
-                    <label>Maximum Users</label>
+                  <div className="form-group" style={{ marginBottom: '16px' }}>
+                    <label>Maximum Users <span style={{ color: 'red' }}>*</span></label>
                     <Field name="max_users">
                       {({ field }) => (
                         <Input 
@@ -235,8 +235,8 @@ const AddPlan = ({ onClose }) => {
                   </div>
                 </Col>
                 <Col span={12}>
-                  <div className="form-group">
-                    <label>Maximum Customers</label>
+                  <div className="form-group" style={{ marginBottom: '16px' }}>
+                    <label>Maximum Customers <span style={{ color: 'red' }}>*</span></label>
                     <Field name="max_customers">
                       {({ field }) => (
                         <Input 
@@ -251,8 +251,8 @@ const AddPlan = ({ onClose }) => {
                   </div>
                 </Col>
                 <Col span={12}>
-                  <div className="form-group">
-                    <label>Maximum Vendors</label>
+                  <div className="form-group" style={{ marginBottom: '16px' }}>
+                    <label>Maximum Vendors <span style={{ color: 'red' }}>*</span></label>
                     <Field name="max_vendors">
                       {({ field }) => (
                         <Input 
@@ -267,8 +267,8 @@ const AddPlan = ({ onClose }) => {
                   </div>
                 </Col>
                 <Col span={12}>
-                  <div className="form-group">
-                    <label>Maximum Clients</label>
+                  <div className="form-group" style={{ marginBottom: '16px' }}>
+                    <label>Maximum Clients <span style={{ color: 'red' }}>*</span></label>
                     <Field name="max_clients">
                       {({ field }) => (
                         <Input 
@@ -283,8 +283,8 @@ const AddPlan = ({ onClose }) => {
                   </div>
                 </Col>
                 <Col span={12}>
-                  <div className="form-group">
-                    <label>Storage Limit (MB)</label>
+                  <div className="form-group" style={{ marginBottom: '16px' }}>
+                    <label>Storage Limit (MB) <span style={{ color: 'red' }}>*</span></label>
                     <Field name="storage_limit">
                       {({ field }) => (
                         <Input 
@@ -299,9 +299,10 @@ const AddPlan = ({ onClose }) => {
                     )}
                   </div>
                 </Col>
-                <Col span={24} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">currency</label>
+
+                <Col span={24} >
+                  <div className="form-group" style={{ marginBottom: '16px' }}>
+                    <label>currency <span style={{ color: 'red' }}>*</span></label>
                     <Field name="currency">
                       {({ field }) => (
                         <Select
@@ -350,7 +351,9 @@ const AddPlan = ({ onClose }) => {
                   <div className="error-message">{errors.description}</div>
                 )}
               </div>
-              <div className="form-group">
+
+
+              <div className="form-group mt-2">
                 <label>Trial is enabled (on/off)</label>
                 <Field name="trial">
                   {({ field }) => (

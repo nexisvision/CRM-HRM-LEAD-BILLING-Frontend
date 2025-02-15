@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ClientData } from "views/app-views/company/CompanyReducers/CompanySlice.jsx";
 import { GetPlan } from "views/app-views/plan/PlanReducers/PlanSlice.jsx";
 import { getAllTicket } from "views/app-views/pages/customersupports/ticket/TicketReducer/TicketSlice.jsx";
+import { getsubplandata } from "views/app-views/subscribeduserplans/subplanReducer/subplanSlice.jsx";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -34,14 +35,31 @@ const DashboardList = () => {
   const fnddataclint = allclientdata.ClientData.data;
 
   const allplandata = useSelector((state) => state.Plan);
-  const fnddataplan = allplandata.Plan.data;
+  const fnddataplan = allplandata.Plan;
+
+  // console.log("fnddataplan",fnddataplan);
+
+  const planNames = fnddataplan?.map((plan) => plan.name) || [];
+const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
 
   const allticket = useSelector((state) => state.Ticket);
   const fnddataticket = allticket.Ticket.data;
 
+
+  
+  const alldatas = useSelector((state) => state.subplan);
+  const fnddtat = alldatas.subplan.data || [];
+
+  console.log("fnddtat",fnddtat);
+
+
   useEffect(() => {
     setTasks(fnddataticket);
   }, [fnddataticket]);
+
+  useEffect(() => {
+    dispatch(getsubplandata());
+  }, []);
 
   useEffect(() => {
     const datalength = fnddataclint?.length; // Getting the length of the array
@@ -97,11 +115,11 @@ const DashboardList = () => {
   ];
 
   const chartData = {
-    labels: ["Free", "Basic", "Standard"],
+    labels: planNames, // Dynamically setting labels
     datasets: [
       {
-        data: [61, 12.12, 27.27], // Percentages
-        backgroundColor: ["#ff8717", "#4d7c0f", "#ffb821"],
+        data: planPrices, // Dynamically setting data
+        backgroundColor: ["#ff8717", "#4d7c0f", "#ffb821", "#007bff", "#dc3545", "#28a745"],
         borderWidth: 1,
       },
     ],
@@ -209,6 +227,8 @@ const DashboardList = () => {
             </div>
           </div>
         </Col>
+
+
         <Col xs={24} sm={24} md={16} lg={16} xl={16}>
           <div
             className="bg-white rounded-lg shadow p-6 h-full flex flex-col"
@@ -219,7 +239,7 @@ const DashboardList = () => {
               <div className="flex-shrink-0">
                 <DateRangeFilter
                   onDateRangeChange={(range) => {
-                    console.log("Selected range:", range);
+                    // console.log("Selected range:", range);
                   }}
                 />
               </div>

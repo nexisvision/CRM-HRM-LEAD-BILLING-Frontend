@@ -179,7 +179,7 @@ const AddSalary = ({ onClose }) => {
             <Row gutter={16}>
               <Col span={24}>
                 <div className="form-item">
-                  <label className="font-semibold">employee</label>
+                  <label className="font-semibold">User</label>
                   <Field name="employeeId">
                     {({ field }) => (
                       <Select

@@ -28,15 +28,15 @@ const AddContract = ({ onClose }) => {
 
   const allloggeduser = useSelector((state)=>state.user.loggedInUser.username)
 
-  const countries = useSelector((state) => state.countries.countries);
+  const countries = useSelector((state) => state.countries?.countries);
 
-  const countrydata = countries?.filter((item) => item.created_by === allloggeduser);
+  // const countrydata = countries?.filter((item) => item.created_by === allloggeduser);
  
   const { currencies } = useSelector((state) => state.currencies);
 
   const curr = currencies?.data || [];
   
-  const curren = curr?.filter((item) => item.created_by === allloggeduser);
+  // const curren = curr?.filter((item) => item.created_by === allloggeduser);
 
   const user = useSelector((state) => state.user.loggedInUser.username);
 
@@ -221,7 +221,7 @@ const AddContract = ({ onClose }) => {
                       name="phoneCode"
                       onChange={(value) => setFieldValue('phoneCode', value)}
                     >
-                      {countrydata.map((country) => (
+                      {countries.map((country) => (
                         <Option key={country.id} value={country.phoneCode}>
                           (+{country.phoneCode})
                         </Option>
@@ -288,7 +288,7 @@ const AddContract = ({ onClose }) => {
                     onChange={(value) => setFieldValue('country', value)}
                     value={values.country}
                   >
-                    {countrydata.map((country) => (
+                    {countries.map((country) => (
                       <Option key={country.id} value={country.countryName}>
                         {country.countryName}
                       </Option>
@@ -384,16 +384,16 @@ const AddContract = ({ onClose }) => {
                           placeholder="Select Currency"
 
                           onChange={(value) => {
-                            const selectedCurrency = Array.isArray(curren) && 
-                            curren.find((c) => c.id === value);
+                            const selectedCurrency = Array.isArray(curr) && 
+                            curr.find((c) => c.id === value);
                             form.setFieldValue(
                               "currency",
                               selectedCurrency?.currencyCode || ""
                             );
                           }}
                         >
-                          {Array.isArray(curren) && curren?.length > 0 ? (
-                            curren.map((currency) => (
+                          {Array.isArray(curr) && curr?.length > 0 ? (
+                            curr.map((currency) => (
                               <Option key={currency.id} value={currency.id}>
                                 {currency.currencyCode}
                               </Option>

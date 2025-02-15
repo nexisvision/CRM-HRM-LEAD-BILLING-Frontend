@@ -397,14 +397,14 @@ const LeadList = () => {
               >
                 Export All
               </Button>
-            <Button
+            {/* <Button
               type="primary"
               icon={<FileExcelOutlined />}
               block
               onClick={openFileManager}
             >
               Import
-            </Button>
+            </Button> */}
           </Flex>
         </Flex>
         <div className="table-responsive mt-2">

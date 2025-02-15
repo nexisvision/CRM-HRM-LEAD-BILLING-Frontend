@@ -118,7 +118,7 @@ const EmployeeList = () => {
 
       setUsers(updatedData.employee.data || updatedData.payload.data);
 
-      // message.success({ content: "Deleted user successfully", duration: 2 });
+      message.success({ content: "Deleted employee successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error);
     }
@@ -301,9 +301,9 @@ const EmployeeList = () => {
     },
     {
       title: "Branch",
-      dataIndex: "banklocation",
+      dataIndex: "branch",
       sorter: {
-        compare: (a, b) => a.banklocation.length - b.banklocation.length,
+        compare: (a, b) => a.branch.length - b.branch.length,
       },
     },
     {
