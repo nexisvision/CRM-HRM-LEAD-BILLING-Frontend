@@ -43,7 +43,7 @@ const EditInvoice = ({ idd, onClose }) => {
   const [discountRate, setDiscountRate] = useState(0);
   const [selectedCurrencyIcon, setSelectedCurrencyIcon] = useState('₹');
   const { taxes } = useSelector((state) => state.tax);
-
+  const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
 
 
 
@@ -252,6 +252,18 @@ const EditInvoice = ({ idd, onClose }) => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
         
+        if (field === 'tax' && taxes?.data) {
+          const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
+          if (selectedTax) {
+            setSelectedTaxDetails(prev => ({
+              ...prev,
+              [id]: {
+                gstName: selectedTax.gstName,
+                gstPercentage: selectedTax.gstPercentage
+              }
+            }));
+          }
+        }
         // Recalculate amount when quantity, price, or tax changes
         // Calculate individual item amounts
         const quantity = parseFloat(updatedRow.quantity) || 0;
@@ -345,12 +357,16 @@ const EditInvoice = ({ idd, onClose }) => {
       const taxAmount = (baseAmount * taxPercentage) / 100;
       const itemTotal = baseAmount - itemDiscountAmount + taxAmount;
 
+       // Get tax details for the current item
+       const taxDetails = selectedTaxDetails[item.id];
+
       acc[`item_${index + 1}`] = {
         item: item.item,
         quantity: quantity,
         price: price,
         tax_percentage: taxPercentage,
         tax_amount: taxAmount,
+        tax_name: taxDetails ? taxDetails.gstName : '', // Use tax details if available
         discount_percentage: itemDiscountPercentage,
         discount_amount: itemDiscountAmount,
         base_amount: baseAmount,

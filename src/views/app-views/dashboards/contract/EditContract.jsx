@@ -147,7 +147,7 @@ const EditContract = ({ id, onClose }) => {
         onSubmit={onSubmit}
         enableReinitialize
       >
-        {({ values, setFieldValue, handleSubmit, handleChange }) => (
+        {({ values, setFieldValue, handleSubmit, handleChange,setFieldTouched }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
             <h2 className="mb-4 border-b pb-2 font-medium"></h2>
 
@@ -471,14 +471,16 @@ const EditContract = ({ id, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Start Date <span className="text-rose-500">*</span></label>
+                  <label className="font-semibold ">StartDate <span className="text-rose-500">*</span></label>
                   <DatePicker
+                    name="startDate"
                     className="w-full mt-1"
-                    format="DD-MM-YYYY"
+                    placeholder="Select startDate"
+                    onChange={(value) => setFieldValue("startDate", value)}
                     value={values.startDate}
-                    onChange={(date) => setFieldValue("startDate", date)}
+                    onBlur={() => setFieldTouched("startDate", true)}
                   />
                   <ErrorMessage
                     name="startDate"
@@ -488,14 +490,16 @@ const EditContract = ({ id, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">End Date <span className="text-rose-500">*</span></label>
+                    <label className="font-semibold ">EndDate <span className="text-rose-500">*</span></label>
                   <DatePicker
+                    name="endDate"
                     className="w-full mt-1"
-                    format="DD-MM-YYYY"
+                    placeholder="Select endDate"
+                    onChange={(value) => setFieldValue("endDate", value)}
                     value={values.endDate}
-                    onChange={(date) => setFieldValue("endDate", date)}
+                    onBlur={() => setFieldTouched("endDate", true)}
                   />
                   <ErrorMessage
                     name="endDate"

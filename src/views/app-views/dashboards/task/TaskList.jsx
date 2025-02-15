@@ -84,12 +84,12 @@ const TaskList = () => {
   const [isAddTaskModalVisible, setIsAddTaskModalVisible] = useState(false);
   const [isEditTaskModalVisible, setIsEditTaskModalVisible] = useState(false);
   const [isViewTaskModalVisible, setIsViewTaskModalVisible] = useState(false);
-  const [iddd, setIddd] = useState("");
+  const [idd, setIdd] = useState("");
 
   const allloggeddata = useSelector((state) => state.user);
   const fndlogged = allloggeddata.loggedInUser;
 
-  const idd = fndlogged.id;
+  const id = fndlogged.id;
 
   const alldatas = useSelector((state) => state.Tasks);
   const fnddata = alldatas.Tasks.data;
@@ -97,8 +97,8 @@ const TaskList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(GetTasks(idd));
-  }, [dispatch, idd]);
+    dispatch(GetTasks(id));
+  }, [dispatch, id]);
 
   useEffect(() => {
     if (fnddata) {
@@ -190,7 +190,7 @@ const TaskList = () => {
 
   const editfubn = (idd) => {
     openEditTaskModal();
-    setIddd(idd);
+    setIdd(idd);
   };
 
   const togglePinTask = (taskId) => {
@@ -509,7 +509,7 @@ const TaskList = () => {
           width={800}
           className="mt-[-70px]"
         >
-          <EditTask onClose={closeEditTaskModal} iddd={iddd} />
+          <EditTask onClose={closeEditTaskModal} idd={idd} />
         </Modal>
 
         {/* <Modal

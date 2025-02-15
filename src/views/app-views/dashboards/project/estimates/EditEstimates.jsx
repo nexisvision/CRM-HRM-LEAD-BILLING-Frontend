@@ -9,6 +9,7 @@ import { getestimateById, updateestimate } from './estimatesReducer/EstimatesSli
 import { getcurren } from 'views/app-views/setting/currencies/currenciesSlice/currenciesSlice';
 import * as Yup from 'yup';
 import { GetLeads } from '../../leads/LeadReducers/LeadSlice';
+import { getAllTaxes } from 'views/app-views/setting/tax/taxreducer/taxSlice';
 
 const { Option } = Select;
 
@@ -35,6 +36,7 @@ const EditEstimates = ({ idd,onClose }) => {
     const { currencies } = useSelector((state) => state.currencies);
     const condata = currencies.data || [];
 
+    const { taxes } = useSelector((state) => state.tax);
 
     const subClients = useSelector((state) => state.SubClient);
     const sub = subClients?.SubClient?.data;
@@ -50,11 +52,8 @@ const EditEstimates = ({ idd,onClose }) => {
 
     const { data: Leads, isLoading: isLeadsLoading, error: leadsError } = useSelector((state) => state.Leads.Leads || []);
 
-    const lead = Leads?.filter((item) => item.created_by === user);
-
-// console.log("dsffsdfdsfsdfsdf",lead);
-
-    const leadDetails = lead?.find((lead) => lead.id === currentEstimate.lead);
+    const lead = Leads?.filter((item) => item.created_by === user) || [];
+    const leadDetails = lead?.find((lead) => lead.id === currentEstimate?.lead);
 
 
     // console.log("asdasdsfsdfsddas",leadDetails)
@@ -93,16 +92,17 @@ const EditEstimates = ({ idd,onClose }) => {
 
     useEffect(() => {
                  dispatch(GetLeads());
+                 dispatch(getAllTaxes());
     }, [dispatch]);
 
 
     // Populate form when currentEstimate changes
     useEffect(() => {
-        if (currentEstimate) {
+        if (currentEstimate && leadDetails) {
             form.setFieldsValue({
                 valid_till: dayjs(currentEstimate.valid_till),
                 currency: currentEstimate.currency,
-                // lead: leadDetails.leadTitle,
+                lead: leadDetails?.leadTitle || '',
                 client: currentEstimate.client,
                 calculatedTax: currentEstimate.calculatedTax,
             });
@@ -111,7 +111,7 @@ const EditEstimates = ({ idd,onClose }) => {
             const itemsArray = Object.values(currentEstimate.items || {});
             setTableData(itemsArray);
         }
-    }, [currentEstimate, form]);
+    }, [currentEstimate, form, leadDetails]);
 
     // Calculate totals
     const calculateSubTotal = () => {
@@ -278,11 +278,9 @@ const EditEstimates = ({ idd,onClose }) => {
         <Select
             className="w-full"
             placeholder="Select Lead Title"
-            // loading={leadsLoading}
-            disabled // Make the field disabled
-            value={leadDetails ? leadDetails.leadTitle : undefined} // Set the leadTitle directly
+            disabled
+            value={leadDetails?.leadTitle || undefined}
         >
-            {/* Optionally, you can still render the options if needed */}
             {Array.isArray(lead) && lead.map((lead) => (
                 <Option
                     key={lead.id}
@@ -433,18 +431,19 @@ const EditEstimates = ({ idd,onClose }) => {
                                                         />
                                                     </td>
                                                     <td className="px-4 py-2 border-b">
-                                                        <select
+                                                        <Select
                                                             value={row.tax}
-                                                            onChange={(e) => handleTableDataChange(row.id, 'tax', e.target.value)}
-                                                            className="w-full p-2 border"
+                                                            onChange={(value) => handleTableDataChange(row.id, "tax", value)}
+                                                            className="w-full"
+                                                            placeholder="Select Tax"
                                                         >
-                                                            <option value="0">Nothing Selected</option>
-                                                            <option value="10">GST:10%</option>
-                                                            <option value="18">CGST:18%</option>
-                                                            <option value="10">VAT:10%</option>
-                                                            <option value="10">IGST:10%</option>
-                                                            <option value="10">UTGST:10%</option>
-                                                        </select>
+                                                            <Option value="0">No Tax</Option>
+                                                            {taxes?.data?.map((tax) => (
+                                                                <Option key={tax.id} value={tax.gstPercentage}>
+                                                                    {tax.gstName} ({tax.gstPercentage}%)
+                                                                </Option>
+                                                            ))}
+                                                        </Select>
                                                     </td>
                                                     <td className="px-4 py-2 border-b">
                                                         <span>{row.amount}</span>

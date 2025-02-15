@@ -12,6 +12,7 @@ import {
   Switch,
 } from "antd";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
 import { Form } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { ErrorMessage, Field } from "formik";
@@ -30,7 +31,8 @@ const AddBilling = ({ onClose }) => {
   const [tags, setTags] = useState([]);
   const AllLoggeddtaa = useSelector((state) => state.user);
   const Tagsdetail = useSelector((state) => state.Lable);
-
+  const { taxes } = useSelector((state) => state.tax);
+  const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const [tableData, setTableData] = useState([
     {
       id: Date.now(),
@@ -72,6 +74,7 @@ const AddBilling = ({ onClose }) => {
 
   useEffect(() => {
     dispatch(Getcus());
+    dispatch(getAllTaxes());
   }, []);
 
   const customerdata = useSelector((state) => state.customers);
@@ -193,6 +196,18 @@ const AddBilling = ({ onClose }) => {
     const updatedData = tableData.map((row) => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
+        if (field === 'tax' && taxes?.data) {
+          const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
+          if (selectedTax) {
+            setSelectedTaxDetails(prevDetails => ({
+              ...prevDetails,
+              [id]: {
+                gstName: selectedTax.gstName,
+                gstPercentage: selectedTax.gstPercentage
+              }
+            }));
+          }
+        }
         
         if (field === 'quantity' || field === 'price' || field === 'tax') {
           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
@@ -218,37 +233,39 @@ const AddBilling = ({ onClose }) => {
     form
       .validateFields()
       .then((values) => {
-        const totals = calculateTotal(); // Get current totals
+        const totals = calculateTotal();
 
-        // Format items data
+        // Format items data with GST name
         const items = tableData.map(row => ({
           item: row.item,
+          tax_name: showTax ? selectedTaxDetails[row.id]?.gstName || '' : '',
+          tax_percentage: showTax ? parseFloat(row.tax) || 0 : 0,
           quantity: parseFloat(row.quantity) || 0,
           price: parseFloat(row.price) || 0,
-          tax: showTax ? parseFloat(row.tax) || 0 : 0,
           amount: parseFloat(row.amount) || 0,
           description: row.description || ""
         }));
 
-        // Create description object without JSON.stringify
+        // Create description object
         const discription = {
           product: tableData.map(item => item.item).filter(Boolean).join(", "),
-          service: tableData.map(item => item.discription).filter(Boolean).join(", "),
+          service: tableData.map(item => item.description).filter(Boolean).join(", "),
           items: tableData.map(item => ({
             name: item.item,
             quantity: parseFloat(item.quantity) || 0,
             unitPrice: parseFloat(item.price) || 0,
             tax: showTax ? parseFloat(item.tax) || 0 : 0,
+            tax_name: showTax ? selectedTaxDetails[item.id]?.gstName || '' : '',
             amount: parseFloat(item.amount) || 0
           }))
         };
 
-        // Create invoice data object with description as an object
+        // Create invoice data object
         const invoiceData = {
           billNumber: values.billNumber,
           vendor: values.vendor,
           billDate: values.billDate?.format("YYYY-MM-DD"),
-          discription: discription, // Remove JSON.stringify
+          discription: discription,
           status: values.status,
           discount: parseFloat(discountRate) || 0,
           tax: totals.totalTax,
@@ -260,6 +277,7 @@ const AddBilling = ({ onClose }) => {
             unitPrice: parseFloat(row.price) || 0,
             quantity: parseFloat(row.quantity) || 0,
             tax: showTax ? parseFloat(row.tax) || 0 : 0,
+            tax_name: showTax ? selectedTaxDetails[row.id]?.gstName || '' : '',
             lineTotal: parseFloat(row.amount) || 0
           }))
         };
@@ -532,21 +550,21 @@ const AddBilling = ({ onClose }) => {
                             <select
                               value={row.tax}
                               onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
-                              className="w-full p-2 border rounded"
+                              className="w-full p-2 border"
                             >
                               <option value="0">Nothing Selected</option>
-                              <option value="10">GST:10%</option>
-                              <option value="18">CGST:18%</option>
-                              <option value="10">VAT:10%</option>
-                              <option value="10">IGST:10%</option>
-                              <option value="10">UTGST:10%</option>
+                              {taxes && taxes.data && taxes.data.map(tax => (
+                                <option key={tax.id} value={tax.gstPercentage}>
+                                  {tax.gstName}: {tax.gstPercentage}%
+                                </option>
+                              ))}
                             </select>
                           ) : (
                             <input
                               type="text"
                               value="0"
                               disabled
-                              className="w-full p-2 border rounded bg-gray-100"
+                              className="w-full p-2 border bg-gray-100"
                             />
                           )}
                         </td>

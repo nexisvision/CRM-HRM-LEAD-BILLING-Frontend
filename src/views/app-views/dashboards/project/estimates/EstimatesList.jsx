@@ -46,6 +46,7 @@ const EstimatesList = () => {
 	const [isAddEstimatesModalVisible, setIsAddEstimatesModalVisible] = useState(false);
 	const [isEditEstimatesModalVisible, setIsEditEstimatesModalVisible] = useState(false);
 	const [isViewEstimatesModalVisible, setIsViewEstimatesModalVisible] = useState(false);
+	const [selectedEstimateId, setSelectedEstimateId] = useState(null);
 	const dispatch = useDispatch();
 	const { id } = useParams();
 
@@ -116,7 +117,10 @@ const EstimatesList = () => {
 						type=""
 						className=""
 						icon={<EyeOutlined />}
-						onClick={openviewEstimatesModal}
+						onClick={() => {
+							setSelectedEstimateId(row.id);
+							openviewEstimatesModal();
+						}}
 						size="small"
 					>
 						<span className="">View Details</span>
@@ -170,10 +174,10 @@ const EstimatesList = () => {
 	);
 
 	const tableColumns = [
-		// {
-		// 	title: 'Estimate Number',
-		// 	dataIndex: 'estimateNumber'
-		// },
+		{
+			title: 'Estimate Number',
+			dataIndex: 'quotationNumber'
+		},
 		{
 			title: 'Date',
 			 dataIndex: "valid_till",
@@ -325,7 +329,7 @@ const EstimatesList = () => {
 				</Modal>
 
 				<Modal
-					title="View Estimate"
+					title={<h2 className="text-2xl font-medium">View Estimate</h2>}
 					visible={isViewEstimatesModalVisible}
 					onCancel={closeViewEstimatesModal}
 					footer={null}
@@ -333,7 +337,7 @@ const EstimatesList = () => {
 					className='mt-[-70px]'
 
 				>
-					<ViewEstimates onClose={closeViewEstimatesModal} />
+					<ViewEstimates estimateId={selectedEstimateId} />
 				</Modal>
 			</Card>
 		</>

@@ -442,7 +442,7 @@ const EditProduct = ({ idd, onClose }) => {
                 </div>
               </Col>
               <Col span={12} className="mt-4">
-                <div className="form-item mt-2">
+                <div className="form-item">
                   <label className="font-semibold">Category <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}

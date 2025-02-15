@@ -459,8 +459,8 @@ const taskfilter = taskdata?.filter((item)=>item?.created_by === loggeddatass)
                         <p className="text-xl font-medium md:text-base text-blue-500">
                         2
                         </p>
-                    </div>
-                    <div className="bg-white p-6 rounded-lg shadow">
+                    </div> */}
+                    {/* <div className="bg-white p-6 rounded-lg shadow">
                         <h3 className="text-gray-600 mb-2 text-lg font-semibold">
                         Total Earnings
                         </h3>

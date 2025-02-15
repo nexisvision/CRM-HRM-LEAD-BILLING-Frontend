@@ -240,11 +240,11 @@ const ProjectList = () => {
 	return (
 		<div>
 
-			<PageHeaderAlt className="border-bottom">
+			<PageHeaderAlt className="border-bottom mt-5">
 				<div className="container-fluid">
-					<Flex justifyContent="space-between" alignItems="center" className="py-4">
-						<h2 className='text-xl font-medium'>Projects</h2>
-						<div className='flex gap-3'>
+					<Flex className="p-2 flex justify-end">
+						{/* <h2 className='text-xl font-medium'>Projects</h2> */}
+						<div className='flex gap-3 justify-end'>
 							<Radio.Group defaultValue={VIEW_GRID} onChange={onChangeProjectView}>
 								<Radio.Button value={VIEW_GRID}>
 									<AppstoreOutlined />

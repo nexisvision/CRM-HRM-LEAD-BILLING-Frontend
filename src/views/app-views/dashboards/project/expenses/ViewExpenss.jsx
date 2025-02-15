@@ -35,24 +35,24 @@ const ViewExpenss = ({ data }) => {
                             {data?.employee || '--'}
                         </td>
                     </tr>
-                    <tr className='text-base grid grid-cols-2'>
+                    {/* <tr className='text-base grid grid-cols-2'>
                         <td className='text-[#99a5b5] font-semibold p-2'>Created By</td>
                         <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
                             {data?.created_by || '--'}
                         </td>
-                    </tr>
-                    <tr className='text-base grid grid-cols-2'>
+                    </tr> */}
+                    {/* <tr className='text-base grid grid-cols-2'>
                         <td className='text-[#99a5b5] font-semibold p-2'>Created At</td>
                         <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
                             {data?.createdAt ? dayjs(data.createdAt).format('DD-MM-YYYY') : '--'}
                         </td>
-                    </tr>
-                    <tr className='text-base grid grid-cols-2'>
+                    </tr> */}
+                    {/* <tr className='text-base grid grid-cols-2'>
                         <td className='text-[#99a5b5] font-semibold p-2'>Updated At</td>
                         <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
                             {data?.updatedAt ? dayjs(data.updatedAt).format('DD-MM-YYYY') : '--'}
                         </td>
-                    </tr>
+                    </tr> */}
                     <tr className='text-base grid grid-cols-2'>
                         <td className='text-[#99a5b5] font-semibold p-2'>Description</td>
                         <td className='text-[#5b676d] font-medium p-2 hover:text-black'>

@@ -93,6 +93,7 @@ const AddProject = ({ onClose }) => {
   
   const fnd = fnadat?.filter((item)=>item?.created_by === allloggeduser)
 
+  
 
   const Tagsdetail = useSelector((state) => state.Tags);
   const AllTags = Tagsdetail?.Tags?.data;
@@ -103,6 +104,8 @@ const AddProject = ({ onClose }) => {
   const AllEmployee = useSelector((state) => state.SubClient);
   const employeedata = AllEmployee.SubClient.data;
 
+
+  // console.log(employeedata, "employeedata");
 
   const fnd2 = employeedata?.filter((item)=>item?.username === allloggeduser)
 

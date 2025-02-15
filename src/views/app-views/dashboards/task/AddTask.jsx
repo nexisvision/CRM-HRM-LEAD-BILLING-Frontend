@@ -35,6 +35,18 @@ const AddTask = ({ onClose }) => {
     ? empData.filter((item) => item?.created_by === loggedusername)
     : [];
 
+
+
+  // const allloggeduserdata = useSelector((state) => state.user || {});
+  // const loggedUserData = allloggeduserdata?.loggedInUser || {};
+  // const loggedusername = loggedUserData?.username || '';
+  // const id = loggedUserData?.id;
+
+  // const allempdata = useSelector((state) => state.employee || {});
+  // const empData = allempdata?.employee?.data || [];
+
+  // const fndassine = empData.filter((item) => item.created_by === loggedusername) || [];
+
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
   const initialValues = {
@@ -211,11 +223,32 @@ const AddTask = ({ onClose }) => {
                             Incomplete
                           </div>
                         </Option>
-                        <Option value="To Do">To Do</Option>
-                        <Option value="In Progress">Doing</Option>
-                        <Option value="Completed">Completed</Option>
-                        <Option value="On Hold">Waiting Approval</Option>
+                        <Option value="To Do">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>
+                            To Do
+                          </div>
+                        </Option>
+                        <Option value="In Progress">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-orange-500 mr-2"></span>
+                            In Progress
+                          </div>
+                        </Option>
+                        <Option value="Completed">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                            Completed
+                          </div>
+                        </Option>
+                        <Option value="On Hold">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
+                            Waiting Approval
+                          </div>
+                        </Option>
                       </Select>
+                      // </Select>
                     )}
                   </Field>
                   <ErrorMessage
@@ -243,8 +276,18 @@ const AddTask = ({ onClose }) => {
                             Medium
                           </div>
                         </Option>
-                        <Option value="High">High</Option>
-                        <Option value="Low">Low</Option>
+                        <Option value="High">
+                        <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+                            High
+                          </div>
+                        </Option>
+                        <Option value="Low">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                            Low
+                          </div>
+                        </Option>
                       </Select>
                     )}
                   </Field>

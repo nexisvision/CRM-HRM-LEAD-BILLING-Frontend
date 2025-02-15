@@ -327,7 +327,7 @@ export const InvoiceList = () => {
             visible={ViewInvoiceModalVisible}
             onCancel={closeViewInvoiceModal}
             footer={null}
-            width={800}
+            width={1000}
         >
      <InvoiceView 
         onClose={closeViewInvoiceModal} 

@@ -18,6 +18,7 @@ import { ErrorMessage, Field } from "formik";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import { addbil, eidtebil, getbil } from "./billing2Reducer/billing2Slice";
+import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice";
 import moment from "moment";
 
 const { Option } = Select;
@@ -27,6 +28,9 @@ const EditBilling = ({ idd, onClose }) => {
   const [form] = Form.useForm();
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [newTag, setNewTag] = useState("");
+
+  // const { taxes } = useSelector((state) => state.tax);
+  const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
 
   const [tags, setTags] = useState([]);
   const AllLoggeddtaa = useSelector((state) => state.user);
@@ -56,6 +60,8 @@ const EditBilling = ({ idd, onClose }) => {
 
   const bildata = useSelector((state) => state.salesbilling);
   const fnsdatas = bildata.salesbilling.data;
+  const taxes = useSelector((state) => state.tax);
+  // const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
 
   useEffect(() => {
     dispatch(getbil(lid));
@@ -100,6 +106,10 @@ const EditBilling = ({ idd, onClose }) => {
       }
     }
   }, [fnsdatas, idd, form]);
+
+  useEffect(() => {
+    dispatch(getAllTaxes());
+  }, []);
 
   const calculateAmount = (row) => {
     const quantity = Number(row.quantity) || 0;
@@ -160,6 +170,19 @@ const EditBilling = ({ idd, onClose }) => {
           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
           const price = parseFloat(field === 'price' ? value : row.price) || 0;
           const tax = showTax ? (parseFloat(field === 'tax' ? value : row.tax) || 0) : 0;
+          
+          if (field === 'tax' && taxes && taxes.data) {
+            const selectedTax = taxes.data.find(t => t.gstPercentage === parseFloat(value));
+            if (selectedTax) {
+              setSelectedTaxDetails(prev => ({
+                ...prev,
+                [id]: {
+                  gstName: selectedTax.gstName,
+                  gstPercentage: selectedTax.gstPercentage
+                }
+              }));
+            }
+          }
           
           const baseAmount = quantity * price;
           const taxAmount = (baseAmount * tax) / 100;
@@ -222,6 +245,7 @@ const EditBilling = ({ idd, onClose }) => {
             quantity: parseFloat(row.quantity) || 0,
             price: parseFloat(row.price) || 0,
             tax: showTax ? parseFloat(row.tax) || 0 : 0,
+            tax_name: showTax ? selectedTaxDetails[row.id]?.gstName || '' : '',
             amount: parseFloat(row.amount) || 0,
             description: row.description || ""
           }))
@@ -469,21 +493,21 @@ const EditBilling = ({ idd, onClose }) => {
                             <select
                               value={row.tax}
                               onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
-                              className="w-full p-2 border rounded"
+                              className="w-full p-2 border"
                             >
                               <option value="0">Nothing Selected</option>
-                              <option value="10">GST:10%</option>
-                              <option value="18">CGST:18%</option>
-                              <option value="10">VAT:10%</option>
-                              <option value="10">IGST:10%</option>
-                              <option value="10">UTGST:10%</option>
+                              {taxes && taxes.data && taxes.data.map(tax => (
+                                <option key={tax.id} value={tax.gstPercentage}>
+                                  {tax.gstName}: {tax.gstPercentage}%
+                                </option>
+                              ))}
                             </select>
                           ) : (
                             <input
                               type="text"
                               value="0"
                               disabled
-                              className="w-full p-2 border rounded bg-gray-100"
+                              className="w-full p-2 border bg-gray-100"
                             />
                           )}
                         </td>

@@ -180,7 +180,7 @@ const AddJobOfferLetter = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12}>
+              {/* <Col span={12}>
                 <div className="form-item mt-2">
                   <label className="font-semibold">Offer Expire On</label>
                   <DatePicker
@@ -196,9 +196,37 @@ const AddJobOfferLetter = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
+              </Col> */}
+
+              <Col span={12} className='mt-2'>
+                <div className="form-item">
+                  <label className='font-semibold'>Offer Expire On</label>
+                  <DatePicker
+                    className="w-full"
+                    format="DD-MM-YYYY"
+                    value={values.offer_expiry}
+                    onChange={(offer_expiry) => setFieldValue('offer_expiry', offer_expiry)}
+                    onBlur={() => setFieldTouched("offer_expiry", true)}
+                  />
+                  <ErrorMessage name="offer_expiry" component="div" className="error-message text-red-500 my-1" />
+                </div>
               </Col>
 
-              <Col span={12}>
+              <Col span={12} className='mt-2'>
+                <div className="form-item">
+                  <label className='font-semibold'>Expected Joining Date</label>
+                  <DatePicker
+                    className="w-full"
+                    format="DD-MM-YYYY"
+                    value={values.expected_joining_date}
+                    onChange={(expected_joining_date) => setFieldValue('expected_joining_date', expected_joining_date)}
+                    onBlur={() => setFieldTouched("expected_joining_date", true)}
+                  />
+                  <ErrorMessage name="expected_joining_date" component="div" className="error-message text-red-500 my-1" />
+                </div>
+              </Col>
+
+              {/* <Col span={12}>
                 <div className="form-item mt-2">
                   <label className="font-semibold">Expected Joining Date</label>
                   <DatePicker
@@ -214,7 +242,7 @@ const AddJobOfferLetter = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
 
               <Col span={12}>
                 <div className="form-item mt-2">

@@ -5,14 +5,18 @@ import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { AddTasks, GetTasks } from "../project/task/TaskReducer/TaskSlice";
+import { AddTasks, EditTaskss, GetTasks } from "../project/task/TaskReducer/TaskSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+import moment from "moment/moment";
+import dayjs from "dayjs";
+import PropTypes from "prop-types";
 
 const { Option } = Select;
 
-const EditTask = ({ onClose }) => {
+const EditTask = ({ onClose, iddd, projectId }) => {
   const dispatch = useDispatch();
+  // const [initialValues, setInitialValues] = useState({});
   const [isWithoutDueDate, setIsWithoutDueDate] = useState(false);
   const [isOtherDetailsVisible, setIsOtherDetailsVisible] = useState(false);
 
@@ -25,19 +29,41 @@ const EditTask = ({ onClose }) => {
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data || [];
 
+  const loggedusername = useSelector((state) => state.user.loggedInUser.username || [])
+ 
+    const fndassine = empData.filter(((item)=>item.created_by === loggedusername || []))
+
   const allloggeduserdata = useSelector((state) => state.user);
   const loggedUserData = allloggeduserdata?.loggedInUser || {};
   const id = loggedUserData?.id;
 
-  const loggedusername = useSelector((state) => state.user?.loggedInUser?.username);
 
-  const fndassine = Array.isArray(empData) && loggedusername
-    ? empData.filter((item) => item?.created_by === loggedusername)
-    : [];
+  const { data: tasks, isLoading: isTasksLoading, error: tasksError } = useSelector((state) => state.tasks);
+
+  const fndatatask = tasks?.data || [];
+
+  // const idd = loggedUserData.id;
+
+  useEffect(() => {
+    dispatch(GetTasks(iddd));
+  }, [dispatch, iddd]);
 
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
-  const initialValues = {
+  // const initialValues = {
+
+  //   taskName: "",
+  //   startDate: null,
+  //   dueDate: null,
+  //   status: "",
+  //   priority: "",
+  //   assignTo: [],
+  //   description: "",
+  //   priority: "",
+  //   status: "",
+  // };
+
+  const [initialValues, setInitialValues] = useState({
     taskName: "",
     startDate: null,
     dueDate: null,
@@ -45,7 +71,63 @@ const EditTask = ({ onClose }) => {
     priority: "",
     assignTo: [],
     description: "",
-  };
+    priority: "",
+    status: "",
+  });
+
+  useEffect(() => {
+    if (fndatatask && iddd) {
+        const task = fndatatask.find((task) => task.id === iddd);
+      if (task) {
+        const dueDate = task.dueDate ? new Date(task.dueDate) : null;
+        setIsWithoutDueDate(dueDate === null);
+        setIsOtherDetailsVisible(task.otherDetailsVisible);
+
+        let assignToArray = [];
+        try {
+          if (task.assignTo) {
+            if (typeof task.assignTo === 'string') {
+              assignToArray = JSON.parse(task.assignTo);
+            } else if (Array.isArray(task.assignTo)) {
+              assignToArray = task.assignTo;
+            } else {
+              assignToArray = [task.assignTo];
+            }
+          }
+        } catch (error) {
+          console.error("Error parsing assignTo:", error);
+          assignToArray = [];
+        }
+
+        if (!Array.isArray(assignToArray)) {
+          assignToArray = [assignToArray];
+        }
+
+        assignToArray = assignToArray.filter(item => item !== null && item !== undefined);
+
+        setInitialValues({
+          taskName: task.taskName || "",
+          startDate: task.startDate ? new Date(task.startDate) : null,
+          dueDate,
+          assignTo: assignToArray,
+          description: task.description || "",
+          status: task.status || "",
+          priority: task.priority || "",
+        });
+
+        // console.log("Parsed assignTo values:", assignToArray);
+      } else {
+        message.error("Task not found.");
+      }
+    }
+  }, [fndatatask, iddd]);
+
+  useEffect(() => {
+    if (!iddd || !projectId) {
+      message.error("Required IDs are missing");
+      onClose();
+    }
+  }, [iddd, projectId, onClose]);
 
   const validationSchema = Yup.object({
     taskName: Yup.string().required("Please enter TaskName."),
@@ -72,32 +154,23 @@ const EditTask = ({ onClose }) => {
     }
 
     // Dispatch AddTasks with updated values
-    dispatch(AddTasks({ id, values }))
-      .then(() => {
-        // Fetch updated tasks after successfully adding
-        dispatch(GetTasks(id))
-          .then(() => {
-            // message.success("Expenses added successfully!");
-            resetForm();
-            onClose();
-          })
-          .catch((error) => {
-            // message.error("Failed to fetch the latest meeting data.");
-            console.error("MeetData API error:", error);
-          });
-      })
-      .catch((error) => {
-        message.error("Failed to add meeting.");
-        console.error("AddMeet API error:", error);
-      });
-  };
-
-  const handleCheckboxChange = () => {
-    setIsWithoutDueDate(!isWithoutDueDate);
-  };
-
-  const toggleOtherDetails = () => {
-    setIsOtherDetailsVisible(!isOtherDetailsVisible);
+    dispatch(EditTaskss({ iddd, values: values }))
+        .then(() => {
+            message.success("Task updated successfully!");
+            dispatch(GetTasks(iddd))
+                .then(() => {
+                    resetForm();
+                    onClose();
+                })
+                .catch((error) => {
+                    message.error("Failed to fetch the latest Task data.");
+                    console.error("MeetData API error:", error);
+                });
+        })
+        .catch((error) => {
+            message.error("Failed to update Task.");
+            console.error("AddTask API error:", error);
+        });
   };
 
   return (
@@ -128,42 +201,38 @@ const EditTask = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold ">StartDate <span className="text-rose-500">*</span></label>
-                  <DatePicker
-                    name="startDate"
-                    className="w-full mt-1"
-                    placeholder="Select startDate"
-                    onChange={(value) => setFieldValue("startDate", value)}
-                    value={values.startDate}
-                    onBlur={() => setFieldTouched("startDate", true)}
-                  />
-                  <ErrorMessage
-                    name="startDate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
+              <Col span={12} className="mt-4">
+                <label className="font-semibold">Start Date</label>
+                <DatePicker
+                  className="w-full"
+                  format="DD-MM-YYYY"
+                  value={values.startDate ? dayjs(values.startDate) : null}
+                  onChange={(startDate) =>
+                    setFieldValue("startDate", startDate)
+                  }
+                  onBlur={() => setFieldTouched("startDate", true)}
+                />
+                <ErrorMessage
+                  name="startDate"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
               </Col>
 
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold ">DueDate <span className="text-rose-500">*</span></label>
-                  <DatePicker
-                    name="dueDate"
-                    className="w-full mt-1"
-                    placeholder="Select DueDate"
-                    onChange={(value) => setFieldValue("dueDate", value)}
-                    value={values.dueDate}
-                    onBlur={() => setFieldTouched("dueDate", true)}
-                  />
-                  <ErrorMessage
-                    name="dueDate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
+              <Col span={12} className="mt-4">
+                <label className="font-semibold">Due Date</label>
+                <DatePicker
+                  className="w-full"
+                  format="DD-MM-YYYY"
+                  value={values.dueDate ? dayjs(values.dueDate) : null}
+                  onChange={(dueDate) => setFieldValue("dueDate", dueDate)}
+                  onBlur={() => setFieldTouched("dueDate", true)}
+                />
+                <ErrorMessage
+                  name="dueDate"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
               </Col>
 
               <Col span={24} className="mt-3">
@@ -219,10 +288,30 @@ const EditTask = ({ onClose }) => {
                             Incomplete
                           </div>
                         </Option>
-                        <Option value="To Do">To Do</Option>
-                        <Option value="In Progress">Doing</Option>
-                        <Option value="Completed">Completed</Option>
-                        <Option value="On Hold">Waiting Approval</Option>
+                        <Option value="To Do">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>
+                            To Do
+                          </div>
+                        </Option>
+                        <Option value="In Progress">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-orange-500 mr-2"></span>
+                            In Progress
+                          </div>
+                        </Option>
+                        <Option value="Completed">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                            Completed
+                          </div>
+                        </Option>
+                        <Option value="On Hold">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
+                            Waiting Approval
+                          </div>
+                        </Option>
                       </Select>
                     )}
                   </Field>
@@ -236,7 +325,7 @@ const EditTask = ({ onClose }) => {
 
               <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Priority <span className="text-rose-500">*</span></label>
+                  <label className="font-semibold">Priority</label>
                   <Field name="priority">
                     {({ field }) => (
                       <Select
@@ -251,8 +340,18 @@ const EditTask = ({ onClose }) => {
                             Medium
                           </div>
                         </Option>
-                        <Option value="High">High</Option>
-                        <Option value="Low">Low</Option>
+                        <Option value="High">
+                        <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+                            High
+                          </div>
+                        </Option>
+                        <Option value="Low">
+                          <div className="flex items-center">
+                            <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                            Low
+                          </div>
+                        </Option>
                       </Select>
                     )}
                   </Field>
@@ -296,6 +395,12 @@ const EditTask = ({ onClose }) => {
       </Formik>
     </div>
   );
+};
+
+EditTask.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  iddd: PropTypes.string.isRequired,
+  projectId: PropTypes.string.isRequired
 };
 
 export default EditTask;

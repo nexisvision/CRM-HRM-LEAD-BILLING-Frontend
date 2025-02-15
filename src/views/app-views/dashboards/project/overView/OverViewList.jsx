@@ -458,12 +458,19 @@ const OverViewList = () => {
 
           <div className="bg-white rounded-lg shadow p-6 w-full h-full flex flex-col items-center justify-center">
             <h2 className="text-xl font-semibold mb-4">Tasks Status</h2>
-            <div className="flex justify-center items-center w-[300px] h-[300px]">
-              <Pie
-                data={taskStatusData}
-                options={chartOptions}
-              />
-            </div>
+            {taskData.length > 0 ? (
+              <div className="flex justify-center items-center w-[300px] h-[300px]">
+                <Pie
+                  data={taskStatusData}
+                  options={chartOptions}
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-[300px]">
+                <p className="text-gray-500 text-lg">No tasks found</p>
+                <p className="text-gray-400 text-sm">Create tasks to see status distribution</p>
+              </div>
+            )}
           
           </div>
 

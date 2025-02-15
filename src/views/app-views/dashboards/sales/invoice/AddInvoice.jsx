@@ -55,6 +55,9 @@ const AddInvoice = ({ onClose }) => {
   // Add this to get taxes from Redux store
   const { taxes } = useSelector((state) => state.tax);
 
+  // Add this state to track selected tax details
+  const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
+
   // Fetch currencies when component mounts
   useEffect(() => {
     dispatch(getcurren());
@@ -102,6 +105,20 @@ const AddInvoice = ({ onClose }) => {
     const updatedData = tableData.map((row) => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
+
+        // If the field is tax, store the tax details
+        if (field === 'tax' && taxes?.data) {
+          const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
+          if (selectedTax) {
+            setSelectedTaxDetails(prevDetails => ({
+              ...prevDetails,
+              [id]: {
+                gstName: selectedTax.gstName,
+                gstPercentage: selectedTax.gstPercentage
+              }
+            }));
+          }
+        }
 
         // Calculate individual item amounts
         const quantity = parseFloat(updatedRow.quantity) || 0;
@@ -193,6 +210,7 @@ const AddInvoice = ({ onClose }) => {
             price: price,
             tax_percentage: taxPercentage,
             tax_amount: taxAmount,
+            tax_name: selectedTaxDetails[item.id]?.gstName || '',
             discount_percentage: itemDiscountPercentage,
             discount_amount: itemDiscountAmount,
             base_amount: baseAmount,
@@ -213,6 +231,7 @@ const AddInvoice = ({ onClose }) => {
           items: itemsForDatabase,
           subtotal: subtotal.toFixed(2),
           discount: discountRate.toFixed(2),
+          
           global_discount_amount: globalDiscountAmount.toFixed(2),
           total_item_discount: totals.itemDiscount,
           total_global_discount: totals.globalDiscount,

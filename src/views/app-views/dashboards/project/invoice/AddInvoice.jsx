@@ -157,38 +157,42 @@ const sub = subClientsss?.SubClient?.data;
     // Handle milestone selection
     const handleMilestoneChange = (value) => {
         if (value) {
+            // Clear product selection when milestone is selected
+            setSelectedProduct(null);
+            form.setFieldsValue({
+                product: undefined
+            });
+
             const selectedMile = milestones?.find(m => m.id === value);
             setSelectedMilestone(value);
-            setSelectedProduct(null); // Reset product selection
 
             if (selectedMile) {
-                // Update table data with milestone information
-                setTableData([
-                    {
-                        id: Date.now(),
-                        item: selectedMile.milestone_title,
-                        quantity: 1,
-                        price: selectedMile.milestone_cost,
-                        tax: 0,
-                        amount: selectedMile.milestone_cost.toString(),
-                        description: selectedMile.milestone_summary,
-                        hsn_sac: "" // Reset HSN/SAC
-                    }
-                ]);
-                calculateTotal([{
-                    quantity: 1,
-                    price: selectedMile.milestone_cost,
-                    tax: 0,
-                    discount: 0
-                }], discountRate);
+                // Parse milestone cost to ensure it's a number
+                const milestoneCost = parseFloat(selectedMile.milestone_cost) || 0;
 
-                // Clear product selection in the Select component
+                // Create new table data with milestone information
+                const newTableData = [{
+                    id: Date.now(),
+                    item: selectedMile.milestone_title || '',
+                    quantity: 1,
+                    price: milestoneCost,
+                    tax: 0,
+                    discount: 0,
+                    amount: milestoneCost.toString(),
+                    description: selectedMile.milestone_summary || '',
+                    hsn_sac: ''
+                }];
+
+                setTableData(newTableData);
+                calculateTotal(newTableData, discountRate);
+
+                // Update form fields with milestone data
                 form.setFieldsValue({
-                    product: undefined
+                    items: newTableData
                 });
             }
         } else {
-            // If deselecting milestone, clear everything
+            // Reset when no milestone is selected
             setSelectedMilestone(null);
             setTableData([{
                 id: Date.now(),
@@ -196,10 +200,12 @@ const sub = subClientsss?.SubClient?.data;
                 quantity: 1,
                 price: "",
                 tax: 0,
+                discount: 0,
                 amount: "0",
                 description: "",
                 hsn_sac: ""
             }]);
+            calculateTotal([], discountRate);
         }
     };
 
@@ -345,7 +351,7 @@ const sub = subClientsss?.SubClient?.data;
             // Calculate amount for single unit: unit price - discount + GST
             const unitAmount = unitPrice - discountAmount + gstAmount;
             
-            // Calculate total amount for this row (unit amount × quantity)
+            // Calculate total amount for this row
             const rowAmount = unitAmount * quantity;
 
             return {
@@ -356,7 +362,7 @@ const sub = subClientsss?.SubClient?.data;
             };
         }, { totalBaseAmount: 0, totalItemDiscount: 0, totalTax: 0, totalAmount: 0 });
 
-        // Calculate subtotal (sum of all row amounts)
+        // Calculate subtotal
         const subtotal = calculatedTotals.totalAmount;
 
         // Calculate global discount
@@ -365,7 +371,7 @@ const sub = subClientsss?.SubClient?.data;
         // Calculate final total
         const finalTotal = subtotal - globalDiscountAmount;
 
-        // Update the totals state
+        // Update totals state
         setTotals({
             subtotal: subtotal.toFixed(2),
             itemDiscount: calculatedTotals.totalItemDiscount.toFixed(2),
@@ -374,19 +380,16 @@ const sub = subClientsss?.SubClient?.data;
             finalTotal: finalTotal.toFixed(2)
         });
 
-        // Update the amount displayed for each row
+        // Update table data with calculated amounts
         const updatedData = data.map(row => {
             const quantity = parseFloat(row.quantity) || 0;
             const unitPrice = parseFloat(row.price) || 0;
             const itemDiscountPercentage = parseFloat(row.discount) || 0;
             const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
 
-            // Calculate per unit amounts
             const discountAmount = (unitPrice * itemDiscountPercentage) / 100;
             const gstAmount = (unitPrice * taxPercentage) / 100;
             const unitAmount = unitPrice - discountAmount + gstAmount;
-            
-            // Calculate total row amount
             const rowAmount = unitAmount * quantity;
 
             return {
@@ -772,21 +775,20 @@ const sub = subClientsss?.SubClient?.data;
                                     <Flex gap="7px" className="flex">
                                         <div className="w-full flex gap-4">
                                             <div>
-                                                <Select
-                                                    value={selectedMilestone}
-                                                    onChange={handleMilestoneChange}
-                                                    className="w-full !rounded-none"
-                                                    placeholder="Select Milestone"
-                                                    rootClassName="!rounded-none"
-                                                    loading={loading}
-                                                    allowClear
-                                                >
-                                                    {milestones?.map((milestone) => (
-                                                        <Option key={milestone.id} value={milestone.id}>
-                                                            {milestone.milestone_title}
-                                                        </Option>
-                                                    ))}
-                                                </Select>
+                                                <Form.Item>
+                                                    <Select
+                                                        placeholder="Select Milestone"
+                                                        onChange={handleMilestoneChange}
+                                                        value={selectedMilestone}
+                                                        allowClear
+                                                    >
+                                                        {milestones?.map((milestone) => (
+                                                            <Option key={milestone.id} value={milestone.id}>
+                                                                {milestone.milestone_title}
+                                                            </Option>
+                                                        ))}
+                                                    </Select>
+                                                </Form.Item>
                                             </div>
                                         </div>
                                     </Flex>

@@ -9,6 +9,7 @@ import html2pdf from 'html2pdf.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllUsers } from "views/auth-views/auth-reducers/UserSlice"
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice"
+import signatureimg from '../../../../../assets/svg/signatureimg1.png';
 // import { SubClient } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice"
 
 import { useParams } from 'react-router-dom';
@@ -221,7 +222,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                     <div className="flex justify-between items-center">
                         <h1 className="text-3xl text-gray-700">Invoice</h1>
                         <div className="flex items-center">
-                            <span className="text-xl ml-2 text-indigo-500">Nexis Vision</span>
+                            <span className="text-xl ml-2 text-indigo-500">Company Logo</span>
                         </div>
                     </div>
                 </div>
@@ -259,8 +260,9 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                     <span className="font-weight-semibold text-dark font-size-lg">Billed By:</span><br />
                                     {allloggeduser ? (
                                         <>
-                                            <span> <span className="font-weight-semibold ">Address: </span>{allloggeduser?.address}</span><br />
-                                            {/* <span>City:{allloggeduser?.city}</span><br /> */}
+                                            <p>
+                                                <span className="font-weight-semibold">Address:</span> {allloggeduser?.address}, {allloggeduser?.city}, {allloggeduser?.state}, {allloggeduser?.zip}, {allloggeduser?.country}
+                                            </p>
                                             <p> <span className="font-weight-semibold ">Email: </span> {allloggeduser?.email}</p>
                                             <p> <span className="font-weight-semibold ">Website: </span> {allloggeduser?.website}</p>
                                             <p> <span className="font-weight-semibold ">Phone: </span> {allloggeduser?.phone}</p>
@@ -284,9 +286,10 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                             {clientDataa ? (
                                 <address>
                                     <p>
-                                        <span> <span className="font-medium  ">Address: </span> {clientDataa.address}</span><br />
-
-                                        <span> <span className="font-weight-semibold  ">Name: </span>{clientDataa.username}</span><br />
+                                    <span> <span className="font-weight-semibold  ">Name: </span>{clientDataa.firstName}</span>
+                                        <p>
+                                            <span className="font-weight-semibold">Address:</span> {clientDataa.address}
+                                        </p>
                                         <p> <span className="font-weight-semibold">Email: </span> {clientDataa.email}</p>
                                         <p> <span className="font-weight-semibold  ">Phone: </span> {clientDataa.phone}</p>
                                         <p> <span className="font-weight-semibold  ">GstIn: </span> {clientDataa.gstIn}</p>
@@ -340,7 +343,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 title="HSN/SAC"
                                 key="hsn_sac"
                                 render={(record) => {
-                                    return `${record?.hsn_sac || 0}`;
+                                    return `${record?.hsn_sac || "--"}`;
                                 }}
                             />
                             <Table.Column
@@ -462,13 +465,21 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                         </div>
                     </div>
                     <div>
+                        <div className="flex justify-end items-center">
+                        <h4 className="font-semibold text-lg mb-2">Signature:</h4>
+                        <div className='flex'>
+                            <img src={signatureimg} alt="Image not show" className='w-28 h-28' />
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                    <div className='mt-4'>
                         <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
                             <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
                             <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
                         </ol>
                     </div>
-                </div>
 
                 <div className="text-center mt-8">
                     <p>Thanks for your Business</p>
@@ -485,7 +496,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
 
         return (
             <div className="bg-white rounded-lg shadow-lg p-8">
-                <span className="text-2xl font-bold text-indigo-600">Nexis Vision</span>
+                <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
                 <div className="d-md-flex justify-content-md-between">
                     {/* Company Details Section */}
                     <div className='text-left'>
@@ -495,8 +506,9 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 <span className="font-weight-semibold text-dark font-size-lg">Billed By:</span><br />
                                 {allloggeduser ? (
                                     <>
-                                        <span> <span className="font-weight-semibold ">Address: </span>{allloggeduser?.address}</span><br />
-                                        {/* <span>City:{allloggeduser?.city}</span><br /> */}
+                                        <p>
+                                            <span className="font-weight-semibold">Address:</span> {allloggeduser?.address}, {allloggeduser?.city}, {allloggeduser?.state}, {allloggeduser?.zip}, {allloggeduser?.country}
+                                        </p>
                                         <p> <span className="font-weight-semibold ">Email: </span> {allloggeduser?.email}</p>
                                         <p> <span className="font-weight-semibold ">Website: </span> {allloggeduser?.website}</p>
                                         <p> <span className="font-weight-semibold ">Phone: </span> {allloggeduser?.phone}</p>
@@ -519,9 +531,10 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                         {clientDataa ? (
                             <address>
                                 <p>
-                                    <span> <span className="font-weight-semibold">Address: </span> {clientDataa.address}</span><br />
-
-                                    <span> <span className="font-weight-semibold  ">Name: </span>{clientDataa.username}</span><br />
+                                <span> <span className="font-weight-semibold  ">Name: </span>{clientDataa.firstName}</span>
+                                    <p>
+                                        <span className="font-weight-semibold">Address:</span> {clientDataa.address}
+                                    </p>
                                     <p> <span className="font-weight-semibold ">Email: </span> {clientDataa.email}</p>
                                     <p> <span className="font-weight-semibold  ">Phone: </span> {clientDataa.phone}</p>
                                     <p> <span className="font-weight-semibold  ">GstIn: </span> {clientDataa.gstIn}</p>
@@ -587,7 +600,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 title="HSN/SAC"
                                 key="hsn_sac"
                                 render={(record) => {
-                                    return `${record?.hsn_sac || 0}`;
+                                    return `${record?.hsn_sac || "--"}`;
                                 }}
                             />
                             <Table.Column
@@ -708,13 +721,21 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                         </div>
                     </div>
                     <div>
+                        <div className="flex justify-end items-center">
+                        <h4 className="font-semibold text-lg mb-2">Signature:</h4>
+                        <div className='flex'>
+                            <img src={signatureimg} alt="Image not show" className='w-28 h-28' />
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                    <div className='mt-4'>
                         <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
                             <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
                             <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
                         </ol>
                     </div>
-                </div>
 
                 <div className="text-center font-semibold mt-8">
                     <p>Thanks for your Business</p>
@@ -730,8 +751,8 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
             <div className="bg-white p-8 border-2 border-gray-200">
                 {/* Header Section */}
                 <div className="flex flex-col items-center mb-8 text-center">
-                    <span className="text-2xl font-bold text-indigo-600">Nexis Vision</span>
-                    <div className="text-gray-600 mt-2">
+                    <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                    <div className="text-gray-600 mt-4">
                         <div className='flex items-center'>
                             <span className=" me-2 font-weight-semibold ">Invoice Num:</span>
                             <p className='text-right'>{invoiceDataa?.invoiceNumber}</p>
@@ -758,8 +779,9 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                     <span className="font-weight-semibold text-dark font-size-lg">Billed By:</span><br />
                                     {allloggeduser ? (
                                         <>
-                                            <span> <span className="font-weight-semibold ">Address: </span>{allloggeduser?.address}</span><br />
-                                            {/* <span>City:{allloggeduser?.city}</span><br /> */}
+                                            <p>
+                                                <span className="font-weight-semibold">Address:</span> {allloggeduser?.address}, {allloggeduser?.city}, {allloggeduser?.state}, {allloggeduser?.zip}, {allloggeduser?.country}
+                                            </p>
                                             <p> <span className="font-weight-semibold ">Email: </span> {allloggeduser?.email}</p>
                                             <p> <span className="font-weight-semibold ">Website: </span> {allloggeduser?.website}</p>
                                             <p> <span className="font-weight-semibold ">Phone: </span> {allloggeduser?.phone}</p>
@@ -786,9 +808,10 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                             {clientDataa ? (
                                 <address>
                                     <p>
-                                        <span> <span className="font-medium  ">Address: </span> {clientDataa.address}</span><br />
-
-                                        <span> <span className="font-weight-semibold ">Name: </span>{clientDataa.username}</span><br />
+                                    <span> <span className="font-weight-semibold ">Name: </span>{clientDataa.firstName}</span><br />
+                                        <p>
+                                            <span className="font-weight-semibold">Address:</span> {clientDataa.address}
+                                        </p>
                                         <p> <span className="font-weight-semibold ">Email: </span> {clientDataa.email}</p>
                                         <p> <span className="font-weight-semibold  ">Phone: </span> {clientDataa.phone}</p>
                                         <p> <span className="font-weight-semibold  ">GstIn: </span> {clientDataa.gstIn}</p>
@@ -823,7 +846,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 title="HSN/SAC"
                                 key="hsn_sac"
                                 render={(record) => {
-                                    return `${record?.hsn_sac || 0}`;
+                                    return `${record?.hsn_sac || "--"}`;
                                 }}
                             />
                             <Table.Column
@@ -944,13 +967,21 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                         </div>
                     </div>
                     <div>
+                        <div className="flex justify-end items-center">
+                        <h4 className="font-semibold text-lg mb-2">Signature:</h4>
+                        <div className='flex'>
+                            <img src={signatureimg} alt="Image not show" className='w-28 h-28' />
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                    <div className='mt-4'>
                         <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
                             <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
                             <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
                         </ol>
                     </div>
-                </div>
                 <div className="text-center font-semibold mt-8">
                     <p>Thanks for your Business</p>
                 </div>
@@ -994,8 +1025,9 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                     <span className="font-weight-semibold text-dark font-size-lg">Billed By:</span><br />
                                     {allloggeduser ? (
                                         <>
-                                            <span> <span className="font-weight-semibold">Address: </span>{allloggeduser?.address}</span><br />
-                                            {/* <span>City:{allloggeduser?.city}</span><br /> */}
+                                            <p>
+                                                <span className="font-weight-semibold">Address:</span> {allloggeduser?.address}, {allloggeduser?.city}, {allloggeduser?.state}, {allloggeduser?.zip}, {allloggeduser?.country}
+                                            </p>
                                             <p> <span className="font-weight-semibold ">Email: </span> {allloggeduser?.email}</p>
                                             <p> <span className="font-weight-semibold ">Website: </span> {allloggeduser?.website}</p>
                                             <p> <span className="font-weight-semibold ">Phone: </span> {allloggeduser?.phone}</p>
@@ -1021,9 +1053,10 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                             {clientDataa ? (
                                 <address>
                                     <p>
-                                        <span> <span className="font-medium ">Address: </span> {clientDataa.address}</span><br />
-
-                                        <span> <span className="font-weight-semibold">Name: </span>{clientDataa.username}</span><br />
+                                    <span> <span className="font-weight-semibold">Name: </span>{clientDataa.firstName}</span>
+                                        <p>
+                                            <span className="font-weight-semibold">Address:</span> {clientDataa.address}
+                                        </p>
                                         <p> <span className="font-weight-semibold">Email: </span> {clientDataa.email}</p>
                                         <p> <span className="font-weight-semibold">Phone: </span> {clientDataa.phone}</p>
                                         <p> <span className="font-weight-semibold">GstIn: </span> {clientDataa.gstIn}</p>
@@ -1058,7 +1091,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 title="HSN/SAC"
                                 key="hsn_sac"
                                 render={(record) => {
-                                    return `${record?.hsn_sac || 0}`;
+                                    return `${record?.hsn_sac || "--"}`;
                                 }}
                             />
                             <Table.Column
@@ -1180,13 +1213,21 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                         </div>
                     </div>
                     <div>
+                        <div className="flex justify-end items-center">
+                        <h4 className="font-semibold text-lg mb-2">Signature:</h4>
+                        <div className='flex'>
+                            <img src={signatureimg} alt="Image not show" className='w-28 h-28' />
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                    <div className='mt-4'>
                         <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
                             <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
                             <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
                         </ol>
                     </div>
-                </div>
                 <div className="text-center font-semibold mt-8">
                     <p>Thanks for your Business</p>
                 </div>

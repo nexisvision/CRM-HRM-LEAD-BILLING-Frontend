@@ -11,6 +11,7 @@ import {
 } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import dayjs from "dayjs";
 import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
 import { GetJobdata } from "../JobReducer/JobSlice";
@@ -60,11 +61,11 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
         setInitialValues({
           job: findofferdatas.job,
           job_applicant: findofferdatas.job_applicant,
-          offer_expiry: moment(findofferdatas.offer_expiry, "YYYY-MM-DD"),
-          expected_joining_date: moment(
-            findofferdatas.expected_joining_date,
-            "YYYY-MM-DD"
-          ), // Ensure moment conversion
+            offer_expiry: moment(findofferdatas.offer_expiry, "YYYY-MM-DD"),
+            expected_joining_date: moment(
+              findofferdatas.expected_joining_date,
+              "YYYY-MM-DD"
+            ), // Ensure moment conversion
           salary: findofferdatas.salary,
           description: findofferdatas.description,
           file: null,
@@ -132,35 +133,35 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
   //   }
   // };
 
-   const onSubmit = async (values, { resetForm }) => {
-      try {
-        const formData = new FormData();
-        
-        // Format dates
-        const formattedValues = {
-          ...values,
-          offer_expiry: values.offer_expiry ? moment(values.offer_expiry).format('YYYY-MM-DD') : null,
-          expected_joining_date: values.expected_joining_date ? moment(values.expected_joining_date).format('YYYY-MM-DD') : null,
-        };
-  
-        // Append all form values to FormData
-        Object.keys(formattedValues).forEach(key => {
-          if (key === 'file' && formattedValues[key]) {
-            formData.append('file', formattedValues[key]);
-          } else if (formattedValues[key] !== null && formattedValues[key] !== undefined) {
-            formData.append(key, formattedValues[key]);
-          }
-        });
-  
-        await dispatch(editjobofferss({idd,formData})).unwrap();
-        await dispatch(getjobofferss());
-        message.success('Job offer letter added successfully');
-        onClose();
-        resetForm();
-      } catch (error) {
-        message.error(error?.message || 'Failed to add job offer letter');
-      }
-    };
+  const onSubmit = async (values, { resetForm }) => {
+    try {
+      const formData = new FormData();
+
+      // Format dates
+      const formattedValues = {
+        ...values,
+        offer_expiry: values.offer_expiry ? moment(values.offer_expiry).format('YYYY-MM-DD') : null,
+        expected_joining_date: values.expected_joining_date ? moment(values.expected_joining_date).format('YYYY-MM-DD') : null,
+      };
+
+      // Append all form values to FormData
+      Object.keys(formattedValues).forEach(key => {
+        if (key === 'file' && formattedValues[key]) {
+          formData.append('file', formattedValues[key]);
+        } else if (formattedValues[key] !== null && formattedValues[key] !== undefined) {
+          formData.append(key, formattedValues[key]);
+        }
+      });
+
+      await dispatch(editjobofferss({ idd, formData })).unwrap();
+      await dispatch(getjobofferss());
+      message.success('Job offer letter added successfully');
+      onClose();
+      resetForm();
+    } catch (error) {
+      message.error(error?.message || 'Failed to add job offer letter');
+    }
+  };
 
   const [initialValues, setInitialValues] = useState({
     job: "",
@@ -283,7 +284,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12}>
+              {/* <Col span={12}>
                 <div className="form-item mt-2">
                   <label >Offer Expire On</label>
                   <DatePicker
@@ -299,9 +300,30 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
+              </Col> */}
+              <Col span={12} className='mt-2'>
+                <div className="form-item">
+                  <label className='font-semibold'>Offer Expire On</label>
+                  <DatePicker
+                    className="w-full"
+                    format="DD-MM-YYYY"
+                    value={values.offer_expiry ? dayjs(values.offer_expiry) : null}
+                    onChange={(date) => setFieldValue('offer_expiry', date)}
+                    onBlur={() => setFieldTouched("offer_expiry", true)}
+                    disabledDate={(current) => {
+                      // Can't select days before today
+                      return current && current < dayjs().startOf('day');
+                    }}
+                    placeholder="Select expiry date"
+                    style={{ width: '100%' }}
+                    showToday
+                    allowClear
+                  />
+                  <ErrorMessage name="offer_expiry" component="div" className="error-message text-red-500 my-1" />
+                </div>
               </Col>
 
-              <Col span={12}>
+              {/* <Col span={12}>
                 <div className="form-item mt-2">
                   <label >Expected Joining Date</label>
                  
@@ -322,13 +344,43 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
+              </Col> */}
+
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Expected Joining Date</label>
+                  <DatePicker
+                    className="w-full"
+                    format="DD-MM-YYYY"
+                    value={values.expected_joining_date ? dayjs(values.expected_joining_date) : null}
+                    onChange={(date) => setFieldValue("expected_joining_date", date)}
+                    onBlur={() => setFieldTouched("expected_joining_date", true)}
+                    disabledDate={(current) => {
+                      // Can't select days before offer expiry date
+                      const offerExpiryDate = values.offer_expiry ? dayjs(values.offer_expiry) : null;
+                      return current && (
+                        current < dayjs().startOf('day') || 
+                        (offerExpiryDate && current < offerExpiryDate)
+                      );
+                    }}
+                    placeholder="Select joining date"
+                    style={{ width: '100%' }}
+                    showToday
+                    allowClear
+                  />
+                  <ErrorMessage
+                    name="expected_joining_date"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
               </Col>
 
               <Col span={12}>
                 <div className="form-item mt-2">
                   <label >Salary</label>
                   <Field
-                  className="mt-2"
+                    className="mt-2"
                     name="salary"
                     as={Input}
                     placeholder="Enter Salary"
@@ -345,7 +397,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                 <div className="form-item mt-2">
                   <label>Rate</label>
                   <Field
-                  className="mt-2"
+                    className="mt-2"
                     name="rate"
                     as={Input}
                     placeholder="Enter Rate"
@@ -369,7 +421,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                     placeholder="Enter Description"
                   />
                   <ErrorMessage
-                
+
                     name="description"
                     component="div"
                     className="error-message text-red-500 my-1"

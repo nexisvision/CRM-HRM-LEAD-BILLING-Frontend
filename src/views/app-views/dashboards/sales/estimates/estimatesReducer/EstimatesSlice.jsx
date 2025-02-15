@@ -79,7 +79,7 @@ const initialState = {
 };
 
 const quotationsSlice = createSlice({
-  name: 'estimate',
+  name: 'salesquotations',
   initialState,
   reducers: {
     clearError: (state) => {

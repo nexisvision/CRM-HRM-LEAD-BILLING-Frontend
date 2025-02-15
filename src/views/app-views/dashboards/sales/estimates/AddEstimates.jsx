@@ -31,7 +31,7 @@ import "react-quill/dist/quill.snow.css";
 import { useSelector, useDispatch } from "react-redux";
 import { createquotations } from "./estimatesReducer/EstimatesSlice";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
-
+import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
 import * as Yup from "yup";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
 
@@ -61,10 +61,12 @@ const AddEstimates = ({ onClose }) => {
   
     useEffect(() => {
       dispatch(Getcus());
+      dispatch(getAllTaxes());
     }, []);
-  
+    const { taxes } = useSelector((state) => state.tax);
     const customerdata = useSelector((state) => state.customers);
     const fnddata = customerdata.customers.data;
+    const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   
 
   const [tableData, setTableData] = useState([
@@ -98,6 +100,8 @@ const AddEstimates = ({ onClose }) => {
           description: item.description || '',
           quantity: parseFloat(item.quantity) || 0,
           price: parseFloat(item.price) || 0,
+          tax_name: selectedTaxDetails[item.id]?.
+          gstName || '',
           tax: parseFloat(item.tax) || 0,
           amount: parseFloat(item.amount) || 0,
           discount: parseFloat(discountRate) || 0  // Store the discount rate here
@@ -131,21 +135,6 @@ const AddEstimates = ({ onClose }) => {
   };
   
 
-
-  const [rows, setRows] = useState([
-    {
-      id: Date.now(),
-      item: "",
-      quantity: "",
-      price: "",
-      discount: "",
-      tax: "",
-      amount: "0",
-      description: "",
-      isNew: false,
-    },
-  ]);
-
   // Function to handle adding a new row
   const handleAddRow = () => {
     const newRow = {
@@ -173,14 +162,6 @@ const AddEstimates = ({ onClose }) => {
 
   const navigate = useNavigate();
 
-  // Calculate discount amount
-  const calculateDiscount = () => {
-    const subTotal = calculateSubTotal();
-    if (discountType === "%") {
-      return (subTotal * (parseFloat(discountValue) || 0)) / 100;
-    }
-    return parseFloat(discountValue) || 0;
-  };
 
   // Calculate total tax
   const calculateTotalTax = () => {
@@ -242,6 +223,18 @@ const AddEstimates = ({ onClose }) => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
         
+        if (field === 'tax' && taxes?.data) {
+          const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
+          if (selectedTax) {
+            setSelectedTaxDetails(prevDetails => ({
+              ...prevDetails,
+              [id]: {
+                gstName: selectedTax.gstName,
+                gstPercentage: selectedTax.gstPercentage
+              }
+            }));
+          }
+        }
         // Calculate amount if quantity, price, or tax changes
         if (field === 'quantity' || field === 'price' || field === 'tax') {
           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
@@ -486,19 +479,19 @@ const AddEstimates = ({ onClose }) => {
                             />
                           </td>
                           <td className="px-4 py-2 border-b">
-                            <select
-                              value={row.tax}
-                              onChange={(e) => handleTableDataChange(row.id, 'tax', e.target.value)}
-                              className="w-full p-2 border rounded"
-                            >
-                              <option value="0">Nothing Selected</option>
-                              <option value="10">GST:10%</option>
-                              <option value="18">CGST:18%</option>
-                              <option value="10">VAT:10%</option>
-                              <option value="10">IGST:10%</option>
-                              <option value="10">UTGST:10%</option>
-                            </select>
-                          </td>
+                          <select
+                            value={row.tax}
+                            onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
+                            className="w-full p-2 border"
+                          >
+                            <option value="0">Nothing Selected</option>
+                            {taxes && taxes.data && taxes.data.map(tax => (
+                              <option key={tax.id} value={tax.gstPercentage}>
+                                {tax.gstName}: {tax.gstPercentage}%
+                              </option>
+                            ))}
+                          </select>
+                        </td>
                           <td className="px-4 py-2 border-b">
                             <span>{row.amount}</span>
                           </td>

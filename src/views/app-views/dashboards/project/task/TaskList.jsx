@@ -274,9 +274,9 @@ export const TaskList = () => {
     },
     {
       title: "End Date",
-      dataIndex: "endDate",
+      dataIndex: "dueDate",
       render: (date) => dayjs(date).format("DD/MM/YYYY"),
-      sorter: (a, b) => new Date(a.endDate) - new Date(b.endDate),
+      sorter: (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
     },
     // {
     //   title: "Estimated Time",
@@ -290,8 +290,8 @@ export const TaskList = () => {
     // },
     {
       title: "Assigned To",
-      dataIndex: "assignedto",
-      sorter: (a, b) => utils.antdTableSorter(a, b, "assignedto"),
+      dataIndex: "assignTo",
+      sorter: (a, b) => utils.antdTableSorter(a, b, "assignTo"),
     },
     {
       title: "status",

@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { updatequotation, getquotationsById, getallquotations } from './estimatesReducer/EstimatesSlice';
+import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
 import dayjs from 'dayjs';
 import * as Yup from 'yup';
 import { Getcus } from '../customer/CustomerReducer/CustomerSlice';
@@ -32,6 +33,9 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
         category: '',
         issueDate: null,
     });
+
+    const { taxes } = useSelector((state) => state.tax);
+    const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
 
     const [totals, setTotals] = useState({
         subtotal: 0,
@@ -115,6 +119,9 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
             message.error("Failed to add Status");
         }
     };
+    useEffect(() => {
+        dispatch(getAllTaxes());
+      }, []);
 
     // First useEffect to fetch all quotations
     useEffect(() => {
@@ -321,6 +328,18 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
     };
 
     const handleTableDataChange = (id, field, value) => {
+        if (field === 'tax' && taxes?.data) {
+            const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
+            if (selectedTax) {
+              setSelectedTaxDetails(prevDetails => ({
+                ...prevDetails,
+                [id]: {
+                  gstName: selectedTax.gstName,
+                  gstPercentage: selectedTax.gstPercentage
+                }
+              }));
+            }
+          }
         const updatedData = tableData.map((row) =>
             row.id === id ? { ...row, [field]: field === 'quantity' || field === 'price' || field === 'tax' ? parseFloat(value) || 0 : value } : row
         );
@@ -483,19 +502,19 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
                                                         />
                                                     </td>
                                                     <td className="px-4 py-2 border-b">
-                                                        <select
-                                                            value={row.tax}
-                                                            onChange={(e) => handleTableDataChange(row.id, 'tax', e.target.value)}
-                                                            className="w-full p-2 border rounded"
-                                                        >
-                                                            <option value="0">Nothing Selected</option>
-                                                            <option value="10">GST:10%</option>
-                                                            <option value="18">CGST:18%</option>
-                                                            <option value="10">VAT:10%</option>
-                                                            <option value="10">IGST:10%</option>
-                                                            <option value="10">UTGST:10%</option>
-                                                        </select>
-                                                    </td>
+                          <select
+                            value={row.tax}
+                            onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
+                            className="w-full p-2 border"
+                          >
+                            <option value="0">Nothing Selected</option>
+                            {taxes && taxes.data && taxes.data.map(tax => (
+                              <option key={tax.id} value={tax.gstPercentage}>
+                                {tax.gstName}: {tax.gstPercentage}%
+                              </option>
+                            ))}
+                          </select>
+                        </td>
                                                     <td className="px-4 py-2 border-b">
                                                         <span>{row.amount}</span>
                                                     </td>

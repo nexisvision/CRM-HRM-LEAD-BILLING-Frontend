@@ -101,6 +101,7 @@ const EditInvoice = ({ idd, onClose }) => {
 
   useEffect(() => {
     dispatch(getInvoiceById(id));
+    dispatch(getAllTaxes());
   }, [dispatch]);
 
   const [tableData, setTableData] = useState([
@@ -152,6 +153,7 @@ const EditInvoice = ({ idd, onClose }) => {
             item: selectedProd.name,
             quantity: 1,
             price: selectedProd.price,
+            hsn_sac: selectedProd.hsn_sac,
             tax: selectedProd.tax || 0,
             // tax: selectedProd.tax || 0,
             amount: selectedProd.price.toString(),
@@ -197,7 +199,8 @@ const EditInvoice = ({ idd, onClose }) => {
             price: selectedMile.milestone_cost,
             tax: 0,
             amount: selectedMile.milestone_cost.toString(),
-            description: selectedMile.milestone_summary
+            description: selectedMile.milestone_summary,
+            hsn_sac: ""
           }
         ]);
         calculateTotal([{
@@ -236,7 +239,7 @@ const EditInvoice = ({ idd, onClose }) => {
         projectName: fnddata?.project_name,
       });
 
-      // Set currency details
+      // Set currency details from the current invoice
       const selectedCurrency = curren?.find(c => c.id === currentInvoice.currency);
       if (selectedCurrency) {
         setSelectedCurrencyIcon(selectedCurrency.currencyIcon);
@@ -302,7 +305,8 @@ const EditInvoice = ({ idd, onClose }) => {
           discount_amount: itemDiscountAmount,
           base_amount: baseAmount,
           final_amount: itemTotal,
-          description: item.description || ""
+          description: item.description || "",
+          hsn_sac: item.hsn_sac || ""
         };
       });
 
@@ -313,12 +317,15 @@ const EditInvoice = ({ idd, onClose }) => {
         issueDate: values.issueDate.format("YYYY-MM-DD"),
         dueDate: values.dueDate.format("YYYY-MM-DD"),
         tax_calculation: values.calctax,
+        currencyIcon: selectedCurrencyIcon,
+        currencyCode: selectedCurrencyDetails?.currencyCode,
         items: itemsArray,
         sub_total: totals.subtotal,
         discount_type: discountType,
         discount_value: discountRate,
         total_tax: totals.totalTax,
-        final_total: totals.finalTotal
+        final_total: totals.finalTotal,
+         
       };
 
       await dispatch(updateInvoice({ idd, data: invoiceData }));
@@ -357,6 +364,7 @@ const EditInvoice = ({ idd, onClose }) => {
         tax: 0,
         amount: "0",
         description: "",
+        hsn_sac: ""
       }
     ]);
   };
@@ -445,11 +453,15 @@ const EditInvoice = ({ idd, onClose }) => {
   const handleCurrencyChange = (currencyId) => {
     const selectedCurrency = curren?.find(c => c.id === currencyId);
     if (selectedCurrency) {
-      setSelectedCurrencyIcon(selectedCurrency.currencyIcon);
-      setSelectedCurrencyDetails(selectedCurrency);
-      form.setFieldsValue({ currency: currencyId });
+      setSelectedCurrencyIcon(selectedCurrency.currencyIcon || '₹');
+      setSelectedCurrencyDetails({
+        currencyCode: selectedCurrency.currencyCode,
+        currencyIcon: selectedCurrency.currencyIcon,
+        id: selectedCurrency.id
+      });
     }
   };
+
 
   // Modify the currency form item
   const renderCurrencySelect = () => (
@@ -462,6 +474,7 @@ const EditInvoice = ({ idd, onClose }) => {
         className="w-full"
         placeholder="Select Currency"
         onChange={handleCurrencyChange}
+        value={currentInvoice?.currency}
       >
         {curren?.map((currency) => (
           <Option key={currency.id} value={currency.id}>
@@ -519,6 +532,16 @@ const EditInvoice = ({ idd, onClose }) => {
                 className="w-full p-2 border rounded"
               />
             </td>
+            <td className="px-4 py-2 border-b">
+                            <input
+                                type="text"
+                                value={row.hsn_sac || ""}
+                                onChange={(e) => handleTableDataChange(row.id, "hsn_sac", e.target.value)}
+                                placeholder="HSN/SAC"
+                                className="w-full p-2 border rounded"
+                                // readOnly={selectedProduct !== null}
+                            />
+              </td>
             <td className="px-4 py-2 border-b">
               <select
                 value={row.tax}
@@ -791,6 +814,9 @@ const EditInvoice = ({ idd, onClose }) => {
                       </th>
                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                         Discount <span className="text-red-500">*</span>
+                      </th>
+                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Hsn/Sac <span className="text-red-500">*</span>
                       </th>
                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                         TAX (%)

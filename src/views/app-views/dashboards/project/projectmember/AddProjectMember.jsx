@@ -98,12 +98,12 @@ const AddProjectMember = ({ onClose }) => {
 const loggeduserdata = useSelector((state)=>state.user.loggedInUser.username)
 
   const allempdata = useSelector((state) => state.employee);
-  const empData = allempdata?.employee?.data;
+  const empData = allempdata?.employee?.data || [];
 
-  const fndemp = empData.filter((item)=>item.created_by === loggeduserdata)
+  const fndemp = empData.filter((item)=>item?.created_by === loggeduserdata) || [];
 
   const Allpeoject = useSelector((state) => state.Project);
-  const Filterdta = Allpeoject?.Project?.data;
+  const Filterdta = Allpeoject?.Project?.data || [];
 
   const project = Filterdta.find((item) => item.id === id);
 

@@ -74,7 +74,7 @@ const currenciesState = useSelector((state) => state.currencies);
 
   const AllLoggedData = useSelector((state) => state.user);
   const loggedInUserId = AllLoggedData?.loggedInUser?.id;
-  const countries = useSelector((state) => state.countries.countries?.data || []);
+  const countries = useSelector((state) => state.countries.countries || []);
 
   const fetchLables = async (lableType, setter) => {
     try {
@@ -180,6 +180,7 @@ const currenciesState = useSelector((state) => state.currencies);
     lastName: Yup.string().required("Last Name is required"),
     telephone: Yup.string()
       .required("Please enter a valid number")
+      .matches(/^\d+$/, "Please enter only numbers")
       .nullable(),
     email: Yup.string().required("Please enter a valid email address").nullable(),
     leadStage: Yup.string().required("Lead Stage is required"),
@@ -298,7 +299,7 @@ const currenciesState = useSelector((state) => state.currencies);
     <div className="add-job-form">
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({
@@ -391,10 +392,13 @@ const currenciesState = useSelector((state) => state.currencies);
                     </Select>
                     <Field
                       name="telephone"
-                      type="text"
                       as={Input}
                       style={{ width: '70%' }}
                       placeholder="Enter Telephone"
+                     onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, '');
+              setFieldValue('telephone', value.toString());
+            }}
                     />
                   </div> 
                   <ErrorMessage

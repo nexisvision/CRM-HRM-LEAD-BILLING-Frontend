@@ -1,116 +1,198 @@
-import React, { useState } from 'react';
-import { DealStatisticViewData } from '../../../dashboards/default/DefaultDashboardData';
-import { Card, Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
-import UserView from '../../../Users/user-list/UserView';
-import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import userData from 'assets/data/user-list.data.json';
+import React, { useEffect, useState } from 'react';
+import { Card, Table, Spin } from 'antd';
+import { useSelector, useDispatch } from 'react-redux';
+import { getestimateById } from './estimatesReducer/EstimatesSlice';
+import dayjs from 'dayjs';
+import NumberFormat from 'react-number-format';
 
+function ViewEstimates({ estimateId, onClose }) {
+    const dispatch = useDispatch();
+    
+    // Get data from Redux store
+    const estimate = useSelector((state) => 
+        state.estimate.estimates.find(est => est.id === estimateId)
+    );
+    console.log('Current Estimate:', estimate); // Debug log
+    
+    const [tableData, setTableData] = useState([]);
 
-function ViewEstimates() {
-    // const [dealStatisticViewData] = useState(DealStatisticViewData);
+    // Process items data when estimate changes
+    useEffect(() => {
+        if (estimate?.items) {
+            try {
+                // Parse the items string to object if needed
+                const itemsObj = typeof estimate.items === 'string' ? 
+                    JSON.parse(estimate.items) : estimate.items;
+                console.log('Parsed Items:', itemsObj); // Debug log
 
-    const [users, setUsers] = useState(userData);
-  
+                // Convert items object to array
+                const itemsArray = Object.entries(itemsObj).map(([key, item]) => ({
+                    key,
+                    ...item
+                }));
+
+                console.log('Items Array:', itemsArray); // Debug log
+                setTableData(itemsArray);
+            } catch (error) {
+                console.error('Error processing items:', error);
+                setTableData([]);
+            }
+        }
+    }, [estimate]);
+
+    const tableColumns = [
+        {
+            title: "No.",
+            key: "index",
+            render: (text, record, index) => index + 1
+        },
+        {
+            title: "Item",
+            dataIndex: "item",
+            key: "item"
+        },
+        {
+            title: "Quantity",
+            dataIndex: "quantity",
+            key: "quantity"
+        },
+        {
+            title: "Unit Price",
+            dataIndex: "price",
+            key: "price",
+            render: (price) => (
+                <NumberFormat
+                    displayType="text"
+                    value={price || 0}
+                    // prefix={`${estimate?.currency || '₹'} `}
+                    thousandSeparator={true}
+                    decimalScale={2}
+                />
+            )
+        },
+        {
+            title: "Tax (%)",
+            dataIndex: "tax",
+            key: "tax",
+            render: (tax) => `${tax || 0}%`
+        },
+        {
+            title: "Description",
+            dataIndex: "itemDescription",
+            key: "itemDescription"
+        },
+        {
+            title: "Amount",
+            dataIndex: "amount",
+            key: "amount",
+            render: (amount) => (
+                <NumberFormat
+                    displayType="text"
+                    value={amount || 0}
+                    // prefix={`${estimate?.currency || '₹'} `}
+                    thousandSeparator={true}
+                    decimalScale={2}
+                />
+            )
+        }
+    ];
+
+    if (!estimate) {
+        return (
+            <div className="flex justify-center items-center h-full">
+                <p>No estimate data found</p>
+            </div>
+        );
+    }
+
     return (
-        <>
-          <div>
-          <div className='bg-gray-50 ml-[-24px] mr-[-24px] p-6 mt-[-53px] rounded-t-lg rounded-b-lg mb-[-24px] pb-3'>
-          <h2 className="mb-4 border-b pb-[35px] font-medium"></h2>
-            <Card className='border-0 mt-4'>
-
-                <div className="p-2">
-
-                    {/* Heading */}
-                    <h1 className="font-bold text-lg mb-1">Product Summary</h1>
-                    <p className="text-xs text-gray-500 mb-2">
-                        All items here cannot be deleted.
-                    </p>
-
-                    {/* Table */}
-                    <div className="overflow-x-auto">
-                        <table className="w-full border border-gray-300 bg-white text-center text-xs">
-                            <thead className="bg-gray-100">
-                                <tr>
-                                    <th className="px-4 py-2">#</th>
-                                    <th className="px-4 py-2">Product</th>
-                                    <th className="px-4 py-2">Quantity</th>
-                                    <th className="px-4 py-2">Rate</th>
-                                    <th className="px-4 py-2">Discount</th>
-                                    <th className="px-4 py-2">Tax</th>
-                                    <th className="px-4 py-2">Description</th>
-                                    <th className="px-4 py-2">
-                                        <span>Price</span>
-                                        <br />
-                                        <span className="text-red-500">(after tax & discount)</span>
-
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {/* Row 1 */}
-                                <tr>
-                                    <td className="px-4 py-2">1</td>
-                                    <td className="px-4 py-2">Refrigerator</td>
-                                    <td className="px-4 py-2">Piece</td>
-                                    <td className="px-4 py-2">USD 9.000,00</td>
-                                    <td className="px-4 py-2">USD 0.00</td>
-                                    <td className="px-4 py-2 text-center">
-                                        <tr><p className='flex gap-3'><span>CGST (10%)</span><span>USD 900,00</span></p></tr>
-                                        <tr><p className='flex gap-5'><span>SGST (5%)</span><span>USD 450,00</span></p></tr>
-                                    </td>
-                                    <td className="px-4 py-2">
-                                       -
-                                    </td>
-                                    <td className="px-4 py-2">USD 10.350,00</td>
-                                </tr>
-                                {/* Total Row */}
-                                <tr className="bg-gray-100 font-semibold">
-                                    <td className="px-4 py-2 text-center" colSpan="2">
-                                        Total
-                                    </td>
-                                    <td className="px-4 py-2">1</td>
-                                    <td className="px-4 py-2">USD 9.000,00</td>
-                                    <td className="px-4 py-2">USD 0,00</td>
-                                    <td className="px-4 py-2">USD 1.350,00</td>
-                                    <td className="px-4 py-2"></td>
-                                    <td className="px-4 py-2"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {/* Summary Details */}
-                    <div className="mt-3 flex flex-col items-end space-y-2 text-xs">
-                        <div className="flex justify-between w-full sm:w-1/3 border-b pb-2">
-                            <span className="text-gray-700">Sub Total</span>
-                            <span className="text-gray-700">USD 9.000,00</span>
-                        </div>
-                        <div className="flex justify-between w-full sm:w-1/3 border-b pb-2">
-                            <span className="text-gray-700">Discount</span>
-                            <span className="text-gray-700">USD 0,00</span>
-                        </div>
-                        <div className="flex justify-between w-full sm:w-1/3 border-b pb-2">
-                            <span className="text-gray-700">CGST</span>
-                            <span className="text-gray-700">USD 900,00</span>
-                        </div>
-                        <div className="flex justify-between w-full sm:w-1/3 border-b pb-2">
-                            <span className="text-gray-700">SGST</span>
-                            <span className="text-gray-700">USD 450,00</span>
-                        </div>
-                        <div className="flex justify-between w-full sm:w-1/3 border-b pb-2">
-                            <span className="text-gray-700">Total</span>
-                            <span className="text-gray-700">USD 10.350,00</span>
+        <div className='ml-[-24px] mr-[-24px] mt-[-52px] mb-[-24px] bg-gray-50 rounded-t-lg rounded-b-lg'>   
+            <div className="p-4">
+                <h2 className="border-b pb-[30px] font-medium"></h2>
+                <Card bordered={false} className='mt-3'>
+                    {/* Header Information */}
+                    <div className="mb-6">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-lg mb-2">
+                                    <strong>Quotation Number:</strong> {estimate.quotationNumber}
+                                </p>
+                                <p className="text-lg mb-2">
+                                    <strong>Date:</strong> {dayjs(estimate.createdAt).format('DD/MM/YYYY')}
+                                </p>
+                                {/* <p className="text-lg mb-2">
+                                    <strong>Valid Till:</strong> {dayjs(estimate.valid_till).format('DD/MM/YYYY')}
+                                </p>
+                                <p className="text-lg mb-2">
+                                    <strong>Client:</strong> {estimate.client}
+                                </p> */}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </Card>
-            </div>
-            </div>
 
-        </>
-    )
+                    {/* Items Table */}
+                    <div className="mb-6">
+                        <Table
+                            columns={tableColumns}
+                            dataSource={tableData}
+                            pagination={false}
+                            bordered
+                        />
+                    </div>
+
+                    {/* Summary Section */}
+                    <div className="flex justify-end mt-4">
+                        <div className="w-72">
+                            <div className="p-4 rounded">
+                                <div className="flex justify-between mb-2">
+                                    <span className="font-semibold">Subtotal:</span>
+                                    <NumberFormat
+                                        displayType="text"
+                                        value={tableData.reduce((sum, item) => 
+                                            sum + parseFloat(item.amount || 0), 0
+                                        )}
+                                        // prefix={`${estimate.currency || '₹'} `}
+                                        thousandSeparator={true}
+                                        decimalScale={2}
+                                    />
+                                </div>
+                                <div className="flex justify-between mb-2">
+                                    <span className="font-semibold">Discount:</span>
+                                    <NumberFormat
+                                        displayType="text"
+                                        value={estimate.discount || 0}
+                                        suffix="%"
+                                        thousandSeparator={true}
+                                        decimalScale={2}
+                                    />
+                                </div>
+                                <div className="flex justify-between mb-2">
+                                    <span className="font-semibold">Tax:</span>
+                                    <NumberFormat
+                                        displayType="text"
+                                        value={estimate.tax || 0}
+                                        // prefix={`${estimate.currency || '₹'} `}
+                                        thousandSeparator={true}
+                                        decimalScale={2}
+                                    />
+                                </div>
+                                <div className="flex justify-between font-bold border-t pt-2 mt-2">
+                                    <span>Total:</span>
+                                    <NumberFormat
+                                        displayType="text"
+                                        value={estimate.total || 0}
+                                        // prefix={`${estimate.currency || '₹'} `}
+                                        thousandSeparator={true}
+                                        decimalScale={2}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Card>
+            </div>
+        </div>
+    );
 }
 
 export default ViewEstimates;

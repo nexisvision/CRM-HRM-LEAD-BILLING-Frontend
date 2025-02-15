@@ -41,6 +41,7 @@ function ProductSummaryList({ billingId }) {
                             quantity: item.quantity,
                             unitPrice: item.unitPrice,
                             tax: item.tax,
+                            tax_name: item.tax_name,
                             amount: item.amount
                         }));
                         
@@ -121,6 +122,20 @@ function ProductSummaryList({ billingId }) {
             key: "tax",
             render: (tax) => `${tax || 0}%`
         },
+        {
+            title: "GST Name",
+            dataIndex: "tax_name",
+            key: "tax_name",
+            render: (tax_name) => tax_name || 'N/A'
+        },
+        // <Table.Column
+        //                         title="GST Name"
+        //                         key="GST Name"
+        //                         render={(record) => {
+        //                             return record?.tax_name || 'N/A';
+        //                         }}
+        //                     />
+
         {
             title: "Amount",
             dataIndex: "amount",

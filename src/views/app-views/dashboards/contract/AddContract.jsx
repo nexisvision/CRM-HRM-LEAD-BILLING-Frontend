@@ -174,7 +174,7 @@ const AddContract = ({ onClose }) => {
         // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
-        {({ handleSubmit, setFieldValue, values }) => (
+        {({ handleSubmit, setFieldValue, values,setFieldTouched }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
             <Row gutter={16}>
               <Col span={12}>
@@ -502,22 +502,17 @@ const AddContract = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
-                  <Field name="startDate">
-                    {({ field }) => (
-                      <DatePicker
-                        className="w-full"
-                        format="YYYY-MM-DD"
-                        onChange={(date) => {
-                          const formattedDate = date ? date.toDate() : null;
-                          setFieldValue("startDate", formattedDate);
-                        }}
-                        value={values.startDate ? moment(values.startDate) : null}
-                      />
-                    )}
-                  </Field>
+                  <label className="font-semibold ">StartDate <span className="text-rose-500">*</span></label>
+                  <DatePicker
+                    name="startDate"
+                    className="w-full mt-1"
+                    placeholder="Select startDate"
+                    onChange={(value) => setFieldValue("startDate", value)}
+                    value={values.startDate}
+                    onBlur={() => setFieldTouched("startDate", true)}
+                  />
                   <ErrorMessage
                     name="startDate"
                     component="div"
@@ -526,22 +521,17 @@ const AddContract = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">End Date <span className="text-red-500">*</span></label>
-                  <Field name="endDate">
-                    {({ field }) => (
-                      <DatePicker
-                        className="w-full mt-1"
-                        format="YYYY-MM-DD"
-                        onChange={(date) => {
-                          const formattedDate = date ? date.toDate() : null;
-                          setFieldValue("endDate", formattedDate);
-                        }}
-                        value={values.endDate ? moment(values.endDate) : null}
-                      />
-                    )}
-                  </Field>
+                  <label className="font-semibold ">EndDate <span className="text-rose-500">*</span></label>
+                  <DatePicker
+                    name="endDate"
+                    className="w-full mt-1"
+                    placeholder="Select endDate"
+                    onChange={(value) => setFieldValue("endDate", value)}
+                    value={values.endDate}
+                    onBlur={() => setFieldTouched("endDate", true)}
+                  />
                   <ErrorMessage
                     name="endDate"
                     component="div"

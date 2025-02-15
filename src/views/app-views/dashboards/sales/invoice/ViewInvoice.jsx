@@ -11,6 +11,7 @@ import { useParams } from 'react-router-dom';
 import { ClientData } from 'views/app-views/Users/client-list/CompanyReducers/CompanySlice';
 import { getInvoice } from './InvoiceReducer/InvoiceSlice';
 import { Getcus } from '../customer/CustomerReducer/CustomerSlice';
+import signatureimg from '../../../../../assets/svg/signatureimg1.png';
 
 
 const { Column } = Table;
@@ -277,7 +278,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     <div className="flex justify-between items-center">
                         <h1 className="text-3xl text-gray-700">Invoice</h1>
                         <div className="flex items-center">
-                            <span className="text-xl ml-2 text-indigo-500">Nexis Vision</span>
+                            <span className="text-xl ml-2 text-indigo-500"> Company Logo</span>
                         </div>
                     </div>
                 </div>
@@ -310,10 +311,10 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                 <span className="font-weight-semibold text-dark font-size-md">
                                     Billed By:</span><br />
                                         <span>
-                                            <span className="font-weight-semibold">created_by:</span> {loggedInUser?.created_by}</span><br />  
-                                        <span><span className="font-weight-semibold">Name:</span> {loggedInUser?.username}</span><br />
+                                            <span className="font-weight-semibold">Address:</span> {loggedInUser?.Address}</span><br />  
                                         <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
                                         <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
+                                        <span><span className="font-weight-semibold">GstNumber:</span> {loggedInUser?.gstIn}</span><br />
                             </p>
                         </address>
                         </div>
@@ -371,6 +372,12 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                 title="Tax (%)"
                                 render={(record) => `${record.tax_percentage || 0}%`}
                                 key="tax_percentage"
+                            />
+
+                            <Table.Column
+                                title="Gst Name"
+                                render={(record) => `${record.tax_name || "--"}`}
+                                key="tax_name"
                             />
                             <Table.Column
                                 title="Amount"
@@ -438,6 +445,15 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             </div>
                         </div>
                     </div>
+
+                    <div>
+                        <div className="flex justify-end items-center">
+                        <h4 className="font-semibold text-lg mb-2">Signature:</h4>
+                        <div className='flex'>
+                            <img src={signatureimg} alt="Image not show" className='w-28 h-28' />
+                        </div>
+                        </div>
+                    </div>
                 {/* </div> */}
                 <div>
                         <h4 className="font-semibold text-lg mb-2">Terms & Conditions:</h4>
@@ -461,19 +477,18 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
         return (
             <div className="bg-white rounded-lg shadow-lg p-8">
-                <span className="text-2xl font-bold text-indigo-600">Nexis Vision</span>
-                <div className="d-md-flex justify-content-md-between">
+                <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                <div className="d-md-flex justify-content-md-between mt-4">
                     {/* Company Details Section */}
                     <div className='text-left'>
                         <address>
                             <p>
 
                                 <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
-                                        <span><span className="font-weight-semibold">created_by:</span> {loggedInUser?.created_by}</span><br />
-                                        <span><span className="font-weight-semibold">Name:</span> {loggedInUser?.username}</span><br />
+                                        <span><span className="font-weight-semibold">Address:</span> {loggedInUser?.Address}</span><br />
                                         <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
                                         <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
-                                        <p><span className="font-weight-semibold">GstNum:</span> {loggedInUser?.gstIn}</p>
+                                        <p><span className="font-weight-semibold">GstNumber:</span> {loggedInUser?.gstIn}</p>
                             </p>
                         </address>
                     </div>
@@ -492,6 +507,9 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                         <span className="font-weight-semibold">Zip:</span> {billingAddress.zip}, <br />
                                         <span className="font-weight-semibold">Country:</span> {billingAddress.country}
                                     </p>
+                                     {/* <p>
+                                    <span className="font-weight-semibold">Address:</span> {cleanStreet}, {billingAddress.city}, {billingAddress.state}, {billingAddress.zip}, {billingAddress.country}
+                                </p> */}
                                     <p><span className="font-weight-semibold">Email:</span> {customerData.email}</p>
                                     <p><span className="font-weight-semibold">Phone:</span> {customerData.contact}</p>
                                 </p>
@@ -543,6 +561,11 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                 title="Tax (%)"
                                 render={(record) => `${record.tax_percentage || 0}%`}
                                 key="tax_percentage"
+                            />
+                            <Table.Column
+                                title="Gst Name"
+                                render={(record) => `${record.tax_name || "--"}`}
+                                key="tax_name"
                             />
                             <Table.Column
                                 title="Amount"
@@ -610,6 +633,14 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             </div>
                         </div>
                     </div>
+                    <div>
+                        <div className="flex justify-end items-center">
+                        <h4 className="font-semibold text-lg mb-2">Signature:</h4>
+                        <div className='flex'>
+                            <img src={signatureimg} alt="Image not show" className='w-28 h-28' />
+                        </div>
+                        </div>
+                    </div>
                     {/* </div> */}
                     <div>
                         <h4><span className="font-weight-semibold text-lg">Terms & Conditions:</span></h4>
@@ -634,7 +665,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
             <div className="bg-white p-8 border-2 border-gray-200">
                 {/* Header Section */}
                 <div className="flex flex-col items-center mb-8 text-center">
-                    <span className="text-2xl font-bold text-indigo-600">Nexis Vision</span>
+                    <span className="text-2xl font-bold text-indigo-600"> Company Logo</span>
                     <div className="text-gray-600 mt-2">
                         <div className='flex'>
                             <span className="mb-1 me-2 font-weight-semibold">Invoice Number :</span>
@@ -660,10 +691,10 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             <p>
 
                                 <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
-                                        <span><span className="font-weight-semibold">created_by:</span> {loggedInUser?.created_by}</span><br />
-                                        <span><span className="font-weight-semibold">Name:</span> {loggedInUser?.username}</span><br />
+                                        <span><span className="font-weight-semibold">Address:</span> {loggedInUser?.Address}</span><br />
                                         <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
                                         <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
+                                        <span><span className="font-weight-semibold">GstNumber:</span> {loggedInUser?.gstIn}</span><br />
                             </p>
                         </address>
                         </div>
@@ -677,7 +708,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             <address>
                                 <p>
                                     <span><span className="font-weight-semibold">Name:</span> {customerData.name}</span><br />
-                                    <span><span className="font-weight-semibold">customerNumber:</span> {customerData.customerNumber}</span><br />
+                                    {/* <span><span className="font-weight-semibold">customerNumber:</span> {customerData.customerNumber}</span><br /> */}
                                     <p>
                                         <span className="font-weight-semibold">Address:</span> {cleanStreet}, <br />
                                         <span className="font-weight-semibold">City:</span> {billingAddress.city}, <br />
@@ -722,6 +753,13 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                 render={(record) => `${record.tax_percentage || 0}%`}
                                 key="tax_percentage"
                             />
+
+                            <Table.Column
+                                title="Gst Name"
+                                render={(record) => `${record.tax_name || "--"}`}
+                                key="tax_name"
+                            />
+
                             <Table.Column
                                 title="Amount"
                                 render={(record) => (
@@ -788,6 +826,14 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             </div>
                     </div>
                 </div>
+                <div>
+                        <div className="flex justify-end items-center">
+                        <h4 className="font-semibold text-lg mb-2">Signature:</h4>
+                        <div className='flex'>
+                            <img src={signatureimg} alt="Image not show" className='w-28 h-28' />
+                        </div>
+                        </div>
+                    </div>
                     <div>
                         <h4 className=""><span className="font-weight-semibold text-lg">Terms & Conditions:</span></h4>
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
@@ -837,10 +883,10 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             <p>
 
                                 <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
-                                        <span><span className="font-weight-semibold">created_by:</span> {loggedInUser?.created_by}</span><br />
-                                        <span><span className="font-weight-semibold">Name:</span> {loggedInUser?.username}</span><br />
+                                        <span><span className="font-weight-semibold">Address:</span> {loggedInUser?.Address}</span><br />
                                         <p><span className="font-weight-semibold">Email:</span> {loggedInUser?.email}</p>
                                         <p><span className="font-weight-semibold">Phone:</span> {loggedInUser?.phone}</p>
+                                        <span><span className="font-weight-semibold">GstNumber:</span> {loggedInUser?.gstIn}</span><br />
                             </p>
                         </address>
                         </div>
@@ -898,6 +944,13 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                 render={(record) => `${record.tax_percentage || 0}%`}
                                 key="tax_percentage"
                             />
+
+                            <Table.Column
+                                title="Gst Name"
+                                render={(record) => `${record.tax_name || "--"}`}
+                                key="tax_name"
+                            />
+
                             <Table.Column
                                 title="Amount"
                                 render={(record) => (
@@ -965,6 +1018,14 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                         </div>
                     </div>
                 {/* </div> */}
+                <div>
+                        <div className="flex justify-end items-center">
+                        <h4 className="font-semibold text-lg mb-2">Signature:</h4>
+                        <div className='flex'>
+                            <img src={signatureimg} alt="Image not show" className='w-28 h-28' />
+                        </div>
+                        </div>
+                    </div>
                 <div>
                         <h4><span className="font-weight-semibold text-lg">Terms & Conditions:</span></h4>
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">

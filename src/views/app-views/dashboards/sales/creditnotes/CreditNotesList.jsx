@@ -74,6 +74,7 @@ const CreditNotesList = () => {
     useState(false);
   const [isViewCreditNotesModalVisible, setIsViewCreditNotesModalVisible] =
     useState(false);
+    const [selectedCreditNoteId, setSelectedCreditNoteId] = useState(null);
 
   const [idd, setIdd] = useState("");
 
@@ -85,6 +86,11 @@ const CreditNotesList = () => {
     dispatch(getcreditnote());
     dispatch(getInvoice());
   }, [dispatch]);
+
+  const handleView = (creditNoteId) => {
+    setSelectedCreditNoteId(creditNoteId);
+    setIsViewCreditNotesModalVisible(true);
+};
 
   useEffect(() => {
     if (creditNotesData && invoicesData) {
@@ -126,8 +132,9 @@ const CreditNotesList = () => {
 
   // Close Add Job Modal
   const closeViewCreditNotesModal = () => {
+    setSelectedCreditNoteId(null);
     setIsViewCreditNotesModalVisible(false);
-  };
+};
 
   const deletefun = (userId) => {
     dispatch(deletecreditnote(userId)).then(() => {
@@ -195,7 +202,7 @@ const CreditNotesList = () => {
             type=""
             className=""
             icon={<EyeOutlined />}
-            onClick={openviewCreditNotesModal}
+            onClick={() => handleView(row.id)}
             size="small"
           >
             <span className="">View Details</span>
@@ -385,14 +392,14 @@ const CreditNotesList = () => {
         </Modal>
 
         <Modal
-          title="View Credite Notes"
+          title={<h2 className="text-xl font-medium">View Credit Note</h2>}
           visible={isViewCreditNotesModalVisible}
           onCancel={closeViewCreditNotesModal}
           footer={null}
           width={1000}
           className="mt-[-70px]"
         >
-          <ViewCreditNotes onClose={closeViewCreditNotesModal} />
+          <ViewCreditNotes creditNoteId={selectedCreditNoteId} onClose={closeViewCreditNotesModal} />
         </Modal>
       </Card>
     </>
