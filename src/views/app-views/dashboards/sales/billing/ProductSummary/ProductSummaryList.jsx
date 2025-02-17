@@ -30,27 +30,49 @@ function ProductSummaryList({ billingId }) {
                         ? JSON.parse(selectedBilling.discription) 
                         : selectedBilling.discription;
 
-                    // Check if description and items exist
-                    if (description && Array.isArray(description.items)) {
-                        const items = description.items.map((item, index) => ({
-                            id: index,
-                            billNumber: selectedBilling.billNumber,
-                            billDate: selectedBilling.billDate,
-                            vendor: selectedBilling.vendor,
-                            product: item.name,
-                            quantity: item.quantity,
-                            unitPrice: item.unitPrice,
-                            tax: item.tax,
-                            tax_name: item.tax_name,
-                            amount: item.amount
-                        }));
+                    // Check if description exists
+                    if (description) {
+                        const items = [];
+                        
+                        // Handle both single item and array of items
+                        if (Array.isArray(description.items)) {
+                            items.push(...description.items.map((item, index) => ({
+                                id: index,
+                                billNumber: selectedBilling.billNumber,
+                                billDate: selectedBilling.billDate,
+                                vendor: selectedBilling.vendor,
+                                product: item.name,
+                                quantity: item.quantity,
+                                unitPrice: item.unitPrice,
+                                tax: item.tax,
+                                tax_name: item.tax_name,
+                                amount: item.amount,
+                                // Add any additional fields from database
+                                ...item
+                            })));
+                        } else {
+                            // If it's a single item
+                            items.push({
+                                id: 0,
+                                billNumber: selectedBilling.billNumber,
+                                billDate: selectedBilling.billDate,
+                                vendor: selectedBilling.vendor,
+                                product: description.name,
+                                quantity: description.quantity,
+                                unitPrice: description.unitPrice,
+                                tax: description.tax,
+                                tax_name: description.tax_name,
+                                amount: description.amount,
+                                // Add any additional fields from database
+                                ...description
+                            });
+                        }
                         
                         setBillingData(items);
                         calculateTotals(selectedBilling);
                     } else {
-                        // If no items, set empty array
                         setBillingData([]);
-                        console.warn('No items found in billing description');
+                        console.warn('No description found in billing data');
                     }
                 } catch (error) {
                     console.error('Error processing billing data:', error);
@@ -64,7 +86,7 @@ function ProductSummaryList({ billingId }) {
         if (!billing) return;
 
         setTotals({
-            subtotal: billing.total + billing.discount || 0,
+            // subtotal: billing.total - billing.discount + billing.tax || 0,
             discount: billing.discount || 0,
             tax: billing.tax || 0,
             total: billing.total || 0
@@ -128,14 +150,6 @@ function ProductSummaryList({ billingId }) {
             key: "tax_name",
             render: (tax_name) => tax_name || 'N/A'
         },
-        // <Table.Column
-        //                         title="GST Name"
-        //                         key="GST Name"
-        //                         render={(record) => {
-        //                             return record?.tax_name || 'N/A';
-        //                         }}
-        //                     />
-
         {
             title: "Amount",
             dataIndex: "amount",
@@ -176,7 +190,7 @@ function ProductSummaryList({ billingId }) {
                                     <span className='font-weight-semibold'>Sub-Total : </span>
                                     <NumberFormat
                                         displayType="text"
-                                        value={totals.subtotal}
+                                        value={billingData.reduce((sum, item) => sum + (Number(item.amount) || 0), 0)}
                                         prefix="₹"
                                         thousandSeparator={true}
                                     />

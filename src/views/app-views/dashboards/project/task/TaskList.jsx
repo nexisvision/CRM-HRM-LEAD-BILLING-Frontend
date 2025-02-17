@@ -46,6 +46,7 @@ import TaskView from "./TaskView";
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteTasks, GetTasks } from "./TaskReducer/TaskSlice";
 import { AnnualStatisticData } from "../../default/DefaultDashboardData";
+import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 
 const { Column } = Table;
 
@@ -92,6 +93,7 @@ export const TaskList = () => {
 
   const alldatatask = useSelector((state) => state.Tasks);
   const fnddata = alldatatask.Tasks.data;
+  const employees = useSelector((state) => state.employee?.employee?.data || []);
 
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -141,6 +143,7 @@ export const TaskList = () => {
     }
   };
   useEffect(() => {
+    dispatch(empdata());
     dispatch(GetTasks(id));
   }, [dispatch]);
 
@@ -149,6 +152,32 @@ export const TaskList = () => {
       setList(fnddata);
     }
   }, [fnddata]);
+
+  // Format tasks with employee names
+  useEffect(() => {
+    if (fnddata && employees?.length > 0) {
+      try {
+        const formattedTasks = fnddata.map(task => {
+          // Parse the assignTo JSON string to array
+          const assignToIds = JSON.parse(task.assignTo || "[]");
+          
+          // Map IDs to employee names
+          const employeeNames = assignToIds.map(empId => {
+            const employee = employees.find(emp => emp.id === empId);
+            return employee?.firstName || 'Unknown';
+          });
+
+          return {
+            ...task,
+            assignToName: employeeNames.join(', ') || 'Not Assigned'
+          };
+        });
+        setList(formattedTasks);
+      } catch (error) {
+        console.error('Error formatting tasks:', error);
+      }
+    }
+  }, [fnddata, employees]);
 
   useEffect(() => {
     // Load pinned tasks from local storage on component mount
@@ -291,7 +320,16 @@ export const TaskList = () => {
     {
       title: "Assigned To",
       dataIndex: "assignTo",
-      sorter: (a, b) => utils.antdTableSorter(a, b, "assignTo"),
+      render: (_, record) => (
+        <span>
+          {record.assignToName || 'Not Assigned'}
+        </span>
+      ),
+      sorter: (a, b) => {
+        const nameA = a.assignToName || '';
+        const nameB = b.assignToName || '';
+        return nameA.localeCompare(nameB);
+      },
     },
     {
       title: "status",

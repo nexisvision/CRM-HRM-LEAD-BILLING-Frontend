@@ -110,6 +110,7 @@ const ProductSummaryList = ({ selectedCreditNote, invoiceData }) => {
         {
             title: 'No.',
             key: 'index',
+            width: 70,
             render: (text, record, index) => index + 1,
         },
         {
@@ -121,11 +122,13 @@ const ProductSummaryList = ({ selectedCreditNote, invoiceData }) => {
             title: 'Quantity',
             dataIndex: 'quantity',
             key: 'quantity',
+            width: 100,
         },
         {
             title: 'Price',
             dataIndex: 'price',
             key: 'price',
+            width: 120,
             render: (price) => (
                 <NumberFormat
                     displayType="text"
@@ -133,6 +136,7 @@ const ProductSummaryList = ({ selectedCreditNote, invoiceData }) => {
                     prefix="₹"
                     thousandSeparator={true}
                     decimalScale={2}
+                    className="text-gray-700"
                 />
             )
         },
@@ -171,89 +175,99 @@ const ProductSummaryList = ({ selectedCreditNote, invoiceData }) => {
     ];
 
     if (!parsedInvoice) {
-        return <div>Loading invoice details...</div>;
+        return (
+            <div className="flex justify-center items-center h-64">
+                <div className="animate-pulse text-gray-500">Loading invoice details...</div>
+            </div>
+        );
     }
 
     return (
-       
-        <div className='ml-[-24px] mr-[-24px] mt-[-52px] mb-[-24px] bg-gray-50 rounded-t-lg rounded-b-lg'>   
-                <div className="p-4">
-                 <h2 className="mb-3 border-b pb-[5px] font-medium"></h2>
-            {/* Invoice Details Header */}
-            <div>
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <p className="mb-2">
-                            <span className="font-semibold text-lg">Invoice Number: </span>
-                           <span className='text-lg font-medium'> {invoiceData.salesInvoiceNumber}</span>
-                        </p>
-                        <p className="mb-2">
-                            <span className="font-semibold text-lg">Issue Date: </span>
-                            <span className='text-lg font-medium'>{dayjs(invoiceData.date).format('DD/MM/YYYY')}</span>
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            {/* Items Table */}
-            <div className='table-responsive'>
-            <Table
-                columns={columns}
-                dataSource={parsedInvoice.items}
-                pagination={false}
-                rowKey={(record) => record.key}
-                className="mb-6"
-            />
-            </div>
-
-            {/* Summary Section */}
-            <div className="flex justify-end mt-4">
-                <div className="w-72">
-                    <div className="bg-gray-50 p-4 rounded">
-                        <div className="flex justify-between mb-2">
-                            <span className="font-medium">Subtotal:</span>
-                            <NumberFormat
-                                displayType="text"
-                                value={totals.subtotal}
-                                prefix="₹"
-                                thousandSeparator={true}
-                                decimalScale={2}
-                            />
+        <div className="bg-white rounded-lg ">
+            {/* Header Section */}
+            <h2 className="mb-3 border-b pb-[5px] font-medium"></h2>
+                {/* Invoice Info */}
+                <div className="flex justify-end gap-8">
+                    <div className="space-y-2">
+                        <div className="flex items-center text-lg">
+                            <span className="text-gray-600 font-semibold ">Invoice Number:</span>
+                            <span className="font-medium text-gray-800">{invoiceData.salesInvoiceNumber}</span>
                         </div>
-                        <div className="flex justify-between mb-2">
-                            <span className="font-medium">Discount ({totals.discountPercentage}%):</span>
-                            <NumberFormat
-                                displayType="text"
-                                value={totals.discountAmount}
-                                prefix="₹"
-                                thousandSeparator={true}
-                                decimalScale={2}
-                            />
-                        </div>
-                        <div className="flex justify-between mb-2">
-                            <span className="font-medium">Tax:</span>
-                            <NumberFormat
-                                displayType="text"
-                                value={totals.tax}
-                                prefix="₹"
-                                thousandSeparator={true}
-                                decimalScale={2}
-                            />
-                        </div>
-                        <div className="flex justify-between pt-2 mt-2 border-t border-gray-200">
-                            <span className="font-semibold">Total:</span>
-                            <NumberFormat
-                                displayType="text"
-                                value={totals.total}
-                                prefix="₹"
-                                thousandSeparator={true}
-                                decimalScale={2}
-                            />
+                        <div className="flex items-center text-lg">
+                            <span className="text-gray-600 font-semibold ">Issue Date:</span>
+                            <span className="font-medium text-gray-800">
+                                {dayjs(invoiceData.date).format('DD/MM/YYYY')}
+                            </span>
                         </div>
                     </div>
                 </div>
-            </div>
-            
+           
+
+            {/* Table Section */}
+            <div className="table-responsive mt-3">
+                <Table
+                    columns={columns}
+                    dataSource={parsedInvoice.items}
+                    pagination={false}
+                    rowKey={(record) => record.key}
+                    className="mb-6"
+                    bordered
+                    scroll={{ x: 'max-content' }}
+                />
+
+                {/* Summary Section */}
+                <div className="flex justify-end">
+                    <div className="w-64 rounded-lg pb-4">
+                        <div className="space-y-3">
+                            <div className="flex justify-between text-gray-600">
+                                <span>Subtotal:</span>
+                                <NumberFormat
+                                    displayType="text"
+                                    value={totals.subtotal}
+                                    prefix="₹"
+                                    thousandSeparator={true}
+                                    decimalScale={2}
+                                    className="font-medium"
+                                />
+                            </div>
+                            <div className="flex justify-between text-gray-600">
+                                <span>Discount ({totals.discountPercentage}%):</span>
+                                <NumberFormat
+                                    displayType="text"
+                                    value={totals.discountAmount}
+                                    prefix="₹"
+                                    thousandSeparator={true}
+                                    decimalScale={2}
+                                    className="font-medium text-red-500"
+                                />
+                            </div>
+                            <div className="flex justify-between text-gray-600">
+                                <span>Tax:</span>
+                                <NumberFormat
+                                    displayType="text"
+                                    value={totals.tax}
+                                    prefix="₹"
+                                    thousandSeparator={true}
+                                    decimalScale={2}
+                                    className="font-medium"
+                                />
+                            </div>
+                            <div className="border-t border-gray-200 pt-3 mt-3">
+                                <div className="flex justify-between">
+                                    <span className="font-semibold text-gray-800">Total:</span>
+                                    <NumberFormat
+                                        displayType="text"
+                                        value={totals.total}
+                                        prefix="₹"
+                                        thousandSeparator={true}
+                                        decimalScale={2}
+                                        className="font-semibold text-gray-800"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

@@ -23,6 +23,10 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteEmp, empdata } from "./EmployeeReducers/EmployeeSlice";
 import { roledata } from "../RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice";
+import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
+import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
+import { getBranch } from "../Branch/BranchReducer/BranchSlice";
+import moment from "moment";
 
 const EmployeeList = () => {
   // State declarations
@@ -48,9 +52,61 @@ const EmployeeList = () => {
   const allroledata = useSelector((state) => state.role);
   const fndroledata = allroledata.role.data;
 
+  const departmentData = useSelector((state) => state.Department?.Department?.data || []);
+  const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
+  const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
+
   useEffect(() => {
     dispatch(roledata());
   }, []);
+
+  useEffect(() => {
+    // Fetch all required data
+    dispatch(empdata());
+    dispatch(getDept());
+    dispatch(getDes());
+    dispatch(getBranch());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (tabledata && tabledata.employee && tabledata.employee.data) {
+      const datas = tabledata.employee.data;
+
+      if (datas) {
+        // Filter employees by created_by matching the logged-in user's username
+        const filteredData = datas.filter(
+          (item) => item.created_by === user && item.employeeId
+        );
+
+        // Map the data to include names instead of IDs
+        const mappedData = filteredData.map(employee => {
+          // Find corresponding department
+          const department = departmentData.find(
+            dept => dept.id === employee.department
+          );
+
+          // Find corresponding designation
+          const designation = designationData.find(
+            desig => desig.id === employee.designation
+          );
+
+          // Find corresponding branch
+          const branch = branchData.find(
+            br => br.id === employee.branch
+          );
+
+          return {
+            ...employee,
+            department: department?.department_name || 'N/A',
+            designation: designation?.designation_name || 'N/A',
+            branch: branch?.branchName || 'N/A'
+          };
+        });
+
+        setUsers(mappedData);
+      }
+    }
+  }, [tabledata, user, departmentData, designationData, branchData]);
 
   // Modal handlers
   const openAddEmployeeModal = () => setIsAddEmployeeModalVisible(true);
@@ -157,25 +213,6 @@ const EmployeeList = () => {
   useEffect(()=>{
     dispatch(empdata())
   },[dispatch])
-
-
-
-
-  useEffect(() => {
-    if (tabledata && tabledata.employee && tabledata.employee.data) {
-      const datas = tabledata.employee.data;
-
-      if (datas) {
-        // Filter employees by created_by matching the logged-in user's username
-        const filteredData = datas.filter(
-          (item) => item.created_by === user && item.employeeId
-        );
-
-        setUsers(filteredData); // Set the filtered users
-      }
-    }
-  }, [tabledata, user,dispatch]);
-
 
 
 
@@ -294,44 +331,70 @@ const EmployeeList = () => {
     },
     {
       title: "User",
-      dataIndex: `username` || `firstName`,
+      dataIndex: "username",
       sorter: {
-        compare: (a, b) => a.firstName.length - b.firstName.length,
+        compare: (a, b) => {
+          if (a.username && b.username) {
+            return a.username.localeCompare(b.username);
+          }
+          return 0;
+        },
       },
     },
     {
       title: "Branch",
       dataIndex: "branch",
       sorter: {
-        compare: (a, b) => a.branch.length - b.branch.length,
+        compare: (a, b) => {
+          if (a.branch && b.branch) {
+            return a.branch.localeCompare(b.branch);
+          }
+          return 0;
+        },
       },
     },
     {
       title: "Department",
       dataIndex: "department",
       sorter: {
-        compare: (a, b) => a.department.length - b.department.length,
+        compare: (a, b) => {
+          if (a.department && b.department) {
+            return a.department.localeCompare(b.department);
+          }
+          return 0;
+        },
       },
     },
     {
       title: "Designation",
       dataIndex: "designation",
       sorter: {
-        compare: (a, b) => a.designation.length - b.designation.length,
+        compare: (a, b) => {
+          if (a.designation && b.designation) {
+            return a.designation.localeCompare(b.designation);
+          }
+          return 0;
+        },
       },
     },
     {
       title: "Date OF Joining",
       dataIndex: "joiningDate",
+      render: (text) => {
+        return text ? moment(text).format('DD-MM-YYYY') : 'N/A';
+      },
       sorter: {
-        compare: (a, b) => a.dateofjoining.length - b.dateofjoining.length,
+        compare: (a, b) => moment(a.joiningDate) - moment(b.joiningDate),
       },
     },
     {
-      title: "Last online",
-      dataIndex: "lastOnline",
+      title: "Leave Date",
+      dataIndex: "leaveDate",
+      render: (text) => {
+        return text ? moment(text).format('DD-MM-YYYY') : 'N/A';
+      },
       sorter: {
-        compare: (a, b) => a.lastOnline.length - b.lastOnline.length,
+        compare: (a, b) => moment(a.leaveDate) - moment(b.leaveDate),
       },
     },
     {
@@ -404,7 +467,7 @@ const EmployeeList = () => {
       />
 
       <Modal
-        title="Add Employee"
+        title={<span className="ms-5">Add Employee</span>}
         visible={isAddEmployeeModalVisible}
         onCancel={closeAddEmployeeModal}
         footer={null}

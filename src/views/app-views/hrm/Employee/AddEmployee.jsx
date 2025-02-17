@@ -677,7 +677,7 @@ const AddEmployee = ({ onClose, setSub }) => {
             onSubmit={handleSubmit}
             onFinishFailed={onFinishFailed}
           >
-            <h1 className="border-b-2 border-gray-300 pb-2"></h1>
+            <h1 className="border-b-2 border-gray-300 pb-4 mt-[-35px] "></h1>
             <h1 className="text-lg font-bold mb-4">Personal Details</h1>
             <Row gutter={16}>
               <Col span={12}>

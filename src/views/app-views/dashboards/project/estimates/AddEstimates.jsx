@@ -152,12 +152,9 @@ const AddEstimates = ({ onClose }) => {
             }
 
             // Calculate subtotal from tableData directly
-            const subtotal = tableData.reduce((sum, item) => {
-                const amount = parseFloat(item.amount) || 0;
-                return sum + amount;
-            }, 0);
-
-            const discountAmount = (subtotal * discountRate) / 100;
+            const subtotal = calculateSubTotal();
+      const discountAmount = (subtotal * discountRate) / 100;
+      const finalTotal = parseFloat(totals.finalTotal);
             
             // Format items for the database
             const formattedItems = {};
@@ -184,7 +181,7 @@ const AddEstimates = ({ onClose }) => {
                 subtotal: subtotal.toFixed(2),
                 calculatedTax: values.calculatedTax,
                 items: formattedItems,
-                total: totals.finalTotal.toFixed(2),
+                total: finalTotal.toFixed(2),
                 tax: totals.totalTax,
                 discount: discountAmount,
                 discountRate: discountRate,
@@ -241,8 +238,10 @@ const AddEstimates = ({ onClose }) => {
 
     // Delete row
     const handleDeleteRow = (id) => {
-        if (rows.length > 1) {
-            setRows(rows.filter(row => row.id !== id));
+        if (tableData.length > 1) {
+            const updatedTableData = tableData.filter(row => row.id !== id);
+            setTableData(updatedTableData);
+            calculateTotal(updatedTableData, discountRate); // Recalculate totals after deletion
         } else {
             message.warning('At least one item is required');
         }
@@ -281,38 +280,46 @@ const AddEstimates = ({ onClose }) => {
       };
 
 
-      const calculateTotal = (data, discountPercentage) => {
+      const calculateTotal = (data = tableData, discount = discountRate) => {
         if (!Array.isArray(data)) {
           console.error('Invalid data passed to calculateTotal');
           return;
         }
     
-        let subtotal = 0;
-        let totalTax = 0;
+        // Calculate subtotal (sum of all item amounts)
+        const subtotal = data.reduce((sum, row) => {
+          return sum + (parseFloat(row.amount) || 0);
+        }, 0);
     
-        data.forEach((row) => {
+        // Calculate discount amount
+        const discountAmount = (subtotal * (parseFloat(discount) || 0)) / 100;
+    
+        // Calculate total tax (for display purposes)
+        const totalTax = data.reduce((sum, row) => {
           const quantity = parseFloat(row.quantity) || 0;
           const price = parseFloat(row.price) || 0;
-          const tax = parseFloat(row.tax) || 0;
-          
+          const tax = (parseFloat(row.tax) || 0) ;
           const baseAmount = quantity * price;
           const taxAmount = (baseAmount * tax) / 100;
-          
-          subtotal += baseAmount;
-          totalTax += taxAmount;
-        });
+          return sum + taxAmount;
+        }, 0);
     
-        // Calculate discount amount from percentage
-        const discountAmount = (subtotal * discountPercentage) / 100;
-        const finalTotal = subtotal - discountAmount + totalTax;
+        // Calculate final total: subtotal - discount
+        const finalTotal = subtotal - discountAmount;
     
         setTotals({
-          subtotal: parseFloat(subtotal.toFixed(2)),
-          discount: parseFloat(discountAmount.toFixed(2)), // Store the actual discount amount
-          discountPercentage: discountPercentage,
-          totalTax: parseFloat(totalTax.toFixed(2)),
-          finalTotal: parseFloat(finalTotal.toFixed(2))
+          subtotal: subtotal.toFixed(2),
+          discount: discountAmount.toFixed(2),
+          totalTax: totalTax.toFixed(2),
+          finalTotal: finalTotal.toFixed(2)
         });
+    
+        return {
+          subtotal,
+          discount: discountAmount,
+          totalTax,
+          finalTotal
+        };
       };
 
    const handleTableDataChange = (id, field, value) => {
@@ -635,7 +642,7 @@ const AddEstimates = ({ onClose }) => {
                                     <tr className="flex justify-between px-2 py-2 border-x-2">
                                         <td className="font-medium">Sub Total</td>
                                         <td className="font-medium px-4 py-2">
-                                            ₹{totals.subtotal.toFixed(2)}
+                                            ₹{totals.subtotal}
                                         </td>
                                     </tr>
 
@@ -667,7 +674,7 @@ const AddEstimates = ({ onClose }) => {
                                     <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
                                         <td className="font-medium">Total Tax</td>
                                         <td className="font-medium px-4 py-2">
-                                            ₹{totals.totalTax.toFixed(2)}
+                                            ₹{totals.totalTax}
                                         </td>
                                     </tr>
 
@@ -675,7 +682,7 @@ const AddEstimates = ({ onClose }) => {
                                     <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
                                         <td className="font-bold text-lg">Total Amount</td>
                                         <td className="font-bold text-lg px-4">
-                                            ₹{totals.finalTotal.toFixed(2)}
+                                            ₹{totals.finalTotal}
                                         </td>
                                     </tr>
                                 </table>

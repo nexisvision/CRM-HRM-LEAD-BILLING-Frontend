@@ -29,7 +29,7 @@ const EditBilling = ({ idd, onClose }) => {
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [newTag, setNewTag] = useState("");
 
-  // const { taxes } = useSelector((state) => state.tax);
+  const { taxes } = useSelector((state) => state.tax);
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
 
   const [tags, setTags] = useState([]);
@@ -53,6 +53,7 @@ const EditBilling = ({ idd, onClose }) => {
       quantity: 1,
       price: 0,
       tax: 0,
+      tax_name: "",
       amount: 0,
       description: "",
     },
@@ -60,56 +61,107 @@ const EditBilling = ({ idd, onClose }) => {
 
   const bildata = useSelector((state) => state.salesbilling);
   const fnsdatas = bildata.salesbilling.data;
-  const taxes = useSelector((state) => state.tax);
-  // const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
 
   useEffect(() => {
     dispatch(getbil(lid));
     fetchTags();
   }, []);
 
-  useEffect(() => {
-    const fnd = fnsdatas.find((item) => item.id === idd);
-    if (fnd) {
-      try {
-        form.setFieldsValue({
-          vendor: fnd.vendor || "",
-          billDate: fnd.billDate ? moment(fnd.billDate) : null,
-          status: fnd.status || "",
-          billNumber: fnd.billNumber || "",
-          note: fnd.note || "",
-        });
+ useEffect(() => {
+  const currentBill = fnsdatas?.find((item) => item.id === idd);
+  
+  if (currentBill) {
+    try {
+      console.log('Current Bill Data:', currentBill);
 
-        setDiscountRate(fnd.discount || 0);
-        setShowTax(!!fnd.tax);
+      // Parse the description JSON string
+      const descriptionData = JSON.parse(currentBill.discription || '{}');
+      const items = descriptionData.items || [];
 
-        if (fnd.items && Array.isArray(fnd.items)) {
-          const formattedItems = fnd.items.map(item => ({
-            id: Date.now() + Math.random(),
-            item: item.item || "",
+      // Set basic form fields
+      form.setFieldsValue({
+        vendor: currentBill.vendor || '',
+        billDate: currentBill.billDate ? moment(currentBill.billDate) : null,
+        status: currentBill.status || '',
+        billNumber: currentBill.billNumber || '',
+        note: currentBill.note || ''
+      });
+
+      // Set tax and discount states
+      setShowTax(!!currentBill.tax);
+      setDiscountRate(currentBill.discount || 0);
+
+      // Format items data
+      if (items.length > 0) {
+        const formattedItems = items.map(item => ({
+          id: Date.now() + Math.random(),
+          item: item.name || '',
+          quantity: Number(item.quantity) || 1,
+          price: Number(item.unitPrice) || 0,
+          tax: showTax ? (Number(item.tax) || 0) : 0,
+          tax_name: item.tax_name || '',
+          amount: calculateAmount({
             quantity: Number(item.quantity) || 1,
-            price: Number(item.price) || 0,
-            tax: Number(item.tax) || 0,
-            amount: calculateAmount({
-              quantity: Number(item.quantity) || 1,
-              price: Number(item.price) || 0,
-              tax: Number(item.tax) || 0
-            }),
-            description: item.description || ""
-          }));
-          setTableData(formattedItems);
-          calculateTotal(formattedItems, fnd.discount || 0);
+            price: Number(item.unitPrice) || 0,
+            tax: Number(item.tax) || 0
+          }),
+          description: descriptionData.service || ''
+        }));
+
+        setTableData(formattedItems);
+
+        // Set tax details if available
+        if (showTax) {
+          formattedItems.forEach(item => {
+            if (item.tax && taxes?.data) {
+              const selectedTax = taxes.data.find(t => t.gstPercentage === parseFloat(item.tax));
+              if (selectedTax) {
+                setSelectedTaxDetails(prev => ({
+                  ...prev,
+                  [item.id]: {
+                    gstName: selectedTax.gstName,
+                    gstPercentage: selectedTax.gstPercentage
+                  }
+                }));
+              }
+            }
+          });
         }
-      } catch (error) {
-        console.error("Error setting form data:", error);
-        message.error("Error loading bill data");
+
+        // Calculate totals
+        calculateTotal(formattedItems, currentBill.discount || 0);
+      } else {
+        // Set default empty row if no items
+        setTableData([{
+          id: Date.now(),
+          item: '',
+          quantity: 1,
+          price: 0,
+          tax: 0,
+          amount: '0.00',
+          description: '',
+          tax_name: ''
+        }]);
+
+        // Reset totals
+        setTotals({
+          subtotal: '0.00',
+          discount: '0.00',
+          totalTax: '0.00',
+          finalTotal: '0.00'
+        });
       }
+
+    } catch (error) {
+      console.error('Error setting bill data:', error);
+      message.error('Error loading bill data');
     }
-  }, [fnsdatas, idd, form]);
+  }
+}, [fnsdatas, idd, form, taxes, showTax]);
 
   useEffect(() => {
     dispatch(getAllTaxes());
-  }, []);
+  }, [dispatch]);
 
   const calculateAmount = (row) => {
     const quantity = Number(row.quantity) || 0;
@@ -171,9 +223,11 @@ const EditBilling = ({ idd, onClose }) => {
           const price = parseFloat(field === 'price' ? value : row.price) || 0;
           const tax = showTax ? (parseFloat(field === 'tax' ? value : row.tax) || 0) : 0;
           
-          if (field === 'tax' && taxes && taxes.data) {
+          // Update tax name when tax is selected
+          if (field === 'tax' && taxes?.data) {
             const selectedTax = taxes.data.find(t => t.gstPercentage === parseFloat(value));
             if (selectedTax) {
+              updatedRow.tax_name = selectedTax.gstName; // Store tax name directly in row
               setSelectedTaxDetails(prev => ({
                 ...prev,
                 [id]: {
@@ -225,30 +279,46 @@ const EditBilling = ({ idd, onClose }) => {
       .then((values) => {
         const totals = calculateTotal();
 
-        const itemsDescription = {
-          product: tableData.map(item => item.item).filter(Boolean).join(", "),
-          service: tableData.map(item => item.description).filter(Boolean).join(", ")
+        // Prepare items data with all necessary details
+        const items = tableData.map(row => {
+          // Find the selected tax details for this row
+          const taxDetails = taxes?.data?.find(t => t.gstPercentage === parseFloat(row.tax));
+          
+          return {
+            name: row.item,
+            quantity: parseFloat(row.quantity) || 0,
+            unitPrice: parseFloat(row.price) || 0,
+            tax: showTax ? parseFloat(row.tax) || 0 : 0,
+            tax_name: showTax ? (taxDetails?.gstName || row.tax_name || '') : '', // Use tax name from details or row
+            amount: parseFloat(row.amount) || 0,
+            description: row.description || ""
+          };
+        });
+
+        // Create description object
+        const descriptionObject = {
+          items: items,
+          service: tableData.map(item => item.description).filter(Boolean).join(", "),
+          product: tableData.map(item => item.item).filter(Boolean).join(", ")
         };
 
         const invoiceData = {
           vendor: values.vendor,
           billDate: values.billDate?.format("YYYY-MM-DD"),
-          discription: itemsDescription,
+          discription: descriptionObject,
           status: values.status,
           billNumber: values.billNumber,
           discount: parseFloat(discountRate) || 0,
           tax: showTax ? parseFloat(totals.totalTax) || 0 : 0,
           total: parseFloat(totals.finalTotal) || 0,
           note: values.note || "",
-          items: tableData.map(row => ({
-            item: row.item,
-            quantity: parseFloat(row.quantity) || 0,
-            price: parseFloat(row.price) || 0,
-            tax: showTax ? parseFloat(row.tax) || 0 : 0,
-            tax_name: showTax ? selectedTaxDetails[row.id]?.gstName || '' : '',
-            amount: parseFloat(row.amount) || 0,
-            description: row.description || ""
-          }))
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          user_id: lid,
+          subtotal: parseFloat(totals.subtotal) || 0,
+          total_tax: parseFloat(totals.totalTax) || 0,
+          total_discount: parseFloat(totals.discount) || 0,
+          items_data: items
         };
 
         dispatch(eidtebil({ idd, invoiceData }))
@@ -259,7 +329,7 @@ const EditBilling = ({ idd, onClose }) => {
           })
           .catch((error) => {
             console.error("Error updating bill:", error);
-            message.error("Failed to update bill");
+            message.error("Failed to update bill: " + (error.message || "Unknown error"));
           });
       })
       .catch((error) => {
@@ -311,6 +381,38 @@ const EditBilling = ({ idd, onClose }) => {
       console.error("Failed to add status:", error);
       message.error("Failed to add status");
     }
+  };
+
+  const renderTaxSelector = (row) => {
+    if (!showTax) {
+      return (
+        <input
+          type="text"
+          value="0"
+          disabled
+          className="w-full p-2 border bg-gray-100"
+        />
+      );
+    }
+
+    return (
+      <select
+        value={row.tax}
+        onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
+        className="w-full p-2 border rounded"
+      >
+        <option value="0">Select Tax</option>
+        {taxes?.data?.map((tax) => (
+          <option 
+            key={tax.id} 
+            value={tax.gstPercentage}
+            title={`${tax.gstName}: ${tax.gstPercentage}%`}
+          >
+            {tax.gstName} ({tax.gstPercentage}%)
+          </option>
+        ))}
+      </select>
+    );
   };
 
   return (
@@ -489,27 +591,7 @@ const EditBilling = ({ idd, onClose }) => {
                           />
                         </td>
                         <td className="px-4 py-2 border-b">
-                          {showTax ? (
-                            <select
-                              value={row.tax}
-                              onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
-                              className="w-full p-2 border"
-                            >
-                              <option value="0">Nothing Selected</option>
-                              {taxes && taxes.data && taxes.data.map(tax => (
-                                <option key={tax.id} value={tax.gstPercentage}>
-                                  {tax.gstName}: {tax.gstPercentage}%
-                                </option>
-                              ))}
-                            </select>
-                          ) : (
-                            <input
-                              type="text"
-                              value="0"
-                              disabled
-                              className="w-full p-2 border bg-gray-100"
-                            />
-                          )}
+                          {renderTaxSelector(row)}
                         </td>
                         <td className="px-4 py-2 border-b">
                           ₹{row.amount}

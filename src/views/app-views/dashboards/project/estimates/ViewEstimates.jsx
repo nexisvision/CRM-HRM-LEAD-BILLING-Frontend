@@ -64,6 +64,7 @@ function ViewEstimates({ estimateId, onClose }) {
                 <NumberFormat
                     displayType="text"
                     value={price || 0}
+                    prefix='₹'
                     // prefix={`${estimate?.currency || '₹'} `}
                     thousandSeparator={true}
                     decimalScale={2}
@@ -77,9 +78,9 @@ function ViewEstimates({ estimateId, onClose }) {
             render: (tax) => `${tax || 0}%`
         },
         {
-            title: "Description",
-            dataIndex: "itemDescription",
-            key: "itemDescription"
+            title: "Gst Name",
+            dataIndex: "tax_name",
+            key: "tax_name"
         },
         {
             title: "Amount",
@@ -89,6 +90,7 @@ function ViewEstimates({ estimateId, onClose }) {
                 <NumberFormat
                     displayType="text"
                     value={amount || 0}
+                    prefix='₹'
                     // prefix={`${estimate?.currency || '₹'} `}
                     thousandSeparator={true}
                     decimalScale={2}
@@ -151,6 +153,7 @@ function ViewEstimates({ estimateId, onClose }) {
                                         value={tableData.reduce((sum, item) => 
                                             sum + parseFloat(item.amount || 0), 0
                                         )}
+                                        prefix='₹'
                                         // prefix={`${estimate.currency || '₹'} `}
                                         thousandSeparator={true}
                                         decimalScale={2}
@@ -161,7 +164,8 @@ function ViewEstimates({ estimateId, onClose }) {
                                     <NumberFormat
                                         displayType="text"
                                         value={estimate.discount || 0}
-                                        suffix="%"
+                                        // suffix="%"
+                                        prefix='₹'
                                         thousandSeparator={true}
                                         decimalScale={2}
                                     />
@@ -171,6 +175,7 @@ function ViewEstimates({ estimateId, onClose }) {
                                     <NumberFormat
                                         displayType="text"
                                         value={estimate.tax || 0}
+                                         prefix='₹'
                                         // prefix={`${estimate.currency || '₹'} `}
                                         thousandSeparator={true}
                                         decimalScale={2}
@@ -181,6 +186,7 @@ function ViewEstimates({ estimateId, onClose }) {
                                     <NumberFormat
                                         displayType="text"
                                         value={estimate.total || 0}
+                                         prefix='₹'
                                         // prefix={`${estimate.currency || '₹'} `}
                                         thousandSeparator={true}
                                         decimalScale={2}

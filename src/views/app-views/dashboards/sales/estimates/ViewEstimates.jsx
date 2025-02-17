@@ -75,14 +75,15 @@ function ViewEstimates({ quotationId, onClose }) {
             )
         },
         {
-            title: "Discount",
+            title: "Discount ",
             dataIndex: "discount",
             key: "discount",
             render: (discount) => (
                 <NumberFormat
                     displayType="text"
                     value={discount || 0}
-                    prefix="₹"
+                    // prefix="₹"
+                    suffix="%"
                     thousandSeparator={true}
                     decimalScale={2}
                 />
@@ -133,89 +134,99 @@ function ViewEstimates({ quotationId, onClose }) {
     }
 
     return (
-        <div className='ml-[-24px] mr-[-24px] mt-[-52px] mb-[-24px] bg-gray-50 rounded-t-lg rounded-b-lg'>   
-                <div className="p-4">
-                <h2 className=" border-b pb-[30px] font-medium"></h2>
-            <Card bordered={false} className='mt-5'>
-                {/* Header Information */}
-                <div className="mb-6">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <p className="text-lg mb-2">
-                                <strong>Quotation Number:</strong> {currentQuotation.salesQuotationNumber}
-                            </p>
-                            <p className="text-lg mb-2">
-                                <strong>Date:</strong> {dayjs(currentQuotation.issueDate).format('DD/MM/YYYY')}
-                            </p>
-                            {/* <p className="text-lg mb-2">
-                                <strong>Category:</strong> {currentQuotation.category}
-                            </p> */}
-                            {/* <p className="text-lg mb-2">
-                                <strong>Customer ID:</strong> {currentQuotation.customer}
-                            </p> */}
-                        </div>
-                    </div>
-                </div>
+        <div className="bg-white rounded-lg">
+             <h2 className="mb-3 border-b pb-[5px] font-medium"></h2>
+            <div className="">
+                <Card bordered={false} >
+                    {/* Header Section */}
+                    <div className="mb-6">
 
-                {/* Items Table */}
-                <div className="mb-2">
-                    <Table
-                        columns={tableColumns}
-                        dataSource={tableData}
-                        pagination={false}
-                        rowKey="key"
-                        bordered
-                    />
-                </div>
-
-                {/* Summary Section */}
-                <div className="flex justify-end mt-2">
-                    <div className="w-72">
-                        <div className=" p-4 rounded">
-                            <div className="flex justify-between mb-2">
-                                <span className="font-semibold">Subtotal:</span>
-                                <NumberFormat
-                                    displayType="text"
-                                    value={(currentQuotation.total - currentQuotation.tax) || 0}
-                                    prefix="₹"
-                                    thousandSeparator={true}
-                                    decimalScale={2}
-                                />
-                            </div>
-                            <div className="flex justify-between mb-2">
-                                <span className="font-semibold">Discount:</span>
-                                <NumberFormat
-                                    displayType="text"
-                                    value={currentQuotation.discount || 0}
-                                    prefix="₹"
-                                    thousandSeparator={true}
-                                    decimalScale={2}
-                                />
-                            </div>
-                            <div className="flex justify-between mb-2">
-                                <span className="font-semibold">Tax:</span>
-                                <NumberFormat
-                                    displayType="text"
-                                    value={currentQuotation.tax || 0}
-                                    prefix="₹"
-                                    thousandSeparator={true}
-                                    decimalScale={2}
-                                />
-                            </div>
-                            <div className="flex justify-between font-bold border-t pt-2 mt-2">
-                                <span>Total:</span>
-                                <NumberFormat
-                                    displayType="text"
-                                    value={currentQuotation.total || 0}
-                                    prefix="₹"
-                                    thousandSeparator={true}
-                                    decimalScale={2}
-                                />
+                        {/* Quotation Info */}
+                            <div className="flex justify-end gap-8">
+                            <div className="space-y-3 ">
+                                <div className="flex items-center text-lg">
+                                    <span className="text-gray-600 font-semibold ">Quotation Number:</span>
+                                    <span className="font-medium text-gray-800">
+                                        {currentQuotation.salesQuotationNumber}
+                                    </span>
+                                </div>
+                                <div className="flex items-center text-lg">
+                                    <span className="text-gray-600 font-semibold ">Issue Date:</span>
+                                    <span className="font-medium text-gray-800">
+                                        {dayjs(currentQuotation.issueDate).format('DD/MM/YYYY')}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </Card>
+
+                    {/* Items Table */}
+                    <div className="table-responsive mt-3">
+                        <Table
+                            columns={tableColumns}
+                            dataSource={tableData}
+                            pagination={false}
+                            rowKey="key"
+                            bordered
+                            className="bg-white rounded-lg"
+                            scroll={{ x: 'max-content' }}
+                        />
+                    </div>
+
+                    {/* Summary Section */}
+                    <div className="flex justify-end mt-8">
+                        <div className="w-64 rounded-lg pb-4">
+                            <div className="space-y-3">
+                                <div className="flex justify-between text-gray-600">
+                                    <span>Subtotal:</span>
+                                    <NumberFormat
+                                        displayType="text"
+                                        value={tableData.reduce((sum, item) => sum + (Number(item.amount) || 0), 0)}
+                                        prefix="₹"
+                                        thousandSeparator={true}
+                                        decimalScale={2}
+                                        className="font-medium"
+                                    />
+                                </div>
+                                <div className="flex justify-between text-gray-600">
+                                    <span>Discount:</span>
+                                    <NumberFormat
+                                        displayType="text"
+                                        value={currentQuotation.discount || 0}
+                                        prefix="₹"
+                                        thousandSeparator={true}
+                                        decimalScale={2}
+                                        className="font-medium text-red-500"
+                                    />
+                                </div>
+                                <div className="flex justify-between text-gray-600">
+                                    <span>Tax:</span>
+                                    <NumberFormat
+                                        displayType="text"
+                                        value={currentQuotation.tax || 0}
+                                        prefix="₹"
+                                        thousandSeparator={true}
+                                        decimalScale={2}
+                                        className="font-medium"
+                                    />
+                                </div>
+                                <div className="border-t border-gray-200 pt-3 mt-3">
+                                    <div className="flex justify-between">
+                                        <span className="font-semibold text-gray-800">Total:</span>
+                                        <NumberFormat
+                                            displayType="text"
+                                            value={currentQuotation.total || 0}
+                                            prefix="₹"
+                                            thousandSeparator={true}
+                                            decimalScale={2}
+                                            className="font-semibold text-gray-800"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Card>
             </div>
         </div>
     );

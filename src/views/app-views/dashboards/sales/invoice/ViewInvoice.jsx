@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { PrinterOutlined, DownloadOutlined } from '@ant-design/icons';
+import { PrinterOutlined, DownloadOutlined, CloseOutlined } from '@ant-design/icons';
 import { Card, Table, Button, Select } from 'antd';
 import { invoiceData } from '../../../pages/invoice/invoiceData';
 // import Qr from '../../../../assets/svg/Qr.png';
@@ -12,6 +12,7 @@ import { ClientData } from 'views/app-views/Users/client-list/CompanyReducers/Co
 import { getInvoice } from './InvoiceReducer/InvoiceSlice';
 import { Getcus } from '../customer/CustomerReducer/CustomerSlice';
 import signatureimg from '../../../../../assets/svg/signatureimg1.png';
+import { getsignaturesss } from 'views/app-views/setting/esignature/EsignatureReducers/EsignatureSlice';
 
 
 const { Column } = Table;
@@ -50,6 +51,15 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
   // Get logged in user data
   const loggedInUser = useSelector((state) => state?.user?.loggedInUser);
+
+  const [selectedSignature, setSelectedSignature] = useState(null);
+  const [selectedSignatureName, setSelectedSignatureName] = useState(null);
+  const [showSelector, setShowSelector] = useState(true);
+  
+  // Get signatures from Redux store
+  const signatures = useSelector((state) => state?.esignature?.esignature?.data);
+
+  const [isSignatureConfirmed, setIsSignatureConfirmed] = useState(false);
 
     // useEffect(() => {
     //     console.log('Fetching data...'); // Debug log
@@ -137,62 +147,134 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
         }
     }, [parsedInvoice, allCustomers]);
 
-    const handlePrint = () => {
-        const printContent = document.getElementById('printable-content');
-        const printWindow = window.open('', '_blank');
+    useEffect(() => {
+        dispatch(getsignaturesss());
+    }, [dispatch]);
 
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <title>Print Invoice</title>
-                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/antd/4.16.13/antd.min.css">
-                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
-                    <style>
-                        body {
-                            padding: 20px;
-                            background: white !important;
-                        }
-                        @media print {
-                            body {
-                                padding: 0;
-                            }
-                            .ant-table {
-                                font-size: 12px;
-                            }
-                            * {
-                                -webkit-print-color-adjust: exact !important;
-                                print-color-adjust: exact !important;
-                            }
-                            .d-print-none {
-                                display: none !important;
-                            }
-                        }
-                        .bg-gradient-to-r {
-                            background-image: linear-gradient(to right, var(--tw-gradient-stops));
-                        }
-                        .from-blue-50 {
-                            --tw-gradient-from: #eff6ff;
-                            --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgb(239 246 255 / 0));
-                        }
-                        .to-purple-50 {
-                            --tw-gradient-to: #f5f3ff;
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${printContent.innerHTML}
-                </body>
-            </html>
-        `);
-
-        printWindow.document.close();
-        printWindow.focus();
-
-        setTimeout(() => {
-            printWindow.print();
-            printWindow.close();
-        }, 500);
+    const handleSignatureSelect = (value) => {
+        const sig = signatures.find(s => s.esignature_name === value);
+        setSelectedSignatureName(value);
+        setSelectedSignature(sig?.e_signatures || null);
+        setShowSelector(false);
     };
+
+    const handleConfirmSignature = () => {
+        setIsSignatureConfirmed(true);
+        setShowSelector(false);
+    };
+
+    const handleRemoveSignature = () => {
+        setSelectedSignature(null);
+        setSelectedSignatureName(null);
+        setShowSelector(true);
+        setIsSignatureConfirmed(false);
+    };
+
+    const renderSignatureSection = () => (
+        <div>
+            <div className="flex justify-end items-center gap-4">
+                {!isSignatureConfirmed && (
+                    <div className="flex flex-col">
+                        <h4 className="font-semibold text-lg mb-2">Select Signature:</h4>
+                        <Select
+                            style={{ width: 200 }}
+                            placeholder="Select a signature"
+                            value={selectedSignatureName}
+                            onChange={handleSignatureSelect}
+                        >
+                            {signatures?.map((sig) => (
+                                <Option key={sig.id} value={sig.esignature_name}>
+                                    {sig.esignature_name}
+                                </Option>
+                            ))}
+                        </Select>
+                    </div>
+                )}
+                {selectedSignature && (
+                    <div className='flex flex-col relative'>
+                        <h4 className="font-semibold text-lg mb-2">Signature:</h4>
+                        <div className='w-36 h-28 flex flex-col items-center justify-center relative'>
+                            <img 
+                                src={selectedSignature} 
+                                alt="Digital Signature" 
+                                className='w-full h-full object-contain border-0'
+                            />
+                            {!isSignatureConfirmed && (
+                                <>
+                                    <button
+                                        onClick={handleRemoveSignature}
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full ps-3 pe-3 pt-1 pb-1 hover:bg-red-600 transition-colors border-0"
+                                        title="Remove signature"
+                                    >
+                                        <CloseOutlined style={{ fontSize: '10px' }} />
+                                    </button>
+                                    <button
+                                        onClick={handleConfirmSignature}
+                                        className="bg-green-500 text-white rounded-md px-4 py-1 hover:bg-green-600 transition-colors mt-4"
+                                    >
+                                        Confirm
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+
+    const handlePrint = () => {
+        // Store the current body content
+        const originalContent = document.body.innerHTML;
+        const printContent = document.getElementById('printable-content');
+    
+        // Create a style element for print-specific CSS
+        const printStyles = `
+            @media print {
+                body * {
+                    visibility: hidden;
+                }
+                #printable-content, #printable-content * {
+                    visibility: visible;
+                }
+                #printable-content {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                }
+                .no-print {
+                    display: none !important;
+                }
+                @page {
+                    size: A4;
+                    // margin: 10mm;
+                }
+                .ant-table {
+                    width: 100% !important;
+                }
+                .ant-table-thead > tr > th {
+                    background-color: #f5f5f5 !important;
+                    color: #000000 !important;
+                }
+                .signature-image {
+                    display: block !important;
+                }
+            }
+        `;
+    
+        // Add print styles
+        const styleSheet = document.createElement('style');
+        styleSheet.innerHTML = printStyles;
+        document.head.appendChild(styleSheet);
+    
+        // Print the specific content
+        window.print();
+    
+        // Remove the print styles
+        document.head.removeChild(styleSheet);
+    };
+
 
     const handleDownload = () => {
         const element = document.getElementById('printable-content');
@@ -325,16 +407,19 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                             <address>
                                     <p>
                                     <p>
-                                        <span className="font-weight-semibold">Address:</span> {cleanStreet}, <br />
-                                        <span className="font-weight-semibold">City:</span> {billingAddress.city}, <br />
-                                        <span className="font-weight-semibold">State:</span> {billingAddress.state}, <br />
-                                        <span className="font-weight-semibold">Zip:</span> {billingAddress.zip}, <br />
-                                        <span className="font-weight-semibold">Country:</span> {billingAddress.country}
+                                    <span>
+                                    <span className='font-weight-semibold'>Address: </span>
+                                    {cleanStreet && `${cleanStreet}, `}
+                                    {billingAddress?.city && `${billingAddress.city}, `}
+                                    {billingAddress?.state && `${billingAddress.state}, `}
+                                    {billingAddress?.zip && `${billingAddress.zip}, `}      
+                                    {billingAddress?.country || 'N/A'}
+                                </span><br />
                                     </p>
 
-                                        <span> <span className="font-weight-semibold  ">Name: </span>{customerData.username}</span><br />
+                                        <span> <span className="font-weight-semibold  ">Name: </span>{customerData.name}</span><br />
                                         <p> <span className="font-weight-semibold">Email: </span> {customerData.email}</p>
-                                        <p> <span className="font-weight-semibold  ">Phone: </span> {customerData.phone}</p>
+                                        <p> <span className="font-weight-semibold  ">Phone: </span> {customerData.contact}</p>
                                         <p> <span className="font-weight-semibold  ">GstIn: </span> {customerData.gstIn}</p>
                                     </p>
                                 </address>
@@ -448,11 +533,10 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
                     <div>
                         <div className="flex justify-end items-center">
-                        <h4 className="font-semibold text-lg mb-2">Signature:</h4>
-                        <div className='flex'>
-                            <img src={signatureimg} alt="Image not show" className='w-28 h-28' />
-                        </div>
-                        </div>
+                            <div className=" rounded-lg p-8">
+                                {/* ... existing content ... */}
+                                {renderSignatureSection()}
+                            </div>
                     </div>
                 {/* </div> */}
                 <div>
@@ -635,12 +719,11 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     </div>
                     <div>
                         <div className="flex justify-end items-center">
-                        <h4 className="font-semibold text-lg mb-2">Signature:</h4>
-                        <div className='flex'>
-                            <img src={signatureimg} alt="Image not show" className='w-28 h-28' />
+                            <div className=" rounded-lg p-8">
+                                {/* ... existing content ... */}
+                                {renderSignatureSection()}
+                            </div>
                         </div>
-                        </div>
-                    </div>
                     {/* </div> */}
                     <div>
                         <h4><span className="font-weight-semibold text-lg">Terms & Conditions:</span></h4>
@@ -654,7 +737,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     <p>Thanks for your Business</p>
                 </div>
             </div>
-            // </div>
+           </div>
         );
     };
 
@@ -754,12 +837,12 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                                 key="tax_percentage"
                             />
 
-                            <Table.Column
+<Table.Column
                                 title="Gst Name"
                                 render={(record) => `${record.tax_name || "--"}`}
                                 key="tax_name"
                             />
-
+                            
                             <Table.Column
                                 title="Amount"
                                 render={(record) => (
@@ -828,10 +911,10 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                 </div>
                 <div>
                         <div className="flex justify-end items-center">
-                        <h4 className="font-semibold text-lg mb-2">Signature:</h4>
-                        <div className='flex'>
-                            <img src={signatureimg} alt="Image not show" className='w-28 h-28' />
-                        </div>
+                            <div className=" rounded-lg  p-8">
+                                {/* ... existing content ... */}
+                                {renderSignatureSection()}
+                            </div>
                         </div>
                     </div>
                     <div>
@@ -1019,10 +1102,12 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     </div>
                 {/* </div> */}
                 <div>
+                <div>
                         <div className="flex justify-end items-center">
-                        <h4 className="font-semibold text-lg mb-2">Signature:</h4>
-                        <div className='flex'>
-                            <img src={signatureimg} alt="Image not show" className='w-28 h-28' />
+                            <div className=" rounded-lg p-8">
+                                {/* ... existing content ... */}
+                                {renderSignatureSection()}
+                            </div>
                         </div>
                         </div>
                     </div>

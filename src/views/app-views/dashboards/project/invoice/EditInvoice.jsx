@@ -44,6 +44,7 @@ import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/cu
 import { GetProdu } from '../product/ProductReducer/ProductsSlice';
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
 import moment from "moment";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -58,6 +59,7 @@ const EditInvoice = ({ idd, onClose }) => {
   const [selectedCurrencyDetails, setSelectedCurrencyDetails] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedMilestone, setSelectedMilestone] = useState(null);
+  const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
   const { currentInvoice } = useSelector((state) => state.invoice);
   const { data: milestones } = useSelector(
     (state) => state.Milestone.Milestone
@@ -226,49 +228,108 @@ const EditInvoice = ({ idd, onClose }) => {
   };
 
   useEffect(() => {
-    if (currentInvoice) {
-      // Set form values
-      form.setFieldsValue({
-        client: currentInvoice.client,
-        project: currentInvoice.project,
-        currency: currentInvoice.currency,
-        issueDate: moment(currentInvoice.issueDate), // Convert to moment object
-        dueDate: moment(currentInvoice.dueDate), // Convert to moment object
-        calctax: currentInvoice.tax_calculation,
-        clientName: subClientData?.username,
-        projectName: fnddata?.project_name,
-      });
+    const setInvoiceData = async () => {
+        if (currentInvoice) {
+            try {
+                console.log("Current Invoice:", currentInvoice);
 
-      // Set currency details from the current invoice
-      const selectedCurrency = curren?.find(c => c.id === currentInvoice.currency);
-      if (selectedCurrency) {
-        setSelectedCurrencyIcon(selectedCurrency.currencyIcon);
-        setSelectedCurrencyDetails(selectedCurrency);
-      }
+                // Set basic form fields
+                form.setFieldsValue({
+                    invoiceNumber: currentInvoice.invoiceNumber,
+                    client: currentInvoice.client,
+                    project: currentInvoice.project,
+                    currency: currentInvoice.currency,
+                    issueDate: dayjs(currentInvoice.issueDate),
+                    dueDate: dayjs(currentInvoice.dueDate),
+                });
 
-      // Set table data with proper calculations
-      if (currentInvoice.items && currentInvoice.items.length > 0) {
-        const formattedItems = currentInvoice.items.map(item => ({
-          id: Date.now() + Math.random(), // Generate unique id
-          item: item.item,
-          quantity: item.quantity,
-          price: item.price,
-          tax: item.tax_percentage || 0,
-          discount: item.discount_percentage || 0,
-          amount: item.final_amount?.toString() || "0",
-          description: item.description || ""
-        }));
+                // Parse items from JSON string
+                if (currentInvoice.items) {
+                    try {
+                        const parsedItems = JSON.parse(currentInvoice.items);
+                        console.log("Parsed Items:", parsedItems);
 
-        setTableData(formattedItems);
-        calculateTotal(formattedItems, currentInvoice.discount_value || 0);
-      }
+                        // Create formatted items array
+                        const formattedItems = parsedItems.map(item => {
+                            return {
+                                id: Date.now() + Math.random(),
+                                item: item.item || '',
+                                quantity: Number(item.quantity) || 0,
+                                price: Number(item.price) || 0,
+                                tax_name: item.tax_name || '',
+                                tax: Number(item.tax_percentage) || 0,
+                                tax_amount: Number(item.tax_amount) || 0,
+                                discount: Number(item.discount_percentage) || 0,
+                                discount_amount: Number(item.discount_amount) || 0,
+                                base_amount: Number(item.base_amount) || 0,
+                                amount: Number(item.final_amount) || 0,
+                                description: item.description || '',
+                                hsn_sac: item.hsn_sac || ''
+                            };
+                        });
 
-      // Set discount related states
-      setDiscountType(currentInvoice.discount_type || "%");
-      setDiscountValue(currentInvoice.discount_value || 0);
-      setDiscountRate(currentInvoice.discount_value || 0);
-    }
-  }, [currentInvoice, form, subClientData, fnddata, curren]);
+                        console.log("Formatted Items:", formattedItems);
+
+                        // Set table data
+                        setTableData(formattedItems);
+
+                        // Calculate and set totals
+                        const totalsData = {
+                            subtotal: formattedItems.reduce((sum, item) => sum + Number(item.base_amount), 0),
+                            itemDiscount: formattedItems.reduce((sum, item) => sum + Number(item.discount_amount), 0),
+                            totalTax: Number(currentInvoice.tax) || 0,
+                            finalTotal: Number(currentInvoice.total) || 0
+                        };
+
+                        setTotals(totalsData);
+                        setDiscountRate(Number(currentInvoice.discount) || 0);
+
+                        // Set tax details for each item
+                        formattedItems.forEach(item => {
+                            if (item.tax && item.tax_name) {
+                                setSelectedTaxDetails(prev => ({
+                                    ...prev,
+                                    [item.id]: {
+                                        gstName: item.tax_name,
+                                        gstPercentage: item.tax
+                                    }
+                                }));
+                            }
+                        });
+
+                    } catch (error) {
+                        console.error("Error parsing items:", error);
+                        message.error("Error loading invoice items");
+                    }
+                }
+
+                // Set currency details
+                if (currentInvoice.currency && curren) {
+                    const selectedCurrency = curren.find(c => c.id === currentInvoice.currency);
+                    if (selectedCurrency) {
+                        setSelectedCurrencyIcon(selectedCurrency.currencyIcon);
+                        setSelectedCurrencyDetails({
+                            currencyCode: selectedCurrency.currencyCode,
+                            currencyIcon: selectedCurrency.currencyIcon,
+                            id: selectedCurrency.id
+                        });
+                    }
+                }
+
+            } catch (error) {
+                console.error("Error setting invoice data:", error);
+                message.error("Failed to load invoice details");
+            }
+        }
+    };
+
+    setInvoiceData();
+}, [currentInvoice, form, curren]);
+
+// Add this debug useEffect
+useEffect(() => {
+    console.log("Current Table Data:", tableData);
+}, [tableData]);
 
   const initialValues = {
     issueDate: null,
@@ -284,55 +345,39 @@ const EditInvoice = ({ idd, onClose }) => {
     try {
       setLoading(true);
 
-      const itemsArray = tableData.map((item) => {
-        const quantity = parseFloat(item.quantity) || 0;
-        const price = parseFloat(item.price) || 0;
-        const itemDiscountPercentage = parseFloat(item.discount) || 0;
-        const taxPercentage = parseFloat(item.tax) || 0;
-
-        const baseAmount = quantity * price;
-        const itemDiscountAmount = (baseAmount * itemDiscountPercentage) / 100;
-        const taxAmount = (baseAmount * taxPercentage) / 100;
-        const itemTotal = baseAmount - itemDiscountAmount + taxAmount;
-
-        return {
-          item: item.item,
-          quantity: quantity,
-          price: price,
-          tax_percentage: taxPercentage,
-          tax_amount: taxAmount,
-          discount_percentage: itemDiscountPercentage,
-          discount_amount: itemDiscountAmount,
-          base_amount: baseAmount,
-          final_amount: itemTotal,
-          description: item.description || "",
-          hsn_sac: item.hsn_sac || ""
-        };
-      });
+      // Format items for database storage
+      const itemsForDb = tableData.map(item => ({
+        item: item.item,
+        quantity: Number(item.quantity),
+        price: Number(item.price),
+        tax_name: item.tax_name,
+        tax_percentage: Number(item.tax),
+        tax_amount: Number(item.tax_amount),
+        discount_percentage: Number(item.discount),
+        discount_amount: Number(item.discount_amount),
+        base_amount: Number(item.base_amount),
+        final_amount: Number(item.amount),
+        description: item.description,
+        hsn_sac: item.hsn_sac
+      }));
 
       const invoiceData = {
-        project: values.project,
-        currency: values.currency,
-        client: values.client,
+        ...values,
         issueDate: values.issueDate.format("YYYY-MM-DD"),
         dueDate: values.dueDate.format("YYYY-MM-DD"),
-        tax_calculation: values.calctax,
-        currencyIcon: selectedCurrencyIcon,
-        currencyCode: selectedCurrencyDetails?.currencyCode,
-        items: itemsArray,
-        sub_total: totals.subtotal,
-        discount_type: discountType,
-        discount_value: discountRate,
-        total_tax: totals.totalTax,
-        final_total: totals.finalTotal,
-         
+        items: JSON.stringify(itemsForDb),
+        discount: discountRate,
+        tax: totals.totalTax,
+        total: totals.finalTotal
       };
 
       await dispatch(updateInvoice({ idd, data: invoiceData }));
+      message.success("Invoice updated successfully!");
       onClose();
-      navigate("/app/dashboards/project/invoice");
+
     } catch (error) {
-      message.error("Failed to update invoice: " + (error.message || "Unknown error"));
+      console.error("Error updating invoice:", error);
+      message.error("Failed to update invoice");
     } finally {
       setLoading(false);
     }
@@ -503,53 +548,52 @@ const EditInvoice = ({ idd, onClose }) => {
             <td className="px-4 py-2 border-b">
               <input
                 type="number"
-                min="1"
                 value={row.quantity}
                 onChange={(e) => handleTableDataChange(row.id, "quantity", e.target.value)}
                 placeholder="Qty"
                 className="w-full p-2 border rounded"
+                min="1"
               />
             </td>
             <td className="px-4 py-2 border-b">
               <Input
                 prefix={selectedCurrencyIcon}
                 type="number"
-                min="0"
                 value={row.price}
                 onChange={(e) => handleTableDataChange(row.id, "price", e.target.value)}
                 placeholder="Price"
-                className="w-full p-2 border rounded-s"
+                className="w-full p-2"
+                min="0"
               />
             </td>
             <td className="px-4 py-2 border-b">
               <input
                 type="number"
+                value={row.discount}
+                onChange={(e) => handleTableDataChange(row.id, "discount", e.target.value)}
+                placeholder="Discount %"
+                className="w-full p-2 border rounded"
                 min="0"
                 max="100"
-                value={row.discount || 0}
-                onChange={(e) => handleTableDataChange(row.id, "discount", e.target.value)}
-                placeholder="0"
-                className="w-full p-2 border rounded"
               />
             </td>
             <td className="px-4 py-2 border-b">
-                            <input
-                                type="text"
-                                value={row.hsn_sac || ""}
-                                onChange={(e) => handleTableDataChange(row.id, "hsn_sac", e.target.value)}
-                                placeholder="HSN/SAC"
-                                className="w-full p-2 border rounded"
-                                // readOnly={selectedProduct !== null}
-                            />
-              </td>
+              <input
+                type="text"
+                value={row.hsn_sac}
+                onChange={(e) => handleTableDataChange(row.id, "hsn_sac", e.target.value)}
+                placeholder="HSN/SAC"
+                className="w-full p-2 border rounded"
+              />
+            </td>
             <td className="px-4 py-2 border-b">
               <select
                 value={row.tax}
                 onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
                 className="w-full p-2 border"
               >
-                <option value="0">Nothing Selected</option>
-                {taxes && taxes.data && taxes.data.map(tax => (
+                <option value="0">Select Tax</option>
+                {taxes?.data?.map(tax => (
                   <option key={tax.id} value={tax.gstPercentage}>
                     {tax.gstName}: {tax.gstPercentage}%
                   </option>
@@ -557,7 +601,7 @@ const EditInvoice = ({ idd, onClose }) => {
               </select>
             </td>
             <td className="px-4 py-2 border-b">
-              <span>{selectedCurrencyIcon} {parseFloat(row.amount || 0).toFixed(2)}</span>
+              <span>{selectedCurrencyIcon} {row.amount}</span>
             </td>
             <td className="px-2 py-1 border-b text-center">
               <Button danger onClick={() => handleDeleteRow(row.id)}>
@@ -566,7 +610,7 @@ const EditInvoice = ({ idd, onClose }) => {
             </td>
           </tr>
           <tr>
-            <td colSpan={6} className="px-4 py-2 border-b">
+            <td colSpan={8} className="px-4 py-2 border-b">
               <textarea
                 rows={2}
                 value={row.description}

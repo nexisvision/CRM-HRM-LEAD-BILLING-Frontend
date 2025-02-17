@@ -323,7 +323,7 @@ const ESignaturePage = () => {
 
   // Handle delete signature
   const handleDelete = (record) => {
-    dispatch(deletesigssss(record.key))
+    dispatch(deletesigssss(record.id))
     dispatch(getsignaturesss())
     setSavedSignatures(prev => {
       const updatedSignatures = prev.filter(sig => sig.key !== record.key);

@@ -89,7 +89,7 @@ const EditCrediteNotes = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={12} className="mt-3">
+                <Col span={12}>
                   <div className="form-item">
                     <label className="font-semibold  mt-1">Issue Date <span className="text-red-500">*</span></label>
                     <DatePicker

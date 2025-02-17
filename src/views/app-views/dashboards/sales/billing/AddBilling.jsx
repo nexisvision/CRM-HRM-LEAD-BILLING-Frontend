@@ -81,8 +81,8 @@ const AddBilling = ({ onClose }) => {
   const fnddata = customerdata.customers.data;
 
   const handleAddRow = () => {
-    setRows([
-      ...rows,
+    setTableData([
+      ...tableData,
       {
         id: Date.now(),
         item: "",
@@ -92,16 +92,18 @@ const AddBilling = ({ onClose }) => {
         tax: 0,
         amount: 0,
         description: "",
-        status: "",
-        referenceNumber: "",
-        isNew: true,
       },
     ]);
   };
 
   const handleDeleteRow = (id) => {
-    const updatedRows = rows.filter((row) => row.id !== id);
-    setRows(updatedRows);
+    if (tableData.length > 1) {
+      const updatedData = tableData.filter((row) => row.id !== id);
+      setTableData(updatedData);
+      calculateTotal(updatedData, discountRate);
+    } else {
+      message.warning("At least one item is required");
+    }
   };
 
   // const handleFieldChange = (id, field, value) => {

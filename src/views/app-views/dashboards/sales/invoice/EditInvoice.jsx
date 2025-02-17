@@ -500,7 +500,7 @@ const EditInvoice = ({ idd, onClose }) => {
                   />
                 </Col>
 
-                <Col span={12} >
+                <Col span={12} className="mt-2">
                   <label className="font-semibold">Due Date</label>
                   <DatePicker
                     className="w-full"
@@ -516,7 +516,7 @@ const EditInvoice = ({ idd, onClose }) => {
                   />
                 </Col>
 
-                <Col span={12} className="mt-2">
+                {/* <Col span={12} className="mt-2">
                   <label className="font-semibold">Invoice Number</label>
                   <Field
                     name="invoicenub"
@@ -528,7 +528,7 @@ const EditInvoice = ({ idd, onClose }) => {
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
-                </Col>
+                </Col> */}
 
                 <Col span={12} className="mt-2">
                   <div className="form-item">

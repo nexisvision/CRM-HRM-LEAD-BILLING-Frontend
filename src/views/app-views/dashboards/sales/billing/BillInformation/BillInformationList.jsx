@@ -1,30 +1,55 @@
-import React,{useState,useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import Qr from '../../../../../../assets/svg/Qr.png'
+import Qr from '../../../../../../assets/svg/Qr.png';
 import { Getcus } from '../../customer/CustomerReducer/CustomerSlice';
 
 const BillInformationList = () => {
     const dispatch = useDispatch();
-    const [customerData, setCustomerData] = useState({});
-    const allCustomers = useSelector((state) => state?.customers?.customers?.data);
-    // Get billing data from the salesbilling slice
+    const [customerData, setCustomerData] = useState(null);
+    
+    // Get data from Redux store
     const billingData = useSelector((state) => state?.salesbilling?.salesbilling?.data?.[0]);
-
-    useEffect(()=>{
-        dispatch(Getcus())
-    },[])
-
-    // Get logged in user data
+    const customers = useSelector((state) => state?.customers?.customers?.data);
     const loggedInUser = useSelector((state) => state?.user?.loggedInUser);
-    const billingAddress = customerData?.billing_address
-        ? JSON.parse(customerData.billing_address)
-        : {};
 
-    const cleanStreet = billingAddress.street ? billingAddress.street.replace(/<\/?p>/g, '') : '';
+    // Fetch customers on component mount
+    useEffect(() => {
+        dispatch(Getcus());
+    }, [dispatch]);
+
+    // Find and set customer data when billing data and customers are available
+    useEffect(() => {
+        if (billingData && customers && customers.length > 0) {
+            // Find the customer that matches the billing customer_id
+            const foundCustomer = customers.find(
+                customer => String(customer._id) === String(billingData.customer_id)
+            );
+            
+            if (foundCustomer) {
+                console.log('Found Customer:', foundCustomer);
+                setCustomerData(foundCustomer);
+            }
+        }
+    }, [billingData, customers]);
+
+    // Parse billing address safely
+    const billingAddress = React.useMemo(() => {
+        if (!customerData?.billing_address) return {};
+        try {
+            return typeof customerData.billing_address === 'string' 
+                ? JSON.parse(customerData.billing_address)
+                : customerData.billing_address;
+        } catch (error) {
+            console.error('Error parsing billing address:', error);
+            return {};
+        }
+    }, [customerData]);
+
+    const cleanStreet = billingAddress?.street ? billingAddress.street.replace(/<\/?p>/g, '') : '';
+
     return (
         <div className="">
-
-            <div className=" p-4">
+            <div className="p-4">
                 {/* Header */}
                 <div className="flex justify-between items-start border-b pb-4 mb-4">
                     <h2 className="text-xl font-bold text-gray-800">Bill</h2>
@@ -35,72 +60,83 @@ const BillInformationList = () => {
 
                 {/* Billing and Shipping Details */}
                 <div className="grid grid-cols-3 gap-20">
-                    {/* Billed To */}
-                    <div> 
+                    {/* Billed By */}
+                    <div>
                         <address>
                             <p>
-
                                 <span className="font-weight-semibold text-dark font-size-md">Billed By:</span><br />
-                                        
                                 <span>
-                                    <span className="font-weight-semibold ">Name:</span>
-                                            {loggedInUser?.username}
+                                    <span className="font-weight-semibold">Name: </span>
+                                    {loggedInUser?.username || 'N/A'}
                                 </span><br />
                                 <span>
-                                    <span className="font-weight-semibold ">Address:</span>
-                                            {loggedInUser?.address}
+                                    <span className="font-weight-semibold">Address: </span>
+                                    {loggedInUser?.address || 'N/A'}
                                 </span><br />
                                 <span>
-                                    <span className="font-weight-semibold ">Email:</span>
-                                            {loggedInUser?.email}
+                                    <span className="font-weight-semibold">Email: </span>
+                                    {loggedInUser?.email || 'N/A'}
                                 </span><br />
                                 <span>
-                                    <span className="font-weight-semibold ">Phone:</span>
-                                            {loggedInUser?.phone}
+                                    <span className="font-weight-semibold">Phone: </span>
+                                    {loggedInUser?.phone || 'N/A'}
                                 </span><br />
                                 <span>
-                                        <span className="font-weight-semibold ">GSTIN:</span>
-                                            {loggedInUser?.gstin}
+                                    <span className="font-weight-semibold">GSTIN: </span>
+                                    {loggedInUser?.gstin || 'N/A'}
                                 </span><br />
                             </p>
                         </address>
-                        </div>
+                    </div>
+
                     {/* Shipped To */}
                     <div>
-                            <span className="font-weight-semibold text-dark font-size-md">Shipping To:</span><br />
-                            <address>
-                                <p>
-                                <span> <span className='font-weight-semibold'>Name: </span>{customerData.name}
+                        <span className="font-weight-semibold text-dark font-size-md">Shipping To:</span><br />
+                        <address>
+                            <p>
+                                <span>
+                                    <span className='font-weight-semibold'>Name: </span>
+                                    {customerData?.name || 'N/A'}
                                 </span><br />
-                                <span> <span className='font-weight-semibold'>customerNumber: </span>{customerData.customerNumber}
+                                <span>
+                                    <span className='font-weight-semibold'>Customer Number: </span>
+                                    {customerData?.customerNumber || 'N/A'}
                                 </span><br />
-                                <span>  <span className='font-weight-semibold'>Address: </span>
-                                        {cleanStreet}, <br />
-                                        {billingAddress.city && `${billingAddress.city}, `}
-                                        {billingAddress.state && `${billingAddress.state}, `}
-                                        {billingAddress.zip && `${billingAddress.zip}, `}
-                                        {billingAddress.country}
-                                </span> <br />
-                                <span> 
+                                <span>
+                                    <span className='font-weight-semibold'>Address: </span>
+                                    {cleanStreet && `${cleanStreet}, `}
+                                    {billingAddress?.city && `${billingAddress.city}, `}
+                                    {billingAddress?.state && `${billingAddress.state}, `}
+                                    {billingAddress?.zip && `${billingAddress.zip}, `}
+                                    {billingAddress?.country || 'N/A'}
+                                </span><br />
+                                <span>
                                     <span className='font-weight-semibold'>Email: </span>
-                                    {customerData.email}
+                                    {customerData?.email || 'N/A'}
                                 </span><br />
-                                    <span> 
-                                        <span className='font-weight-semibold'>Phone: </span>
-                                        {customerData.contact}
-                                    </span><br />
-                                    <span className='font-weight-semibold'>GstIn: </span>
-                                    {customerData.gstIn}
-                                </p>
-                            </address>
-                        </div>
+                                <span>
+                                    <span className='font-weight-semibold'>Phone: </span>
+                                    {customerData?.contact || 'N/A'}
+                                </span><br />
+                                <span>
+                                    <span className='font-weight-semibold'>GSTIN: </span>
+                                    {customerData?.gstIn || 'N/A'}
+                                </span>
+                            </p>
+                        </address>
+                    </div>
+
+                    {/* QR Code */}
                     <div className='flex justify-end'>
-                        <img src={Qr} alt="Image not show" className='w-28 h-28' />
+                        <img src={Qr} alt="QR Code" className='w-28 h-28' />
                     </div>
                 </div>
             </div>
-        </div>
-    )
-}
 
-export default BillInformationList
+          
+        </div>
+    );
+};
+
+export default BillInformationList;
+
