@@ -1,361 +1,151 @@
-import React from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import React, { useState } from 'react';
+import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import {
-    Card,
-    Input,
-    Select,
-    Button,
-    Switch,
-    Row,
-    Col
-} from 'antd';
+import { Card, Button, Upload, message, Row, Col } from 'antd';
+import { QuestionCircleOutlined, UploadOutlined } from '@ant-design/icons';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
-const { Option } = Select;
-
-// Validation schema
 const validationSchema = Yup.object().shape({
-    appName: Yup.string()
-        .required('App Name is required'),
-    email: Yup.string()
-        .email('Invalid email')
-        .required('Email is required'),
-    phone: Yup.string()
-        .matches(/^\+\d{1,3}\s\d+$/, 'Invalid phone number format')
-        .required('Phone number is required'),
-    planExpireNotification: Yup.number()
-        .min(1, 'Must be at least 1 day')
-        .required('Plan expiration notification days is required'),
-    address: Yup.string()
-        .required('Address is required'),
-    defaultLanguage: Yup.string()
-        .required('Default language is required'),
-    userDefaultLanguage: Yup.string()
-        .required('User default language is required'),
-    defaultCountryCode: Yup.string()
-        .required('Default country code is required'),
-    defaultCurrencyFormat: Yup.string()
-        .required('Default currency format is required'),
-    affiliationAmount: Yup.number()
-        .min(0, 'Must be a positive number')
-        .required('Affiliation amount is required'),
-    affiliationType: Yup.string()
-        .required('Affiliation type is required'),
-    timezone: Yup.string()
-        .required('Timezone is required'),
-    dateTimeFormat: Yup.string()
-        .required('Date-time format is required'),
-    showCurrencyBehind: Yup.boolean()
-        .required('Show currency behind is required'),
-    enablePhoneValidation: Yup.boolean()
-        .required('Enable phone validation is required'),
-    allowEditVCardURL: Yup.boolean()
-        .required('Allow edit vCard URL is required'),
+  description: Yup.string().required('Description is required'),
 });
 
 const GeneralList = () => {
-    const initialValues = {
-        appName: '',
-        email: '',
-        phone: '',
-        planExpireNotification: '',
-        address: '',
-        defaultLanguage: '',
-        userDefaultLanguage: '',
-        defaultCountryCode: '',
-        defaultCurrencyFormat: '',
-        affiliationAmount: '',
-        affiliationType: '',
-        timezone: '',
-        dateTimeFormat: '',
-        showCurrencyBehind: false,
-        enablePhoneValidation: true,
-        allowEditVCardURL: false,
-        hideDecimalValues: false
-    };
+  const [imageUrl, setImageUrl] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (values, { setSubmitting }) => {
-        setTimeout(() => {
-            console.log('Form values:', values);
-            setSubmitting(false);
-        }, 500);
-    };
+  const initialValues = {
+    description: '',
+  };
 
-    return (
-        <div className="add-job-form">
-            <div className="ml-[-24px] mr-[-24px] mt-[-52px] mb-[-40px] rounded-t-lg rounded-b-lg p-4">
-                <h1 className="mb-4 border-b pb-4 font-medium"></h1>
-                <Formik
-                    initialValues={initialValues}
-                    validationSchema={validationSchema}
-                    onSubmit={handleSubmit}
-                >
-                    {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
-                        <Form className="formik-form" onSubmit={handleSubmit}>
-                            <Row gutter={[16, 16]}>
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      formData.append('image', imageUrl);
+      formData.append('description', values.description);
 
-                                <Col span={8}>
-                                    <div className="form-item mt-2">
-                                        <label className="font-semibold">App Name</label>
-                                        <Field name="appName" as={Input} placeholder="Enter App Name" className='mt-2'/>
-                                        <ErrorMessage name="appName" component="div" className="error-message text-red-500 my-1" />
-                                    </div>
-                                </Col>
+      // Add your API call here
+      // await updateGeneralSettings(formData);
+      
+      message.success('Settings updated successfully');
+    } catch (error) {
+      message.error('Failed to update settings');
+    } finally {
+      setLoading(false);
+      setSubmitting(false);
+    }
+  };
 
-                                <Col span={8}>
-                                    <div className="form-item mt-2">
-                                        <label className="font-semibold">Email</label>
-                                        <Field name="email" as={Input} placeholder="Enter Email" className='mt-2'/>
-                                        <ErrorMessage name="email" component="div" className="error-message text-red-500 my-1" />
-                                    </div>
-                                </Col>
+  const handleImageUpload = (info) => {
+    if (info.file.status === 'uploading') {
+      setLoading(true);
+      return;
+    }
+    if (info.file.status === 'done') {
+      setImageUrl(info.file.response.url);
+      setLoading(false);
+      message.success(`${info.file.name} uploaded successfully`);
+    } else if (info.file.status === 'error') {
+      setLoading(false);
+      message.error(`${info.file.name} upload failed`);
+    }
+  };
 
-                                <Col span={8}>
-                                    <div className="form-item mt-2">
-                                        <label className="font-semibold">Phone</label>
-                                        <Field name="phone" as={Input} placeholder="Enter Phone" className='mt-2'/>
-                                        <ErrorMessage name="phone" component="div" className="error-message text-red-500 my-1" />
-                                    </div>
-                                </Col>
+  return (
+    <div className="bg-white p-6">
+      <Row gutter={[24, 0]} className="mb-6">
+        <Col span={24}>
+          <h1 className="text-2xl font-medium text-gray-800 border-b pb-4">
+            General Settings
+          </h1>
+        </Col>
+      </Row>
+      
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ values, setFieldValue, handleSubmit, isSubmitting }) => (
+          <Form className="formik-form" onSubmit={handleSubmit}>
+            <Card className="mb-4">
+              <Row gutter={[24, 24]}>
+                {/* Upload Picture */}
+                <Col span={24} >
+                <span className="block font-semibold text-lg mb-2 ">
+                  Upload Company Logo 
+                </span>
+                <Field name="image">
+                  {({ field }) => (
+                    <div>
+                      <Upload
+                     
+                        beforeUpload={(file) => {
+                          setFieldValue("image", file); // Set file in Formik state
+                          return false; // Prevent auto upload
+                        }}
+                        showUploadList={false}
+                      >
+                        <Button icon={<UploadOutlined />}>Choose File</Button>
+                      </Upload>
+                    </div>
+                  )}
+                </Field>
+              </Col>
 
-                                <Col span={12}>
-                                    <div className="form-item mt-2">
-                                        <label className="font-semibold">Plan Expire Notification (in Days)</label>
-                                        <Field name="planExpireNotification" as={Input} type="number" placeholder="Enter Days" className='mt-2'/>
-                                        <ErrorMessage name="planExpireNotification" component="div" className="error-message text-red-500 my-1" />
-                                    </div>
-                                </Col>
-
-                                <Col span={12}>
-                                    <div className="form-item mt-2">
-                                        <label className="font-semibold">Address</label>
-                                        <Field name="address" as={Input} placeholder="Enter Address" className='mt-2'/>
-                                        <ErrorMessage name="address" component="div" className="error-message text-red-500 my-1" />
-                                    </div>
-                                </Col>
-
-                                <Col span={8}>
-                                    <div className="form-item mt-2  ">
-                                        <label className="font-semibold">Default Language</label>
-                                        <Field name="defaultLanguage">
-                                            {({ field }) => (
-                                                <Select {...field} className="w-full mt-2"
-                                                placeholder="Select Default Language"
-                                                onChange={(value) => setFieldValue('defaultLanguage', value)}
-                                                value={values.defaultLanguage}
-                                                onBlur={() => setFieldTouched("defaultLanguage", true)}>
-                                                    <Option value="English">English</Option>
-                                                    <Option value="Spanish">Spanish</Option>
-                                                    <Option value="French">French</Option>
-                                                </Select>
-                                            )}
-                                        </Field>
-                                        <ErrorMessage name="defaultLanguage" component="div" className="error-message text-red-500 my-1" />
-                                    </div>
-                                </Col>
-
-                                <Col span={8} className='mt-2'>
-                                    <div className="form-item ">
-                                        <label className='font-semibold'>User Default Language</label>
-                                        <Field name="userDefaultLanguage">
-                                            {({ field }) => (
-                                                <Select
-                                                    {...field}
-                                                    className="w-full mt-2"
-                                                    placeholder="Select User Default Language"
-                                                    onChange={(value) => setFieldValue('userDefaultLanguage', value)}
-                                                    value={values.userDefaultLanguage}
-                                                    onBlur={() => setFieldTouched("userDefaultLanguage", true)}
-                                                >
-                                                    <Option value="English">English</Option>
-                                                    <Option value="Spanish">Spanish</Option>
-                                                    <Option value="French">French</Option>
-                                                </Select>
-                                            )}
-                                        </Field>
-                                        <ErrorMessage name="userDefaultLanguage" component="div" className="error-message text-red-500 my-1" />
-                                    </div>
-                                </Col>
-
-                                {/* <Col span={8}>
+                {/* Description */}
+                <Col xs={24} sm={24} md={24} >
                   <div className="form-item">
-                    <label className="font-semibold">User Default Language</label>
-                    <Field name="userDefaultLanguage">
-                      {({ field }) => (
-                        <Select {...field} className="w-full">
-                          <Option value="English">English</Option>
-                          <Option value="Spanish">Spanish</Option>
-                          <Option value="French">French</Option>
-                        </Select>
-                      )}
-                    </Field>
-                    <ErrorMessage name="billing_address" component="div" className="error-message text-red-500 my-1" />
+                    <label className="block text-lg font-medium text-gray-700 mb-2">
+                      Description
+                    </label>
+                    <ReactQuill
+                      theme="snow"
+                      value={values.description}
+                      onChange={(content) => setFieldValue('description', content)}
+                      className=""
+                      modules={{
+                        toolbar: [
+                          ['bold', 'italic', 'underline'],
+                          [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                          ['link'],
+                          ['clean']
+                        ]
+                      }}
+                    />
                   </div>
-                </Col> */}
+                </Col>
+              </Row>
+            </Card>
 
-                                <Col span={8}>
-                                    <div className="form-item mt-2">
-                                        <label className="font-semibold">Default Country Code</label>
-                                        <Field name="defaultCountryCode">
-                                            {({ field }) => (
-                                                <Select {...field} className="w-full mt-2"
-                                                placeholder="Select Default Country Code"
-                                                onChange={(value) => setFieldValue('defaultCountryCode', value)}
-                                                value={values.defaultCountryCode}
-                                                onBlur={() => setFieldTouched("defaultCountryCode", true)}
-                                                >
-                                                    <Option value="+91 India (भारत)+91">+91 India (भारत)+91</Option>
-                                                    <Option value="+1 USA">+1 USA</Option>
-                                                    <Option value="+44 UK">+44 UK</Option>
-                                                </Select>
-                                            )}
-                                        </Field>
-                                        <ErrorMessage name="defaultCountryCode" component="div" className="error-message text-red-500 my-1" />
-                                    </div>
-                                </Col>
-
-                                <Col span={8}>
-                                    <div className="form-item mt-2">
-                                        <label className="font-semibold">Default Currency Format</label>
-                                        <Field name="defaultCurrencyFormat">
-                                            {({ field }) => (
-                                                <Select {...field} className="w-full mt-2"
-                                                placeholder="Select Default Currency Format"
-                                                onChange={(value) => setFieldValue('defaultCurrencyFormat', value)}
-                                                value={values.defaultCurrencyFormat}
-                                                onBlur={() => setFieldTouched("defaultCurrencyFormat", true)}>
-                                                    <Option value="$ - USD US Dollar">$ - USD US Dollar</Option>
-                                                    <Option value="€ - EUR Euro">€ - EUR Euro</Option>
-                                                    <Option value="£ - GBP British Pound">£ - GBP British Pound</Option>
-                                                </Select>
-                                            )}
-                                        </Field>
-                                        <ErrorMessage name="defaultCurrencyFormat" component="div" className="error-message text-red-500 my-1" />
-                                    </div>
-                                </Col>
-
-                                <Col span={8}>
-                                    <div className="form-item mt-2">
-                                        <label className="font-semibold">Affiliation Amount Or Percentage</label>
-                                        <Field name="affiliationAmount" as={Input} type="number" placeholder="Enter Amount" className='mt-2'/>
-                                        <ErrorMessage name="affiliationAmount" component="div" className="error-message text-red-500 my-1" />
-                                    </div>
-                                </Col>
-
-                                <Col span={8}>
-                                    <div className="form-item mt-2">
-                                        <label className="font-semibold">Affiliation Type</label>
-                                        <Field name="affiliationType">
-                                            {({ field }) => (
-                                                <Select {...field} className="w-full mt-2"
-                                                placeholder="Select Affiliation Type"
-                                                onChange={(value) => setFieldValue('affiliationType', value)}
-                                                value={values.affiliationType}
-                                                onBlur={() => setFieldTouched("affiliationType", true)}>
-                                                    <Option value="Fix Amount">Fix Amount</Option>
-                                                    <Option value="Percentage">Percentage</Option>
-                                                </Select>
-                                            )}
-                                        </Field>
-                                        <ErrorMessage name="affiliationType" component="div" className="error-message text-red-500 my-1" />
-                                    </div>
-                                </Col>
-
-                                <Col span={8}>
-                                    <div className="form-item mt-2">
-                                        <label className="font-semibold">Timezone</label>
-                                        <Field name="timezone">
-                                            {({ field }) => (
-                                                <Select {...field} className="w-full mt-2"
-                                                placeholder="Select Timezone"
-                                                onChange={(value) => setFieldValue('timezone', value)}
-                                                value={values.timezone}
-                                                onBlur={() => setFieldTouched("timezone", true)}>
-                                                    <Option value="UTC">UTC</Option>
-                                                    <Option value="GMT">GMT</Option>
-                                                    <Option value="EST">EST</Option>
-                                                </Select>
-                                            )}
-                                        </Field>
-                                        <ErrorMessage name="timezone" component="div" className="error-message text-red-500 my-1" />
-                                    </div>
-                                </Col>
-
-                                <Col span={8}>
-                                    <div className="form-item mt-2">
-                                        <label className="font-semibold">Date-Time Format</label>
-                                        <Field name="dateTimeFormat">
-                                            {({ field }) => (
-                                                <Select {...field} className="w-full mt-2"
-                                                placeholder="Select Date-Time Format"
-                                                onChange={(value) => setFieldValue('dateTimeFormat', value)}
-                                                value={values.dateTimeFormat}
-                                                onBlur={() => setFieldTouched("dateTimeFormat", true)}>
-                                                    <Option value="Month Day, Year">Month Day, Year</Option>
-                                                    <Option value="Day Month, Year">Day Month, Year</Option>
-                                                    <Option value="Year Month Day">Year Month Day</Option>
-                                                </Select>
-                                            )}
-                                        </Field>
-                                        <ErrorMessage name="dateTimeFormat" component="div" className="error-message text-red-500 my-1" />
-                                    </div>
-                                </Col>
-
-                                <Col span={12}>
-                                    <div className="form-item mt-2">
-                                        <Switch
-                                            checked={values.showCurrencyBehind}
-                                            onChange={(checked) => setFieldValue('showCurrencyBehind', checked)}
-                                        />
-                                        <span className="ml-2">Show Currency Behind</span>
-                                    </div>
-                                </Col>
-
-                                <Col span={12}>
-                                    <div className="form-item mt-2">
-                                        <Switch
-                                            checked={values.enablePhoneValidation}
-                                            onChange={(checked) => setFieldValue('enablePhoneValidation', checked)}
-                                        />
-                                        <span className="ml-2">Enable Phone Number Input Validation</span>
-                                    </div>
-                                </Col>
-
-                                <Col span={12}>
-                                    <div className="form-item mt-2">
-                                        <Switch
-                                            checked={values.allowEditVCardURL}
-                                            onChange={(checked) => setFieldValue('allowEditVCardURL', checked)}
-                                        />
-                                        <span className="ml-2">Allow to edit vCard URL Alias</span>
-                                    </div>
-                                </Col>
-
-                                <Col span={12}>
-                                    <div className="form-item mt-2">
-                                        <Switch
-                                            checked={values.hideDecimalValues}
-                                            onChange={(checked) => setFieldValue('hideDecimalValues', checked)}
-                                        />
-                                        <span className="ml-2">Hide Decimal Values</span>
-                                    </div>
-                                </Col>
-                            </Row>
-
-                            <div className="form-buttons text-right mt-2">
-                                <Button type="default" className="mr-2">
-                                    Discard
-                                </Button>
-                                <Button type="primary" htmlType="submit">
-                                    Save
-                                </Button>
-                            </div>
-                        </Form>
-                    )}
-                </Formik>
-            </div>
-        </div>
-    );
+            {/* Buttons */}
+            <Row>
+              <Col span={24}>
+                <div className="flex justify-end space-x-4 mt-6">
+                  <Button 
+                    type="default"
+                    className="px-6 py-2 hover:bg-gray-50"
+                    onClick={() => window.location.reload()}
+                  >
+                    Discard
+                  </Button>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={isSubmitting}
+                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    Save
+                  </Button>
+                </div>
+              </Col>
+            </Row>
+          </Form>
+        )}
+      </Formik>
+    </div>
+  );
 };
 
 export default GeneralList; 

@@ -1159,6 +1159,16 @@ export const protectedRoutes = [
         path: `${APP_PREFIX_PATH}/setting/tax`,
         component: React.lazy(() => import('views/app-views/setting/tax')),
     },
+    // {
+    //     key: 'setting.plan',
+    //     path: `${APP_PREFIX_PATH}/setting/plan`,
+    //     component: React.lazy(() => import('views/app-views/setting/plan')),
+    // },
+    {
+        key: 'setting.plan',
+        path: `${APP_PREFIX_PATH}/setting/plan`,
+        component: React.lazy(() => import('views/app-views/plan')),
+    },
     {
         key: 'setting.esignature',
         path: `${APP_PREFIX_PATH}/setting/esignature`,

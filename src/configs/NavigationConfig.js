@@ -341,6 +341,14 @@ const extraNavvTree = [
             submenu: []
           },
           {
+            key: 'extra-superadmin-setting-plan',
+            path: `${APP_PREFIX_PATH}/setting/plan`,
+            title: 'Plan',
+            icon: BlockOutlined,
+            breadcrumb: true,
+            submenu: []
+          },
+          {
             key: 'extra-superadmin-setting-esignature',
             path: `${APP_PREFIX_PATH}/setting/esignature`,
             title: 'ESignature',
