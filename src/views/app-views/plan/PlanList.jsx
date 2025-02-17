@@ -4,7 +4,7 @@ import { EditOutlined, DeleteOutlined, PlusOutlined, UserOutlined, CloudUploadOu
 import AddPlan from "./AddPlan";
 import EditPlan from "./EditPlan";
 import { useDispatch, useSelector } from "react-redux";
-import { DeleteP, GetPlan } from "./PlanReducers/PlanSlice";
+import { DeleteP, GetPlan, planbutus } from "./PlanReducers/PlanSlice";
 import './PlanList.css'; // Import the CSS file
 import { getcurren } from "../setting/currencies/currenciesSlice/currenciesSlice";
 import { getRoles } from "../hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice";
@@ -96,21 +96,29 @@ const PlanList = () => {
   ];
 
   const handleBuyClick = (plan) => {
-    setSelectedPlan(plan);
+    setSelectedPlan(plan.id);
     setIsPurchaseModalVisible(true);
   };
 
   const PurchaseModal = ({ visible, onCancel, plan, currencyData }) => {
     const [loading, setLoading] = useState(false);
+    const loggedInUser = useSelector((state) => state.user.loggedInUser);
 
-    const handlePurchase = async (values) => {
+    const handlePurchase = async () => {
       try {
         setLoading(true);
-        // Add your purchase API call here
+        const purchasePayload = {
+          client_id: loggedInUser?.id || '', // Get client_id from logged in user
+          plan_id: selectedPlan, // Get plan_id from selected plan
+          payment_status: 'paid' // Default payment status
+        };
+
+        await dispatch(planbutus(purchasePayload));
         message.success('Plan purchased successfully');
         onCancel();
       } catch (error) {
         message.error('Failed to purchase plan');
+        console.error('Purchase error:', error);
       } finally {
         setLoading(false);
       }

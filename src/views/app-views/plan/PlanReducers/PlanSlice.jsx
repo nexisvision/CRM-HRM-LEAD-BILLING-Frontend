@@ -4,6 +4,20 @@ import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
+
+export const planbutus = createAsyncThunk(
+    "users/planbutus",
+    async (userData, thunkAPI) => {
+        try {
+            const response = await UserService.planbuy(userData);
+            return response;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error.response.data);
+        }
+    }
+);
+
+
 // Async thunk for adding user
 export const CreatePlan = createAsyncThunk(
     "users/addplan",
@@ -139,6 +153,20 @@ const PlanSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+
+        .addCase(planbutus.pending, (state) => {
+            state.isLoading = true;
+        })
+        .addCase(planbutus.fulfilled, (state, action) => {
+            state.isLoading = false;
+            // message.success(action.payload?.message);
+        })
+        .addCase(planbutus.rejected, (state, action) => {
+            state.isLoading = false;
+            // message.error(action.payload?.message);
+        })
+
+
             //add
             .addCase(CreatePlan.pending, (state) => {
                 state.isLoading = true;

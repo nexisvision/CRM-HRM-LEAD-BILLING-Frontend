@@ -84,6 +84,28 @@ const EditP = async (id, values) => {
   }
 };
 
+const planbuy = async (payload) => {
+  const token = localStorage.getItem("auth_token");
+
+  try {
+    const res = await axios.post(
+      "http://localhost:5353/api/v1/subscriptions/request",
+      JSON.stringify(payload), // Convert payload to JSON string
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json", // Explicitly set content type
+        },
+      }
+    );
+    // Handle response data as needed
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
 // const getAllUsers = async () => {
 //     const res = await axios.get(`${baseUrl}users/all`, getToken());
 //     return res.data
@@ -110,6 +132,7 @@ const UserService = {
   AddPlan,
   DeletePlan,
   EditP,
+  planbuy,
   // getAllUsers,
   // getUserById,
   // deleteUser,

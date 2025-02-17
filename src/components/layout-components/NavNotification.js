@@ -78,6 +78,7 @@ const NavNotification = ({ mode }) => {
         <img
           src="https://gw.alipayobjects.com/zos/rmsportal/sAuJeJzSKbUmHfBQRzmZ.svg"
           alt="empty"
+          style={{ width: '100px', height: '100px',marginLeft: '45px' }}
         />
         <p className="mt-3">You have viewed all notifications</p>
       </div>

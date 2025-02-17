@@ -8,6 +8,7 @@ import * as Yup from "yup";
 import { AddTasks, GetTasks } from "../project/task/TaskReducer/TaskSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+import { GetAllNotifications } from "views/app-views/pages/setting/NotificationReducer/NotificationSlice";
 
 const { Option } = Select;
 
@@ -84,6 +85,7 @@ const AddTask = ({ onClose }) => {
             // message.success("Expenses added successfully!");
             resetForm();
             onClose();
+            dispatch(GetAllNotifications())
           })
           .catch((error) => {
             // message.error("Failed to fetch the latest meeting data.");
