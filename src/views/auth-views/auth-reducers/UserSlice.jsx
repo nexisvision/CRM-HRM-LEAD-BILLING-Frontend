@@ -3,6 +3,47 @@ import UserService from "./UserService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
+
+
+
+export const forgotpass = createAsyncThunk(
+  "users/forgotpass",
+  async (userData, thunkAPI) => {
+    try {
+      const response = await UserService.forgotpass(userData);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const forgototp = createAsyncThunk(
+  "users/forgototp",
+  async (userData, thunkAPI) => {
+    try {
+      const response = await UserService.forgototps(userData);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const resetpass = createAsyncThunk(
+  "users/resetpass",
+  async (userData, thunkAPI) => {
+    try {
+      const response = await UserService.resetpass(userData);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+
+
 // Async thunk for adding user
 export const addNewUser = createAsyncThunk(
   "users/addUser",
@@ -161,6 +202,49 @@ const usersSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+
+    ////
+
+
+    .addCase(forgotpass.pending, (state) => {
+      state.isLoading = true;
+    })
+    .addCase(forgotpass.fulfilled, (state, action) => {
+      state.isLoading = false;
+      toast.success(action.payload?.data?.message);
+    })
+    .addCase(forgotpass.rejected, (state, action) => {
+      state.isLoading = false;
+      toast.error(action.payload?.message);
+    })
+
+    
+    .addCase(forgototp.pending, (state) => {
+      state.isLoading = true;
+    })
+    .addCase(forgototp.fulfilled, (state, action) => {
+      state.isLoading = false;
+      toast.success(action.payload?.data?.message);
+    })
+    .addCase(forgototp.rejected, (state, action) => {
+      state.isLoading = false;
+      toast.error(action.payload?.message);
+    })
+
+    .addCase(resetpass.pending, (state) => {
+      state.isLoading = true;
+    })
+    .addCase(resetpass.fulfilled, (state, action) => {
+      state.isLoading = false;
+      toast.success(action.payload?.data?.message);
+    })
+    .addCase(resetpass.rejected, (state, action) => {
+      state.isLoading = false;
+      toast.error(action.payload?.message);
+    })
+
+
+    
       //add
       .addCase(addNewUser.pending, (state) => {
         state.isLoading = true;

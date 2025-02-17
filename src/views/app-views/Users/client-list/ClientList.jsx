@@ -27,10 +27,7 @@ import UserView from "../client-list/UserView";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-import OrderListData from "assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
-
-import userData from "assets/data/user-list.data.json";
 
 import ResetPassword from "./ResetPassword";
 import { useDispatch, useSelector } from "react-redux";
@@ -45,10 +42,10 @@ const { Option } = Select;
 
 const ClientList = () => {
   const navigate = useNavigate();
-  const [users, setUsers] = useState(userData);
+  const [users, setUsers] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const [isAddCompanyModalVisible, setIsAddCompanyModalVisible] =
     useState(false);
   const [isEditCompanyModalVisible, setIsEditCompanyModalVisible] =
@@ -161,16 +158,16 @@ const ClientList = () => {
   const handleShowStatus = (value) => {
     if (value !== "All") {
       const key = "status";
-      const data = utils.filterArray(userData, key, value);
+      const data = utils.filterArray(users, key, value);
       setUsers(data);
     } else {
-      setUsers(userData);
+      dispatch(ClientData());
     }
   };
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
+    const searchArray = value ? list : list;
     const data = utils.wildCardSearch(searchArray, value);
     setList(data);
   };

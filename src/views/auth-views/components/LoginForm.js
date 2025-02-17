@@ -17,27 +17,24 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from "framer-motion"
 import UserService from '../auth-reducers/UserService';
 import { useDispatch } from 'react-redux';
-import { autol, userLogin } from '../auth-reducers/UserSlice';
+import { autol, forgototp, forgotpass, resetpass, userLogin } from '../auth-reducers/UserSlice';
 
 const ForgotPasswordForm = ({ visible, onCancel }) => {
 	const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
 	const [form] = Form.useForm();
+	const dispatch = useDispatch();
 
 	const handleSubmit = async (values) => {
 		try {
 			if (step === 1) {
-				// Handle email submission
-				// TODO: Implement your email verification API call here
+				dispatch(forgotpass(values));
 				setStep(2);
 			} else if (step === 2) {
-				// Handle OTP verification
-				// TODO: Implement your OTP verification API call here
+				dispatch(forgototp(values));
 				setStep(3);
 			} else if (step === 3) {
-				// Handle password reset
-				// TODO: Implement your password reset API call here
+				dispatch(resetpass(values))
 				onCancel();
-				// Show success message
 			}
 		} catch (error) {
 			console.error('Error:', error);
@@ -202,7 +199,6 @@ export const LoginForm = props => {
 		const checkAndAutoLogin = async () => {
 			const localemail = localStorage.getItem('email');
 			const localtoken = localStorage.getItem('autologintoken');
-			console.log('Checking for email:', localemail); // Debug log
 
 			if (localemail) {
 				try {
@@ -223,13 +219,10 @@ export const LoginForm = props => {
 			}
 		};
 
-		// Execute immediately
 		checkAndAutoLogin();
 		
-		// Also set up an interval to check a few times in case of timing issues
 		const intervalId = setInterval(checkAndAutoLogin, 1000); // Check every second
 		
-		// Clean up after 5 seconds
 		setTimeout(() => {
 			clearInterval(intervalId);
 		}, 5000);
@@ -239,8 +232,6 @@ export const LoginForm = props => {
 
 	const onLogin = values => {
 		showLoading()
-		
-	
 			dispatch(userLogin(values))
 			.then((response) => {
 				if (response.meta.requestStatus === 'fulfilled') { 
@@ -254,10 +245,6 @@ export const LoginForm = props => {
 			.finally(() => {
 				// hideLoading();
 			});
-	
-
-		// signIn(values);
-
 	};
 
 	const onGoogleLogin = () => {

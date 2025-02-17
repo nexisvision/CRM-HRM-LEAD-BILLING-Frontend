@@ -70,20 +70,14 @@ const EditLeave = ({ editid, onClose }) => {
       // Format the values to ISO date strings
       const formattedValues = {
         ...values,
-        startDate: values.startDate.toISOString(),
-        endDate: values.endDate.toISOString(),
+        startDate: moment(values.startDate).format('YYYY-MM-DD'),
+        endDate: moment(values.endDate).format('YYYY-MM-DD'),
       };
 
-      dispatch(EditLeaveAction({ id, values: formattedValues }))
-        .then(() => {
-          dispatch(GetLeave());
-          onClose();
-          navigate("/app/hrm/leave");
-        })
-        .catch((error) => {
-          message.error("Failed to update Leave.");
-          console.error("Edit API error:", error);
-        });
+      await dispatch(EditLeaveAction({ id, values: formattedValues }));
+      dispatch(GetLeave());
+      onClose();
+      navigate("/app/hrm/leave");
     } catch (error) {
       message.error("Failed to update leave: " + (error.message || "Unknown error"));
     } finally {
@@ -154,6 +148,8 @@ const EditLeave = ({ editid, onClose }) => {
                 <DatePicker
                   className="w-full"
                   format="YYYY-MM-DD"
+                  value={values.startDate}
+                  onChange={(date) => setFieldValue("startDate", date)}
                   disabledDate={(current) => current && current < moment().startOf('day')}
                 />
                 {errors.startDate && touched.startDate && (
@@ -168,6 +164,8 @@ const EditLeave = ({ editid, onClose }) => {
                 <DatePicker
                   className="w-full"
                   format="YYYY-MM-DD"
+                  value={values.endDate}
+                  onChange={(date) => setFieldValue("endDate", date)}
                   disabledDate={(current) => current && current < moment().startOf('day')}
                 />
                 {errors.endDate && touched.endDate && (

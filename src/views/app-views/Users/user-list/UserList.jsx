@@ -232,11 +232,10 @@ const UserList = () => {
       dataIndex: "name",
       render: (_, record) => (
         <div className="d-flex">
-          <AvatarStatus
-            src={record.img}
-            name={record.name}
-            subTitle={record.email}
-          />
+          <div>
+            <div className="font-weight-bold">{record.name}</div>
+            <div className="text-muted">{record.email}</div>
+          </div>
         </div>
       ),
       sorter: (a, b) =>
@@ -246,8 +245,9 @@ const UserList = () => {
           ? 1
           : 0,
     },
+    
     {
-      title: "Last online",
+      title: "Date & time",
       dataIndex: "updatedAt",
       sorter: (a, b) => dayjs(a.updatedAt).unix() - dayjs(b.updatedAt).unix(),
     },
