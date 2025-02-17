@@ -1145,6 +1145,11 @@ export const protectedRoutes = [
         component: React.lazy(() => import('views/app-views/setting/general')),
     },
     {
+        key: 'setting.payment',
+        path: `${APP_PREFIX_PATH}/setting/payment`,
+        component: React.lazy(() => import('views/app-views/setting/payment')),
+    },
+    {
         key: 'setting.countries',
         path: `${APP_PREFIX_PATH}/setting/countries`,
         component: React.lazy(() => import('views/app-views/setting/countries')),
@@ -1244,7 +1249,6 @@ export const protectedRoutes = [
     },
    
 ]
-
 // import React from 'react'
 // import { AUTH_PREFIX_PATH, APP_PREFIX_PATH } from 'configs/AppConfig'
 
@@ -2171,3 +2175,4 @@ export const protectedRoutes = [
 //         component: React.lazy(() => import('views/app-views/docs')),
 //     }
 // ]
+

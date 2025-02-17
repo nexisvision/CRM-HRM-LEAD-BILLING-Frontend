@@ -452,6 +452,14 @@ const extraNavvvTree = [
                 submenu: []
               },
               {
+                key: 'extra-superadmin-setting-payment',
+                path: `${APP_PREFIX_PATH}/setting/payment`,
+                title: 'Payment',
+                icon: DollarOutlined ,
+                breadcrumb: true,
+                submenu: []
+              },
+              {
                 key: 'extra-superadmin-setting-countries',
                 path: `${APP_PREFIX_PATH}/setting/countries`,
                 title: 'Countries',

@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Card, Button, Modal, message, Switch, Tag, Row, Col, Typography, Empty, Dropdown } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined, UserOutlined, CloudUploadOutlined, TeamOutlined, CalendarOutlined, CrownOutlined, MoreOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusOutlined, UserOutlined, CloudUploadOutlined, TeamOutlined, CalendarOutlined, CrownOutlined, MoreOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import AddPlan from "./AddPlan";
 import EditPlan from "./EditPlan";
 import { useDispatch, useSelector } from "react-redux";
 import { DeleteP, GetPlan } from "./PlanReducers/PlanSlice";
 import './PlanList.css'; // Import the CSS file
 import { getcurren } from "../setting/currencies/currenciesSlice/currenciesSlice";
+import { getRoles } from "../hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice";
+import moment from "moment";
 // import { getallcurrencies } from "../setting/currencies/currenciesreducer/currenciesSlice";
 
 const { Title, Text } = Typography;
@@ -15,9 +17,25 @@ const PlanList = () => {
   const [isAddPlanModalVisible, setIsAddPlanModalVisible] = useState(false);
   const [isEditPlanModalVisible, setIsEditPlanModalVisible] = useState(false);
   const [idd, setIdd] = useState("");
+  const [isPurchaseModalVisible, setIsPurchaseModalVisible] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const dispatch = useDispatch();
   const Plandata = useSelector((state) => state.Plan);
   const allPlans = Plandata.Plan;
+
+
+  const roleid = useSelector((state) => state.user.loggedInUser.role_id);
+
+  const role = useSelector((state) => state.role.role.data || []);
+
+  const roleidd = role.find((item) => item.id === roleid);
+  const isAdmin = roleidd?.role_name === 'super-admin';
+
+  const filteredPlans = isAdmin ? allPlans : [];
+
+  console.log("Role data:", roleidd);
+
+  
 
   const allempdatass = useSelector((state) => state.currencies);
   const currencyData = allempdatass?.currencies?.data || [];
@@ -28,6 +46,10 @@ const PlanList = () => {
 
   useEffect(() => {
     dispatch(GetPlan());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getRoles());
   }, [dispatch]);
 
   const deletePlan = async (planId) => {
@@ -73,9 +95,251 @@ const PlanList = () => {
     }
   ];
 
-  
+  const handleBuyClick = (plan) => {
+    setSelectedPlan(plan);
+    setIsPurchaseModalVisible(true);
+  };
 
-  
+  const PurchaseModal = ({ visible, onCancel, plan, currencyData }) => {
+    const [loading, setLoading] = useState(false);
+
+    const handlePurchase = async (values) => {
+      try {
+        setLoading(true);
+        // Add your purchase API call here
+        message.success('Plan purchased successfully');
+        onCancel();
+      } catch (error) {
+        message.error('Failed to purchase plan');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const selectedCurrency = Array.isArray(currencyData) && 
+      currencyData.find((item) => item.id === plan?.currency);
+
+    return (
+      <Modal
+        title={<Title level={4}>Purchase Plan</Title>}
+        visible={visible}
+        onCancel={onCancel}
+        footer={null}
+        width={700}
+        className="purchase-plan-modal"
+      >
+        <div className="p-4">
+          <Row gutter={[24, 24]}>
+            {/* Plan Details */}
+            <Col span={24}>
+              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <Row gutter={[16, 16]}>
+                  <Col span={12}>
+                    <div className="space-y-1">
+                      <Text type="secondary">Selected Plan</Text>
+                      <div className="text-lg font-semibold text-gray-800">
+                        {plan?.name}
+                      </div>
+                    </div>
+                  </Col>
+                  <Col span={12}>
+                    <div className="space-y-1">
+                      <Text type="secondary">Amount</Text>
+                      <div className="text-lg font-semibold text-blue-600">
+                        {selectedCurrency?.currencyIcon}{plan?.price}
+                        <span className="text-sm text-gray-500 ml-1">
+                          /{plan?.duration?.toLowerCase()}
+                        </span>
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+              </div>
+            </Col>
+
+            {/* Plan Features */}
+            <Col span={24}>
+              <div className="space-y-4">
+                <Text strong>Plan Features:</Text>
+                <Row gutter={[16, 16]}>
+                  <Col xs={24} sm={12}>
+                    <div className="flex items-center gap-3 bg-gray-50 p-3 rounded">
+                      <UserOutlined className="text-blue-500" />
+                      <div>
+                        <div className="text-sm text-gray-600">Users</div>
+                        <div className="font-medium">{plan?.max_users}</div>
+                      </div>
+                    </div>
+                  </Col>
+                  <Col xs={24} sm={12}>
+                    <div className="flex items-center gap-3 bg-gray-50 p-3 rounded">
+                      <TeamOutlined className="text-green-500" />
+                      <div>
+                        <div className="text-sm text-gray-600">Clients</div>
+                        <div className="font-medium">{plan?.max_clients}</div>
+                      </div>
+                    </div>
+                  </Col>
+                  <Col xs={24} sm={12}>
+                    <div className="flex items-center gap-3 bg-gray-50 p-3 rounded">
+                      <CloudUploadOutlined className="text-purple-500" />
+                      <div>
+                        <div className="text-sm text-gray-600">Storage</div>
+                        <div className="font-medium">{plan?.storage_limit} GB</div>
+                      </div>
+                    </div>
+                  </Col>
+                  <Col xs={24} sm={12}>
+                    <div className="flex items-center gap-3 bg-gray-50 p-3 rounded">
+                      <CalendarOutlined className="text-orange-500" />
+                      <div>
+                        <div className="text-sm text-gray-600">Duration</div>
+                        <div className="font-medium">{plan?.duration}</div>
+                      </div>
+                    </div>
+                  </Col>
+                </Row>
+              </div>
+            </Col>
+
+            {/* Trial Period Notice */}
+            <Col span={24}>
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <InfoCircleOutlined className="text-blue-500 mt-0.5" />
+                  <div>
+                    <Text strong className="text-blue-600">Trial Period</Text>
+                    <p className="text-sm text-gray-600 mt-1">
+                      You will get a {plan?.trial_period} days trial period with this plan.
+                      No charges will be applied during the trial period.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Col>
+
+            {/* Action Buttons */}
+            <Col span={24}>
+              <div className="flex justify-end gap-4 pt-4 border-t">
+                <Button onClick={onCancel}>
+                  Cancel
+                </Button>
+                <Button
+                  type="primary"
+                  loading={loading}
+                  onClick={handlePurchase}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Confirm Purchase
+                </Button>
+              </div>
+            </Col>
+          </Row>
+        </div>
+      </Modal>
+    );
+  };
+
+  const renderUserPlanStatus = () => {
+    // Assuming you have the user's current plan data in your state
+    const userCurrentPlan = allPlans?.find(plan => plan.status === 'active');
+    
+    return (
+      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Your Current Subscription
+            </h2>
+            <p className="text-gray-600">
+              Plan details and status
+            </p>
+          </div>
+          {userCurrentPlan?.status === 'active' && (
+            <Tag color="success" className="px-4 py-1 text-sm">
+              Active
+            </Tag>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-gray-600 mb-1">Current Plan</p>
+            <p className="text-lg font-semibold text-gray-800">
+              {userCurrentPlan?.name || 'No active plan'}
+            </p>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-gray-600 mb-1">Expiry Date</p>
+            <p className="text-lg font-semibold text-gray-800">
+              {userCurrentPlan?.expiry_date ? (
+                moment(userCurrentPlan.expiry_date).format('DD MMM, YYYY')
+              ) : (
+                'N/A'
+              )}
+            </p>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <p className="text-gray-600 mb-1">Days Remaining</p>
+            <p className="text-lg font-semibold text-gray-800">
+              {userCurrentPlan?.expiry_date ? (
+                `${moment(userCurrentPlan.expiry_date).diff(moment(), 'days')} days`
+              ) : (
+                'N/A'
+              )}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 border-t pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="flex items-center gap-3">
+              <UserOutlined className="text-blue-500" />
+              <div>
+                <p className="text-gray-600 text-sm">Users</p>
+                <p className="font-semibold">
+                  {userCurrentPlan?.current_users || 0}/{userCurrentPlan?.max_users || 0}
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <TeamOutlined className="text-green-500" />
+              <div>
+                <p className="text-gray-600 text-sm">Clients</p>
+                <p className="font-semibold">
+                  {userCurrentPlan?.current_clients || 0}/{userCurrentPlan?.max_clients || 0}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <CloudUploadOutlined className="text-purple-500" />
+              <div>
+                <p className="text-gray-600 text-sm">Storage</p>
+                <p className="font-semibold">
+                  {userCurrentPlan?.used_storage || 0}/{userCurrentPlan?.storage_limit || 0} GB
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <CalendarOutlined className="text-orange-500" />
+              <div>
+                <p className="text-gray-600 text-sm">Billing Cycle</p>
+                <p className="font-semibold">
+                  {userCurrentPlan?.duration || 'N/A'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="plan-list-container p-6 bg-gray-50 min-h-screen">
       <div className="mx-auto">
@@ -87,19 +351,23 @@ const PlanList = () => {
             </Title>
             <Text type="secondary">Manage your subscription plans</Text>
           </Col>
-          <Col>
-            <Button
-              type="primary"
-              // size="large"
-              onClick={openAddPlanModal}
-              icon={<PlusOutlined />}
-              // className="hover:shadow-lg transition-shadow duration-300"
-            >
-              Add New Plan
-            </Button>
-          </Col>
+          {isAdmin && (
+            <Col>
+              <Button
+                type="primary"
+                onClick={openAddPlanModal}
+                icon={<PlusOutlined />}
+              >
+                Add New Plan
+              </Button>
+            </Col>
+          )}
         </Row>
 
+        {/* Show current plan status for non-admin users */}
+        {!isAdmin && renderUserPlanStatus()}
+
+        {/* Show all plans for everyone */}
         {allPlans?.length === 0 ? (
           <Empty description="No plans found" className="my-12" />
         ) : (
@@ -107,26 +375,28 @@ const PlanList = () => {
             {allPlans?.map((plan) => (
               <Col xs={24} sm={24} md={12} lg={8} xl={6} key={plan.id}>
                 <Card
-                  className="plan-card h-full  rounded-xl"
+                  className="plan-card h-full rounded-xl"
                   hoverable
                   title={
                     <div className="flex justify-between items-center py-2">
                       <span className="text-xl font-bold text-gray-800">{plan.name}</span>
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={plan.status === 'active'}
-                          onChange={() => togglePlan(plan.id)}
-                          checkedChildren="Active"
-                          unCheckedChildren="Inactive"
-                        />
-                        <Dropdown
-                          menu={{ items: getMenuItems(plan.id) }}
-                          placement="bottomRight"
-                          trigger={['click']}
-                        >
-                          <Button type="text" icon={<MoreOutlined />} />
-                        </Dropdown>
-                      </div>
+                      {isAdmin && (
+                        <div className="flex items-center gap-2">
+                          <Switch
+                            checked={plan.status === 'active'}
+                            onChange={() => togglePlan(plan.id)}
+                            checkedChildren="Active"
+                            unCheckedChildren="Inactive"
+                          />
+                          <Dropdown
+                            menu={{ items: getMenuItems(plan.id) }}
+                            placement="bottomRight"
+                            trigger={['click']}
+                          >
+                            <Button type="text" icon={<MoreOutlined />} />
+                          </Dropdown>
+                        </div>
+                      )}
                     </div>
                   }
                 >
@@ -146,6 +416,7 @@ const PlanList = () => {
                         );
                       })()}
                     </div>
+
                     <div className="space-y-3">
                       <div className="flex items-center gap-3 bg-gray-50 p-2 rounded">
                         <CalendarOutlined className="text-blue-500" />
@@ -174,6 +445,17 @@ const PlanList = () => {
                       </Tag>
                     </div>
 
+                    {!isAdmin && (
+                      <Button 
+                        type="primary" 
+                        block
+                        onClick={() => handleBuyClick(plan)}
+                        className="mt-4 h-10 bg-blue-600 hover:bg-blue-700"
+                      >
+                        {plan.status === 'active' ? 'Buy' : ''}
+                      </Button>
+                    )}
+
                     {plan.features && (
                       <div className="border-t pt-4">
                         <Text strong className="block mb-3">Features:</Text>
@@ -197,7 +479,6 @@ const PlanList = () => {
           </Row>
         )}
 
-
         <Modal
           title={<Title level={4}>Add New Plan</Title>}
           visible={isAddPlanModalVisible}
@@ -219,6 +500,13 @@ const PlanList = () => {
         >
           <EditPlan onClose={closeEditPlanModal} id={idd} />
         </Modal>
+
+        <PurchaseModal
+          visible={isPurchaseModalVisible}
+          onCancel={() => setIsPurchaseModalVisible(false)}
+          plan={selectedPlan}
+          currencyData={currencyData}
+        />
       </div>
     </div>
   );

@@ -209,7 +209,7 @@ export const LoginForm = props => {
 					if (response.meta.requestStatus === 'fulfilled') { 
 						localStorage.removeItem('email');
 						localStorage.removeItem("autologintoken");
-						navigate('/dashboard/default');
+						// navigate('/dashboard/default');
 						window.location.reload();
 					}
 				} catch (error) {
@@ -234,16 +234,32 @@ export const LoginForm = props => {
 		showLoading()
 			dispatch(userLogin(values))
 			.then((response) => {
-				if (response.meta.requestStatus === 'fulfilled') { 
-					navigate('/dashboard/default');
-					window.location.reload();
+				if (response.meta.requestStatus === 'fulfilled') {
+					// Get user role from response
+					const userRole = response.payload.role;
+					
+					// Redirect based on role
+					switch(userRole) {
+						case 'superadmin':
+							navigate('/app/superadmin/dashboard');
+							break;
+						case 'admin':
+							navigate('/app/admin/dashboard');
+							break;
+						case 'user':
+							navigate('/app/user/dashboard');
+							break;
+						default:
+							navigate('/app/dashboard');
+					}
+
+					// Store the role in localStorage
+					localStorage.setItem('userRole', userRole);
 				}
 			})
 			.catch((error) => {
 				console.error('Login failed:', error);
-			})
-			.finally(() => {
-				// hideLoading();
+				message.error('Login failed. Please check your credentials.');
 			});
 	};
 
