@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Button, Form, Input, Divider, Alert } from 'antd';
+import { Button, Form, Input, Divider, Alert, Modal } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 import { GoogleSVG, FacebookSVG } from 'assets/svg/icon';
@@ -19,8 +19,156 @@ import UserService from '../auth-reducers/UserService';
 import { useDispatch } from 'react-redux';
 import { autol, userLogin } from '../auth-reducers/UserSlice';
 
-export const LoginForm = props => {
+const ForgotPasswordForm = ({ visible, onCancel }) => {
+	const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
+	const [form] = Form.useForm();
 
+	const handleSubmit = async (values) => {
+		try {
+			if (step === 1) {
+				// Handle email submission
+				// TODO: Implement your email verification API call here
+				setStep(2);
+			} else if (step === 2) {
+				// Handle OTP verification
+				// TODO: Implement your OTP verification API call here
+				setStep(3);
+			} else if (step === 3) {
+				// Handle password reset
+				// TODO: Implement your password reset API call here
+				onCancel();
+				// Show success message
+			}
+		} catch (error) {
+			console.error('Error:', error);
+		}
+	};
+
+	const renderStepContent = () => {
+		switch (step) {
+			case 1:
+				return (
+					<Form.Item
+						name="email"
+						rules={[
+							{ required: true, message: 'Please enter your email' },
+							{ type: 'email', message: 'Please enter a valid email' }
+						]}
+					>
+						<Input 
+							prefix={<MailOutlined className="text-primary" />}
+							placeholder="Email"
+							className="rounded-md"
+						/>
+					</Form.Item>
+				);
+			case 2:
+				return (
+					<Form.Item
+						name="otp"
+						rules={[{ required: true, message: 'Please enter OTP' }]}
+					>
+						<Input 
+							placeholder="Enter OTP"
+							className="rounded-md"
+							maxLength={6}
+						/>
+					</Form.Item>
+				);
+			case 3:
+				return (
+					<>
+						<Form.Item
+							name="newPassword"
+							rules={[
+								{ required: true, message: 'Please enter new password' },
+								{ min: 6, message: 'Password must be at least 6 characters' }
+							]}
+						>
+							<Input.Password 
+								prefix={<LockOutlined className="text-primary" />}
+								placeholder="New Password"
+								className="rounded-md"
+							/>
+						</Form.Item>
+						<Form.Item
+							name="confirmPassword"
+							dependencies={['newPassword']}
+							rules={[
+								{ required: true, message: 'Please confirm your password' },
+								({ getFieldValue }) => ({
+									validator(_, value) {
+										if (!value || getFieldValue('newPassword') === value) {
+											return Promise.resolve();
+										}
+										return Promise.reject('Passwords do not match');
+									},
+								}),
+							]}
+						>
+							<Input.Password 
+								prefix={<LockOutlined className="text-primary" />}
+								placeholder="Confirm Password"
+								className="rounded-md"
+							/>
+						</Form.Item>
+					</>
+				);
+			default:
+				return null;
+		}
+	};
+
+	return (
+		<Modal
+			title={
+				<div className="text-lg font-semibold text-gray-800">
+					{step === 1 ? 'Forgot Password' : step === 2 ? 'Enter OTP' : 'Reset Password'}
+				</div>
+			}
+			visible={visible}
+			onCancel={onCancel}
+			footer={null}
+			className="rounded-lg"
+		>
+			<Form
+				form={form}
+				onFinish={handleSubmit}
+				className="space-y-4"
+			>
+				<div className="mb-4">
+					<p className="text-gray-600">
+						{step === 1 
+							? 'Enter your email to receive a verification code'
+							: step === 2 
+							? 'Enter the OTP sent to your email'
+							: 'Enter your new password'}
+					</p>
+				</div>
+
+				{renderStepContent()}
+
+				<div className="flex justify-end space-x-4">
+					<Button 
+						onClick={onCancel}
+						className="px-4 py-2 text-gray-700 hover:text-gray-900"
+					>
+						Cancel
+					</Button>
+					<Button 
+						type="primary" 
+						htmlType="submit"
+						className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white"
+					>
+						{step === 1 ? 'Send OTP' : step === 2 ? 'Verify OTP' : 'Reset Password'}
+					</Button>
+				</div>
+			</Form>
+		</Modal>
+	);
+};
+
+export const LoginForm = props => {
 	const dispatch = useDispatch();
 	
 	const navigate = useNavigate();
@@ -47,6 +195,8 @@ export const LoginForm = props => {
 		email: 'user1@themenate.net',
 		password: '2005ipo'
 	}
+
+	const [forgotPasswordVisible, setForgotPasswordVisible] = useState(false);
 
 	useEffect(() => {
 		const checkAndAutoLogin = async () => {
@@ -160,74 +310,91 @@ export const LoginForm = props => {
 	)
 
 	return (
-		<>
-			<motion.div 
-				initial={{ opacity: 0, marginBottom: 0 }} 
-				animate={{ 
-					opacity: showMessage ? 1 : 0,
-					marginBottom: showMessage ? 20 : 0 
-				}}> 
-				<Alert type="error" showIcon message={message}></Alert>
-			</motion.div>
+		<div className="bg-white rounded-2xl p-8 w-full max-w-md mx-auto ">
+			<div className="mb-6">
+				{/* <h1 className="text-2xl font-bold text-gray-800 mb-2">emilus</h1>
+				<p className="text-gray-600">
+					Don't have an account yet? 
+					<span className="text-blue-600 hover:text-blue-700 cursor-pointer ml-1">
+						Sign Up
+					</span>
+				</p> */}
+			</div>
+
 			<Form 
 				layout="vertical" 
 				name="login-form" 
 				initialValues={initialCredential}
 				onFinish={onLogin}
+				className="space-y-4"
 			>
 				<Form.Item 
 					name="login" 
-					label="Email" 
+					label={
+						<span className="flex items-center">
+							<span className="text-red-500 mr-1"></span>
+							Email
+						</span>
+					}
 					rules={[
-						{ 
-							required: true,
-							message: 'Please input your email',
-						},
-						{ 
-							type: 'email',
-							message: 'Please enter a validate email!'
-						}
-					]}>
-					<Input prefix={<MailOutlined className="text-primary" />}/>
+						{ required: true, message: 'Please input your email' },
+						{ type: 'email', message: 'Please enter a valid email!' }
+					]}
+				>
+					<Input 
+						prefix={<MailOutlined className="text-gray-400" />}
+						className="h-12 rounded-md"
+						placeholder="Enter your email"
+					/>
 				</Form.Item>
+				
 				<Form.Item 
 					name="password" 
 					label={
-						<div className={`${showForgetPassword? 'd-flex justify-content-between w-100 align-items-center' : ''}`}>
-							<span>Password</span>
-							{
-								showForgetPassword && 
-								<span 
-									onClick={() => onForgetPasswordClick} 
-									className="cursor-pointer font-size-sm font-weight-normal text-muted"
-								>
-									Forget Password?
-								</span>
-							} 
-						</div>
-					} 
+						<span className="flex items-center">
+							<span className="text-red-500 mr-1"></span>
+							Password
+						</span>
+					}
 					rules={[
-						{ 
-							required: true,
-							message: 'Please input your password',
-						}
+						{ required: true, message: 'Please input your password' }
 					]}
 				>
-					<Input.Password prefix={<LockOutlined className="text-primary" />}/>
+					<Input.Password 
+						prefix={<LockOutlined className="text-gray-400" />}
+						className="h-12 rounded-md"
+						placeholder="••••••••"
+					/>
 				</Form.Item>
-				<Form.Item>
-					<Button type="primary" htmlType="submit" block >
+
+				<div className="flex justify-end -mt-2 mb-4">
+					<span 
+						onClick={() => setForgotPasswordVisible(true)} 
+						className="text-blue-600 hover:text-blue-700 cursor-pointer text-sm"
+					>
+						Forgot Password?
+					</span>
+				</div>
+
+				<Form.Item className="mb-0">
+					<Button 
+						type="primary" 
+						htmlType="submit" 
+						block
+						className="h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 rounded-md"
+					>
 						Sign In
 					</Button>
 				</Form.Item>
-				{/* {
-					otherSignIn ? renderOtherSignIn : null
-				}
-				{ extra } */}
 			</Form>
-		</>
-	)
-}
+
+			<ForgotPasswordForm 
+				visible={forgotPasswordVisible}
+				onCancel={() => setForgotPasswordVisible(false)}
+			/>
+		</div>
+	);
+};
 
 LoginForm.propTypes = {
 	otherSignIn: PropTypes.bool,
