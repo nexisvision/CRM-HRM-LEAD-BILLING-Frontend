@@ -27,6 +27,7 @@ import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
 import { getBranch } from "../Branch/BranchReducer/BranchSlice";
 import moment from "moment";
+import { MdOutlineEmail } from "react-icons/md";
 
 const EmployeeList = () => {
   // State declarations
@@ -42,8 +43,14 @@ const EmployeeList = () => {
     useState(false);
   const [isViewEmployeeModalVisible, setIsViewEmployeeModalVisible] =
     useState(false);
+    const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
+    const [comnyid, setCompnyid] = useState("");
+  const [initialValues, setInitialValues] = useState({ email: '' });
+  const [isOtpModalVisible, setIsOtpModalVisible] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [emailForOtp, setEmailForOtp] = useState('');
 
-    const user = useSelector((state) => state.user.loggedInUser.username);
+  const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.employee);
 
   const [sub, setSub] = useState(false);
@@ -124,37 +131,37 @@ const EmployeeList = () => {
   };
 
   //// permission
-                 
-      const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-      const roles = useSelector((state) => state.role?.role?.data);
-      const roleData = roles?.find(role => role.id === roleId);
-   
-      const whorole = roleData.role_name;
-   
-      const parsedPermissions = Array.isArray(roleData?.permissions)
-      ? roleData.permissions
-      : typeof roleData?.permissions === 'string'
+
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
       ? JSON.parse(roleData.permissions)
       : [];
-    
-    
-      let allpermisson;  
-   
-      if (parsedPermissions["extra-hrm-employee"] && parsedPermissions["extra-hrm-employee"][0]?.permissions) {
-        allpermisson = parsedPermissions["extra-hrm-employee"][0].permissions;
-        // console.log('Parsed Permissions:', allpermisson);
-      
-      } else {
-        // console.log('extra-hrm-employee is not available');
-      }
-      
-      const canCreateClient = allpermisson?.includes('create');
-      const canEditClient = allpermisson?.includes('edit');
-      const canDeleteClient = allpermisson?.includes('delete');
-      const canViewClient = allpermisson?.includes('view');
-   
-      ///endpermission
-   
+
+
+  let allpermisson;
+
+  if (parsedPermissions["extra-hrm-employee"] && parsedPermissions["extra-hrm-employee"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-employee"][0].permissions;
+    // console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    // console.log('extra-hrm-employee is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+  ///endpermission
+
 
   // Search handler
   const onSearch = (e) => {
@@ -210,9 +217,9 @@ const EmployeeList = () => {
   }, [sub, dispatch]);
 
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(empdata())
-  },[dispatch])
+  }, [dispatch])
 
 
 
@@ -277,41 +284,59 @@ const EmployeeList = () => {
           </Button>
         </Flex>
       </Menu.Item> */}
-      
-    
+
+
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                            <Menu.Item>
-                            <Flex alignItems="center">
-                              <Button
-                                type=""
-                                className=""
-                                icon={<EditOutlined />}
-                                onClick={() => openEditEmployeeModal(elm.id)}
-                                size="small"
-                              >
-                                <span className="ml-2">Edit</span>
-                              </Button>
-                            </Flex>
-                          </Menu.Item>
-                    ) : null}
-      
-      
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              className=""
+              icon={<EditOutlined />}
+              onClick={() => openEditEmployeeModal(elm.id)}
+              size="small"
+            >
+              <span className="ml-2">Edit</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
+
+<Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className="flex items-center gap-2"
+            icon={<MdOutlineEmail/>}
+            onClick={() => {
+              setIsEmailVerificationModalVisible(true);
+              setCompnyid(user.id);
+            }}
+            size="small"
+            // style={{ display: "block", marginBottom: "8px" }}
+          >
+            <span>Update Email</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
+
+
       {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                       <Menu.Item>
-                       <Flex alignItems="center">
-                         <Button
-                           type=""
-                           className=""
-                           icon={<DeleteOutlined />}
-                           onClick={() => deleteUser(elm.id)}
-                           size="small"
-                         >
-                           <span className="">Delete</span>
-                         </Button>
-                       </Flex>
-                     </Menu.Item>
-                    ) : null}
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              className=""
+              icon={<DeleteOutlined />}
+              onClick={() => deleteUser(elm.id)}
+              size="small"
+            >
+              <span className="">Delete</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
 
 
     </Menu>
@@ -408,6 +433,31 @@ const EmployeeList = () => {
     },
   ];
 
+  const handleEmailVerification = (email) => {
+    setInitialValues({ email });
+    setIsEmailVerificationModalVisible(true);
+  };
+
+  const handleSendOTP = () => {
+    setEmailForOtp(initialValues.email);
+    setIsEmailVerificationModalVisible(false);
+    setIsOtpModalVisible(true);
+  };
+
+  // Add this handler for OTP verification
+  const handleVerifyOTP = () => {
+    // Add your OTP verification logic here
+    
+    // Close the OTP modal
+    setIsOtpModalVisible(false);
+    
+    // Clear the OTP input
+    setOtp('');
+    
+    // Optionally show a success message
+    message.success('Email verified successfully');
+  };
+
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
       <Flex
@@ -425,38 +475,38 @@ const EmployeeList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-          
 
-          
-                     {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                                                             <Button
-                                                                                                                                                             type="primary"
-                                                                                                                                                             className="ml-2"
-                                                                                                                                                             onClick={openAddEmployeeModal}
-                                                                                                                                                           >
-                                                                                                                                                             <PlusOutlined />
-                                                                                                                                                             <span>New</span>
-                                                                                                                                                           </Button>
-                                                                                                                                                
-                                                                                                                                                  ) : null}
+
+
+          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Button
+              type="primary"
+              className="ml-2"
+              onClick={openAddEmployeeModal}
+            >
+              <PlusOutlined />
+              <span>New</span>
+            </Button>
+
+          ) : null}
 
 
           <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel} // Call export function when the button is clicked
+            block
+          >
+            Export All
+          </Button>
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
 
-         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                                  <Table columns={tableColumns} dataSource={users} rowKey="id" />
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          <Table columns={tableColumns} dataSource={users} rowKey="id" />
 
-                                                                                                                          ) : null}
+        ) : null}
 
 
       </div>
@@ -499,6 +549,69 @@ const EmployeeList = () => {
         className="mt-[-80px]"
       >
         <ViewEmployee onClose={closeViewEmployeeModal} />
+      </Modal>
+
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <MailOutlined />
+            <span>Email Verification</span>
+          </div>
+        }
+        visible={isEmailVerificationModalVisible}
+        onCancel={() => setIsEmailVerificationModalVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setIsEmailVerificationModalVisible(false)}>
+            Cancel
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleSendOTP}>
+            Send OTP
+          </Button>
+        ]}
+        width={400}
+      >
+        <div>
+          <div style={{ marginBottom: '8px' }}>
+          Email Address <span style={{ color: '#ff4d4f' }}>*</span> 
+          </div>
+          <Input 
+            placeholder="Enter your email"
+            value={initialValues.email}
+            onChange={(e) => setInitialValues({ email: e.target.value })}
+          />
+        </div>
+      </Modal>
+
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <MailOutlined />
+            <span>Verify OTP</span>
+          </div>
+        }
+        visible={isOtpModalVisible}
+        onCancel={() => setIsOtpModalVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setIsOtpModalVisible(false)}>
+            Cancel
+          </Button>,
+          <Button key="submit" type="primary" onClick={handleVerifyOTP}>
+            Verify OTP
+          </Button>
+        ]}
+        width={400}
+      >
+        <div>
+          <div>{emailForOtp}</div>
+          <div style={{ marginBottom: '8px', marginTop: '16px' }}>
+            <span style={{ color: '#ff4d4f' }}>*</span> Enter OTP
+          </div>
+          <Input 
+            placeholder="Enter 6-digit OTP"
+            value={otp}
+            onChange={(e) => setOtp(e.target.value)}
+          />
+        </div>
       </Modal>
     </Card>
   );
