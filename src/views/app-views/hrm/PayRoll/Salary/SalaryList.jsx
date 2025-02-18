@@ -32,8 +32,12 @@ const SalaryList = () => {
     dispatch(getSalaryss());
   }, []);
 
+const user = useSelector((state) => state.user.loggedInUser.username);
+
   const alldata = useSelector((state) => state.salary);
-  const dfnddata = alldata.salary.data;
+  const dfnddataa = alldata.salary.data || [];
+
+const dfnddata = dfnddataa.filter((item) => item.created_by === user);
 
   useEffect(() => {
     if (dfnddata) {

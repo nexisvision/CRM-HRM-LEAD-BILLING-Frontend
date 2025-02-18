@@ -516,22 +516,22 @@ const dashBoardNavTree = [{
   breadcrumb: true,
   isGroupTitle: true,
   submenu: [
-    {
-      key: 'dashboards-default',
-      path: `${APP_PREFIX_PATH}/dashboards/default`,  
-      title: 'Contacts',
-      icon: DashboardOutlined,
-      breadcrumb: true,
-      submenu: []
-    },
-    {
-      key: 'dashboards-analytic',
-      path: `${APP_PREFIX_PATH}/dashboards/analytic`,
-      title: 'sidenav.dashboard.analytic',
-      icon: DotChartOutlined,
-      breadcrumb: true,
-      submenu: []
-    },
+    // {
+    //   key: 'dashboards-default',
+    //   path: `${APP_PREFIX_PATH}/dashboards/default`,  
+    //   title: 'Contacts',
+    //   icon: DashboardOutlined,
+    //   breadcrumb: true,
+    //   submenu: []
+    // },
+    // {
+    //   key: 'dashboards-analytic',
+    //   path: `${APP_PREFIX_PATH}/dashboards/analytic`,
+    //   title: 'sidenav.dashboard.analytic',
+    //   icon: DotChartOutlined,
+    //   breadcrumb: true,
+    //   submenu: []
+    // },
     // {
     //   key: 'dashboards-crm',
     //   path: `${APP_PREFIX_PATH}/dashboards/crm`,
@@ -730,27 +730,27 @@ const dashBoardNavTree = [{
           },
       
          
-          {
-            key: 'extra-pages',
-            path: `${APP_PREFIX_PATH}/pages`,
-            title: 'sidenav.pages',
-            icon: FileTextOutlined,
-            breadcrumb: true,
-            submenu: [
+          // {
+          //   key: 'extra-pages',
+          //   path: `${APP_PREFIX_PATH}/pages`,
+          //   title: 'sidenav.pages',
+          //   icon: FileTextOutlined,
+          //   breadcrumb: true,
+          //   submenu: [
               
-              {
-                key: 'extra-pages-invoice',
-                path: `${APP_PREFIX_PATH}/pages/invoice`,
-                title: 'sidenav.pages.invoice',
-                icon: FileDoneOutlined,
-                breadcrumb: true,
-                submenu: []
-              },
+          //     {
+          //       key: 'extra-pages-invoice',
+          //       path: `${APP_PREFIX_PATH}/pages/invoice`,
+          //       title: 'sidenav.pages.invoice',
+          //       icon: FileDoneOutlined,
+          //       breadcrumb: true,
+          //       submenu: []
+          //     },
               
 
             
-            ]
-          },
+          //   ]
+          // },
           { 
             key: 'extra-users',
             path: `${APP_PREFIX_PATH}/users`,

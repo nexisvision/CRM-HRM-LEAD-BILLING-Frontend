@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./UserService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
+import { message } from "antd";
 
 
 
@@ -265,11 +266,11 @@ const usersSlice = createSlice({
         state.isLoading = false;
         state.isAuth = true;
         state.loggedInUser = action.payload.user;
-        toast.success(action.payload.message);
+        message.success(action.payload?.message);
       })
       .addCase(userLogin.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.error);
+        message.error(action.payload?.message);
       })
 
 
@@ -280,11 +281,11 @@ const usersSlice = createSlice({
         state.isLoading = false;
         state.isAuth = true;
         state.loggedInUser = action.payload.user;
-        toast.success(action.payload.message);
+        message.success(action.payload.message);
       })
       .addCase(autol.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.error);
+        message.error(action.payload?.message);
       })
 
 

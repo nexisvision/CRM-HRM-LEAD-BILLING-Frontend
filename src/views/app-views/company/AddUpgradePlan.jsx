@@ -97,7 +97,7 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                   <Col span={12} className="">
                     <div className="form-item">
                       <label className="font-semibold">Plan <span className="text-red-500">*</span></label>
-                      <Field name="plan_id">
+                      {/* <Field name="plan_id">
                         {({ field, form }) => (
                           <Select
                             {...field}
@@ -122,19 +122,69 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                             )}
                           </Select>
                         )}
-                      </Field>
+                      </Field> */}
+
+
+<Field name="plan_id">
+  {({ field, form }) => (
+    <Select
+      {...field}
+      className="w-full mt-1"
+      placeholder="Select Plan"
+      loading={!fnsfdtaf}
+      onChange={(value) => {
+        const selectedPlan = fnsfdtaf.find(plan => plan.id === value);
+        if (selectedPlan) {
+          const startDate = moment(); // Today’s date
+          let endDate = moment(startDate); // Clone start date
+
+          // Calculate end date based on duration
+          if (selectedPlan.duration.toLowerCase().includes("month")) {
+            endDate.add(1, 'months');
+          } else if (selectedPlan.duration.toLowerCase().includes("year")) {
+            endDate.add(1, 'years');
+          }
+
+          // Set values for start_date and end_date
+          form.setFieldValue("plan_id", value);
+          form.setFieldValue("start_date", startDate.format("YYYY-MM-DD"));
+          form.setFieldValue("end_date", endDate.format("YYYY-MM-DD"));
+        }
+      }}
+      value={values.plan_id}
+    >
+      {fnsfdtaf && fnsfdtaf.length > 0 ? (
+        fnsfdtaf.map((plan) => (
+          <Option key={plan.id} value={plan.id}>
+            {plan.name}
+          </Option>
+        ))
+      ) : (
+        <Option value="" disabled>
+          No Plan available
+        </Option>
+      )}
+    </Select>
+  )}
+</Field>
                     </div>
                   </Col>
 
                   <Col span={12} className="">
                     <div className="form-item">
                       <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
-                      <DatePicker
+                      {/* <DatePicker
                         className="w-full mt-1"
                         format="DD-MM-YYYY"
                         value={values.start_date}
                         onChange={(date) => setFieldValue("start_date", date)}
-                      />
+                      /> */}
+                     <DatePicker
+  className="w-full mt-1"
+  format="DD-MM-YYYY"
+  value={values.start_date ? moment(values.start_date) : null}
+  disabled
+/>
                       <ErrorMessage
                         name="start_date"
                         component="div"
@@ -146,13 +196,20 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                   <Col span={12} className="mt-3">
                     <div className="form-item">
                       <label className="font-semibold">End Date <span className="text-red-500">*</span> </label>
-                      <DatePicker
+                      {/* <DatePicker
                         className="w-full mt-2"
                         format="DD-MM-YYYY"
                         value={values.endDate}
                         onChange={(date) => setFieldValue("end_date", date)}
                         onBlur={() => setFieldTouched("end_date", true)}
-                      />
+                      /> */}
+
+<DatePicker
+  className="w-full mt-2"
+  format="DD-MM-YYYY"
+  value={values.end_date ? moment(values.end_date) : null}
+  disabled
+/>
                       <ErrorMessage
                         name="end_date"
                         component="div"

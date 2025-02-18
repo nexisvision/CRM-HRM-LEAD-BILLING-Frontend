@@ -189,13 +189,13 @@ const CompanyCard = ({ company }) => {
           </Button>
         </Flex>
       </Menu.Item> */}
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button type="" className="" icon={<LoginOutlined />} size="small">
             <span>Login Disable</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
     </Menu>
   );
 

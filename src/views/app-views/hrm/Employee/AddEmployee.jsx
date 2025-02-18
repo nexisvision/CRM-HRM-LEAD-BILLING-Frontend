@@ -583,6 +583,7 @@ const AddEmployee = ({ onClose, setSub }) => {
     try {
       // console.log("values", values);
       const response = await dispatch(addEmp(values));
+      
       if (response.payload?.data?.sessionToken) {
         setOtpToken(response.payload?.data?.sessionToken);
         setShowOtpModal(true);

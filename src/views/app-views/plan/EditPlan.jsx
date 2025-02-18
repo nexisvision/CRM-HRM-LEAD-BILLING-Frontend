@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Button, Select, Switch, Row, Col, message } from 'antd';
+import { Input, Button, Select, Switch, Row, Dropdown, Menu, Col, message } from 'antd';
 import { Editplan, GetPlan } from './PlanReducers/PlanSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -14,13 +14,17 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
   const [isTrialEnabled, setIsTrialEnabled] = useState(planData?.trial || false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [durationType, setDurationType] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [selectedYear, setSelectedYear] = useState(null);
 
   useEffect(() => {
     dispatch(getcurren());
   }, [dispatch]);
 
   const allempdatass = useSelector((state) => state.currencies);
-  const fnddatass = allempdatass?.currencies;
+  const fnddatass = allempdatass?.currencies?.data;
+  
   const alldept = useSelector((state) => state.Plan);
   const alldept2 = alldept.Plan.data;
 
@@ -78,7 +82,7 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
       });
     onUpdate(submitValues);
   };
-
+ 
   return (
     <div>
       <Formik
@@ -86,7 +90,58 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ values, handleSubmit, setFieldValue, errors, touched }) => (
+        {({ values, handleSubmit, setFieldValue, errors, touched }) => {
+           const handleMenuClick = (e) => {
+            if (e.key === 'Lifetime') {
+              setDurationType('Lifetime');
+              setSelectedMonth(null);
+              setSelectedYear(null);
+              setFieldValue('duration', 'Lifetime');
+            }
+          };
+ const yearlyMenu = (
+  <Menu onClick={({ key }) => {
+    setDurationType('Yearly');
+    setSelectedYear(key);
+    setFieldValue('duration', 'Per Year');
+  }}>
+    <Menu.Item className='w-full'>
+      <Input 
+        placeholder="Enter years"
+        type="number"
+        onChange={(e) => {
+          const value = e.target.value;
+          setSelectedYear(value);
+        }}
+      />
+    </Menu.Item>
+  </Menu>
+);
+
+const monthlyMenu = (
+  <Menu onClick={({ key }) => {
+    setDurationType('Monthly');
+    setSelectedMonth(key);
+    setFieldValue('duration', 'Per Month');
+  }}>
+    {Array.from({ length: 12 }, (_, i) => (
+      <Menu.Item key={i + 1}>{`${i + 1} Month${i + 1 > 1 ? 's' : ''}`}</Menu.Item>
+    ))}
+  </Menu>
+);
+
+const mainMenu = (
+  <Menu onClick={handleMenuClick}>
+    <Menu.Item key="Lifetime">Lifetime</Menu.Item>
+    <Menu.SubMenu key="Yearly" title="Yearly">
+      {yearlyMenu}
+    </Menu.SubMenu>
+    <Menu.SubMenu key="Monthly" title="Monthly">
+      {monthlyMenu}
+    </Menu.SubMenu>
+  </Menu>
+);
+return (
           <form onSubmit={handleSubmit}>
             <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
 
@@ -116,20 +171,28 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
               </Col>
 
               <Col span={12}>
-                <div className="mb-4">
-                  <label className="block mb-1">Duration <span className="text-red-500">*</span></label>
-                  <Field name="duration">
-                    {({ field }) => (
-                      <Select {...field} className="w-full">
-                        <Option value="Lifetime">Lifetime</Option>
-                        <Option value="Yearly">Yearly</Option>
-                        <Option value="Monthly">Monthly</Option>
-                      </Select>
+                  <div className="form-group" style={{ marginBottom: '16px' }}>
+                    <label>Duration <span style={{ color: 'red' }}>*</span></label>
+                    <Dropdown 
+                      overlay={mainMenu} 
+                      trigger={['click']} 
+                      className='w-full'
+                    >
+                      <Button>
+                        {durationType === 'Monthly' && selectedMonth
+                          ? `${selectedMonth} Month${selectedMonth > 1 ? 's' : ''}`
+                          : durationType === 'Yearly' && selectedYear
+                            ? `${selectedYear} Year${selectedYear > 1 ? 's' : ''}`
+                            : durationType === 'Lifetime'
+                              ? 'Lifetime'
+                              : 'Select Duration'}
+                      </Button>
+                    </Dropdown>
+                    {errors.duration && touched.duration && (
+                      <div className="error-message">{errors.duration}</div>
                     )}
-                  </Field>
-                  <ErrorMessage name="duration" component="div" className="text-red-500" />
-                </div>
-              </Col>
+                  </div>
+                </Col>
 
               <Col span={12}>
                 <div className="mb-4">
@@ -192,27 +255,41 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24}>
-                <div className="mb-4">
-                  <label className="block mb-1">Currency <span className="text-red-500">*</span></label>
-                  <Field name="currency">
-                    {({ field }) => (
-                      <Select {...field} className="w-full" placeholder="Select Currency">
-                        {fnddatass && fnddatass?.length > 0 ? (
-                          fnddatass?.map((client) => (
-                            <Option key={client.id} value={client?.id}>
-                              {client?.currencyIcon || client?.currencyCode || "Unnamed currency"}
+              <Col span={24} >
+                  <div className="form-group" style={{ marginBottom: '16px' }}>
+                    <label>currency <span style={{ color: 'red' }}>*</span></label>
+                    <Field name="currency">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-2"
+                          placeholder="Select currency"
+                          onChange={(value) => setFieldValue("currency", value)}
+                          value={values.currency}
+                        >
+                          {fnddatass && fnddatass?.length > 0 ? (
+                            fnddatass?.map((client) => (
+                              <Option key={client.id} value={client?.id}>
+                                {client?.currencyIcon ||
+                                  client?.currencyCode ||
+                                  "Unnamed currency"}
+                              </Option>
+                            ))
+                          ) : (
+                            <Option value="" disabled>
+                              No currency Available
                             </Option>
-                          ))
-                        ) : (
-                          <Option value="" disabled>No Currencies Available</Option>
-                        )}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage name="currency" component="div" className="text-red-500" />
-                </div>
-              </Col>
+                          )}
+                        </Select>
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="currency"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
             </Row>
 
             <div className="mb-4">
@@ -262,7 +339,8 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
               </Button>
             </div>
           </form>
-        )}
+          );
+        }}
       </Formik>
     </div>
   );

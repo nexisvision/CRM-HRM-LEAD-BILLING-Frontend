@@ -107,12 +107,10 @@ const CompanyList = () => {
 
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
+    const value = e.currentTarget.value.toLowerCase();
     const searchResults = value
-      ? users.filter((user) =>
-          user.name.toLowerCase().includes(value.toLowerCase())
-        )
-      : users;
+      ? users.filter((user) => user.username.toLowerCase().includes(value))
+      : tableData.ClientData.data; // Reset to original data if search is cleared
     setUsers(searchResults);
   };
 

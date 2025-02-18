@@ -4,11 +4,12 @@ import { EditOutlined, DeleteOutlined, PlusOutlined, UserOutlined, CloudUploadOu
 import AddPlan from "./AddPlan";
 import EditPlan from "./EditPlan";
 import { useDispatch, useSelector } from "react-redux";
-import { DeleteP, GetPlan, planbutus } from "./PlanReducers/PlanSlice";
+import { DeleteP, Editplan, GetPlan,planbutus } from "./PlanReducers/PlanSlice";
 import './PlanList.css'; // Import the CSS file
 import { getcurren } from "../setting/currencies/currenciesSlice/currenciesSlice";
 import { getRoles } from "../hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice";
 import moment from "moment";
+import { getsubplandata } from "../subscribeduserplans/subplanReducer/subplanSlice";
 // import { getallcurrencies } from "../setting/currencies/currenciesreducer/currenciesSlice";
 
 const { Title, Text } = Typography;
@@ -18,10 +19,10 @@ const PlanList = () => {
   const [isEditPlanModalVisible, setIsEditPlanModalVisible] = useState(false);
   const [idd, setIdd] = useState("");
   const [isPurchaseModalVisible, setIsPurchaseModalVisible] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [selectedPlan, setSelectedPlan] = useState("");
   const dispatch = useDispatch();
   const Plandata = useSelector((state) => state.Plan);
-  const allPlans = Plandata.Plan;
+  const allPlans = Plandata.Plan || [];
 
 
   const roleid = useSelector((state) => state.user.loggedInUser.role_id);
@@ -29,20 +30,50 @@ const PlanList = () => {
   const role = useSelector((state) => state.role.role.data || []);
 
   const roleidd = role.find((item) => item.id === roleid);
-  const isAdmin = roleidd?.role_name === 'super-admin';
+  const isAdmin = roleidd?.role_name === 'super-admin';  
 
   const filteredPlans = isAdmin ? allPlans : [];
 
-  console.log("Role data:", roleidd);
+  // console.log("Role data:", roleidd);
 
-  
+  const userid = useSelector((state) => state.user.loggedInUser.id);
 
   const allempdatass = useSelector((state) => state.currencies);
   const currencyData = allempdatass?.currencies?.data || [];
 
+  const alldatas = useSelector((state) => state.subplan);
+  const fnddtat = alldatas.subplan.data || [];
+
+  // console.log("fnddtat", fnddtat);
+
+  const userplan = fnddtat.find((item) => item.client_id === userid);
+
+  // console.log("userplan", userplan);
+
+  const userplanstatus = userplan?.plan_id;
+
+  const allPlansStatus = allPlans.find((item) => item.id === userplanstatus);
+
+  // console.log("allPlansStatus", allPlansStatus);
+
+  console.log("userplanstatus", selectedPlan);
+
+
+  const userplanstatuss = allPlans.find((item) => item.id === selectedPlan);
+
+  console.log("userplanstatuss", userplanstatuss);
+
+  // const 
+
+
   useEffect(() => {
     dispatch(getcurren())
   }, [])
+
+  useEffect(() => {
+    dispatch(getsubplandata());
+  }, []);
+
 
   useEffect(() => {
     dispatch(GetPlan());
@@ -69,9 +100,25 @@ const PlanList = () => {
   const openEditPlanModal = () => setIsEditPlanModalVisible(true);
   const closeEditPlanModal = () => setIsEditPlanModalVisible(false);
 
-  const togglePlan = (id) => {
-    message.info({ content: 'Plan status toggle functionality needs to be implemented', duration: 2 });
-    // TODO: Implement plan status toggle through Redux
+  const togglePlan = (id, currentStatus, plan) => {
+    if (currentStatus === 'active') {
+      const submitValues = {
+        ...plan,  // Keep all existing plan data
+        status: 'inactive'  // Set status to inactive
+      };
+  
+      dispatch(Editplan({ id, values: submitValues }))
+        .then(() => {
+          dispatch(GetPlan()); // Refresh plans after update
+          message.success("Plan status updated to inactive");
+        })
+        .catch((error) => {
+          message.error("Failed to update plan status");
+          console.error("Error updating status:", error);
+        });
+    } else {
+      message.info("Plan is already inactive");
+    }
   };
 
   const EditP = (id) => {
@@ -146,7 +193,7 @@ const PlanList = () => {
                     <div className="space-y-1">
                       <Text type="secondary">Selected Plan</Text>
                       <div className="text-lg font-semibold text-gray-800">
-                        {plan?.name}
+                        {userplanstatuss?.name}
                       </div>
                     </div>
                   </Col>
@@ -154,10 +201,26 @@ const PlanList = () => {
                     <div className="space-y-1">
                       <Text type="secondary">Amount</Text>
                       <div className="text-lg font-semibold text-blue-600">
-                        {selectedCurrency?.currencyIcon}{plan?.price}
+                        {selectedCurrency?.currencyIcon}{userplanstatuss?.price}
                         <span className="text-sm text-gray-500 ml-1">
                           /{plan?.duration?.toLowerCase()}
                         </span>
+                      </div>
+                    </div>
+                  </Col>
+                  <Col span={12}>
+                    <div className="space-y-1">
+                      <Text type="secondary">Start Date</Text>
+                      <div className="text-lg font-semibold text-gray-800">
+                        {userplan?.start_date ? moment(userplan.start_date).format('DD MMM, YYYY') : 'N/A'}
+                      </div>
+                    </div>
+                  </Col>
+                  <Col span={12}>
+                    <div className="space-y-1">
+                      <Text type="secondary">End Date</Text>
+                      <div className="text-lg font-semibold text-gray-800">
+                        {userplan?.end_date ? moment(userplan?.end_date).format('DD MMM, YYYY') : 'N/A'}
                       </div>
                     </div>
                   </Col>
@@ -250,7 +313,7 @@ const PlanList = () => {
 
   const renderUserPlanStatus = () => {
     // Assuming you have the user's current plan data in your state
-    const userCurrentPlan = allPlans?.find(plan => plan.status === 'active');
+    // const userCurrentPlan = allPlans?.find(plan => plan.status === 'active');
     
     return (
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
@@ -263,7 +326,7 @@ const PlanList = () => {
               Plan details and status
             </p>
           </div>
-          {userCurrentPlan?.status === 'active' && (
+          {allPlansStatus?.status === 'active' && (
             <Tag color="success" className="px-4 py-1 text-sm">
               Active
             </Tag>
@@ -274,15 +337,15 @@ const PlanList = () => {
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="text-gray-600 mb-1">Current Plan</p>
             <p className="text-lg font-semibold text-gray-800">
-              {userCurrentPlan?.name || 'No active plan'}
+              {allPlansStatus?.name || 'No active plan'}
             </p>
           </div>
 
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="text-gray-600 mb-1">Expiry Date</p>
             <p className="text-lg font-semibold text-gray-800">
-              {userCurrentPlan?.expiry_date ? (
-                moment(userCurrentPlan.expiry_date).format('DD MMM, YYYY')
+              {userplan?.end_date ? (
+                moment(userplan.end_date).format('DD MMM, YYYY')
               ) : (
                 'N/A'
               )}
@@ -292,8 +355,8 @@ const PlanList = () => {
           <div className="bg-gray-50 p-4 rounded-lg">
             <p className="text-gray-600 mb-1">Days Remaining</p>
             <p className="text-lg font-semibold text-gray-800">
-              {userCurrentPlan?.expiry_date ? (
-                `${moment(userCurrentPlan.expiry_date).diff(moment(), 'days')} days`
+              {userplan?.end_date ? (
+                `${moment(userplan?.end_date).diff(moment(), 'days')} days`
               ) : (
                 'N/A'
               )}
@@ -308,7 +371,7 @@ const PlanList = () => {
               <div>
                 <p className="text-gray-600 text-sm">Users</p>
                 <p className="font-semibold">
-                  {userCurrentPlan?.current_users || 0}/{userCurrentPlan?.max_users || 0}
+                  {allPlansStatus?.current_users || 0}/{allPlansStatus?.max_users || 0}
                 </p>
               </div>
             </div>
@@ -318,7 +381,7 @@ const PlanList = () => {
               <div>
                 <p className="text-gray-600 text-sm">Clients</p>
                 <p className="font-semibold">
-                  {userCurrentPlan?.current_clients || 0}/{userCurrentPlan?.max_clients || 0}
+                  {allPlansStatus?.current_clients || 0}/{allPlansStatus?.max_clients || 0}
                 </p>
               </div>
             </div>
@@ -328,7 +391,7 @@ const PlanList = () => {
               <div>
                 <p className="text-gray-600 text-sm">Storage</p>
                 <p className="font-semibold">
-                  {userCurrentPlan?.used_storage || 0}/{userCurrentPlan?.storage_limit || 0} GB
+                  {allPlansStatus?.used_storage || 0}/{allPlansStatus?.storage_limit || 0} GB
                 </p>
               </div>
             </div>
@@ -338,7 +401,7 @@ const PlanList = () => {
               <div>
                 <p className="text-gray-600 text-sm">Billing Cycle</p>
                 <p className="font-semibold">
-                  {userCurrentPlan?.duration || 'N/A'}
+                  {allPlansStatus?.duration || 'N/A'}
                 </p>
               </div>
             </div>
@@ -514,6 +577,7 @@ const PlanList = () => {
           onCancel={() => setIsPurchaseModalVisible(false)}
           plan={selectedPlan}
           currencyData={currencyData}
+
         />
       </div>
     </div>

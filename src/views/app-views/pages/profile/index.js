@@ -427,7 +427,7 @@ const taskfilter = taskdata?.filter((item)=>item?.created_by === loggeddatass)
                 <div className="bg-white p-6 rounded-lg shadow flex flex-col">
                     <div className="flex items-center gap-4">
                         <img
-                            src="https://i.pravatar.cc/300?u=admin@example.com"
+                            src={loggeddata.profilePic}
                             alt="Client"
                             className="w-24 h-24 rounded-md object-cover"
                         />

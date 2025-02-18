@@ -170,6 +170,7 @@ export const LoginForm = props => {
 	
 	const navigate = useNavigate();
 
+
 	const { 
 		otherSignIn, 
 		showForgetPassword, 
@@ -234,32 +235,20 @@ export const LoginForm = props => {
 		showLoading()
 			dispatch(userLogin(values))
 			.then((response) => {
-				if (response.meta.requestStatus === 'fulfilled') {
-					// Get user role from response
-					const userRole = response.payload.role;
-					
-					// Redirect based on role
-					switch(userRole) {
-						case 'superadmin':
-							navigate('/app/superadmin/dashboard');
-							break;
-						case 'admin':
-							navigate('/app/admin/dashboard');
-							break;
-						case 'user':
-							navigate('/app/user/dashboard');
-							break;
-						default:
-							navigate('/app/dashboard');
-					}
-
-					// Store the role in localStorage
-					localStorage.setItem('userRole', userRole);
+				if (response.meta.requestStatus === 'fulfilled') { 
+					// message.success("Login successful");
+					navigate('/dashboard/default');
+					window.location.reload();
 				}
 			})
 			.catch((error) => {
+				// message.error("Login failed. Please try again.");
+				
 				console.error('Login failed:', error);
-				message.error('Login failed. Please check your credentials.');
+
+			})
+			.finally(() => {
+				// hideLoading();
 			});
 	};
 
