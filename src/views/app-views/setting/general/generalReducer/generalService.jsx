@@ -44,12 +44,12 @@ const creategenaral = async (payload) => {
   }
 };
 
-const Deleteticket = async (id) => {
+const deletesetting = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/tickets/${id}`,
+      `http://localhost:5353/api/v1/settings/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -107,7 +107,7 @@ const UserService = {
   // addUser,
   getgeneralsetting,
   creategenaral,
-  Deleteticket,
+  deletesetting,
   Editticket,
   // getAllUsers,
   // getUserById,

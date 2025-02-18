@@ -5,7 +5,7 @@ import { Card, Button, Upload, message, Row, Col, Avatar } from 'antd';
 import { QuestionCircleOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { creategenaralsett, getgeneralsettings } from './generalReducer/generalSlice';
+import { creategenaralsett, deletesettingss, getgeneralsettings } from './generalReducer/generalSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import useSelection from 'antd/es/table/hooks/useSelection';
 
@@ -41,7 +41,6 @@ const GeneralList = () => {
       setLoading(true);
       const formData = new FormData();
       
-      // Add file only if it exists
       if (selectedFile) {
         formData.append('companylogo', selectedFile);
       }
@@ -49,7 +48,6 @@ const GeneralList = () => {
 
       await dispatch(creategenaralsett(formData));
       await dispatch(getgeneralsettings())
-      message.success('Settings updated successfully');
     } catch (error) {
       message.error('Failed to update settings');
     } finally {
@@ -63,6 +61,18 @@ const GeneralList = () => {
     if (file) {
       setSelectedFile(file);
       message.success(`${file.name} selected successfully`);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      setLoading(true);
+      await dispatch(deletesettingss(alldata[0].id));
+      await dispatch(getgeneralsettings());
+    } catch (error) {
+      message.error('Failed to delete settings');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -80,7 +90,18 @@ const GeneralList = () => {
         <div className="mb-6">
           <Row gutter={[24, 24]}>
             <Col span={24}>
-              <h2 className="text-xl font-medium mb-4">Current Settings</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-medium">Current Settings</h2>
+                <Button 
+                  type="primary" 
+                  danger
+                  onClick={handleDelete}
+                  loading={loading}
+                  className="px-4 py-1"
+                >
+                  Delete Settings
+                </Button>
+              </div>
               <div className="flex items-start gap-6">
                 <div>
                   <h3 className="font-medium mb-2">Company Logo</h3>

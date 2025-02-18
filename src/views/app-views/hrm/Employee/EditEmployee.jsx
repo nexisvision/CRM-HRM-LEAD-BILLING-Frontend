@@ -55,6 +55,9 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
   // Add state for file handling
   const [fileList, setFileList] = useState([]);
 
+  // Update CV state to match profile picture structure
+  const [cvFileList, setCvFileList] = useState([]);
+
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
 
@@ -154,18 +157,48 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
   const onFinish = async (values) => {
     try {
       const formData = new FormData();
-      
-      // Handle profile picture separately
-      if (fileList.length > 0) {
-        formData.append('profilePic', fileList[0].originFileObj || fileList[0]);
+
+      // Handle profile picture
+      if (fileList.length > 0 && fileList[0].originFileObj) {
+        const profileFile = fileList[0].originFileObj;
+        formData.append('profilePic', profileFile, profileFile.name);
+      }
+
+      // Handle CV file - updated to match profile picture structure
+      if (cvFileList.length > 0 && cvFileList[0].originFileObj) {
+        const cvFile = cvFileList[0].originFileObj;
+        formData.append('cv', cvFile, cvFile.name);
+      }
+
+      // Convert dates to ISO strings if they exist
+      if (values.joiningDate) {
+        formData.append('joiningDate', values.joiningDate.toISOString());
+      }
+      if (values.leaveDate) {
+        formData.append('leaveDate', values.leaveDate.toISOString());
       }
 
       // Add all other form values to FormData
       Object.keys(values).forEach(key => {
-        if (key !== 'profilePic' && values[key] !== undefined && values[key] !== null) {
-          formData.append(key, values[key]);
+        if (key !== 'profilePic' && 
+            key !== 'cv' && 
+            key !== 'joiningDate' && 
+            key !== 'leaveDate' && 
+            values[key] !== undefined && 
+            values[key] !== null) {
+          // Handle nested objects like phone
+          if (typeof values[key] === 'object' && values[key] !== null) {
+            formData.append(key, JSON.stringify(values[key]));
+          } else {
+            formData.append(key, values[key]);
+          }
         }
       });
+
+      // Log FormData contents for debugging (remove in production)
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
 
       const response = await dispatch(updateEmp({ employeeIdd, formData })).unwrap();
       
@@ -216,15 +249,42 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
   //   return <div>Loading...</div>;
   // }
 
-  // Update file handling function
+  // Handle CV file change
+  const handleCVChange = ({ file }) => {
+    // Check if file is a valid document type
+    const isValidType = file.type === 'application/pdf' || 
+                       file.type === 'application/msword' || 
+                       file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    
+    if (!isValidType && file.status !== 'removed') {
+      message.error('You can only upload PDF or Word documents!');
+      return;
+    }
+
+    if (file.status !== 'removed') {
+      setCvFileList([{
+        uid: '-1',
+        name: file.name,
+        status: 'done',
+        originFileObj: file
+      }]);
+    } else {
+      setCvFileList([]);
+    }
+  };
+
+  // Handle profile picture change - store the actual file object
   const handleFileChange = ({ file }) => {
-    // Store the actual file object
-    setFileList([{
-      uid: '-1',
-      name: file.name,
-      status: 'done',
-      originFileObj: file
-    }]);
+    if (file.status !== 'removed') {
+      setFileList([{
+        uid: '-1',
+        name: file.name,
+        status: 'done',
+        originFileObj: file
+      }]);
+    } else {
+      setFileList([]);
+    }
   };
 
   return (
@@ -586,15 +646,36 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item name="file" label="Upload CV" className=" font-semibold ">
+            <Form.Item 
+              name="cv" 
+              label="Upload CV" 
+              className="font-semibold"
+            >
               <Upload
-                action="http://localhost:3000/api/users/upload-cv"
-                listType="picture"
-                accept=".pdf"
+                fileList={cvFileList}
+                beforeUpload={(file) => {
+                  const isValidType = file.type === 'application/pdf' || 
+                                    file.type === 'application/msword' || 
+                                    file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                  if (!isValidType) {
+                    message.error('You can only upload PDF or Word documents!');
+                  }
+                  return false; // Prevent auto upload
+                }}
+                onChange={handleCVChange}
+                onRemove={() => {
+                  form.setFieldsValue({ cv: null });
+                  setCvFileList([]);
+                }}
+                accept=".pdf,.doc,.docx"
                 maxCount={1}
-                showUploadList={{ showRemoveIcon: true }}
               >
-                <Button icon={<UploadOutlined />}>Upload </Button>
+                <Button 
+                  icon={<UploadOutlined />}
+                  disabled={cvFileList.length > 0}
+                >
+                  Choose CV File (.pdf, .doc, .docx)
+                </Button>
               </Upload>
             </Form.Item>
           </Col>
@@ -756,9 +837,14 @@ export default EditEmployee;
 //             <Form.Item
 //               name="email"
 //               label="Email"
+//               className=" font-semibold"
 //               rules={[
-//                 { required: true, message: 'Email is required' },
-//                 { type: 'email', message: 'Please enter a valid email (e.g., example@example.com)' },
+//                 { required: true, message: "Email is required" },
+//                 {
+//                   type: "email",
+//                   message:
+//                     "Please enter a valid email (e.g., example@example.com)",
+//                 },
 //               ]}
 //             >
 //               <Input placeholder="johndoe@example.com" />
@@ -768,15 +854,45 @@ export default EditEmployee;
 //             <Form.Item
 //               name="phone"
 //               label="Phone"
-//               rules={[
-//                 { required: true, message: 'Phone number is required' },
-//                 {
-//                   pattern: /^[0-9]{10}$/,
-//                   message: 'Phone number must be exactly 10 digits',
-//                 },
-//               ]}
+//               className=" font-semibold"
+//               rules={[{ required: true, message: 'Phone number is required' }]}
 //             >
-//               <Input placeholder="1234567890" maxLength={10} />
+//               <Input.Group compact>
+//                 <Form.Item
+//                   name={['phone', 'code']}
+//                   noStyle
+//                   // rules={[{ required: true, message: 'Code is required' }]}
+//                 >
+//                   <Select
+//                     style={{ width: '30%' }}
+//                     placeholder="Code"
+//                   >
+//                     {countries.map((country) => (
+//                       <Option key={country.id} value={country.phoneCode}>
+//                         (+{country.phoneCode})
+//                       </Option>
+//                     ))}
+//                   </Select>
+//                 </Form.Item>
+//                 <Form.Item
+//                   name={['phone', 'number']}
+//                   noStyle
+//                   rules={[{ required: true, message: 'Phone number is required' }]}
+//                 >
+//                   <Input 
+//                     type="number"
+//                     style={{ width: '70%' }} 
+//                     placeholder="Enter Phone"
+//                     onKeyPress={(e) => {
+//                       // Allow only numbers
+//                       if (!/[0-9]/.test(e.key)) {
+//                         e.preventDefault();
+//                       }
+//                     }}
+//                     className="hide-number-spinner"
+//                   />
+//                 </Form.Item>
+//               </Input.Group>
 //             </Form.Item>
 //           </Col>
 //         </Row>
@@ -842,6 +958,7 @@ export default EditEmployee;
 //             <Form.Item
 //               name="joiningDate"
 //               label="Joining Date"
+//               className=" font-semibold"
 //               rules={[{ required: true, message: 'Joining Date is required' }]}
 //             >
 //               <DatePicker style={{ width: '100%' }} />
@@ -1119,6 +1236,7 @@ export default EditEmployee;
 //             <Form.Item
 //               name="joiningDate"
 //               label="Joining Date"
+//               className=" font-semibold"
 //               rules={[{ required: true, message: 'Joining Date is required' }]}
 //             >
 //               <DatePicker style={{ width: '100%' }} />

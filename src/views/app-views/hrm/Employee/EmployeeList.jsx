@@ -28,6 +28,7 @@ import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
 import { getBranch } from "../Branch/BranchReducer/BranchSlice";
 import moment from "moment";
 import { MdOutlineEmail } from "react-icons/md";
+import EmailVerification from "views/app-views/company/EmailVerification";
 
 const EmployeeList = () => {
   // State declarations
@@ -311,7 +312,7 @@ const EmployeeList = () => {
             icon={<MdOutlineEmail/>}
             onClick={() => {
               setIsEmailVerificationModalVisible(true);
-              setCompnyid(user.id);
+              setCompnyid(elm.id);
             }}
             size="small"
             // style={{ display: "block", marginBottom: "8px" }}
@@ -551,7 +552,7 @@ const EmployeeList = () => {
         <ViewEmployee onClose={closeViewEmployeeModal} />
       </Modal>
 
-      <Modal
+      {/* <Modal
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <MailOutlined />
@@ -612,7 +613,14 @@ const EmployeeList = () => {
             onChange={(e) => setOtp(e.target.value)}
           />
         </div>
-      </Modal>
+      </Modal> */}
+
+      <EmailVerification
+        visible={isEmailVerificationModalVisible}
+        onCancel={() => setIsEmailVerificationModalVisible(false)}
+        initialEmail={initialValues.email}
+        idd={comnyid}
+      />
     </Card>
   );
 };

@@ -376,6 +376,7 @@ const CompanyList = () => {
       visible={isEmailVerificationModalVisible}
           onCancel={() => setIsEmailVerificationModalVisible(false)}
           onSubmit={handleEmailVerification}
+          idd={comnyid}
           initialEmail={initialValues.email}
         />
 

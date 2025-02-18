@@ -210,7 +210,7 @@ export const LoginForm = props => {
 					if (response.meta.requestStatus === 'fulfilled') { 
 						localStorage.removeItem('email');
 						localStorage.removeItem("autologintoken");
-						// navigate('/dashboard/default');
+						navigate('/dashboard/default');
 						window.location.reload();
 					}
 				} catch (error) {
@@ -236,7 +236,6 @@ export const LoginForm = props => {
 			dispatch(userLogin(values))
 			.then((response) => {
 				if (response.meta.requestStatus === 'fulfilled') { 
-					// message.success("Login successful");
 					navigate('/dashboard/default');
 					window.location.reload();
 				}
@@ -245,7 +244,6 @@ export const LoginForm = props => {
 				// message.error("Login failed. Please try again.");
 				
 				console.error('Login failed:', error);
-
 			})
 			.finally(() => {
 				// hideLoading();

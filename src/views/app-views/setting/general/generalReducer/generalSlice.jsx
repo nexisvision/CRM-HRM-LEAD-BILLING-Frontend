@@ -61,11 +61,11 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const DeleteTicket = createAsyncThunk(
-  "users/DeleteTicketeet",
+export const deletesettingss = createAsyncThunk(
+  "users/Deletese",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.Deleteticket(userId);
+      const response = await UserService.deletesetting(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -164,14 +164,14 @@ const TicketSlice = createSlice({
 
       
       //delete
-      .addCase(DeleteTicket.pending, (state) => {
+      .addCase(deletesettingss.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(DeleteTicket.fulfilled, (state, action) => {
+      .addCase(deletesettingss.fulfilled, (state, action) => {
         state.isLoading = false;
         message.success(action.payload?.message);
       })
-      .addCase(DeleteTicket.rejected, (state, action) => {
+      .addCase(deletesettingss.rejected, (state, action) => {
         state.isLoading = false;
         message.error(action.payload?.message);
       })

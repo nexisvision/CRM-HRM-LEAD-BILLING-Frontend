@@ -5,8 +5,14 @@ import { protectedRoutes, publicRoutes } from 'configs/RoutesConfig';
 import ProtectedRoute from './ProtectedRoute';
 import PublicRoute from './PublicRoute';
 import AppRoute from './AppRoute';
+import { useSelector } from 'react-redux';
 
 const Routes = () => {
+
+	// const alldata = useSelector((state)=>state.user.loggedInUser.username);
+	// if(alldata){
+
+	// }
 
 	return (
 		<RouterRoutes>

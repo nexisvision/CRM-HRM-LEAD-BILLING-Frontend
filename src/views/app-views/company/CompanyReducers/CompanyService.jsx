@@ -102,6 +102,49 @@ const assignplan = async (payload) => {
   }
 };
 
+const sendemailotp = async (idd,values) => {
+  const token = localStorage.getItem("auth_token");
+
+  try {
+    const res = await axios.put(
+      `http://localhost:5353/api/v1/clients/email/${idd}`,
+      values,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    localStorage.setItem("emailupdate",res.data.data.sessionToken);
+    //    dispatch(empdata());
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+const otpverify = async (values) => {
+  const token = localStorage.getItem("emailupdate");
+
+  try {
+    const res = await axios.post(
+      `http://localhost:5353/api/v1/auth/verify`,
+      values,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    //    dispatch(empdata());
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
 // const getAllUsers = async () => {
 //     const res = await axios.get(`${baseUrl}users/all`, getToken());
 //     return res.data
@@ -129,6 +172,8 @@ const UserService = {
   DeleteClient,
   EditClientss,
   assignplan,
+  sendemailotp,
+  otpverify,
   // getAllUsers,
   // getUserById,
   // deleteUser,

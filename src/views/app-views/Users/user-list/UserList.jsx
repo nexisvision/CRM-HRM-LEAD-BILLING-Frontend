@@ -391,6 +391,7 @@ const UserList = () => {
         visible={isEmailVerificationModalVisible}
         onCancel={() => setIsEmailVerificationModalVisible(false)}
         initialEmail={users.find(user => user.id === selectedUserId)?.email}
+        idd={selectedUserId}
       />
     </Card>
   );

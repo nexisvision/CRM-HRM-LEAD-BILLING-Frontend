@@ -6,6 +6,35 @@ import { message } from "antd";
 
 // Async thunk for adding user
 
+export const sendmailupdateotp = createAsyncThunk(
+  "users/sendmailupdateotp",
+  async ({idd,values}, thunkAPI) => {
+    try {
+      const response = await UserService.sendemailotp(idd,values);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+
+export const otpverifyemail = createAsyncThunk(
+  "users/otpverifyemail",
+  async (values, thunkAPI) => {
+    try {
+      const response = await UserService.otpverify(values);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+
+
+
+
 export const addassignplan = createAsyncThunk(
   "users/addassignplan",
   async (userData, thunkAPI) => {
@@ -148,6 +177,34 @@ const CompanySlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
+
+      .addCase(sendmailupdateotp.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(sendmailupdateotp.fulfilled, (state, action) => {
+        state.isLoading = false;
+        toast.success(action.payload?.data?.message);
+      })
+      .addCase(sendmailupdateotp.rejected, (state, action) => {
+        state.isLoading = false;
+        toast.error(action.payload?.message);
+      })
+
+
+      
+      .addCase(otpverifyemail.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(otpverifyemail.fulfilled, (state, action) => {
+        state.isLoading = false;
+        toast.success(action.payload?.data?.message);
+      })
+      .addCase(otpverifyemail.rejected, (state, action) => {
+        state.isLoading = false;
+        toast.error(action.payload?.message);
+      })
+
+
       .addCase(addassignplan.pending, (state) => {
         state.isLoading = true;
       })
