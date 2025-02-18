@@ -29,6 +29,9 @@ import EditCompany from "./EditCompany";
 import { ClientData, deleteClient } from "./CompanyReducers/CompanySlice";
 import AddUpgradePlan from "./AddUpgradePlan";
 import { useNavigate } from "react-router-dom";
+import { MdOutlineEmail } from "react-icons/md";
+import EmailVerification from './EmailVerification';
+
 const CompanyCard = ({ company }) => {
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -41,7 +44,7 @@ const CompanyCard = ({ company }) => {
   const navigate = useNavigate();
   const[idd,setIdd]= useState("");
   const[emails,setEmail]= useState("");
-
+  const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
 
   const showUserProfile = (idd) => {
     // setUserProfileVisible(true);
@@ -108,19 +111,35 @@ const CompanyCard = ({ company }) => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      {/* <Menu.Item>
+      <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
             className=""
             icon={<EditOutlined />}
-            onClick={() => showUserProfile(elm)} // Pass full company object
+            onClick={() => eidtfun(elm.id)}
             size="small"
           >
             <span className="">Edit</span>
           </Button>
         </Flex>
-      </Menu.Item> */}
+      </Menu.Item>
+      <Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className="flex items-center gap-2"
+            icon={<MdOutlineEmail/>}
+            onClick={() => {
+              setIsEmailVerificationModalVisible(true);
+              setCompnyid(elm.id);
+            }}
+            size="small"
+          >
+            <span>Update Email</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center">
           <Button
@@ -163,13 +182,13 @@ const CompanyCard = ({ company }) => {
       </Menu.Item>
 
 
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button type="" className="" icon={<EyeOutlined />} size="small">
             <span>Reset Password</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item>
         <Flex alignItems="center">
           <Button type="" className="" icon={<LoginOutlined />} size="small">
@@ -223,6 +242,7 @@ const CompanyCard = ({ company }) => {
         visible={isEditCompanyCardModalVisible}
         onCancel={() => setIsEditCompanyCardModalVisible(false)}
         footer={null}
+        width={900}
       >
         <EditCompany
           onClose={() => setIsEditCompanyCardModalVisible(false)}
@@ -230,6 +250,11 @@ const CompanyCard = ({ company }) => {
           companyData={selectedUser} // Pass the correct company data to the modal
         />
       </Modal>
+      <EmailVerification
+        visible={isEmailVerificationModalVisible}
+        onCancel={() => setIsEmailVerificationModalVisible(false)}
+        initialEmail={company.email}
+      />
     </div>
   );
 };

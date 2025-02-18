@@ -297,11 +297,26 @@ const EditCompany = ({ comnyid, onClose }) => {
               <Col span={12} className="mt-3">
                     <div className="form-item">
                       <label className="font-semibold ">Website <span className="text-red-500">*</span></label>
-                        <Field name="website" as={Input} placeholder="Enter  Website" className="mt-1"  />
+                        <Field name="website" as={Input} placeholder="Enter  Website" className="mt-2"  />
                       <ErrorMessage
                         name="website"
                         component="div"
                         className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+                  <Col span={12} className="mt-3">
+                    <div className="flex flex-col space-y-2">
+                      <label className="text-sm font-semibold text-gray-700">Account Type <span className="text-red-500">*</span></label>
+                        <Field name="accountType" as={Select} placeholder="Select Account Type" className="w-full rounded-md border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                          <Option value="current">Current</Option>
+                          <Option value="saving">Saving</Option>
+                          <Option value="business">Business</Option>
+                        </Field>
+                      <ErrorMessage
+                        name="accountType"
+                        component="div"
+                        className="text-sm text-red-500"
                       />
                     </div>
                   </Col>
@@ -315,6 +330,7 @@ const EditCompany = ({ comnyid, onClose }) => {
                         beforeUpload={(file) => {
                           form.setFieldValue('profilePic', file); // Set the uploaded file in Formik state
                           return false; // Prevent automatic upload
+
                         }}
                         showUploadList={true}
                       >

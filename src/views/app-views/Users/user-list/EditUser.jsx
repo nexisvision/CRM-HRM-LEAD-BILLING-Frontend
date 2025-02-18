@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { Row, Col, Button, Select } from "antd";
-import { Formik, Form, Field } from 'formik';
+import { Row, Col, Button, Select, Input } from "antd";
+import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from "react-redux";
 import { Edituser, GetUsers } from "../UserReducers/UserSlice";
@@ -62,7 +62,7 @@ const EditUser = ({ idd, visible, onClose, onUpdate }) => {
   };
 
   return (
-    <div className="p-4">
+    <div className="">
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -74,51 +74,32 @@ const EditUser = ({ idd, visible, onClose, onUpdate }) => {
             <div className="border-b border-gray-200 mb-6"></div>
 
             <Row gutter={[16, 16]}>
-              <Col span={12}>
+            <Col span={12}>
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Name <span className="text-red-500">*</span>
-                  </label>
+                <div className="form-item">
+                  <label className="font-semibold">Name <span className="text-red-500">*</span></label>
                   <Field
                     name="username"
-                    className={`w-full px-3 py-2 border rounded-md  focus:ring-blue-500 focus:border-blue-500 ${
-                      errors.username && touched.username ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="Enter User Name"
+                    as={Input}
+                    placeholder="Enter Name"
+                    className="w-full mt-2"
+                    rules={[{ required: true }]}
                   />
-                  {errors.username && touched.username && (
-                    <div className="text-red-500 text-sm mt-1">{errors.username}</div>
-                  )}
+                  <ErrorMessage
+                    name="username"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
                 </div>
               </Col>
-              <Col span={12}>
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Email <span className="text-red-500">*</span>
-                  </label>
-                  <Field
-                    name="email"
-                    type="email"
-                    className={`w-full px-3 py-2 border rounded-md  focus:ring-blue-500 focus:border-blue-500 ${
-                      errors.email && touched.email ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    placeholder="Enter User Email"
-                  />
-                  {errors.email && touched.email && (
-                    <div className="text-red-500 text-sm mt-1">{errors.email}</div>
-                  )}
-                </div>
-              </Col>
-            </Row>
-
-            <Row gutter={[16, 16]}>
               <Col span={12}>
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">
                     User Role <span className="text-red-500">*</span>
                   </label>
                   <Select
-                    className="w-full"
+                    className="w-full mt-2"
                     placeholder="Select Role"
                     value={values.role_id}
                     onChange={(value) => setFieldValue('role_id', value)}
@@ -136,7 +117,6 @@ const EditUser = ({ idd, visible, onClose, onUpdate }) => {
                 </div>
               </Col>
             </Row>
-
             <div className="flex justify-end gap-2 mt-6">
               <Button 
                 onClick={onClose}

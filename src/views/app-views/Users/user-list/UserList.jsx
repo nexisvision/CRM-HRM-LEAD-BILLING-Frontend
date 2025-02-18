@@ -28,6 +28,8 @@ import EditUser from "./EditUser"; // Assuming EditUser is a component
 import ResetPassword from "./ResetPassword";
 import { Dleteusetr, GetUsers } from "../UserReducers/UserSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { MdOutlineEmail } from "react-icons/md";
+import EmailVerification from "../../company/EmailVerification";
 
 const UserList = () => {
   const dispatch = useDispatch();
@@ -38,6 +40,8 @@ const UserList = () => {
   const [isResetPasswordModalVisible, setIsResetPasswordModalVisible] = useState(false);
   const [idd, setIdd] = useState("");
   const [userUpdated, setUserUpdated] = useState(false);
+  const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   const paymentStatusList = ["active", "blocked"];
 
@@ -205,7 +209,23 @@ const UserList = () => {
                              </Flex>
                            </Menu.Item>
                     ) : null}
-      
+
+<Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className="flex items-center gap-2"
+            icon={<MdOutlineEmail/>}
+            onClick={() => {
+              setIsEmailVerificationModalVisible(true);
+              setSelectedUserId(elm.id);
+            }}
+            size="small"
+          >
+            <span>Update Email</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
       
       {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
                        <Menu.Item>
@@ -366,6 +386,12 @@ const UserList = () => {
       >
         <ResetPassword onClose={closeResetPasswordModal} />
       </Modal>
+
+      <EmailVerification
+        visible={isEmailVerificationModalVisible}
+        onCancel={() => setIsEmailVerificationModalVisible(false)}
+        initialEmail={users.find(user => user.id === selectedUserId)?.email}
+      />
     </Card>
   );
 };

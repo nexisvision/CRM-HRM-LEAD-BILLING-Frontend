@@ -372,19 +372,14 @@ const CompanyList = () => {
         />
       </Modal>
 
-      <Modal
-        title="Email Verification"
-        visible={isEmailVerificationModalVisible}
-        onCancel={() => setIsEmailVerificationModalVisible(false)}
-        footer={null}
-      >
-        <EmailVerificationModal
-          visible={isEmailVerificationModalVisible}
+      
+
+      <EmailVerificationModal
+      visible={isEmailVerificationModalVisible}
           onCancel={() => setIsEmailVerificationModalVisible(false)}
           onSubmit={handleEmailVerification}
           initialEmail={initialValues.email}
         />
-      </Modal>
 
       <Modal
         title="Reset Password"

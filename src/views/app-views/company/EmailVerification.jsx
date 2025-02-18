@@ -1,109 +1,175 @@
 import React, { useState } from 'react';
 import { Modal, Form, Input, Button, message } from 'antd';
-import { MailOutlined } from '@ant-design/icons';
-import { useDispatch } from 'react-redux';
+import { MdOutlineEmail } from 'react-icons/md';
 
-const EmailVerification = ({ visible, onCancel, companyId }) => {
+const EmailVerification = ({ visible, onCancel, initialEmail }) => {
   const [form] = Form.useForm();
-  const [step, setStep] = useState(1); // 1: Email, 2: OTP
-  const dispatch = useDispatch();
+  const [otpForm] = Form.useForm();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState('');
 
-  const handleSubmit = async (values) => {
+  // Handle Send OTP Click
+  const handleSendOtp = async () => {
     try {
-      if (step === 1) {
-        // Send verification email
-        // await dispatch(sendVerificationEmail(values.email));
-        message.success('Verification code sent to your email');
-        setStep(2);
-      } else if (step === 2) {
-        // Verify OTP
-        // await dispatch(verifyOTP(values.otp));
-        message.success('Email verified successfully');
-        onCancel(); // Close modal after successful verification
-      }
+      const values = await form.validateFields();
+      setIsLoading(true);
+      
+      // Simulate sending OTP
+      setTimeout(() => {
+        message.success('OTP sent successfully');
+        setVerificationEmail(values.email);
+        setIsLoading(false);
+        setShowOtpModal(true);
+      }, 1000);
     } catch (error) {
-      message.error('An error occurred. Please try again.');
+      message.error('Please enter a valid email');
     }
   };
 
-  const handleCancel = () => {
+  // Handle OTP Verification
+  const handleVerifyOtp = async (values) => {
+    try {
+      setIsLoading(true);
+      
+      // Simulate OTP verification
+      setTimeout(() => {
+        message.success('Email verified successfully');
+        handleClose();
+      }, 1000);
+    } catch (error) {
+      message.error('Invalid OTP');
+      setIsLoading(false);
+    }
+  };
+
+  // Handle modal close
+  const handleClose = () => {
     form.resetFields();
-    setStep(1);
+    otpForm.resetFields();
+    setShowOtpModal(false);
+    setVerificationEmail('');
+    setIsLoading(false);
     if (onCancel) {
       onCancel();
     }
   };
 
-  const renderStepContent = () => {
-    switch (step) {
-      case 1:
-        return (
+  // Handle email modal close
+  const handleEmailModalClose = () => {
+    form.resetFields();
+    setIsLoading(false);
+    if (onCancel) {
+      onCancel();
+    }
+  };
+
+  // Handle OTP modal close
+  const handleOtpModalClose = () => {
+    otpForm.resetFields();
+    setShowOtpModal(false);
+    setVerificationEmail('');
+    setIsLoading(false);
+    if (onCancel) {
+      onCancel();
+    }
+  };
+
+  return (
+    <>
+      {/* Email Input Modal */}
+      <Modal
+        title={
+          <div className="flex items-center gap-2 text-lg">
+            <MdOutlineEmail className="text-blue-500" />
+            <span>Email Verification</span>
+          </div>
+        }
+        open={visible && !showOtpModal}
+        onCancel={handleEmailModalClose}
+        maskClosable={false}
+        footer={null}
+        className="rounded-lg"
+      >
+        <Form form={form} layout="vertical">
           <Form.Item
             name="email"
+            label="Email Address"
             rules={[
               { required: true, message: 'Please enter your email' },
               { type: 'email', message: 'Please enter a valid email' }
             ]}
           >
             <Input 
-              prefix={<MailOutlined className="text-primary" />}
-              placeholder="Email"
+              placeholder="Enter your email"
               className="rounded-md"
             />
           </Form.Item>
-        );
-      case 2:
-        return (
+          <div className="flex justify-end gap-2 mt-4">
+            <Button onClick={handleEmailModalClose}>
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              onClick={handleSendOtp}
+              loading={isLoading}
+              className="bg-blue-500 hover:bg-blue-600"
+            >
+              Send OTP
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+
+      {/* OTP Verification Modal */}
+      <Modal
+        title={
+          <div className="flex items-center gap-2 text-lg">
+            <MdOutlineEmail className="text-blue-500" />
+            <span>Verify OTP</span>
+          </div>
+        }
+        open={showOtpModal}
+        onCancel={handleOtpModalClose}
+        maskClosable={false}
+        footer={null}
+        className="rounded-lg"
+      >
+        <Form form={otpForm} layout="vertical" onFinish={handleVerifyOtp}>
+          <div className="mb-4">
+            {/* <p className="text-gray-600">We've sent a verification code to:</p> */}
+            <p className="font-medium">{verificationEmail}</p>
+          </div>
           <Form.Item
             name="otp"
+            label="Enter OTP"
             rules={[
-              { required: true, message: 'Please enter verification code' },
-              {
-                pattern: /^[0-9]{6}$/,
-                message: 'Please enter 6 digits only'
-              }
+              { required: true, message: 'Please enter OTP' },
+              { len: 6, message: 'OTP must be 6 digits' }
             ]}
           >
-            <Input 
-              placeholder="Enter verification code"
-              className="rounded-md"
+            <Input
+              placeholder="Enter 6-digit OTP"
               maxLength={6}
-              type="number"
-              onKeyPress={(e) => {
-                if (!/[0-9]/.test(e.key)) {
-                  e.preventDefault();
-                }
-              }}
+              className="rounded-md"
             />
           </Form.Item>
-        );
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <Modal
-      title={step === 1 ? "Email Verification" : "Enter Verification Code"}
-      visible={visible}
-      onCancel={handleCancel}
-      footer={[
-        <Button key="close" onClick={handleCancel}>
-          Close
-        </Button>,
-        <Button key="submit" type="primary" onClick={form.submit}>
-          {step === 1 ? 'Send Verification Code' : 'Verify'}
-        </Button>
-      ]}
-    >
-      <Form
-        form={form}
-        onFinish={handleSubmit}
-        layout="vertical"
-      >
-        {renderStepContent()}
-      </Form>
-    </Modal>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button onClick={handleOtpModalClose}>
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={isLoading}
+              className="bg-blue-500 hover:bg-blue-600"
+            >
+              Verify OTP
+            </Button>
+          </div>
+        </Form>
+      </Modal>
+    </>
   );
 };
 

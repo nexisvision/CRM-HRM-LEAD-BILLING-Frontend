@@ -37,6 +37,8 @@ import AddClient from "./AddClient";
 import EditClient from "./EditClient";
 import { useLocation, useNavigate } from "react-router-dom";
 import ProjectList from "views/app-views/dashboards/project/project-list/ProjectList";
+import { MdOutlineEmail } from "react-icons/md";
+import EmailVerification from "../../company/EmailVerification";
 
 const { Option } = Select;
 
@@ -56,6 +58,7 @@ const ClientList = () => {
     useState(false);
   const [isUpgradePlanModalVisible, setIsUpgradePlanModalVisible] =
     useState(false);
+  const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
   const [comnyid, setCompnyid] = useState("");
   const [clientid,setClientId] = useState("");
 
@@ -309,6 +312,23 @@ const ClientList = () => {
                            </Menu.Item>
                     ) : null}
       
+      <Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className="flex items-center gap-2"
+            icon={<MdOutlineEmail/>}
+            onClick={() => {
+              setIsEmailVerificationModalVisible(true);
+              setCompnyid(user.id);
+            }}
+            size="small"
+            // style={{ display: "block", marginBottom: "8px" }}
+          >
+            <span>Update Email</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
       
       {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
                        <Menu.Item>
@@ -502,6 +522,11 @@ const ClientList = () => {
         width={1000}
       >
       </Modal>
+      <EmailVerification
+        visible={isEmailVerificationModalVisible}
+        onCancel={() => setIsEmailVerificationModalVisible(false)}
+        initialEmail={users.find(user => user.id === comnyid)?.email}
+      />
     </Card>
   );
 };
