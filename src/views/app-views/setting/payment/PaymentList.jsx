@@ -62,11 +62,11 @@ const PaymentList = () => {
                       <Switch
                         checked={values.razorpayEnabled}
                         onChange={(checked) => setFieldValue('razorpayEnabled', checked)}
-                        className="bg-blue-500"
+                        className={`${values.razorpayEnabled ? '!bg-blue-500' : '!bg-gray-300'}`}
                       />
                     </div>
                   }
-                  className="h-full  hover:shadow-lg transition-shadow duration-300"
+                  className="h-full shadow-md hover:shadow-lg transition-shadow duration-300"
                 >
                   <div className="space-y-4">
                     <div>
@@ -119,11 +119,11 @@ const PaymentList = () => {
                       <Switch
                         checked={values.phonePayEnabled}
                         onChange={(checked) => setFieldValue('phonePayEnabled', checked)}
-                        className="bg-blue-500"
+                        className={`${values.phonePayEnabled ? '!bg-blue-500' : '!bg-gray-300'}`}
                       />
                     </div>
                   }
-                  className="h-full   hover:shadow-lg transition-shadow duration-300"
+                  className="h-full shadow-md hover:shadow-lg transition-shadow duration-300"
                 >
                   <div className="space-y-4">
                     <div>

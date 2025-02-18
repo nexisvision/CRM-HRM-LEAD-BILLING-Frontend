@@ -137,10 +137,10 @@ const EditCompany = ({ comnyid, onClose }) => {
                   />
                 </div>
               </Col>
-              {/* <Col span={12} className="mt-2">
+              {/* <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Email</label>
-                  <Field name="email" as={Input} placeholder="Enter Email" />
+                  <label className="font-semibold">Email <span className="text-red-500">*</span></label>
+                  <Field name="email" as={Input} placeholder="Enter Email" className="mt-1" />
                   <ErrorMessage
   
                     name="email"
@@ -295,6 +295,17 @@ const EditCompany = ({ comnyid, onClose }) => {
                 </div>
               </Col>
               <Col span={12} className="mt-3">
+                    <div className="form-item">
+                      <label className="font-semibold ">Website <span className="text-red-500">*</span></label>
+                        <Field name="website" as={Input} placeholder="Enter  Website" className="mt-1"  />
+                      <ErrorMessage
+                        name="website"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+              <Col span={12} className="mt-3">
                 <div className="flex flex-col gap-3">
                   <label className="font-semibold text-gray-700">Profile Picture <span className="text-red-500">*</span></label>
                   <Field name="profilePic">
@@ -321,17 +332,7 @@ const EditCompany = ({ comnyid, onClose }) => {
                   
                 </div>
               </Col>
-              <Col span={12} className="mt-3">
-                    <div className="form-item">
-                      <label className="font-semibold ">Website <span className="text-red-500">*</span></label>
-                        <Field name="website" as={Input} placeholder="Enter  Website" className="mt-1"  />
-                      <ErrorMessage
-                        name="website"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
-                    </div>
-                  </Col>
+              
             </Row>
             <div className="form-buttons text-right mt-2">
               <Button type="default" className="mr-2" onClick={onClose}>

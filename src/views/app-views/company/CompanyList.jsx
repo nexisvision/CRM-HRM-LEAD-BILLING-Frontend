@@ -28,6 +28,7 @@ import {
   Menu,
   Table,
 } from "antd";
+import { MdOutlineEmail } from "react-icons/md";
 import AddCompany from "./AddCompany";
 import EditCompany from "./EditCompany";
 import ResetPassword from "./ResetPassword";
@@ -39,6 +40,7 @@ import Flex from "components/shared-components/Flex";
 import { getsubplandata } from "../subscribeduserplans/subplanReducer/subplanSlice";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddUpgradePlan from './AddUpgradePlan';
+import EmailVerificationModal from "./EmailVerification";
 
 const { Option } = Select;
 const VIEW_LIST = "LIST";
@@ -56,6 +58,10 @@ const CompanyList = () => {
   const [isUpgradePlanModalVisible, setIsUpgradePlanModalVisible] =
     useState(false);
   const [comnyid, setCompnyid] = useState("");
+  const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
+  const [initialValues, setInitialValues] = useState({
+    email: "",
+  });
 
   // New state for editing company card modal
   // const [isEditCompanyCardModalVisible, setIsEditCompanyCardModalVisible] = useState(false);
@@ -88,6 +94,17 @@ const CompanyList = () => {
   const handleCompanyClick = (id) => {
     navigate(`/app/company/${id}`);
   };
+
+  const handleEmailVerification = async (email) => {
+    try {
+      // Add your email verification logic here
+      // await dispatch(sendVerificationEmail(email));
+      message.success('Verification email sent successfully');  
+    } catch (error) {
+      message.error('Failed to send verification email');
+    }
+  };
+
 
   const onSearch = (e) => {
     const value = e.currentTarget.value;
@@ -131,19 +148,22 @@ const CompanyList = () => {
         </Flex>
       </Menu.Item>
 
-      {/* <Menu.Item>
+      <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
-            className=""
-            icon={<PushpinOutlined />}
-            onClick={() => setIsResetPasswordModalVisible(true)}
+            className="flex items-center gap-2"
+            icon={<MdOutlineEmail />}
+            onClick={() => {
+              setIsEmailVerificationModalVisible(true);
+              setCompnyid(user.id);
+            }}
             size="small"
           >
-            <span>Reset Password</span>
+            <span>Update Email</span>
           </Button>
         </Flex>
-      </Menu.Item> */}
+      </Menu.Item>
 
       <Menu.Item>
         <Flex alignItems="center">
@@ -352,13 +372,19 @@ const CompanyList = () => {
         />
       </Modal>
 
-      {/* <Modal
-        title="Edit Company Card"
-        visible={isEditCompanyCardModalVisible}
-        onCancel={() => setIsEditCompanyCardModalVisible(false)}
-        footer={null} >
-        <EditCompany onClose={() => setIsEditCompanyCardModalVisible(false)} comnyid={comnyid} />
-      </Modal> */}
+      <Modal
+        title="Email Verification"
+        visible={isEmailVerificationModalVisible}
+        onCancel={() => setIsEmailVerificationModalVisible(false)}
+        footer={null}
+      >
+        <EmailVerificationModal
+          visible={isEmailVerificationModalVisible}
+          onCancel={() => setIsEmailVerificationModalVisible(false)}
+          onSubmit={handleEmailVerification}
+          initialEmail={initialValues.email}
+        />
+      </Modal>
 
       <Modal
         title="Reset Password"
