@@ -364,11 +364,41 @@ export const TaskList = () => {
     },
   };
 
+  const filterTasks = () => {
+    let filteredData = [...fnddata];
+
+    // Apply search filter
+    if (searchText) {
+      filteredData = filteredData.filter(task => 
+        task.taskName.toLowerCase().includes(searchText.toLowerCase()) ||
+        task.assignToName?.toLowerCase().includes(searchText.toLowerCase()) ||
+        task.priority.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+
+    // Apply status filter
+    if (statusFilter !== 'All') {
+      filteredData = filteredData.filter(task => 
+        task.status === statusFilter
+      );
+    }
+
+    setList(filteredData);
+  };
+
+  // Update useEffect for data filtering
+  useEffect(() => {
+    filterTasks();
+  }, [searchText, statusFilter, fnddata, employees]);
+
+  // Replace your existing onSearch with this
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const data = utils.wildCardSearch(list, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    setSearchText(e.currentTarget.value);
+  };
+
+  // Add this handler for status filter
+  const handleStatusFilter = (value) => {
+    setStatusFilter(value);
   };
 
   // Get unique statuses from task data

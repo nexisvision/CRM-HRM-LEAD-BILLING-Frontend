@@ -80,9 +80,9 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
 
   const currenciesState = useSelector((state) => state.currencies);
 
-  const curr = currenciesState?.currencies?.data || [];
+  const curren = currenciesState?.currencies?.data || [];
 
-  const curren = curr?.filter((item) => item.created_by === user);
+  // const curren = curr?.filter((item) => item.created_by === user);
 
   const subClientData = sub?.find((subClient) => subClient?.id === client);
 

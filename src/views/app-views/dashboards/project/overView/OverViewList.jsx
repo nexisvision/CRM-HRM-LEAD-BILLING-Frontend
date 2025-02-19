@@ -352,8 +352,8 @@ const OverViewList = () => {
     <>
       <div className="p-2 bg-gray-50">
       <div className="mb-4 bg-white p-8 rounded-lg shadow">
-          <h4 className="text-2xl font-medium text-black mb-4">Project Details</h4>
-          <div className="flex flex-col items-center sm:items-start">
+          <h4 className="text-2xl font-medium text-black mb-4">Project</h4>
+          <div className="flex justify-between items-center sm:items-start">
                 <span className="text-gray-500 font-weight-bold text-lg mb-1">Start Date</span>
                 <span className="text-gray-800 text-sm sm:text-base">
                   {filterdata?.[0]?.startDate
@@ -363,7 +363,7 @@ const OverViewList = () => {
               </div>
 
               {/* End Date */}
-              <div className="flex flex-col items-center sm:items-start">
+              <div className="flex justify-between items-center sm:items-start">
                 <span className="text-gray-500 font-weight-bold text-lg mb-1">End Date</span>
                 <span className="text-gray-800 text-sm sm:text-base">
                   {filterdata?.[0]?.endDate

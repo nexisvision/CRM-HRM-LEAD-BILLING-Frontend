@@ -35,9 +35,9 @@ const user = useSelector((state) => state.user.loggedInUser.username);
 
     const { currencies } = useSelector((state) => state.currencies);
 
-const curr = currencies?.data || [];
+const curren = currencies?.data || [];
 
-const curren = curr?.filter((item) => item.created_by === user);
+// const curren = curr?.filter((item) => item.created_by === user);
 
 
     const { data: employee } = useSelector((state) => state.employee.employee);
