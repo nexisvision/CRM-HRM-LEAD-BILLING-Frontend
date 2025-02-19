@@ -89,7 +89,7 @@ const EditClient = ({ comnyid, onClose }) => {
                 
                     dispatch(Editclient({ comnyid, formData })).then(() => {
                       dispatch(ClientData());
-                      message.success("Client edited successfully");
+                      message.success("Client updated successfully");
                       resetForm();
                       onClose();
                     });

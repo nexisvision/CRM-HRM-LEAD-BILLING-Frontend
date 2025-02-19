@@ -29,11 +29,11 @@ export const CountriesList = () => {
     }, [dispatch]);
 
 
-    const filterdata = useSelector((state)=>state.countries.countries);
+    const countries = useSelector((state)=>state.countries.countries);
 
     const loggedIndata = useSelector((state)=>state.user.loggedInUser.username)
 
-    const countries = filterdata?.filter((item)=>item?.created_by === loggedIndata)
+    // const countries = filterdata?.filter((item)=>item?.created_by === loggedIndata)
 
      // Get countries data from Redux store
     //  const { countries, isLoading } = useSelector((state) => state.countries);
@@ -42,7 +42,7 @@ export const CountriesList = () => {
         if(countries){
             setFilteredData(countries);
         }
-    }, [filterdata]);
+    }, [countries]);
   
     // Open Add Job Modal
     const openAddCountriesModal = () => {

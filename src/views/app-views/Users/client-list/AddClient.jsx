@@ -66,7 +66,7 @@ const AddClient = ({ visible, onClose, onCreate }) => {
       const response = await dispatch(addClient(values));
       if (response.payload?.data?.sessionToken) {
         setOtpToken(response.payload?.data?.sessionToken);
-        message.success("Employee added successfully! Please verify OTP.");
+        message.success("Client added successfully! Please verify OTP.");
         setShowOtpModal(true);
         onClose();
       }
@@ -74,7 +74,7 @@ const AddClient = ({ visible, onClose, onCreate }) => {
       resetForm();
       dispatch(ClientData());
     } catch (error) {
-      message.error("Failed to add employee. Please try again.");
+      message.error("Failed to add client. Please try again.");
     }
   };
 

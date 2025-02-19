@@ -108,7 +108,7 @@ const ClientList = () => {
     dispatch(deleteClient(userId));
     setUsers(users.filter((user) => user.id !== userId));
     dispatch(ClientData());
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    message.success({ content: `Deleted client successfully`, duration: 2 });
   };
 
   const getCompanyStatus = (status) => {

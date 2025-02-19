@@ -103,6 +103,10 @@ const LeadList = () => {
     setSelectedRowKeys([]);
   };
 
+  const handleLeadClick = (id) => {
+    navigate(`/app/dashboards/lead/view/${id}`);
+};
+
   //// permission
           
                     const roleId = useSelector((state) => state.user.loggedInUser.role_id);
@@ -273,6 +277,14 @@ const LeadList = () => {
     {
       title: "leadTitle",
       dataIndex: "leadTitle",
+      render: (leadTitle, record) => (
+        <div 
+            onClick={() => handleLeadClick(record.id)}
+            className="cursor-pointer hover:text-blue-600"
+        >
+            <h4 className="mb-0">{leadTitle}</h4>
+        </div>
+    ),
       sorter: {
         compare: (a, b) => a.leadTitle.length - b.leadTitle.length,
       },

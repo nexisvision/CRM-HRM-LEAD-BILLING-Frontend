@@ -37,9 +37,9 @@ const AddInvoice = ({ onClose }) => {
 
     const currenciesState = useSelector((state) => state.currencies);
 
-    const curr = currenciesState?.currencies?.data || [];
+    const curren = currenciesState?.currencies?.data || [];
 
-    const curren = curr?.filter((item) => item.created_by === user);
+    // const curren = curr?.filter((item) => item.created_by === user);
 
     const [currenciesList, setCurrenciesList] = useState([]);
     const [discountRate, setDiscountRate] = useState(0);

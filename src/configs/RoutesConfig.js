@@ -141,6 +141,11 @@ export const protectedRoutes = [
         component: React.lazy(() => import('views/app-views/dashboards/leads')),
     },
     {
+        key: 'dashboard.project.view',
+        path: `${APP_PREFIX_PATH}/dashboards/lead/view/:id`,
+        component: React.lazy(() => import('views/app-views/dashboards/leads/ViewLead')),
+    },
+    {
         key: 'dashboard.project.lead',
         path: `${APP_PREFIX_PATH}/dashboards/project/lead/ViewLead`,
         component: React.lazy(() => import('views/app-views/dashboards/leads/ViewLead')),
