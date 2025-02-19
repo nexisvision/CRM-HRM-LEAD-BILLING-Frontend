@@ -26,6 +26,7 @@ import {
   GetProject,
 } from "../../project/project-list/projectReducer/ProjectSlice";
 import axios from "axios";
+import { GetLeads } from "../LeadReducers/LeadSlice";
 const { Option } = Select;
 const AddLeadMember = ({ onClose }) => {
   const navigate = useNavigate();
@@ -34,22 +35,26 @@ const AddLeadMember = ({ onClose }) => {
   const [showReceiptUpload, setShowReceiptUpload] = useState(false);
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const initialValues = {
-    project_members: [],
+    lead_members: [],
   };
   const validationSchema = Yup.object({
-    project_members: Yup.array().required(
-      "Please enter AddProjectMember name."
+    lead_members: Yup.array().required(
+      "Please enter AddLeadMember name."
     ),
   });
 
   const { id } = useParams();
+
+  useEffect(()=>{
+    dispatch(GetLeads())
+  },[dispatch])
 
   const Addmember = async (payload) => {
     const token = localStorage.getItem("auth_token");
 
     try {
       const res = await axios.post(
-        `http://localhost:5353/api/v1/projects/membersadd/${id}`,
+        `http://localhost:5353/api/v1/leads/membersadd/${id}`,
         payload,
         {
           headers: {
@@ -79,12 +84,14 @@ const AddLeadMember = ({ onClose }) => {
   const onSubmit = async (values, { resetForm }) => {
     try {
       const payload = {
-        project_members: values,
+        lead_members: {
+          lead_members: values.lead_members
+        }
       };
 
       await Addmember(payload);
 
-      await dispatch(GetProject()).unwrap();
+      await dispatch(GetLeads()).unwrap();
 
       message.success("Project added successfully!");
       resetForm();
@@ -119,7 +126,7 @@ const loggeduserdata = useSelector((state)=>state.user.loggedInUser.username)
       <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (

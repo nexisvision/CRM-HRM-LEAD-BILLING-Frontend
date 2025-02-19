@@ -100,10 +100,10 @@ const sub = subClientsss?.SubClient?.data;
 
     // Handle currencies data when it changes
     useEffect(() => {
-        if (curr) {
-            setCurrenciesList(curr);
+        if (curren) {
+            setCurrenciesList(curren);
         }
-    }, [curr]);
+    }, [curren]);
 
     // Fetch milestones when product changes
     useEffect(() => {
@@ -470,7 +470,7 @@ const sub = subClientsss?.SubClient?.data;
                 placeholder="Select Currency"
                 onChange={handleCurrencyChange}
             >
-                {curr?.map((currency) => (
+                {curren?.map((currency) => (
                     <Option key={currency.id} value={currency.id}>
                         {currency.currencyCode} ({currency.currencyIcon})
                     </Option>

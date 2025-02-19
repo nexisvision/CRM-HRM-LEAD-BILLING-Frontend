@@ -32,7 +32,7 @@ function FileList() {
     
     // Create FormData object to send file
     const formData = new FormData();
-    formData.append('project_files', file);
+    formData.append('lead_files', file);
     
     try {
       // Dispatch file upload action and wait for it to complete

@@ -20,6 +20,7 @@ import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/Co
 import { useNavigate, useParams } from 'react-router-dom';
 import { Modal } from 'antd';
 import { GetTasks } from "../../project/task/TaskReducer/TaskSlice";
+import { GetLeads } from "../LeadReducers/LeadSlice";
 
 // Register the chart components
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -32,6 +33,15 @@ const OverViewList = () => {
   const navigate = useNavigate();
   const [isTaskModalVisible, setIsTaskModalVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(null);
+
+  useEffect(()=>{
+    dispatch(GetLeads())
+  },[dispatch])
+
+  const alldeaddata = useSelector((state)=>state.Leads.Leads.data)
+  const fnddead = alldeaddata.find((item)=>item.id === id)
+
+  console.log("fnddead",fnddead)
 
 
 

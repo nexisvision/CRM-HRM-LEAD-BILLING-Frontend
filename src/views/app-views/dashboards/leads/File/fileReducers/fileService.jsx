@@ -27,7 +27,7 @@ const addfiless = async (id,values) => {
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/projects/files/${id}`,
+      `http://localhost:5353/api/v1/leads/files/${id}`,
       values,
       {
         headers: {

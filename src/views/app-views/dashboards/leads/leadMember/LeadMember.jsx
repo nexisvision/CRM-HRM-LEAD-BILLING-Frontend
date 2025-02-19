@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Row, Card, Table, Button, Modal, message } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import AddLeadMember from "./AddLeadMember";
-import { GetProject } from "../../project/project-list/projectReducer/ProjectSlice";
 
 import Flex from "components/shared-components/Flex";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { GetLeads } from "../LeadReducers/LeadSlice";
+import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 
 const LeadMember = () => {
   const dispatch = useDispatch();
@@ -23,30 +23,65 @@ const LeadMember = () => {
 
   const { id } = useParams();
 
+  // Add useEffect to fetch data on component mount
+  useEffect(() => {
+    dispatch(GetLeads());
+    dispatch(empdata());
+  }, [dispatch]);
 
-  const allproject = useSelector((state) => state.Project);
-  const fndrewduxxdaa = allproject.Project.data
+  const allproject = useSelector((state) => state.Leads);
+  const fndrewduxxdaa = allproject.Leads.data;
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
+
+  console.log("fnddatamembers",fnddata.lead_members);
   
 
 
+  // const DeletePro2 = async (payload) => {
+  //   const token = localStorage.getItem("auth_token");
+
+  //   const payload2 = {
+  //     lead_members: [payload],
+  //   };
+
+  //   try {
+  //     const res = await axios.delete(
+  //       `http://localhost:5353/api/v1/leads/membersdel/${id}`,
+  //       { lead_members: payload2 },
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       }
+  //     );
+  //     // dispatch(empdata());
+  //     return res.data;
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //     throw error;
+  //   }
+  // };
+
+  
   const DeletePro2 = async (payload) => {
     const token = localStorage.getItem("auth_token");
 
     const payload2 = {
-      project_members: [payload],
+      lead_members: [payload],
     };
 
     try {
       const res = await axios.post(
-        `http://localhost:5353/api/v1/projects/membersdelete/${id}`,
-        { project_members: payload2 },
+        `http://localhost:5353/api/v1/leads/membersdel/${id}`,
+        { lead_members: payload2 },
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
+      dispatch(GetLeads());
+      dispatch(empdata());
       // dispatch(empdata());
       return res.data;
     } catch (error) {
@@ -55,32 +90,29 @@ const LeadMember = () => {
     }
   };
 
-  console.log("tt", leadData);
-
   const project = leadData[0]; // Accessing the first project as an example
-
-console.log("sdfsdfsdf",project);
-
-  const userField = fnddata?.project_members; // The 'user' field in the project
-  let userArray = [];
-  console.log("popopop", userField);
-
+  const leadMembers = fnddata?.lead_members || [];
+  let memberArray = [];
+  
   try {
-    const parsedUserField = JSON.parse(userField); // Parse the JSON string
-    userArray = parsedUserField?.project_members; // Extract the array of user IDs
+    memberArray = typeof leadMembers === 'string' 
+      ? JSON.parse(leadMembers).lead_members 
+      : leadMembers;
   } catch (error) {
-    console.error("Error parsing user field:", error);
+    console.error("Error parsing lead members:", error);
   }
 
-  const userEmployeeData = userArray
-    ?.map((userId) => {
-      const employee = employeeData?.find((emp) => emp?.id === userId);
-      if (!employee) {
-        console.warn(`No employee found for userId: ${userId}`);
-      }
-      return employee || null; // Return the employee if found, otherwise null
-    })
-    .filter((employee) => employee !== null); // Remove null values
+  const userEmployeeData = useMemo(() => {
+    return memberArray
+      ?.map((memberId) => {
+        const employee = employeeData?.find((emp) => emp?.id === memberId);
+        if (!employee) {
+          console.warn(`No employee found for memberId: ${memberId}`);
+        }
+        return employee || null;
+      })
+      .filter((employee) => employee !== null);
+  }, [memberArray, employeeData]);
 
   console.log("Filtered Employee Data:", userEmployeeData);
 
@@ -136,9 +168,10 @@ console.log("sdfsdfsdf",project);
     }
   };
 
-  useEffect(() => {
-    dispatch(GetProject());
-  }, [dispatch]);
+ 
+  useEffect(()=>{
+    dispatch(GetLeads())
+  },[dispatch])
 
   return (
     <div className="container">
