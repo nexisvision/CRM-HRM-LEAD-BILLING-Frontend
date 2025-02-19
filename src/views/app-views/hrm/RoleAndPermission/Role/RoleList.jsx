@@ -28,6 +28,7 @@ const RoleList = () => {
   const filteredData = Array.isArray(tabledata) && loginUser ?
     tabledata.filter((item) => item.created_by === loginUser.username) : [];
 
+  const [searchText, setSearchText] = useState('');
 
   const openEditRoleModal = () => {
     setIsEditRoleModalVisible(true);
@@ -50,11 +51,21 @@ const RoleList = () => {
   }, [dispatch]);
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = value ? list : [];
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+  };
+
+  const getFilteredRoles = () => {
+    if (!users) return [];
+    
+    if (!searchText) return users;
+
+    return users.filter(role => {
+      return (
+        role.role_name?.toLowerCase().includes(searchText.toLowerCase()) ||
+        JSON.stringify(role.permissions)?.toLowerCase().includes(searchText.toLowerCase())
+      );
+    });
   };
 
   useEffect(() => {
@@ -203,32 +214,42 @@ const RoleList = () => {
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={(e) => onSearch(e)} />
+            <Input
+              placeholder="Search role name or permissions..."
+              prefix={<SearchOutlined />}
+              onChange={onSearch}
+              value={searchText}
+              allowClear
+              className="search-input"
+            />
           </div>
         </Flex>
         <Flex gap="7px">
-        
-
-            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                                                        <Button type="primary" className="ml-2" onClick={openAddRoleModal}>
-                                                                                                                                                        <PlusOutlined />
-                                                                                                                                                        <span>New</span>
-                                                                                                                                                      </Button>                                                                                                            
-                                                                                                                                                                      ) : null}
-
+          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Button type="primary" className="ml-2" onClick={openAddRoleModal}>
+              <PlusOutlined />
+              <span>New</span>
+            </Button>
+          ) : null}
           <Button type="primary" icon={<FileExcelOutlined />} block>
             Export All
           </Button>
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-
-         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                         <Table columns={tableColumns} dataSource={users} rowKey="id" />
-                                                                                             ) : null}
-
-
-      
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          <Table 
+            columns={tableColumns} 
+            dataSource={getFilteredRoles()} 
+            rowKey="id"
+            pagination={{
+              total: getFilteredRoles().length,
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+            }}
+          />
+        ) : null}
       </div>
 
       <Modal
@@ -256,4 +277,48 @@ const RoleList = () => {
   );
 };
 
-export default RoleList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 300px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-input-affix-wrapper {
+    min-width: 250px;
+  }
+
+  @media (max-width: 768px) {
+    .search-input,
+    .ant-input-affix-wrapper {
+      width: 100%;
+      min-width: unset;
+    }
+    
+    .mb-1 {
+      margin-bottom: 1rem;
+    }
+
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const RoleListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <RoleList />
+  </>
+);
+
+export default RoleListWithStyles;

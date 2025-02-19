@@ -42,6 +42,7 @@ const BranchList = () => {
 
   const [idd, setIdd] = useState("");
 
+  const [searchText, setSearchText] = useState('');
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Branch);
@@ -115,11 +116,20 @@ const BranchList = () => {
   };
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+  };
+
+  const getFilteredBranches = () => {
+    if (!users) return [];
+    
+    if (!searchText) return users;
+
+    return users.filter(branch => {
+      return (
+        branch.branchName?.toLowerCase().includes(searchText.toLowerCase())
+      );
+    });
   };
 
   //   useEffect(()=>{
@@ -252,9 +262,12 @@ const BranchList = () => {
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
-              placeholder="Search"
+              placeholder="Search branch name..."
               prefix={<SearchOutlined />}
               onChange={onSearch}
+              value={searchText}
+              allowClear
+              className="search-input"
             />
           </div>
         </Flex>
@@ -283,7 +296,12 @@ const BranchList = () => {
 
          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                                                                                                                                                                   
-                    <Table columns={tableColumns} dataSource={users} rowKey="id" />
+                    <Table columns={tableColumns} dataSource={getFilteredBranches()} rowKey="id" pagination={{
+                      total: getFilteredBranches().length,
+                      pageSize: 10,
+                      showSizeChanger: true,
+                      showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                    }} />
                        ) : null}
 
 
@@ -319,4 +337,48 @@ const BranchList = () => {
   );
 };
 
-export default BranchList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 300px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-input-affix-wrapper {
+    min-width: 250px;
+  }
+
+  @media (max-width: 768px) {
+    .search-input,
+    .ant-input-affix-wrapper {
+      width: 100%;
+      min-width: unset;
+    }
+    
+    .mb-1 {
+      margin-bottom: 1rem;
+    }
+
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const BranchListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <BranchList />
+  </>
+);
+
+export default BranchListWithStyles;

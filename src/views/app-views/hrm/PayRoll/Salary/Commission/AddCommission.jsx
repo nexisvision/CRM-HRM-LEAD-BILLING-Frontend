@@ -35,7 +35,7 @@ const AddCommission = ({ id, onClose }) => {
     });
   };
   return (
-    <div className="employee-salary p-4">
+    <div className="employee-salary">
       <hr className="my-2 border-gray-300" />
       <Formik
         initialValues={{ title: "", type: "", currency: "", amount: "" }}
@@ -45,7 +45,7 @@ const AddCommission = ({ id, onClose }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <Col span={24} className="mt-4">
               <div className="form-item">
-                <label className="font-semibold">employee</label>
+                <label className="font-semibold">employee <span className="text-red-500">*</span></label>
                 <Field name="employeeId">
                   {({ field }) => (
                     <Select
@@ -79,7 +79,7 @@ const AddCommission = ({ id, onClose }) => {
               </div>
             </Col>
             <div>
-              <label className="font-semibold">Title</label>
+              <label className="font-semibold">Title <span className="text-red-500">*</span></label>
               <Field name="title">
                 {({ field }) => <Input {...field} placeholder="Enter Title" />}
               </Field>
@@ -91,7 +91,7 @@ const AddCommission = ({ id, onClose }) => {
             </div>
             {/* Type */}
             <div>
-              <label className="font-semibold">Type</label>
+              <label className="font-semibold">Type <span className="text-red-500">*</span></label>
               <Field name="type">
                 {({ field }) => <Input {...field} placeholder="Enter Type" />}
               </Field>
@@ -104,7 +104,7 @@ const AddCommission = ({ id, onClose }) => {
             {/* Deduction Option */}
             <Col span={24} className="mt-4">
               <div className="form-item">
-                <label className="font-semibold">currency</label>
+                <label className="font-semibold">currency <span className="text-red-500">*</span></label>
                 <Field name="currency">
                   {({ field }) => (
                     <Select
@@ -117,9 +117,8 @@ const AddCommission = ({ id, onClose }) => {
                       {fnddatass && fnddatass?.length > 0 ? (
                         fnddatass?.map((client) => (
                           <Option key={client.id} value={client?.id}>
-                            {client?.currencyIcon ||
-                              client?.currencyCode ||
-                              "Unnamed currency"}
+                            {client?.currencyCode}
+                           ({client?.currencyIcon})
                           </Option>
                         ))
                       ) : (
@@ -139,7 +138,7 @@ const AddCommission = ({ id, onClose }) => {
             </Col>
             {/* Currency */}
             <div>
-              <label className="font-semibold">Amount</label>
+              <label className="font-semibold">Amount <span className="text-red-500">*</span></label>
               <Field name="amount">
                 {({ field }) => <Input {...field} placeholder="Enter Amount" type="number" />}
               </Field>

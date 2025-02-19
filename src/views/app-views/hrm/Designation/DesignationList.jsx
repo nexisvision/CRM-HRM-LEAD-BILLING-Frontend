@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Button, Input, message, Modal } from 'antd';
+import { Card, Table, Menu, Button, Input, message, Modal, Select } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, EditOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
 import UserView from '../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
@@ -11,6 +11,9 @@ import ParticularDesignation from './ParticularDesignation';
 import EditDesignation from './EditDesignation';
 import { useDispatch, useSelector } from 'react-redux';
 import { DeleteDes, getDes } from './DesignationReducers/DesignationSlice';
+import { getBranch } from '../Branch/BranchReducer/BranchSlice';
+
+const { Option } = Select;
 
 const DesignationList = () => {
   const [users, setUsers] = useState([]);
@@ -27,10 +30,19 @@ const DesignationList = () => {
   const tabledata = useSelector((state) => state.Designation);
 
   const [id,setId]=useState("");
+  const [searchText, setSearchText] = useState('');
+  const [selectedBranch, setSelectedBranch] = useState('all');
+  
+  // Add branch data from Redux store
+  const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
 
-  useEffect(()=>{
-    dispatch(getDes())
-  },[dispatch])
+  // Filter branches for current user
+  const userBranches = branchData.filter(branch => branch.created_by === user);
+
+  useEffect(() => {
+    dispatch(getDes());
+    dispatch(getBranch());
+  }, [dispatch]);
 
   //// permission
                         
@@ -96,11 +108,42 @@ const DesignationList = () => {
   };
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = value ? list : users;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+  };
+
+  // Function to get branch name by ID
+  const getBranchNameById = (branchId) => {
+    const branch = branchData.find(branch => branch.id === branchId);
+    return branch ? branch.branchName : 'N/A';
+  };
+
+  // Function to filter designations based on search and branch
+  const getFilteredDesignations = () => {
+    if (!users) return [];
+    
+    let filtered = users;
+
+    // Apply search filter
+    if (searchText) {
+      filtered = filtered.filter(designation => 
+        designation.designation_name?.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+
+    // Apply branch filter
+    if (selectedBranch !== 'all') {
+      filtered = filtered.filter(designation => 
+        designation.branch === selectedBranch
+      );
+    }
+
+    return filtered;
+  };
+
+  // Handle branch change
+  const handleBranchChange = (value) => {
+    setSelectedBranch(value);
   };
 
   const deleteUser = (userId) => {
@@ -174,7 +217,19 @@ const DesignationList = () => {
       title: 'Designation',
       dataIndex: 'designation_name',
       sorter: {
-        compare: (a, b) => a.designation.length - b.designation.length,
+        compare: (a, b) => a.designation_name.length - b.designation_name.length,
+      },
+    },
+    {
+      title: 'Branch',
+      dataIndex: 'branch',
+      render: (branchId) => getBranchNameById(branchId),
+      sorter: {
+        compare: (a, b) => {
+          const branchNameA = getBranchNameById(a.branch).toLowerCase();
+          const branchNameB = getBranchNameById(b.branch).toLowerCase();
+          return branchNameA.localeCompare(branchNameB);
+        },
       },
     },
     {
@@ -193,35 +248,63 @@ const DesignationList = () => {
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={onSearch} />
+            <Input
+              placeholder="Search designation..."
+              prefix={<SearchOutlined />}
+              onChange={onSearch}
+              value={searchText}
+              allowClear
+              className="search-input"
+            />
+          </div>
+          <div className="mr-md-3 mb-3">
+            <Select
+              placeholder="Filter by branch"
+              onChange={handleBranchChange}
+              value={selectedBranch}
+              style={{ width: 200 }}
+              className="branch-select"
+            >
+              <Option value="all">All Branches</Option>
+              {userBranches.map(branch => (
+                <Option key={branch.id} value={branch.id}>
+                  {branch.branchName}
+                </Option>
+              ))}
+            </Select>
           </div>
         </Flex>
         <Flex gap="7px">
-     
           {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                         <Button type="primary" className="ml-2" onClick={openAddDesignationModal}>
-                                                         <PlusOutlined />
-                                                         <span>New</span>
-                                                       </Button>                                                                                                                                              
-                                                                  ) : null}
+            <Button type="primary" className="ml-2" onClick={openAddDesignationModal}>
+              <PlusOutlined />
+              <span>New</span>
+            </Button>
+          ) : null}
           <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel}
+            block
+          >
+            Export All
+          </Button>
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                      
-                                       <Table columns={tableColumns} dataSource={users} rowKey="id" />
-
-        
-                                    ) : null}
-
+          <Table 
+            columns={tableColumns} 
+            dataSource={getFilteredDesignations()} 
+            rowKey="id"
+            pagination={{
+              total: getFilteredDesignations().length,
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+            }}
+          />
+        ) : null}
       </div>
       <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
 
@@ -254,7 +337,60 @@ const DesignationList = () => {
   );
 };
 
-export default DesignationList;
+// Update styles
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 200px;
+  }
+
+  .branch-select {
+    transition: all 0.3s;
+  }
+
+  .search-input:hover,
+  .search-input:focus,
+  .branch-select:hover,
+  .branch-select:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-input-group {
+    display: flex;
+    align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    .search-input,
+    .branch-select,
+    .ant-input-group {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    
+    .mb-1 {
+      margin-bottom: 1rem;
+    }
+
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const DesignationListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <DesignationList />
+  </>
+);
+
+export default DesignationListWithStyles;
 
 
 
@@ -398,7 +534,6 @@ export default DesignationList;
 //     //         return a > b ? -1 : b > a ? 1 : 0;
 //     //       },
 //     //     },
-//     //   },
 //       {
 //         title: 'Designation',
 //         dataIndex: 'designation',

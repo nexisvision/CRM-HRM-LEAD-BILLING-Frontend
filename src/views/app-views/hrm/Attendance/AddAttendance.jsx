@@ -28,9 +28,14 @@ const AddAttendance = ({ onClose }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const employeeData = useSelector(
+
+  const user = useSelector((state) => state.user.loggedInUser.username);
+
+  const employeeDataa = useSelector(
     (state) => state.employee?.employee?.data || []
   );
+
+  const employeeData = employeeDataa.filter((item) => item.created_by === user);
 
   useEffect(() => {
     dispatch(empdata());

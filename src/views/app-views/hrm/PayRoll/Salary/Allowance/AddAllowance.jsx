@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { Select, Button, message, Col } from "antd";
+import { Select, Button, message, Col, Input } from "antd";
 import axios from "axios";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -79,12 +79,12 @@ const AddAllowance = ({ id, onClose}) => {
           <Form className="formik-form">
             <Col span={24} className="mt-4">
               <div className="form-item">
-                <label className="font-semibold">employee</label>
+                <label className="font-semibold">employee<span className="text-red-500">*</span></label>
                 <Field name="employeeId">
                   {({ field }) => (
                     <Select
                       {...field}
-                      className="w-full mt-2"
+                      className="w-full mt-1"
                       placeholder="Select Employee"
                       onChange={(value) => setFieldValue("employeeId", value)}
                       value={values.employeeId}
@@ -114,10 +114,11 @@ const AddAllowance = ({ id, onClose}) => {
             </Col>
 
             <div className="form-group">
-              <label>Allowance Option</label>
+              <label className="mt-2">Allowance Option <span className="text-red-500">*</span></label>
               <Select
                 placeholder="Select Allowance Option"
                 value={values.allowanceOption}
+                className="w-full mt-1"
                 onChange={(value) => setFieldValue("allowanceOption", value)}
                 style={{ width: "100%" }}
               >
@@ -132,23 +133,23 @@ const AddAllowance = ({ id, onClose}) => {
               )}
             </div>
 
-            <div className="form-group">
-              <label>Title</label>
-              <Field
+            <div>
+              <label className="mt-2">Title <span className="text-red-500">*</span></label>
+              <Field name="title">
+                {({ field }) => <Input {...field} placeholder="Enter Title" />}
+              </Field>
+              <ErrorMessage
                 name="title"
-                type="text"
-                className="form-control"
-                placeholder="Title"
+                component="div"
+                className="text-red-500"
               />
-              {errors.title && touched.title && (
-                <div className="error-message">{errors.title}</div>
-              )}
             </div>
 
             <div className="form-group">
-              <label>Type</label>
+                <label className="mt-2">Type <span className="text-red-500">*</span></label>
               <Select
                 placeholder="Select Type"
+                className="w-full mt-1"
                 value={values.type}
                 onChange={(value) => setFieldValue("type", value)}
                 style={{ width: "100%" }}
@@ -163,12 +164,12 @@ const AddAllowance = ({ id, onClose}) => {
 
             <Col span={24} className="mt-4">
               <div className="form-item">
-                <label className="font-semibold">currency</label>
+                <label className="font-semibold">currency <span className="text-red-500">*</span></label>
                 <Field name="currency">
                   {({ field }) => (
                     <Select
                       {...field}
-                      className="w-full mt-2"
+                      className="w-full mt-1"
                       placeholder="Select Currency"
                       onChange={(value) => setFieldValue("currency", value)}
                       value={values.currency}
@@ -176,9 +177,9 @@ const AddAllowance = ({ id, onClose}) => {
                       {fnddatass && fnddatass?.length > 0 ? (
                         fnddatass?.map((client) => (
                           <Option key={client.id} value={client?.id}>
-                            {client?.currencyIcon ||
-                              client?.currencyCode ||
-                              "Unnamed currency"}
+                               {client?.currencyCode}
+                               ({client?.currencyIcon})
+                             
                           </Option>
                         ))
                       ) : (
@@ -197,21 +198,21 @@ const AddAllowance = ({ id, onClose}) => {
               </div>
             </Col>
 
-            <div className="form-group">
-              <label>Amount</label>
-              <Field
+           
+            <div>
+              <label className="mt-2">Amount <span className="text-red-500">*</span></label>
+              <Field name="amount">
+                {({ field }) => <Input {...field} placeholder="Enter Amount" type="number" />}
+              </Field>
+              <ErrorMessage
                 name="amount"
-                type="number"
-                className="form-control"
-                placeholder="Amount"
+                component="div"
+                className="text-red-500"
               />
-              {errors.amount && touched.amount && (
-                <div className="error-message">{errors.amount}</div>
-              )}
             </div>
 
-            <Button type="primary" htmlType="submit" onClick={onClose}>
-              Add Allowance
+            <Button type="primary" htmlType="submit" onClick={onClose} className="mt-4" >
+             Submit
             </Button>
           </Form>
         )}

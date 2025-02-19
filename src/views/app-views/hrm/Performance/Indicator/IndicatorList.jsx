@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Tag, Input, message, Button, Modal,Rate  } from 'antd';
+import { Card, Table, Menu, Tag, Input, message, Button, Modal,Rate, Select } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, EditOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from '../../../Users/user-list/UserView';
@@ -22,6 +22,8 @@ import { getBranch } from '../../Branch/BranchReducer/BranchSlice';
 import { getDept } from '../../Department/DepartmentReducers/DepartmentSlice';
 import { getDes } from '../../Designation/DesignationReducers/DesignationSlice';
 
+const { Option } = Select;
+
 const IndicatorList = () => {
   const [users, setUsers] = useState([]);
   const [list, setList] = useState([]);
@@ -31,6 +33,8 @@ const IndicatorList = () => {
   const [isAddIndicatorModalVisible, setIsAddIndicatorModalVisible] = useState(false);
   const [isEditIndicatorModalVisible, setIsEditIndicatorModalVisible] = useState(false);
   const [isViewIndicatorModalVisible, setIsViewIndicatorModalVisible] = useState(false);
+  const [selectedBranch, setSelectedBranch] = useState('all');
+  const [searchText, setSearchText] = useState('');
 const dispatch = useDispatch();
 
   const openAddIndicatorModal = () => setIsAddIndicatorModalVisible(true);
@@ -46,10 +50,12 @@ const dispatch = useDispatch();
     const tabledata = useSelector((state) => state.indicator);
 
 
-const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
+const branchDaata = useSelector((state) => state.Branch?.Branch?.data || []);
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
 
+
+  const branchData = branchDaata.filter(item => item.created_by === user);
    //// permission
                    
      const roleId = useSelector((state) => state.user.loggedInUser.role_id);
@@ -121,7 +127,7 @@ useEffect(() => {
       });
     setUsers(mappedData);
   }
-}, [tabledata, branchData, departmentData, designationData, user]);
+}, [tabledata, departmentData, designationData, user]);
 
 
 
@@ -146,10 +152,8 @@ useEffect(() => {
 // }, [tabledata, branchData, departmentData, designationData]);
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = value ? list : [];
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
   };
 
   const exportToExcel = () => {
@@ -335,12 +339,72 @@ useEffect(() => {
     },
   ];
 
+  const getFilteredIndicators = () => {
+    if (!users) return [];
+    
+    let filteredData = [...users];
+
+    // Filter by search text
+    if (searchText) {
+      const searchLower = searchText.toLowerCase();
+      filteredData = filteredData.filter(indicator => {
+        return (
+          indicator.branch?.toLowerCase().includes(searchLower) ||
+          indicator.department?.toLowerCase().includes(searchLower) ||
+          indicator.designation?.toLowerCase().includes(searchLower) ||
+          indicator.overallRating?.toString().includes(searchLower) ||
+          indicator.businessProcess?.toString().includes(searchLower) ||
+          indicator.oralCommunication?.toString().includes(searchLower) ||
+          indicator.leadership?.toString().includes(searchLower) ||
+          indicator.projectManagement?.toString().includes(searchLower) ||
+          indicator.allocatingResources?.toString().includes(searchLower)
+        );
+      });
+    }
+
+    // Filter by selected branch
+    if (selectedBranch !== 'all') {
+      filteredData = filteredData.filter(indicator => 
+        indicator.branch === selectedBranch
+      );
+    }
+
+    return filteredData;
+  };
+
+  const BranchFilter = () => (
+    <Select
+      style={{ width: 200 }}
+      placeholder="Filter by Branch"
+      value={selectedBranch}
+      onChange={setSelectedBranch}
+      className="mr-2"
+    >
+      <Option value="all">All Branches</Option>
+      {branchData.map(branch => (
+        <Option key={branch.id} value={branch.branchName}>
+          {branch.branchName}
+        </Option>
+      ))}
+    </Select>
+  );
+
   return (
     <Card bodyStyle={{ padding: '-3px' }}>
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={(e) => onSearch(e)} />
+            <Input
+              placeholder="Search branch, department, designation..."
+              prefix={<SearchOutlined />}
+              onChange={onSearch}
+              value={searchText}
+              allowClear
+              className="search-input"
+            />
+          </div>
+          <div className="mr-md-3 mb-3">
+            <BranchFilter />
           </div>
         </Flex>
         <Flex gap="7px">
@@ -369,7 +433,7 @@ useEffect(() => {
 
          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                                                                                                                                   
-        <Table columns={tableColumns} dataSource={users} rowKey="id" />
+        <Table columns={tableColumns} dataSource={getFilteredIndicators()} rowKey="id" />
               
                                                    ) : null}
 
@@ -412,7 +476,56 @@ useEffect(() => {
   );
 };
 
-export default IndicatorList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 300px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-input-affix-wrapper {
+    min-width: 250px;
+  }
+
+  .ant-select {
+    min-width: 200px;
+  }
+
+  @media (max-width: 768px) {
+    .search-input,
+    .ant-input-affix-wrapper,
+    .ant-select {
+      width: 100%;
+      min-width: unset;
+    }
+    
+    .mb-1 {
+      margin-bottom: 1rem;
+    }
+
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const IndicatorListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <IndicatorList />
+  </>
+);
+
+export default IndicatorListWithStyles;
 
 
 

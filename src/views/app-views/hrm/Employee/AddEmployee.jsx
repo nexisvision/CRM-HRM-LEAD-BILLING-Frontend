@@ -192,7 +192,7 @@
 //             <Row gutter={16}>
 //               <Col span={12}>
 //                 <div className="form-item">
-//                   <label className="font-semibold">First Name</label>
+//                   <label className="">First Name</label>
 //                   <Field name="firstName" as={Input} placeholder="John" className="mt-1" />
 //                   <ErrorMessage name="firstName" component="div" className="text-red-500" />
 //                 </div>
@@ -683,14 +683,14 @@ const AddEmployee = ({ onClose, setSub }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">First Name <span className="text-red-500">*</span></label>
+                  <label className="">First Name <span className="text-red-500">*</span></label>
                   <Field name="firstName" as={Input} placeholder="John" className="mt-1" />
                   <ErrorMessage name="firstName" component="div" className="text-red-500" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Last Name <span className="text-red-500">*</span></label>
+                  <label className="">Last Name <span className="text-red-500">*</span></label>
                   <Field name="lastName" as={Input} placeholder="Doe" className="mt-1" />
                   <ErrorMessage name="lastName" component="div" className="text-red-500" />
                 </div>
@@ -699,14 +699,14 @@ const AddEmployee = ({ onClose, setSub }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Username <span className="text-red-500">*</span></label>
+                  <label className="">Username <span className="text-red-500">*</span></label>
                   <Field name="username" as={Input} placeholder="john_doe" className="mt-1" />
                   <ErrorMessage name="username" component="div" className="text-red-500" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Password <span className="text-red-500">*</span></label>
+                    <label className="">Password <span className="text-red-500">*</span></label>
                   <Field name="password" as={Input.Password} placeholder="Strong Password" className="mt-1" />
                   <ErrorMessage name="password" component="div" className="text-red-500" />
                 </div>
@@ -715,14 +715,14 @@ const AddEmployee = ({ onClose, setSub }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Email <span className="text-red-500">*</span></label>
+                  <label className="">Email <span className="text-red-500">*</span></label>
                   <Field name="email" as={Input} placeholder="johndoe@example.com" className="mt-1" />
                   <ErrorMessage name="email" component="div" className="text-red-500" />
                 </div>
               </Col>
               <Col span={12} className="mt-2">
   <div className="form-item">
-    <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
+    <label className="">Phone <span className="text-red-500">*</span></label>
     <div className="flex">
       <Select
         style={{ width: '30%', marginRight: '8px' }}
@@ -766,14 +766,14 @@ const AddEmployee = ({ onClose, setSub }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Address <span className="text-red-500">*</span></label>
+                  <label className="">Address <span className="text-red-500">*</span></label>
                   <Field name="address" as={Input} placeholder="Enter Address" className="mt-1" />
                   <ErrorMessage name="address" component="div" className="text-red-500" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Joining Date <span className="text-red-500">*</span></label>
+                  <label className="">Joining Date <span className="text-red-500">*</span></label>
                   <Field name="joiningDate">
                     {({ field }) => (
                       <DatePicker
@@ -790,7 +790,7 @@ const AddEmployee = ({ onClose, setSub }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Leave Date <span className="text-red-500">*</span></label>
+                  <label className="">Leave Date <span className="text-red-500">*</span></label>
                   <Field name="leaveDate">
                     {({ field }) => (
                       <DatePicker
@@ -806,7 +806,7 @@ const AddEmployee = ({ onClose, setSub }) => {
               
               <Col span={12}>
             <div className="form-item">
-              <label className="font-semibold">Branch <span className="text-red-500">*</span></label>
+              <label className="">Branch <span className="text-red-500">*</span></label>
               <Field name="branch">
                 {({ field }) => (
                   <Select
@@ -835,7 +835,7 @@ const AddEmployee = ({ onClose, setSub }) => {
           {/* Department Selection */}
           <Col span={12}>
             <div className="form-item mt-2">
-              <label className="font-semibold">Department <span className="text-red-500">*</span></label>
+              <label className="">Department <span className="text-red-500">*</span></label>
               <Field name="department">
                 {({ field }) => (
                   <Select
@@ -860,7 +860,7 @@ const AddEmployee = ({ onClose, setSub }) => {
           {/* Designation Selection */}
           <Col span={12}>
             <div className="form-item mt-2">
-              <label className="font-semibold">Designation <span className="text-red-500">*</span></label>
+              <label className="">Designation <span className="text-red-500">*</span></label>
               <Field name="designation">
                 {({ field }) => (
                   <Select
@@ -884,7 +884,7 @@ const AddEmployee = ({ onClose, setSub }) => {
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label className="font-semibold">Salary <span className="text-red-500">*</span></label>
+                  <label className="font-semibol">Salary <span className="text-red-500">*</span></label>
                   <Field name="salary" as={Input} placeholder="$" type="number" className="mt-1" />
                   <ErrorMessage name="salary" component="div" className="text-red-500" />
                 </div>
@@ -894,14 +894,14 @@ const AddEmployee = ({ onClose, setSub }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Account Holder Name <span className="text-red-500">*</span></label>
+                  <label className="">Account Holder Name <span className="text-red-500">*</span></label>
                   <Field name="accountholder" as={Input} placeholder="John Doe" className="mt-1" />
                   <ErrorMessage name="accountholder" component="div" className="text-red-500" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Account Number <span className="text-red-500">*</span></label>
+                  <label className="">Account Number <span className="text-red-500">*</span></label>
                   <Field name="accountnumber" as={Input} placeholder="123456789" type="number" className="mt-1" />
                   <ErrorMessage name="accountnumber" component="div" className="text-red-500" />
                 </div>
@@ -910,14 +910,14 @@ const AddEmployee = ({ onClose, setSub }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Bank Name <span className="text-red-500">*</span></label>
+                  <label className="">Bank Name <span className="text-red-500">*</span></label>
                   <Field name="bankname" as={Input} placeholder="Bank Name" className="mt-1" />
                   <ErrorMessage name="bankname" component="div" className="text-red-500" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">IFSC <span className="text-red-500">*</span></label>
+                  <label className="">IFSC <span className="text-red-500">*</span></label>
                   <Field name="ifsc" as={Input} placeholder="IFSC" className="mt-1" />
                   <ErrorMessage name="ifsc" component="div" className="text-red-500" />
                 </div>
@@ -926,7 +926,7 @@ const AddEmployee = ({ onClose, setSub }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Bank Location <span className="text-red-500">*</span>  </label>
+                  <label className="">Bank Location <span className="text-red-500">*</span>  </label>
                   <Field name="banklocation" as={Input} placeholder="Bank Location" className="mt-1" />
                   <ErrorMessage name="banklocation" component="div" className="text-red-500" />
                 </div>
@@ -955,7 +955,7 @@ const AddEmployee = ({ onClose, setSub }) => {
         centered
       >
         <div className="p-4 rounded-lg bg-white">
-          <h2 className="text-xl font-semibold mb-4">OTP Page</h2>
+          <h2 className="text-xl  mb-4">OTP Page</h2>
           <p>
             An OTP has been sent to your registered email. Please enter the OTP
             below to verify your account.

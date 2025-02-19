@@ -35,6 +35,7 @@ const LeaveList = () => {
   const [editid, setEditid] = useState(null);
   const [users, setUsers] = useState([]);  // Changed to empty array instead of userData
   const dispatch = useDispatch();
+  const [searchText, setSearchText] = useState('');
   // console.log("xiiiii", editid);
 
   const user = useSelector((state) => state.user.loggedInUser.username);
@@ -66,21 +67,27 @@ const LeaveList = () => {
     setIsEditLeaveModalVisible(false);
   };
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    if (value) {
-      const filteredData = users.filter(item => 
-        item.name?.toLowerCase().includes(value.toLowerCase()) ||
-        item.leaveType?.toLowerCase().includes(value.toLowerCase()) ||
-        item.reason?.toLowerCase().includes(value.toLowerCase())
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+  };
+
+  const getFilteredLeaves = () => {
+    if (!users) return [];
+    
+    if (!searchText) return users;
+
+    return users.filter(leave => {
+      return (
+        leave.name?.toLowerCase().includes(searchText.toLowerCase()) ||
+        leave.leaveType?.toLowerCase().includes(searchText.toLowerCase()) ||
+        leave.reason?.toLowerCase().includes(searchText.toLowerCase()) ||
+        leave.status?.toLowerCase().includes(searchText.toLowerCase())
       );
-      setUsers(filteredData);
-    } else {
-      // If search is empty, reset to the original data from redux
-      if (tabledata && tabledata.Leave && tabledata.Leave.data) {
-        const filteredData = tabledata.Leave.data.filter(item => item.created_by === user);
-        setUsers(filteredData);
-      }
-    }
+    });
+  };
+
+  const handleSearch = () => {
+    message.success('Search completed');
   };
 
    //// permission
@@ -193,7 +200,7 @@ const LeaveList = () => {
           </Button>
         </Flex>
       </Menu.Item> */}
-      
+{/*       
       <Menu.Item>
         <Flex alignItems="center">
           <Button
@@ -205,7 +212,7 @@ const LeaveList = () => {
             <span className="ml-2">Pin</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
       
 
        {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
@@ -331,11 +338,23 @@ const LeaveList = () => {
       >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input
-              placeholder="Search"
-              prefix={<SearchOutlined />}
-              onChange={onSearch}
-            />
+            <Input.Group compact>
+              <Input
+                placeholder="Search employee"
+                prefix={<SearchOutlined />}
+                onChange={onSearch}
+                value={searchText}
+                className="search-input"
+                onPressEnter={handleSearch}
+              />
+              {/* <Button 
+                type="primary" 
+                onClick={handleSearch}
+                icon={<SearchOutlined />}
+              >
+                Search
+              </Button> */}
+            </Input.Group>
           </div>
         </Flex>
         <Flex gap="7px">
@@ -363,9 +382,14 @@ const LeaveList = () => {
          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
                            <Table
                            columns={tableColumns}
-                           dataSource={users}
+                           dataSource={getFilteredLeaves()}
                            rowKey="id"
-                           scroll={{ x: 1200 }}
+                           pagination={{
+                             total: getFilteredLeaves().length,
+                             pageSize: 10,
+                             showSizeChanger: true,
+                             showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                           }}
                          />
                              ) : null}
 
@@ -410,4 +434,61 @@ const LeaveList = () => {
     </Card>
   );
 };
-export default LeaveList;
+
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 300px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-input-group {
+    display: flex;
+    align-items: center;
+  }
+
+  .ant-input-group .ant-input {
+    width: calc(100% - 90px);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .ant-input-group .ant-btn {
+    width: 90px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  @media (max-width: 768px) {
+    .search-input,
+    .ant-input-group {
+      width: 100%;
+    }
+    
+    .mb-1 {
+      margin-bottom: 1rem;
+    }
+
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const LeaveListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <LeaveList />
+  </>
+);
+
+export default LeaveListWithStyles;

@@ -32,7 +32,7 @@ const AddOvertime = ({ id, onClose }) => {
       });
   };
   return (
-    <div className="employee-salary p-4">
+    <div className="employee-salary">
       <hr className="my-2 border-gray-300" />
       <Formik
         initialValues={{ title: "", days: "", Hours: "", rate: "" }}
@@ -44,7 +44,7 @@ const AddOvertime = ({ id, onClose }) => {
 
             <Col span={24} className="mt-4">
               <div className="form-item">
-                <label className="font-semibold">Employee</label>
+                <label className="font-semibold">Employee <span className="text-red-500">*</span></label>
                 <Field name="employeeId">
                   {({ field }) => (
                     <Select
@@ -79,7 +79,7 @@ const AddOvertime = ({ id, onClose }) => {
             </Col>
 
             <div>
-              <label className="font-semibold">Title</label>
+              <label className="font-semibold">Title <span className="text-red-500">*</span>  </label>
               <Field name="title">
                 {({ field }) => <Input {...field} placeholder="Enter Title" />}
               </Field>
@@ -91,7 +91,7 @@ const AddOvertime = ({ id, onClose }) => {
             </div>
             {/* Type */}
             <div>
-              <label className="font-semibold">Days</label>
+              <label className="font-semibold">Days <span className="text-red-500">*</span></label>
               <Field name="days">
                 {({ field }) => <Input {...field} placeholder="Enter Days" />}
               </Field>
@@ -103,7 +103,7 @@ const AddOvertime = ({ id, onClose }) => {
             </div>
             {/* Deduction Option */}
             <div>
-              <label className="font-semibold">Hours</label>
+              <label className="font-semibold">Hours <span className="text-red-500">*</span></label>
               <Field name="Hours">
                 {({ field }) => <Input {...field} placeholder="Enter Hours" />}
               </Field>
@@ -115,7 +115,7 @@ const AddOvertime = ({ id, onClose }) => {
             </div>
             {/* Currency */}
             <div>
-              <label className="font-semibold">Rate</label>
+              <label className="font-semibold">Rate <span className="text-red-500">*</span>   </label>
               <Field name="rate">
                 {({ field }) => <Input {...field} placeholder="Enter Rate" type="text" />}
               </Field>

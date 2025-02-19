@@ -23,6 +23,7 @@ const MeetingList = () => {
   const [isAddMeetingModalVisible, setIsAddMeetingModalVisible] = useState(false);
   const [isEditMeetingModalVisible, setIsEditMeetingModalVisible] = useState(false);
   const [meetid, setMeetid] = useState("");
+  const [searchText, setSearchText] = useState('');
 
   const dispatch = useDispatch();
 
@@ -89,16 +90,29 @@ const MeetingList = () => {
 
   // Search functionality
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const data = value ? 
-      filteredData.filter(item => 
-        item.title.toLowerCase().includes(value.toLowerCase()) ||
-        item.date.toLowerCase().includes(value.toLowerCase())
-      ) : 
-      filteredData;
-    setSelectedRowKeys([]);
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
   };
 
+  // Add this function to filter meetings
+  const getFilteredMeetings = () => {
+    if (!filteredData) return [];
+    
+    if (!searchText) return filteredData;
+
+    return filteredData.filter(meeting => {
+      return (
+        meeting.title?.toLowerCase().includes(searchText.toLowerCase()) ||
+        meeting.date?.toLowerCase().includes(searchText.toLowerCase()) ||
+        meeting.startTime?.toLowerCase().includes(searchText.toLowerCase())
+      );
+    });
+  };
+
+  // Add search button handler
+  const handleSearch = () => {
+    message.success('Search completed');
+  };
 
   const deleteUser = async (userId) => {
     try {
@@ -240,7 +254,16 @@ const MeetingList = () => {
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={(e) => onSearch(e)} />
+            <Input.Group compact>
+              <Input
+                placeholder="Search meeting title"
+                prefix={<SearchOutlined />}
+                onChange={onSearch}
+                value={searchText}
+                className="search-input"
+                onPressEnter={handleSearch}
+              />
+            </Input.Group>
           </div>
         </Flex>
         <Flex gap="7px">
@@ -268,9 +291,14 @@ const MeetingList = () => {
          {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                    <Table
                                    columns={tableColumns}
-                                   dataSource={filteredData}
+                                   dataSource={getFilteredMeetings()}
                                    rowKey="id"
-                                   scroll={{ x: 1200 }}
+                                   pagination={{
+                                     total: getFilteredMeetings().length,
+                                     pageSize: 10,
+                                     showSizeChanger: true,
+                                     showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                                   }}
                                  />
                                      ) : null}
 
@@ -302,5 +330,62 @@ const MeetingList = () => {
   );
 };
 
-export default MeetingList;
+// Add styles
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 300px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-input-group {
+    display: flex;
+    align-items: center;
+  }
+
+  .ant-input-group .ant-input {
+    width: calc(100% - 90px);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .ant-input-group .ant-btn {
+    width: 90px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  @media (max-width: 768px) {
+    .search-input,
+    .ant-input-group {
+      width: 100%;
+    }
+    
+    .mb-1 {
+      margin-bottom: 1rem;
+    }
+
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const MeetingListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <MeetingList />
+  </>
+);
+
+export default MeetingListWithStyles;
 

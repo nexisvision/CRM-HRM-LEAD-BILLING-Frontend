@@ -54,6 +54,7 @@ const JobOnBordingList = () => {
     useState(false);
     const [idd, setIdd] = useState("");
   const navigate = useNavigate();
+  const [searchText, setSearchText] = useState('');
 
   const user = useSelector((state) => state.user.loggedInUser.username);
 
@@ -93,13 +94,26 @@ const JobOnBordingList = () => {
     setIsEditJobOnBordingModalVisible(false);
   };
 
-  // Search functionality
+  // Update the search handler
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+  };
+
+  // Add this function to filter onboarding entries by name
+  const getFilteredOnboarding = () => {
+    if (!filteredData) return [];
+    
+    if (!searchText) return filteredData;
+
+    return filteredData.filter(onboarding => {
+      return onboarding.Interviewer?.toLowerCase().includes(searchText.toLowerCase());
+    });
+  };
+
+  // Add search button handler
+  const handleSearch = () => {
+    message.success('Search completed');
   };
 
    //// permission
@@ -334,11 +348,16 @@ const JobOnBordingList = () => {
       >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input
-              placeholder="Search"
-              prefix={<SearchOutlined />}
-              onChange={(e) => onSearch(e)}
-            />
+            <Input.Group compact>
+              <Input
+                placeholder="Search"
+                prefix={<SearchOutlined />}
+                onChange={onSearch}
+                value={searchText}
+                className="search-input"
+                onPressEnter={handleSearch}
+              />
+            </Input.Group>
           </div>
           {/* <div className="w-full md:w-48 ">
             <Select
@@ -383,9 +402,14 @@ const JobOnBordingList = () => {
            {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                                    <Table
                                                    columns={tableColumns}
-                                                   dataSource={users}
+                                                   dataSource={getFilteredOnboarding()}
                                                    rowKey="id"
-                                                   scroll={{ x: 1200 }}
+                                                   pagination={{
+                                                     total: getFilteredOnboarding().length,
+                                                     pageSize: 10,
+                                                     showSizeChanger: true,
+                                                     showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                                                   }}
                                                  />
                                                      ) : null}
 
@@ -421,4 +445,61 @@ const JobOnBordingList = () => {
   );
 };
 
-export default JobOnBordingList;
+// Add styles
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 300px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-input-group {
+    display: flex;
+    align-items: center;
+  }
+
+  .ant-input-group .ant-input {
+    width: calc(100% - 90px);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .ant-input-group .ant-btn {
+    width: 90px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  @media (max-width: 768px) {
+    .search-input,
+    .ant-input-group {
+      width: 100%;
+    }
+    
+    .mb-1 {
+      margin-bottom: 1rem;
+    }
+
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const JobOnBordingListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <JobOnBordingList />
+  </>
+);
+
+export default JobOnBordingListWithStyles;

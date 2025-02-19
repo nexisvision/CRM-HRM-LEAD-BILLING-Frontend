@@ -23,6 +23,7 @@ const SalaryList = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddSalaryModalVisible, setIsAddSalaryModalVisible] = useState(false);
   const [isSetSalaryModalVisible, setIsSetSalaryModalVisible] = useState(false);
+  const [searchText, setSearchText] = useState('');
 
   const navigate = useNavigate();
   const openSetSalaryModal = () => setIsSetSalaryModalVisible(true);
@@ -88,14 +89,24 @@ const dfnddata = dfnddataa.filter((item) => item.created_by === user);
   };
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchStr = value.toLowerCase();
-    const filteredData = dfnddata.filter(item => 
-      Object.values(item).some(val => 
-        val?.toString().toLowerCase().includes(searchStr)
-      )
-    );
-    setList(filteredData);
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+  };
+
+  const getFilteredSalaries = () => {
+    if (!list) return [];
+    
+    if (!searchText) return list;
+
+    return list.filter(salary => {
+      return (
+        salary.salary?.toString().toLowerCase().includes(searchText) ||
+        salary.payslipType?.toLowerCase().includes(searchText) ||
+        salary.netSalary?.toString().toLowerCase().includes(searchText) ||
+        salary.bankAccount?.toString().toLowerCase().includes(searchText) ||
+        salary.status?.toLowerCase().includes(searchText)
+      );
+    });
   };
 
   const deleteUser = (userId) => {
@@ -158,29 +169,43 @@ const dfnddata = dfnddataa.filter((item) => item.created_by === user);
 
   return (
     <Card>
-      <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+      <Space style={{ width: '100%', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <Input
-          placeholder="Search"
+          placeholder="Search by salary, payslip type, bank account..."
           prefix={<SearchOutlined />}
           onChange={onSearch}
+          value={searchText}
+          allowClear
+          style={{ width: 300 }}
+          className="search-input"
         />
    
         {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-          <Button type="primary" className="mt-4" onClick={openAddSalaryModal}>
+          <Button type="primary" onClick={openAddSalaryModal}>
             <PlusOutlined /> Add Salary
           </Button>
         ) : null}
       </Space>
 
       {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Table columns={tableColumns} className="mt-4" dataSource={list} rowKey="id" />
+        <Table 
+          columns={tableColumns} 
+          dataSource={getFilteredSalaries()} 
+          rowKey="id"
+          pagination={{
+            total: getFilteredSalaries().length,
+            pageSize: 10,
+            showSizeChanger: true,
+            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+          }}
+        />
       ) : null}
 
       <Modal
         title="Add Salary"
         visible={isAddSalaryModalVisible}
         onCancel={closeAddSalaryModal}
-        width={1000}
+        width={800}
         footer={null}
       >
         <AddSalary onClose={closeAddSalaryModal} />
@@ -199,4 +224,48 @@ const dfnddata = dfnddataa.filter((item) => item.created_by === user);
   );
 };
 
-export default SalaryList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-input-affix-wrapper {
+    min-width: 250px;
+  }
+
+  @media (max-width: 768px) {
+    .ant-input-affix-wrapper {
+      width: 100%;
+    }
+  }
+
+  .ant-space {
+    flex-wrap: wrap;
+    gap: 16px !important;
+  }
+
+  @media (max-width: 576px) {
+    .ant-space {
+      flex-direction: column;
+    }
+    
+    .ant-space > * {
+      width: 100% !important;
+    }
+  }
+`;
+
+const SalaryListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <SalaryList />
+  </>
+);
+
+export default SalaryListWithStyles;

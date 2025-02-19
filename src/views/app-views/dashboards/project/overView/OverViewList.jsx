@@ -464,13 +464,13 @@ const OverViewList = () => {
                   {/* Profile Picture with error handling */}
                   <div className="w-16 h-16 rounded-full overflow-hidden">
                     <img 
-                      src={fndclient?.profilePic || 'https://via.placeholder.com/64'} 
+                      src={fndclient?.profilePic } 
                       alt="Client profile"
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'https://via.placeholder.com/64';
-                      }}
+                      // onError={(e) => {
+                      //   e.target.onerror = null;
+                      //   e.target.src = 'https://via.placeholder.com/64';
+                      // }}
                     />
                   </div>
                 </div>

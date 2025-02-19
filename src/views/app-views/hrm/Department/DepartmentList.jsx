@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Input, Button, Modal, message } from 'antd';
+import { Card, Table, Menu, Input, Button, Modal, message, Select } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from '../../Users/user-list/UserView';
@@ -12,6 +12,9 @@ import EditDepartment from './EditDepartment';
 import { utils, writeFile } from "xlsx";
 import { useDispatch, useSelector } from 'react-redux';
 import { DeleteDept, getDept } from './DepartmentReducers/DepartmentSlice';
+import { getBranch } from '../Branch/BranchReducer/BranchSlice';
+
+const { Option } = Select;
 
 const DepartmentList = () => {
   const navigate = useNavigate();
@@ -25,6 +28,8 @@ const DepartmentList = () => {
   const  [dept,setDept] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [selectedBranch, setSelectedBranch] = useState('all');
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Department);
@@ -74,16 +79,54 @@ const DepartmentList = () => {
   };
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = value ? list : users;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
   };
 
-  useEffect(()=>{
-    dispatch(getDept())
-  },[dispatch]);
+  // Get branch data from Redux store
+  const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
+  
+  // Filter branches for current user
+  const userBranches = branchData.filter(branch => branch.created_by === user);
+
+  // Function to filter departments based on search and branch
+  const getFilteredDepartments = () => {
+    if (!users) return [];
+    
+    let filtered = users;
+
+    // Apply search filter
+    if (searchText) {
+      filtered = filtered.filter(department => 
+        department.department_name?.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+
+    // Apply branch filter
+    if (selectedBranch !== 'all') {
+      filtered = filtered.filter(department => 
+        department.branch === selectedBranch
+      );
+    }
+
+    return filtered;
+  };
+
+  // Handle branch change
+  const handleBranchChange = (value) => {
+    setSelectedBranch(value);
+  };
+
+  useEffect(() => {
+    dispatch(getDept());
+    dispatch(getBranch()); // Add this to fetch branch data
+  }, [dispatch]);
+
+  // Function to get branch name by ID
+  const getBranchNameById = (branchId) => {
+    const branch = branchData.find(branch => branch.id === branchId);
+    return branch ? branch.branchName : 'N/A';
+  };
 
   useEffect(() => {
     if (tabledata && tabledata.Department && tabledata.Department.data) {
@@ -163,11 +206,22 @@ const DepartmentList = () => {
     </Menu>
   );
 
+  // Update table columns to show branch name
   const tableColumns = [
     {
       title: 'Department',
       dataIndex: 'department_name',
-      sorter: (a, b) => a.department.length - b.department.length,
+      sorter: (a, b) => a.department_name.length - b.department_name.length,
+    },
+    {
+      title: 'Branch',
+      dataIndex: 'branch',
+      render: (branchId) => getBranchNameById(branchId),
+      sorter: (a, b) => {
+        const branchNameA = getBranchNameById(a.branch).toLowerCase();
+        const branchNameB = getBranchNameById(b.branch).toLowerCase();
+        return branchNameA.localeCompare(branchNameB);
+      },
     },
     {
       title: 'Action',
@@ -185,7 +239,30 @@ const DepartmentList = () => {
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={onSearch} />
+            <Input
+              placeholder="Search department..."
+              prefix={<SearchOutlined />}
+              onChange={onSearch}
+              value={searchText}
+              allowClear
+              className="search-input"
+            />
+          </div>
+          <div className="mr-md-3 mb-3">
+            <Select
+              placeholder="Filter by branch"
+              onChange={handleBranchChange}
+              value={selectedBranch}
+              style={{ width: 200 }}
+              className="branch-select"
+            >
+              <Option value="all">All Branches</Option>
+              {userBranches.map(branch => (
+                <Option key={branch.id} value={branch.id}>
+                  {branch.branchName}
+                </Option>
+              ))}
+            </Select>
           </div>
         </Flex>
         <Flex gap="7px">
@@ -214,7 +291,17 @@ const DepartmentList = () => {
 
             {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                                                                                                                                                           
-                              <Table columns={tableColumns} dataSource={users} rowKey="id" />
+                              <Table 
+                                columns={tableColumns} 
+                                dataSource={getFilteredDepartments()} 
+                                rowKey="id"
+                                pagination={{
+                                  total: getFilteredDepartments().length,
+                                  pageSize: 10,
+                                  showSizeChanger: true,
+                                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                                }}
+                              />
 
                                             ) : null}
       </div>
@@ -248,7 +335,59 @@ const DepartmentList = () => {
   );
 };
 
-export default DepartmentList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 200px;
+  }
+
+  .branch-select {
+    transition: all 0.3s;
+  }
+
+  .search-input:hover,
+  .search-input:focus,
+  .branch-select:hover,
+  .branch-select:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-input-group {
+    display: flex;
+    align-items: center;
+  }
+
+  @media (max-width: 768px) {
+    .search-input,
+    .branch-select,
+    .ant-input-group {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+    
+    .mb-1 {
+      margin-bottom: 1rem;
+    }
+
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const DepartmentListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <DepartmentList />
+  </>
+);
+
+export default DepartmentListWithStyles;
 
 
 
@@ -392,7 +531,6 @@ export default DepartmentList;
 //     //         return a > b ? -1 : b > a ? 1 : 0;
 //     //       },
 //     //     },
-//     //   },
 //       {
 //         title: 'Department',
 //         dataIndex: 'department',
@@ -445,8 +583,6 @@ export default DepartmentList;
 //     //           <Button danger icon={<DeleteOutlined />} onClick={() => this.deleteUser(elm.id)} size="small" />
 //     //         </Tooltip>
 //     //       </div>
-//     //     ),
-//     //   },
 //     ];
 
 //     return (

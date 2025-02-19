@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Menu, Input, message, Button, Modal } from "antd";
+import { Card, Table, Menu, Input, message, Button, Modal, Select } from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
@@ -30,6 +30,8 @@ import moment from "moment";
 import { MdOutlineEmail } from "react-icons/md";
 import EmailVerification from "views/app-views/company/EmailVerification";
 
+import { Option } from "antd/es/mentions";
+
 const EmployeeList = () => {
   // State declarations
   const [users, setUsers] = useState([]);
@@ -50,6 +52,8 @@ const EmployeeList = () => {
   const [isOtpModalVisible, setIsOtpModalVisible] = useState(false);
   const [otp, setOtp] = useState('');
   const [emailForOtp, setEmailForOtp] = useState('');
+  const [selectedBranch, setSelectedBranch] = useState('all');
+  const [searchText, setSearchText] = useState('');
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.employee);
@@ -62,7 +66,14 @@ const EmployeeList = () => {
 
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
-  const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
+
+  // console.log("tData", designationData);
+
+  const branchDataa = useSelector((state) => state.Branch?.Branch?.data || []);
+
+  const branchData = branchDataa.filter(item => item.created_by === user);
+
+  // console.log("branchData", branchData);
 
   useEffect(() => {
     dispatch(roledata());
@@ -114,7 +125,7 @@ const EmployeeList = () => {
         setUsers(mappedData);
       }
     }
-  }, [tabledata, user, departmentData, designationData, branchData]);
+  }, [tabledata, user, departmentData, designationData]);
 
   // Modal handlers
   const openAddEmployeeModal = () => setIsAddEmployeeModalVisible(true);
@@ -166,11 +177,8 @@ const EmployeeList = () => {
 
   // Search handler
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = value ? list : [];
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    const value = e.target.value;
+    setSearchText(value);
   };
 
   const deleteUser = async (userId) => {
@@ -459,6 +467,54 @@ const EmployeeList = () => {
     message.success('Email verified successfully');
   };
 
+  // Add this function to filter employees by branch
+  const getFilteredEmployees = () => {
+    if (!users) return [];
+    
+    let filteredData = users;
+
+    // Filter by branch
+    if (selectedBranch !== 'all') {
+      filteredData = filteredData.filter(employee => employee.branch === selectedBranch);
+    }
+
+    // Filter by search text
+    if (searchText) {
+      const searchLower = searchText.toLowerCase();
+      filteredData = filteredData.filter(employee => {
+        return (
+          employee.username?.toLowerCase().includes(searchLower) ||
+          employee.firstName?.toLowerCase().includes(searchLower) ||
+          employee.lastName?.toLowerCase().includes(searchLower) ||
+          employee.department?.toLowerCase().includes(searchLower) ||
+          employee.designation?.toLowerCase().includes(searchLower) ||
+          employee.branch?.toLowerCase().includes(searchLower)
+        );
+      });
+    }
+
+    return filteredData;
+  };
+
+  // Add this before the table component
+  const BranchFilter = () => (
+    <div style={{ marginBottom: '1rem' }}>
+      <Select
+        style={{ width: 200 }}
+        placeholder="Filter by Branch"
+        value={selectedBranch}
+        onChange={setSelectedBranch}
+      >
+        <Option value="all">All Branches</Option>
+        {branchData.map(branch => (
+          <Option key={branch.id} value={branch.branchName}>
+            {branch.branchName}
+          </Option>
+        ))}
+      </Select>
+    </div>
+  );
+
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
       <Flex
@@ -469,10 +525,15 @@ const EmployeeList = () => {
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
-              placeholder="Search"
+              placeholder="Search by name, department, designation..."
               prefix={<SearchOutlined />}
               onChange={onSearch}
+              value={searchText}
+              allowClear
             />
+          </div>
+          <div className="mr-md-3 mb-3">
+            <BranchFilter />
           </div>
         </Flex>
         <Flex gap="7px">
@@ -482,7 +543,7 @@ const EmployeeList = () => {
           {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
             <Button
               type="primary"
-              className="ml-2"
+              className="ml-2 mb-5"
               onClick={openAddEmployeeModal}
             >
               <PlusOutlined />
@@ -505,7 +566,7 @@ const EmployeeList = () => {
       <div className="table-responsive mt-2">
 
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-          <Table columns={tableColumns} dataSource={users} rowKey="id" />
+          <Table columns={tableColumns} dataSource={getFilteredEmployees()} rowKey="id" />
 
         ) : null}
 
@@ -625,4 +686,33 @@ const EmployeeList = () => {
   );
 };
 
-export default EmployeeList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-input-affix-wrapper {
+    min-width: 250px;
+  }
+
+  @media (max-width: 768px) {
+    .ant-input-affix-wrapper {
+      width: 100%;
+    }
+  }
+`;
+
+const EmployeeListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <EmployeeList />
+  </>
+);
+
+export default EmployeeListWithStyles;

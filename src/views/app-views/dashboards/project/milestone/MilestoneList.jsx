@@ -96,17 +96,32 @@ export const MilestoneList = () => {
   const allempdata = useSelector((state) => state.Milestone);
   const filtermin = allempdata.Milestone.data;
 
+  
+
   const dispatch = useDispatch();
 
-  // const handleShowStatus = (value) => {
-  //   if (value !== "All") { 
-  //     const key = "milestone_status";
-  //     const data = utils.filterArray(OrderListData, key, value);
-  //     setList(data);
-  //   } else {
-  //     setList(OrderListData);
-  //   }
-  // };
+  const [searchText, setSearchText] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('all');
+
+  // Get unique statuses from milestone data
+  const getUniqueStatuses = () => {
+    if (!filtermin) return [];
+    
+    // Get all unique statuses from the data
+    const statuses = [...new Set(filtermin.map(item => item.milestone_status))];
+    
+    // Create status options array with 'All Status' as first option
+    return [
+      { value: 'all', label: 'All Status' },
+      ...statuses.map(status => ({
+        value: status,
+        label: status
+      }))
+    ];
+  };
+
+  // Get status options
+  const statusOptions = getUniqueStatuses();
 
   // Open Add Job Modal
   const openAddMilestoneModal = () => {
@@ -239,11 +254,47 @@ export const MilestoneList = () => {
   };
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : OrderListData;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+    
+    if (!value) {
+      setList(filtermin);
+      return;
+    }
+    
+    const filtered = filtermin.filter(milestone => 
+      milestone.milestone_title?.toLowerCase().includes(value)
+    );
+    
+    setList(filtered);
+  };
+
+  // Update the filter function to include status
+  const getFilteredMilestones = () => {
+    if (!filtermin) return [];
+    
+    let filtered = filtermin;
+
+    // Apply search filter
+    if (searchText) {
+      filtered = filtered.filter(milestone => 
+        milestone.milestone_title?.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+
+    // Apply status filter
+    if (selectedStatus !== 'all') {
+      filtered = filtered.filter(milestone => 
+        milestone.milestone_status === selectedStatus
+      );
+    }
+
+    return filtered;
+  };
+
+  // Handle status change
+  const handleStatusChange = (value) => {
+    setSelectedStatus(value);
   };
 
   return (
@@ -253,7 +304,7 @@ export const MilestoneList = () => {
           alignItems="center"
           justifyContent="space-between"
           mobileFlex={false}
-          className="flex flex-wrap  gap-4"
+          className="flex flex-wrap gap-4"
         >
           <Flex
             className="flex flex-wrap gap-4 mb-4 md:mb-0"
@@ -261,23 +312,29 @@ export const MilestoneList = () => {
           >
             <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
               <Input
-                placeholder="Search"
+                placeholder="Search by milestone title..."
                 prefix={<SearchOutlined />}
-                onChange={(e) => onSearch(e)}
+                onChange={onSearch}
+                value={searchText}
+                allowClear
+                className="search-input"
               />
             </div>
-            {/* <div className="mb-3">
-							<Select
-								defaultValue="All"
-								className="w-100"
-								style={{ minWidth: 180 }}
-								onChange={handleShowStatus}
-								placeholder="Status"
-							>
-								<Option value="All">All payment </Option>
-								{paymentStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
-							</Select>
-						</div> */}
+            <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-40">
+              <Select
+                placeholder="Filter by status"
+                onChange={handleStatusChange}
+                value={selectedStatus}
+                style={{ width: '100%' }}
+                className="status-select"
+              >
+                {statusOptions.map(status => (
+                  <Option key={status.value} value={status.value}>
+                    {status.label}
+                  </Option>
+                ))}
+              </Select>
+            </div>
           </Flex>
           <Flex gap="7px" className="flex">
             <div className="flex gap-4">
@@ -297,9 +354,14 @@ export const MilestoneList = () => {
         <div className="table-responsive">
           <Table
             columns={tableColumns}
-            dataSource={list}
+            dataSource={getFilteredMilestones()}
             rowKey="id"
-            scroll={{ x: 1200 }}
+            pagination={{
+              total: getFilteredMilestones().length,
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+            }}
           />
         </div>
 
@@ -328,4 +390,46 @@ export const MilestoneList = () => {
   );
 };
 
-export default MilestoneList;
+const styles = `
+  .search-input,
+  .status-select {
+    transition: all 0.3s;
+  }
+
+  .search-input:hover,
+  .search-input:focus,
+  .status-select:hover,
+  .status-select:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .search-input,
+    .status-select,
+    .ant-input-group {
+      width: 100%;
+    }
+    
+    .mb-1 {
+      margin-bottom: 1rem;
+    }
+
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const MilestoneListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <MilestoneList />
+  </>
+);
+
+export default MilestoneListWithStyles;

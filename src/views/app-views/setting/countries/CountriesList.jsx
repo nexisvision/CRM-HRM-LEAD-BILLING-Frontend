@@ -22,6 +22,7 @@ export const CountriesList = () => {
     const dispatch = useDispatch();
     const [selectedCountry, setSelectedCountry] = useState(null);
     const [idd, setIdd] = useState("");
+    const [searchText, setSearchText] = useState('');
 
     useEffect(() => {
         dispatch(getallcountries());
@@ -69,7 +70,8 @@ export const CountriesList = () => {
 
      // Search function
      const onSearch = (e) => {
-        const value = e.currentTarget.value.toLowerCase();
+        const value = e.target.value.toLowerCase();
+        setSearchText(value);
         
         // If search value is empty, show all data
         if (!value) {
@@ -77,11 +79,9 @@ export const CountriesList = () => {
             return;
         }
 
-        // Filter the data based on search value
-        const filtered = countries.filter(item => 
-            item.countryName?.toLowerCase().includes(value) ||
-            item.countryCode?.toLowerCase().includes(value) ||
-            item.phoneCode?.toLowerCase().includes(value)
+        // Filter the data based on country name
+        const filtered = countries.filter(country => 
+            country.countryName?.toLowerCase().includes(value)
         );
         
         setFilteredData(filtered);
@@ -161,10 +161,20 @@ export const CountriesList = () => {
     return (
         <div className="container">
             <Card>
-                <Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
+                <Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap gap-4'>
                     <Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
                         <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
-                            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)} />
+                            <Input.Group compact>
+                                <Input
+                                    placeholder="Search by country name..."
+                                    prefix={<SearchOutlined />}
+                                    onChange={onSearch}
+                                    value={searchText}
+                                    allowClear
+                                    className="search-input"
+                                    onPressEnter={() => message.success('Search completed')}
+                                />
+                            </Input.Group>
                         </div>
                     </Flex>
                     {/* <Flex gap="7px" className="flex">
@@ -180,6 +190,12 @@ export const CountriesList = () => {
                         dataSource={filteredData}
                         rowKey='id'
                         scroll={{ x: 1000 }}
+                        pagination={{
+                            total: filteredData.length,
+                            pageSize: 10,
+                            showSizeChanger: true,
+                            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                        }}
                     />
                 </div>
             </Card>
@@ -216,4 +232,55 @@ export const CountriesList = () => {
         </div>
     );
 }
-export default CountriesList;
+
+// Add styles
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 300px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-input-group {
+    display: flex;
+    align-items: center;
+  }
+
+  .ant-input-group .ant-input {
+    width: 100%;
+    border-radius: 6px;
+  }
+
+  @media (max-width: 768px) {
+    .search-input,
+    .ant-input-group {
+      width: 100%;
+    }
+    
+    .mb-1 {
+      margin-bottom: 1rem;
+    }
+
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const CountriesListWithStyles = () => (
+    <>
+        <style>{styles}</style>
+        <CountriesList />
+    </>
+);
+
+export default CountriesListWithStyles;

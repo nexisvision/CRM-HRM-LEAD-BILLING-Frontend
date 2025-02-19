@@ -5,30 +5,28 @@ import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AddDes, getDes } from "./DesignationReducers/DesignationSlice";
-import { getBranch } from "../Branch/BranchReducer/BranchSlice"; // Import getBranch action
+import { getBranch } from "../Branch/BranchReducer/BranchSlice";
 
 const { Option } = Select;
-
-// Validation Schema using Yup
-const validationSchema = Yup.object().shape({
-  designation_name: Yup.string()
-    .required("Designation Name is required")
-    .min(2, "Designation name must be at least 2 characters")
-    .max(50, "Designation name cannot exceed 50 characters"),
-  branch: Yup.string().required("Branch is required"), // Make branch required
-});
 
 const AddDesignation = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { data: Branch, status, error } = useSelector((state) => state.Branch);
-
+  // Get the logged-in user
   const user = useSelector((state) => state.user.loggedInUser.username);
 
-  const alldatas = useSelector((state) => state.Branch);
-  const fnddata = alldatas.Branch.data || [];
-  const fndbranchdata = fnddata.filter((item) => item.created_by === user);
+  // Get branch data from Redux store
+  const branchData = useSelector((state) => state.Branch);
+  const allBranches = branchData.Branch.data || [];
+  
+  // Filter branches for the current user
+  const userBranches = allBranches.filter((item) => item.created_by === user);
+
+  // Fetch branch data when component mounts
+  useEffect(() => {
+    dispatch(getBranch());
+  }, [dispatch]);
 
   // Handle form submission
   const handleSubmit = (values, { resetForm }) => {
@@ -46,20 +44,21 @@ const AddDesignation = ({ onClose }) => {
       });
   };
 
-  useEffect(() => {
-    // Dispatch getBranch action to fetch branch data
-    dispatch(getBranch());
-  }, [dispatch]);
-
   return (
     <div className="add-designation">
       <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
       <Formik
         initialValues={{
           designation_name: "",
-          branch: "", // Initialize branch field
+          branch: "",
         }}
-        validationSchema={validationSchema}
+        validationSchema={Yup.object().shape({
+          designation_name: Yup.string()
+            .required("Designation Name is required")
+            .min(2, "Designation name must be at least 2 characters")
+            .max(50, "Designation name cannot exceed 50 characters"),
+          branch: Yup.string().required("Branch is required"),
+        })}
         onSubmit={handleSubmit}
       >
         {({ errors, touched, setFieldValue, values, setFieldTouched }) => (
@@ -67,27 +66,28 @@ const AddDesignation = ({ onClose }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
-                  <label className="font-semibold">Designation <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">
+                    Designation <span className="text-red-500">*</span>
+                  </label>
                   <Field
                     as={Input}
                     name="designation_name"
                     className="w-full mt-1"
                     placeholder="Enter Designation Name"
-                    onChange={(e) =>
-                      setFieldValue("designation_name", e.target.value)
-                    }
                   />
-                  {errors.designation_name && touched.designation_name && (
-                    <div style={{ color: "red", fontSize: "12px" }}>
-                      {errors.designation_name}
-                    </div>
-                  )}
+                  <ErrorMessage
+                    name="designation_name"
+                    component="div"
+                    className="text-red-500 mt-1"
+                  />
                 </div>
               </Col>
 
-              <Col span={12} className="mb-4">
-                <div className="form-item">
-                  <label className="font-semibold">Branch <span className="text-red-500">*</span></label>
+              <Col span={12}>
+                <div style={{ marginBottom: "16px" }}>
+                  <label className="font-semibold">
+                    Branch <span className="text-red-500">*</span>
+                  </label>
                   <Field name="branch">
                     {({ field }) => (
                       <Select
@@ -95,10 +95,9 @@ const AddDesignation = ({ onClose }) => {
                         className="w-full mt-1"
                         placeholder="Select Branch"
                         onChange={(value) => setFieldValue("branch", value)}
-                        value={values.branch}
                         onBlur={() => setFieldTouched("branch", true)}
                       >
-                        {fndbranchdata?.map((branch) => (
+                        {userBranches.map((branch) => (
                           <Option key={branch.id} value={branch.id}>
                             {branch.branchName}
                           </Option>
@@ -109,7 +108,7 @@ const AddDesignation = ({ onClose }) => {
                   <ErrorMessage
                     name="branch"
                     component="div"
-                    className="error-message text-red-500 my-1"
+                    className="text-red-500 mt-1"
                   />
                 </div>
               </Col>

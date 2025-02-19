@@ -110,20 +110,37 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
       ) : (
         fnddata.map((task) => (
           <div key={task.id} className="task-card-wrapper">
-            <div className="task-card mb-3" style={{ borderLeft: `4px solid ${task.color || '#007bff'}`, paddingLeft: '12px' }}>
-              <h5 className="task-card-title">{task.taskName}</h5>
-              <div className="task-card-time">
-                <div>{moment(task.taskDate).format('MMM DD, YYYY')}</div>
-                <div className="text-muted">
-                  {moment(task.taskDate).format('HH:mm')} - {moment(task.taskTime, 'HH:mm').format('HH:mm')}
+            <Tooltip 
+              title={
+                <div>
+                  <div><strong>{task.taskName}</strong></div>
+                  <div>Time: {moment(task.taskTime, 'HH:mm').format('hh:mm A')}</div>
+                  <div>Description: {task.taskDescription}</div>
+                </div>
+              }
+            >
+              <div 
+                className="task-card mb-3" 
+                style={{ 
+                  borderLeft: `4px solid ${task.color || '#5B5FC7'}`,
+                  paddingLeft: '12px',
+                  cursor: 'pointer'
+                }}
+              >
+                <h5 className="task-card-title">{task.taskName}</h5>
+                <div className="task-card-time">
+                  <div>{moment(task.taskDate).format('MMM DD, YYYY')}</div>
+                  <div className="text-muted">
+                    {moment(task.taskTime, 'HH:mm').format('hh:mm A')}
+                  </div>
+                </div>
+                <div className="task-card-actions">
+                  <Tooltip title="Delete task">
+                    <DeleteOutlined onClick={() => handleDelete(task)} className="delete-icon" />
+                  </Tooltip>
                 </div>
               </div>
-              <div className="task-card-actions">
-                <Tooltip title="Delete task">
-                  <DeleteOutlined onClick={() => handleDelete(task)} className="delete-icon" />
-                </Tooltip>
-              </div>
-            </div>
+            </Tooltip>
           </div>
         ))
       )}
@@ -167,18 +184,36 @@ const CustomCalendar = ({ taskData, onDeleteTask, onDateSelect }) => {
   const renderTaskBadge = (task) => {
     const timeStr = formatTaskTime(task.taskTime);
     return (
-      <div key={task.id} className="task-badge">
-        {`${timeStr} ${task.taskName}`}
-        <Tooltip title="Delete">
-          <DeleteOutlined
-            onClick={(e) => {
-              e.stopPropagation();
-              onDeleteTask(task.id);
-            }}
-            className="delete-icon"
-          />
-        </Tooltip>
-      </div>
+      <Tooltip 
+        title={
+          <div>
+            <div><strong>{task.taskName}</strong></div>
+            <div>Time: {moment(task.taskTime, 'HH:mm').format('hh:mm A')}</div>
+            <div>Description: {task.taskDescription}</div>
+          </div>
+        }
+      >
+        <div 
+          key={task.id} 
+          className="task-badge" 
+          style={{ 
+            backgroundColor: task.color || '#5B5FC7',
+            color: 'white',
+            height: '24px'
+          }}
+        >
+          {`${timeStr} ${task.taskName}`}
+          <Tooltip title="Delete">
+            <DeleteOutlined
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeleteTask(task.id);
+              }}
+              className="delete-icon"
+            />
+          </Tooltip>
+        </div>
+      </Tooltip>
     );
   };
 
@@ -384,14 +419,33 @@ const styles = `
   }
 
   .task-badge {
-    background-color: #5B5FC7;
-    color: white;
-    padding: 2px 8px;
+    padding: 4px 8px;
     border-radius: 4px;
     font-size: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .task-badge:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .task-card {
+    transition: all 0.3s;
+  }
+
+  .task-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
 
   .delete-icon {
@@ -402,6 +456,23 @@ const styles = `
 
   .delete-icon:hover {
     opacity: 0.8;
+  }
+
+  // Tooltip styles
+  .ant-tooltip-inner {
+    min-width: 200px;
+    padding: 8px 12px;
+  }
+
+  .ant-tooltip-inner strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px;
+  }
+
+  .ant-tooltip-inner div {
+    margin-bottom: 2px;
+    font-size: 12px;
   }
 `;
 

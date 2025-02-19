@@ -320,7 +320,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              className="mt-2 font-semibold"
+              className="mt-2 "
               name="firstName"
               label="First Name"
               rules={[{ required: true, message: "First Name is required" }]}
@@ -330,7 +330,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
           </Col>
           <Col span={12}>
             <Form.Item
-              className="mt-2 font-semibold "
+              className="mt-2  "
               name="lastName"
               label="Last Name"
               rules={[{ required: true, message: "Last Name is required" }]}
@@ -351,7 +351,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             <Form.Item
               name="password"
               label="Password"
-              className=" font-semibold"
+              className=" "
               rules={[{ required: true, message: "Password is required" }]}
             >
               <Input.Password placeholder="Strong Password" />
@@ -361,7 +361,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             <Form.Item
               name="email"
               label="Email"
-              className=" font-semibold"
+              className=" "
               rules={[
                 { required: true, message: "Email is required" },
                 {
@@ -378,7 +378,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
   <Form.Item
     name="phone"
     label="Phone"
-    className=" font-semibold"
+    className=" "
     rules={[{ required: true, message: "Phone number is required" }]}
   >
     <Input.Group compact>
@@ -427,7 +427,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             <Form.Item
               name="address"
               label="Address"
-              className=" font-semibold"
+              className=" "
               rules={[{ required: true, message: "Address is required" }]}
             >
               <TextArea placeholder="123 Main Street" />
@@ -441,7 +441,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             <Form.Item
               name="joiningDate"
               label="Joining Date"
-              className=" font-semibold"
+              className=" "
               rules={[{ required: true, message: "Joining Date is required" }]}
             >
               <DatePicker style={{ width: "100%" }} />
@@ -451,7 +451,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
           <Col span={12}>
             <Form.Item name="leaveDate" 
             label="Leave Date"
-             className=" font-semibold"
+             className=" "
               rules={[{ required: true, message: "Leave Date is required" }]}>
               <DatePicker style={{ width: "100%" }} />
             </Form.Item>
@@ -467,7 +467,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
         {/* Designation, Salary, and CV Upload */}
         <Row gutter={16}>
         <Col span={24} className="mt-4">
-                <span className="block font-semibold p-2">
+                <span className="block  p-2">
                   Profile Picture <QuestionCircleOutlined />
                 </span>
                 <Form.Item name="profilePic">
@@ -530,7 +530,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             </Col> */}
            <Col span={12}>
             <div className="form-item">
-              <label className="font-semibold">Branch <span className="text-red-500">*</span></label>
+              <label className="">Branch <span className="text-red-500">*</span></label>
               <Field name="branch">
                 {({ field }) => (
                   <Select
@@ -559,7 +559,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
           {/* Department Selection */}
           <Col span={12}>
             <div className="form-item">
-              <label className="font-semibold">Department <span className="text-red-500">*</span></label>
+              <label className="">Department <span className="text-red-500">*</span></label>
               <Field name="department">
                 {({ field }) => (
                   <Select
@@ -584,7 +584,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
           {/* Designation Selection */}
           <Col span={12}>
             <div className="form-item mt-2">
-              <label className="font-semibold">Designation <span className="text-red-500">*</span></label>
+              <label className="">Designation <span className="text-red-500">*</span></label>
               <Field name="designation">
                 {({ field }) => (
                   <Select
@@ -614,7 +614,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
           <Col span={12}>
             <Form.Item
               name="accountholder"
-              className="mt-2 font-semibold"
+              className="mt-2 "
               label="Account Holder Name"
               rules={[
                 { required: true, message: "Account Holder Name is required" },
@@ -627,7 +627,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             <Form.Item
               name="accountnumber"
               label="Account Number"
-              className="mt-2 font-semibold "
+              className="mt-2  "
               rules={[
                 { required: true, message: "Account Number is required" },
               ]}
@@ -639,7 +639,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             <Form.Item
               name="bankName"
               label="Bank Name"
-              className=" font-semibold "
+              className="  "
               rules={[{ required: true, message: "Bank Name is required" }]}
             >
               <Input placeholder="Bank of Example" />
@@ -682,7 +682,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
         </Row>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" style={{ width: "100%" }}>
+          <Button type="primary" htmlType="submit" className="mr-3" >
             Update Employee
           </Button>
         </Form.Item>

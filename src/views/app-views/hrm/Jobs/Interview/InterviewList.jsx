@@ -146,8 +146,8 @@ const CustomCalendar = ({ interviewData, onDeleteInterview, onDateSelect }) => {
 };
 const InterviewCalendarApp = () => {
   const dispatch = useDispatch();
-  const allInterviewData = useSelector((state) => state.Interviews);
-  const interviewData = allInterviewData?.Interviews.data || [];
+      const allInterviewData = useSelector((state) => state.Interviews);
+      const interviewData = allInterviewData?.Interviews.data || [];
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [form] = Form.useForm();

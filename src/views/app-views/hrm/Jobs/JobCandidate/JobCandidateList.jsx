@@ -45,6 +45,7 @@ const JobCandidateList = () => {
     useState(false);
   const [annualStatisticData] = useState(AnnualStatisticData);
   const [users, setUsers] = useState([]);
+  const [searchText, setSearchText] = useState('');
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
@@ -88,11 +89,27 @@ const JobCandidateList = () => {
   };
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = filteredData;
-    const data = utils.wildCardSearch(searchArray, value);
-    setUsers(data);
-    setSelectedRowKeys([]);
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+  };
+
+  const getFilteredCandidates = () => {
+    if (!users) return [];
+    
+    if (!searchText) return users;
+
+    return users.filter(candidate => {
+      return (
+        candidate.name?.toLowerCase().includes(searchText.toLowerCase()) ||
+        candidate.job?.toLowerCase().includes(searchText.toLowerCase()) ||
+        candidate.location?.toLowerCase().includes(searchText.toLowerCase()) ||
+        candidate.current_location?.toLowerCase().includes(searchText.toLowerCase())
+      );
+    });
+  };
+
+  const handleSearch = () => {
+    message.success('Search completed');
   };
 
   // Delete user
@@ -277,18 +294,29 @@ const JobCandidateList = () => {
       >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input
-              placeholder="Search"
-              prefix={<SearchOutlined />}
-              onChange={(e) => onSearch(e)}
-            />
+            <Input.Group compact>
+              <Input
+                placeholder="Search "
+                prefix={<SearchOutlined />}
+                onChange={onSearch}
+                value={searchText}
+                className="search-input"
+                onPressEnter={handleSearch}
+              />
+            </Input.Group>
           </div>
         </Flex>
         <Flex gap="7px">
+          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Button type="primary" className="ml-2" onClick={openAddJobCandidateModal}>
+              <PlusOutlined />
+              <span>New</span>
+            </Button>
+          ) : null}
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
-            onClick={exportToExcel} // Call export function when the button is clicked
+            onClick={exportToExcel}
             block
           >
             Export All
@@ -297,11 +325,16 @@ const JobCandidateList = () => {
       </Flex>
       <div className="table-responsive mt-2">
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-          <Table
-            columns={tableColumns}
-            dataSource={filteredData}
+          <Table 
+            columns={tableColumns} 
+            dataSource={getFilteredCandidates()} 
             rowKey="id"
-            scroll={{ x: 1200 }}
+            pagination={{
+              total: getFilteredCandidates().length,
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+            }}
           />
         ) : null}
       </div>
@@ -325,4 +358,60 @@ const JobCandidateList = () => {
   );
 };
 
-export default JobCandidateList;
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 300px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-input-group {
+    display: flex;
+    align-items: center;
+  }
+
+  .ant-input-group .ant-input {
+    width: calc(100% - 90px);
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .ant-input-group .ant-btn {
+    width: 90px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  @media (max-width: 768px) {
+    .search-input,
+    .ant-input-group {
+      width: 100%;
+    }
+    
+    .mb-1 {
+      margin-bottom: 1rem;
+    }
+
+    .mr-md-3 {
+      margin-right: 0;
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+`;
+
+const JobCandidateListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <JobCandidateList />
+  </>
+);
+
+export default JobCandidateListWithStyles;

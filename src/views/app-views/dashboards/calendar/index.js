@@ -8,8 +8,123 @@ import moment from 'moment';
 const { Option } = Select;
 
 const badgeColors = [
-  'pink', 'red', 'yellow', 'orange', 'cyan', 'green', 'blue', 'purple', 'geekblue', 'magenta', 'volcano', 'gold', 'lime',
+  'pink', 'red', 'orange',  'green'
 ];
+
+const CustomCalendar = ({ eventData, onDeleteEvent, onDateSelect }) => {
+  const [currentDate, setCurrentDate] = useState(moment());
+
+  // Generate calendar data
+  const generateCalendarDays = () => {
+    const firstDay = moment(currentDate).startOf('month');
+    const lastDay = moment(currentDate).endOf('month');
+    const startDate = moment(firstDay).startOf('week');
+    const endDate = moment(lastDay).endOf('week');
+    const calendar = [];
+    let week = [];
+    
+    for (let day = moment(startDate); day.isSameOrBefore(endDate); day.add(1, 'day')) {
+      week.push({
+        date: moment(day),
+        isCurrentMonth: day.month() === currentDate.month(),
+        events: eventData.filter(event =>
+          moment(event.startDate).format('YYYY-MM-DD') === day.format('YYYY-MM-DD')
+        )
+      });
+      if (week.length === 7) {
+        calendar.push(week);
+        week = [];
+      }
+    }
+    return calendar;
+  };
+
+  const formatEventTime = (time) => {
+    return moment(time).format('hh:mm A');
+  };
+
+  const renderEventBadge = (event) => {
+    const timeStr = formatEventTime(event.startDate);
+    return (
+      <Tooltip 
+        title={
+          <div>
+            <div><strong>{event.name}</strong></div>
+            <div>Start: {moment(event.startDate).format('hh:mm A')}</div>
+            <div>End: {moment(event.endDate).format('hh:mm A')}</div>
+          </div>
+        }
+      >
+        <div 
+          key={event.id} 
+          className="event-badge" 
+          style={{ 
+            backgroundColor: event.color,
+            color: 'white',
+            height: '24px'
+          }}
+        >
+          {`${timeStr} ${event.name}`}
+          <Tooltip title="Delete">
+            <DeleteOutlined
+              onClick={(e) => {
+                e.stopPropagation();
+                onDeleteEvent(event.id);
+              }}
+              className="delete-icon"
+            />
+          </Tooltip>
+        </div>
+      </Tooltip>
+    );
+  };
+
+  return (
+    <div className="custom-calendar">
+      <div className="calendar-header">
+        <Button 
+          onClick={() => setCurrentDate(moment(currentDate).subtract(1, 'month'))}
+        >
+          Previous
+        </Button>
+        <h2>{currentDate.format('MMMM YYYY')}</h2>
+        <Button 
+          onClick={() => setCurrentDate(moment(currentDate).add(1, 'month'))}
+        >
+          Next
+        </Button>
+      </div>
+      <table className="calendar-table">
+        <thead>
+          <tr>
+            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+              <th key={day}>{day}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {generateCalendarDays().map((week, weekIndex) => (
+            <tr key={weekIndex}>
+              {week.map((day, dayIndex) => (
+                <td
+                  key={dayIndex}
+                  className={`calendar-cell ${!day.isCurrentMonth ? 'other-month' : ''}`}
+                  onClick={() => onDateSelect(day.date)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className="date-number">{day.date.date()}</div>
+                  <div className="event-list">
+                    {day.events.map(event => renderEventBadge(event))}
+                  </div>
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
 const CalendarApp = () => {
   const dispatch = useDispatch();
@@ -171,7 +286,11 @@ const CalendarApp = () => {
         <Col xs={24} sm={24} md={16} lg={18}>
           {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
             <Card className="mb-4">
-              <Calendar cellRender={cellRender} onSelect={handleDateSelect} />
+              <CustomCalendar
+                eventData={fndata}
+                onDeleteEvent={onDeleteEvent}
+                onDateSelect={handleDateSelect}
+              />
             </Card>
           ) : null}
 
@@ -227,4 +346,142 @@ const CalendarApp = () => {
   );
 };
 
-export default CalendarApp;
+// Update the styles section with these new styles
+const styles = `
+  .custom-calendar {
+    width: 100%;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 16px;
+  }
+
+  .calendar-header h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .calendar-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 1px;
+  }
+
+  .calendar-table th {
+    padding: 12px 8px;
+    text-align: center;
+    color: #666;
+    font-weight: 500;
+    font-size: 14px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .calendar-cell {
+    padding: 8px;
+    border: 1px solid #f0f0f0;
+    vertical-align: top;
+    height: 130px;
+    background: white;
+  }
+
+  .other-month {
+    background-color: #fafafa;
+  }
+
+  .date-number {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #333;
+  }
+
+  .other-month .date-number {
+    color: #999;
+  }
+
+  .event-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .event-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .event-badge:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .delete-icon {
+    color: white;
+    margin-left: 8px;
+    cursor: pointer;
+    font-size: 12px;
+  }
+
+  .delete-icon:hover {
+    opacity: 0.8;
+  }
+
+  // Styles for the navigation buttons
+  .calendar-header .ant-btn {
+    border: 1px solid #d9d9d9;
+    background: white;
+    font-size: 14px;
+    height: 32px;
+    padding: 4px 15px;
+    border-radius: 6px;
+  }
+
+  .calendar-header .ant-btn:hover {
+    border-color: #40a9ff;
+    color: #40a9ff;
+  }
+
+  // Add styles for the tooltip content
+  .ant-tooltip-inner {
+    min-width: 200px;
+    padding: 8px 12px;
+  }
+
+  .ant-tooltip-inner strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px;
+  }
+
+  .ant-tooltip-inner div {
+    margin-bottom: 2px;
+    font-size: 12px;
+  }
+`;
+
+const CalendarAppWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <CalendarApp />
+  </>
+);
+
+export default CalendarAppWithStyles;

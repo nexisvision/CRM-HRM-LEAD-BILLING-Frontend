@@ -97,6 +97,8 @@ export const TaskList = () => {
 
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState('all');
+  const [searchText, setSearchText] = useState('');
 
   // Open Add Job Modal
   const openAddTaskModal = () => {
@@ -369,6 +371,54 @@ export const TaskList = () => {
     setSelectedRowKeys([]);
   };
 
+  // Get unique statuses from task data
+  const getUniqueStatuses = () => {
+    if (!fnddata) return [];
+    
+    // Get all unique statuses from the data
+    const statuses = [...new Set(fnddata.map(item => item.status))];
+    
+    // Create status options array with 'All Status' as first option
+    return [
+      { value: 'all', label: 'All Status' },
+      ...statuses.map(status => ({
+        value: status,
+        label: status
+      }))
+    ];
+  };
+
+  // Get status options
+  const statusOptions = getUniqueStatuses();
+
+  // Update the filter function to include status
+  const getFilteredTasks = () => {
+    if (!list) return [];
+    
+    let filtered = list;
+
+    // Apply search filter
+    if (searchText) {
+      filtered = filtered.filter(task => 
+        task.taskName?.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+
+    // Apply status filter
+    if (selectedStatus !== 'all') {
+      filtered = filtered.filter(task => 
+        task.status === selectedStatus
+      );
+    }
+
+    return filtered;
+  };
+
+  // Handle status change
+  const handleStatusChange = (value) => {
+    setSelectedStatus(value);
+  };
+
   return (
     <div className="container">
       <Card>
@@ -384,62 +434,29 @@ export const TaskList = () => {
           >
             <div className="mr-0 md:mr-3 mt-[30px] md:mb-0 w-full md:w-48">
               <Input
-                placeholder="Search"
+                placeholder="Search by task name..."
                 prefix={<SearchOutlined />}
-                onChange={(e) => onSearch(e)}
+                onChange={(e) => setSearchText(e.target.value)}
+                value={searchText}
+                allowClear
+                className="search-input"
               />
             </div>
-            {/* <div className="mb-3">
-              <h1 className="mb-2 text-black text-base">Status</h1>
+            <div className="mr-0 md:mr-3 mt-7 md:mb-0 w-full md:w-40">
               <Select
-                defaultValue="All"
-                className="w-100"
-                style={{ minWidth: 180 }}
-                onChange={handleShowStatus}
-                placeholder="Status"
+                placeholder="Filter by status"
+                onChange={handleStatusChange}
+                value={selectedStatus}
+                style={{ width: '100%' }}
+                className="status-select"
               >
-                <Option value="All">Hide Completed Task </Option>
-                {paymentStatusList.map((elm) => (
-                  <Option key={elm} value={elm}>
-                    {elm}
+                {statusOptions.map(status => (
+                  <Option key={status.value} value={status.value}>
+                    {status.label}
                   </Option>
                 ))}
               </Select>
             </div>
-            <div className="mb-3">
-              <h1 className="mb-2 text-black text-base">Assigned To</h1>
-              <Select
-                defaultValue="All"
-                className="w-100"
-                style={{ minWidth: 180 }}
-                onChange={handleShowStatus}
-                placeholder="Status"
-              >
-                <Option value="All">All</Option>
-                {paymentStatusList.map((elm) => (
-                  <Option key={elm} value={elm}>
-                    {elm}
-                  </Option>
-                ))}
-              </Select>
-            </div>
-            <div className="mb-3">
-              <h1 className="mb-2 text-black text-base">Milestone</h1>
-              <Select
-                defaultValue="All"
-                className="w-100"
-                style={{ minWidth: 180 }}
-                onChange={handleShowStatus}
-                placeholder="Status"
-              >
-                <Option value="All">All payment </Option>
-                {paymentStatusList.map((elm) => (
-                  <Option key={elm} value={elm}>
-                    {elm}
-                  </Option>
-                ))}
-              </Select>
-            </div> */}
           </Flex>
           <Flex gap="7px" className="flex">
             <Button
@@ -463,7 +480,7 @@ export const TaskList = () => {
         <div className="table-responsive">
           <Table
             columns={tableColumns}
-            dataSource={list}
+            dataSource={getFilteredTasks()}
             rowKey="id"
             scroll={{ x: 1600 }}
             rowSelection={{
