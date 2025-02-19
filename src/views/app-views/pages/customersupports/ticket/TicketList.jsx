@@ -14,6 +14,7 @@ import {
   Menu,
   Tag,
   message,
+  Space,
 } from "antd";
 import NumberFormat from "react-number-format";
 import {
@@ -38,6 +39,7 @@ import ViewTicket from "./ViewTicket";
 import { DeleteTicket, getAllTicket } from "./TicketReducer/TicketSlice";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
+import { debounce } from 'lodash';
 
 const { Column } = Table;
 
@@ -80,6 +82,7 @@ export const TicketList = () => {
     useState(false);
 
   const [idd, setIdd] = useState("");
+  const [searchValue, setSearchValue] = useState("");
 
   const dispatch = useDispatch();
 
@@ -144,6 +147,7 @@ export const TicketList = () => {
       setList(finddata);
     }
   }, [finddata]);
+
   const exportToExcel = () => {
     try {
       const ws = utils.json_to_sheet(list); // Convert JSON data to a sheet
@@ -184,60 +188,33 @@ export const TicketList = () => {
     });
   };
 
-  const dropdownMenu = (row) => (
-    <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EditOutlined />}
-            onClick={openViewTicketModal}
-            size="small"
-          >
-            <span className="ml-2">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => togglePinTask(row.id)}>
-          {pinnedTasks.includes(row.id) ? (
-            <PushpinOutlined style={{ color: "gold" }} />
-          ) : (
-            <PushpinOutlined />
-          )}
-          <span className="ml-2">{pinnedTasks.includes(row.id) ? "Unpin" : "Pin"}</span>
-        </Flex>
-      </Menu.Item>
-     {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EditOutlined />}
-            onClick={() => editfun(row.id)}
-            size="small"
-          >
-            <span className="ml-2">Edit</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-      
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => editfun(row.id)}>
-          <EditOutlined />
-          <span className="ml-2">Edit</span>
-        </Flex>
-      </Menu.Item>
+  // Create debounced version of search
+  const debouncedSearch = debounce((value, data, setList) => {
+    const searchValue = value.toLowerCase();
+    
+    if (!searchValue) {
+      // Reset to original data
+      setList(data || []);
+      return;
+    }
 
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => deletfun(row.id)}>
-          <DeleteOutlined />
-          <span className="ml-2">Delete</span>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+    const filteredData = data?.filter(ticket => {
+      return (
+        ticket.ticketSubject?.toString().toLowerCase().includes(searchValue) ||
+        ticket.requestor?.toString().toLowerCase().includes(searchValue) ||
+        ticket.priority?.toString().toLowerCase().includes(searchValue)
+      );
+    }) || [];
+
+    setList(filteredData);
+  }, 300); // 300ms delay
+
+  // Modified onSearch function
+  const onSearch = (e) => {
+    const value = e.currentTarget.value;
+    setSearchValue(value);
+    debouncedSearch(value, finddata, setList);
+  };
 
   const tableColumns = [
     {
@@ -256,11 +233,39 @@ export const TicketList = () => {
     {
       title: "Subject",
       dataIndex: "ticketSubject",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            placeholder="Search subject"
+            value={selectedKeys[0]}
+            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => confirm()}
+            style={{ width: 188, marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Search
+            </Button>
+            <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
+              Reset
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) =>
+        record.ticketSubject
+          ? record.ticketSubject.toString().toLowerCase().includes(value.toLowerCase())
+          : '',
       sorter: {
         compare: (a, b) => a.subject.length - b.subject.length,
       },
     },
-
     {
       title: "requestor",
       dataIndex: "requestor",
@@ -268,14 +273,6 @@ export const TicketList = () => {
         compare: (a, b) => a.subject.length - b.subject.length,
       },
     },
-
-    // {
-    // 	title: 'Project List',
-    // 	dataIndex: 'project',
-    // 	sorter: {
-    // 		compare: (a, b) => a.project.length - b.project.length,
-    // 	},
-    // },
     {
       title: "Start Date", 
       dataIndex: "createdAt",
@@ -284,7 +281,6 @@ export const TicketList = () => {
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "createdAt"),
     },
-
     {
       title: "Priority",
       dataIndex: "priority",
@@ -299,16 +295,6 @@ export const TicketList = () => {
         compare: (a, b) => a.activity.length - b.activity.length,
       },
     },
-    // {
-    //   title: "Status",
-    //   dataIndex: "status",
-    //   render: (_, record) => (
-    //     <>
-    //       <Tag color={getShippingStatus(record.status)}>{record.status}</Tag>
-    //     </>
-    //   ),
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
-    // },
     {
       title: "Action",
       dataIndex: "actions",
@@ -327,13 +313,32 @@ export const TicketList = () => {
     },
   };
 
-  const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : finddata;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
-  };
+  const dropdownMenu = (row) => (
+    <Menu>
+      <Menu.Item>
+        <Flex alignItems="center" onClick={() => togglePinTask(row.id)}>
+          {pinnedTasks.includes(row.id) ? (
+            <PushpinOutlined style={{ color: "gold" }} />
+          ) : (
+            <PushpinOutlined />
+          )}
+          <span className="ml-2">{pinnedTasks.includes(row.id) ? "Unpin" : "Pin"}</span>
+        </Flex>
+      </Menu.Item>
+      <Menu.Item>
+        <Flex alignItems="center" onClick={() => editfun(row.id)}>
+          <EditOutlined />
+          <span className="ml-2">Edit</span>
+        </Flex>
+      </Menu.Item>
+      <Menu.Item>
+        <Flex alignItems="center" onClick={() => deletfun(row.id)}>
+          <DeleteOutlined />
+          <span className="ml-2">Delete</span>
+        </Flex>
+      </Menu.Item>
+    </Menu>
+  );
 
   return (
     <div className="container">
@@ -346,12 +351,15 @@ export const TicketList = () => {
           <Flex className="mb-1" mobileFlex={false}>
             <div className="mr-md-3 mb-3">
               <Input
-                placeholder="Search"
+                placeholder="Search by subject..."
                 prefix={<SearchOutlined />}
-                onChange={(e) => onSearch(e)}
+                onChange={onSearch}
+                value={searchValue}
+                allowClear
+                style={{ width: '250px' }}
               />
             </div>
-            {/* <div className="mb-3">
+            <div className="mb-3">
               <Select
                 defaultValue="All"
                 className="w-100"
@@ -359,14 +367,14 @@ export const TicketList = () => {
                 onChange={handleShowStatus}
                 placeholder="Status"
               >
-                <Option value="All">All priority </Option>
+                <Option value="All">All Status</Option>
                 {paymentStatusList.map((elm) => (
                   <Option key={elm} value={elm}>
                     {elm}
                   </Option>
                 ))}
               </Select>
-            </div> */}
+            </div>
           </Flex>
 
           <Flex alignItems="center" justifyContent="space-between" gap="7px">
@@ -381,7 +389,7 @@ export const TicketList = () => {
             <Button
                 type="primary"
                 icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
+                onClick={exportToExcel}
                 block
               >
                 Export All
@@ -407,8 +415,6 @@ export const TicketList = () => {
           onCancel={closeAddTicketModal}
           footer={null}
           width={1000}
-          // className='mt-[-70px]'
-          // height={1000}
         >
           <AddTicket onClose={closeAddTicketModal} />
         </Modal>
@@ -419,7 +425,6 @@ export const TicketList = () => {
           onCancel={closeEditTicketModal}
           footer={null}
           width={1000}
-          // height={1000}
         >
           <EditTicket onClose={closeEditTicketModal} idd={idd} />
         </Modal>
@@ -429,7 +434,6 @@ export const TicketList = () => {
           onCancel={closeViewTicketModal}
           footer={null}
           width={1000}
-          // height={1000}
         >
           <ViewTicket onClose={closeViewTicketModal} />
         </Modal>

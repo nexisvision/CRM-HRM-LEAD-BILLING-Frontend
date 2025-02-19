@@ -321,13 +321,11 @@ export const InvoiceList = () => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
     
-    // If search value is empty, show all data
     if (!value) {
       setList(fnddata);
       return;
     }
     
-    // Filter the data based on invoice number
     const filtered = fnddata.filter(invoice => 
       invoice.salesInvoiceNumber?.toLowerCase().includes(value)
     );

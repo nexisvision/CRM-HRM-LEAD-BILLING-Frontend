@@ -72,6 +72,11 @@ const RevenueList = () => {
     useState(false);
 
   const [idd, setIdd] = useState("");
+  const [searchText, setSearchText] = useState('');
+  // const [selectedStatus, setSelectedStatus] = useState('All');
+  // const [statusOptions, setStatusOptions] = useState(['All']);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [categoryOptions, setCategoryOptions] = useState(['All']);
 
   const dispatch = useDispatch();
   const customerData = useSelector((state) => state.customers);
@@ -88,6 +93,13 @@ const RevenueList = () => {
   useEffect(() => {
     if (fnddata) {
       setList(fnddata);
+    }
+  }, [fnddata]);
+
+  useEffect(() => {
+    if (fnddata && fnddata.length > 0) {
+      const uniqueCategories = [...new Set(fnddata.map(revenue => revenue.category))].filter(Boolean);
+      setCategoryOptions(['All', ...uniqueCategories]);
     }
   }, [fnddata]);
 
@@ -318,11 +330,86 @@ const RevenueList = () => {
   };
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : fnddata;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+    
+    // If search value is empty, show all data
+    if (!value) {
+      setList(fnddata);
+      return;
+    }
+    
+    // Filter the data based on customer name
+    const filtered = fnddata.filter(revenue => {
+      const customerName = fnddataCustomers?.find(cust => 
+        cust.id === revenue.customer
+      )?.name?.toLowerCase();
+      
+      return customerName?.includes(value);
+    });
+    
+    setList(filtered);
+  };
+
+  // const handleStatusChange = (value) => {
+  //   setSelectedStatus(value);
+    
+  //   if (value === 'All') {
+  //     setList(fnddata);
+  //     return;
+  //   }
+
+  //   const filtered = fnddata.filter(revenue => 
+  //     revenue.status === value
+  //   );
+  //   setList(filtered);
+  // };
+
+  const handleCategoryChange = (value) => {
+    setSelectedCategory(value);
+    
+    if (value === 'All') {
+      setList(fnddata);
+      return;
+    }
+
+    const filtered = fnddata.filter(revenue => 
+      revenue.category === value
+    );
+    setList(filtered);
+  };
+
+  const getFilteredRevenues = () => {
+    if (!list) return [];
+    
+    let filtered = list;
+
+    // Apply search filter
+    if (searchText) {
+      filtered = filtered.filter(revenue => {
+        const customerName = fnddataCustomers?.find(cust => 
+          cust.id === revenue.customer
+        )?.name?.toLowerCase();
+        
+        return customerName?.includes(searchText.toLowerCase());
+      });
+    }
+
+    // Apply status filter
+    // if (selectedStatus !== 'All') {
+    //   filtered = filtered.filter(revenue => 
+    //     revenue.status === selectedStatus
+    //   );
+    // }
+
+    // Apply category filter
+    if (selectedCategory !== 'All') {
+      filtered = filtered.filter(revenue => 
+        revenue.category === selectedCategory
+      );
+    }
+
+    return filtered;
   };
 
   return (
@@ -332,34 +419,49 @@ const RevenueList = () => {
           alignItems="center"
           justifyContent="space-between"
           mobileFlex={false}
-          className="flex flex-wrap  gap-4"
+          className="flex flex-wrap gap-4"
         >
-          <Flex
-            className="flex flex-wrap gap-4 mb-4 md:mb-0"
-            mobileFlex={false}
-          >
+          <Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
             <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
               <Input
-                placeholder="Search"
+                placeholder="Search by customer name..."
                 prefix={<SearchOutlined />}
-                onChange={(e) => onSearch(e)}
+                onChange={onSearch}
+                value={searchText}
+                allowClear
+                className="search-input"
               />
             </div>
-            <div className="w-full md:w-48">
+            <div className="mb-3">
               <Select
                 defaultValue="All"
-                className="w-full"
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+                className="w-100"
                 style={{ minWidth: 180 }}
-                onChange={handleShowStatus}
-                placeholder="Status"
+                placeholder="Select Category"
               >
-                <Option value="All">All Revenue</Option>
-                {revenueStatusList.map((elm) => (
-                  <Option key={elm} value={elm}>
-                    {elm}
+                {categoryOptions.map((category) => (
+                  <Option key={category} value={category}>
+                    {category === 'All' ? 'All Categories' : category}
                   </Option>
                 ))}
               </Select>
+            </div>
+            <div className="mb-3">
+              {/* <Select
+                defaultValue="All"
+                value={selectedStatus}
+                onChange={handleStatusChange}
+                className="w-100"
+                style={{ minWidth: 180 }}
+              >
+                {statusOptions.map((status) => (
+                  <Option key={status} value={status}>
+                    {status === 'All' ? 'All Status' : status}
+                  </Option>
+                ))}
+              </Select> */}
             </div>
           </Flex>
           <Flex gap="7px" className="flex">
@@ -392,14 +494,13 @@ const RevenueList = () => {
            {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                                     <Table
                                                     columns={tableColumns}
-                                                    dataSource={list}
+                                                    dataSource={getFilteredRevenues()}
                                                     rowKey="id"
-                                                    // scroll={{ x: 1800 }}
-                                                    rowSelection={{
-                                                      selectedRowKeys: selectedRowKeys,
-                                                      // type: 'checkbox',
-                                                      preserveSelectedRowKeys: false,
-                                                      ...rowSelection,
+                                                    pagination={{
+                                                      total: getFilteredRevenues().length,
+                                                      pageSize: 10,
+                                                      showSizeChanger: true,
+                                                      showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
                                                     }}
                                                   />
                                                     ) : null}
@@ -434,4 +535,37 @@ const RevenueList = () => {
   );
 };
 
-export default RevenueList;
+// Add styles
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 200px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  .ant-select {
+    min-width: 180px;
+  }
+
+  @media (max-width: 768px) {
+    .search-input,
+    .ant-select {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+  }
+`;
+
+const RevenueListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <RevenueList />
+  </>
+);
+
+export default RevenueListWithStyles;

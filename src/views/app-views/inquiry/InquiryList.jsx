@@ -9,6 +9,7 @@ import {
   Button,
   Modal,
   Select,
+  Space,
 } from "antd";
 import {
   EyeOutlined,
@@ -39,6 +40,7 @@ import { deleteinqu, getinqu } from "./inquiryReducer/inquirySlice";
 //   getjobapplication,
 // } from "./JobapplicationReducer/JobapplicationSlice";
 // import ViewJobApplication from './ViewJobApplication';
+import { debounce } from 'lodash';
 
 const { Option } = Select;
 
@@ -54,6 +56,8 @@ const InquiryList = () => {
     useState(false);
 
   const [idd, setIdd] = useState("");
+  const [searchValue, setSearchValue] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     dispatch(getinqu());
@@ -113,12 +117,36 @@ const InquiryList = () => {
       message.error("Failed to export data. Please try again."); // Show error message
     }
   };
+
+  // Create debounced version of search
+  const debouncedSearch = debounce((value, data, setUsers) => {
+    setIsSearching(true);
+    
+    const searchValue = value.toLowerCase();
+    
+    if (!searchValue) {
+      setUsers(fndbranch || []); // Reset to original data
+      setIsSearching(false);
+      return;
+    }
+
+    const filteredData = fndbranch?.filter(inquiry => {
+      return (
+        inquiry.name?.toString().toLowerCase().includes(searchValue) ||
+        inquiry.email?.toString().toLowerCase().includes(searchValue) ||
+        inquiry.subject?.toString().toLowerCase().includes(searchValue)
+      );
+    }) || [];
+
+    setUsers(filteredData);
+    setIsSearching(false);
+  }, 300); // 300ms delay
+
+  // Modified onSearch function
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : [];
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    setSearchValue(value);
+    debouncedSearch(value, fndbranch, setUsers);
   };
 
   const deleteUser = (userId) => {
@@ -217,23 +245,38 @@ const InquiryList = () => {
   );
 
   const tableColumns = [
-    // {
-    //   title: "Branch",
-    //   dataIndex: "Branch",
-    //   //   render: (_, record) => (
-    //   //     <div className="d-flex">
-    //   //       <AvatarStatus
-    //   //         src={record.img}
-    //   //         name={record.name}
-    //   //         subTitle={record.email}
-    //   //       />
-    //   //     </div>
-    //   //   ),
-    //   sorter: (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1),
-    // },
     {
       title: "Name",
       dataIndex: "name",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            placeholder="Search name"
+            value={selectedKeys[0]}
+            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => confirm()}
+            style={{ width: 188, marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Search
+            </Button>
+            <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
+              Reset
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) =>
+        record.name
+          ? record.name.toString().toLowerCase().includes(value.toLowerCase())
+          : '',
       sorter: (a, b) => a.name.length - b.name.length,
     },
     {
@@ -287,12 +330,16 @@ const InquiryList = () => {
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
-              placeholder="Search"
+              placeholder="Search by name..."
               prefix={<SearchOutlined />}
               onChange={onSearch}
+              value={searchValue}
+              allowClear
+              style={{ width: '250px' }}
+              loading={isSearching}
             />
           </div>
-          {/* <div className="w-full md:w-48 ">
+          <div className="mb-3">
             <Select
               defaultValue="All"
               className="w-100"
@@ -300,14 +347,14 @@ const InquiryList = () => {
               onChange={handleShowStatus}
               placeholder="Status"
             >
-              <Option value="All">All Job </Option>
+              <Option value="All">All Status</Option>
               {jobStatusList.map((elm) => (
                 <Option key={elm} value={elm}>
                   {elm}
                 </Option>
               ))}
             </Select>
-          </div> */}
+          </div>
         </Flex>
         <Flex gap="7px">
           <Button type="primary" className="ml-2" onClick={openAddinquiryModal}>
@@ -317,7 +364,7 @@ const InquiryList = () => {
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
-            onClick={exportToExcel} // Call export function when the button is clicked
+            onClick={exportToExcel}
             block
           >
             Export All
@@ -329,7 +376,6 @@ const InquiryList = () => {
           columns={tableColumns}
           dataSource={users}
           rowKey="id"
-          scroll={{ x: 1200 }}
         />
       </div>
       {/* <UserView

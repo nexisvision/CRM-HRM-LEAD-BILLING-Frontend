@@ -13,6 +13,7 @@ import {
   Tag,
   Modal,
   message,
+  Space,
 } from "antd";
 // import OrderListData from "../../../../assets/data/order-list.data.json";
 // import OrderListData from "assets/data/order-list.data.json"
@@ -44,6 +45,7 @@ import AddTask from "./AddTask";
 import EditTask from "./EditTask";
 import { useSelector, useDispatch } from "react-redux";
 import { DeleteTasks, GetTasks } from "../project/task/TaskReducer/TaskSlice";
+import { debounce } from 'lodash';
 
 const { Option } = Select;
 
@@ -78,6 +80,8 @@ const TaskList = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [pinnedTasks, setPinnedTasks] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -269,9 +273,36 @@ const TaskList = () => {
     {
       title: "Title",
       dataIndex: "taskName",
-      sorter: {
-        compare: (a, b) => a.taskName.length - b.taskName.length,
-      },
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            placeholder="Search title"
+            value={selectedKeys[0]}
+            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => confirm()}
+            style={{ width: 188, marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Search
+            </Button>
+            <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
+              Reset
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) =>
+        record.taskName
+          ? record.taskName.toString().toLowerCase().includes(value.toLowerCase())
+          : '',
+      sorter: (a, b) => a.taskName.length - b.taskName.length,
     },
     {
       title: "priority",
@@ -370,12 +401,35 @@ const TaskList = () => {
     },
   };
 
+  // Create debounced version of search
+  const debouncedSearch = debounce((value, data, setList) => {
+    setIsSearching(true);
+    
+    const searchValue = value.toLowerCase();
+    
+    if (!searchValue) {
+      setList(fnddata || []); // Reset to original data
+      setIsSearching(false);
+      return;
+    }
+
+    const filteredData = fnddata?.filter(task => {
+      return (
+        task.taskName?.toString().toLowerCase().includes(searchValue) ||
+        stripHtmlTags(task.description)?.toLowerCase().includes(searchValue) ||
+        task.priority?.toString().toLowerCase().includes(searchValue)
+      );
+    }) || [];
+
+    setList(filteredData);
+    setIsSearching(false);
+  }, 300); // 300ms delay
+
+  // Modified onSearch function
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : fnddata;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    setSearchValue(value);
+    debouncedSearch(value, fnddata, setList);
   };
 
   // const exportToExcel = () => {
@@ -420,11 +474,15 @@ const TaskList = () => {
             className="flex flex-wrap gap-4 mb-4 md:mb-0"
             mobileFlex={false}
           >
-            <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
+            <div className="mr-0 md:mr-3 mb-3 md:mb-0" style={{ display: 'flex', gap: '8px' }}>
               <Input
-                placeholder="Search"
+                placeholder="Search by task title..."
                 prefix={<SearchOutlined />}
-                onChange={(e) => onSearch(e)}
+                onChange={onSearch}
+                value={searchValue}
+                allowClear
+                style={{ width: '250px' }}
+                loading={isSearching}
               />
             </div>
             <div className="mb-3">
@@ -435,7 +493,7 @@ const TaskList = () => {
                 onChange={handleShowStatus}
                 placeholder="Status"
               >
-                <Option value="All">All Status </Option>
+                <Option value="All">All Status</Option>
                 {orderStatusList.map((elm) => (
                   <Option key={elm} value={elm}>
                     {elm}

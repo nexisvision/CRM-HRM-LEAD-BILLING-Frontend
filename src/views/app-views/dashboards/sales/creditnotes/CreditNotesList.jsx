@@ -82,10 +82,26 @@ const CreditNotesList = () => {
   const creditNotesData = useSelector((state) => state.creditnotes.creditnotes.data);
   const invoicesData = useSelector((state) => state.salesInvoices.salesInvoices.data);
 
+  const [searchText, setSearchText] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
+
   useEffect(() => {
     dispatch(getcreditnote());
     dispatch(getInvoice());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (fnddata && invoicesData) {
+      const combinedData = fnddata.map(creditNote => {
+        const matchingInvoice = invoicesData.find(invoice => invoice.id === creditNote.invoice);
+        return {
+          ...creditNote,
+          salesInvoiceNumber: matchingInvoice ? matchingInvoice.salesInvoiceNumber : 'N/A'
+        };
+      });
+      setFilteredData(combinedData);
+    }
+  }, [fnddata, invoicesData]);
 
   const handleView = (creditNoteId) => {
     setSelectedCreditNoteId(creditNoteId);
@@ -319,11 +335,38 @@ const CreditNotesList = () => {
   ];
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = list;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+    
+    if (!value || !fnddata || !invoicesData) {
+      // Reset to original combined data
+      const combinedData = fnddata.map(creditNote => {
+        const matchingInvoice = invoicesData.find(invoice => invoice.id === creditNote.invoice);
+        return {
+          ...creditNote,
+          salesInvoiceNumber: matchingInvoice ? matchingInvoice.salesInvoiceNumber : 'N/A'
+        };
+      });
+      setFilteredData(combinedData);
+      return;
+    }
+    
+    // Filter based on invoice number
+    const filtered = fnddata.map(creditNote => {
+      const matchingInvoice = invoicesData.find(invoice => invoice.id === creditNote.invoice);
+      return {
+        ...creditNote,
+        salesInvoiceNumber: matchingInvoice ? matchingInvoice.salesInvoiceNumber : 'N/A'
+      };
+    }).filter(item => 
+      item.salesInvoiceNumber.toString().toLowerCase().includes(value)
+    );
+    
+    setFilteredData(filtered);
+  };
+
+  const getFilteredCreditNotes = () => {
+    return filteredData || [];
   };
 
   return (
@@ -341,9 +384,12 @@ const CreditNotesList = () => {
           >
             <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48 me-2">
               <Input
-                placeholder="Search"
+                placeholder="Search by invoice number..."
                 prefix={<SearchOutlined />}
-                onChange={(e) => onSearch(e)}
+                onChange={onSearch}
+                value={searchText}
+                allowClear
+                className="search-input"
               />
             </div>
           </Flex>
@@ -370,15 +416,14 @@ const CreditNotesList = () => {
           {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
             <Table
               columns={tableColumns}
-              dataSource={list}
+              dataSource={getFilteredCreditNotes()}
               rowKey="id"
-              scroll={{ x: 1200 }}
-            // rowSelection={{
-            // 	selectedRowKeys: selectedRowKeys,
-            // 	type: 'checkbox',
-            // 	preserveSelectedRowKeys: false,
-            // 	...rowSelection,
-            // }}
+              pagination={{
+                total: getFilteredCreditNotes().length,
+                pageSize: 10,
+                showSizeChanger: true,
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              }}
             />
           ) : null}
 

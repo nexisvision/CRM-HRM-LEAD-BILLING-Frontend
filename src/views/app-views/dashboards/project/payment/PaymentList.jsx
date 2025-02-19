@@ -65,6 +65,7 @@ const PaymentList = () => {
     useState(false);
   const [isViewPaymentModalVisible, setIsViewPaymentModalVisible] =
     useState(false);
+  const [searchText, setSearchText] = useState('');
 
   const { id } = useParams();
   const dispatch = useDispatch();
@@ -286,11 +287,39 @@ const PaymentList = () => {
   };
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : list;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+    
+    // If search value is empty, show all data
+    if (!value) {
+      setList(filtermin);
+      return;
+    }
+    
+    // Filter the data based on project name
+    const filtered = filtermin.filter(payment => {
+      const projectName = getProjectName(payment.project_name)?.toLowerCase();
+      return projectName?.includes(value);
+    });
+    
+    setList(filtered);
+  };
+
+  // Update the filter function to include search
+  const getFilteredPayments = () => {
+    if (!list) return [];
+    
+    let filtered = list;
+
+    // Apply search filter
+    if (searchText) {
+      filtered = filtered.filter(payment => {
+        const projectName = getProjectName(payment.project_name)?.toLowerCase();
+        return projectName?.includes(searchText.toLowerCase());
+      });
+    }
+
+    return filtered;
   };
 
   // Update the list when payment data changes
@@ -311,9 +340,12 @@ const PaymentList = () => {
         <Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
           <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
             <Input
-              placeholder="Search"
+              placeholder="Search by project name..."
               prefix={<SearchOutlined />}
-              onChange={(e) => onSearch(e)}
+              onChange={onSearch}
+              value={searchText}
+              allowClear
+              className="search-input"
             />
           </div>
           {/* <div className="w-full md:w-48">
@@ -347,15 +379,14 @@ const PaymentList = () => {
         <div className="table-responsive">
           <Table
             columns={tableColumns}
-            dataSource={list}
+            dataSource={getFilteredPayments()}
             rowKey="id"
-            scroll={{ x: 1200 }}
-            // rowSelection={{
-            //   selectedRowKeys: selectedRowKeys,
-            //   type: "checkbox",
-            //   preserveSelectedRowKeys: false,
-            //   ...rowSelection,
-            // }}
+            pagination={{
+              total: getFilteredPayments().length,
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+            }}
           />
         </div>
       {/* </Card> */}
@@ -400,4 +431,32 @@ const PaymentList = () => {
   );
 };
 
-export default PaymentList;
+// Add styles
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 200px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .search-input {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+  }
+`;
+
+const PaymentListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <PaymentList />
+  </>
+);
+
+export default PaymentListWithStyles;

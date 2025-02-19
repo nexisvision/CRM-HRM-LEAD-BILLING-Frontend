@@ -13,7 +13,7 @@ import {
 } from "antd";
 import {
   EyeOutlined,
-  DeleteOutlined,
+  DeleteOutlined, 
   SearchOutlined,
   MailOutlined,
   PlusOutlined,
@@ -49,6 +49,8 @@ const LeadList = () => {
   const navigate = useNavigate();
 
   const [id, setId] = useState("null");
+  const [searchText, setSearchText] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
 
   // Ref for file input
   const fileInputRef = useRef(null);
@@ -88,19 +90,34 @@ const LeadList = () => {
 
   const user = useSelector((state) => state.user.loggedInUser.username);
 
-  const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    if (value) {
-      const filteredData = users.filter(item => 
-        Object.values(item).some(val => 
-          val?.toString().toLowerCase().includes(value.toLowerCase())
-        )
-      );
-      setList(filteredData);
-    } else {
-      setList([]);
+  // Set initial filtered data
+  useEffect(() => {
+    if (tabledata && tabledata.Leads && tabledata.Leads.data) {
+      setFilteredData(tabledata.Leads.data);
     }
-    setSelectedRowKeys([]);
+  }, [tabledata]);
+
+  // Search function
+  const onSearch = (e) => {
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+    
+    if (!value || !tabledata.Leads.data) {
+      setFilteredData(tabledata.Leads.data);
+      return;
+    }
+    
+    // Filter based on lead title
+    const filtered = tabledata.Leads.data.filter(lead => 
+      lead.leadTitle?.toString().toLowerCase().includes(value)
+    );
+    
+    setFilteredData(filtered);
+  };
+
+  // Get filtered data
+  const getFilteredLeads = () => {
+    return filteredData || [];
   };
 
   const handleLeadClick = (id) => {
@@ -383,9 +400,12 @@ const LeadList = () => {
           <Flex className="mb-1" mobileFlex={false}>
             <div className="mr-md-3 mb-3">
               <Input
-                placeholder="Search"
+                placeholder="Search by lead title..."
                 prefix={<SearchOutlined />}
-                onChange={(e) => onSearch(e)}
+                onChange={onSearch}
+                value={searchText}
+                allowClear
+                className="search-input"
               />
             </div>
           </Flex>
@@ -424,9 +444,14 @@ const LeadList = () => {
              {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                                                                   <Table
                                                                                   columns={tableColumns}
-                                                                                  dataSource={users}
+                                                                                  dataSource={getFilteredLeads()}
                                                                                   rowKey="id"
-                                                                                  scroll={{ x: 1200 }}
+                                                                                  pagination={{
+                                                                                    total: getFilteredLeads().length,
+                                                                                    pageSize: 10,
+                                                                                    showSizeChanger: true,
+                                                                                    showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                                                                                  }}
                                                                                 />
                                                                                   ) : null}
 

@@ -117,13 +117,50 @@ const ContractList = () => {
     setIsEditContractModalVisible(false);
   };
   // Search functionality
+  const [searchText, setSearchText] = useState('');
+
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+    
+    // If search value is empty, show all data
+    if (!value) {
+      setUsers(tabledata?.Contract?.data || []);
+      return;
+    }
+    
+    // Filter the data based on client name
+    const filtered = tabledata?.Contract?.data?.filter(contract => {
+      const clientName = clientData?.find(client => 
+        client.id === contract.client
+      )?.username?.toLowerCase();
+      
+      return clientName?.includes(value);
+    }) || [];
+    
+    setUsers(filtered);
   };
+
+  // Add filter function
+  const getFilteredContracts = () => {
+    if (!users) return [];
+    
+    let filtered = users;
+
+    // Apply search filter
+    if (searchText) {
+      filtered = filtered.filter(contract => {
+        const clientName = clientData?.find(client => 
+          client.id === contract.client
+        )?.username?.toLowerCase();
+        
+        return clientName?.includes(searchText.toLowerCase());
+      });
+    }
+
+    return filtered;
+  };
+
   // Delete user
   // const deleteUser = (userId) => {
   //   dispatch(DeleteCon(userId));
@@ -433,9 +470,12 @@ const ContractList = () => {
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
-              placeholder="Search"
+              placeholder="Search by client name..."
               prefix={<SearchOutlined />}
-              onChange={(e) => onSearch(e)}
+              onChange={onSearch}
+              value={searchText}
+              allowClear
+              className="search-input"
             />
           </div>
         </Flex>
@@ -468,9 +508,14 @@ const ContractList = () => {
       {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
 							  <Table
                 columns={tableColumns}
-                dataSource={users}
+                dataSource={getFilteredContracts()}
                 rowKey="id"
-                scroll={{ x: 1200 }}
+                pagination={{
+                  total: getFilteredContracts().length,
+                  pageSize: 10,
+                  showSizeChanger: true,
+                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                }}
               />
 							) : null}
       </div>
@@ -513,4 +558,33 @@ const ContractList = () => {
     </Card>
   );
 };
-export default ContractList;
+
+// Add styles
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 200px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .search-input {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+  }
+`;
+
+const ContractListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <ContractList />
+  </>
+);
+
+export default ContractListWithStyles;

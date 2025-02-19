@@ -103,6 +103,9 @@ export const BillingList = () => {
   const fnddata = alldata.salesbilling.data;
 
   const [selectedBillingId, setSelectedBillingId] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [statusOptions, setStatusOptions] = useState(['All']);
+  const [searchText, setSearchText] = useState('');
 
   const handleShowStatus = (value) => {
     if (value !== "All") {
@@ -124,6 +127,15 @@ export const BillingList = () => {
   useEffect(() => {
     if (fnddata) {
       setList(fnddata);
+    }
+  }, [fnddata]);
+
+  // Add useEffect to get unique statuses from database data
+  useEffect(() => {
+    if (fnddata && fnddata.length > 0) {
+      // Get unique statuses from the billing data
+      const uniqueStatuses = [...new Set(fnddata.map(bill => bill.status))].filter(Boolean);
+      setStatusOptions(['All', ...uniqueStatuses]);
     }
   }, [fnddata]);
 
@@ -349,11 +361,58 @@ export const BillingList = () => {
   ];
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : OrderListData;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+    
+    // If search value is empty, show all data
+    if (!value) {
+      setList(fnddata);
+      return;
+    }
+    
+    // Filter the data based on bill number
+    const filtered = fnddata.filter(bill => 
+      bill.billNumber?.toLowerCase().includes(value)
+    );
+    
+    setList(filtered);
+  };
+
+  const getFilteredBillings = () => {
+    if (!list) return [];
+    
+    let filtered = list;
+
+    // Apply search filter
+    if (searchText) {
+      filtered = filtered.filter(bill => 
+        bill.billNumber?.toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+
+    // Apply status filter
+    if (selectedStatus && selectedStatus !== 'All') {
+      filtered = filtered.filter(bill => 
+        bill.status === selectedStatus
+      );
+    }
+
+    return filtered;
+  };
+
+  // Update status change handler
+  const handleStatusChange = (value) => {
+    setSelectedStatus(value);
+    
+    if (value === 'All') {
+      setList(fnddata);
+      return;
+    }
+
+    const filtered = fnddata.filter(bill => 
+      bill.status === value
+    );
+    setList(filtered);
   };
 
   return (
@@ -371,23 +430,25 @@ export const BillingList = () => {
           >
             <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
               <Input
-                placeholder="Search"
+                placeholder="Search by bill number..."
                 prefix={<SearchOutlined />}
-                onChange={(e) => onSearch(e)}
+                onChange={onSearch}
+                value={searchText}
+                allowClear
+                className="search-input"
               />
             </div>
             <div className="mb-3">
               <Select
                 defaultValue="All"
+                value={selectedStatus}
+                onChange={handleStatusChange}
                 className="w-100"
                 style={{ minWidth: 180 }}
-                onChange={handleShowStatus}
-                placeholder="Status"
               >
-                <Option value="All">All Billing </Option>
-                {paymentStatusList.map((elm) => (
-                  <Option key={elm} value={elm}>
-                    {elm}
+                {statusOptions.map((status) => (
+                  <Option key={status} value={status}>
+                    {status === 'All' ? 'All Status' : status}
                   </Option>
                 ))}
               </Select>
@@ -423,15 +484,15 @@ export const BillingList = () => {
            {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                            <Table
                                            columns={tableColumns}
-                                           dataSource={list}
+                                           dataSource={getFilteredBillings()}
                                            rowKey="id"
                                            scroll={{ x: 1200 }}
-                                           // rowSelection={{
-                                           // 	selectedRowKeys: selectedRowKeys,
-                                           // 	type: 'checkbox',
-                                           // 	preserveSelectedRowKeys: false,
-                                           // 	...rowSelection,
-                                           // }}
+                                           pagination={{
+                                             total: getFilteredBillings().length,
+                                             pageSize: 10,
+                                             showSizeChanger: true,
+                                             showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                                           }}
                                          />
                                           ) : null}
         </div>
@@ -474,4 +535,32 @@ export const BillingList = () => {
   );
 };
 
-export default BillingList;
+// Add styles
+const styles = `
+  .search-input {
+    transition: all 0.3s;
+    min-width: 200px;
+  }
+
+  .search-input:hover,
+  .search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .search-input {
+      width: 100%;
+      margin-bottom: 1rem;
+    }
+  }
+`;
+
+const BillingListWithStyles = () => (
+  <>
+    <style>{styles}</style>
+    <BillingList />
+  </>
+);
+
+export default BillingListWithStyles;

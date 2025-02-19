@@ -158,13 +158,16 @@ const DealList = () => {
     setIsViewDealModalVisible(false);
   };
 
-  // Search functionality
+  // Update the search functionality
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    const searchValue = e.currentTarget.value.toLowerCase();
+    if (tabledata && tabledata.Deals && tabledata.Deals.data) {
+      const filteredDeals = tabledata.Deals.data.filter(deal => 
+        deal.created_by === user && 
+        deal.dealName.toLowerCase().includes(searchValue)
+      );
+      setUsers(filteredDeals);
+    }
   };
 
   const deleteUser = async (userId) => {

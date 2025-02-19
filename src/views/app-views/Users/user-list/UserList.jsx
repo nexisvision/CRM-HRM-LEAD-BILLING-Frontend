@@ -30,6 +30,7 @@ import { Dleteusetr, GetUsers } from "../UserReducers/UserSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { MdOutlineEmail } from "react-icons/md";
 import EmailVerification from "../../company/EmailVerification";
+import { debounce } from 'lodash';
 
 const UserList = () => {
   const dispatch = useDispatch();
@@ -112,11 +113,30 @@ const UserList = () => {
     }
   };
 
+  // Create debounced version of search
+  const debouncedSearch = debounce((value, data, setUsers) => {
+    const searchValue = value.toLowerCase();
+    
+    if (!searchValue) {
+      setUsers(data || []); // Reset to original filtered data
+      return;
+    }
+
+    const filteredData = data?.filter(user => {
+      return (
+        user.name?.toString().toLowerCase().includes(searchValue) ||
+        user.email?.toString().toLowerCase().includes(searchValue) ||
+        user.status?.toString().toLowerCase().includes(searchValue)
+      );
+    }) || [];
+
+    setUsers(filteredData);
+  }, 300); // 300ms delay
+
+  // Modified onSearch function
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? users : fndfdata;
-    const data = searchArray.filter(user => user.name.toLowerCase().includes(value.toLowerCase()));
-    setUsers(data);
+    debouncedSearch(value, finddata, setUsers);
   };
 
   const deleteUser = (userId) => {
@@ -305,9 +325,11 @@ const UserList = () => {
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
-              placeholder="Search"
+              placeholder="Search users..."
               prefix={<SearchOutlined />}
-              onChange={(e) => onSearch(e)}
+              onChange={onSearch}
+              allowClear // Adds a clear button
+              style={{ width: '250px' }}
             />
           </div>
           <div className="mb-3">

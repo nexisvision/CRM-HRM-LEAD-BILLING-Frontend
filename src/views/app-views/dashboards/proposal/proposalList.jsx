@@ -9,6 +9,7 @@ import {
   Button,
   Modal,
   Select,
+  Space,
 } from "antd";
 import {
   EyeOutlined,
@@ -21,6 +22,7 @@ import {
   EditOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
+import { debounce } from 'lodash';
 
 import Flex from "components/shared-components/Flex";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
@@ -204,12 +206,52 @@ const ProposalList = () => {
 
 
 
+  // Add new state for search value
+  const [searchValue, setSearchValue] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Create debounced version of search
+  const debouncedSearch = debounce((value, data, setUsers) => {
+    setIsSearching(true);
+    
+    const searchValue = value.toLowerCase();
+    
+    if (!searchValue) {
+      setUsers(fnddatas || []); // Reset to original data
+      setIsSearching(false);
+      return;
+    }
+
+    // Filter the data based on search value
+    const filteredData = fnddatas?.filter(proposal => {
+      const lead = Leads?.find((l) => l.id === proposal.lead_title);
+      return (
+        lead?.leadTitle?.toString().toLowerCase().includes(searchValue) ||
+        proposal.deal_title?.toString().toLowerCase().includes(searchValue)
+      );
+    }) || [];
+
+    // Enrich the filtered data with lead and deal titles
+    const enrichedData = filteredData.map((proposal) => {
+      const lead = Leads?.find((l) => l.id === proposal.lead_title);
+      const deal = Deals?.find((d) => d.id === proposal.deal_title);
+
+      return {
+        ...proposal,
+        lead_title: lead?.leadTitle || "N/A",
+        deal_title: deal?.dealName || "N/A",
+      };
+    });
+
+    setUsers(enrichedData);
+    setIsSearching(false);
+  }, 300);
+
+  // Modified onSearch function
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    setSearchValue(value);
+    debouncedSearch(value, fnddatas, setUsers);
   };
 
   const deleteUser = (userId) => {
@@ -353,6 +395,35 @@ const ProposalList = () => {
     {
       title: "Lead title",
       dataIndex: "lead_title",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            placeholder="Search lead title"
+            value={selectedKeys[0]}
+            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => confirm()}
+            style={{ width: 188, marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Search
+            </Button>
+            <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
+              Reset
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) =>
+        record.lead_title
+          ? record.lead_title.toString().toLowerCase().includes(value.toLowerCase())
+          : '',
       sorter: (a, b) => a.lead_title.length - b.lead_title.length,
     },
     {
@@ -408,21 +479,17 @@ const ProposalList = () => {
         mobileFlex={false}
       >
         <Flex className="mb-1" mobileFlex={false}>
-          {/* <div className="mr-md-3 mb-3">
-            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={onSearch} />
+          <div className="mr-md-3 mb-3" style={{ display: 'flex', gap: '8px' }}>
+            <Input
+              placeholder="Search by lead title"
+              prefix={<SearchOutlined />}
+              onChange={onSearch}
+              value={searchValue}
+              allowClear
+              style={{ width: '200px' }}
+              loading={isSearching}
+            />
           </div>
-          <div className="w-full md:w-48 ">
-            <Select
-              defaultValue="All"
-              className="w-100"
-              style={{ minWidth: 180 }}
-              onChange={handleShowStatus}
-              placeholder="Status"
-            >
-              <Option value="All">All Job </Option>
-              {jobStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
-            </Select>
-          </div> */}
         </Flex>
         <Flex gap="7px">
         

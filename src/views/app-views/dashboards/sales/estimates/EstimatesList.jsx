@@ -45,16 +45,16 @@ import EditEstimates from "./EditEstimates";
 import ViewEstimates from "./ViewEstimates";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 const { Option } = Select;
-const getShippingStatus = (orderStatus) => {
-  if (orderStatus === "Ready") {
-    return "blue";
-  }
-  if (orderStatus === "Shipped") {
-    return "cyan";
-  }
-  return "";
-};
-const orderStatusList = ["Ready", "Shipped"];
+// const getShippingStatus = (orderStatus) => {
+//   if (orderStatus === "Ready") {
+//     return "blue";
+//   }
+//   if (orderStatus === "Shipped") {
+//     return "cyan";
+//   }
+//   return "";
+// };
+// const orderStatusList = ["Ready", "Shipped"];
 const EstimatesList = () => {
   const { salesquotations, loading, error } = useSelector((state) => state.estimate);
   const [list, setList] = useState([]);
@@ -71,6 +71,9 @@ const EstimatesList = () => {
   const dispatch = useDispatch();
   const [idd, setIdd] = useState("");
   const [selectedQuotationId, setSelectedQuotationId] = useState(null);
+  const [searchText, setSearchText] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [categoryOptions, setCategoryOptions] = useState(['All']);
 
   const customerData = useSelector((state) => state.customers);
   const fnddataCustomers = customerData.customers.data;
@@ -91,28 +94,32 @@ const EstimatesList = () => {
   useEffect(() => {
     setFilteredData(allsdata);
   }, [allsdata]);
+
+  // Add useEffect to get unique categories
+  useEffect(() => {
+    if (allsdata && allsdata.length > 0) {
+      // Extract unique categories from data
+      const uniqueCategories = [...new Set(allsdata.map(item => item.category))].filter(Boolean);
+      setCategoryOptions(['All', ...uniqueCategories]);
+    }
+  }, [allsdata]);
+
   // Search function
   const onSearch = (e) => {
-    const value = e.currentTarget.value.toLowerCase();
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
     
-    // If no salesquotations data, return empty array
-    if (!Array.isArray(salesquotations)) {
-      setFilteredData([]);
-      return;
-    }
-
-    // If search value is empty, show all data
-    if (!value) {
+    // If no data or empty search, show all data
+    if (!value || !allsdata) {
       setFilteredData(allsdata);
       return;
     }
-
-    // Filter the data based on search value
-    const filtered = allsdata.filter(item =>
-      item.customer?.toLowerCase().includes(value) ||
-      item.category?.toLowerCase().includes(value) 
-      // item.phoneCode?.toLowerCase().includes(value)
+    
+    // Filter the data based on Quotation Number
+    const filtered = allsdata.filter(estimate => 
+      estimate.salesQuotationNumber?.toString().toLowerCase().includes(value)
     );
+    
     setFilteredData(filtered);
   };
 
@@ -396,6 +403,44 @@ const EstimatesList = () => {
     return filteredData;
   }, [filteredData]);
 
+  // Add category change handler
+  const handleCategoryChange = (value) => {
+    setSelectedCategory(value);
+    
+    if (value === 'All') {
+      setFilteredData(allsdata);
+      return;
+    }
+
+    const filtered = allsdata.filter(item => 
+      item.category === value
+    );
+    setFilteredData(filtered);
+  };
+
+  // Update getFilteredEstimates to include both search and category filters
+  const getFilteredEstimates = () => {
+    if (!filteredData) return [];
+    
+    let filtered = filteredData;
+
+    // Apply search filter
+    if (searchText) {
+      filtered = filtered.filter(item => 
+        item.salesQuotationNumber?.toString().toLowerCase().includes(searchText.toLowerCase())
+      );
+    }
+
+    // Apply category filter
+    if (selectedCategory !== 'All') {
+      filtered = filtered.filter(item => 
+        item.category === selectedCategory
+      );
+    }
+
+    return filtered;
+  };
+
   return (
     <>
       <Card>
@@ -418,21 +463,24 @@ const EstimatesList = () => {
           className="flex flex-wrap  gap-4"
         >
           <Flex
-            cclassName="flex flex-wrap gap-4 mb-4 md:mb-0"
+            className="flex flex-wrap gap-4 mb-4 md:mb-0"
             mobileFlex={false}
           >
-            <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48 me-2">
+            <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
               <Input
-                placeholder="Search"
+                placeholder="Search by quotation number..."
                 prefix={<SearchOutlined />}
-                onChange={e => onSearch(e)}
+                onChange={onSearch}
+                value={searchText}
+                allowClear
+                className="search-input"
               />
             </div>
-            <div className="w-full md:w-48 ">
-              <Col span={12}>
+            {/* <div className="w-full md:w-48">
+              <Col span={12} className="w-full">
                 <Select
                   defaultValue="All"
-                  style={{ width: "100%" }}
+                  className="w-full"
                   onChange={(value) =>
                     setFilteredData(
                       allsdata.filter(
@@ -446,6 +494,22 @@ const EstimatesList = () => {
                   <Option value="Shipped">Shipped</Option>
                 </Select>
               </Col>
+            </div> */}
+            <div className="mb-3">
+              <Select
+                defaultValue="All"
+                value={selectedCategory}
+                onChange={handleCategoryChange}
+                className="w-100"
+                style={{ minWidth: 180 }}
+                placeholder="Select Category"
+              >
+                {categoryOptions.map((category) => (
+                  <Option key={category} value={category}>
+                    {category === 'All' ? 'All Categories' : category}
+                  </Option>
+                ))}
+              </Select>
             </div>
           </Flex>
           <Flex gap="7px" className="flex">
@@ -478,10 +542,15 @@ const EstimatesList = () => {
             {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                                               <Table
                                                               columns={tableColumns}
-                                                              dataSource={safeFilteredData}
+                                                              dataSource={getFilteredEstimates()}
                                                               rowKey="id"
                                                               scroll={{ x: 1200 }}
-                                                              loading={loading}
+                                                              pagination={{
+                                                                total: getFilteredEstimates().length,
+                                                                pageSize: 10,
+                                                                showSizeChanger: true,
+                                                                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                                                              }}
                                                             />
                                                               ) : null}
 

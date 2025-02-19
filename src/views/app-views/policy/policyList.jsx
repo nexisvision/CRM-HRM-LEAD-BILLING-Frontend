@@ -9,6 +9,7 @@ import {
   Button,
   Modal,
   Select,
+  Space,
 } from "antd";
 import {
   EyeOutlined,
@@ -36,6 +37,7 @@ import { deletepolicys, getpolicys } from "./policyReducer/policySlice";
 //   getjobapplication,
 // } from "./JobapplicationReducer/JobapplicationSlice";
 // import ViewJobApplication from './ViewJobApplication';
+import { debounce } from 'lodash';
 
 const { Option } = Select;
 
@@ -48,6 +50,10 @@ const PolicyList = () => {
   const [isAddpolicyModalVisible, setIsAddpolicyModalVisible] = useState(false);
 
   const [idd, setIdd] = useState("");
+  const [searchValue, setSearchValue] = useState("");
+
+  // Add loading state
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     dispatch(getpolicys());
@@ -94,12 +100,34 @@ const PolicyList = () => {
     setIsEditpolicyModalVisible(false);
   };
 
+  // Create debounced version of search
+  const debouncedSearch = debounce((value, data, setUsers) => {
+    setIsSearching(true);
+    
+    const searchValue = value.toLowerCase();
+    
+    if (!searchValue) {
+      setUsers(fndbranch || []);
+      setIsSearching(false);
+      return;
+    }
+
+    const filteredData = fndbranch?.filter(policy => {
+      return (
+        policy.title?.toString().toLowerCase().includes(searchValue) ||
+        policy.description?.toString().toLowerCase().includes(searchValue)
+      );
+    }) || [];
+
+    setUsers(filteredData);
+    setIsSearching(false);
+  }, 300);
+
+  // Modified onSearch function
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = users;
-    const data = utils.wildCardSearch(searchArray, value);
-    setUsers(data);
-    setSelectedRowKeys([]);
+    setSearchValue(value);
+    debouncedSearch(value, fndbranch, setUsers);
   };
 
   const deleteUser = (userId) => {
@@ -193,23 +221,38 @@ const PolicyList = () => {
   );
 
   const tableColumns = [
-    // {
-    //   title: "Branch",
-    //   dataIndex: "Branch",
-    //   //   render: (_, record) => (
-    //   //     <div className="d-flex">
-    //   //       <AvatarStatus
-    //   //         src={record.img}
-    //   //         name={record.name}
-    //   //         subTitle={record.email}
-    //   //       />
-    //   //     </div>
-    //   //   ),
-    //   sorter: (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1),
-    // },
     {
       title: "Title",
       dataIndex: "title",
+      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+        <div style={{ padding: 8 }}>
+          <Input
+            placeholder="Search title"
+            value={selectedKeys[0]}
+            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+            onPressEnter={() => confirm()}
+            style={{ width: 188, marginBottom: 8, display: 'block' }}
+          />
+          <Space>
+            <Button
+              type="primary"
+              onClick={() => confirm()}
+              size="small"
+              style={{ width: 90 }}
+            >
+              Search
+            </Button>
+            <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
+              Reset
+            </Button>
+          </Space>
+        </div>
+      ),
+      filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+      onFilter: (value, record) =>
+        record.title
+          ? record.title.toString().toLowerCase().includes(value.toLowerCase())
+          : '',
       sorter: (a, b) => a.title.length - b.title.length,
     },
     {
@@ -220,11 +263,6 @@ const PolicyList = () => {
       ),
       sorter: (a, b) => a.description.length - b.description.length,
     },
-    // {
-    //   title: "Created By",
-    //   dataIndex: "created_by",
-    //   sorter: (a, b) => a.created_by.length - b.created_by.length,
-    // },
     {
       title: "Action",
       dataIndex: "actions",
@@ -246,9 +284,13 @@ const PolicyList = () => {
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
-              placeholder="Search"
+              placeholder="Search by title..."
               prefix={<SearchOutlined />}
               onChange={onSearch}
+              value={searchValue}
+              allowClear
+              style={{ width: '250px' }}
+              loading={isSearching}
             />
           </div>
           {/* <div className="w-full md:w-48 ">
@@ -273,14 +315,14 @@ const PolicyList = () => {
             <PlusOutlined />
             <span>New</span>  
           </Button>
-          {/* <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button> */}
+          <Button
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel}
+            block
+          >
+            Export All
+          </Button>
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">

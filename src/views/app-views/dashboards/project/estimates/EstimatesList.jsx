@@ -49,6 +49,7 @@ const EstimatesList = () => {
 	const [selectedEstimateId, setSelectedEstimateId] = useState(null);
 	const dispatch = useDispatch();
 	const { id } = useParams();
+	const [searchText, setSearchText] = useState('');
 
 	useEffect(() => {
 		dispatch(getallestimate(id));
@@ -268,13 +269,35 @@ const EstimatesList = () => {
 		}
 	};
 
-	const onSearch = e => {
-		const value = e.currentTarget.value
-		const searchArray = e.currentTarget.value ? list : estimates
-		const data = utils.wildCardSearch(searchArray, value)
-		setList(data)
-		setSelectedRowKeys([])
-	}
+	const onSearch = (e) => {
+		const value = e.target.value.toLowerCase();
+		setSearchText(value);
+		
+		if (!value) {
+			setList(estimates);
+			return;
+		}
+		
+		const filtered = estimates.filter(estimate => 
+			estimate.quotationNumber?.toLowerCase().includes(value)
+		);
+		
+		setList(filtered);
+	};
+
+	const getFilteredEstimates = () => {
+		if (!list) return [];
+		
+		let filtered = list;
+
+		if (searchText) {
+			filtered = filtered.filter(estimate => 
+				estimate.quotationNumber?.toLowerCase().includes(searchText.toLowerCase())
+			);
+		}
+
+		return filtered;
+	};
 
 	return (
 		<>
@@ -283,8 +306,7 @@ const EstimatesList = () => {
 				<Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
 					<Flex cclassName="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
 						<div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48 me-2">
-							<Input placeholder="Search" prefix={<SearchOutlined />} onChange={() => onSearch()}
-            />
+							<Input placeholder="Search by estimate number..." prefix={<SearchOutlined />} onChange={onSearch} value={searchText} allowClear className="search-input" />
 						</div>
 						{/* <div className="w-full md:w-48 ">
 							<Col span={12}>
@@ -306,10 +328,15 @@ const EstimatesList = () => {
 				<div className="table-responsive">
 					<Table
 						columns={tableColumns}
-						dataSource={estimates}
+						dataSource={getFilteredEstimates()}
 						rowKey='id'
 						scroll={{ x: 1200 }}
-					
+						pagination={{
+							total: getFilteredEstimates().length,
+							pageSize: 10,
+							showSizeChanger: true,
+							showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+						}}
 					/>
 				</div>
 			</Card>
