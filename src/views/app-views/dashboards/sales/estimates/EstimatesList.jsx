@@ -260,6 +260,21 @@ const EstimatesList = () => {
     {
       title: "Quotation Number",
       dataIndex: "salesQuotationNumber",
+      render: (text, record) => (
+        <span
+          className="cursor-pointer hover:underline"
+          onClick={() => {
+            // Check if user has view permission
+            if (whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) {
+              setSelectedQuotationId(record.id);
+              openviewEstimatesModal();
+            }
+          }}
+        >
+          {text}
+        </span>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "salesQuotationNumber"),
     },
     {
       title: "Issue  Date",

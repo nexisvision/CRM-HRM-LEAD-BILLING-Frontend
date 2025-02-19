@@ -210,6 +210,20 @@ export const InvoiceList = () => {
     {
       title: "Invoice Number",
       dataIndex: "salesInvoiceNumber",
+      render: (text, record) => (
+        <span
+          className="cursor-pointer hover:underline"
+          onClick={() => {
+            // Check if user has view permission
+            if (whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) {
+              Viewfunc(record.id);
+            }
+          }}
+        >
+          {text}
+        </span>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "salesInvoiceNumber"),
     },
     {
       title: "Customer",

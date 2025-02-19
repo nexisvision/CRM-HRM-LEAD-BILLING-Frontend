@@ -200,7 +200,17 @@ const ExpensesList = () => {
         {
             title: "ItemName",
             dataIndex: "item",
-            render: (_, record) => <span>{record.item}</span>,
+            render: (text, record) => (
+                <span
+                    className="cursor-pointer hover:underline"
+                    onClick={() => {
+                        setSelectedExpense(record);
+                        openviewExpensesModal();
+                    }}
+                >
+                    {record.item}
+                </span>
+            ),
             sorter: (a, b) => utils.antdTableSorter(a, b, "item"),
         },
         {

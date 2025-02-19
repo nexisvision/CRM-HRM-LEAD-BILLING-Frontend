@@ -216,6 +216,7 @@ const curren = curr?.filter((item) => item.created_by === user);
                               {curren.map((currency) => (
                                 <Option key={currency.id} value={currency.id}>
                                   {currency.currencyCode}
+                                  ({currency.currencyIcon})
                                 </Option>
                               ))}
                             </Select>

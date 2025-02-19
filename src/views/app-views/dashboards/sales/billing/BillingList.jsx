@@ -289,8 +289,21 @@ export const BillingList = () => {
     {
       title: "billNumber",
       dataIndex: "billNumber",
-      render: (_, record) => <span>{record.billNumber}</span>,
-      sorter: (a, b) => utils.antdTableSorter(a, b, "duedate"),
+      render: (text, record) => (
+        <span
+          className=" cursor-pointer hover:underline"
+          onClick={() => {
+            // Check if user has view permission
+            if (whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) {
+              setSelectedBillingId(record.id);
+              openViewBillingModal();
+            }
+          }}
+        >
+          {record.billNumber}
+        </span>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "billNumber"),
     },
     {
       title: "vendor",

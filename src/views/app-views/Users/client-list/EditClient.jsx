@@ -5,6 +5,7 @@ import {
   message,
   Row,
   Col,
+  Select,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -16,6 +17,8 @@ import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeS
 import Upload from "antd/es/upload/Upload";
 import { UploadOutlined } from '@ant-design/icons';
 import {  QuestionCircleOutlined } from "@ant-design/icons";
+
+const { Option } = Select;
 
 const EditClient = ({ comnyid, onClose }) => {
   const navigate = useNavigate();
@@ -61,6 +64,7 @@ const EditClient = ({ comnyid, onClose }) => {
         country: clientData.Country || "",
         zipcode: clientData.Zipcode || "",
         address: clientData.address || "",
+        accountType: clientData.accountType || "",
       });
     }
   }, [fnddatas]);
@@ -106,6 +110,7 @@ const EditClient = ({ comnyid, onClose }) => {
     country: "",
     zipcode: "",
     address: "",
+    accountType: "",
   })
 
   const validationSchema = Yup.object({
@@ -123,13 +128,14 @@ const EditClient = ({ comnyid, onClose }) => {
     country: Yup.string().required("Please enter a Country."),
     zipcode: Yup.string().required("Please enter a Zipcode."),
     address: Yup.string().required("Please enter an Address."),
+    accountType: Yup.string().required("Please select an Account Type."),
   });
 
   return (
     <div className="add-job-form">
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={onSubmit}
         enableReinitialize
         validateOnSubmit={true}
@@ -266,7 +272,7 @@ const EditClient = ({ comnyid, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              {/* <Col span={12} className="mt-2">
                 <div className="form-item">
                   <label className="font-semibold">Signature <span className="text-red-500">*</span></label>
                   <Field
@@ -281,7 +287,7 @@ const EditClient = ({ comnyid, onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
 
               <Col span={12} className="mt-2">
                 <div className="form-item">
@@ -347,6 +353,31 @@ const EditClient = ({ comnyid, onClose }) => {
                     name="country"
                     component="div"
                     className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold text-gray-700">Account Type <span className="text-red-500">*</span></label>
+                  <Field name="accountType">
+                    {({ field, form }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-2"
+                        placeholder="Select Account Type"
+                        onChange={(value) => form.setFieldValue("accountType", value)}
+                      >
+                        <Option value="savings">Savings</Option>
+                        <Option value="current">Current</Option>
+                        <Option value="other">Other</Option>
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="accountType"
+                    component="div" 
+                    className="text-red-500 text-sm mt-1"
                   />
                 </div>
               </Col>
@@ -443,7 +474,7 @@ const EditClient = ({ comnyid, onClose }) => {
               <Button
                 type="primary"
                 htmlType="submit"
-                disabled={!isValid || !dirty}
+                // disabled={!isValid || !dirty}
               >
                 Save Changes
               </Button>

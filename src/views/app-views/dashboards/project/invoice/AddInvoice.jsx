@@ -769,11 +769,7 @@ const sub = subClientsss?.SubClient?.data;
                                                 </Select>
                                             </div>
 
-                                        </div>
-
-                                    </Flex>
-                                    <Flex gap="7px" className="flex">
-                                        <div className="w-full flex gap-4">
+                                            <div className="w-full flex gap-4">
                                             <div>
                                                 <Form.Item>
                                                     <Select
@@ -791,6 +787,9 @@ const sub = subClientsss?.SubClient?.data;
                                                 </Form.Item>
                                             </div>
                                         </div>
+
+                                        </div>
+
                                     </Flex>
                                 </Flex>
 
@@ -825,23 +824,6 @@ const sub = subClientsss?.SubClient?.data;
                                 </table>
                             </div>
                             {renderSummarySection()}
-                            <div className='mt-4'>
-                                <span className='block mb-2'>Add File</span>
-                                <Col span={24} >
-                                    <Upload
-                                        action="http://localhost:5500/api/users/upload-cv"
-                                        listType="picture"
-                                        accept=".pdf"
-                                        maxCount={1}
-                                        showUploadList={{ showRemoveIcon: true }}
-                                        className='border-2 flex justify-center items-center p-10'
-
-                                    >
-                                        <span className='text-xl'>Choose File</span>
-                                        {/* <CloudUploadOutlined className='text-4xl' /> */}
-                                    </Upload>
-                                </Col>
-                            </div>
                         </div>
 
                         {/* <div className='mt-4'>

@@ -591,7 +591,8 @@ const EditInvoice = ({ idd, onClose }) => {
                           key={currency.id}
                           value={currency.currencyCode}
                         >
-                          {currency.currencyName} ({currency.currencyIcon})
+                          {currency.currencyCode}
+                          ({currency.currencyIcon})
                         </Option>
                       ))}
                     </Select>

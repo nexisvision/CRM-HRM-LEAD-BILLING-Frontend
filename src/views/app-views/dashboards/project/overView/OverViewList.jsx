@@ -351,6 +351,27 @@ const OverViewList = () => {
   return (
     <>
       <div className="p-2 bg-gray-50">
+      <div className="mb-4 bg-white p-8 rounded-lg shadow">
+          <h4 className="text-2xl font-medium text-black mb-4">Project Details</h4>
+          <div className="flex flex-col items-center sm:items-start">
+                <span className="text-gray-500 font-weight-bold text-lg mb-1">Start Date</span>
+                <span className="text-gray-800 text-sm sm:text-base">
+                  {filterdata?.[0]?.startDate
+                    ? dayjs(filterdata[0].startDate).format('DD/MM/YYYY')  // Changed format here
+                    : "N/A"}
+                </span>
+              </div>
+
+              {/* End Date */}
+              <div className="flex flex-col items-center sm:items-start">
+                <span className="text-gray-500 font-weight-bold text-lg mb-1">End Date</span>
+                <span className="text-gray-800 text-sm sm:text-base">
+                  {filterdata?.[0]?.endDate
+                    ? dayjs(filterdata[0].endDate).format('DD/MM/YYYY')  // Changed format here
+                    : "N/A"}
+                </span>
+              </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-medium text-black mb-4">
@@ -437,19 +458,36 @@ const OverViewList = () => {
        
           <div className="bg-white p-6 rounded-lg shadow flex flex-col">
             <h2 className="text-xl font-medium mb-0 text-black">Client</h2>
-            <div className="flex items-center gap-4">
-             
-              <div>
-                <h3 className="f-18 f-w-500 mb-0 text-black mt-6">
-                  {/* {clientInfo.username} */}
-                  {logged.username}
-                </h3>
-                <p className="f-14 mb-0 text-lightest">
-                  {logged.email}
-                </p>
-             
+            {fndclient ? (
+              <div className="flex items-center gap-4">
+                <div className="mt-6">
+                  {/* Profile Picture with error handling */}
+                  <div className="w-16 h-16 rounded-full overflow-hidden">
+                    <img 
+                      src={fndclient?.profilePic || 'https://via.placeholder.com/64'} 
+                      alt="Client profile"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://via.placeholder.com/64';
+                      }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <h3 className="f-18 f-w-500 mb-0 text-black mt-6">
+                    {fndclient?.firstName || fndclient?.username || 'No Name Available'}
+                  </h3>
+                  <p className="f-14 mb-0 text-lightest">
+                    {fndclient?.email || 'No Email Available'}
+                  </p>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="mt-4 text-gray-500">
+                No client information available
+              </div>
+            )}
           </div>
         </div>
 
@@ -492,7 +530,7 @@ const OverViewList = () => {
                   {filterdata[0]?.budget}
                 </p>
               </div>
-              <div className="bg-white p-6 rounded-lg">
+              <div className="bg-white p-6 rounded-lg shadow">
                 <h3 className="text-gray-600 mb-2 text-lg font-semibold">
                   Hours Logged
                 </h3>
@@ -587,14 +625,15 @@ const OverViewList = () => {
         </div>
 
        
-        <div className=" mb-4 bg-white p-8  rounded-lg shadow">
-          <h4 className="text-2xl font-medium text-black ">Project Details</h4>
-          <p className="flex justify-start mt-2 text-sm font-medium">
-            Rem asperiores voluptates distinctio ab. Cum rerum veritatis
-            nesciunt libero laboriosam molestiae. Voluptates hic molestias
-            consectetur doloribus.
-          </p>
-          {/* </div> */}
+       
+         <div className="mb-4 bg-white p-8 rounded-lg shadow">
+          <h4 className="text-2xl font-medium text-black mb-4">Project Details</h4>
+          <div className="mt-4">
+            <ul className="list-disc pl-4">
+              <li dangerouslySetInnerHTML={{ __html: filterdata?.[0]?.project_description?.replace(/<[^>]*>/g, '') || 'No project description available' }}>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 

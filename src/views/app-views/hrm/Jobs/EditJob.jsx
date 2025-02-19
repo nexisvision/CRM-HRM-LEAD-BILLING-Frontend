@@ -443,6 +443,7 @@ const EditJob = ({ idd, onClose }) => {
                           {currencies?.data?.map((currency) => (
                             <Option key={currency.id} value={currency.id}>
                               {currency.currencyCode}
+                              ({currency.currencyIcon})
                             </Option>
                           ))}
                         </Select>
@@ -517,9 +518,9 @@ const EditJob = ({ idd, onClose }) => {
                     <label className="font-semibold">Job Discription <span className="text-red-500">*</span></label>
 
                     <ReactQuill
-                      value={values.endDate}
+                      value={values.description}
                       onChange={(value) => setFieldValue("description", value)}
-                      placeholder="Enter discription"
+                      placeholder="Enter description"
                       onBlur={() => setFieldTouched("description", true)}
                         className="mt-1"
                     />

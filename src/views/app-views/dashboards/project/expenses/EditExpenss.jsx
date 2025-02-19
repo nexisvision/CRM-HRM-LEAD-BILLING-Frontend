@@ -180,6 +180,7 @@ const EditExpenses = ({ idd, onClose }) => {
                             value={currency.id}
                           >
                             {currency.currencyCode}
+                            ({currency.currencyIcon})
                           </Option>
                         ))}
                       </Select>

@@ -12,8 +12,10 @@ import {
   Upload,
   Select,
   DatePicker,
+
   Modal,
 } from "antd";
+import { ErrorMessage } from "formik";
 import {
   EyeOutlined,
   DeleteOutlined,
@@ -48,7 +50,7 @@ import dayjs from "dayjs";
 
 const { Option } = Select;
 
-const EditInvoice = ({ idd, onClose }) => {
+const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
   const { id } = useParams();
   const [discountType, setDiscountType] = useState("%");
   const [loading, setLoading] = useState(false);
@@ -303,11 +305,12 @@ const EditInvoice = ({ idd, onClose }) => {
                     }
                 }
 
-                // Set currency details
+                // Set currency and update currency icon
                 if (currentInvoice.currency && curren) {
                     const selectedCurrency = curren.find(c => c.id === currentInvoice.currency);
                     if (selectedCurrency) {
-                        setSelectedCurrencyIcon(selectedCurrency.currencyIcon);
+                        form.setFieldsValue({ currency: currentInvoice.currency });
+                        setSelectedCurrencyIcon(selectedCurrency.currencyIcon || '₹');
                         setSelectedCurrencyDetails({
                             currencyCode: selectedCurrency.currencyCode,
                             currencyIcon: selectedCurrency.currencyIcon,
@@ -513,13 +516,23 @@ useEffect(() => {
     <Form.Item
       name="currency"
       label="Currency"
-      rules={[{ required: true, message: "Please select a currency" }]}
+      rules={[{ required: true, message: "Please select currency" }]}
     >
       <Select
         className="w-full"
         placeholder="Select Currency"
-        onChange={handleCurrencyChange}
-        value={currentInvoice?.currency}
+        onChange={(value) => {
+          const selectedCurrency = curren?.find(c => c.id === value);
+          if (selectedCurrency) {
+            setSelectedCurrencyIcon(selectedCurrency.currencyIcon || '₹');
+            setSelectedCurrencyDetails({
+              currencyCode: selectedCurrency.currencyCode,
+              currencyIcon: selectedCurrency.currencyIcon,
+              id: selectedCurrency.id
+            });
+            form.setFieldsValue({ currency: value });
+          }
+        }}
       >
         {curren?.map((currency) => (
           <Option key={currency.id} value={currency.id}>
@@ -735,7 +748,34 @@ useEffect(() => {
                   </Col>
 
                   <Col span={12}>
-                    {renderCurrencySelect()}
+                    <Form.Item
+                      name="currency"
+                      label="Currency"
+                      rules={[{ required: true, message: "Please select currency" }]}
+                    >
+                      <Select
+                        className="w-full"
+                        placeholder="Select Currency"
+                        onChange={(value) => {
+                          const selectedCurrency = curren?.find(c => c.id === value);
+                          if (selectedCurrency) {
+                            setSelectedCurrencyIcon(selectedCurrency.currencyIcon || '₹');
+                            setSelectedCurrencyDetails({
+                              currencyCode: selectedCurrency.currencyCode,
+                              currencyIcon: selectedCurrency.currencyIcon,
+                              id: selectedCurrency.id
+                            });
+                            form.setFieldsValue({ currency: value });
+                          }
+                        }}
+                      >
+                        {curren?.map((currency) => (
+                          <Option key={currency.id} value={currency.id}>
+                            {currency.currencyCode} ({currency.currencyIcon})
+                          </Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
                   </Col>
                 
                   <Col span={12}>
@@ -874,7 +914,7 @@ useEffect(() => {
                 </table>
               </div>
               {renderSummarySection()}
-              <div className="mt-4">
+              {/* <div className="mt-4">
                 <span className="block mb-2">Add File</span>
                 <Col span={24}>
                   <Upload
@@ -889,7 +929,7 @@ useEffect(() => {
                     <span className="text-xl">Choose File</span>
                   </Upload>
                 </Col>
-              </div>
+              </div> */}
             </div>
 
             <Form.Item className="mt-4">

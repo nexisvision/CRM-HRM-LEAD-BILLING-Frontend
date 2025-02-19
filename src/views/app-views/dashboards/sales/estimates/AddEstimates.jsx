@@ -162,18 +162,6 @@ const AddEstimates = ({ onClose }) => {
 
   const navigate = useNavigate();
 
-
-  // Calculate total tax
-  const calculateTotalTax = () => {
-    return tableData.reduce((sum, row) => {
-      const quantity = parseFloat(row.quantity) || 0;
-      const price = parseFloat(row.price) || 0;
-      const tax = parseFloat(row.tax) || 0;
-      const baseAmount = quantity * price;
-      return sum + ((baseAmount * tax) / 100);
-    }, 0);
-  };
-
   // Calculate subtotal (sum of all row amounts before discount)
   const calculateSubTotal = () => {
     return tableData.reduce((sum, row) => {

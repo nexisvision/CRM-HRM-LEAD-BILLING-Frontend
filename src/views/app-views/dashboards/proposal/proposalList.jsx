@@ -130,8 +130,8 @@ const ProposalList = () => {
       
       // Enrich filtered proposals with lead and deal titles
       const enrichedData = filteredProposals.map((proposal) => {
-        const lead = Leads.find((l) => l.id === proposal.lead_title); // Match lead by ID
-        const deal = Deals.find((d) => d.id === proposal.deal_title);
+        const lead = Leads?.find((l) => l.id === proposal.lead_title); // Match lead by ID
+        const deal = Deals?.find((d) => d.id === proposal.deal_title);
 
         return {
           ...proposal,
@@ -297,7 +297,7 @@ const ProposalList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -309,7 +309,7 @@ const ProposalList = () => {
             <span>View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
      
      
 
@@ -360,11 +360,11 @@ const ProposalList = () => {
       dataIndex: "deal_title",
       sorter: (a, b) => a.deal_title.length - b.deal_title.length,
     },
-    {
-      title: "calculatedTax",
-      dataIndex: "calculatedTax",
-      sorter: (a, b) => a.calculatedTax.length - b.calculatedTax.length,
-    },
+    // {
+    //   title: "calculatedTax",
+    //   dataIndex: "calculatedTax",
+    //   sorter: (a, b) => a.calculatedTax.length - b.calculatedTax.length,
+    // },
 
 
     {
@@ -383,11 +383,11 @@ const ProposalList = () => {
       render: (date) => (date ? dayjs(date).format("DD-MM-YYYY") : "N/A"),
       sorter: (a, b) => a.valid_till.length - b.valid_till.length,
     },
-    {
-      title: "created_by ",
-      dataIndex: "created_by",
-      sorter: (a, b) => a.created_by.length - b.created_by.length,
-    },
+    // {
+    //   title: "created_by ",
+    //   dataIndex: "created_by",
+    //   sorter: (a, b) => a.created_by.length - b.created_by.length,
+    // },
 
     {
       title: "Action",

@@ -441,6 +441,7 @@ const AddJob = ({ onClose }) => {
                           {currencies?.data?.map((currency) => (
                             <Option key={currency.id} value={currency.id}>
                               {currency.currencyCode}
+                              ({currency.currencyIcon})
                             </Option>
                           ))}
                         </Select>

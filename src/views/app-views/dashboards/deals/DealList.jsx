@@ -235,7 +235,7 @@ const DealList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -247,7 +247,7 @@ const DealList = () => {
             <span className="">View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
       {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
@@ -335,12 +335,12 @@ const DealList = () => {
         <div className="d-flex">
           <AvatarStatus 
             size={30}
-            name={record.clientName}
+            name={record.firstName}
           />
         </div>
       ),
       sorter: {
-        compare: (a, b) => (a.clientName || '').localeCompare(b.clientName || ''),
+        compare: (a, b) => (a.firstName || '').localeCompare(b.firstName || ''),
       },
     },
     {

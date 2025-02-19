@@ -176,7 +176,18 @@ const EstimatesList = () => {
 	const tableColumns = [
 		{
 			title: 'Estimate Number',
-			dataIndex: 'quotationNumber'
+			dataIndex: 'quotationNumber',
+			render: (text, record) => (
+				<span
+					className=" cursor-pointer hover:underline"
+					onClick={() => {
+						setSelectedEstimateId(record.id);
+						openviewEstimatesModal();
+					}}
+				>
+					{text}
+				</span>
+			)
 		},
 		{
 			title: 'Date',

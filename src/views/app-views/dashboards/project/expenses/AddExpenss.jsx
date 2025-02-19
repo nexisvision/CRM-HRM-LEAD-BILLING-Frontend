@@ -154,6 +154,7 @@ const curren = curr?.filter((item) => item.created_by === user);
                                                         value={currency.id}
                                                     >
                                                         {currency.currencyCode}
+                                                        ({currency.currencyIcon})
                                                     </Option>
                                                 ))}
                                             </Select>

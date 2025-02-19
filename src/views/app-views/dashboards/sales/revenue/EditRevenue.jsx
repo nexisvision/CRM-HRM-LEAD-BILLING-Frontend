@@ -179,7 +179,7 @@ const EditRevenue = ({ idd, onClose }) => {
     description: Yup.string().required("Please enter a description."),
     category: Yup.string().required("Please select a category."),
     currency: Yup.string().required("Please select a currency."),
-    paymentReceipt: Yup.string().optional("Please enter a payment receipt."),
+    paymentReceipt: Yup.mixed().nullable(),
   });
 
   return (
@@ -391,6 +391,7 @@ const EditRevenue = ({ idd, onClose }) => {
                                 currencies.map((currency) => (
                                   <Option key={currency.id} value={currency.id}>
                                     {currency.currencyCode}
+                                    ({currency.currencyIcon})
                                   </Option>
                                 ))
                               ) : (
@@ -410,12 +411,14 @@ const EditRevenue = ({ idd, onClose }) => {
                   <Col span={12} className="mt-3">
                     <div className="form-item">
                       <label className="font-semibold">Payment Receipt</label>
-                      <Field
-                        name="paymentReceipt"
+                      <input
                         type="file"
-                        // as={Input}
-                        placeholder="Enter payment receipt"
-                        className="mt-2"
+                        onChange={(event) => {
+                          const file = event.currentTarget.files[0];
+                          // Store the file name as a string
+                          setFieldValue("paymentReceipt", file ? file.name : "");
+                        }}
+                        className="mt-2 w-full"
                       />
                       <ErrorMessage
                         name="paymentReceipt"

@@ -277,12 +277,12 @@ export const TicketList = () => {
     // 	},
     // },
     {
-      title: "Date",
-      dataIndex: "date",
+      title: "Start Date", 
+      dataIndex: "createdAt",
       render: (_, record) => (
-        <span>{dayjs.unix(record.date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
+        <span>{dayjs(record.createdAt).format(DATE_FORMAT_DD_MM_YYYY)}</span>
       ),
-      sorter: (a, b) => utils.antdTableSorter(a, b, "date"),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "createdAt"),
     },
 
     {

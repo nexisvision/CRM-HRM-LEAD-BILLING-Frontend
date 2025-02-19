@@ -74,7 +74,7 @@ const currenciesState = useSelector((state) => state.currencies);
 
   const AllLoggedData = useSelector((state) => state.user);
   const loggedInUserId = AllLoggedData?.loggedInUser?.id;
-  const countries = useSelector((state) => state.countries.countries?.data || []);
+  const countries = useSelector((state) => state.countries.countries || []);
 
   const fetchLables = async (lableType, setter) => {
     try {
@@ -298,7 +298,7 @@ const currenciesState = useSelector((state) => state.currencies);
     <div className="add-job-form">
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({
@@ -391,10 +391,13 @@ const currenciesState = useSelector((state) => state.currencies);
                     </Select>
                     <Field
                       name="telephone"
-                      type="text"
                       as={Input}
                       style={{ width: '70%' }}
                       placeholder="Enter Telephone"
+                     onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, '');
+              setFieldValue('telephone', value.toString());
+            }}
                     />
                   </div> 
                   <ErrorMessage
@@ -492,7 +495,7 @@ const currenciesState = useSelector((state) => state.currencies);
                 <div className="form-item">
                   <label className="font-semibold mb-2">Assigned <span className="text-rose-500">*</span></label>
                   <div className="flex gap-2">
-                    <Field name="assigned">
+                    <Field name="employee">
                       {({ field, form }) => (
                         <Select
                           {...field}
@@ -519,7 +522,7 @@ const currenciesState = useSelector((state) => state.currencies);
                     </Field>
                   </div>
                   <ErrorMessage
-                    name="assigned"
+                    name="employee"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />

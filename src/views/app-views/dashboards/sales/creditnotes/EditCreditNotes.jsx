@@ -10,6 +10,7 @@ import {
   getcreditnote,
 } from "./CustomerReducer/CreditnoteSlice";
 import moment from "moment/moment";
+import dayjs from "dayjs";
 
 const EditCrediteNotes = ({ idd, onClose }) => {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ const EditCrediteNotes = ({ idd, onClose }) => {
 
   useEffect(() => {
     if (fnd) {
-      const formattedDate = fnd?.date ? new Date(fnd.date) : null;
+      const formattedDate = fnd?.date ? dayjs(fnd.date) : null;
       setInitialValues({
         amount: fnd.amount,
         date: formattedDate,
@@ -47,7 +48,7 @@ const EditCrediteNotes = ({ idd, onClose }) => {
       dispatch(getcreditnote());
       onClose();
       console.log("Submitted values:", values);
-      message.success("Job added successfully!");
+      message.success("Credit Note updated successfully!");
     });
   };
 
@@ -89,13 +90,31 @@ const EditCrediteNotes = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={12}>
+                {/* <Col span={12}>
                   <div className="form-item">
                     <label className="font-semibold  mt-1">Issue Date <span className="text-red-500">*</span></label>
                     <DatePicker
                       className="w-full"
                       format="DD-MM-YYYY"
                       value={values.date ? moment(values.date) : null} // Convert to moment object
+                      onChange={(date) => setFieldValue("date", date)}
+                      onBlur={() => setFieldTouched("date", true)}
+                    />
+                    <ErrorMessage
+                      name="date"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col> */}
+
+                <Col span={12}>
+                  <div className="form-item">
+                    <label className="font-semibold">Issue Date <span className="text-red-500">*</span></label>
+                    <DatePicker
+                      className="w-full"
+                      format="DD-MM-YYYY"
+                      value={values.date ? dayjs(values.date) : null}
                       onChange={(date) => setFieldValue("date", date)}
                       onBlur={() => setFieldTouched("date", true)}
                     />

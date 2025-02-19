@@ -433,6 +433,7 @@ const AddRevenue = ({ onClose }) => {
                                 currencies.map((currency) => (
                                   <Option key={currency.id} value={currency.id}>
                                     {currency.currencyCode}
+                                    ({currency.currencyIcon})
                                   </Option>
                                 ))
                               ) : (

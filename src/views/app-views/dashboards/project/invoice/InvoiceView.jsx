@@ -12,6 +12,7 @@ import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/Co
 import signatureimg from '../../../../../assets/svg/signatureimg1.png';
 // import { SubClient } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice"
 import { getsignaturesss } from 'views/app-views/setting/esignature/EsignatureReducers/EsignatureSlice';
+import { getgeneralsettings } from '../../../setting/general/generalReducer/generalSlice';
 
 import { useParams } from 'react-router-dom';
 
@@ -28,6 +29,8 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     // const invoiceDataa = Array.isArray(invoices) ? invoices.find(invoice => invoice.id === idd) : null;
 
     const [parsedInvoice, setParsedInvoice] = useState({ items: [] });
+
+    const [generalSettings, setGeneralSettings] = useState(null);
 
 
     // console.log("ssssssssss", idd);
@@ -53,9 +56,16 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
 
     const clientDataa = allclient.find((SubClient) => SubClient.id === invoiceDataa?.client);
 
+    const generalSettingsData = useSelector((state) => state.generalsetting.generalsetting.data);
+
 
     // console.log("ppppppppppppp", clientDataa, "clientDataa");
     // const clientDataa = allclient.find((SubClient) => SubClient.id === id);
+
+     // Add this useEffect to fetch general settings
+     useEffect(() => {
+        dispatch(getgeneralsettings());
+    }, [dispatch]);
 
     // UseEffect to fetch client data
     useEffect(() => {
@@ -67,6 +77,13 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
         dispatch(getAllInvoices(id)); // Fetch all invoices for invoice ID
     }, [dispatch, id]);
 
+
+     // Update useEffect to set general settings
+     useEffect(() => {
+        if (generalSettingsData && generalSettingsData.length > 0) {
+            setGeneralSettings(generalSettingsData[0]);
+        }
+    }, [generalSettingsData]);
 
 
     useEffect(() => {
@@ -303,7 +320,15 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                     <div className="flex justify-between items-center">
                         <h1 className="text-3xl text-gray-700">Invoice</h1>
                         <div className="flex items-center">
-                            <span className="text-xl ml-2 text-indigo-500">Company Logo</span>
+                        {generalSettings?.companylogo ? (
+                        <img 
+                            src={generalSettings.companylogo} 
+                            alt="Company Logo" 
+                            className="h-16 mx-auto"
+                        />
+                    ) : (
+                        <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                    )}
                         </div>
                     </div>
                 </div>
@@ -556,10 +581,19 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                 </div>
                     <div className='mt-4'>
                         <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
+                        {generalSettings?.termsandconditions ? (
+                        <div 
+                            dangerouslySetInnerHTML={{ 
+                                __html: generalSettings.termsandconditions 
+                            }} 
+                            className="text-gray-600 text-sm"
+                        />
+                    ) : (
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
                             <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
                             <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
                         </ol>
+                    )}
                     </div>
 
                 <div className="text-center mt-8">
@@ -577,7 +611,17 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
 
         return (
             <div className="bg-white rounded-lg shadow-lg p-8">
-                <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                <div>
+                 {generalSettings?.companylogo ? (
+                        <img 
+                            src={generalSettings.companylogo} 
+                            alt="Company Logo" 
+                            className="h-16 "
+                        />
+                    ) : (
+                        <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                    )}
+                </div>
                 <div className="d-md-flex justify-content-md-between">
                     {/* Company Details Section */}
                     <div className='text-left'>
@@ -812,10 +856,19 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                 </div>
                     <div className='mt-4'>
                         <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
+                        {generalSettings?.termsandconditions ? (
+                        <div 
+                            dangerouslySetInnerHTML={{ 
+                                __html: generalSettings.termsandconditions 
+                            }} 
+                            className="text-gray-600 text-sm"
+                        />
+                    ) : (
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
-                            <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
-                            <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
+                            <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
+                            <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
                         </ol>
+                    )}
                     </div>
 
                 <div className="text-center font-semibold mt-8">
@@ -832,7 +885,17 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
             <div className="bg-white p-8 border-2 border-gray-200">
                 {/* Header Section */}
                 <div className="flex flex-col items-center mb-8 text-center">
-                    <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                   <div>
+                    { generalSettings?.companylogo ? (
+                        <img 
+                            src={generalSettings.companylogo} 
+                            alt="Company Logo" 
+                            className="h-16 mx-auto"
+                        />
+                    ) : (
+                        <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                    )}
+                    </div>
                     <div className="text-gray-600 mt-4">
                         <div className='flex items-center'>
                             <span className=" me-2 font-weight-semibold ">Invoice Num:</span>
@@ -1058,10 +1121,19 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                 </div>
                     <div className='mt-4'>
                         <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
+                        {generalSettings?.termsandconditions ? (
+                        <div 
+                            dangerouslySetInnerHTML={{ 
+                                __html: generalSettings.termsandconditions 
+                            }} 
+                            className="text-gray-600 text-sm"
+                        />
+                    ) : (
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
-                            <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
-                            <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
+                            <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
+                            <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
                         </ol>
+                    )}
                     </div>
                 <div className="text-center font-semibold mt-8">
                     <p>Thanks for your Business</p>
@@ -1078,7 +1150,17 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                 {/* Header */}
                 <div className="flex justify-between items-center mb-12">
                     <div className='text-left'>
-                        <h1 className="text-3xl font-light text-gray-700">INVOICE</h1>
+                    <div>
+                    { generalSettings?.companylogo ? (
+                        <img 
+                            src={generalSettings.companylogo} 
+                            alt="Company Logo" 
+                            className="h-16"
+                        />
+                    ) : (
+                        <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                    )}
+                    </div>
                         <div className="text-gray-600 mt-2">
                         <div className='flex items-center'>
                             <span className=" me-2 font-weight-semibold ">Invoice Num:</span>
@@ -1304,10 +1386,19 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                 </div>
                     <div className='mt-4'>
                         <h4 className="font-weight-semibold text-lg mb-2">Terms & Conditions:</h4>
+                        {generalSettings?.termsandconditions ? (
+                        <div 
+                            dangerouslySetInnerHTML={{ 
+                                __html: generalSettings.termsandconditions 
+                            }} 
+                            className="text-gray-600 text-sm"
+                        />
+                    ) : (
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
-                            <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
-                            <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
+                            <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
+                            <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
                         </ol>
+                    )}
                     </div>
                 <div className="text-center font-semibold mt-8">
                     <p>Thanks for your Business</p>

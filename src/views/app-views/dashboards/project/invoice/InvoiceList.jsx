@@ -205,8 +205,15 @@ export const InvoiceList = () => {
       title: "Invoice Number",
       dataIndex: "invoiceNumber",
       sorter: (a, b) => a.invoiceNumber.localeCompare(b.invoiceNumber),
+      render: (text, record) => (
+        <span
+          className="cursor-pointer hover:underline"
+          onClick={() => Viewfunc(record.id)}
+        >
+          {text}
+        </span>
+      ),
     },
-     
     {
       title: "Issue Date",
       dataIndex: "issueDate",

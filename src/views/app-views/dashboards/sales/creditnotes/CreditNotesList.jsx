@@ -245,6 +245,19 @@ const CreditNotesList = () => {
     {
       title: "Invoice Number",
       dataIndex: "salesInvoiceNumber",
+      render: (text, record) => (
+        <span
+          className=" cursor-pointer hover:underline"
+          onClick={() => {
+            // Check if user has view permission
+            if (whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) {
+              handleView(record.id);
+            }
+          }}
+        >
+          {text}
+        </span>
+      ),
       sorter: {
         compare: (a, b) => {
           const numA = a.salesInvoiceNumber || '';
@@ -374,7 +387,7 @@ const CreditNotesList = () => {
         </div>
       </Card>
 
-      <Card>
+     
         <Modal
           title="Add Credite Notes"
           visible={isAddCreditNotesModalVisible}
@@ -407,7 +420,7 @@ const CreditNotesList = () => {
         >
           <ViewCreditNotes creditNoteId={selectedCreditNoteId} onClose={closeViewCreditNotesModal} />
         </Modal>
-      </Card>
+
     </>
   );
 };

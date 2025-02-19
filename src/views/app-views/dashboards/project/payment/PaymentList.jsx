@@ -193,13 +193,22 @@ const PaymentList = () => {
     {
       title: "Project",
       dataIndex: "project_name",
-      render: (_, record) => getProjectName(record.project_name),
+      render: (_, record) => (
+        <span 
+          className=" cursor-pointer hover:underline"
+          onClick={() => {
+            setSelectedPayment(record);
+            openViewPaymentModal();
+          }}
+        >
+          {getProjectName(record.project_name)}
+        </span>
+      ),
       sorter: (a, b) => {
         const nameA = getProjectName(a.project_name);
         const nameB = getProjectName(b.project_name);
         return nameA.localeCompare(nameB);
       },
-
     },
     {
       title: "Invoice",
@@ -350,7 +359,7 @@ const PaymentList = () => {
           />
         </div>
       {/* </Card> */}
-      <Card>
+     
         <Modal
           title="Add Payment"
           visible={isAddPaymentModalVisible}
@@ -375,19 +384,18 @@ const PaymentList = () => {
 				</Modal> */}
 
         <Modal
-          title="Payment Details"
+          title="View Payment"
           visible={isViewPaymentModalVisible}
-          onCancel={() => {
-            closeViewPaymentModal();
-            setSelectedPayment(null);
-          }}
+          onCancel={closeViewPaymentModal}
           footer={null}
           width={800}
-          className="mt-[-70px]"
         >
-          <ViewPayment data={selectedPayment} onClose={closeViewPaymentModal} />
+          <ViewPayment 
+            data={selectedPayment} 
+            onClose={closeViewPaymentModal} 
+          />
         </Modal>
-      </Card>
+   
     </>
   );
 };

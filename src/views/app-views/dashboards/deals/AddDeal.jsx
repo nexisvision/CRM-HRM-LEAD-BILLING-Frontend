@@ -275,6 +275,7 @@ const AddDeal = ({ onClose }) => {
                             form.setFieldValue(
                               "currency",
                               selectedCurrency?.currencyCode || ""
+                              
                             );
                           }}
                         >
@@ -282,6 +283,7 @@ const AddDeal = ({ onClose }) => {
                             currencies.data.map((currency) => (
                               <Option key={currency.id} value={currency.id}>
                                 {currency.currencyCode}
+                                ({currency.currencyIcon})
                               </Option>
                             ))
                           ) : (

@@ -35,6 +35,18 @@ function ViewPayment({ data }) {
         <div className="bg-white shadow rounded-lg p-6 space-y-4 w-full">
             <table className="table">
                 <tbody>
+                <tr className='text-base grid grid-cols-2'>
+                        <td className='text-[#99a5b5] font-semibold p-2'>Invoice Number</td>
+                        <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
+                            {invoiceNumber}
+                        </td>
+                    </tr>
+                    <tr className='text-base grid grid-cols-2'>
+                        <td className='text-[#99a5b5] font-semibold p-2'>Project Name</td>
+                        <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
+                            {projectName}
+                        </td>
+                    </tr>
                     <tr className='text-base grid grid-cols-2'>
                         <td className='text-[#99a5b5] font-semibold p-2'>Amount</td>
                         <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
@@ -47,18 +59,7 @@ function ViewPayment({ data }) {
                             {data?.paidOn ? dayjs(data.paidOn).format('DD-MM-YYYY') : '--'}
                         </td>
                     </tr>
-                    <tr className='text-base grid grid-cols-2'>
-                        <td className='text-[#99a5b5] font-semibold p-2'>Invoice Number</td>
-                        <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
-                            {invoiceNumber}
-                        </td>
-                    </tr>
-                    <tr className='text-base grid grid-cols-2'>
-                        <td className='text-[#99a5b5] font-semibold p-2'>Project Name</td>
-                        <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
-                            {projectName}
-                        </td>
-                    </tr>
+                    
                     <tr className='text-base grid grid-cols-2'>
                         <td className='text-[#99a5b5] font-semibold p-2'>Currency</td>
                         <td className='text-[#5b676d] font-medium p-2 hover:text-black'>

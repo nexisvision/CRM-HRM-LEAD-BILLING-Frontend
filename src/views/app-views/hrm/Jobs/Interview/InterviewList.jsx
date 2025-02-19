@@ -86,7 +86,7 @@ const CustomCalendar = ({ interviewData, onDeleteInterview, onDateSelect }) => {
   const renderInterviewBadge = (interview) => {
     const timeStr = formatInterviewTime(interview.startTime);
     const type = interview.interviewType === 'Online' ? 'Video' : 'Phone';
-    const text = `${timeStr} ${type} Interv${type === 'Video' ? 'i' : 'ie'}`;
+    const text = `${timeStr} ${interview.interviewer}`;
     return (
       <div key={interview.id} className="interview-badge">
         {text}

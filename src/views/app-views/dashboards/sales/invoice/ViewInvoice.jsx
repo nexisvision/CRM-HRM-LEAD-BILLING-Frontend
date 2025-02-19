@@ -13,6 +13,7 @@ import { getInvoice } from './InvoiceReducer/InvoiceSlice';
 import { Getcus } from '../customer/CustomerReducer/CustomerSlice';
 import signatureimg from '../../../../../assets/svg/signatureimg1.png';
 import { getsignaturesss } from 'views/app-views/setting/esignature/EsignatureReducers/EsignatureSlice';
+import { getgeneralsettings } from '../../../setting/general/generalReducer/generalSlice';
 
 
 const { Column } = Table;
@@ -25,6 +26,7 @@ const ViewInvoice = ({idd, onClose}) => {
     const [template, setTemplate] = useState('rendertemplate');
     const [parsedInvoice, setParsedInvoice] = useState({ items: [] });
     const [customerData, setCustomerData] = useState({});
+    const [generalSettings, setGeneralSettings] = useState(null);
 
     // const { id } = useParams();
     // const [idd, setIdd] = useState("");
@@ -35,6 +37,11 @@ const ViewInvoice = ({idd, onClose}) => {
     useEffect(()=>{
         dispatch(Getcus())
     },[])
+
+     // Add this useEffect to fetch general settings
+     useEffect(() => {
+        dispatch(getgeneralsettings());
+    }, [dispatch]);
     
 
   // Get invoice data
@@ -45,6 +52,9 @@ const ViewInvoice = ({idd, onClose}) => {
 //   const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 //   const customerData = allCustomers.find(customers => customers.id === invoiceData.customer);
 const allCustomers = useSelector((state) => state?.customers?.customers?.data);
+
+ // Add this selector to get general settings data
+ const generalSettingsData = useSelector((state) => state.generalsetting.generalsetting.data);
 // const customerData = allCustomers?.find(customer => customer.related_id === invoiceData.related_id) || {};
 
   console.log(customerData, "customerData");
@@ -81,6 +91,13 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
       useEffect(() => {
     dispatch(Getcus());
   }, []);
+
+   // Update useEffect to set general settings
+   useEffect(() => {
+    if (generalSettingsData && generalSettingsData.length > 0) {
+        setGeneralSettings(generalSettingsData[0]);
+    }
+}, [generalSettingsData]);
 
 //   useEffect(() => {
 //     if (invoiceData?.items) {
@@ -360,7 +377,15 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     <div className="flex justify-between items-center">
                         <h1 className="text-3xl text-gray-700">Invoice</h1>
                         <div className="flex items-center">
-                            <span className="text-xl ml-2 text-indigo-500"> Company Logo</span>
+                        {generalSettings?.companylogo ? (
+                        <img 
+                            src={generalSettings.companylogo} 
+                            alt="Company Logo" 
+                            className="h-16 mx-auto"
+                        />
+                    ) : (
+                        <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                    )}
                         </div>
                     </div>
                 </div>
@@ -541,10 +566,19 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                 {/* </div> */}
                 <div>
                         <h4 className="font-semibold text-lg mb-2">Terms & Conditions:</h4>
+                        {generalSettings?.termsandconditions ? (
+                        <div 
+                            dangerouslySetInnerHTML={{ 
+                                __html: generalSettings.termsandconditions 
+                            }} 
+                            className="text-gray-600 text-sm"
+                        />
+                    ) : (
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
-                            <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
-                            <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
+                            <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
+                            <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
                         </ol>
+                    )}
                     </div>
                 </div>
                 <div className="text-center font-semibold mt-8">
@@ -561,7 +595,17 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
         return (
             <div className="bg-white rounded-lg shadow-lg p-8">
-                <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                <div>
+                {generalSettings?.companylogo ? (
+                        <img 
+                            src={generalSettings.companylogo} 
+                            alt="Company Logo" 
+                            className="h-16"
+                        />
+                    ) : (
+                        <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                    )}
+                </div>
                 <div className="d-md-flex justify-content-md-between mt-4">
                     {/* Company Details Section */}
                     <div className='text-left'>
@@ -727,10 +771,19 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     {/* </div> */}
                     <div>
                         <h4><span className="font-weight-semibold text-lg">Terms & Conditions:</span></h4>
+                        {generalSettings?.termsandconditions ? (
+                        <div 
+                            dangerouslySetInnerHTML={{ 
+                                __html: generalSettings.termsandconditions 
+                            }} 
+                            className="text-gray-600 text-sm"
+                        />
+                    ) : (
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
-                            <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
-                            <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
+                            <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
+                            <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
                         </ol>
+                    )}
                     </div>
                 </div>
                 <div className="text-center font-semibold mt-8">
@@ -748,7 +801,17 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
             <div className="bg-white p-8 border-2 border-gray-200">
                 {/* Header Section */}
                 <div className="flex flex-col items-center mb-8 text-center">
-                    <span className="text-2xl font-bold text-indigo-600"> Company Logo</span>
+                    <div>
+                {generalSettings?.companylogo ? (
+                        <img 
+                            src={generalSettings.companylogo} 
+                            alt="Company Logo" 
+                            className="h-16 mx-auto"
+                        />
+                    ) : (
+                        <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                    )}
+                    </div>
                     <div className="text-gray-600 mt-2">
                         <div className='flex'>
                             <span className="mb-1 me-2 font-weight-semibold">Invoice Number :</span>
@@ -919,10 +982,19 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     </div>
                     <div>
                         <h4 className=""><span className="font-weight-semibold text-lg">Terms & Conditions:</span></h4>
+                        {generalSettings?.termsandconditions ? (
+                        <div 
+                            dangerouslySetInnerHTML={{ 
+                                __html: generalSettings.termsandconditions 
+                            }} 
+                            className="text-gray-600 text-sm"
+                        />
+                    ) : (
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
-                            <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
-                            <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
+                            <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
+                            <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
                         </ol>
+                    )}
                     </div>
                 </div>
                 <div className="text-center font-semibold mt-8">
@@ -940,7 +1012,17 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                 {/* Header */}
                 <div className="flex justify-between items-center mb-12">
                     <div className='text-left'>
-                        <h1 className="text-3xl font-light text-gray-700">INVOICE</h1>
+                    <div>
+                            {generalSettings?.companylogo ? (
+                                <img
+                                    src={generalSettings.companylogo}
+                                    alt="Company Logo"
+                                    className="h-16"
+                                />
+                            ) : (
+                                <span className="text-2xl font-bold text-indigo-600">Company Logo</span>
+                            )}
+                </div>
                         <div className="text-gray-600 mt-2">
                             <div className='flex'>
                                 <span className="mb-1 me-2 font-weight-semibold">Invoice Number:</span>
@@ -1113,10 +1195,19 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     </div>
                 <div>
                         <h4><span className="font-weight-semibold text-lg">Terms & Conditions:</span></h4>
+                        {generalSettings?.termsandconditions ? (
+                        <div 
+                            dangerouslySetInnerHTML={{ 
+                                __html: generalSettings.termsandconditions 
+                            }} 
+                            className="text-gray-600 text-sm"
+                        />
+                    ) : (
                         <ol className="list-decimal list-inside text-gray-600 text-sm space-y-1">
-                            <li>This is a GST-based invoice bill, which is applicable for TDS Deduction.</li>
-                            <li>We are not the manufacturers; the company will stand for warranty as per their terms and conditions.</li>
+                            <li>This is a GST based invoice bill,Which is applicable for TDS Deduction</li>
+                            <li>We are not the manufactures, company will stand for warranty as per their terms and conditions.</li>
                         </ol>
+                    )}
                     </div>
                 </div>
                 <div className="text-center font-semibold mt-8">

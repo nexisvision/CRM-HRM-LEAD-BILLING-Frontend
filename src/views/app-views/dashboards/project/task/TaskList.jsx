@@ -281,13 +281,13 @@ export const TaskList = () => {
         compare: (a, b) => a.task.length - b.task.length,
       },
     },
-    {
-      title: "Completed On",
-      dataIndex: "taskDate",
-      sorter: {
-        compare: (a, b) => a.completedon.length - b.completedon.length,
-      },
-    },
+    // {
+    //   title: "Completed On",
+    //   dataIndex: "taskDate",
+    //   sorter: {
+    //     compare: (a, b) => a.completedon.length - b.completedon.length,
+    //   },
+    // },
     {
       title: "Priority",
       dataIndex: "priority",
