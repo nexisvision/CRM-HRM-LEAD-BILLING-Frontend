@@ -52,17 +52,23 @@ const EditJobApplication = ({ idd, onClose }) => {
     dispatch(getjobapplication());
   }, []);
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values, { resetForm }) => {
     try {
-      dispatch(editjobapplication({ idd, values })).then(() => {
+      const formData = new FormData();
+      // Append all values to formData
+      for (const key in values) {
+        formData.append(key, values[key]);
+      }
+
+      dispatch(editjobapplication({ idd, formData })).then(() => {
         dispatch(getjobapplication());
+        message.success("Job application updated successfully!");
+        resetForm();
         onClose();
-        // message.success("Form submitted successfully");
       });
-      // message.success("Job application added successfully!");
     } catch (error) {
       console.error("Submission error:", error);
-      // message.error("An error occurred while submitting the job application.");
+      message.error("An error occurred while updating the job application.");
     }
   };
   const [initialValues, setInitialValues] = useState({
@@ -79,6 +85,8 @@ const EditJobApplication = ({ idd, onClose }) => {
     cover_letter: "",
     cv: null,
   });
+  const [cvFileList, setCvFileList] = useState([]);
+
   const validationSchema = Yup.object({
     job: Yup.string().required("Please select a job."),
     name: Yup.string().required("Please enter a name."),
@@ -109,280 +117,298 @@ const EditJobApplication = ({ idd, onClose }) => {
         onSubmit={onSubmit}
         enableReinitialize
       >
-        {({ values, setFieldValue, setFieldTouched, handleSubmit }) => (
-          <Form
-            onSubmit={handleSubmit}
-            style={{
-              padding: "20px",
-              background: "#fff",
-              borderRadius: "8px",
-            }}
-          >
-            <Row gutter={16}>
-              {/* Job */}
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">job <span className="text-red-500">*</span></label>
-                  <Field name="job">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        placeholder="Select job"
-                        loading={!fnddataa} // Loading state
-                        onChange={(value) => setFieldValue("job", value)}
-                        value={values.customer}
-                        onBlur={() => setFieldTouched("job", true)}
-                      >
-                        {fnddataa && fnddataa.length > 0 ? (
-                          fnddataa.map((client) => (
-                            <Option key={client.id} value={client.id}>
-                              {client.title || "Unnamed job"}
+        {({ values, setFieldValue, setFieldTouched, handleSubmit }) => {
+          const handleCvChange = ({ file }) => {
+            setCvFileList([file]);
+            setFieldValue('cv', file);
+          };
+
+          return (
+            <Form
+              onSubmit={handleSubmit}
+              style={{
+                padding: "20px",
+                background: "#fff",
+                borderRadius: "8px",
+              }}
+            >
+              <Row gutter={16}>
+                {/* Job */}
+                <Col span={12}>
+                  <div className="form-item">
+                    <label className="font-semibold">job <span className="text-red-500">*</span></label>
+                    <Field name="job">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-1"
+                          placeholder="Select job"
+                          loading={!fnddataa} // Loading state
+                          onChange={(value) => setFieldValue("job", value)}
+                          value={values.customer}
+                          onBlur={() => setFieldTouched("job", true)}
+                        >
+                          {fnddataa && fnddataa.length > 0 ? (
+                            fnddataa.map((client) => (
+                              <Option key={client.id} value={client.id}>
+                                {client.title || "Unnamed job"}
+                              </Option>
+                            ))
+                          ) : (
+                            <Option value="" disabled>
+                              No job available
                             </Option>
-                          ))
-                        ) : (
-                          <Option value="" disabled>
-                            No job available
-                          </Option>
-                        )}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="customer"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              {/* Name */}
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Name <span className="text-red-500">*</span></label>
-                  <Field name="name" as={Input} placeholder="Enter Name"  className="w-full mt-1"/>
-                  <ErrorMessage
-                    name="name"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              {/* Email */}
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Email <span className="text-red-500">*</span></label>
-                  <Field name="email" as={Input} placeholder="Enter Email"  className="w-full mt-1"/>
-                  <ErrorMessage
-                    name="email"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              {/* Phone */}
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
-                  <div className="flex">
-                    <Select
-                      style={{ width: '30%', marginRight: '8px' }}
-                      placeholder="Code"
-                      name="phoneCode"
-                      className="w-full mt-1"
-                      onChange={(value) => setFieldValue('phoneCode', value)}
-                    >
-                      {countries.map((country) => (
-                        <Option key={country.id} value={country.phoneCode}>
-                          (+{country.phoneCode})
-                        </Option>
-                      ))}
-                    </Select>
-                    <Field
-                      name="phone"
-                      as={Input}
-                      type="number"
-                      style={{ width: '70%' }}
-                      placeholder="Enter Phone"
+                          )}
+                        </Select>
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="customer"
+                      component="div"
+                      className="error-message text-red-500 my-1"
                     />
                   </div>
-                  <ErrorMessage
-                    name="phone"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              {/* Location */}
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Location <span className="text-red-500">*</span></label>
-                  <Field
-                    name="location"
-                    as={Input}
-                    placeholder="Enter Location"
-                    className="w-full mt-1"
-                  />
-                  <ErrorMessage
-                    name="location"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              {/* Total Experience */}
-              <Col span={12}  className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Total Experience <span className="text-red-500">*</span></label>
-                  <Select
-                    placeholder="Select Total Experience"
-                    value={values.total_experience}
-                    onChange={(value) =>
-                      setFieldValue("total_experience", value)
-                    }
-                    className="w-full mt-1"
-                  >
-                    <Option value="0-1">0-1 Years</Option>
-                    <Option value="1-3">1-3 Years</Option>
-                    <Option value="3-5">3-5 Years</Option>
-                    <Option value="5+">5+ Years</Option>
-                  </Select>
-                  <ErrorMessage
-                    name="total_experience"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              {/* Current Location */}
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Current Location <span className="text-red-500">*</span></label>
-                  <Field
-                    name="current_location"
-                    as={Input}
-                    placeholder="Enter Current Location"
-                    className="w-full mt-1"
-                  />
-                  <ErrorMessage
-                    name="current_location"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              {/* Notice Period */}
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Notice Period <span className="text-red-500">*</span></label>
-                  <Select
-                    placeholder="Select Notice Period"
-                    value={values.notice_period}
-                    onChange={(value) => setFieldValue("notice_period", value)}
-                    className="w-full"
-                  >
-                    <Option value="immediate">Immediate</Option>
-                    <Option value="15 days">15 Days</Option>
-                    <Option value="1 month">1 Month</Option>
-                    <Option value="2 months">2 Months</Option>
-                  </Select>
-                  <ErrorMessage
-                    name="notice_period"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              {/* Status */}
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Status <span className="text-red-500">*</span></label><br/>
-                  <Radio.Group
-                    value={values.status}
-                    onChange={(e) => setFieldValue("status", e.target.value)}
-                  >
-                    <Radio value="active">Active</Radio>
-                    <Radio value="inactive">Inactive</Radio>
-                  </Radio.Group>
-                  <ErrorMessage
-                    name="status"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              {/* Applied Source */}
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Applied Sources <span className="text-red-500">*</span></label>
-                  <Field
-                    name="applied_source"
-                    as={Input}
-                    placeholder="Enter Applied Sources"
-                    className="w-full mt-1"
-                  />
-                  <ErrorMessage
-                    name="applied_source"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-               {/* CV Upload */}
-               <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Upload CV</label><br/>
-                  <Field name="cv">
-                    {({ field, form }) => (
-                      <Upload
+                </Col>
+                {/* Name */}
+                <Col span={12}>
+                  <div className="form-item">
+                    <label className="font-semibold">Name <span className="text-red-500">*</span></label>
+                    <Field name="name" as={Input} placeholder="Enter Name"  className="w-full mt-1"/>
+                    <ErrorMessage
+                      name="name"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                {/* Email */}
+                <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Email <span className="text-red-500">*</span></label>
+                    <Field name="email" as={Input} placeholder="Enter Email"  className="w-full mt-1"/>
+                    <ErrorMessage
+                      name="email"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                {/* Phone */}
+                <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
+                    <div className="flex">
+                      <Select
+                        style={{ width: '30%', marginRight: '8px' }}
+                        placeholder="Code"
+                        name="phoneCode"
                         className="w-full mt-1"
-                        action="http://localhost:5500/api/users/upload-cv"
-                        accept=".pdf"
-                        maxCount={1}
-                        showUploadList={{ showRemoveIcon: true }}
-                        onChange={({ file }) => {
-                          form.setFieldValue('cv', file);
-                        }}
+                        onChange={(value) => setFieldValue('phoneCode', value)}
                       >
-                        <Button icon={<UploadOutlined />}>Upload</Button>
-                      </Upload>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="cv"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              {/* Cover Letter */}
-              <Col span={24} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Cover Letter <span className="text-red-500">*</span></label>
-                  <ReactQuill
-                    className="w-full mt-1"
-                    value={values.cover_letter}
-                    onChange={(value) => setFieldValue("cover_letter", value)}
-                    onBlur={() => setFieldTouched("cover_letter", true)}
-                    placeholder="Enter Cover Letter"
-                  />
-                  <ErrorMessage
-                    name="cover_letter"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-            </Row>
-            <div style={{ textAlign: "right", marginTop: "16px" }}>
-              <Button style={{ marginRight: 8 }} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="primary" htmlType="submit">
-                Submit
-              </Button>
-            </div>
-          </Form>
-        )}
+                        {countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            (+{country.phoneCode})
+                          </Option>
+                        ))}
+                      </Select>
+                      <Field
+                        name="phone"
+                        as={Input}
+                        type="number"
+                        style={{ width: '70%' }}
+                        placeholder="Enter Phone"
+                      />
+                    </div>
+                    <ErrorMessage
+                      name="phone"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                {/* Location */}
+                <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Location <span className="text-red-500">*</span></label>
+                    <Field
+                      name="location"
+                      as={Input}
+                      placeholder="Enter Location"
+                      className="w-full mt-1"
+                    />
+                    <ErrorMessage
+                      name="location"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                {/* Total Experience */}
+                <Col span={12}  className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Total Experience <span className="text-red-500">*</span></label>
+                    <Select
+                      placeholder="Select Total Experience"
+                      value={values.total_experience}
+                      onChange={(value) =>
+                        setFieldValue("total_experience", value)
+                      }
+                      className="w-full mt-1"
+                    >
+                      <Option value="0-1">0-1 Years</Option>
+                      <Option value="1-3">1-3 Years</Option>
+                      <Option value="3-5">3-5 Years</Option>
+                      <Option value="5+">5+ Years</Option>
+                    </Select>
+                    <ErrorMessage
+                      name="total_experience"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                {/* Current Location */}
+                <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Current Location <span className="text-red-500">*</span></label>
+                    <Field
+                      name="current_location"
+                      as={Input}
+                      placeholder="Enter Current Location"
+                      className="w-full mt-1"
+                    />
+                    <ErrorMessage
+                      name="current_location"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                {/* Notice Period */}
+                <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Notice Period <span className="text-red-500">*</span></label>
+                    <Select
+                      placeholder="Select Notice Period"
+                      value={values.notice_period}
+                      onChange={(value) => setFieldValue("notice_period", value)}
+                      className="w-full"
+                    >
+                      <Option value="immediate">Immediate</Option>
+                      <Option value="15 days">15 Days</Option>
+                      <Option value="1 month">1 Month</Option>
+                      <Option value="2 months">2 Months</Option>
+                    </Select>
+                    <ErrorMessage
+                      name="notice_period"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                {/* Status */}
+                <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Status <span className="text-red-500">*</span></label><br/>
+                    <Radio.Group
+                      value={values.status}
+                      onChange={(e) => setFieldValue("status", e.target.value)}
+                    >
+                      <Radio value="active">Active</Radio>
+                      <Radio value="inactive">Inactive</Radio>
+                    </Radio.Group>
+                    <ErrorMessage
+                      name="status"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                {/* Applied Source */}
+                <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Applied Sources <span className="text-red-500">*</span></label>
+                    <Field
+                      name="applied_source"
+                      as={Input}
+                      placeholder="Enter Applied Sources"
+                      className="w-full mt-1"
+                    />
+                    <ErrorMessage
+                      name="applied_source"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                 {/* CV Upload */}
+                 <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Upload CV</label><br/>
+                    <Field name="cv">
+                      {({ field, form }) => (
+                        <Upload
+                          fileList={cvFileList}
+                          beforeUpload={(file) => {
+                            handleCvChange({ file });
+                            return false; // Prevent auto upload
+                          }}
+                          onRemove={() => {
+                            form.setFieldValue('cv', null);
+                            setCvFileList([]);
+                          }}
+                          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                          maxCount={1}
+                        >
+                          <Button 
+                            icon={<UploadOutlined />}
+                            disabled={cvFileList.length > 0}
+                          >
+                            Choose CV
+                          </Button>
+                        </Upload>
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="cv"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                
+
+                {/* Cover Letter */}
+                <Col span={24} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Cover Letter <span className="text-red-500">*</span></label>
+                    <ReactQuill
+                      className="w-full mt-1"
+                      value={values.cover_letter}
+                      onChange={(value) => setFieldValue("cover_letter", value)}
+                      onBlur={() => setFieldTouched("cover_letter", true)}
+                      placeholder="Enter Cover Letter"
+                    />
+                    <ErrorMessage
+                      name="cover_letter"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+              </Row>
+              <div style={{ textAlign: "right", marginTop: "16px" }}>
+                <Button style={{ marginRight: 8 }} onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button type="primary" htmlType="submit">
+                  Submit
+                </Button>
+              </div>
+            </Form>
+          );
+        }}
       </Formik>
     </div>
   );

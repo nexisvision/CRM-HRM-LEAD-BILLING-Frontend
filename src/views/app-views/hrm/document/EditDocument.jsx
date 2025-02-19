@@ -89,12 +89,7 @@ const EditDocument = ({ idd, onClose }) => {
   // };
 
   const onSubmit = async (values, { resetForm }) => {
-    // dispatch(editDocu({ idd, values })).then(() => {
-    //   dispatch(getDocu());
-    //   message.success("Document added successfully!");
-    //   resetForm();
-    //   onClose();
-    // });
+   
       const formData = new FormData();
         for (const key in values) {
             formData.append(key, values[key]);

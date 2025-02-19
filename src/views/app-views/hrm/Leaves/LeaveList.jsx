@@ -200,8 +200,8 @@ const LeaveList = () => {
           </Button>
         </Flex>
       </Menu.Item> */}
-{/*       
-      <Menu.Item>
+      
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -249,15 +249,11 @@ const LeaveList = () => {
   );
   const tableColumns = [
     {
-      title: "Employee",
-      dataIndex: "name",
+      title: "created_by",
+      dataIndex: "created_by",
       render: (_, record) => (
         <div className="d-flex">
-          <AvatarStatus
-            src={record.img}
-            name={record.name}
-            subTitle={record.email}
-          />
+          {record.created_by}
         </div>
       ),
       sorter: (a, b) =>

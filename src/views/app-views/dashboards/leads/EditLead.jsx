@@ -21,7 +21,7 @@ import OrderListData from "assets/data/order-list.data.json";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { GetLeads, LeadsAdd } from "./LeadReducers/LeadSlice";
+import { GetLeads, LeadsAdd, LeadsEdit } from "./LeadReducers/LeadSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { GetLable, AddLable } from "../project/milestone/LableReducer/LableSlice";
 import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
@@ -30,9 +30,8 @@ import { getallcountries } from "views/app-views/setting/countries/countriesredu
 
 const { Option } = Select;
 
-const EditLead = ({ onClose }) => {
+const EditLead = ({ id,onClose }) => {
   const navigate = useNavigate();
-  const { id } = useParams();
   const [details, setDetails] = useState(false);
   const [info, setInfo] = useState(false);
   const [organisation, setorganisation] = useState(false);
@@ -41,6 +40,9 @@ const EditLead = ({ onClose }) => {
 //  const { currencies } = useSelector((state) => state.currencies);
 const currenciesState = useSelector((state) => state.currencies);
   const currencies = currenciesState?.currencies?.data || [];
+
+    const countriesss = useSelector((state) => state.countries.countries || []);
+  
   // 
   // const { data: employee } = useSelector((state) => state.employee.employee);
   
@@ -225,10 +227,9 @@ const currenciesState = useSelector((state) => state.currencies);
       leadValue: values.leadValue ? String(values.leadValue) : null,
       currencyIcon: values.currencyIcon || null,
     };
-    dispatch(LeadsAdd(formData))
+    dispatch(LeadsEdit({id,formData}))
       .then(() => {
         dispatch(GetLeads()); // Refresh leave data
-        message.success("Leads added successfully!");
         resetForm();
         onClose(); // Close modal
       })
@@ -379,8 +380,8 @@ const currenciesState = useSelector((state) => state.currencies);
                       className="mt-1"
                       onChange={(value) => setFieldValue('phoneCode', value)}
                     >
-                      {Array.isArray(countries) && countries.length > 0 ? (
-                        countries.map((country) => (
+                      {Array.isArray(countriesss) && countriesss.length > 0 ? (
+                        countriesss.map((country) => (
                           <Option key={country.id} value={country.phoneCode}>
                             (+{country.phoneCode})
                           </Option>

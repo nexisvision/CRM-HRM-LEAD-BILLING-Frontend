@@ -68,10 +68,10 @@ export const LeadsDelete = createAsyncThunk(
 );
 export const LeadsEdit = createAsyncThunk(
   "users/LeadsEdit",
-  async ({ id, values }, thunkAPI) => {
+  async ({ id, formData }, thunkAPI) => {
     try {
       console.log("idinslice", id);
-      const response = await UserService.EditLeads(id, values);
+      const response = await UserService.EditLeads(id, formData);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(

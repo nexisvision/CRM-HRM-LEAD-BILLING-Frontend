@@ -66,12 +66,12 @@ const deletejobapp = async (id) => {
   }
 };
 
-const editjobapp = async (idd, values) => {
+const editjobapp = async (idd, formData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
       `http://localhost:5353/api/v1/job-applications/${idd}`,
-      values,
+      formData,
       {
         headers: {
           Authorization: `Bearer ${token}`,

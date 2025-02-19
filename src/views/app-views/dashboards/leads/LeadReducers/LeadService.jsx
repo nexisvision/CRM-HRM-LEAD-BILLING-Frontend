@@ -60,12 +60,12 @@ const DeleteLeads = async (id) => {
   }
 };
 
-const EditLeads = async (id, values) => {
+const EditLeads = async (id, formData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
       `http://localhost:5353/api/v1/leads/${id}`,
-      values,
+      formData,
       {
         headers: {
           Authorization: `Bearer ${token}`,

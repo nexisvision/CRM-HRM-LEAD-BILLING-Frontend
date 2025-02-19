@@ -14,17 +14,23 @@ import PropTypes from "prop-types";
 
 const { Option } = Select;
 
-const EditTask = ({ onClose, iddd, projectId }) => {
+const EditTask = ({ onClose, idd, projectId }) => {
   const dispatch = useDispatch();
-  // const [initialValues, setInitialValues] = useState({});
+  const [loading, setLoading] = useState(true);
   const [isWithoutDueDate, setIsWithoutDueDate] = useState(false);
   const [isOtherDetailsVisible, setIsOtherDetailsVisible] = useState(false);
 
-  // const { id } = useParams();
+  const allloggeduserdata = useSelector((state) => state.user);
+  const loggedUserData = allloggeduserdata?.loggedInUser || {};
+  const id = loggedUserData?.id;
 
   useEffect(() => {
     dispatch(empdata());
   }, [dispatch]);
+
+  useEffect(()=>{
+    dispatch(GetTasks(id))
+  },[])
 
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data || [];
@@ -33,37 +39,15 @@ const EditTask = ({ onClose, iddd, projectId }) => {
  
     const fndassine = empData.filter(((item)=>item.created_by === loggedusername || []))
 
-  const allloggeduserdata = useSelector((state) => state.user);
-  const loggedUserData = allloggeduserdata?.loggedInUser || {};
-  const id = loggedUserData?.id;
 
+  const taskadata = useSelector((state)=>state.Tasks.Tasks);
 
-  const { data: tasks, isLoading: isTasksLoading, error: tasksError } = useSelector((state) => state.tasks);
-
-  const fndatatask = tasks?.data || [];
-
-  // const idd = loggedUserData.id;
-
-  useEffect(() => {
-    dispatch(GetTasks(iddd));
-  }, [dispatch, iddd]);
-
-  // const [uploadModalVisible, setUploadModalVisible] = useState(false);
-
-  // const initialValues = {
-
-  //   taskName: "",
-  //   startDate: null,
-  //   dueDate: null,
-  //   status: "",
-  //   priority: "",
-  //   assignTo: [],
-  //   description: "",
-  //   priority: "",
-  //   status: "",
-  // };
+  const fndatatask = taskadata?.data || [];
 
   const [initialValues, setInitialValues] = useState({
+
+
+    
     taskName: "",
     startDate: null,
     dueDate: null,
@@ -71,63 +55,99 @@ const EditTask = ({ onClose, iddd, projectId }) => {
     priority: "",
     assignTo: [],
     description: "",
-    priority: "",
-    status: "",
   });
 
+  // First fetch the task data
   useEffect(() => {
-    if (fndatatask && iddd) {
-        const task = fndatatask.find((task) => task.id === iddd);
-      if (task) {
-        const dueDate = task.dueDate ? new Date(task.dueDate) : null;
-        setIsWithoutDueDate(dueDate === null);
-        setIsOtherDetailsVisible(task.otherDetailsVisible);
-
-        let assignToArray = [];
-        try {
-          if (task.assignTo) {
-            if (typeof task.assignTo === 'string') {
-              assignToArray = JSON.parse(task.assignTo);
-            } else if (Array.isArray(task.assignTo)) {
-              assignToArray = task.assignTo;
-            } else {
-              assignToArray = [task.assignTo];
-            }
-          }
-        } catch (error) {
-          console.error("Error parsing assignTo:", error);
-          assignToArray = [];
+    const fetchTaskData = async () => {
+      setLoading(true);
+      try {
+        // If projectId exists, use it in the GetTasks call
+        const response = await dispatch(GetTasks(projectId || idd));
+        console.log("Task data fetch response:", response);
+        
+        if (!response.payload || !response.payload.data) {
+          throw new Error('No data received from API');
         }
-
-        if (!Array.isArray(assignToArray)) {
-          assignToArray = [assignToArray];
-        }
-
-        assignToArray = assignToArray.filter(item => item !== null && item !== undefined);
-
-        setInitialValues({
-          taskName: task.taskName || "",
-          startDate: task.startDate ? new Date(task.startDate) : null,
-          dueDate,
-          assignTo: assignToArray,
-          description: task.description || "",
-          status: task.status || "",
-          priority: task.priority || "",
-        });
-
-        // console.log("Parsed assignTo values:", assignToArray);
-      } else {
-        message.error("Task not found.");
+      } catch (error) {
+        console.error("Error fetching task data:", error);
+        message.error("Failed to fetch task data");
+      } finally {
+        setLoading(false);
       }
-    }
-  }, [fndatatask, iddd]);
+    };
 
+    fetchTaskData();
+  }, [dispatch, idd, projectId]);
+
+  // Then set the initial values once we have the data
   useEffect(() => {
-    if (!iddd || !projectId) {
-      message.error("Required IDs are missing");
-      onClose();
+    if (!loading && fndatatask.length > 0) {
+      console.log("Finding task with ID:", idd);
+      console.log("Available tasks:", fndatatask);
+      
+      // Try to find the task by both id and _id
+      const task = fndatatask.find((t) => t.id === idd || t._id === idd);
+      
+      if (!task) {
+        console.error("Task not found:", { 
+          taskId: idd, 
+          availableTasks: fndatatask,
+          taskIds: fndatatask.map(t => ({ id: t.id, _id: t._id }))
+        });
+        message.error("Task not found");
+        return;
+      }
+
+      console.log("Found task:", task);
+
+      let assignToArray = [];
+      try {
+        if (task.assignTo) {
+          if (typeof task.assignTo === 'string') {
+            assignToArray = JSON.parse(task.assignTo);
+          } else if (Array.isArray(task.assignTo)) {
+            assignToArray = task.assignTo;
+          } else {
+            assignToArray = [task.assignTo];
+          }
+        }
+      } catch (error) {
+        console.error("Error parsing assignTo:", error);
+        assignToArray = [];
+      }
+
+      // Ensure assignToArray is always an array and filter out null/undefined
+      assignToArray = Array.isArray(assignToArray) ? assignToArray : [assignToArray];
+      assignToArray = assignToArray.filter(item => item !== null && item !== undefined);
+
+      const newInitialValues = {
+        taskName: task.taskName || "",
+        startDate: task.startDate ? dayjs(task.startDate) : null,
+        dueDate: task.dueDate ? dayjs(task.dueDate) : null,
+        assignTo: assignToArray,
+        description: task.description || "",
+        status: task.status || "",
+        priority: task.priority || "",
+      };
+
+      console.log("Setting initial values:", newInitialValues);
+      setInitialValues(newInitialValues);
+      setIsWithoutDueDate(!task.dueDate);
+      setIsOtherDetailsVisible(!!task.otherDetailsVisible);
     }
-  }, [iddd, projectId, onClose]);
+  }, [fndatatask, idd, loading]);
+
+  // Add debug logging for task data
+  useEffect(() => {
+    console.log("Current task data state:", {
+      loading,
+      taskadata,
+      fndatatask,
+      idd,
+      projectId
+    });
+  }, [loading, taskadata, fndatatask, idd, projectId]);
 
   const validationSchema = Yup.object({
     taskName: Yup.string().required("Please enter TaskName."),
@@ -140,38 +160,29 @@ const EditTask = ({ onClose, iddd, projectId }) => {
   });
 
   const onSubmit = async (values, { resetForm }) => {
-    // Convert AssignTo array into an object containing the array
-    // if (Array.isArray(values.AssignTo) && values.AssignTo.length > 0) {
-    //   values.AssignTo = { AssignTo: [...values.AssignTo] };
-    // }
-    // Log the values to check the structure
-    // console.log("Form Values:", values);
+    try {
+      const formattedValues = {
+        ...values,
+        startDate: values.startDate ? values.startDate.toISOString() : null,
+        dueDate: values.dueDate ? values.dueDate.toISOString() : null,
+        assignTo: Array.isArray(values.assignTo) ? values.assignTo : [values.assignTo],
+      };
 
-    // Ensure assignTo is an array
-    if (!Array.isArray(values.assignTo)) {
-        message.error("AssignTo must be an array.");
-        return; // Prevent submission if assignTo is not an array
+      console.log("Submitting values:", formattedValues);
+      
+      await dispatch(EditTaskss({ idd, values: formattedValues }));
+      message.success("Task updated successfully!");
+      await dispatch(GetTasks(idd));
+      onClose();
+    } catch (error) {
+      console.error("Error updating task:", error);
+      message.error("Failed to update task");
     }
-
-    // Dispatch AddTasks with updated values
-    dispatch(EditTaskss({ iddd, values: values }))
-        .then(() => {
-            message.success("Task updated successfully!");
-            dispatch(GetTasks(iddd))
-                .then(() => {
-                    resetForm();
-                    onClose();
-                })
-                .catch((error) => {
-                    message.error("Failed to fetch the latest Task data.");
-                    console.error("MeetData API error:", error);
-                });
-        })
-        .catch((error) => {
-            message.error("Failed to update Task.");
-            console.error("AddTask API error:", error);
-        });
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="add-expenses-form">
@@ -399,157 +410,8 @@ const EditTask = ({ onClose, iddd, projectId }) => {
 
 EditTask.propTypes = {
   onClose: PropTypes.func.isRequired,
-  iddd: PropTypes.string.isRequired,
+  idd: PropTypes.string.isRequired,
   projectId: PropTypes.string.isRequired
 };
 
 export default EditTask;
-
-// import React, { useState } from 'react';
-// import { Input, Button, DatePicker, Select, message, Row, Col, Switch, Upload, Card } from 'antd';
-// import { useNavigate } from 'react-router-dom';
-// import { ExclamationCircleOutlined } from '@ant-design/icons';
-// import 'react-quill/dist/quill.snow.css';
-// import ReactQuill from 'react-quill';
-// import utils from 'utils';
-// import OrderListData from "assets/data/order-list.data.json"
-// import { Formik, Form, Field, ErrorMessage } from 'formik';
-// import * as Yup from 'yup';
-
-// const { Option } = Select;
-
-// const AddTask = () => {
-//     const navigate = useNavigate();
-//     const [description, setDescription] = useState(false);
-//     const [info, setInfo] = useState(false);
-//     const [option, setOption] = useState(false);
-
-//     const initialValues = {
-
-//         title: '',
-//         status: '',
-//         priority: '',
-
-//         description: '',
-
-//     };
-
-//     const validationSchema = Yup.object({
-
-//         title: Yup.string().required('Please enter a Title.'),
-//         status: Yup.string().required('Please select status.'),
-//         priority: Yup.string().required('please select a Priority'),
-
-//         description: description ? Yup.string().required("Description are required") : Yup.string(),
-
-//     });
-
-//     const onSubmit = (values) => {
-//         console.log('Submitted values:', values);
-//         message.success('Project added successfully!');
-//         navigate('/app/apps/project');
-//     };
-//     // console.log("object",Option)
-
-//     return (
-//         <div className="add-job-form">
-//             <Formik
-//                 initialValues={initialValues}
-//                 validationSchema={validationSchema}
-//                 onSubmit={onSubmit}
-//             >
-//                 {({ values, setFieldValue, handleSubmit, handleChange, }) => (
-//                     <Form className="formik-form" onSubmit={handleSubmit}>
-//                         <h2 className="mb-4 border-b pb-2 font-medium"></h2>
-
-//                         <Row gutter={16}>
-
-//                             <Col span={12} className='mt-2'>
-//                                 <div className="form-item">
-//                                     <label className='font-semibold flex'>Title<h1 className='text-rose-500'>*</h1></label>
-//                                     <Field name="title" as={Input} placeholder="Enter Title Name" />
-//                                     <ErrorMessage name="title" component="div" className="error-message text-red-500 my-1" />
-//                                 </div>
-//                             </Col>
-//                             <Col span={12} className='mt-2'>
-//                                 <div className="form-item">
-//                                     <label className='font-semibold flex'>Status <h1 className='text-rose-500'>*</h1></label>
-//                                     <Field name="status">
-//                                         {({ field }) => (
-//                                             <Select
-//                                                 {...field}
-//                                                 className="w-full"
-//                                                 placeholder="Select Status"
-//                                                 onChange={(value) => setFieldValue('status', value)}
-//                                                 value={values.status}
-//                                             >
-//                                                 <Option value="new">New</Option>
-//                                                 <Option value="converted">Converted</Option>
-//                                                 <Option value="qualified">Qualified</Option>
-//                                                 <Option value="proposalsent">Proposal Sent</Option>
-//                                             </Select>
-//                                         )}
-//                                     </Field>
-//                                     <ErrorMessage name="status" component="div" className="error-message text-red-500 my-1" />
-//                                 </div>
-//                             </Col>
-
-//                             <Col span={12} className='mt-2'>
-//                                 <div className="form-item">
-//                                     <label className='font-semibold flex'>Priority <h1 className='text-rose-500'>*</h1></label>
-//                                     <Field name="priority">
-//                                         {({ field }) => (
-//                                             <Select
-//                                                 {...field}
-//                                                 className="w-full"
-//                                                 placeholder="Select Priority"
-//                                                 onChange={(value) => setFieldValue('priority', value)}
-//                                                 value={values.priority}
-//                                             >
-//                                                 <Option value="new">New</Option>
-//                                                 <Option value="converted">Converted</Option>
-//                                                 <Option value="qualified">Qualified</Option>
-//                                                 <Option value="proposalsent">Proposal Sent</Option>
-//                                             </Select>
-//                                         )}
-//                                     </Field>
-//                                     <ErrorMessage name="priority" component="div" className="error-message text-red-500 my-1" />
-//                                 </div>
-//                             </Col>
-
-//                             <Col span={24} className="mt-4 border-t pt-4">
-//                                 <div className="flex justify-between items-center">
-//                                     <label className="font-semibold">Description</label>
-//                                 </div>
-
-//                                 {/* Always show the description field */}
-//                                 <Col span={24}>
-//                                     <div className="mt-2">
-//                                         <ReactQuill
-//                                             value={values.notes}
-//                                             onChange={(value) => setFieldValue("description", value)}
-//                                             placeholder="Enter Description"
-//                                             className="mt-2 bg-white rounded-md"
-//                                         />
-//                                         <ErrorMessage
-//                                             name="description"
-//                                             component="div"
-//                                             className="error-message text-red-500 my-1"
-//                                         />
-//                                     </div>
-//                                 </Col>
-//                             </Col>
-//                         </Row>
-
-//                         <div className="form-buttons text-right mt-4">
-//                             <Button type="default" htmlType='submit' className="mr-2" onClick={() => navigate('/app/apps/project/lead')}>Cancel</Button>
-//                             <Button type="primary" htmlType="submit">Create</Button>
-//                         </div>
-//                     </Form>
-//                 )}
-//             </Formik>
-//         </div>
-//     );
-// };
-
-// export default AddTask;

@@ -503,14 +503,10 @@ const currenciesState = useSelector((state) => state.currencies);
                           className="w-full mt-1"
                           placeholder="Select Employee"
                           onChange={(value) => {
-                            const selectedEmployee =
-                              Array.isArray(employee) &&
-                              employee.find((e) => e.id === value);
-                            form.setFieldValue(
-                              "employee",
-                              selectedEmployee?.username || ""
-                            );
+                            const selectedEmployee = employee.find((emp) => emp.id === value);
+                            form.setFieldValue("employee", value);
                           }}
+                          value={field.value}
                         >
                           {Array.isArray(employee) &&
                             employee.map((emp) => (

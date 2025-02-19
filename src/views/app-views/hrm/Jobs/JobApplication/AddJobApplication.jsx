@@ -311,7 +311,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                 </div>
               </Col>
               {/* CV Upload */}
-              <Col span={12}>
+              {/* <Col span={12}>
                 <div className="form-item mt-2">
                   <label className="font-semibold">Upload CV </label>
                   <Field name="cv">
@@ -336,7 +336,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
 
               {/* Cover Letter */}
               <Col span={24}>

@@ -329,35 +329,37 @@ const DealList = () => {
       },
     },
     {
-      title: "Client",
-      dataIndex: "clientName",
-      render: (_, record) => (
-        <div className="d-flex">
-          <AvatarStatus 
-            size={30}
-            name={record.firstName}
-          />
-        </div>
-      ),
+      title: "created_by",
+      dataIndex: "created_by",
       sorter: {
-        compare: (a, b) => (a.firstName || '').localeCompare(b.firstName || ''),
+        compare: (a, b) => a.created_by - b.created_by,
+      },
+    },
+
+    {
+      title: "dealName",
+      dataIndex: "dealName",
+      sorter: {
+        compare: (a, b) => a.dealName - b.dealName,
       },
     },
     {
-      title: "Task",
-      dataIndex: "status",
-      render: (status) => (
-        <Tag
-          className="text-capitalize"
-          color={status === "active" ? "cyan" : "red"}
-        >
-          {status}
-        </Tag>
-      ),
+      title: "leadTitle",
+      dataIndex: "leadTitle",
       sorter: {
-        compare: (a, b) => a.status.length - b.status.length,
+        compare: (a, b) => a.leadTitle - b.leadTitle,
       },
     },
+    {
+      title: "project",
+      dataIndex: "project",
+      sorter: {
+        compare: (a, b) => a.project - b.project,
+      },
+    },
+
+   
+    
     {
       title: "Action",
       dataIndex: "actions",

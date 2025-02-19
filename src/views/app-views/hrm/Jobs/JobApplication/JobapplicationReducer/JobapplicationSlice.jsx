@@ -72,9 +72,9 @@ export const deletejobapplication = createAsyncThunk(
 );
 export const editjobapplication = createAsyncThunk(
   "users/editjobapplication",
-  async ({ idd, values }, thunkAPI) => {
+  async ({ idd, formData }, thunkAPI) => {
     try {
-      const response = await UserService.editjobapp(idd, values);
+      const response = await UserService.editjobapp(idd, formData);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
