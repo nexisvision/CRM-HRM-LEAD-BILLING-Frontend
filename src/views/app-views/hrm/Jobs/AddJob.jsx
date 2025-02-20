@@ -102,17 +102,27 @@ const AddJob = ({ onClose }) => {
     // Transforming skills and interviewRounds into the desired object structure
     const transformedValues = {
       ...values,
-      skills: { Skills: values.skills },
-      interviewRounds: { InterviewRounds: values.interviewRounds },
+      skills: { Skills: values.skillss }, // Send as object
+      interviewRounds: { InterviewRounds: values.interviewRounds }, // Send as object, not JSON string
+      startDate: values.startDate ? values.startDate.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]') : null,
+      endDate: values.endDate ? values.endDate.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]') : null,
     };
+
+    // Remove the skillss field as we've transformed it to skills
+    delete transformedValues.skillss;
+
+    // Log the transformed values to verify the structure
+    console.log('Transformed Values:', transformedValues);
 
     dispatch(AddJobs(transformedValues)).then(() => {
       dispatch(GetJobdata());
+      message.success("Job added successfully!");
       onClose();
-    })
-    // console.log("Submitted values:", transformedValues);
-    message.success("Job added successfully!");
-    resetForm();
+      resetForm();
+    }).catch((error) => {
+      console.error('Error adding job:', error);
+      message.error("Failed to add job");
+    });
   };
 
   useEffect(() => {

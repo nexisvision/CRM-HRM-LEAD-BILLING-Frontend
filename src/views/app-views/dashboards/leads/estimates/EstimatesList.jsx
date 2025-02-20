@@ -241,14 +241,14 @@ const EstimatesList = () => {
 			),
 			sorter: (a, b) => utils.antdTableSorter(a, b, 'total')
 		},
-		{
-			title: 'Status',
-			dataIndex: 'orderStatus',
-			render: (_, record) => (
-				<><Tag color={getShippingStatus(record.orderStatus)}>{record.orderStatus}</Tag></>
-			),
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'orderStatus')
-		},
+		// {
+		// 	title: 'Status',
+		// 	dataIndex: 'orderStatus',
+		// 	render: (_, record) => (
+		// 		<><Tag color={getShippingStatus(record.orderStatus)}>{record.orderStatus}</Tag></>
+		// 	),
+		// 	sorter: (a, b) => utils.antdTableSorter(a, b, 'orderStatus')
+		// },
 		
 		{
 			title: 'Action',
@@ -268,13 +268,24 @@ const EstimatesList = () => {
 		}
 	};
 
-	const onSearch = e => {
-		const value = e.currentTarget.value
-		const searchArray = e.currentTarget.value ? list : estimates
-		const data = utils.wildCardSearch(searchArray, value)
-		setList(data)
-		setSelectedRowKeys([])
-	}
+	const onSearch = (e) => {
+		const value = e.target.value.toLowerCase();
+		
+		if (value) {
+			const filteredData = estimates.filter((item) => {
+				return (
+					(item.quotationNumber && item.quotationNumber.toLowerCase().includes(value)) ||
+					(item.created_by && item.created_by.toLowerCase().includes(value)) ||
+					(item.currency && item.currency.toLowerCase().includes(value)) ||
+					(item.tax && item.tax.toString().includes(value)) ||
+					(item.total && item.total.toString().includes(value))
+				);
+			});
+			setList(filteredData);
+		} else {
+			setList(estimates);
+		}
+	};
 
 	return (
 		<>
@@ -283,8 +294,11 @@ const EstimatesList = () => {
 				<Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
 					<Flex cclassName="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
 						<div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48 me-2">
-							<Input placeholder="Search" prefix={<SearchOutlined />} onChange={() => onSearch()}
-            />
+							<Input 
+								placeholder="Search" 
+								prefix={<SearchOutlined />} 
+								onChange={onSearch}
+							/>
 						</div>
 						{/* <div className="w-full md:w-48 ">
 							<Col span={12}>
@@ -306,10 +320,9 @@ const EstimatesList = () => {
 				<div className="table-responsive">
 					<Table
 						columns={tableColumns}
-						dataSource={estimates}
+						dataSource={list}
 						rowKey='id'
 						scroll={{ x: 1200 }}
-					
 					/>
 				</div>
 			</Card>

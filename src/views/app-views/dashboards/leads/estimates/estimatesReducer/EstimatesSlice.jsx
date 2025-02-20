@@ -70,9 +70,9 @@ export const deleteestimate = createAsyncThunk(
 );
 
 const estimateSlice = createSlice({
-  name: 'estimate',
+  name: 'leadestimate',
   initialState: {
-    estimates: [],
+    leadestimates: [],
     currentEstimate: null,
     loading: false,
     error: null,
@@ -100,7 +100,7 @@ const estimateSlice = createSlice({
       })
       .addCase(createestimate.fulfilled, (state, action) => {
         state.loading = false;
-        state.estimates.push(action.payload.data);
+        state.leadestimates.push(action.payload.data);
         state.success = true;
         message.success(action.payload?.message);
       })
@@ -110,14 +110,14 @@ const estimateSlice = createSlice({
         message.error(action.payload?.message);
       })
 
-      // Get all estimates
+      // Get all leadestimates
       .addCase(getallestimate.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(getallestimate.fulfilled, (state, action) => {
         state.loading = false;
-        state.estimates = action.payload.data;
+        state.leadestimates = action.payload.data;
       })
       .addCase(getallestimate.rejected, (state, action) => {
         state.loading = false;
@@ -147,11 +147,11 @@ const estimateSlice = createSlice({
         state.loading = false;
         state.success = true;
         // Update the estimate in the list
-        const index = state.estimates.findIndex(
+        const index = state.leadestimates.findIndex(
           (estimate) => estimate._id === action.payload.data._id
         );
         if (index !== -1) {
-          state.estimates[index] = action.payload.data;
+          state.leadestimates[index] = action.payload.data;
         }
         message.success(action.payload?.message);
 
@@ -170,7 +170,7 @@ const estimateSlice = createSlice({
       })
       .addCase(deleteestimate.fulfilled, (state, action) => {
         state.loading = false;
-        state.estimates = state.estimates.filter(
+        state.leadestimates = state.leadestimates.filter(
           (estimate) => estimate._id !== action.payload
         );
         state.success = true;

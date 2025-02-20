@@ -306,7 +306,7 @@ const JobCandidateList = () => {
             </Input.Group>
           </div>
         </Flex>
-        <Flex gap="7px">
+        {/* <Flex gap="7px">
           {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
             <Button type="primary" className="ml-2" onClick={openAddJobCandidateModal}>
               <PlusOutlined />
@@ -321,7 +321,7 @@ const JobCandidateList = () => {
           >
             Export All
           </Button>
-        </Flex>
+        </Flex> */}
       </Flex>
       <div className="table-responsive mt-2">
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (

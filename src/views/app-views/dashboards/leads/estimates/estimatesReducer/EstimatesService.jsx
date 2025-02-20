@@ -22,7 +22,7 @@ const EstimateService = {
     const token = localStorage.getItem('auth_token');
     try {
       const response = await axios.post(
-        `http://localhost:5353/api/v1/quotations/${id}`,
+        `http://localhost:5353/api/v1/quotations/lead/${id}`,
         estimateData,
         {
           headers: {
@@ -60,7 +60,7 @@ const EstimateService = {
     const token = localStorage.getItem('auth_token');
     try {
       const response = await axios.put(
-        `http://localhost:5353/api/v1/quotations/${idd}`,
+        `http://localhost:5353/api/v1/quotations/lead/${idd}`,
         data,
         {
           headers: {

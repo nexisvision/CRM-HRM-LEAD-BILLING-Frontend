@@ -69,6 +69,11 @@ const ExpensesList = () => {
     const allempdata = useSelector((state) => state.Expense);
     const filtermin = allempdata.Expense.data;
 
+    const [filteredData, setFilteredData] = useState([]);
+    const [searchText, setSearchText] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState('all');
+    const [loading, setLoading] = useState(false);
+
     const openAddExpensesModal = () => {
         setIsAddExpensesModalVisible(true);
     };
@@ -93,16 +98,79 @@ const ExpensesList = () => {
     };
 
     useEffect(() => {
-        if (id) {
-            dispatch(Getexp(id));
-        }
+        const loadInitialData = async () => {
+            setLoading(true);
+            try {
+                if (id) {
+                    await dispatch(Getexp(id));
+                }
+            } catch (error) {
+                console.error('Error loading data:', error);
+                message.error('Failed to load data');
+            }
+            setLoading(false);
+        };
+
+        loadInitialData();
     }, [dispatch, id]);
 
     useEffect(() => {
         if (filtermin) {
             setList(filtermin);
+            handleFilters(filtermin); // Initialize filtered data
         }
     }, [filtermin]);
+
+    const handleFilters = (data = list) => {
+        setLoading(true);
+        try {
+            let filtered = [...data];
+
+            // Apply search text filter
+            if (searchText) {
+                filtered = filtered.filter(item => 
+                    item.item?.toLowerCase().includes(searchText.toLowerCase()) ||
+                    item.employee?.toLowerCase().includes(searchText.toLowerCase()) ||
+                    item.currency?.toLowerCase().includes(searchText.toLowerCase())
+                );
+            }
+
+
+            setFilteredData(filtered);
+        } catch (error) {
+            console.error('Error filtering data:', error);
+            message.error('Failed to filter data');
+        }
+        setLoading(false);
+    };
+
+    useEffect(() => {
+        handleFilters();
+    }, [searchText, selectedStatus, list]);
+
+    const onSearch = (e) => {
+        setSearchText(e.currentTarget.value);
+    };
+
+    const getUniqueStatuses = () => {
+        if (!list) return [];
+        
+        const statuses = [...new Set(list.map(item => item.status))];
+        return [
+            { value: 'all', label: 'All Status' },
+            ...statuses.map(status => ({
+                value: status,
+                label: status
+            }))
+        ];
+    };
+
+    const handleStatusChange = (value) => {
+        setSelectedStatus(value);
+    };
+
+    const statusOptions = getUniqueStatuses();
+
     const exportToExcel = () => {
         try {
           // Format the data for Excel
@@ -277,40 +345,34 @@ const ExpensesList = () => {
             setSelectedRowKeys(key);
         },
     };
-    const onSearch = (e) => {
-        const value = e.currentTarget.value;
-        const data = utils.wildCardSearch(list, value);
-        setList(data);
-        setSelectedRowKeys([]);
-    };
     return (
         <>
             <Flex
                 alignItems="center"
                 justifyContent="space-between"
                 mobileFlex={false}
-                className="flex flex-wrap  gap-4"
+                className="flex flex-wrap gap-4"
             >
                 <Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
                     <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
                         <Input
-                            placeholder="Search"
+                            placeholder="Search expenses..."
                             prefix={<SearchOutlined />}
-                            onChange={(e) => onSearch(e)}
+                            onChange={onSearch}
+                            value={searchText}
+                            allowClear
                         />
                     </div>
                     {/* <div className="w-full md:w-48">
                         <Select
-                            defaultValue="All"
-                            className="w-full"
-                            style={{ minWidth: 180 }}
-                            onChange={handleShowStatus}
-                            placeholder="Status"
+                            placeholder="Filter by status"
+                            onChange={handleStatusChange}
+                            value={selectedStatus}
+                            style={{ width: '100%' }}
                         >
-                            <Option value="All">All Status </Option>
-                            {expenseStatusList.map((elm) => (
-                                <Option key={elm} value={elm}>
-                                    {elm}
+                            {statusOptions.map(status => (
+                                <Option key={status.value} value={status.value}>
+                                    {status.label}
                                 </Option>
                             ))}
                         </Select>
@@ -326,21 +388,22 @@ const ExpensesList = () => {
                         <span className="ml-2">Add Expenses</span>
                     </Button>
                     <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
+                        type="primary"
+                        icon={<FileExcelOutlined />}
+                        onClick={exportToExcel}
+                        block
+                    >
+                        Export All
+                    </Button>
                 </Flex>
             </Flex>
             <Card>
                 <div className="table-responsive">
                     <Table
                         columns={tableColumns}
-                        dataSource={list}
+                        dataSource={filteredData}
                         rowKey="id"
+                        loading={loading}
                         scroll={{ x: 1200 }}
                         rowSelection={{
                             selectedRowKeys: selectedRowKeys,

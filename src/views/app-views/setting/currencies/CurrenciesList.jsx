@@ -11,6 +11,7 @@ import AddCurrencies from './AddCurrencies';
 import EditCurrencies from './EditCurrencies';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import { deletecurren, getcurren } from './currenciesSlice/currenciesSlice';
+import { getRoles } from 'views/app-views/hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice';
 
 const { Column } = Table;
 
@@ -25,16 +26,31 @@ export const CurrenciesList = () => {
     const dispatch = useDispatch();
     const filterdata = useSelector((state) => state.currencies?.currencies?.data);
         
-    // Get logged-in username
-    const loggedusername = useSelector((state) => state.user.loggedInUser.username);
-    
+    // Get logged-in user data
+    const userData = useSelector((state) => state.user?.loggedInUser);
+    const roles = useSelector((state) => state.role?.role?.data);
+
+    useEffect(() => {
+        dispatch(getRoles());
+    }, [dispatch]);
+
+    // Check if user is super-admin
+    const isSuperAdmin = () => {
+        const userRole = roles?.find(role => role.id === userData?.role_id);
+        return userRole?.role_name === 'super-admin';
+    };
+
+    console.log('User Role ID:', userData?.role_id);
+    console.log('Roles:', roles);
+    console.log('Is Super Admin:', isSuperAdmin());
+
     useEffect(() => {
         if (!filterdata || filterdata.length === 0) {
             dispatch(getcurren());
         }
     }, [dispatch, filterdata]); 
 
-    const allcurrdata = filterdata?.filter((item) => item?.created_by === loggedusername);
+    const allcurrdata = filterdata?.filter((item) => item?.created_by === userData?.username);
    
 
      useEffect(() => {
@@ -141,12 +157,19 @@ export const CurrenciesList = () => {
                             <Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)} />
                         </div>
                     </Flex>
-                    {/* <Flex gap="7px" className="flex">
-                        <Button type="primary" className="flex items-center" onClick={openAddCurrenciesModal}>
-                            <PlusOutlined />
-                            <span className="ml-2">New</span>
-                        </Button>
-                    </Flex> */}
+                    {/* Only show Add button if role_name is super-admin */}
+                    {isSuperAdmin() && (
+                        <Flex gap="7px" className="flex">
+                            <Button 
+                                type="primary" 
+                                className="flex items-center" 
+                                onClick={openAddCurrenciesModal}
+                            >
+                                <PlusOutlined />
+                                <span className="ml-2">Add Currency</span>
+                            </Button>
+                        </Flex>
+                    )}
                 </Flex>
                 <div className="table-responsive">
                     <Table

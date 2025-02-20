@@ -40,19 +40,29 @@ const EditEstimates = ({ idd, onClose }) => {
 
     const { taxes } = useSelector((state) => state.tax);
 
-    const subClients = useSelector((state) => state.SubClient);
-    const sub = subClients?.SubClient?.data;
+    // const subClients = useSelector((state) => state.SubClient);
+    // const sub = subClients?.SubClient?.data;
 
-    const allproject = useSelector((state) => state.Project);
-    const fndrewduxxdaa = allproject.Project.data
-    const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
+    // const allproject = useSelector((state) => state.Project);
+    // const fndrewduxxdaa = allproject.Project.data
+    // const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
 
-    const client = fnddata?.client;
+    // const client = fnddata?.client;
 
-    const subClientData = sub?.find((subClient) => subClient?.id === client);
+    // const subClientData = sub?.find((subClient) => subClient?.id === client);
 
 
     const { data: Leads, isLoading: isLeadsLoading, error: leadsError } = useSelector((state) => state.Leads.Leads || []);
+
+    const allleads = useSelector((state) => state.Leads);
+    const fndrewduxxdaa = allleads.Leads.data
+    const fnddata = fndrewduxxdaa?.find((lead) => lead?.id === id);
+ // Get leads data and find the selected lead
+ const allLeads = useSelector((state) => state.Leads);
+ const leadsData = allLeads.Leads.data || [];
+ const selectedLead = leadsData?.find((lead) => lead?.id === id);
+
+  const leadTitle = selectedLead?.leadTitle || 'N/A'
 
     const lead = Leads?.filter((item) => item.created_by === user) || [];
     const leadDetails = lead?.find((lead) => lead.id === currentEstimate?.lead);
@@ -122,10 +132,11 @@ const EditEstimates = ({ idd, onClose }) => {
                     form.setFieldsValue({
                         valid_till: dayjs(currentEstimate.valid_till),
                         currency: currentEstimate.currency,
-                        lead: leadDetails?.id,
-                        client: currentEstimate.client,
+                        leadTitle: leadTitle,
+                        lead: id,
+                        // client: currentEstimate.client,
                         calculatedTax: currentEstimate.calculatedTax,
-                        projectName: fnddata?.project_name
+                        // projectName: fnddata?.project_name
                     });
 
                     // Parse and set items
@@ -207,7 +218,7 @@ const EditEstimates = ({ idd, onClose }) => {
         };
 
         fetchAndSetEstimateData();
-    }, [currentEstimate, form, leadDetails, fnddata]);
+    }, [currentEstimate, form, leadDetails,leadTitle,id]);
 
     // Add debug logging
     useEffect(() => {
@@ -291,8 +302,8 @@ const EditEstimates = ({ idd, onClose }) => {
                 id: idd,
                 valid_till: values.valid_till.format('YYYY-MM-DD'),
                 currency: values.currency,
-                lead: leadDetails?.id,
-                client: values.client,
+                lead: values.lead,
+                // client: values.client,
                 discount: discountAmount,
                 discountRate: discountRate,
                 calculatedTax: parseFloat(values.calculatedTax) || 0,
@@ -388,36 +399,27 @@ const EditEstimates = ({ idd, onClose }) => {
                             <div className=" p-2">
 
                                 <Row gutter={16}>
-                                    <Col span={12}>
-                                        <Form.Item
-                                            name="lead"
+                                <Col span={12}>
+                                         <Form.Item
+                                            name="leadTitle"
                                             label="Lead Title"
-                                            rules={[
-                                                {
-                                                    required: true,
-                                                    message: "Please select a Lead Title"
-                                                }
-                                            ]}
+                                            rules={[{ required: true, message: "Lead title is required" }]}
                                         >
-                                            <Select
-                                                className="w-full"
-                                                placeholder="Select Lead Title"
-                                                disabled
-                                                value={leadDetails?.leadTitle || undefined}
-                                            >
-                                                {Array.isArray(lead) && lead.map((lead) => (
-                                                    <Option
-                                                        key={lead.id}
-                                                        value={lead.id}
-                                                    >
-                                                        {lead.leadTitle}
-                                                    </Option>
-                                                ))}
-                                            </Select>
+                                            <Input 
+                                                placeholder="Lead Title"
+                                                disabled 
+                                                value={leadTitle}
+                                            />
+                                        </Form.Item>
+                                        <Form.Item 
+                                            name="lead" 
+                                            hidden
+                                        >
+                                            <Input type="hidden" />
                                         </Form.Item>
                                     </Col>
 
-                                    <Col span={12}>
+                                    {/* <Col span={12}>
                                         <Form.Item
                                             name="client"
                                             label="Client Name"
@@ -426,14 +428,14 @@ const EditEstimates = ({ idd, onClose }) => {
                                         >
                                             <Input placeholder="Enter client name" disabled />
                                         </Form.Item>
-                                        {/* Hidden field to pass the client ID */}
+                                       
                                         <Form.Item name="client" initialValue={fnddata?.client} hidden>
                                             <Input type="hidden" />
                                         </Form.Item>
-                                    </Col>
+                                    </Col> */}
 
-                                    <Col span={12}>
-                                        {/* Display the project name */}
+                                    {/* <Col span={12}>
+                                      
                                         <Form.Item
                                             name="projectName"
                                             label="Project Name"
@@ -443,11 +445,11 @@ const EditEstimates = ({ idd, onClose }) => {
                                             <Input placeholder="Enter project name" disabled />
                                         </Form.Item>
 
-                                        {/* Hidden field to pass the project ID */}
+                                       
                                         <Form.Item name="project" initialValue={fnddata?.id} hidden>
                                             <Input type="hidden" />
                                         </Form.Item>
-                                    </Col>
+                                    </Col> */}
 
                                     <Col span={12}>
                                         <Form.Item

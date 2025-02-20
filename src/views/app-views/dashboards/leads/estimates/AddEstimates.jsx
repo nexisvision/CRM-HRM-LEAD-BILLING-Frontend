@@ -36,20 +36,29 @@ const AddEstimates = ({ onClose }) => {
     const { taxes } = useSelector((state) => state.tax);
     const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
 
-    const [selectedLead, setSelectedLead] = useState(null);
+    // const [selectedLead, setSelectedLead] = useState(null);
 
-    const subClients = useSelector((state) => state.SubClient);
-    const sub = subClients?.SubClient?.data;
+    // const subClients = useSelector((state) => state.SubClient);
+    // const sub = subClients?.SubClient?.data;
 
-    const allproject = useSelector((state) => state.Project);
-    const fndrewduxxdaa = allproject.Project.data
-    const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
+    // const allproject = useSelector((state) => state.Project);
+    // const fndrewduxxdaa = allproject.Project.data
+    // const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
 
-    const client = fnddata?.client;
+    // const client = fnddata?.client;
 
-    const subClientData = sub?.find((subClient) => subClient?.id === client);
+    // const subClientData = sub?.find((subClient) => subClient?.id === client);
 
     // console.log("sdsdfdf",subClientData);
+
+    const allleads = useSelector((state) => state.Leads);
+    const fndrewduxxdaa = allleads.Leads.data
+    const fnddata = fndrewduxxdaa?.find((lead) => lead?.id === id);
+
+    // Add this to get the lead name
+    const leadName = fnddata?.leadTitle || 'N/A';
+
+    console.log("sdsdfdf",fnddata);
 
     const [discountRate, setDiscountRate] = useState(10);
     const dispatch = useDispatch();
@@ -110,13 +119,29 @@ const AddEstimates = ({ onClose }) => {
         fetchLeads();
     }, [dispatch]);
 
+    // Get leads data and find the selected lead
+    const allLeads = useSelector((state) => state.Leads);
+    const leadsData = allLeads.Leads.data || [];
+    const selectedLead = leadsData?.find((lead) => lead?.id === id);
+
+    // Get the lead title
+    const leadTitle = selectedLead?.leadTitle || 'N/A';
+
+    // Set initial form values including lead title
+    useEffect(() => {
+        form.setFieldsValue({
+            leadTitle: leadTitle,
+            lead: id  // Keep the ID in hidden field
+        });
+    }, [form, leadTitle, id]);
+
     const initialValues = {
         valid_till: "",
         currency: "",
-        lead: "",
+        // lead: "",
         calculatedTax: 0,
-        client: fnddata?.client || "",
-        project: fnddata?.id || "",
+        // client: fnddata?.client || "",
+        lead: fnddata?.id || "",
         discount: 0,
         tax: 0,
         total: 0,
@@ -134,7 +159,7 @@ const AddEstimates = ({ onClose }) => {
                 valid_till: values.valid_till,
                 currency: values.currency,
                 lead: values.lead,
-                client: values.client,
+                // client: values.client,
                 calculatedTax: values.calculatedTax
             };
 
@@ -176,7 +201,7 @@ const AddEstimates = ({ onClose }) => {
                 valid_till: values.valid_till.format('YYYY-MM-DD'),
                 currency: values.currency,
                 lead: values.lead,
-                client: values.client,
+                // client: values.client,
                 related_id: id,
                 subtotal: subtotal.toFixed(2),
                 calculatedTax: values.calculatedTax,
@@ -206,20 +231,6 @@ const AddEstimates = ({ onClose }) => {
         }
     };
 
-    const [rows, setRows] = useState([
-        {
-            id: Date.now(),
-            item: "",
-            quantity: "",
-            price: "",
-            discount: "",
-            tax: "",
-            amount: "0",
-            description: "",
-            isNew: false,
-        },
-    ]);
-
     // Function to handle adding a new row
     const handleAddRow = () => {
         setTableData((prevData) => [
@@ -248,16 +259,6 @@ const AddEstimates = ({ onClose }) => {
     };
 
     const navigate = useNavigate();
-
-
-    // Calculate discount amount
-    // const calculateDiscount = () => {
-    //     const subTotal = calculateSubTotal();
-    //     if (discountType === '%') {
-    //         return subTotal * (parseFloat(discountValue) || 0) / 100;
-    //     }
-    //     return parseFloat(discountValue) || 0;
-    // };
 
     // Calculate total tax
     const calculateTotalTax = () => {
@@ -378,7 +379,7 @@ const AddEstimates = ({ onClose }) => {
                             <div className=" p-2">
 
                                 <Row gutter={16}>
-                                    <Col span={12}>
+                                    {/* <Col span={12}>
                                         <Form.Item
                                             name="client"
                                             label="Client Name"
@@ -387,14 +388,14 @@ const AddEstimates = ({ onClose }) => {
                                         >
                                             <Input placeholder="Enter client name" disabled />
                                         </Form.Item>
-                                        {/* Hidden field to pass the client ID */}
+                                      
                                         <Form.Item name="client" initialValue={fnddata?.client} hidden>
                                             <Input type="hidden" />
                                         </Form.Item>
-                                    </Col>
+                                    </Col> */}
 
-                                    <Col span={12}>
-                                        {/* Display the project name */}
+                                    {/* <Col span={12}>
+                                       
                                         <Form.Item
                                             name="projectName"
                                             label="Project Name"
@@ -404,14 +405,14 @@ const AddEstimates = ({ onClose }) => {
                                             <Input placeholder="Enter project name" disabled />
                                         </Form.Item>
 
-                                        {/* Hidden field to pass the project ID */}
+                                       
                                         <Form.Item name="project" initialValue={fnddata?.id} hidden>
                                             <Input type="hidden" />
                                         </Form.Item>
-                                    </Col>
+                                    </Col> */}
 
                                     <Col span={12}>
-                                        <Form.Item
+                                        {/* <Form.Item
                                             name="lead"
                                             label="Lead Title"
                                             rules={[
@@ -446,6 +447,23 @@ const AddEstimates = ({ onClose }) => {
                                                     </Option>
                                                 ))}
                                             </Select>
+                                        </Form.Item> */}
+                                         <Form.Item
+                                            name="leadTitle"
+                                            label="Lead Title"
+                                            rules={[{ required: true, message: "Lead title is required" }]}
+                                        >
+                                            <Input 
+                                                placeholder="Lead Title"
+                                                disabled 
+                                                value={leadTitle}
+                                            />
+                                        </Form.Item>
+                                        <Form.Item 
+                                            name="lead" 
+                                            hidden
+                                        >
+                                            <Input type="hidden" />
                                         </Form.Item>
                                     </Col>
 

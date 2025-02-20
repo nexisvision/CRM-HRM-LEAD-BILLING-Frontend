@@ -100,6 +100,11 @@ export const TaskList = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [searchText, setSearchText] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  // Add these new state variables if not already present
+  const [filteredData, setFilteredData] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // Open Add Job Modal
   const openAddTaskModal = () => {
@@ -145,10 +150,23 @@ export const TaskList = () => {
       message.error("Failed to export data. Please try again."); // Show error message
     }
   };
+
+  // Modify the existing useEffect to handle initial data loading
   useEffect(() => {
-    dispatch(empdata());
-    dispatch(GetTasks(id));
-  }, [dispatch]);
+    const loadInitialData = async () => {
+      setLoading(true);
+      try {
+        await dispatch(empdata());
+        await dispatch(GetTasks(id));
+      } catch (error) {
+        console.error('Error loading data:', error);
+        message.error('Failed to load data');
+      }
+      setLoading(false);
+    };
+
+    loadInitialData();
+  }, [dispatch, id]);
 
   useEffect(() => {
     if (fnddata) {
@@ -365,32 +383,45 @@ export const TaskList = () => {
     },
   };
 
-  const filterTasks = () => {
-    let filteredData = [...fnddata];
+  // Update the filter function to handle API data
+  const handleFilters = async () => {
+    setLoading(true);
+    try {
+      // First, ensure we have the base data
+      let filtered = [...fnddata];
 
-    // Apply search filter
-    if (searchText) {
-      filteredData = filteredData.filter(task => 
-        task.taskName.toLowerCase().includes(searchText.toLowerCase()) ||
-        task.assignToName?.toLowerCase().includes(searchText.toLowerCase()) ||
-        task.priority.toLowerCase().includes(searchText.toLowerCase())
-      );
+      // Apply search text filter
+      if (searchText) {
+        filtered = filtered.filter(item => 
+          item.taskName?.toLowerCase().includes(searchText.toLowerCase()) ||
+          item.assignToName?.toLowerCase().includes(searchText.toLowerCase()) ||
+          item.priority?.toLowerCase().includes(searchText.toLowerCase())
+        );
+      }
+
+      // Apply status filter
+      if (selectedStatus && selectedStatus !== 'all') {
+        filtered = filtered.filter(item => item.status === selectedStatus);
+      }
+
+      // Update the filtered data
+      setFilteredData(filtered);
+    } catch (error) {
+      console.error('Error filtering data:', error);
+      message.error('Failed to filter data');
     }
-
-    // Apply status filter
-    if (statusFilter !== 'All') {
-      filteredData = filteredData.filter(task => 
-        task.status === statusFilter
-      );
-    }
-
-    setList(filteredData);
+    setLoading(false);
   };
 
-  // Update useEffect for data filtering
+  // Add useEffect to trigger filtering when search or status changes
   useEffect(() => {
-    filterTasks();
-  }, [searchText, statusFilter, fnddata, employees]);
+    handleFilters();
+  }, [searchText, selectedStatus, fnddata]);
+
+  // Update the getFilteredTasks function
+  const getFilteredTasks = () => {
+    return filteredData;
+  };
 
   // Replace your existing onSearch with this
   const onSearch = (e) => {
@@ -421,29 +452,6 @@ export const TaskList = () => {
 
   // Get status options
   const statusOptions = getUniqueStatuses();
-
-  // Update the filter function to include status
-  const getFilteredTasks = () => {
-    if (!list) return [];
-    
-    let filtered = list;
-
-    // Apply search filter
-    if (searchText) {
-      filtered = filtered.filter(task => 
-        task.taskName?.toLowerCase().includes(searchText.toLowerCase())
-      );
-    }
-
-    // Apply status filter
-    if (selectedStatus !== 'all') {
-      filtered = filtered.filter(task => 
-        task.status === selectedStatus
-      );
-    }
-
-    return filtered;
-  };
 
   // Handle status change
   const handleStatusChange = (value) => {
@@ -513,6 +521,7 @@ export const TaskList = () => {
             columns={tableColumns}
             dataSource={getFilteredTasks()}
             rowKey="id"
+            loading={loading}
             scroll={{ x: 1600 }}
             rowSelection={{
               selectedRowKeys: selectedRowKeys,

@@ -48,9 +48,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-
   // console.log("employeeIdd", employeeIdd);
-
 
   // Add state for file handling
   const [fileList, setFileList] = useState([]);
@@ -71,7 +69,35 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
     const fnddepart =  departmentData.filter((item)=>item.created_by === loggedusername);
     const fnddesi = designationData.filter((item)=>item.created_by === loggedusername);
   
+
+
+
+    const departmentDataa = useSelector((state) => state.Department?.Department?.data || []);
+    const designationDataa = useSelector((state) => state.Designation?.Designation?.data || []);
+    const branchDataa = useSelector((state) => state.Branch?.Branch?.data || []);
+  
     
+    const getBranchName = (branchId) => {
+      const branch = branchDataa.find(item => item.id === branchId);
+      console.log("branch", branch);
+      return branch?.branchName || '';
+    };
+    
+    const getDepartmentName = (deptId) => {
+      const department = departmentDataa.find(item => item.id === deptId);
+      console.log("department", department);
+      return department?.department_name || '';
+    };
+    
+
+    const getDesignationName = (desigId) => {
+      const designation = designationDataa.find(item => item.id === desigId);
+      console.log("designation", designation);
+      return designation?.designation_name || '';
+    };
+
+
+
   const [selectedBranch, setSelectedBranch] = useState(null);
 
   // Filter departments and designations based on selected branch
@@ -116,32 +142,83 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
 
     // Update form fields with the employee's data once it's available
     if (data) {
+      // Split phone number into code and number if it exists
+      let phoneCode = "";
+      let phoneNumber = "";
+      if (data.phone) {
+        const phoneMatch = data.phone.match(/\+(\d+)\s*\((\d+)\)\s*(\d+)-(\d+)/);
+        if (phoneMatch) {
+          phoneCode = phoneMatch[1];
+          phoneNumber = `${phoneMatch[2]}${phoneMatch[3]}${phoneMatch[4]}`;
+        }
+      }
+
+      // Get names using IDs
+      const branchName = getBranchName(data.branch);
+      const departmentName = getDepartmentName(data.department);
+      const designationName = getDesignationName(data.designation);
+
       form.setFieldsValue({
-        firstName: data.firstName,
-        lastName: data.lastName,
-        username: data.username,
-        password: data.password,
-        email: data.email,
-        phone: data.phone,
-        address: data.address,
+        firstName: data.firstName || "",
+        lastName: data.lastName || "",
+        username: data.username || "",
+        password: data.password || "",
+        email: data.email || "",
+        phone: {
+          code: phoneCode,
+          number: phoneNumber
+        },
+        address: data.address || "",
         joiningDate: data.joiningDate ? moment(data.joiningDate) : null,
         leaveDate: data.leaveDate ? moment(data.leaveDate) : null,
-        department: data.department,
-        designation: data.designation,
-        salary: data.salary,
-        accountholder: data.accountholder,
-        accountnumber: data.accountnumber,
-        bankname: data.bankname,
-        banklocation: data.banklocation,
-        profilePic: data.profilePic,
-        branch: data.branch,
-        // Add other fields as needed
+        branch: {
+          label: branchName,
+          value: data.branch
+        },
+        department: {
+          label: departmentName,
+          value: data.department
+        },
+        designation: {
+          label: designationName,
+          value: data.designation
+        },
+        salary: data.salary || "",
+        accountholder: data.accountholder || "",
+        accountnumber: data.accountnumber?.toString() || "",
+        bankname: data.bankname || "",
+        banklocation: data.banklocation || "",
+        profilePic: data.profilePic || "",
+        
       });
+
+      // Set file lists if profile pic or CV exists
+      if (data.profilePic) {
+        setFileList([{
+          uid: '-1',
+          name: 'Profile Picture',
+          status: 'done',
+          url: data.profilePic
+        }]);
+      }
+
+      if (data.cv_path) {
+        setCvFileList([{
+          uid: '-1',
+          name: 'CV',
+          status: 'done',
+          url: data.cv_path
+        }]);
+      }
+
+      console.log('Branch Name:', branchName);
+      console.log('Department Name:', departmentName);
+      console.log('Designation Name:', designationName);
     }
-  }, [allempdata, employeeIdd, form]);
+  }, [allempdata, employeeIdd, form, branchData, departmentData, designationData]);
 
-
-  // useEffect(() => {
+  //   console.log("singleEmp", singleEmp);
+  // // useEffect(() => {
   //   if (singleEmp) {
   //     form.setFieldsValue({
   //       ...singleEmp,
@@ -158,19 +235,21 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
     try {
       const formData = new FormData();
 
-      // Handle profile picture
+      // Handle file uploads
       if (fileList.length > 0 && fileList[0].originFileObj) {
-        const profileFile = fileList[0].originFileObj;
-        formData.append('profilePic', profileFile, profileFile.name);
+        formData.append('profilePic', fileList[0].originFileObj);
       }
 
-      // Handle CV file - updated to match profile picture structure
       if (cvFileList.length > 0 && cvFileList[0].originFileObj) {
-        const cvFile = cvFileList[0].originFileObj;
-        formData.append('cv', cvFile, cvFile.name);
+        formData.append('cv', cvFileList[0].originFileObj);
       }
 
-      // Convert dates to ISO strings if they exist
+      // Format phone number
+      if (values.phone?.code && values.phone?.number) {
+        formData.append('phone', `+${values.phone.code} (${values.phone.number})`);
+      }
+
+      // Handle dates
       if (values.joiningDate) {
         formData.append('joiningDate', values.joiningDate.toISOString());
       }
@@ -178,27 +257,23 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
         formData.append('leaveDate', values.leaveDate.toISOString());
       }
 
-      // Add all other form values to FormData
+      // Convert the branch, department, and designation back to IDs for submission
+      formData.append('branch', values.branch.value);
+      formData.append('department', values.department.value);
+      formData.append('designation', values.designation.value);
+
+      // Add all other form values
       Object.keys(values).forEach(key => {
-        if (key !== 'profilePic' && 
+        if (key !== 'phone' && 
+            key !== 'profilePic' && 
             key !== 'cv' && 
             key !== 'joiningDate' && 
             key !== 'leaveDate' && 
             values[key] !== undefined && 
             values[key] !== null) {
-          // Handle nested objects like phone
-          if (typeof values[key] === 'object' && values[key] !== null) {
-            formData.append(key, JSON.stringify(values[key]));
-          } else {
-            formData.append(key, values[key]);
-          }
+          formData.append(key, values[key]);
         }
       });
-
-      // Log FormData contents for debugging (remove in production)
-      for (let pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
-      }
 
       const response = await dispatch(updateEmp({ employeeIdd, formData })).unwrap();
       
@@ -209,7 +284,7 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
       }
     } catch (error) {
       console.error("Update error:", error);
-      message.error(error?.message || "An error occurred while updating the employee.");
+      message.error(error?.message || "Failed to update employee");
     }
   };
 
@@ -221,26 +296,26 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
 
 
   const initialValues = {
-    firstName: singleEmp?.firstName || "",
-    lastName: singleEmp?.lastName || "",
-    // username: singleEmp?.username || "",
+    firstName: "",
+    lastName: "",
+    username: "",
     password: "",
-    email: singleEmp?.email || "",
+    email: "",
     phone: {
-      code: singleEmp?.phone?.code || "",
-      number: singleEmp?.phone?.number || ""
+      code: "",
+      number: ""
     },
-    address: singleEmp?.address || "",
-    joiningDate: singleEmp?.joiningDate ? moment(singleEmp.joiningDate) : null,
-    leaveDate: singleEmp?.leaveDate ? moment(singleEmp.leaveDate) : null,
-    // employeeId: "",
-    department: singleEmp?.department || "",
-    designation: singleEmp?.designation || "",
-    salary: singleEmp?.salary || "",
-    accountholder: singleEmp?.accountholder || "",
-    accountnumber: singleEmp?.accountnumber || "",
-    bankname: singleEmp?.bankname || "",
-    banklocation: singleEmp?.banklocation || "",
+    address: "",
+    branch: "",
+    department: "",
+    designation: "",
+    salary: "",
+    accountholder: "",
+    accountnumber: "",
+    bankname: "",
+    banklocation: "",
+    joiningDate: null,
+    leaveDate: null,
   };
 
 
@@ -529,81 +604,65 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             </Form.Item>
             </Col> */}
            <Col span={12}>
-            <div className="form-item">
-              <label className="">Branch <span className="text-red-500">*</span></label>
-              <Field name="branch">
-                {({ field }) => (
-                  <Select
-                    {...field}
-                    className="w-full mt-1"
-                    placeholder="Select Branch"
-                    onChange={(value) => {
-                      setFieldValue("branch", value);
-                      setFieldValue("department", "");
-                      setFieldValue("designation", "");
-                      setSelectedBranch(value); // Update selected branch
-                    }}
-                  >
-                    {fndbranchdata.map((branch) => (
-                       <Option key={branch.id} value={branch.id}>
-                       {branch.branchName}
-                     </Option>
-                    ))}
-                  </Select>
-                )}
-              </Field>
-              <ErrorMessage name="branch" component="div" className="text-red-500" />
-            </div>
+            <Form.Item
+              name="branch"
+              label="Branch"
+              rules={[{ required: true, message: "Branch is required" }]}
+            >
+              <Select
+                placeholder="Select Branch"
+                labelInValue
+                onChange={(value) => form.setFieldsValue({ branch: value })}
+              >
+                {branchData.map((branch) => (
+                  <Option key={branch.id} value={branch.id}>
+                    {branch.branchName}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
           </Col>
 
           {/* Department Selection */}
           <Col span={12}>
-            <div className="form-item">
-              <label className="">Department <span className="text-red-500">*</span></label>
-              <Field name="department">
-                {({ field }) => (
-                  <Select
-                    {...field}
-                    className="w-full mt-1"
-                    placeholder="Select Department"
-                    disabled={!selectedBranch}
-                    onChange={(value) => setFieldValue("department", value)}
-                  >
-                    {filteredDepartments.map((dept) => (
-                      <Option key={dept.id} value={dept.id}>
-                        {dept.department_name}
-                      </Option>
-                    ))}
-                  </Select>
-                )}
-              </Field>
-              <ErrorMessage name="department" component="div" className="text-red-500" />
-            </div>
+            <Form.Item
+              name="department"
+              label="Department"
+              rules={[{ required: true, message: "Department is required" }]}
+            >
+              <Select
+                placeholder="Select Department"
+                labelInValue
+                onChange={(value) => form.setFieldsValue({ department: value })}
+              >
+                {departmentData.map((dept) => (
+                  <Option key={dept.id} value={dept.id}>
+                    {dept.department_name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
           </Col>
 
           {/* Designation Selection */}
           <Col span={12}>
-            <div className="form-item mt-2">
-              <label className="">Designation <span className="text-red-500">*</span></label>
-              <Field name="designation">
-                {({ field }) => (
-                  <Select
-                    {...field}
-                    className="w-full mt-1"
-                    placeholder="Select Designation"
-                    disabled={!selectedBranch}
-                    onChange={(value) => setFieldValue("designation", value)}
-                  >
-                    {filteredDesignations.map((des) => (
-                      <Option key={des.id} value={des.id}>
-                        {des.designation_name}
-                      </Option>
-                    ))}
-                  </Select>
-                )}
-              </Field>
-              <ErrorMessage name="designation" component="div" className="text-red-500" />
-            </div>
+            <Form.Item
+              name="designation"
+              label="Designation"
+              rules={[{ required: true, message: "Designation is required" }]}
+            >
+              <Select
+                placeholder="Select Designation"
+                labelInValue
+                onChange={(value) => form.setFieldsValue({ designation: value })}
+              >
+                {designationData.map((desig) => (
+                  <Option key={desig.id} value={desig.id}>
+                    {desig.designation_name}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
           </Col>
           
 
@@ -637,12 +696,22 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
           </Col>
           <Col span={12}>
             <Form.Item
-              name="bankName"
+              name="bankname"
               label="Bank Name"
               className="  "
               rules={[{ required: true, message: "Bank Name is required" }]}
             >
               <Input placeholder="Bank of Example" />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              name="banklocation"
+              label="Bank Location"
+              className="  "
+              rules={[{ required: true, message: "Bank Location is required" }]}
+            >
+              <Input placeholder="Bank Location" />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -1031,284 +1100,6 @@ export default EditEmployee;
 //             </Button>
 //             <Button type="primary" htmlType="submit">
 //               Save
-//             </Button>
-//           </div>
-//         </Form.Item>
-//       </Form>
-//     </div>
-//   );
-// };
-
-// export default EditEmployee;
-
-// import React, { useEffect, useState } from 'react';
-// import { Form, Input, Button, DatePicker, Select, message, Row, Col } from 'antd';
-// import { useNavigate, useParams } from 'react-router-dom';
-
-// const { Option } = Select;
-
-// const EditEmployee = () => {
-//   const [form] = Form.useForm();
-//   const navigate = useNavigate();
-//   const { employeeId } = useParams(); // Assuming employeeId is passed in the route params
-
-//   // Simulating fetching employee data (In a real app, you should fetch data from an API)
-//   const [employeeData, setEmployeeData] = useState(null);
-
-//   useEffect(() => {
-//     // Mock employee data. Replace this with an actual API call to fetch the employee details by employeeId.
-//     const mockEmployeeData = {
-//       firstName: 'John',
-//       lastName: 'Doe',
-//       username: 'john_doe',
-//       password: 'StrongPassword',
-//       email: 'johndoe@example.com',
-//       phone: '1234567890',
-//       street: '123 Main Street',
-//       city: 'Los Angeles',
-//       state: 'CA',
-//       zipCode: '90211',
-//       country: 'USA',
-//       joiningDate: '2023-01-01',
-//       leaveDate: '2024-01-01',
-//       employeeId: 'OE-012',
-//       bloodGroup: 'O+',
-//       designation: 'Developer',
-//       salary: 50000,
-//     };
-
-//     setEmployeeData(mockEmployeeData); // Set the fetched data
-//   }, [employeeId]);
-
-//   // Handle form submission for editing
-//   const onFinish = (values) => {
-//     console.log('Updated values:', values);
-//     message.success('Employee updated successfully!');
-//     navigate('/app/hrm/employee');
-//   };
-
-//   const onFinishFailed = (errorInfo) => {
-//     console.error('Form submission failed:', errorInfo);
-//     message.error('Please fill out all required fields.');
-//   };
-
-//   if (!employeeData) {
-//     return <div>Loading...</div>; // Return loading state while employeeData is being fetched
-//   }
-
-//   return (
-//     <div className="edit-employee">
-//       <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
-
-//       <Form
-//         layout="vertical"
-//         form={form}
-//         name="edit-employee"
-//         initialValues={employeeData}
-//         onFinish={onFinish}
-//         onFinishFailed={onFinishFailed}
-//       >
-//         {/* User Information */}
-//         <Row gutter={16}>
-//           <Col span={12}>
-//             <Form.Item
-//               name="firstName"
-//               label="First Name"
-//               rules={[{ required: true, message: 'First Name is required' }]}
-//             >
-//               <Input placeholder="John" />
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item
-//               name="lastName"
-//               label="Last Name"
-//               rules={[{ required: true, message: 'Last Name is required' }]}
-//             >
-//               <Input placeholder="Doe" />
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item
-//               name="username"
-//               label="User Name"
-//               rules={[{ required: true, message: 'User Name is required' }]}
-//             >
-//               <Input placeholder="john_doe" />
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item
-//               name="password"
-//               label="Password"
-//               rules={[{ required: true, message: 'Password is required' }]}
-//             >
-//               <Input.Password placeholder="Strong Password" />
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item
-//               name="email"
-//               label="Email"
-//               rules={[
-//                 { required: true, message: 'Email is required' },
-//                 { type: 'email', message: 'Please enter a valid email (e.g., example@example.com)' },
-//               ]}
-//             >
-//               <Input placeholder="johndoe@example.com" />
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item
-//               name="phone"
-//               label="Phone"
-//               rules={[
-//                 { required: true, message: 'Phone number is required' },
-//                 {
-//                   pattern: /^[0-9]{10}$/,
-//                   message: 'Phone number must be exactly 10 digits',
-//                 },
-//               ]}
-//             >
-//               <Input placeholder="1234567890" maxLength={10} />
-//             </Form.Item>
-//           </Col>
-//         </Row>
-
-//         {/* Address Information */}
-//         <Row gutter={16}>
-//           <Col span={12}>
-//             <Form.Item
-//               name="street"
-//               label="Street"
-//               rules={[{ required: true, message: 'Street is required' }]}
-//             >
-//               <Input placeholder="123 Main Street" />
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item
-//               name="city"
-//               label="City"
-//               rules={[{ required: true, message: 'City is required' }]}
-//             >
-//               <Input placeholder="Los Angeles" />
-//             </Form.Item>
-//           </Col>
-//           <Col span={8}>
-//             <Form.Item
-//               name="state"
-//               label="State"
-//               rules={[{ required: true, message: 'State is required' }]}
-//             >
-//               <Input placeholder="CA" />
-//             </Form.Item>
-//           </Col>
-//           <Col span={8}>
-//             <Form.Item
-//               name="zipCode"
-//               label="Zip Code"
-//               rules={[
-//                 { required: true, message: 'Zip Code is required' },
-//                 {
-//                   pattern: /^[0-9]{6}$/,
-//                   message: 'Zip Code must be exactly 6 digits',
-//                 },
-//               ]}
-//             >
-//               <Input placeholder="90211" maxLength={6} />
-//             </Form.Item>
-//           </Col>
-//           <Col span={8}>
-//             <Form.Item
-//               name="country"
-//               label="Country"
-//               rules={[{ required: true, message: 'Country is required' }]}
-//             >
-//               <Input placeholder="USA" />
-//             </Form.Item>
-//           </Col>
-//         </Row>
-
-//         {/* Employee Information */}
-//         <Row gutter={16}>
-//           <Col span={12}>
-//             <Form.Item
-//               name="joiningDate"
-//               label="Joining Date"
-//               className=" font-semibold"
-//               rules={[{ required: true, message: 'Joining Date is required' }]}
-//             >
-//               <DatePicker style={{ width: '100%' }} />
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item name="leaveDate" label="Leave Date">
-//               <DatePicker style={{ width: '100%' }} />
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item
-//               name="employeeId"
-//               label="Employee ID"
-//               rules={[{ required: true, message: 'Employee ID is required' }]}
-//             >
-//               <Input placeholder="OE-012" />
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item
-//               name="bloodGroup"
-//               label="Blood Group"
-//               rules={[{ required: true, message: 'Blood Group is required' }]}
-//             >
-//               <Select placeholder="Select Blood Group">
-//                 <Option value="A+">A+</Option>
-//                 <Option value="A-">A-</Option>
-//                 <Option value="B+">B+</Option>
-//                 <Option value="B-">B-</Option>
-//                 <Option value="O+">O+</Option>
-//                 <Option value="O-">O-</Option>
-//                 <Option value="AB+">AB+</Option>
-//                 <Option value="AB-">AB-</Option>
-//               </Select>
-//             </Form.Item>
-//           </Col>
-//         </Row>
-
-//         {/* Designation & Salary Information */}
-//         <Row gutter={16}>
-//           <Col span={12}>
-//             <Form.Item
-//               name="designation"
-//               label="Designation"
-//               rules={[{ required: true, message: 'Designation is required' }]}
-//             >
-//               <Select placeholder="Select Designation">
-//                 <Option value="Manager">Manager</Option>
-//                 <Option value="Developer">Developer</Option>
-//                 <Option value="Designer">Designer</Option>
-//               </Select>
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item
-//               name="salary"
-//               label="Salary"
-//               rules={[{ required: true, message: 'Salary is required' }]}
-//             >
-//               <Input placeholder="$" type="number" />
-//             </Form.Item>
-//           </Col>
-//         </Row>
-
-//         <Form.Item>
-//           <div className="text-right">
-//             <Button type="default" className="mr-2" onClick={() => navigate('/app/hrm/employee')}>
-//               Cancel
-//             </Button>
-//             <Button type="primary" htmlType="submit">
-//               Update
 //             </Button>
 //           </div>
 //         </Form.Item>

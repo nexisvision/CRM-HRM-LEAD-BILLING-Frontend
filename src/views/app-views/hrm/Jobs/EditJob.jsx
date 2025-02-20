@@ -27,6 +27,7 @@ import {
 } from "views/app-views/dashboards/project/milestone/LableReducer/LableSlice";
 import { AddJobs, EditJobs, GetJobdata } from "./JobReducer/JobSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -56,16 +57,15 @@ const EditJob = ({ idd, onClose }) => {
   const [singleEmp, setSingleEmp] = useState(null);
 
   useEffect(() => {
-
     const empData = alldept?.Jobs?.data || [];
     const data = empData.find((item) => item.id === idd);
     setSingleEmp(data || null);
   }, [idd, alldept]);
 
-
   useEffect(() => {
     dispatch(getcurren());
   }, [dispatch]);
+
   const initialValues = {
     title: singleEmp ? singleEmp.title : "",
     category: singleEmp ? singleEmp.category : "",
@@ -154,7 +154,6 @@ const EditJob = ({ idd, onClose }) => {
     fetchLabels("jobstatus", setJobStatuses);
   }, []);
 
-
   const handleAddNewLabel = async (lableType, newValue, setter, modalSetter) => {
     if (!newValue.trim()) {
       message.error(`Please enter a ${lableType} name.`);
@@ -182,12 +181,56 @@ const EditJob = ({ idd, onClose }) => {
     }
   };
 
+  useEffect(() => {
+    const empData = alldept?.Jobs?.data || [];
+    const data = empData.find((item) => item.id === idd);
+    if (data) {
+      // Set form values using setFieldValue
+      const formik = formikRef.current;
+      if (formik) {
+        formik.setFieldValue('title', data.title || '');
+        formik.setFieldValue('category', data.category || '');
+        formik.setFieldValue('skillss', data.skills === "{}" ? "" : JSON.parse(data.skills)?.Skills || "");
+        formik.setFieldValue('location', data.location || '');
+        formik.setFieldValue('interviewRounds', 
+          data.interviewRounds ? JSON.parse(data.interviewRounds)?.InterviewRounds || [] : []);
+        formik.setFieldValue('startDate', data.startDate ? dayjs(data.startDate) : null);
+        formik.setFieldValue('endDate', data.endDate ? dayjs(data.endDate) : null);
+        formik.setFieldValue('recruiter', data.recruiter || '');
+        formik.setFieldValue('jobType', data.jobType || '');
+        formik.setFieldValue('workExperience', data.workExperience || '');
+        formik.setFieldValue('currency', data.currency || '');
+        formik.setFieldValue('description', data.description || '');
+        formik.setFieldValue('status', data.status || '');
+        formik.setFieldValue('expectedSalary', data.expectedSalary || '');
+      }
+    }
+  }, [idd, alldept]);
+
+  // Add formikRef to access Formik instance
+  const formikRef = React.useRef(null);
+
   return (
     <div className="add-expenses-form">
       <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
       <Formik
-        initialValues={initialValues}
-        // validationSchema={validationSchema}
+        innerRef={formikRef}  // Add this line to get Formik reference
+        initialValues={{
+          title: '',
+          category: '',
+          skillss: '',
+          location: '',
+          interviewRounds: [],
+          startDate: null,
+          endDate: null,
+          recruiter: '',
+          jobType: '',
+          workExperience: '',
+          currency: '',
+          description: '',
+          status: '',
+          expectedSalary: '',
+        }}
         onSubmit={onSubmit}
       >
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (

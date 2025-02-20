@@ -69,6 +69,7 @@ import tax from 'views/app-views/setting/tax/taxreducer/taxSlice'
 import salesquotation from "views/app-views/dashboards/sales/estimates/estimatesReducer/EstimatesSlice"
 import esignature from "views/app-views/setting/esignature/EsignatureReducers/EsignatureSlice"
 import generalsetting from "../views/app-views/setting/general/generalReducer/generalSlice"
+import leadestimate from "views/app-views/dashboards/leads/estimates/estimatesReducer/EstimatesSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -142,6 +143,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
         salesquotation,
         esignature,
         generalsetting,
+        leadestimate,
         // employee,
         // department,
         ...asyncReducers,

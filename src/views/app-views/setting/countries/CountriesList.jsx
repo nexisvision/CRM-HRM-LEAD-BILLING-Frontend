@@ -11,10 +11,13 @@ import { deleteCountries } from './countriesreducer/countriesSlice';
 import userData from 'assets/data/user-list.data.json';
 import AddCountries from './AddCountries';
 import EditCountries from './EditCountries';
+import { getRoles } from 'views/app-views/hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice';
 const { Column } = Table;
 const { Option } = Select
 export const CountriesList = () => {
     // const [countries, setCountries] = useState([]);
+
+
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [isAddCountriesModalVisible, setIsAddCountriesModalVisible] = useState(false);
@@ -23,6 +26,10 @@ export const CountriesList = () => {
     const [selectedCountry, setSelectedCountry] = useState(null);
     const [idd, setIdd] = useState("");
     const [searchText, setSearchText] = useState('');
+
+      // Get logged-in user data
+      const userData = useSelector((state) => state.user?.loggedInUser);
+      const roles = useSelector((state) => state.role?.role?.data);
 
     useEffect(() => {
         dispatch(getallcountries());
@@ -43,6 +50,16 @@ export const CountriesList = () => {
             setFilteredData(countries);
         }
     }, [countries]);
+
+    useEffect(() => {
+        dispatch(getRoles());
+    }, [dispatch]);
+
+    // Check if user is super-admin
+    const isSuperAdmin = () => {
+        const userRole = roles?.find(role => role.id === userData?.role_id);
+        return userRole?.role_name === 'super-admin';
+    };
   
     // Open Add Job Modal
     const openAddCountriesModal = () => {
@@ -177,12 +194,19 @@ export const CountriesList = () => {
                             </Input.Group>
                         </div>
                     </Flex>
-                    {/* <Flex gap="7px" className="flex">
-                        <Button type="primary" className="flex items-center" onClick={openAddCountriesModal}>
-                            <PlusOutlined />
-                            <span className="ml-2">New</span>
-                        </Button>
-                    </Flex> */}
+                   {/* Only show Add button if role_name is super-admin */}
+                   {isSuperAdmin() && (
+                        <Flex gap="7px" className="flex">
+                            <Button 
+                                type="primary" 
+                                className="flex items-center" 
+                                onClick={openAddCountriesModal}
+                            >
+                                <PlusOutlined />
+                                <span className="ml-2">Add Country</span>
+                            </Button>
+                        </Flex>
+                    )}
                 </Flex>
                 <div className="table-responsive">
                     <Table
