@@ -13,6 +13,7 @@ import {
   Modal,
   Select,
   Form,
+  Avatar,
 } from "antd";
 import {
   EyeOutlined,
@@ -24,6 +25,7 @@ import {
   LoginOutlined,
   FileExcelOutlined,
   EditOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import EditCompany from "./EditCompany";
 import { ClientData, deleteClient } from "./CompanyReducers/CompanySlice";
@@ -205,11 +207,29 @@ const CompanyCard = ({ company }) => {
         <EllipsisDropdown menu={dropdownMenu(company)} />
       </div>
       <div className="flex flex-col items-center">
-        <img
-          src={company.profilePic}
-          alt={company.name}
-          className="rounded-full w-24 h-24 mb-2"
-        />
+        {company.profilePic ? (
+          <img
+            src={company.profilePic}
+            alt={company.name}
+            className="rounded-full w-24 h-24 mb-2 object-cover"
+            onError={(e) => {
+              e.target.onerror = null; // Prevent infinite loop
+              e.target.src = ""; // Clear the broken image
+              e.target.style.display = "none"; // Hide the img element
+              e.target.nextSibling.style.display = "inline-flex"; // Show the Avatar
+            }}
+          />
+        ) : (
+          <Avatar 
+            size={96} // 24px * 4 to match the w-24 class
+            icon={<UserOutlined style={{ color: '#666666' }} />}
+            className="mb-2 flex items-center justify-center"
+            style={{ 
+              backgroundColor: '#f0f0f0', // Light gray background
+              display: company.profilePic ? 'none' : 'flex'
+            }}
+          />
+        )}
         <h3 className="font-semibold text-lg">{company.name}</h3>
         <p className="text-gray-500">{company.email}</p>
         <p className="text-gray-400">{company.plan}</p>

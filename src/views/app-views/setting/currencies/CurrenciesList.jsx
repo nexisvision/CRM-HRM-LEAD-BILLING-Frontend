@@ -80,7 +80,7 @@ export const CurrenciesList = () => {
        dispatch(deletecurren(id))
         .then(()=>{
             dispatch(getcurren())
-            // message.success('Currency deleted successfully');
+            message.success('Currency deleted successfully');
             setFilteredData(filteredData.filter(item => item.id!== id));
         })
     };

@@ -403,14 +403,14 @@ const extraNavvvTree = [
         breadcrumb: true,
         submenu: []
       },
-      {
-        key: 'superadmin-planrequest',
-        path: `${APP_PREFIX_PATH}/superadmin/planrequest`,
-        title: 'Plan Request',
-        icon: PullRequestOutlined ,
-        breadcrumb: true,
-        submenu: []
-      },
+      // {
+      //   key: 'superadmin-planrequest',
+      //   path: `${APP_PREFIX_PATH}/superadmin/planrequest`,
+      //   title: 'Plan Request',
+      //   icon: PullRequestOutlined ,
+      //   breadcrumb: true,
+      //   submenu: []
+      // },
       {
         key: 'superadmin-subscribeduserplans',
         path: `${APP_PREFIX_PATH}/superadmin/subscribeduserplans`,

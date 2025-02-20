@@ -45,11 +45,11 @@ const EditCountries = ({ idd, onClose }) => {
         dispatch(updatecountries({ idd, values }))
             .then(() => {
                 dispatch(getallcountries()); // Refresh country data
-                // message.success('Country updated successfully!');
+                message.success('Country updated successfully!');
                 onClose(); // Close modal or perform any other action
             })
             .catch((error) => {
-                // message.error('Failed to update country.');
+                message.error('Failed to update country.');
                 // console.error('Edit API error:', error);
             });
     };

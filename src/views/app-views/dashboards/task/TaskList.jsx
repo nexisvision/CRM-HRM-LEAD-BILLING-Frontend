@@ -480,7 +480,7 @@ const TaskList = () => {
                 prefix={<SearchOutlined />}
                 onChange={onSearch}
                 value={searchValue}
-                allowClear
+                // allowClear
                 style={{ width: '250px' }}
                 loading={isSearching}
               />

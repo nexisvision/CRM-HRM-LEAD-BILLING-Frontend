@@ -41,6 +41,8 @@ import { getsubplandata } from "../subscribeduserplans/subplanReducer/subplanSli
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddUpgradePlan from './AddUpgradePlan';
 import EmailVerificationModal from "./EmailVerification";
+import { Avatar } from 'antd';
+import { UserOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
 const VIEW_LIST = "LIST";
@@ -202,17 +204,49 @@ const CompanyList = () => {
 
   const tableColumns = [
 
+    // {
+    //       title: "profilePic",
+    //       dataIndex: 'profilePic',
+    //       render: (_, record) => (
+    //         <AvatarStatus
+    //           src={record.profilePic}
+    //           name={record.username || record.firstName}
+    //           size={40}
+    //         />
+    //       ),
+    //     },
+
     {
-          title: "profilePic",
-          dataIndex: 'profilePic',
-          render: (_, record) => (
+      title: "profilePic",
+      dataIndex: 'profilePic', 
+      render: (_, record) => (
+        <div className="d-flex align-items-center">
+          {record.profilePic ? (
             <AvatarStatus
               src={record.profilePic}
               name={record.username || record.firstName}
               size={40}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.style.display = "none";
+              }}
             />
-          ),
-        },
+          ) : (
+            <div className="d-flex align-items-center">
+              <Avatar 
+                size={40}
+                icon={<UserOutlined style={{ color: '#666666' }} />}
+                style={{ 
+                  backgroundColor: '#f0f0f0',
+                  marginRight: '8px'
+                }}
+              />
+              <span>{record.username}</span>
+            </div>
+          )}
+        </div>
+      ),
+    },
   
     {
       title: "Company",

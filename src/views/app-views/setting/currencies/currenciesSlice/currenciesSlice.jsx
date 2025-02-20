@@ -145,12 +145,12 @@ const currenciesSlice = createSlice({
             })
             .addCase(addcurren.fulfilled, (state, action) => {
                 state.isLoading = false;
-                message.success(action.payload?.message);
+                // message.success(action.payload?.message);
             })
 
             .addCase(addcurren.rejected, (state, action) => {
                 state.isLoading = false;
-                message.error(action.payload?.message);
+                // message.error(action.payload?.message);
             })
 
 
@@ -181,45 +181,19 @@ const currenciesSlice = createSlice({
                     })
 
            
-            //getall
-            .addCase(getAllUsers.pending, (state) => {
-                state.isLoading = true;
-            })
-            .addCase(getAllUsers.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.users = action.payload;
-                // toast.success(`Users fetched successfully`);
-            })
-            .addCase(getAllUsers.rejected, (state, action) => {
-                state.isLoading = false;
-                toast.error(action.payload?.response?.data?.message);
-            })
-            
-            //getuserbyid
-            .addCase(getUserById.pending, (state) => {
-                state.isLoading = true;
-            })
-            .addCase(getUserById.fulfilled, (state, action) => {
-                state.isLoading = false;
-                state.detailItem = action.payload?.user;
-                toast.success(action.payload.message);
-            })
-            .addCase(getUserById.rejected, (state, action) => {
-                state.isLoading = false;
-                toast.error(action.payload?.response?.data?.message);
-            })
+            // 
             //delete
             .addCase(deletecurren.pending, (state) => {
                 state.isLoading = true;
             })
             .addCase(deletecurren.fulfilled, (state, action) => {
                 state.isLoading = false;
-                message.success(action.payload.message);
+                // message.success(action.payload.message);
             })
 
             .addCase(deletecurren.rejected, (state, action) => {
                 state.isLoading = false;
-                message.error(action.payload?.response?.data?.message);
+                // message.error(action.payload?.response?.data?.message);
             })
             //update
 
@@ -230,13 +204,13 @@ const currenciesSlice = createSlice({
               .addCase(editscurren.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
-                message.success(action.payload?.message);
+                // message.success(action.payload?.message);
               })
 
               .addCase(editscurren.rejected, (state, action) => {
                 state.isLoading = false;
                 // state.error = action.payload;
-                message.error(action.payload?.response?.data?.message);
+                // message.error(action.payload?.response?.data?.message);
               });
     },
 });

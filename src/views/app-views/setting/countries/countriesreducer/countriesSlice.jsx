@@ -102,12 +102,12 @@ const countriesSlice = createSlice({
         .addCase(addCountry.fulfilled, (state, action) => {
             state.countries.push(action.payload);
             state.isLoading = false;
-            message.success(action.payload?.message);
+            // message.success(action.payload?.message);
         })
         .addCase(addCountry.rejected, (state, action) => {
             state.isLoading = false;
             state.error = action.payload;
-            message.error(action.payload?.message);
+            // message.error(action.payload?.message);
         })
 
         .addCase(getallcountries.pending, (state, action) => {
@@ -127,11 +127,11 @@ const countriesSlice = createSlice({
         .addCase(updatecountries.fulfilled, (state, action) => {
           state.editItem = action.payload.data;
             state.isLoading = false;
-            message.success(action.payload?.message);
+            // message.success(action.payload?.message);
         })
         .addCase(updatecountries.rejected, (state, action) => {
             state.isLoading = false;
-            message.error(action.payload?.message);
+            // message.error(action.payload?.message);
         })
         .addCase(DeletePs.pending, (state) => {
             state.isLoading = true;
@@ -141,14 +141,14 @@ const countriesSlice = createSlice({
         .addCase(DeletePs.fulfilled, (state, action) => {
             state.isLoading = false;
             state.countries = state.countries.filter(country => country.id !== action.payload.id);
-            message.success(action.payload?.message);
+            // message.success(action.payload?.message);
         })
 
 
         .addCase(DeletePs.rejected, (state, action) => {
             state.isLoading = false;
             state.error = action.payload;
-            message.error(action.payload?.message);
+            // message.error(action.payload?.message);
         })
 
     }

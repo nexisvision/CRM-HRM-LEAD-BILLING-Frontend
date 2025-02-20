@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Form, Input, Button, notification } from "antd";
+import { Card, Form, Input, Button, notification, message } from "antd";
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { addCountry, getallcountries } from './countriesreducer/countriesSlice';
@@ -27,17 +27,19 @@ const AddCountries = ({onClose}) => {
     try {
       await dispatch(addCountry(values)).unwrap();
       await dispatch(getallcountries());
-      notification.success({
-        message: 'Success',
-        description: 'Country added successfully.',
-      });
+      // notification.success({
+      //   message: 'Success',
+      //   description: 'Country added successfully.',
+      // });
+      message.success('Country added successfully.');
       resetForm();
       onClose();
     } catch (error) {
-      notification.error({
-        message: 'Error',
-        description: error.message || 'Failed to add country.',
-      });
+      // notification.error({
+      //   message: 'Error',
+      //   description: error.message || 'Failed to add country.',
+      // });
+      message.error('Failed to add country.');
     } finally {
       setSubmitting(false);
     }

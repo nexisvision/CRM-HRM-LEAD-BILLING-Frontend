@@ -6,13 +6,17 @@ import {
 	SettingOutlined, 
 	ShopOutlined, 
 	QuestionCircleOutlined, 
-	LogoutOutlined 
+	LogoutOutlined ,
+	UserOutlined
 } from '@ant-design/icons';
 import NavItem from './NavItem';
 import Flex from 'components/shared-components/Flex';
 import { signOut } from 'store/slices/authSlice';
 import styled from '@emotion/styled';
-import { FONT_WEIGHT, MEDIA_QUERIES, SPACER, FONT_SIZES } from 'constants/ThemeConstant'
+import { FONT_WEIGHT, MEDIA_QUERIES, SPACER, FONT_SIZES } from 'constants/ThemeConstant';
+// import { Avatar } from 'antd';
+// import { UserOutlined } from '@ant-design/icons';
+
 
 const Icon = styled.div(() => ({
 	fontSize: FONT_SIZES.LG
@@ -114,7 +118,21 @@ export const NavProfile = ({ mode }) => {
     <Dropdown placement="bottomRight" menu={{ items }} trigger={["click"]}>
       <NavItem mode={mode}>
         <Profile>
-          <Avatar src={currentuser?.loggedInUser?.profilePic} />
+          {currentuser?.loggedInUser?.profilePic ? (
+            <Avatar 
+              src={currentuser?.loggedInUser?.profilePic}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "";
+                e.target.style.display = "none";
+              }}
+            />
+          ) : (
+            <Avatar
+              icon={<UserOutlined style={{ color: '#666666' }} />}
+              style={{ backgroundColor: '#f0f0f0' }}
+            />
+          )}
           <UserInfo className="profile-text">
             <Name>{current}</Name>
             <Title>{roleu}</Title>

@@ -397,7 +397,7 @@ const TrainingSetupList = () => {
       </Modal>
 
       <Modal
-        title="Edit Training Setup"
+        title=""
         visible={isViewTrainingSetupModalVisible}
         onCancel={closeViewTrainingSetupModal}
         footer={null}

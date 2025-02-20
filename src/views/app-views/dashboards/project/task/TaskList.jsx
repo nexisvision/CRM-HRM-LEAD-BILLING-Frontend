@@ -100,7 +100,7 @@ export const TaskList = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [searchText, setSearchText] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  // const [statusFilter, setStatusFilter] = useState('all');
 
   // Add these new state variables if not already present
   const [filteredData, setFilteredData] = useState([]);

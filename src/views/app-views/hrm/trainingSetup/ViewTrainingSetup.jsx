@@ -63,15 +63,15 @@ const ViewTrainingSetup = ({ idd, onClose }) => {
   }, [dispatch]);
 
   return (
-    <div className="bg-slate-400 ml-[-24px] mr-[-24px] mt-[-52px] mb-[-24px] rounded-xl">
-      <div className="container mx-auto p-6">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
+    <div className="bg-slate-50 ml-[-24px] mr-[-24px] mt-[-52px] mb-[-24px] rounded-xl">
+      <div className="container mx-auto p-6 mt-[-52px]">
+        <h1 className="text-3xl font-bold text-center text-gray-500 mb-8">
           {milestone?.category}
         </h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {linksArray.map((video, index) => (
             <Card key={index} className="bg-slate-100">
-              <div className="relative rounded-lg shadow-lg overflow-hidden">
+              <div className="relative rounded-lg  overflow-hidden">
                 {!isPlaying[index] && (
                   <button
                     onClick={() => handlePlay(index)}

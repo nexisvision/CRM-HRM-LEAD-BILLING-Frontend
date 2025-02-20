@@ -34,6 +34,7 @@ import userData from "assets/data/user-list.data.json";
 import OrderListData from "assets/data/order-list.data.json";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { GetJobdata } from '../JobReducer/JobSlice';  // Import the jobs action
 
 import { getjobapplication } from "../JobApplication/JobapplicationReducer/JobapplicationSlice";
 
@@ -54,6 +55,8 @@ const JobCandidateList = () => {
   const fnddta = alldata.jobapplications.data || [];
 
   const filteredData = fnddta.filter((item) => item.created_by === user);
+    // Get jobs data from Redux store
+    const jobsData = useSelector((state) => state.Jobs?.Jobs?.data || []);
 
   useEffect(() => {
     dispatch(getjobapplication());
@@ -115,6 +118,27 @@ const JobCandidateList = () => {
   // Delete user
   const deleteUser = (userId) => {
     setUsers(filteredData.filter((item) => item.id !== userId));
+  };
+
+    // Fetch jobs data when component mounts
+    useEffect(() => {
+      dispatch(GetJobdata());
+    }, [dispatch]);
+
+   // Debug logs
+   useEffect(() => {
+     console.log('Jobs Data:', jobsData);
+     console.log('Job Application Data:', fnddta);
+   }, [jobsData, fnddta]);
+
+   // Function to get job name from job id
+   const getJobName = (jobId) => {
+    const job = jobsData.find(job => job.id === jobId);
+    if (job) {
+      console.log('Found job:', job); // Debug log
+      return job.title;
+    }
+    return 'N/A';
   };
 
   // Show user profile
@@ -255,7 +279,15 @@ const JobCandidateList = () => {
     {
       title: "Job",
       dataIndex: "job",
-      sorter: (a, b) => a.leavetype.length - b.leavetype.length,
+      render: (jobId) => {
+        console.log('Rendering job ID:', jobId); // Debug log
+        return <span>{getJobName(jobId)}</span>;
+      },
+      sorter: (a, b) => {
+        const jobNameA = getJobName(a.job)?.toLowerCase() || '';
+        const jobNameB = getJobName(b.job)?.toLowerCase() || '';
+        return jobNameA.localeCompare(jobNameB);
+      },
     },
     {
       title: "current_location",
