@@ -126,6 +126,7 @@ const EditContract = ({ id, onClose }) => {
         phone: filcon.phone || "",
         phoneCode: filcon.phoneCode || "",
         // contract_number: filcon.contract_number || "",
+
         currency: filcon.currency || "",
         address: filcon.address || "",
         city: filcon.city || "",

@@ -322,22 +322,7 @@ const EditExpenses = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
-              <div className="mt-4 w-full">
-                <span className="block  font-semibold p-2">Bill</span>
-                <Col span={24}>
-                  <Upload
-                    action="http://localhost:5500/api/users/upload-cv"
-                    listType="picture"
-                    accept=".pdf"
-                    maxCount={1}
-                    showUploadList={{ showRemoveIcon: true }}
-                    className="border-2 flex justify-center items-center p-10 "
-                  >
-                    <span className="text-xl">Choose File</span>
-                    {/* <CloudUploadOutlined className='text-4xl' /> */}
-                  </Upload>
-                </Col>
-              </div>
+        
             </Row>
             <div className="form-buttons text-right mt-4">
               <Button type="default" className="mr-2" onClick={onClose}>

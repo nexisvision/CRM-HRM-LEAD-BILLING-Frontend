@@ -142,7 +142,7 @@ const currenciesState = useSelector((state) => state.currencies);
   const allcountry = useSelector((state) => state.countries);
   const fndcountry = allcountry?.countries?.data || [];
 
-  const initialValues = {
+  const [initialValues,setInitialValues] = useState({
     leadTitle: "",
     firstName: "",
     lastName: "",
@@ -162,7 +162,7 @@ const currenciesState = useSelector((state) => state.currencies);
     contentType: "",
     brandName: "",
     tags: [],
-  };
+  });
 
   useEffect(() => {
     dispatch(getcurren());
@@ -238,6 +238,30 @@ const currenciesState = useSelector((state) => state.currencies);
         console.error("Add API error:", error);
       });
   };
+
+  const alldatas = useSelector((state)=>state.Leads.Leads.data);
+  console.log(alldatas,"alldatas");
+
+  const fnddata = alldatas.filter((item)=>item.id === id);
+  console.log(fnddata,"fnddata");
+
+  useEffect(()=>{
+    setInitialValues({
+      leadTitle: fnddata[0].leadTitle,
+      firstName: fnddata[0].firstName,
+      lastName: fnddata[0].lastName,
+      telephone: fnddata[0].telephone,
+      email: fnddata[0].email,
+      leadStage: fnddata[0].leadStage,
+      leadValue: fnddata[0].leadValue,  
+      currencyIcon: fnddata[0].currencyIcon,
+      assigned: fnddata[0].assigned,
+      status: fnddata[0].status,
+      notes: fnddata[0].notes,
+      source: fnddata[0].source,
+      category: fnddata[0].category,    
+    })
+  },[])
 
  const LeadValueField = ({ field, form }) => (
      <Col span={24} className="mt-2">

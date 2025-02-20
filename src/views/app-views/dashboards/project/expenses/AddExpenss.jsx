@@ -88,19 +88,43 @@ const curren = currencies?.data || [];
         bill: Yup.string().optional("Please enter Bill."),
         description: Yup.string().optional("Please enter a description."),
     });
+
+    const [fileList, setFileList] = useState([]);
+
     const onSubmit = (values, { resetForm }) => {
+        // Create FormData object
+        const formData = new FormData();
+        
+        // Append all form values
+        Object.keys(values).forEach(key => {
+            if (key !== 'bill') {
+                formData.append(key, values[key]);
+            }
+        });
+
+        // Append the file if exists
+        if (fileList[0]?.originFileObj) {
+            formData.append('bill', fileList[0].originFileObj);
+        }
+
         console.log("Form Values Submitted:", values);
-        dispatch(Addexp({ id, values }))
+        dispatch(Addexp({ id, values: formData }))
             .then(() => {
                 dispatch(Getexp(id));
                 onClose();
                 message.success("Expenses added successfully!");
                 resetForm();
+                setFileList([]); // Reset file list
             })
             .catch((error) => {
                 console.error("Submission Error:", error);
                 message.error("Failed to add expenses. Please try again.");
             });
+    };
+
+    // Handle file upload changes
+    const handleFileChange = ({ fileList: newFileList }) => {
+        setFileList(newFileList);
     };
 
     return (
@@ -326,18 +350,19 @@ const curren = currencies?.data || [];
                                 </div>
                             </Col>
                             <div className="mt-4 w-full">
-                                <span className="block  font-semibold p-2">Bill</span>
+                                <span className="block font-semibold p-2">Bill</span>
                                 <Col span={24}>
                                     <Upload
-                                        action="http://localhost:5500/api/users/upload-cv"
+                                        beforeUpload={() => false} // Prevent auto upload
                                         listType="picture"
-                                        accept=".pdf"
+                                        accept=".pdf,.jpg,.jpeg,.png"
                                         maxCount={1}
+                                        fileList={fileList}
+                                        onChange={handleFileChange}
                                         showUploadList={{ showRemoveIcon: true }}
-                                        className="border-2 flex justify-center items-center p-10 "
+                                        className="border-2 flex justify-center items-center p-10"
                                     >
-                                        <span className="text-xl">Choose File</span>
-                                        {/* <CloudUploadOutlined className='text-4xl' /> */}
+                                        <Button icon={<UploadOutlined />}>Choose File</Button>
                                     </Upload>
                                 </Col>
                             </div>
