@@ -10,15 +10,18 @@ import {
   message,
   Button,
   Modal,
+  Radio,
 } from "antd";
 import {
   EyeOutlined,
-  DeleteOutlined, 
+  DeleteOutlined,
   SearchOutlined,
   MailOutlined,
   PlusOutlined,
   EditOutlined,
   FileExcelOutlined,
+  UnorderedListOutlined,
+  AppstoreOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import UserView from "../../Users/user-list/UserView";
@@ -34,7 +37,12 @@ import ViewLead from "./ViewLead";
 import { useDispatch, useSelector } from "react-redux";
 import { GetLeads, LeadsDelete } from "./LeadReducers/LeadSlice";
 import { useNavigate } from "react-router-dom";
+import { AiOutlinePlus } from "react-icons/ai";
+import LeadCards from "./LeadCards/LeadCards";
 // import LeadCardsList from './LeadCards/LeadCardsList'; // Adjust the import path as necessary
+
+const VIEW_LIST = 'LIST';
+const VIEW_GRID = 'GRID';
 
 const LeadList = () => {
   const [users, setUsers] = useState([]);
@@ -56,6 +64,8 @@ const LeadList = () => {
   const fileInputRef = useRef(null);
 
   const dispatch = useDispatch();
+
+  const [view, setView] = useState(VIEW_LIST);
 
   // Handle file selection
   const handleFileChange = (event) => {
@@ -101,17 +111,17 @@ const LeadList = () => {
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
-    
+
     if (!value || !tabledata.Leads.data) {
       setFilteredData(tabledata.Leads.data);
       return;
     }
-    
+
     // Filter based on lead title
-    const filtered = tabledata.Leads.data.filter(lead => 
+    const filtered = tabledata.Leads.data.filter(lead =>
       lead.leadTitle?.toString().toLowerCase().includes(value)
     );
-    
+
     setFilteredData(filtered);
   };
 
@@ -122,39 +132,39 @@ const LeadList = () => {
 
   const handleLeadClick = (id) => {
     navigate(`/app/dashboards/lead/view/${id}`);
-};
+  };
 
   //// permission
-          
-                    const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                    const roles = useSelector((state) => state.role?.role?.data);
-                    const roleData = roles?.find(role => role.id === roleId);
-                
-                    const whorole = roleData.role_name;
-                
-                    const parsedPermissions = Array.isArray(roleData?.permissions)
-                    ? roleData.permissions
-                    : typeof roleData?.permissions === 'string'
-                    ? JSON.parse(roleData.permissions)
-                    : [];
-                  
-                  
-                    let allpermisson;  
-                
-                    if (parsedPermissions["dashboards-lead"] && parsedPermissions["dashboards-lead"][0]?.permissions) {
-                      allpermisson = parsedPermissions["dashboards-lead"][0].permissions;
-                      console.log('Parsed Permissions:', allpermisson);
-                    
-                    } else {
-                      console.log('dashboards-lead is not available');
-                    }
-                    
-                    const canCreateClient = allpermisson?.includes('create');
-                    const canEditClient = allpermisson?.includes('edit');
-                    const canDeleteClient = allpermisson?.includes('delete');
-                    const canViewClient = allpermisson?.includes('view');
-          
-                    ///endpermission
+
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+
+  let allpermisson;
+
+  if (parsedPermissions["dashboards-lead"] && parsedPermissions["dashboards-lead"][0]?.permissions) {
+    allpermisson = parsedPermissions["dashboards-lead"][0].permissions;
+    console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    console.log('dashboards-lead is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+  ///endpermission
 
 
 
@@ -250,41 +260,41 @@ const LeadList = () => {
           </Button>
         </Flex>
       </Menu.Item> */}
-     
-      
+
+
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                            <Menu.Item>
-                            <Flex alignItems="center">
-                              <Button
-                                type=""
-                                className=""
-                                icon={<EditOutlined />}
-                                onClick={() => EditFun(elm.id)}
-                                size="small"
-                              >
-                                <span className="ml-2">Edit</span>
-                              </Button>
-                            </Flex>
-                          </Menu.Item>
-                    ) : null}
-      
-      
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              className=""
+              icon={<EditOutlined />}
+              onClick={() => EditFun(elm.id)}
+              size="small"
+            >
+              <span className="ml-2">Edit</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
+
+
       {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                      <Menu.Item>
-                      <Flex alignItems="center">
-                        <Button
-                          type=""
-                          className=""
-                          icon={<DeleteOutlined />}
-                          onClick={() => deleteUser(elm.id)}
-                          size="small"
-                        >
-                          <span className="">Delete</span>
-                        </Button>
-                      </Flex>
-                    </Menu.Item>
-                    ) : null}
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              className=""
+              icon={<DeleteOutlined />}
+              onClick={() => deleteUser(elm.id)}
+              size="small"
+            >
+              <span className="">Delete</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
 
 
     </Menu>
@@ -295,13 +305,13 @@ const LeadList = () => {
       title: "leadTitle",
       dataIndex: "leadTitle",
       render: (leadTitle, record) => (
-        <div 
-            onClick={() => handleLeadClick(record.id)}
-            className="cursor-pointer hover:text-blue-600"
+        <div
+          onClick={() => handleLeadClick(record.id)}
+          className="cursor-pointer hover:text-blue-600"
         >
-            <h4 className="mb-0">{leadTitle}</h4>
+          <h4 className="mb-0">{leadTitle}</h4>
         </div>
-    ),
+      ),
       sorter: {
         compare: (a, b) => a.leadTitle.length - b.leadTitle.length,
       },
@@ -376,6 +386,14 @@ const LeadList = () => {
     // Table columns definition
   ];
 
+  const onChangeProjectView = (e) => {
+    setView(e.target.value);
+  };
+
+  const handleAddNewLead = () => {
+    openAddLeadModal();
+  };
+
   return (
     <div>
       {/* <LeadCardsList /> */}
@@ -409,54 +427,60 @@ const LeadList = () => {
               />
             </div>
           </Flex>
-          <Flex gap="7px">
-           
 
-             {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                          <Button type="primary" className="ml-2" onClick={openAddLeadModal}>
-                                                                                                          <PlusOutlined />
-                                                                                                          <span>New</span>
-                                                                                                        </Button>
-                                                                                            
-                                                                                                ) : null}
+          {/* Buttons positioned to the right */}
+          <Flex gap="7px" className="items-center">
+            <Radio.Group
+              defaultValue={VIEW_LIST}
+              onChange={(e) => setView(e.target.value)}
+              value={view}
+              className="mr-2"
+            >
+              <Radio.Button value={VIEW_GRID}>
+                <AppstoreOutlined />
+              </Radio.Button>
+              <Radio.Button value={VIEW_LIST}>
+                <UnorderedListOutlined />
+              </Radio.Button>
+            </Radio.Group>
 
+            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) && (
+              <Button type="primary" onClick={openAddLeadModal}>
+                <PlusOutlined />
+                <span>New</span>
+              </Button>
+            )}
 
             <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
-            {/* <Button
               type="primary"
               icon={<FileExcelOutlined />}
-              block
-              onClick={openFileManager}
+              onClick={exportToExcel}
             >
-              Import
-            </Button> */}
+              Export All
+            </Button>
           </Flex>
         </Flex>
-        <div className="table-responsive mt-2">
 
-             {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                  <Table
-                                                                                  columns={tableColumns}
-                                                                                  dataSource={getFilteredLeads()}
-                                                                                  rowKey="id"
-                                                                                  pagination={{
-                                                                                    total: getFilteredLeads().length,
-                                                                                    pageSize: 10,
-                                                                                    showSizeChanger: true,
-                                                                                    showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-                                                                                  }}
-                                                                                />
-                                                                                  ) : null}
-
-         
-        </div>
+        {/* View switching section */}
+        {view === VIEW_LIST ? (
+          <div className="table-responsive">
+            {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
+              <Table
+                columns={tableColumns}
+                dataSource={getFilteredLeads()}
+                rowKey="id"
+                pagination={{
+                  total: getFilteredLeads().length,
+                  pageSize: 10,
+                  showSizeChanger: true,
+                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                }}
+              />
+            )}
+          </div>
+        ) : (
+          <LeadCards data={getFilteredLeads()} />
+        )}
 
         {/* File input (hidden) */}
         <input

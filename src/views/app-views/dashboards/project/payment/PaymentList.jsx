@@ -256,18 +256,18 @@ const PaymentList = () => {
       dataIndex: "paymentMethod",
       sorter: (a, b) => utils.antdTableSorter(a, b, "paymentMethod"),
     },
-    {
-      title: "Status",
-      dataIndex: "status",
-      render: (_, record) => (
-        <>
-          <Tag color={getPaymentStatus(record.status)}>{record.status}</Tag>
-        </>
-      ),
-      sorter: {
-        compare: (a, b) => a.status.length - b.status.length,
-      },
-    },
+    // {
+    //   title: "Status",
+    //   dataIndex: "status",
+    //   render: (_, record) => (
+    //     <>
+    //       <Tag color={getPaymentStatus(record.status)}>{record.status}</Tag>
+    //     </>
+    //   ),
+    //   sorter: {
+    //     compare: (a, b) => a.status.length - b.status.length,
+    //   },
+    // },
     {
       title: "Action",
       dataIndex: "actions",

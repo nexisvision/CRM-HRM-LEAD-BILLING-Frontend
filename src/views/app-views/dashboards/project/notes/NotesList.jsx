@@ -44,6 +44,7 @@ import ViewNotes from "./ViewNotes";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { DeleteNotes, GetNote } from "./NotesReducer/NotesSlice";
+import { debounce } from 'lodash';
 
 const { Column } = Table;
 
@@ -83,6 +84,8 @@ export const NotesList = () => {
   const [ViewNotesModalVisible, setViewNotesModalVisible] = useState(false);
   const [idd, setIdd] = useState("");
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
 
   const handleShowStatus = (value) => {
     if (value !== "All") {
@@ -220,12 +223,31 @@ export const NotesList = () => {
     },
   };
 
+  // Create debounced search function
+  const debouncedSearch = debounce((value, data) => {
+    setIsSearching(true);
+    const searchValue = value.toLowerCase();
+    
+    if (!searchValue) {
+      setList(filtermin || []); // Reset to original data
+      setIsSearching(false);
+      return;
+    }
+
+    const filteredData = filtermin?.filter(note => 
+      note.note_title?.toString().toLowerCase().includes(searchValue) ||
+      note.notetype?.toString().toLowerCase().includes(searchValue)
+    ) || [];
+
+    setList(filteredData);
+    setIsSearching(false);
+  }, 300); // 300ms delay
+
+  // Modified onSearch function
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : [];
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
+    setSearchValue(value);
+    debouncedSearch(value, filtermin);
   };
 
   return (
@@ -243,9 +265,12 @@ export const NotesList = () => {
           >
             <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
               <Input
-                placeholder="Search"
+                placeholder="Search notes..."
                 prefix={<SearchOutlined />}
-                onChange={(e) => onSearch(e)}
+                onChange={onSearch}
+                value={searchValue}
+                allowClear
+                loading={isSearching}
               />
             </div>
             {/* <div className="mb-3">
@@ -282,6 +307,7 @@ export const NotesList = () => {
             dataSource={list}
             rowKey="id"
             scroll={{ x: 1200 }}
+            loading={isSearching}
             rowSelection={{
               selectedRowKeys: selectedRowKeys,
               type: "checkbox",

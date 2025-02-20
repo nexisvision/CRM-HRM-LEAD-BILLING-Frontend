@@ -225,7 +225,7 @@ const EstimatesList = () => {
             </Flex>
         </Menu.Item>
         ) : null}
-        <Menu.Item>
+        {/* <Menu.Item>
             <Flex alignItems="center">
                 <PlusCircleOutlined />
                 <span className="ml-2">Add to remark</span>
@@ -237,7 +237,7 @@ const EstimatesList = () => {
                 <TiPinOutline />
                 <span className="ml-2">Pin</span>
             </Flex>
-        </Menu.Item>
+        </Menu.Item> */}
        
 
         

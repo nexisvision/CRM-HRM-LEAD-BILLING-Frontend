@@ -11,6 +11,7 @@ import {
   BlockOutlined,
   PaperClipOutlined,
   StopOutlined,
+  TransactionOutlined,
   SnippetsOutlined,
   DotChartOutlined,
   UsergroupDeleteOutlined,
@@ -582,7 +583,7 @@ const dashBoardNavTree = [{
             key: 'dashboards-sales',
             path: `${APP_PREFIX_PATH}/dashboards/sales`,
             title: 'Sales',
-            icon: BulbOutlined,
+            icon: TransactionOutlined,
             breadcrumb: true,
             submenu: [
               {
@@ -631,7 +632,7 @@ const dashBoardNavTree = [{
                 key: 'dashboards-sales-creditnotes',
                 path: `${APP_PREFIX_PATH}/dashboards/sales/creditnotes`,
                 title: 'Credit Notes',
-                icon: EuroCircleOutlined,
+                icon: SnippetsOutlined ,
                 breadcrumb: true,
                 submenu: []
               },
@@ -646,14 +647,14 @@ const dashBoardNavTree = [{
           //   breadcrumb: false,
           //   submenu: []
           // },
-          {
-            key: 'dashboards-leadcards',
-            path: `${APP_PREFIX_PATH}/dashboards/leadcards`,
-            title: 'Lead Cards',
-            icon: RiseOutlined,
-            breadcrumb: true,
-            submenu: []
-          },
+          // {
+          //   key: 'dashboards-leadcards',
+          //   path: `${APP_PREFIX_PATH}/dashboards/leadcards`,
+          //   title: 'Lead Cards',
+          //   icon: RiseOutlined,
+          //   breadcrumb: true,
+          //   submenu: []
+          // },
           {
             key: 'dashboards-lead',
             path: `${APP_PREFIX_PATH}/dashboards/lead`,

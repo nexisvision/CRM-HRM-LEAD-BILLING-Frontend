@@ -85,6 +85,7 @@ export const TaskList = () => {
   const [isAddTaskModalVisible, setIsAddTaskModalVisible] = useState(false);
   const [isEditTaskModalVisible, setIsEditTaskModalVisible] = useState(false);
   const [isViewTaskModalVisible, setIsViewTaskModalVisible] = useState(false);
+  const [statusFilter, setStatusFilter] = useState([]);
   const [idd, setIdd] = useState("");
   const navigate = useNavigate();
 

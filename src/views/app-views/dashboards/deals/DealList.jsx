@@ -40,6 +40,7 @@ import { useNavigate } from "react-router-dom";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { getstages } from '../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice';
 import { GetPip } from "../systemsetup/Pipeline/PiplineReducer/piplineSlice";
+import { debounce } from 'lodash';
 
 const DealList = () => {
   const [users, setUsers] = useState([]);
@@ -69,10 +70,78 @@ const DealList = () => {
   // Add new state for stages
   const [stagesList, setStagesList] = useState([]);
 
-    useEffect(()=>{
-      dispatch(GetPip())
-    },[dispatch])
-  
+  const [searchValue, setSearchValue] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Add console.log to debug data
+  useEffect(() => {
+    console.log('TableData:', tabledata);
+    console.log('Users State:', users);
+  }, [tabledata, users]);
+
+  // Modified debounced search function with better error handling
+  const debouncedSearch = debounce((value) => {
+    setIsSearching(true);
+    const searchValue = value.toLowerCase();
+    
+    try {
+      if (!searchValue) {
+        // Reset to original filtered data
+        if (tabledata?.Deals?.data) {
+          const filteredDeals = tabledata.Deals.data.filter(deal => deal.created_by === user);
+          setUsers(filteredDeals);
+        }
+        setIsSearching(false);
+        return;
+      }
+
+      // Make sure we have data to filter
+      if (!tabledata?.Deals?.data) {
+        console.log('No deals data available');
+        setUsers([]);
+        setIsSearching(false);
+        return;
+      }
+
+      // Filter by created_by and search value
+      const filteredData = tabledata.Deals.data.filter(deal => {
+        const matchesUser = deal.created_by === user;
+        const matchesSearch = 
+          (deal.dealName?.toString().toLowerCase().includes(searchValue)) ||
+          (deal.leadTitle?.toString().toLowerCase().includes(searchValue)) ||
+          (deal.project?.toString().toLowerCase().includes(searchValue));
+        
+        return matchesUser && matchesSearch;
+      });
+
+      console.log('Filtered Data:', filteredData); // Debug log
+      setUsers(filteredData);
+    } catch (error) {
+      console.error('Search error:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  }, 300);
+
+  // Simplified onSearch function
+  const onSearch = (e) => {
+    const value = e.currentTarget.value;
+    setSearchValue(value);
+    debouncedSearch(value);
+  };
+
+  // Make sure initial data is loaded
+  useEffect(() => {
+    if (tabledata?.Deals?.data) {
+      const filteredDeals = tabledata.Deals.data.filter(deal => deal.created_by === user);
+      setUsers(filteredDeals);
+    }
+  }, [tabledata, user]);
+
+  useEffect(()=>{
+    dispatch(GetPip())
+  },[dispatch])
+
   // Get stages data from redux store
   const stagesData = useSelector((state) => state.StagesLeadsDeals);
 
@@ -159,16 +228,16 @@ const DealList = () => {
   };
 
   // Update the search functionality
-  const onSearch = (e) => {
-    const searchValue = e.currentTarget.value.toLowerCase();
-    if (tabledata && tabledata.Deals && tabledata.Deals.data) {
-      const filteredDeals = tabledata.Deals.data.filter(deal => 
-        deal.created_by === user && 
-        deal.dealName.toLowerCase().includes(searchValue)
-      );
-      setUsers(filteredDeals);
-    }
-  };
+  // const onSearch = (e) => {
+  //   const searchValue = e.currentTarget.value.toLowerCase();
+  //   if (tabledata && tabledata.Deals && tabledata.Deals.data) {
+  //     const filteredDeals = tabledata.Deals.data.filter(deal => 
+  //       deal.created_by === user && 
+  //       deal.dealName.toLowerCase().includes(searchValue)
+  //     );
+  //     setUsers(filteredDeals);
+  //   }
+  // };
 
   const deleteUser = async (userId) => {
     try {
@@ -402,10 +471,14 @@ const DealList = () => {
       >
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input    
-              placeholder="Search"
+            <Input
+              placeholder="Search by deal name, lead title, or project..."
               prefix={<SearchOutlined />}
-              onChange={(e) => onSearch(e)}
+              onChange={onSearch}
+              value={searchValue}
+              allowClear
+              style={{ width: '300px' }}
+              loading={isSearching}
             />
           </div>
         </Flex>

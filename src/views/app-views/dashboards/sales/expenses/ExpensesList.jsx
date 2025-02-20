@@ -18,6 +18,7 @@ import utils from 'utils'
 import AddExpenses from "./AddExpenses";
 import EditExpenses from "./EditExpenses"
 import ViewExpenses from './ViewExpenses';
+import { debounce } from 'lodash';
 
 const { Option } = Select
 
@@ -46,6 +47,32 @@ const ExpensesList = () => {
 	const [isEditExpensesModalVisible, setIsEditExpensesModalVisible] = useState(false);
 	const [isViewExpensesModalVisible, setIsViewExpensesModalVisible] = useState(false);
 
+	const [searchValue, setSearchValue] = useState("");
+	const [isSearching, setIsSearching] = useState(false);
+
+	// Create debounced search function
+	const debouncedSearch = debounce((value, data, setList) => {
+		setIsSearching(true);
+		const searchValue = value.toLowerCase();
+		
+		if (!searchValue) {
+			setList(OrderListData); // Reset to original data
+			setIsSearching(false);
+			return;
+		}
+
+		const filteredData = OrderListData.filter(expense => {
+			return (
+				expense.description?.toString().toLowerCase().includes(searchValue) ||
+				expense.name?.toString().toLowerCase().includes(searchValue) ||
+				expense.project?.toString().toLowerCase().includes(searchValue) ||
+				expense.user?.toString().toLowerCase().includes(searchValue)
+			);
+		});
+
+		setList(filteredData);
+		setIsSearching(false);
+	}, 300); // 300ms delay
 
 	// Open Add Job Modal
 	const openAddExpensesModal = () => {
@@ -226,13 +253,12 @@ const ExpensesList = () => {
 		}
 	};
 
-	const onSearch = e => {
-		const value = e.currentTarget.value
-		const searchArray = e.currentTarget.value ? list : OrderListData
-		const data = utils.wildCardSearch(searchArray, value)
-		setList(data)
-		setSelectedRowKeys([])
-	}
+	// Modified onSearch function
+	const onSearch = (e) => {
+		const value = e.currentTarget.value;
+		setSearchValue(value);
+		debouncedSearch(value, OrderListData, setList);
+	};
 
 	return (
 		<>
@@ -254,8 +280,16 @@ const ExpensesList = () => {
 				</Row>
 				<Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
 					<Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false} >
-						<div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
-							<Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)} />
+						<div className="mr-0 md:mr-3 mb-3 md:mb-0">
+							<Input 
+								placeholder="Search expenses..." 
+								prefix={<SearchOutlined />} 
+								onChange={onSearch}
+								value={searchValue}
+								allowClear
+								style={{ width: '250px' }}
+								loading={isSearching}
+							/>
 						</div>
 						<div className="w-full md:w-48">
 							<Select
@@ -286,6 +320,7 @@ const ExpensesList = () => {
 						dataSource={list}
 						rowKey='id'
 						scroll={{x:1200}}
+						loading={isSearching}
 						rowSelection={{
 							selectedRowKeys: selectedRowKeys,
 							type: 'checkbox',

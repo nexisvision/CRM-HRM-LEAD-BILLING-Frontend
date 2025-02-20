@@ -39,7 +39,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import ProjectList from "views/app-views/dashboards/project/project-list/ProjectList";
 import { MdOutlineEmail } from "react-icons/md";
 import EmailVerification from "../../company/EmailVerification";
-import { debounce } from 'lodash';
 
 const { Option } = Select;
 
@@ -62,7 +61,6 @@ const ClientList = () => {
   const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
   const [comnyid, setCompnyid] = useState("");
   const [clientid,setClientId] = useState("");
-  const [searchValue, setSearchValue] = useState("");
 
   const tabledata = useSelector((state) => state.ClientData);
 
@@ -140,57 +138,23 @@ const ClientList = () => {
   
       const matchingClients = allddata?.filter(client => client?.created_by === clientid);
 
-  // Create debounced version of search
-  const debouncedSearch = debounce((value, data, setUsers) => {
-    const searchValue = value.toLowerCase();
-    
-    if (!searchValue) {
-      // Reset to original data based on user role
-      if(loggedInUser.username === "superadmin" && !state){
-        setUsers(tabledata.ClientData.data);
-      } else if(state && matchingClients){
-        setUsers(matchingClients)
-      } else {
-        if (tabledata && tabledata.ClientData && tabledata.ClientData.data) {
-          const filteredUsers = tabledata.ClientData.data.filter(
-            (client) => client.created_by === loggedInUser?.username
-          );
-          setUsers(filteredUsers);
-        }
+
+  useEffect(() => {
+    if(loggedInUser.username == "superadmin" && !state){
+      setUsers(tabledata.ClientData.data);
+    }else if(state && matchingClients){
+      setUsers(matchingClients)
+    }else{
+      if (tabledata && tabledata.ClientData && tabledata.ClientData.data) {
+        const filteredUsers = tabledata.ClientData.data.filter(
+          (client) => client.created_by === loggedInUser?.username
+        );
+        setUsers(filteredUsers);
       }
-      return;
     }
+  }, [tabledata]);
 
-    // Get the base data to search from
-    let searchableData = [];
-    if(loggedInUser.username === "superadmin" && !state){
-      searchableData = tabledata.ClientData.data;
-    } else if(state && matchingClients){
-      searchableData = matchingClients;
-    } else {
-      searchableData = tabledata.ClientData.data.filter(
-        (client) => client.created_by === loggedInUser?.username
-      );
-    }
 
-    // Filter the data based on search value
-    const filteredData = searchableData?.filter(client => {
-      return (
-        client.username?.toString().toLowerCase().includes(searchValue) ||
-        client.email?.toString().toLowerCase().includes(searchValue) ||
-        client.created_by?.toString().toLowerCase().includes(searchValue)
-      );
-    }) || [];
-
-    setUsers(filteredData);
-  }, 300); // 300ms delay
-
-  // Modified onSearch function
-  const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    setSearchValue(value);
-    debouncedSearch(value, tabledata.ClientData.data, setUsers);
-  };
 
   const companyStatusList = ["active", "blocked"];
 
@@ -201,6 +165,32 @@ const ClientList = () => {
       setUsers(data);
     } else {
       dispatch(ClientData());
+    }
+  };
+
+  const onSearch = (e) => {
+    const searchValue = e.currentTarget.value.toLowerCase();
+    
+    // First, get the base data according to user role
+    let baseData;
+    if(loggedInUser.username === "superadmin" && !state){
+      baseData = tabledata.ClientData.data;
+    } else if(state && matchingClients){
+      baseData = matchingClients;
+    } else {
+      baseData = tabledata.ClientData.data.filter(
+        (client) => client.created_by === loggedInUser?.username
+      );
+    }
+
+    // Then apply the search filter on the already filtered data
+    if (searchValue) {
+      const filteredData = baseData.filter(user => 
+        user.username.toLowerCase().includes(searchValue)
+      );
+      setUsers(filteredData);
+    } else {
+      setUsers(baseData);
     }
   };
 
@@ -449,12 +439,9 @@ const ClientList = () => {
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
-              placeholder="Search by username, email..."
+              placeholder="Search"
               prefix={<SearchOutlined />}
-              onChange={onSearch}
-              value={searchValue}
-              allowClear // Adds a clear button
-              style={{ width: '250px' }}
+              onChange={(e) => onSearch(e)}
             />
           </div>
           <div className="mb-3">
@@ -465,11 +452,11 @@ const ClientList = () => {
               onChange={handleShowStatus}
               placeholder="Status"
             >
-              <Option value="All">All Status</Option>
+              <Select.Option value="All">All Status</Select.Option>
               {companyStatusList.map((elm) => (
-                <Option key={elm} value={elm}>
+                <Select.Option key={elm} value={elm}>
                   {elm}
-                </Option>
+                </Select.Option>
               ))}
             </Select>
           </div>

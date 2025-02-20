@@ -17,36 +17,44 @@ import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
-
-import { useDispatch } from "react-redux";
-import {
-  Editpro,
-  GetProject,
-} from "../project-list/projectReducer/ProjectSlice";
+import { GetProject } from "../project-list/projectReducer/ProjectSlice";
 import axios from "axios";
 const { Option } = Select;
 const AddProjectMember = ({ onClose }) => {
   const navigate = useNavigate();
-
   const dispatch = useDispatch();
-  const [showReceiptUpload, setShowReceiptUpload] = useState(false);
-  // const [uploadModalVisible, setUploadModalVisible] = useState(false);
+  const { id } = useParams();
+
+  // Get logged-in user data
+  const loggedInUser = useSelector((state) => state.user.loggedInUser);
+  const allEmployees = useSelector((state) => state.employee?.employee?.data || []);
+
+  // Filter employees for the logged-in client
+  const clientEmployees = allEmployees.filter(
+    (emp) => emp?.created_by === loggedInUser.username
+  );
+
+  console.log("Logged in user:", loggedInUser);
+  console.log("Client employees:", clientEmployees);
+
   const initialValues = {
     project_members: [],
   };
+
   const validationSchema = Yup.object({
-    project_members: Yup.array().required(
-      "Please enter AddProjectMember name."
-    ),
+    project_members: Yup.array().required("Please select project members"),
   });
 
-  const { id } = useParams();
+  // Fetch employees and projects on component mount
+  useEffect(() => {
+    dispatch(empdata());
+    dispatch(GetProject());
+  }, [dispatch]);
 
   const Addmember = async (payload) => {
     const token = localStorage.getItem("auth_token");
-
     try {
       const res = await axios.post(
         `http://localhost:5353/api/v1/projects/membersadd/${id}`,
@@ -57,21 +65,9 @@ const AddProjectMember = ({ onClose }) => {
           },
         }
       );
-      console.log("Addmember API response:", res.data); // Log response
       return res.data;
     } catch (error) {
-      if (error.response) {
-        // Server responded with a status code out of the range of 2xx
-        console.error("Error response:", error.response.data);
-        console.error("Status code:", error.response.status);
-        console.error("Headers:", error.response.headers);
-      } else if (error.request) {
-        // Request was made, but no response was received
-        console.error("Error request:", error.request);
-      } else {
-        // Something happened in setting up the request
-        console.error("Error message:", error.message);
-      }
+      console.error("API Error:", error);
       throw error;
     }
   };
@@ -79,47 +75,27 @@ const AddProjectMember = ({ onClose }) => {
   const onSubmit = async (values, { resetForm }) => {
     try {
       const payload = {
-        project_members: values,
+        project_members: values.project_members,
       };
 
       await Addmember(payload);
-
       await dispatch(GetProject()).unwrap();
 
-      message.success("Project added successfully!");
+      message.success("Project members added successfully!");
       resetForm();
       onClose();
     } catch (error) {
-      message.error("Failed to add project or fetch data!");
-      console.error("Error in onSubmit:", error);
+      message.error("Failed to add project members!");
+      console.error("Submit Error:", error);
     }
   };
-
-const loggeduserdata = useSelector((state)=>state.user.loggedInUser.username)
-
-  const allempdata = useSelector((state) => state.employee);
-  const empData = allempdata?.employee?.data || [];
-
-  const fndemp = empData.filter((item)=>item?.created_by === loggeduserdata) || [];
-
-  const Allpeoject = useSelector((state) => state.Project);
-  const Filterdta = Allpeoject?.Project?.data || [];
-
-  const project = Filterdta.find((item) => item.id === id);
-
-  console.log("swswswsw", project.project_members);
-
-  useEffect(() => {
-    dispatch(empdata());
-    dispatch(GetProject());
-  }, [dispatch]);
 
   return (
     <div className="add-project-member-form">
       <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
@@ -127,33 +103,29 @@ const loggeduserdata = useSelector((state)=>state.user.loggedInUser.username)
             <Row gutter={16}>
               <Col span={24} className="mt-2">
                 <div className="form-item">
-                  {/* <label className="font-semibold text-[12] text-dark-gray-500 ">
-                    Add Project Member
-                  </label> */}
+                  <label className="font-semibold text-dark-gray-500">
+                    Add Project Member <span className="text-red-500">*</span>
+                  </label>
                   <Field name="project_members">
                     {({ field }) => (
                       <Select
                         {...field}
                         className="w-full mt-2"
                         mode="multiple"
-                        placeholder="Select AddProjectMember"
-                        onChange={(value) =>
-                          setFieldValue("project_members", value)
-                        }
+                        placeholder="Select Project Members"
+                        onChange={(value) => setFieldValue("project_members", value)}
                         value={values.project_members}
                         onBlur={() => setFieldTouched("project_members", true)}
                       >
-                        {fndemp && fndemp.length > 0 ? (
-                          fndemp.map((client) => (
-                            <Option key={client.id} value={client.id}>
-                              {client.firstName ||
-                                client.username ||
-                                "Unnamed Client"}
+                        {clientEmployees && clientEmployees.length > 0 ? (
+                          clientEmployees.map((employee) => (
+                            <Option key={employee.id} value={employee.id}>
+                              {employee.firstName || employee.username || "Unnamed Employee"}
                             </Option>
                           ))
                         ) : (
                           <Option value="" disabled>
-                            No Clients Available
+                            No Employees Available
                           </Option>
                         )}
                       </Select>
@@ -172,12 +144,9 @@ const loggeduserdata = useSelector((state)=>state.user.loggedInUser.username)
                 Cancel
               </Button>
               <Button type="primary" htmlType="submit">
-                Create
+                Add Members
               </Button>
             </div>
-            {/* <Modal
-                          
-                        </Modal> */}
           </Form>
         )}
       </Formik>

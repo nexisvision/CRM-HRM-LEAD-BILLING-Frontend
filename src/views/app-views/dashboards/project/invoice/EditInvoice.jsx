@@ -534,7 +534,7 @@ useEffect(() => {
           }
         }}
       >
-        {curr?.map((currency) => (
+        {curren?.map((currency) => (
           <Option key={currency.id} value={currency.id}>
             {currency.currencyCode} ({currency.currencyIcon})
           </Option>
