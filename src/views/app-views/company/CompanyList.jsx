@@ -336,13 +336,13 @@ const CompanyList = () => {
           <Radio.Group value={view} onChange={onChangeCompanyView}>
             <Radio.Button
               value={VIEW_GRID}
-              className="border-2 px-3 py-2 rounded-md"
+              className="border-[2px] px-[12px] py-[8px] rounded-[6px] inline-flex items-center justify-center"
             >
               <AppstoreOutlined />
             </Radio.Button>
             <Radio.Button
-              value={VIEW_LIST}
-              className="border-2 px-3 py-2 rounded-md"
+              value={VIEW_LIST} 
+              className="border-[2px] px-[12px] py-[8px] rounded-[6px] inline-flex items-center justify-center"
             >
               <UnorderedListOutlined />
             </Radio.Button>

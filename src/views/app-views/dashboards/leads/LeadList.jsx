@@ -130,7 +130,7 @@ const LeadList = () => {
     return filteredData || [];
   };
 
-  const handleProjectClick = (id) => {
+  const handleLeadClick = (id) => {
     navigate(`/app/dashboards/lead/view/${id}`);
   };
 
