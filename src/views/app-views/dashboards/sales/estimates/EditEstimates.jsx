@@ -23,9 +23,11 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
     const [discountRate, setDiscountRate] = useState(10);
     const dispatch = useDispatch();
     
+console.log("idd", idd);  
+
     // Safely access the Redux state with default values
-    const allempdata = useSelector((state) => state.estimate) || {};
-    const quotationData = allempdata?.salesquotations?.data || [];
+    const allempdata = useSelector((state) => state.salesquotation) || {};
+    const quotationData = allempdata?.salesquotations || [];
     
     const [form] = Form.useForm();
     const [formData, setFormData] = useState({
@@ -142,7 +144,8 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
             if (idd && quotationData) {
                 try {
                     const quodata = quotationData.find((item) => item.id === idd);
-                    
+                    console.log("Quotation Data:", quodata);
+
                     if (quodata) {
                         // Set form fields
                         const formValues = {
@@ -155,30 +158,47 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
                         form.setFieldsValue(formValues);
                         setFormData(formValues);
 
-                        // Set table data if it exists
-                        if (quodata.items && Array.isArray(quodata.items)) {
-                            const formattedTableData = quodata.items.map(item => ({
-                                id: item.id || Date.now(),
-                                item: item.description || '',
-                                quantity: parseFloat(item.quantity) || 0,
-                                price: parseFloat(item.price) || 0,
-                                tax: parseFloat(item.tax) || 0,
-                                amount: (parseFloat(item.quantity || 0) * parseFloat(item.price || 0)).toString(),
-                                description: item.description || '',
-                            }));
-                            setTableData(formattedTableData);
+                        let formattedTableData = []; // Define the variable here
+
+                        // Parse items JSON string and convert to array format
+                        if (quodata.items) {
+                            try {
+                                const parsedItems = JSON.parse(quodata.items);
+                                formattedTableData = Object.entries(parsedItems).map(([key, item]) => ({
+                                    id: Date.now() + Math.random(), // Generate unique ID
+                                    item: item.item || '',
+                                    description: item.description || '',
+                                    quantity: Number(item.quantity) || 0,
+                                    price: Number(item.price) || 0,
+                                    tax_name: item.tax_name || '',
+                                    tax: Number(item.tax) || 0,
+                                    amount: Number(item.amount) || 0,
+                                    discount: Number(item.discount) || 0
+                                }));
+
+                                setTableData(formattedTableData);
+
+                                // Calculate totals
+                                calculateTotal(formattedTableData, Number(quodata.discount) || 0);
+                            } catch (error) {
+                                console.error("Error parsing items:", error);
+                                message.error("Failed to parse items data");
+                            }
                         }
 
-                        // Set discount rate
-                        if (quodata.discountRate) {
-                            setDiscountRate(parseFloat(quodata.discountRate));
-                        }
+                        // Set discount
+                        setDiscountRate(Number(quodata.discount) || 0);
 
-                        // Calculate totals
-                        calculateTotal(quodata.items || [], parseFloat(quodata.discountRate) || 0);
+                        // Set totals
+                        setTotals({
+                            subtotal: formattedTableData.reduce((sum, item) => sum + Number(item.amount), 0),
+                            totalTax: Number(quodata.tax) || 0,
+                            finalTotal: Number(quodata.total) || 0
+                        });
                     }
                 } catch (error) {
-                    message.error('Failed to fetch quotation details');
+                    console.error("Error fetching quotation details:", error);
+                    // message.error('Failed to fetch quotation details');
                 }
             }
         };
@@ -190,26 +210,26 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
     try {
         setLoading(true);
         
-        // Format items data as an array instead of an object
-        const formattedItems = tableData.map(item => ({
-            description: item.item,
-            quantity: parseFloat(item.quantity) || 0,
-            price: parseFloat(item.price) || 0,
-            tax_name: selectedTaxDetails[item.id]?.gstName || '',
-            tax: parseFloat(item.tax) || 0,
-            amount: parseFloat(item.amount) || 0,
-            item_description: item.description || ''
-        }));
-
-        const subtotal = calculateSubTotal();
-        const discountAmount = (subtotal * discountRate) / 100;
+        // Convert items array back to object format
+        const itemsObject = tableData.reduce((acc, item, index) => {
+            acc[`item_${index + 1}`] = {
+                item: item.item,
+                description: item.description || '',
+                quantity: parseFloat(item.quantity) || 0,
+                price: parseFloat(item.price) || 0,
+                tax_name: item.tax_name || '',
+                tax: parseFloat(item.tax) || 0,
+                amount: parseFloat(item.amount) || 0,
+                discount: parseFloat(item.discount) || 0
+            };
+            return acc;
+        }, {});
 
         const updatedValues = {
             ...values,
             issueDate: values.issueDate.format("YYYY-MM-DD"),
-            items: formattedItems, // Send items as an array
-            discount: discountAmount,
-            discountRate: discountRate,
+            items: itemsObject, // Send items as an object
+            discount: discountRate,
             tax: totals.totalTax,
             total: totals.finalTotal
         };

@@ -59,16 +59,24 @@ const AddPlan = ({ onClose }) => {
     trial_period: ''
   };
   const handleSubmit = (values, { resetForm }) => {
-    const formattedDuration = values.duration === 'Monthly' ? 'Per Month' : 
-                             values.duration === 'Yearly' ? 'Per Year' : 
-                             'Lifetime';
-                            
+    let formattedDuration = 'Lifetime';
+    
+    if (durationType === 'Monthly' && selectedMonth) {
+      formattedDuration = `${selectedMonth} Month${selectedMonth > 1 ? 's' : ''}`;
+    } else if (durationType === 'Yearly' && selectedYear) {
+      formattedDuration = `${selectedYear} Year${selectedYear > 1 ? 's' : ''}`;
+    }
+                      
     const payload = { 
       ...values, 
       duration: formattedDuration,
       features: featureStates 
     };
 
+
+    console.log('Payload:', payload); // Log payload before dispatching API request
+
+    
     dispatch(CreatePlan(payload))
       .then(() => {
         dispatch(GetPlan());
@@ -145,7 +153,7 @@ const AddPlan = ({ onClose }) => {
                 {monthlyMenu}
               </Menu.SubMenu>
             </Menu>
-          );
+          );  
 
           const handleMonthlySelect = ({ key }) => {
             setDurationType('Monthly');

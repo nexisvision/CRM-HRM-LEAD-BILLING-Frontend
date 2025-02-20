@@ -62,7 +62,7 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
   const filteredEmpDataa = filteredEmpData.filter((emp) => emp.department === selectedDept);
   const [initialValues, setInitialValues] = useState({
     department: "",
-    employee: "",
+    employee: [],
     title: "",
     date: null,
     startTime: null,
@@ -74,23 +74,50 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
 
   useEffect(() => {
     if (dataM) {
-      setInitialValues({
-        department: dataM.department || "",
-        employee: dataM.employee || "",
-        title: dataM.title || "",
-        date: dataM.date ? moment(dataM.date, "DD-MM-YYYY") : null,
-        startTime: dataM.startTime ? moment(dataM.startTime, "HH:mm") : null,
-        endTime: dataM.endTime ? moment(dataM.endTime, "HH:mm") : null,
-        meetingLink: dataM.meetingLink || "",
-        status: dataM.status || "",
-        description: dataM.description || "",
+      try {
+        // Parse the employee JSON string to array
+        const employeeIds = JSON.parse(dataM.employee);
+        
+        setInitialValues({
+          department: dataM.department || "",
+          employee: employeeIds, // Set the parsed array directly
+          title: dataM.title || "",
+          date: dataM.date ? moment(dataM.date, "YYYY-MM-DD") : null,
+          startTime: dataM.startTime ? moment(dataM.startTime, "HH:mm:ss") : null,
+          endTime: dataM.endTime ? moment(dataM.endTime, "HH:mm:ss") : null,
+          meetingLink: dataM.meetingLink || "",
+          status: dataM.status || "",
+          description: dataM.description || "",
+        });
 
-      });
+        // Set selected department to filter employees
+        setSelectedDept(dataM.department);
+
+      } catch (error) {
+        console.error("Error parsing employee data:", error);
+        message.error("Error loading employee data");
+      }
     }
   }, [dataM]);
 
+  const getEmployeeNames = (employeeIds) => {
+    if (!employeeIds || !filteredEmpData) return [];
+    
+    return employeeIds.map(id => {
+      const employee = filteredEmpData.find(emp => emp.id === id);
+      console.log('employee',employee);
+      return employee ? employee.username : "Unknown Employee";
+    });
+  };
+
   const onSubmit = (values) => {
-    dispatch(EditMeet({ meetid, values }))
+    // Convert employee array back to JSON string
+    const modifiedValues = {
+      ...values,
+      employee: JSON.stringify(values.employee)
+    };
+
+    dispatch(EditMeet({ meetid, values: modifiedValues }))
       .then(() => {
         dispatch(MeetData());
         message.success("Meeting details updated successfully!");
@@ -105,7 +132,7 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
 
   const validationSchema = Yup.object({
     department: Yup.string().required("Please Select a department."),
-    employee: Yup.string().required("Please select an employee."),
+    employee: Yup.array().min(1, "Please select at least one employee."),
     title: Yup.string().required("Please enter a meeting title."),
     date: Yup.date().nullable().required("Event Start Date is required."),
     startTime: Yup.date().nullable().required("Meeting time is required."),
@@ -143,7 +170,7 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
                         onChange={(value) => {
                           form.setFieldValue("department", value);
                           setSelectedDept(value); // ✅ Set selected department here
-                          form.setFieldValue("employee", ""); // Reset employee field when department changes
+                          form.setFieldValue("employee", []); // Reset employee field when department changes
                         }}
                         onBlur={() => form.setFieldTouched("department", true)}
                       >
@@ -175,14 +202,20 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
                   <Field name="employee">
                     {({ field, form }) => (
                       <Select
+                        mode="multiple"
                         style={{ width: "100%" }}
                         {...field}
-                        placeholder="Select Employee"
+                        placeholder="Select Employees"
                         className="w-full mt-1"
                         loading={!filteredEmpDataa}
                         value={form.values.employee}
                         onChange={(value) => form.setFieldValue("employee", value)}
                         onBlur={() => form.setFieldTouched("employee", true)}
+                        optionFilterProp="children"
+                        showSearch
+                        filterOption={(input, option) =>
+                          option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
                       >
                         {filteredEmpDataa && filteredEmpDataa.length > 0 ? (
                           filteredEmpDataa.map((emp) => (

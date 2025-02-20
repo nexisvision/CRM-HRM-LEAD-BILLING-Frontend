@@ -130,7 +130,7 @@ const LeadList = () => {
     return filteredData || [];
   };
 
-  const handleLeadClick = (id) => {
+  const handleProjectClick = (id) => {
     navigate(`/app/dashboards/lead/view/${id}`);
   };
 
@@ -330,13 +330,13 @@ const LeadList = () => {
         compare: (a, b) => a.email.length - b.email.length,
       },
     },
-    {
-      title: "leadTitle",
-      dataIndex: "leadTitle",
-      sorter: {
-        compare: (a, b) => a.leadTitle.length - b.leadTitle.length,
-      },
-    },
+    // {
+    //   title: "leadTitle",
+    //   dataIndex: "leadTitle",
+    //   sorter: {
+    //     compare: (a, b) => a.leadTitle.length - b.leadTitle.length,
+    //   },
+    // },
     // {
     //   title: "leadTitle",
     //   dataIndex: "leadTitle",
@@ -346,6 +346,7 @@ const LeadList = () => {
       title: "Task",
       dataIndex: "status",
       render: (status) => (
+      
         <Tag
           className="text-capitalize"
           color={status === "active" ? "cyan" : "red"}

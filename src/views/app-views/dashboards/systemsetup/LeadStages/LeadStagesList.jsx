@@ -17,8 +17,14 @@ const LeadStagesList = () => {
     useState(false);
   const dispatch = useDispatch();
 
+const user = useSelector((state) => state.user.loggedInUser.username);
+
   const allfdata = useSelector((state) => state.StagesLeadsDeals);
-  const fnddata = allfdata?.StagesLeadsDeals?.data || [];
+  const fnddataa = allfdata?.StagesLeadsDeals?.data || [];
+
+  const fnddata = user && Array.isArray(fnddataa) 
+    ? fnddataa.filter((item) => item?.created_by === user)
+    : [];
 
   const Allpipline = useSelector((state) => state.Piplines);
   const Filterpipline = Allpipline?.Piplines?.data || [];

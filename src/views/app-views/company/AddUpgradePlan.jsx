@@ -125,7 +125,64 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                       </Field> */}
 
 
+
+
+
 <Field name="plan_id">
+  {({ field, form }) => (
+    <Select
+      {...field}
+      className="w-full mt-1"
+      placeholder="Select Plan"
+      loading={!fnsfdtaf}
+      onChange={(value) => {
+        const selectedPlan = fnsfdtaf.find(plan => plan.id === value);
+        if (selectedPlan) {
+          const startDate = moment(); // Today’s date
+          let endDate = moment(startDate); // Clone start date
+
+          // Extract duration value and unit (e.g., "3 Years" -> 3, "2 Months" -> 2)
+          const durationMatch = selectedPlan.duration.match(/^(\d+)\s*(Month|Year)s?$/i);
+          if (durationMatch) {
+            const durationValue = parseInt(durationMatch[1], 10);
+            const durationUnit = durationMatch[2].toLowerCase(); // 'month' or 'year'
+
+            if (durationUnit === "month") {
+              endDate.add(durationValue, "months");
+            } else if (durationUnit === "year") {
+              endDate.add(durationValue, "years");
+            }
+          }
+
+          // Set values for start_date and end_date
+          form.setFieldValue("plan_id", value);
+          form.setFieldValue("start_date", startDate.format("YYYY-MM-DD"));
+          form.setFieldValue("end_date", endDate.format("YYYY-MM-DD"));
+        }
+      }}
+      value={values.plan_id}
+    >
+      {fnsfdtaf && fnsfdtaf.length > 0 ? (
+        fnsfdtaf.map((plan) => (
+          <Option key={plan.id} value={plan.id}>
+            {plan.name}
+          </Option>
+        ))
+      ) : (
+        <Option value="" disabled>
+          No Plan available
+        </Option>
+      )}
+    </Select>
+  )}
+</Field>
+
+
+
+
+
+
+{/* <Field name="plan_id">
   {({ field, form }) => (
     <Select
       {...field}
@@ -166,7 +223,7 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
       )}
     </Select>
   )}
-</Field>
+</Field> */}
                     </div>
                   </Col>
 

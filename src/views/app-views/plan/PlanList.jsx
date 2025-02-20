@@ -56,12 +56,14 @@ const PlanList = () => {
 
   // console.log("allPlansStatus", allPlansStatus);
 
-  console.log("userplanstatus", selectedPlan);
+  // console.log("userplanstatus", selectedPlan);
 
 
   const userplanstatuss = allPlans.find((item) => item.id === selectedPlan);
 
-  console.log("userplanstatuss", userplanstatuss);
+  console.log("userplan", userplanstatuss);
+
+  
 
   // const 
 
@@ -154,13 +156,21 @@ const PlanList = () => {
     const handlePurchase = async () => {
       try {
         setLoading(true);
+        const startDate = moment().format('YYYY-MM-DD');
+        const endDate = userplanstatuss?.duration === 'Lifetime' 
+          ? null 
+          : calculateEndDate(moment(), userplanstatuss?.duration).format('YYYY-MM-DD');
+
         const purchasePayload = {
-          client_id: loggedInUser?.id || '', // Get client_id from logged in user
-          plan_id: selectedPlan, // Get plan_id from selected plan
-          payment_status: 'paid' // Default payment status
+          client_id: loggedInUser?.id || '',
+          plan_id: selectedPlan,
+          payment_status: 'paid',
+          start_date: startDate,
+          end_date: endDate
         };
 
         await dispatch(planbutus(purchasePayload));
+        console.log("purchasePayload", purchasePayload);
         message.success('Plan purchased successfully');
         onCancel();
       } catch (error) {
@@ -212,7 +222,7 @@ const PlanList = () => {
                     <div className="space-y-1">
                       <Text type="secondary">Start Date</Text>
                       <div className="text-lg font-semibold text-gray-800">
-                        {userplan?.start_date ? moment(userplan.start_date).format('DD MMM, YYYY') : 'N/A'}
+                        {moment().format('DD MMM, YYYY')}
                       </div>
                     </div>
                   </Col>
@@ -220,7 +230,11 @@ const PlanList = () => {
                     <div className="space-y-1">
                       <Text type="secondary">End Date</Text>
                       <div className="text-lg font-semibold text-gray-800">
-                        {userplan?.end_date ? moment(userplan?.end_date).format('DD MMM, YYYY') : 'N/A'}
+                        {userplanstatuss?.duration === 'Lifetime' ? (
+                          'Lifetime'
+                        ) : (
+                          calculateEndDate(moment(), userplanstatuss?.duration)?.format('DD MMM, YYYY') || 'N/A'
+                        )}
                       </div>
                     </div>
                   </Col>
@@ -238,7 +252,7 @@ const PlanList = () => {
                       <UserOutlined className="text-blue-500" />
                       <div>
                         <div className="text-sm text-gray-600">Users</div>
-                        <div className="font-medium">{plan?.max_users}</div>
+                        <div className="font-medium">{userplanstatuss?.max_users}</div>
                       </div>
                     </div>
                   </Col>
@@ -247,7 +261,7 @@ const PlanList = () => {
                       <TeamOutlined className="text-green-500" />
                       <div>
                         <div className="text-sm text-gray-600">Clients</div>
-                        <div className="font-medium">{plan?.max_clients}</div>
+                        <div className="font-medium">{userplanstatuss?.max_clients}</div>
                       </div>
                     </div>
                   </Col>
@@ -256,7 +270,7 @@ const PlanList = () => {
                       <CloudUploadOutlined className="text-purple-500" />
                       <div>
                         <div className="text-sm text-gray-600">Storage</div>
-                        <div className="font-medium">{plan?.storage_limit} GB</div>
+                        <div className="font-medium">{userplanstatuss?.storage_limit} GB</div>
                       </div>
                     </div>
                   </Col>
@@ -265,7 +279,7 @@ const PlanList = () => {
                       <CalendarOutlined className="text-orange-500" />
                       <div>
                         <div className="text-sm text-gray-600">Duration</div>
-                        <div className="font-medium">{plan?.duration}</div>
+                        <div className="font-medium">{userplanstatuss?.duration}</div>
                       </div>
                     </div>
                   </Col>
@@ -281,7 +295,7 @@ const PlanList = () => {
                   <div>
                     <Text strong className="text-blue-600">Trial Period</Text>
                     <p className="text-sm text-gray-600 mt-1">
-                      You will get a {plan?.trial_period} days trial period with this plan.
+                      You will get a {userplanstatuss?.trial_period} days trial period with this plan.
                       No charges will be applied during the trial period.
                     </p>
                   </div>
@@ -409,6 +423,28 @@ const PlanList = () => {
         </div>
       </div>
     );
+  };
+
+  const calculateEndDate = (startDate, duration) => {
+    if (!duration) return null;
+    
+    // Parse the duration string (e.g., "4 Months", "1 Year", "Lifetime")
+    const [amount, unit] = duration.split(' ');
+    
+    if (unit.toLowerCase() === 'lifetime') {
+      return 'Lifetime';
+    }
+    
+    const start = moment(startDate);
+    
+    // Add the duration based on the unit
+    if (unit.toLowerCase().includes('month')) {
+      return start.clone().add(amount, 'months');
+    } else if (unit.toLowerCase().includes('year')) {
+      return start.clone().add(amount, 'years');
+    }
+    
+    return null;
   };
 
   return (

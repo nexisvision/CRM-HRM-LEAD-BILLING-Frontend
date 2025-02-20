@@ -30,11 +30,33 @@ const AddDeal = ({ onClose }) => {
     ? allpipline.filter((item) => item?.created_by === logged)
     : [];
 
-  const { data: StagesLeadsDeals = [] } = useSelector(
+  const { data: StagesLeadsDealss = [] } = useSelector(
     (state) => state.StagesLeadsDeals.StagesLeadsDeals || {}
   );
-  const { data: Leads = [] } = useSelector((state) => state.Leads.Leads || {});
-  const { data: Project = [] } = useSelector((state) => state.Project.Project || {});
+  const StagesLeadsDeals = logged && Array.isArray(StagesLeadsDealss) 
+    ? StagesLeadsDealss.filter((item) => 
+        item?.created_by === logged && item?.stageType === "deal"
+      )
+    : [];
+
+  // console.log(dealstages,"dealstages")
+
+
+  const { data: Leadss = [] } = useSelector((state) => state.Leads.Leads || {});
+
+  const Leads = logged && Array.isArray(Leadss) 
+    ? Leadss.filter((item) => item?.created_by === logged)
+    : [];
+
+
+
+  const { data: Projectt = [] } = useSelector((state) => state.Project.Project || {});
+
+  const Project = logged && Array.isArray(Projectt) 
+  ? Projectt.filter((item) => item?.created_by === logged)
+  : [];
+
+
   const clientdata = tabledata?.SubClient?.data || [];
 
   const countries = useSelector((state) => state.countries?.countries || []);

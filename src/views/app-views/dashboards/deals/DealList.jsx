@@ -46,6 +46,9 @@ const DealList = () => {
   const [users, setUsers] = useState([]);
   const [list, setList] = useState(OrderListData);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const navigate = useNavigate();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   // const [viewDealVisible, setViewDealVisible] = useState(false);
@@ -294,6 +297,25 @@ const DealList = () => {
     }
   }, [stagesData]);
 
+  useEffect(() => {
+    if (stagesList?.StagesLeadsDeals?.data) {
+      setStagesList(stagesList.StagesLeadsDeals.data);
+    }
+  }, [stagesList]);
+
+
+  const filterData = () => {
+    let filtered = users.filter((deal) =>
+      deal.dealName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    setFilteredUsers(filtered);
+  };
+
+  useEffect(() => {
+    filterData();
+  }, [searchTerm]);
+
   const EditDelas = (id) => {
     openEditDealModal();
     setIdd(id);
@@ -511,7 +533,7 @@ const DealList = () => {
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                                                                            <Table
                                                                                            columns={tableColumns}
-                                                                                           dataSource={users}
+                                                                                           dataSource={filteredUsers}
                                                                                            rowKey="id"
                                                                                            scroll={{ x: 1200 }}
                                                                                          />

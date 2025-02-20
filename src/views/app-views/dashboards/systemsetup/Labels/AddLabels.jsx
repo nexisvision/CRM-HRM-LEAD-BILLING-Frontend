@@ -35,10 +35,12 @@ const AddLabels = ({ onClose }) => {
   // const navigate = useNavigate();
   const dispatch = useDispatch();
 
-
+  const loggeduser = useSelector((state) => state.user.loggedInUser.username);
   
   const allpipline = useSelector((state) => state.Piplines);
-  const fndpip = allpipline.Piplines.data;
+  const fndpipp = allpipline.Piplines.data;
+
+  const fndpip = fndpipp.filter((item)=>item.created_by === loggeduser)
 
   useEffect(() => {
     dispatch(GetPip());

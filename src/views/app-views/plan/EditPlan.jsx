@@ -99,6 +99,7 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
               setFieldValue('duration', 'Lifetime');
             }
           };
+
  const yearlyMenu = (
   <Menu onClick={({ key }) => {
     setDurationType('Yearly');
@@ -141,6 +142,7 @@ const mainMenu = (
     </Menu.SubMenu>
   </Menu>
 );
+
 return (
           <form onSubmit={handleSubmit}>
             <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />

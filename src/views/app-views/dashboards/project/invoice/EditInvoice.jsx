@@ -36,6 +36,7 @@ import Flex from "components/shared-components/Flex";
 import { Getmins } from "../../../dashboards/project/milestone/minestoneReducer/minestoneSlice";
 import {
   updateInvoice,
+  getAllInvoices,
   getInvoiceById,
 } from "../../../dashboards/project/invoice/invoicereducer/InvoiceSlice";
 import { useSelector, useDispatch } from "react-redux";
@@ -368,7 +369,9 @@ useEffect(() => {
         ...values,
         issueDate: values.issueDate.format("YYYY-MM-DD"),
         dueDate: values.dueDate.format("YYYY-MM-DD"),
-        items: JSON.stringify(itemsForDb),
+        project: fnddata?.project_name,
+        client: fnddata?.client,
+        items: itemsForDb,
         discount: discountRate,
         tax: totals.totalTax,
         total: totals.finalTotal
@@ -377,6 +380,7 @@ useEffect(() => {
       await dispatch(updateInvoice({ idd, data: invoiceData }));
       message.success("Invoice updated successfully!");
       onClose();
+      dispatch(getAllInvoices(id));
 
     } catch (error) {
       console.error("Error updating invoice:", error);

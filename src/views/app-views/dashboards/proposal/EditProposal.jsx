@@ -16,6 +16,7 @@ import { GetDeals } from '../deals/DealReducers/DealSlice';
 import { edpropos, getpropos } from './proposalReducers/proposalSlice';
 import { getcurren } from 'views/app-views/setting/currencies/currenciesSlice/currenciesSlice';
 import { getAllTaxes } from "views/app-views/setting/tax/taxreducer/taxSlice";
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 
@@ -41,6 +42,7 @@ const EditProposal = ({ id, onClose }) => {
   // const [selectedProject, setSelectedProject] = useState(null);
   // const [clientOptions, setClientOptions] = useState([]);
 
+  const loggeduser = useSelector((state) => state.user.loggedInUser.username);
   const currencies = useSelector((state) => state.currencies?.currencies?.data || []);
   const [discountRate, setDiscountRate] = useState(10);
   const dispatch = useDispatch();
@@ -48,8 +50,19 @@ const EditProposal = ({ id, onClose }) => {
 
   const alldept = useSelector((state) => state.proposal);
 
-  const { data: Leads } = useSelector((state) => state.Leads.Leads);
-  const { data: Deals } = useSelector((state) => state.Deals.Deals);
+  const { data: Leadss } = useSelector((state) => state.Leads.Leads);
+
+  const Leads = loggeduser && Array.isArray(Leadss) 
+  ? Leadss.filter((item) => item?.created_by === loggeduser)
+  : [];
+
+  const { data: Dealss } = useSelector((state) => state.Deals.Deals);
+
+  const Deals = loggeduser && Array.isArray(Dealss) 
+  ? Dealss.filter((item) => item?.created_by === loggeduser)
+  : [];
+
+
 
 
   // console.log("SubClient Data:", subClientData.username);
@@ -71,6 +84,8 @@ const EditProposal = ({ id, onClose }) => {
     const empData = alldept?.proposal?.data || [];
     const data = empData.find((item) => item.id === id);
     setSingleEmp(data || null);
+
+    console.log("data",data)
 
     // Update form values when singleEmp is set
     if (data) {
@@ -121,6 +136,78 @@ const EditProposal = ({ id, onClose }) => {
     dispatch(GetDeals());
     dispatch(getAllTaxes());
   }, [dispatch]);
+
+  useEffect(() => {
+    const empData = alldept?.proposal?.data || [];
+    const data = empData.find((item) => item.id === id);
+    setSingleEmp(data || null);
+
+    const setProposalData = async () => {
+      if (data) {
+        try {
+          // Set basic form fields
+          form.setFieldsValue({
+            lead_title: data.lead_title,
+            deal_title: data.deal_title,
+            valid_till: dayjs(data.valid_till),
+            currency: data.currency,
+            calculatedTax: data.calculatedTax,
+          });
+
+          // Parse items from JSON string
+          if (data.items) {
+            const parsedItems = JSON.parse(data.items);
+            const formattedItems = Array.isArray(parsedItems) ? parsedItems : [parsedItems];
+            
+            const formattedTableData = formattedItems.map(item => ({
+              id: Date.now() + Math.random(), // Generate unique ID
+              item: item.item || '',
+              quantity: Number(item.quantity) || 0,
+              price: Number(item.price) || 0,
+              tax_name: item.tax_name || '',
+              tax: Number(item.tax) || 0,
+              amount: Number(item.amount) || 0,
+              description: item.description || ''
+            }));
+
+            setTableData(formattedTableData);
+
+            // Set discount rate
+            setDiscountRate(Number(data.discount) || 0);
+
+            // Calculate and set totals
+            const totalsData = {
+              subtotal: formattedTableData.reduce((sum, item) => sum + Number(item.amount), 0),
+              discount: Number(data.discount) || 0,
+              totalTax: Number(data.tax) || 0,
+              finalTotal: Number(data.total) || 0
+            };
+
+            setTotals(totalsData);
+
+            // Set tax details if available
+            formattedTableData.forEach(item => {
+              if (item.tax && item.tax_name) {
+                setSelectedTaxDetails(prev => ({
+                  ...prev,
+                  [item.id]: {
+                    gstName: item.tax_name,
+                    gstPercentage: item.tax
+                  }
+                }));
+              }
+            });
+          }
+
+        } catch (error) {
+          console.error("Error setting proposal data:", error);
+          message.error("Failed to load proposal details");
+        }
+      }
+    };
+
+    setProposalData();
+  }, [alldept, form]);
 
   const handleFinish = async (values) => {
     try {

@@ -23,15 +23,21 @@ const DealStagesList = () => {
 
   const dispatch = useDispatch();
 
+  const loggeduser = useSelector((state) => state.user.loggedInUser.username);
+
+
   const allfdata = useSelector((state) => state.StagesLeadsDeals);
-  const fnddata = allfdata?.StagesLeadsDeals?.data || [];
+  const fnddataa = allfdata?.StagesLeadsDeals?.data || [];
+
+  const fnddata = fnddataa.filter((item)=>item.created_by === loggeduser)
+
+
   const [leadadatafilter, setLeadadatafilter] = useState([]);
   const [idd, setIdd] = useState("");
 
   const Allpipline = useSelector((state) => state.Piplines);
   const Filterpipline = Allpipline?.Piplines?.data || [];
 
-    const loggeduser = useSelector((state) => state.user.loggedInUser.username);
   
     const filterpipline = Filterpipline.filter((item)=>item.created_by === loggeduser)
 

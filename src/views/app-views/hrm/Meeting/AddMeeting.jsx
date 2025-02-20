@@ -76,26 +76,26 @@ const AddMeeting = ({ onClose }) => {
 
   const initialValues = {
     department: "",
-    employee: "",
+    employee: [],
     title: "",
     date: null,
     startTime: null,
     endTime: null,
-    meetingLink:"",
-    status:"",
+    meetingLink: "",
+    status: "",
     description: "",
   };
 
   const validationSchema = Yup.object({
-    department: Yup.string().required("Please Select a department."), // Required field
-    employee: Yup.string().required("Please select an employee."), // Required field
-    title: Yup.string().required("Please enter a meeting title."), // Required field
-    date: Yup.date().nullable().required("Event Start Date is required."), // Required field (date)
-    startTime: Yup.date().nullable().required("Meeting time is required."), // Required field (time)
-    endTime: Yup.date().nullable().required("Meeting time is required."), // Required field (time)
-    description: Yup.string().required("Please enter a description."), // Required field
-    status: Yup.string().required("Please select a status."), // Required field
-    meetingLink: Yup.string().required("Please enter a description."), // Required field
+    department: Yup.string().required("Please Select a department."),
+    employee: Yup.array().min(1, "Please select at least one employee."),
+    title: Yup.string().required("Please enter a meeting title."),
+    date: Yup.date().nullable().required("Event Start Date is required."),
+    startTime: Yup.date().nullable().required("Meeting time is required."),
+    endTime: Yup.date().nullable().required("Meeting time is required."),
+    description: Yup.string().required("Please enter a description."),
+    status: Yup.string().required("Please select a status."),
+    meetingLink: Yup.string().required("Please enter a description."),
   });
 
   return (
@@ -104,7 +104,7 @@ const AddMeeting = ({ onClose }) => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
-        validateOnSubmit={true} // Ensure validation on submit
+        validateOnSubmit={true}
       >
         {({
           values,
@@ -135,7 +135,7 @@ const AddMeeting = ({ onClose }) => {
                       onChange={(value) => {
                         form.setFieldValue("department", value);
                         setSelectedDept(value); // ✅ Set selected department here
-                        form.setFieldValue("employee", ""); // Reset employee field when department changes
+                        form.setFieldValue("employee", []); // Reset employee field when department changes
                       }}
                       onBlur={() => form.setFieldTouched("department", true)}
                     >
@@ -165,31 +165,39 @@ const AddMeeting = ({ onClose }) => {
               {/* Employee Field */}
               <Col span={24} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Employee <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">
+                    Employees <span className="text-red-500">*</span>
+                  </label>
                   <Field name="employee">
                     {({ field, form }) => (
-                     <Select
-                     style={{ width: "100%" }}
-                     {...field}
-                     placeholder="Select Employee"
-                     loading={!filteredEmpDataa}
-                     value={form.values.employee}
-                     className="w-full mt-1"
-                     onChange={(value) => form.setFieldValue("employee", value)}
-                     onBlur={() => form.setFieldTouched("employee", true)}
-                   >
-                     {filteredEmpDataa && filteredEmpDataa.length > 0 ? (
-                       filteredEmpDataa.map((emp) => (
-                         <Option key={emp.id} value={emp.id}>
-                           {emp.username || "Unnamed Employee"}
-                         </Option>
-                       ))
-                     ) : (
-                       <Option value="" disabled>
-                         No Employees Available
-                       </Option>
-                     )}
-                   </Select>
+                      <Select
+                        mode="multiple"
+                        style={{ width: "100%" }}
+                        {...field}
+                        placeholder="Select Employees"
+                        loading={!filteredEmpDataa}
+                        value={form.values.employee}
+                        className="w-full mt-1"
+                        onChange={(value) => form.setFieldValue("employee", value)}
+                        onBlur={() => form.setFieldTouched("employee", true)}
+                        optionFilterProp="children"
+                        showSearch
+                        filterOption={(input, option) =>
+                          option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                        }
+                      >
+                        {filteredEmpDataa && filteredEmpDataa.length > 0 ? (
+                          filteredEmpDataa.map((emp) => (
+                            <Option key={emp.id} value={emp.id}>
+                              {emp.username || "Unnamed Employee"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Employees Available
+                          </Option>
+                        )}
+                      </Select>
                     )}
                   </Field>
                   <ErrorMessage
