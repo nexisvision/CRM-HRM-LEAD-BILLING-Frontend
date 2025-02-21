@@ -17,6 +17,7 @@ import { ClientData } from "views/app-views/company/CompanyReducers/CompanySlice
 import { GetPlan } from "views/app-views/plan/PlanReducers/PlanSlice.jsx";
 import { getAllTicket } from "views/app-views/pages/customersupports/ticket/TicketReducer/TicketSlice.jsx";
 import { getsubplandata } from "views/app-views/subscribeduserplans/subplanReducer/subplanSlice.jsx";
+import { Empty } from "antd";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -209,21 +210,33 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
             style={{ height: "450px" }}
           >
             <h2 className="text-xl font-medium mb-4 p-4">Plans by Clients</h2>
-            <div className=" flex items-center justify-center">
-              <Pie
-                data={chartData}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: {
-                      display: true,
-                      position: "bottom",
+            <div className="flex items-center justify-center h-[350px]">
+              {planNames.length > 0 ? (
+                <Pie
+                  data={chartData}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        display: true,
+                        position: "bottom",
+                      },
                     },
-                  },
-                }}
-                className="w-[300px] h-[300px]"
-              />
+                  }}
+                  className="w-[300px] h-[300px]"
+                />
+              ) : (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description={
+                    <div className="text-center">
+                      <p className="text-gray-500">No Plan Data Available</p>
+                      <p className="text-sm text-gray-400">Please add some plans to see the statistics</p>
+                    </div>
+                  }
+                />
+              )}
             </div>
           </div>
         </Col>
@@ -258,11 +271,25 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
         </div>
       </div>
 
-      <div className="container p-4 bg-white  rounded-lg shadow mt-8">
-        <h1 className="text-xl font-medium  text-black">
+      <div className="container p-4 bg-white rounded-lg shadow mt-8">
+        <h1 className="text-xl font-medium text-black">
           Recent Users Registration
         </h1>
-        <RegistionTable />
+        {fnddtat && fnddtat.length > 0 ? (
+          <RegistionTable />
+        ) : (
+          <div className="flex items-center justify-center py-8">
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={
+                <div className="text-center">
+                  <p className="text-gray-500">No User Registration Data Available</p>
+                  <p className="text-sm text-gray-400">New user registrations will appear here</p>
+                </div>
+              }
+            />
+          </div>
+        )}
       </div>
     </div>
   );

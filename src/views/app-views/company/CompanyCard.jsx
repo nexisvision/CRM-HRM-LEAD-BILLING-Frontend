@@ -76,9 +76,16 @@ const CompanyCard = ({ company }) => {
     setCompnyid(idd);
   };
 
-  const deleteUser = (elmId) => {
-    dispatch(deleteClient(elmId));
-    // message.success(`Deleted user ${elmId}`);
+  const deleteUser = async (elmId) => {
+    try {
+      await dispatch(deleteClient(elmId)).then(() => {
+        dispatch(ClientData());
+      });
+    message.success({ content: 'Plan deleted successfully', duration: 2 });
+  } catch (error) {
+    message.error({ content: 'Failed to delete plan', duration: 2 });
+    console.error('Error deleting plan:', error);
+  }
   };
 
   useEffect(() => {

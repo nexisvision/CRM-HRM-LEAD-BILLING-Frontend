@@ -359,38 +359,6 @@ const AddPlan = ({ onClose }) => {
                   <div className="error-message">{errors.description}</div>
                 )}
               </div>
-
-
-              <div className="form-group mt-2">
-                <label>Trial is enabled (on/off)</label>
-                <Field name="trial">
-                  {({ field }) => (
-                    <Switch 
-                      checked={field.value}
-                      onChange={(checked) => {
-                        setFieldValue('trial', checked);
-                        handleTrialToggle(checked);
-                      }}
-                    />
-                  )}
-                </Field>
-              </div>
-              {isTrialEnabled && durationType !== 'Lifetime' && (
-                <div className="form-group">
-                  <label>Trial Days</label>
-                  <Field name="trial_period">
-                    {({ field }) => (
-                      <Input 
-                        {...field} 
-                        placeholder="Enter Number of Trial Days" 
-                      />
-                    )}
-                  </Field>
-                  {errors.trial_period && touched.trial_period && (
-                    <div className="error-message">{errors.trial_period}</div>
-                  )}
-                </div>
-              )}
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Button style={{ marginRight: '8px' }} onClick={() => {
                   onClose();

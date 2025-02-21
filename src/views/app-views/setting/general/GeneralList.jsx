@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import { Card, Button, Upload, message, Row, Col, Avatar } from 'antd';
+import { Card, Button, Upload, message, Row, Col, Avatar, Input } from 'antd';
 import { QuestionCircleOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -10,16 +10,22 @@ import { useDispatch, useSelector } from 'react-redux';
 import useSelection from 'antd/es/table/hooks/useSelection';
 
 const validationSchema = Yup.object().shape({
+  companyName: Yup.string().required('Company name is required'),
+  siteTitle: Yup.string().required('Site title is required'),
   description: Yup.string().required('Description is required'),
 });
 
 const GeneralList = () => {
   const [imageUrl, setImageUrl] = useState('');
+  const [faviconUrl, setFaviconUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFavicon, setSelectedFavicon] = useState(null);
   const dispatch = useDispatch();
 
   const initialValues = {
+    companyName: '',
+    siteTitle: '',
     description: '',
   };
 
@@ -44,10 +50,16 @@ const GeneralList = () => {
       if (selectedFile) {
         formData.append('companylogo', selectedFile);
       }
+      if (selectedFavicon) {
+        formData.append('favicon', selectedFavicon);
+      }
+      formData.append('companyName', values.companyName);
+      formData.append('siteTitle', values.siteTitle);
       formData.append('termsandconditions', values.description);
 
       await dispatch(creategenaralsett(formData));
-      await dispatch(getgeneralsettings())
+      await dispatch(getgeneralsettings());
+      message.success('Settings updated successfully');
     } catch (error) {
       message.error('Failed to update settings');
     } finally {
@@ -56,10 +68,14 @@ const GeneralList = () => {
     }
   };
 
-  const handleFileChange = (info) => {
+  const handleFileChange = (info, type) => {
     const file = info.file;
     if (file) {
-      setSelectedFile(file);
+      if (type === 'logo') {
+        setSelectedFile(file);
+      } else if (type === 'favicon') {
+        setSelectedFavicon(file);
+      }
       message.success(`${file.name} selected successfully`);
     }
   };
@@ -125,44 +141,96 @@ const GeneralList = () => {
       onSubmit={handleSubmit}
       enableReinitialize
     >
-      {({ values, setFieldValue, handleSubmit, isSubmitting }) => (
+      {({ values, setFieldValue, handleSubmit, isSubmitting, errors, touched }) => (
         <Form className="formik-form" onSubmit={handleSubmit}>
           <Card className="mb-4">
             <Row gutter={[24, 24]}>
-              {/* Upload Picture */}
-              <Col span={24} >
-              <span className="block font-semibold text-lg mb-2 ">
-                Upload Company Logo 
-              </span>
-              <Field name="image">
-                {({ field }) => (
-                  <div>
-                    <Upload
-                      accept="image/*"
-                      beforeUpload={(file) => {
-                        handleFileChange({ file });
-                        return false; // Prevent auto upload
-                      }}
-                      showUploadList={false}
-                    >
-                      <Button icon={<UploadOutlined />}>Choose File</Button>
-                    </Upload>
-                  </div>
-                )}
-              </Field>
-            </Col>
+              {/* Company Name */}
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="block  font-medium text-gray-700 mb-2">
+                    Company Name <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    name="companyName"
+                    as={Input}
+                    placeholder="Enter company name"
+                    className="w-full"
+                  />
+                  {errors.companyName && touched.companyName && (
+                    <div className="text-red-500 text-sm mt-1">{errors.companyName}</div>
+                  )}
+                </div>
+              </Col>
+
+              {/* Site Title */}
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="block  font-medium text-gray-700 mb-2">
+                    Site Title <span className="text-red-500">*</span>    
+                  </label>
+                  <Field
+                    name="siteTitle"
+                    as={Input}
+                    placeholder="Enter site title"
+                    className="w-full"
+                  />
+                  {errors.siteTitle && touched.siteTitle && (
+                    <div className="text-red-500 text-sm mt-1">{errors.siteTitle}</div>
+                  )}
+                </div>
+              </Col>
+
+              {/* Company Logo */}
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="block  font-medium text-gray-700 mb-2">
+                    Company Logo <span className="text-red-500">*</span>
+                  </label>
+                  <Upload
+                    accept="image/*"
+                    beforeUpload={(file) => {
+                      handleFileChange({ file }, 'logo');
+                      return false;
+                    }}
+                    showUploadList={false}
+                  >
+                    <Button icon={<UploadOutlined />}>Upload Logo</Button>
+                  </Upload>
+                  {selectedFile && <p className="mt-2 text-sm text-gray-500">{selectedFile.name}</p>}
+                </div>
+              </Col>
+
+              {/* Favicon */}
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="block  font-medium text-gray-700 mb-2">
+                    Favicon Icon <span className="text-red-500">*</span>
+                  </label>
+                  <Upload
+                    accept=".ico,.png"
+                    beforeUpload={(file) => {
+                      handleFileChange({ file }, 'favicon');
+                      return false;
+                    }}
+                    showUploadList={false}
+                  >
+                    <Button icon={<UploadOutlined />}>Upload Favicon</Button>
+                  </Upload>
+                  {selectedFavicon && <p className="mt-2 text-sm text-gray-500">{selectedFavicon.name}</p>}
+                </div>
+              </Col>
 
               {/* Description */}
-              <Col xs={24} sm={24} md={24} >
+              <Col span={24}>
                 <div className="form-item">
-                  <label className="block text-lg font-medium text-gray-700 mb-2">
-                    Description
+                  <label className="block  font-medium text-gray-700 mb-2">
+                    Description <span className="text-red-500">*</span>
                   </label>
                   <ReactQuill
                     theme="snow"
                     value={values.description}
                     onChange={(content) => setFieldValue('description', content)}
-                    className=""
                     modules={{
                       toolbar: [
                         ['bold', 'italic', 'underline'],

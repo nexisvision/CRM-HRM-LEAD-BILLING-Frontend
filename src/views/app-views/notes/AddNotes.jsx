@@ -58,12 +58,12 @@ const AddNotes = ({ onClose }) => {
 
       dispatch(addnotess({ id, formData })).then(() => {
         dispatch(getnotess(id)).unwrap();
-        message.success("Notes added successfully!");
+        // message.success("Notes added successfully!");
         resetForm();
         onClose();
       });
     } catch (error) {
-      message.error(error.message || "Failed to add note");
+      // message.error(error.message || "Failed to add note");
     } finally {
       setSubmitting(false);
     }

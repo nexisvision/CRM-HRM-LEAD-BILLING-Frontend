@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   Input,
@@ -13,6 +13,7 @@ import { addClient, ClientData } from "./CompanyReducers/CompanySlice"; // Adjus
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import { KeyOutlined } from "@ant-design/icons";
 
 const AddCompany = ({ onClose }) => {
   const navigate = useNavigate();
@@ -21,6 +22,25 @@ const AddCompany = ({ onClose }) => {
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpToken, setOtpToken] = useState(null);
   const [otp, setOtp] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Function to generate random password
+  const generatePassword = () => {
+    const length = 6;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let password = "";
+    
+    // Generate 6 characters
+    for (let i = 0; i < length; i++) {
+      password += charset[Math.floor(Math.random() * charset.length)];
+    }
+
+    // Ensure at least one number
+    const randomNum = Math.floor(Math.random() * 10).toString();
+    password = password.slice(0, 5) + randomNum;
+    
+    return password;
+  };
 
   // Submit handler for OTP
   const otpapi = async (otp) => {
@@ -63,6 +83,7 @@ const AddCompany = ({ onClose }) => {
 
   // Form submit handler
   const onSubmit = async (values, { resetForm, setSubmitting }) => {
+    setIsSubmitting(true);
     try {
       const response = await dispatch(addClient(values)); // Dispatching the addClient action
       if (response.payload?.data?.sessionToken) {
@@ -76,13 +97,14 @@ const AddCompany = ({ onClose }) => {
       message.error("Failed to add Company. Please try again.");
     } finally {
       setSubmitting(false);
+      setIsSubmitting(false);
     }
   };
 
-  // Initial form values
+  // Initial form values without default password
   const initialValues = {
     username: "",
-    password: "",
+    password: "", // Empty password initially
     email: "",
   };
 
@@ -90,7 +112,7 @@ const AddCompany = ({ onClose }) => {
   const validationSchema = Yup.object({
     username: Yup.string().required("Please enter a username."),
     password: Yup.string()
-      .min(8, "Password must be at least 8 characters")
+      .min(6, "Password must be at least 6 characters")
       .matches(/\d/, "Password must have at least one number")
       .required("Password is required"),
     email: Yup.string()
@@ -105,7 +127,7 @@ const AddCompany = ({ onClose }) => {
         validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, setFieldValue }) => (
           <Form className="space-y-4">
             <Row gutter={16}>
               <Col span={12}>
@@ -127,12 +149,22 @@ const AddCompany = ({ onClose }) => {
               <Col span={12}>
                 <div className="form-item mt-2">
                 <label className="font-semibold">Password <span className="text-red-500">*</span></label>
-                  <Field
-                    name="password"
-                    as={Input.Password}
-                    placeholder="Strong Password"
-                    className="mt-1"
-                  />
+                  <div className="relative">
+                    <Field
+                      name="password"
+                      as={Input.Password}
+                      placeholder="Password"
+                      className="mt-1 w-full"
+                    />
+                    <Button
+                      type="text"
+                      className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center z-10"
+                      onClick={() => setFieldValue("password", generatePassword())}
+                      icon={<KeyOutlined />}
+                    >
+                     
+                    </Button>
+                  </div>
                   <ErrorMessage
                     name="password"
                     component="div"
@@ -166,6 +198,7 @@ const AddCompany = ({ onClose }) => {
               <Button
                 type="primary"
                 htmlType="submit"
+                loading={isSubmitting}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Submitting..." : "Submit"}
@@ -197,13 +230,15 @@ const AddCompany = ({ onClose }) => {
             onChange={(e) => setOtp(e.target.value)}
           />
           <div className="mt-4">
-            <Button
-              type="primary"
-              className="w-full"
-              onClick={handleOtpVerify}
-            >
-              Verify OTP
-            </Button>
+          <Button
+                type="primary"
+                htmlType="submit"
+                loading={isSubmitting}
+                disabled={isSubmitting}
+                onClick={handleOtpVerify}
+              >
+                {isSubmitting ? "Verifying..." : "Verify OTP"}
+              </Button>
           </div>
         </div>
       </Modal>

@@ -546,11 +546,11 @@ const PlanList = () => {
                       </div>
                     </div>
 
-                    <div className="pt-2">
+                    {/* <div className="pt-2">
                       <Tag color="blue" className="px-3 py-1 rounded-full">
                         Trial Period: {plan.trial_period} days
                       </Tag>
-                    </div>
+                    </div> */}
 
                     {!isAdmin && (
                       <Button 
@@ -563,7 +563,7 @@ const PlanList = () => {
                       </Button>
                     )}
 
-                    {plan.features && (
+                    {/* {plan.features && (
                       <div className="border-t pt-4">
                         <Text strong className="block mb-3">Features:</Text>
                         <div className="flex flex-wrap gap-2">
@@ -578,7 +578,7 @@ const PlanList = () => {
                           ))}
                         </div>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </Card>
               </Col>
