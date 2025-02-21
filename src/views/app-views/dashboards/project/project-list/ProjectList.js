@@ -76,30 +76,50 @@ const ProjectList = () => {
 		filteredProjects = filteredProjects.filter(item => item.created_by === username);
 
 		const formattedData = filteredProjects.map((item) => {
-			const currentDate = new Date();
-			const endDate = new Date(item.endDate);
-			const startDate = new Date(item.startDate);
-	  
-			const totalDays = Math.ceil((endDate - startDate) / (1000 * 3600 * 24));
-			const completedDays = Math.ceil((currentDate - startDate) / (1000 * 3600 * 24));
-			const adjustedCompletedDays = Math.min(Math.max(0, completedDays), totalDays);
-	  
+			// Parse project_members and files for each project individually
+			let projectMembers = [];
+			let filesArray = [];
+			
+			try {
+				// Parse project members
+				const parsedMembers = JSON.parse(item.project_members);
+				projectMembers = parsedMembers.project_members || [];
+				
+				// Parse files for this specific project
+				filesArray = JSON.parse(item.files) || [];
+			} catch (error) {
+				console.error("Error parsing data:", error);
+			}
+
+			// Get file URLs for this specific project
+			const fileUrls = filesArray.map(file => file.url);
+
+			// Map members to their avatars, cycling through available files
+			const memberWithAvatars = projectMembers.map((memberId, index) => ({
+				id: memberId,
+				name: "Member",
+				// Use modulo to cycle through available files if there are more members than files
+				img: fileUrls[index % fileUrls.length] || "https://xsgames.co/randomusers/avatar.php?g=pixel"
+			}));
+
 			return {
+				...item,
+				dateRange: `${new Date(item.startDate).toLocaleDateString()}/${new Date(item.endDate).toLocaleDateString()}`,
 				id: item.id,
 				name: item.project_name || item.name,
-				category: item.category,
+				category: item.project_category,
 				attachmentCount: item.attachmentCount,
 				totalTask: item.budget,
-				completedTask: `${adjustedCompletedDays}/${totalDays}`,
-				progression: item.startDate,
-				dayleft: Math.max(0, Math.ceil((endDate - currentDate) / (1000 * 3600 * 24))),
+				completedTask: `${Math.round((new Date() - new Date(item.startDate)) / (new Date(item.endDate) - new Date(item.startDate)) * 100)}%`,
+				progressPercent: Math.round((new Date() - new Date(item.startDate)) / (new Date(item.endDate) - new Date(item.startDate)) * 100),
+				dayleft: Math.max(0, Math.ceil((new Date(item.endDate) - new Date()) / (1000 * 3600 * 24))),
 				statusColor: item.status,
-				member: item.member,
+				member: memberWithAvatars,
 				tag: item.tag_name || item.tag,
-			  };
-			});
-			setList(formattedData);
-		}, [properdata, clientid, username]);
+			};
+		});
+		setList(formattedData);
+	}, [properdata, clientid, username]);
 
 
 	  
@@ -161,7 +181,7 @@ const ProjectList = () => {
                     className="cursor-pointer hover:text-blue-600"
                 >
                     <h4 className="mb-0">{name}</h4>
-                    <span className="text-muted">{record.category}</span>
+                    <span className="text-gray-500">{record.project_category}</span>
                 </div>
             ),
         },
@@ -286,12 +306,11 @@ const ProjectList = () => {
 										
 <Card>
 							<div className='flex items-center justify-between'>
-								<div className='' onClick={() => handleProjectClick(item.id)}>
-									<p className='font-bold text-black cursor-pointer'>{item.name}</p>
+								<div className="flex flex-col" onClick={() => handleProjectClick(item.id)}>
+									<p className="text-base font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">{item.name}</p>
+									<p className="text-sm text-gray-600 mt-2">{item.category}</p>
 								</div>
-								<div>
-									<p>{item.category}</p>
-								</div>
+								
 								<div className="flex items-center gap-2">
 									{item.tag && (
 										<Tag 
@@ -312,18 +331,16 @@ const ProjectList = () => {
 								</div>
 							</div>
 
-							<p className="flex gap-4 mt-1">
-								<span>{item.member}</span>
-							</p>
+							
 
-							<p className="flex gap-4 mt-1">
+							<div className="mt-4 flex items-center gap-4">
 								<span>
 									<PaperClipOutlined />
 									{item.totalTask}
 								</span>
 								<span>
 									<CheckCircleOutlined />
-									{item.completedTask}
+									{item.dateRange}
 								</span>
 								<span
 									style={{
@@ -336,20 +353,50 @@ const ProjectList = () => {
 									<ClockCircleOutlined />
 									{item.dayleft} days left
 								</span>
-							</p>
-							<p>
+							</div>
+							
+							<div className="mt-3">
 								<Progress
-									percent={item.dayleft}
+									percent={item.progressPercent}
 									strokeColor={
-										item.dayleft >= 80
-											? 'green'
-											: item.dayleft >= 60
+										item.progressPercent <= 50
+											? 'red'
+											: item.progressPercent <= 75
 												? 'orange'
-												: 'red'
+												: 'green'
 									}
 									size="small"
 								/>
-							</p>
+							</div>
+
+							{/* Modified Avatar group section with conditional rendering */}
+							{item.member && item.member.length > 0 && (
+								<div className="mt-4">
+									<Avatar.Group
+										maxCount={4}
+										maxStyle={{
+											color: '#f56a00',
+											backgroundColor: '#fde3cf',
+										}}
+									>
+										{item.member.map((member, index) => (
+											<Tooltip title={member.name} key={index}>
+												<Avatar 
+													src={member.img}
+													className="rounded-full"
+													style={{ backgroundColor: '#87d068' }}
+													onError={(e) => {
+														// If image fails to load, replace with default avatar
+														e.target.src = "https://xsgames.co/randomusers/avatar.php?g=pixel";
+													}}
+												>
+													{member.name[0]} {/* Fallback to first letter if both image and default fail */}
+												</Avatar>
+											</Tooltip>
+										))}
+									</Avatar.Group>
+								</div>
+							)}
 						</Card>
 
 								</Col>

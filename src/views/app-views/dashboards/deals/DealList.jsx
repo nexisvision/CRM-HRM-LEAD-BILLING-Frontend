@@ -82,43 +82,42 @@ const DealList = () => {
     console.log('Users State:', users);
   }, [tabledata, users]);
 
-  // Modified debounced search function with better error handling
+  // Modified useEffect for initial data loading
+  useEffect(() => {
+    if (tabledata?.Deals?.data) {
+      const filteredDeals = tabledata.Deals.data.filter(deal => deal.created_by === user);
+      setUsers(filteredDeals);
+      setFilteredUsers(filteredDeals); // Also set filtered users initially
+    }
+  }, [tabledata, user]);
+
+  // Modified debounced search function
   const debouncedSearch = debounce((value) => {
     setIsSearching(true);
     const searchValue = value.toLowerCase();
     
     try {
-      if (!searchValue) {
-        // Reset to original filtered data
-        if (tabledata?.Deals?.data) {
-          const filteredDeals = tabledata.Deals.data.filter(deal => deal.created_by === user);
-          setUsers(filteredDeals);
-        }
-        setIsSearching(false);
-        return;
-      }
-
-      // Make sure we have data to filter
       if (!tabledata?.Deals?.data) {
         console.log('No deals data available');
         setUsers([]);
+        setFilteredUsers([]);
         setIsSearching(false);
         return;
       }
 
-      // Filter by created_by and search value
       const filteredData = tabledata.Deals.data.filter(deal => {
         const matchesUser = deal.created_by === user;
-        const matchesSearch = 
+        const matchesSearch = !searchValue || (
           (deal.dealName?.toString().toLowerCase().includes(searchValue)) ||
           (deal.leadTitle?.toString().toLowerCase().includes(searchValue)) ||
-          (deal.project?.toString().toLowerCase().includes(searchValue));
+          (deal.project?.toString().toLowerCase().includes(searchValue))
+        );
         
         return matchesUser && matchesSearch;
       });
 
-      console.log('Filtered Data:', filteredData); // Debug log
       setUsers(filteredData);
+      setFilteredUsers(filteredData);
     } catch (error) {
       console.error('Search error:', error);
     } finally {
@@ -132,14 +131,6 @@ const DealList = () => {
     setSearchValue(value);
     debouncedSearch(value);
   };
-
-  // Make sure initial data is loaded
-  useEffect(() => {
-    if (tabledata?.Deals?.data) {
-      const filteredDeals = tabledata.Deals.data.filter(deal => deal.created_by === user);
-      setUsers(filteredDeals);
-    }
-  }, [tabledata, user]);
 
   useEffect(()=>{
     dispatch(GetPip())
@@ -303,18 +294,6 @@ const DealList = () => {
     }
   }, [stagesList]);
 
-
-  const filterData = () => {
-    let filtered = users.filter((deal) =>
-      deal.dealName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    setFilteredUsers(filtered);
-  };
-
-  useEffect(() => {
-    filterData();
-  }, [searchTerm]);
 
   const EditDelas = (id) => {
     openEditDealModal();
@@ -533,7 +512,7 @@ const DealList = () => {
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                                                                            <Table
                                                                                            columns={tableColumns}
-                                                                                           dataSource={filteredUsers}
+                                                                                           dataSource={users}
                                                                                            rowKey="id"
                                                                                            scroll={{ x: 1200 }}
                                                                                          />

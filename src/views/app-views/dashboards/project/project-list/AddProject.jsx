@@ -105,9 +105,7 @@ const AddProject = ({ onClose }) => {
   const employeedata = AllEmployee.SubClient.data;
 
 
-  // console.log(employeedata, "employeedata");
-
-  const fnd2 = employeedata?.filter((item)=>item?.username === allloggeduser)
+  const fnd2 = employeedata?.filter((item)=>item?.created_by === allloggeduser)
 
 
   const AllLoggeddtaa = useSelector((state) => state.user);
@@ -357,15 +355,15 @@ const AddProject = ({ onClose }) => {
                     style={{ width: "100%" }}
                     className="mt-1"
                     placeholder="Select Client"
-                    loading={!employeedata}
+                    loading={!fnd2}
                     value={values.client} // Bind value to Formik's field
                     // value="sdfsdf"
                     onChange={(value) => setFieldValue("client", value)} // Update Formik's field value
                     onBlur={() => setFieldTouched("client", true)} // Set touched state
                   >
-                    {employeedata && employeedata?.length > 0 ? (
-                      employeedata
-                        .filter(client => client.created_by === AllLoggedData.loggedInUser.username) // Filter clients based on created_by
+                    {fnd2 && fnd2?.length > 0 ? (
+                      fnd2
+                        .filter(client => client.created_by === AllLoggedData.loggedInUser.username) 
                         .map((client) => (
                           <Option key={client.id} value={client.id}>
                             {client.firstName || client.username || "Unnamed Client"}

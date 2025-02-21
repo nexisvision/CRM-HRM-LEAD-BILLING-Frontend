@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeSwitcherProvider } from 'react-css-theme-switcher';
 import store from './store';
@@ -16,7 +16,28 @@ const themes = {
   light: `${process.env.PUBLIC_URL}/css/light-theme.css`,
 };
 
-function App() {
+// Create a separate component for the content that needs Redux
+function AppContent() {
+  const alldata = useSelector((state) => state.generalsetting.generalsetting.data);
+  const companyData = Array.isArray(alldata) ? alldata[0] : alldata;
+
+  useEffect(() => {
+    // Update title
+    document.title = companyData?.title || 'CRM';
+
+    // Update favicon
+    const favicon = document.querySelector("link[rel='icon']");
+    if (favicon && companyData?.favicon) {
+      favicon.href = companyData.favicon;
+    }
+
+    // Update apple-touch-icon as well if needed
+    const appleIcon = document.querySelector("link[rel='apple-touch-icon']");
+    if (appleIcon && companyData?.favicon) {
+      appleIcon.href = companyData.favicon;
+    }
+  }, [companyData,alldata]);
+
   useEffect(() => {
     // Initialize socket connection
     const socket = socketService.connect();
@@ -28,16 +49,22 @@ function App() {
   }, []);
 
   return (
+    <ThemeSwitcherProvider
+      themeMap={themes}
+      defaultTheme={THEME_CONFIG.currentTheme}
+      insertionPoint="styles-insertion-point"
+    >
+      <Layouts />
+    </ThemeSwitcherProvider>
+  );
+}
+
+function App() {
+  return (
     <div className="App">
       <Provider store={store}>
         <BrowserRouter history={history}>
-          <ThemeSwitcherProvider
-            themeMap={themes}
-            defaultTheme={THEME_CONFIG.currentTheme}
-            insertionPoint="styles-insertion-point"
-          >
-            <Layouts />
-          </ThemeSwitcherProvider>
+          <AppContent />
         </BrowserRouter>
       </Provider>
     </div>

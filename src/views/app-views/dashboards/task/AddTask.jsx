@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, DatePicker, Select, message, Row, Col } from "antd";
+import { Input, Button, DatePicker, Select, message, Row, Col, Upload } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -9,6 +9,7 @@ import { AddTasks, GetTasks } from "../project/task/TaskReducer/TaskSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { GetAllNotifications } from "views/app-views/pages/setting/NotificationReducer/NotificationSlice";
+import { UploadOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -16,6 +17,7 @@ const AddTask = ({ onClose }) => {
   const dispatch = useDispatch();
   const [isWithoutDueDate, setIsWithoutDueDate] = useState(false);
   const [isOtherDetailsVisible, setIsOtherDetailsVisible] = useState(false);
+  const [fileList, setFileList] = useState([]);
 
   // const { id } = useParams();
 
@@ -70,31 +72,77 @@ const AddTask = ({ onClose }) => {
     description: Yup.string().required("Please enter a Description."),
   });
 
-  const onSubmit = async (values, { resetForm }) => {
-    // Convert AssignTo array into an object containing the array
-    // if (Array.isArray(values.AssignTo) && values.AssignTo.length > 0) {
-    //   values.AssignTo = { AssignTo: [...values.AssignTo] };
-    // }
+  // File upload configuration
+  const uploadProps = {
+    onRemove: (file) => {
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
+    },
+    beforeUpload: (file) => {
+      // File type validation
+      const isValidType = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ].includes(file.type);
+      
+      // File size validation (2MB)
+      const isLt2M = file.size / 1024 / 1024 < 2;
 
-    // Dispatch AddTasks with updated values
-    dispatch(AddTasks({ id, values }))
+      if (!isValidType) {
+        message.error('You can only upload JPG/PNG/PDF/DOC files!');
+        return false;
+      }
+      
+      if (!isLt2M) {
+        message.error('File must be smaller than 2MB!');
+        return false;
+      }
+
+      setFileList([...fileList, file]);
+      return false; // Prevent automatic upload
+    },
+    fileList,
+    multiple: true,
+  };
+
+  const onSubmit = async (values, { resetForm }) => {
+    const formData = new FormData();
+    
+    // Append all form fields
+    Object.keys(values).forEach(key => {
+      if (key !== 'files') {
+        formData.append(key, values[key]);
+      }
+    });
+
+    // Append files
+    fileList.forEach((file) => {
+      formData.append('task_file', file);
+    });
+
+    dispatch(AddTasks({ id, values: formData }))
       .then(() => {
-        // Fetch updated tasks after successfully adding
+        message.success("Task added successfully!");
         dispatch(GetTasks(id))
           .then(() => {
-            // message.success("Expenses added successfully!");
             resetForm();
+            setFileList([]); // Reset file list
             onClose();
-            dispatch(GetAllNotifications())
           })
           .catch((error) => {
-            // message.error("Failed to fetch the latest meeting data.");
-            console.error("MeetData API error:", error);
+            message.error("Failed to fetch the latest Task data.");
+            console.error("Task API error:", error);
           });
       })
       .catch((error) => {
-        message.error("Failed to add meeting.");
-        console.error("AddMeet API error:", error);
+        message.error("Failed to add Task.");
+        console.error("AddTask API error:", error);
       });
   };
 
@@ -316,6 +364,18 @@ const AddTask = ({ onClose }) => {
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
+                </div>
+              </Col>
+
+              {/* Add File Upload field */}
+              <Col span={24} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Attachments <span className="text-rose-500">*</span></label>
+                  <Upload {...uploadProps} className="mt-2">
+                    <Button icon={<UploadOutlined />} className="hover:bg-gray-50">
+                      Click to Upload Files
+                    </Button>
+                  </Upload>
                 </div>
               </Col>
             </Row>

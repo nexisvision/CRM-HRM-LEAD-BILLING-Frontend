@@ -51,6 +51,9 @@ const AddTask = ({ onClose }) => {
     const [categories, setCategories] = useState([]);
     const [statuses, setStatuses] = useState([]);
 
+    // Add new state for files
+    const [fileList, setFileList] = useState([]);
+
 
   const { id } = useParams();
 
@@ -88,6 +91,7 @@ const AddTask = ({ onClose }) => {
     dueDate: null,
     assignTo: [],
     description: "",
+    files: [] // Add files to initial values
   };
 
   const validationSchema = Yup.object({
@@ -160,25 +164,51 @@ const AddTask = ({ onClose }) => {
     }
   };
 
+  // File upload props configuration
+  const uploadProps = {
+    onRemove: (file) => {
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
+    },
+    beforeUpload: (file) => {
+      setFileList([...fileList, file]);
+      return false; // Prevent automatic upload
+    },
+    fileList,
+    multiple: true,
+  };
 
   const onSubmit = async (values, { resetForm }) => {
-    // Convert AssignTo array into an object containing the array
-    // if (Array.isArray(values.AssignTo) && values.AssignTo.length > 0) {
-    //   values.AssignTo = { AssignTo: [...values.AssignTo] };
-    // }
+    // Create FormData to handle file upload
+    const formData = new FormData();
+    
+    // Append all regular fields
+    Object.keys(values).forEach(key => {
+      if (key !== 'files') {
+        formData.append(key, values[key]);
+      }
+    });
 
-    // Dispatch AddTasks with updated values
-    dispatch(AddTaskk({ id, values })).then(() => {
-      message.success("Task added successfully!");
-        // Fetch updated tasks after successfully adding
+    // Append files with the key 'task_file'
+    fileList.forEach((file) => {
+      formData.append('task_file', file);
+    });
+
+    // Dispatch AddTaskk with formData
+    dispatch(AddTaskk({ id, values: formData }))
+      .then(() => {
+        message.success("Task added successfully!");
         dispatch(GetTasks(id))
           .then(() => {
             resetForm();
+            setFileList([]); // Reset file list
             onClose();
           })
           .catch((error) => {
             message.error("Failed to fetch the latest Task data.");
-            console.error("MeetData API error:", error);
+            console.error("Task API error:", error);
           });
       })
       .catch((error) => {
@@ -366,7 +396,7 @@ const AddTask = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">AssignTo</label>
+                  <label className="font-semibold">AssignTo <span className="text-red-500">*</span></label>
                   <Field name="assignTo">
                     {({ field }) => (
                       <Select
@@ -479,7 +509,7 @@ const AddTask = ({ onClose }) => {
               
               <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Description</label>
+                  <label className="font-semibold">Description <span className="text-red-500">*</span></label>
                   <ReactQuill
                     value={values.description}
                     className="mt-1"
@@ -492,6 +522,35 @@ const AddTask = ({ onClose }) => {
                     component="div mt-2"
                     className="error-message text-red-500 my-1"
                   />
+                </div>
+              </Col>
+
+              {/* Add File Upload field */}
+              {/* <Col span={24} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">Attachments</label>
+                  <Upload
+                    {...uploadProps}
+                    listType="picture-card"
+                  >
+                    <div>
+                      <PlusOutlined />
+                      <div style={{ marginTop: 8 }}>Upload</div>
+                    </div>
+                  </Upload>
+                </div>
+              </Col> */}
+
+              {/* Alternative simple file upload design */}
+              <Col span={24} className="mt-4">
+                <div className="form-item">
+                  <label className="text-sm font-semibold mb-2 block">Attachments <span className="text-red-500">*</span></label>
+                  <Upload
+                    {...uploadProps}
+                    className="mt-2"
+                  >
+                    <Button icon={<UploadOutlined />} className="hover:bg-gray-50">Click to Upload</Button>
+                  </Upload>
                 </div>
               </Col>
 

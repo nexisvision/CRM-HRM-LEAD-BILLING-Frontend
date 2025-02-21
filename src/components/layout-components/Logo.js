@@ -19,9 +19,9 @@ const LogoWrapper = styled.div(() => ({
 const { useBreakpoint } = Grid;
 
 export const Logo = ({ mobileLogo, logoType }) => {
-
+	const alldata = useSelector((state) => state.generalsetting.generalsetting.data);
+	const companyData = Array.isArray(alldata) ? alldata[0] : alldata;
 	const isMobile = !utils.getBreakPoint(useBreakpoint()).includes('lg');
-
 	const navCollapsed = useSelector(state => state.theme.navCollapsed);
 	const navType = useSelector(state => state.theme.navType);
 
@@ -56,8 +56,10 @@ export const Logo = ({ mobileLogo, logoType }) => {
 
 	return (
 		<LogoWrapper className={isMobile && !mobileLogo ? 'd-none' : 'logo'} style={{width: `${getLogoWidthGutter()}`}}>
-			{/* <img src={getLogo()} alt={`${APP_NAME} logo`}/> */}
-			<h1>CRM</h1>
+			
+				<h1 style={{ margin: 0, fontSize: '1.2rem' }}>
+					{companyData?.companyName || 'CRM'}
+				</h1>
 		</LogoWrapper>
 	)
 }

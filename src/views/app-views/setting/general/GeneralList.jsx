@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { Card, Button, Upload, message, Row, Col, Avatar, Input } from 'antd';
-import { QuestionCircleOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
+import { DeleteOutlined, QuestionCircleOutlined, UploadOutlined, UserOutlined } from '@ant-design/icons';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { creategenaralsett, deletesettingss, getgeneralsettings } from './generalReducer/generalSlice';
@@ -11,7 +11,7 @@ import useSelection from 'antd/es/table/hooks/useSelection';
 
 const validationSchema = Yup.object().shape({
   companyName: Yup.string().required('Company name is required'),
-  siteTitle: Yup.string().required('Site title is required'),
+  title: Yup.string().required('Site title is required'),
   description: Yup.string().required('Description is required'),
 });
 
@@ -25,7 +25,7 @@ const GeneralList = () => {
 
   const initialValues = {
     companyName: '',
-    siteTitle: '',
+    title: '',
     description: '',
   };
 
@@ -54,7 +54,7 @@ const GeneralList = () => {
         formData.append('favicon', selectedFavicon);
       }
       formData.append('companyName', values.companyName);
-      formData.append('siteTitle', values.siteTitle);
+      formData.append('title', values.title);
       formData.append('termsandconditions', values.description);
 
       await dispatch(creategenaralsett(formData));
@@ -109,13 +109,13 @@ const GeneralList = () => {
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-medium">Current Settings</h2>
                 <Button 
-                  type="primary" 
+                  // type="primary" 
                   danger
                   onClick={handleDelete}
                   loading={loading}
                   className="px-4 py-1"
                 >
-                  Delete Settings
+                  <DeleteOutlined/>
                 </Button>
               </div>
               <div className="flex items-start gap-6">
@@ -170,13 +170,13 @@ const GeneralList = () => {
                     Site Title <span className="text-red-500">*</span>    
                   </label>
                   <Field
-                    name="siteTitle"
+                    name="title"
                     as={Input}
                     placeholder="Enter site title"
                     className="w-full"
                   />
-                  {errors.siteTitle && touched.siteTitle && (
-                    <div className="text-red-500 text-sm mt-1">{errors.siteTitle}</div>
+                  {errors.title && touched.title && (
+                    <div className="text-red-500 text-sm mt-1">{errors.title}</div>
                   )}
                 </div>
               </Col>

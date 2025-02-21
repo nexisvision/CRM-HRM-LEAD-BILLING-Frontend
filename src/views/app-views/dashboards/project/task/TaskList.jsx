@@ -170,27 +170,30 @@ export const TaskList = () => {
 
   useEffect(() => {
     if (fnddata) {
+      console.log("fnddata",fnddata);
       setList(fnddata);
     }
   }, [fnddata]);
 
-  // Format tasks with employee names
   useEffect(() => {
     if (fnddata && employees?.length > 0) {
       try {
         const formattedTasks = fnddata.map(task => {
-          // Parse the assignTo JSON string to array
-          const assignToIds = JSON.parse(task.assignTo || "[]");
-          
-          // Map IDs to employee names
-          const employeeNames = assignToIds.map(empId => {
-            const employee = employees.find(emp => emp.id === empId);
-            return employee?.firstName || 'Unknown';
-          });
+          let assignToNames = 'Not Assigned';
+          try {
+            const assignToIds = JSON.parse(task.assignTo || "[]");
+            const employeeNames = assignToIds.map(empId => {
+              const employee = employees.find(emp => emp.id === empId);
+              return employee?.firstName || 'Unknown';
+            });
+            assignToNames = employeeNames.join(', ');
+          } catch (error) {
+            console.error('Error parsing assignTo:', error);
+          }
 
           return {
             ...task,
-            assignToName: employeeNames.join(', ') || 'Not Assigned'
+            assignToName: assignToNames
           };
         });
         setList(formattedTasks);
@@ -201,7 +204,6 @@ export const TaskList = () => {
   }, [fnddata, employees]);
 
   useEffect(() => {
-    // Load pinned tasks from local storage on component mount
     const storedPinnedTasks = JSON.parse(localStorage.getItem("pinnedTasks")) || [];
     setPinnedTasks(storedPinnedTasks);
   }, []);
@@ -519,7 +521,7 @@ export const TaskList = () => {
         <div className="table-responsive">
           <Table
             columns={tableColumns}
-            dataSource={getFilteredTasks()}
+            dataSource={list}
             rowKey="id"
             loading={loading}
             scroll={{ x: 1600 }}

@@ -327,8 +327,8 @@ export const LoginForm = props => {
 						</span>
 					}
 					rules={[
-						{ required: true, message: 'Please input your email' },
-						{ type: 'email', message: 'Please enter a valid email!' }
+						{ required: true, message: 'Please input your email or username' },
+						{ type: 'text', message: 'Please enter a valid username or email' }
 					]}
 				>
 					<Input 
