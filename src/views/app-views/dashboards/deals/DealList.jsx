@@ -10,6 +10,7 @@ import {
   message,
   Button,
   Modal,
+  Radio,
 } from "antd";
 import {
   EyeOutlined,
@@ -20,6 +21,8 @@ import {
   EditOutlined,
   FileAddOutlined,
   FileExcelOutlined,
+  AppstoreOutlined,
+  UnorderedListOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import UserView from "../../Users/user-list/UserView";
@@ -42,6 +45,9 @@ import { getstages } from '../systemsetup/LeadStages/LeadsReducer/LeadsstageSlic
 import { GetPip } from "../systemsetup/Pipeline/PiplineReducer/piplineSlice";
 import { debounce } from 'lodash';
 
+const VIEW_LIST = 'LIST';
+const VIEW_GRID = 'GRID';
+
 const DealList = () => {
   const [users, setUsers] = useState([]);
   const [list, setList] = useState(OrderListData);
@@ -55,6 +61,8 @@ const DealList = () => {
 
   const dispatch = useDispatch();
 
+  const [view, setView] = useState(VIEW_LIST);
+  
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddDealModalVisible, setIsAddDealModalVisible] = useState(false);
   const [isViewDealModalVisible, setIsViewDealModalVisible] = useState(false);
@@ -451,6 +459,49 @@ const DealList = () => {
     console.log('Mapped Users:', users);
   }, [users]);
 
+  const renderGridView = () => {
+    return (
+      <Row gutter={[16, 16]}>
+        {users.map((deal, index) => (
+          <Col xs={24} sm={12} md={8} lg={6} key={deal.id || index}>
+            <Card hoverable className="h-full">
+              <div className="p-3">
+                <h4 className="mb-2 font-semibold">{deal.dealName}</h4>
+                <div className="text-gray-600 mb-2">
+                  <div>Price: ${deal.price}</div>
+                  <div>Stage: {getStageName(deal.stage)}</div>
+                  <div>Created by: {deal.created_by}</div>
+                </div>
+                <div className="text-gray-500">
+                  <div>Lead: {deal.leadTitle}</div>
+                  <div>Project: {deal.project}</div>
+                </div>
+                <div className="mt-3 flex justify-end">
+                  <EllipsisDropdown menu={dropdownMenu(deal)} />
+                </div>
+              </div>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    );
+  };
+
+  const renderListView = () => {
+    return (
+      <div className="table-responsive">
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
+          <Table
+            columns={tableColumns}
+            dataSource={users}
+            rowKey="id"
+            scroll={{ x: 1200 }}
+          />
+        )}
+      </div>
+    );
+  };
+
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
       {/* <Row gutter={16}>
@@ -483,8 +534,21 @@ const DealList = () => {
             />
           </div>
         </Flex>
-        <Flex gap="7px">
+        <Flex gap="7px" className="items-center">
         
+        <Radio.Group
+              defaultValue={VIEW_LIST}
+              onChange={(e) => setView(e.target.value)} 
+              value={view}
+              className="mr-2 flex items-center"
+            >
+              <Radio.Button value={VIEW_GRID} className="flex items-center justify-center">
+                <AppstoreOutlined />
+              </Radio.Button>
+              <Radio.Button value={VIEW_LIST} className="flex items-center justify-center">
+                <UnorderedListOutlined />
+              </Radio.Button>
+            </Radio.Group>
 
             {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                                                                                                      <Button type="primary" className="ml-2" onClick={openAddDealModal}>
@@ -507,20 +571,9 @@ const DealList = () => {
           </Button> */}
         </Flex>
       </Flex>
-      <div className="table-responsive mt-2">
 
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                           <Table
-                                                                                           columns={tableColumns}
-                                                                                           dataSource={users}
-                                                                                           rowKey="id"
-                                                                                           scroll={{ x: 1200 }}
-                                                                                         />
-                                                                                          ) : null}
+      {view === VIEW_GRID ? renderGridView() : renderListView()}
 
-
-       
-      </div>
       <UserView
         data={selectedUser}
         visible={userProfileVisible}
