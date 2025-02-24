@@ -323,7 +323,7 @@ export const LoginForm = props => {
 					label={
 						<span className="flex items-center">
 							<span className="text-red-500 mr-1"></span>
-							Email
+							Email / Username / Phone
 						</span>
 					}
 					rules={[

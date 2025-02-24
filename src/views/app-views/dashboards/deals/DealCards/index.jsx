@@ -1,12 +1,12 @@
 import React from 'react';
 // import LeadCardsList from './LeadCardsList';
-import LeadCards from './LeadCards';
+import DealCards from './DealCards';
 
-const LeadCardss = () => (
+const DealCardss = () => (
   <div className="mail">
     {/* <LeadCardsList /> */}
-    <LeadCards/>
+    <DealCards/>
   </div>
 );
 
-export default LeadCardss;
+export default DealCardss;

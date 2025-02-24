@@ -17,10 +17,10 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useDispatch, useSelector } from "react-redux";
-import { getstages } from "../../../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
+import { getstages } from "../../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { GetLeads, LeadsEdit } from "../../leads/LeadReducers/LeadSlice";  
-import AddLeadCards from "./AddleadCards"; // Assuming AddLead is an action
-import { GetPip } from "../../../systemsetup/Pipeline/PiplineReducer/piplineSlice";
+import AddDealCards from "./AdddealCards"; // Assuming AddLead is an action
+import { GetPip } from "../../systemsetup/Pipeline/PiplineReducer/piplineSlice";
 import { Option } from "antd/es/mentions";
 
 const DraggableItem = ({ lead, id }) => {
@@ -219,7 +219,7 @@ const LeadCards = () => {
 
  
   const handleAddLeadCardsSubmit = () => {
-    dispatch(AddLeadCards(newLead));
+    // dispatch(AddDealCards(newLead));
     setIsAddLeadCardsVisible(false); // Close the form after submission
     // setNewLead({leadtitle:"", firstName: "", lastName: "",telephone:"", leadstage: "",  emailadress: "",leadvalue:"",currency:"",assigned:"",status:"" }); // Reset form fields
   };
@@ -296,7 +296,7 @@ const LeadCards = () => {
           onCancel={() => setIsAddLeadCardsVisible(false)}
           footer={null} // Remove the footer since AddLeadCards will have its own buttons
         >
-          <AddLeadCards
+          <AddDealCards
             visible={isAddLeadCardsVisible}
             onClose={() => setIsAddLeadCardsVisible(false)}
           />

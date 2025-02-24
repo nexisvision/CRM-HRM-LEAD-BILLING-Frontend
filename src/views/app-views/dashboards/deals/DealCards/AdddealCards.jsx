@@ -21,8 +21,8 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 // import { GetLeads, LeadsAdd } from "./LeadReducers/LeadSlice";
-import { GetLeads } from "../LeadReducers/LeadSlice";
-import { LeadsAdd } from "../LeadReducers/LeadSlice";
+import { GetLeads } from "../../leads/LeadReducers/LeadSlice";
+import { LeadsAdd } from "../../leads/LeadReducers/LeadSlice";
 // import { getallcurrencies } from "../../setting/currencies/currenciesreducer/currenciesSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 // import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
@@ -33,7 +33,7 @@ import { getallcountries } from "views/app-views/setting/countries/countriesredu
 
 const { Option } = Select;
 
-const AddLeadCards = ({ onClose }) => {
+const AddDealCards = ({ onClose }) => {
   const navigate = useNavigate();
   const [details, setDetails] = useState(false);
   const [info, setInfo] = useState(false);
@@ -785,5 +785,5 @@ const AddLeadCards = ({ onClose }) => {
   );
 };
 
-export default AddLeadCards;
+export default AddDealCards;
 

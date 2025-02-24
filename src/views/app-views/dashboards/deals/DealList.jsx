@@ -44,6 +44,7 @@ import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/Co
 import { getstages } from '../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice';
 import { GetPip } from "../systemsetup/Pipeline/PiplineReducer/piplineSlice";
 import { debounce } from 'lodash';
+import DealCards from "./DealCards";
 
 const VIEW_LIST = 'LIST';
 const VIEW_GRID = 'GRID';
@@ -572,7 +573,27 @@ const DealList = () => {
         </Flex>
       </Flex>
 
-      {view === VIEW_GRID ? renderGridView() : renderListView()}
+
+ {view === VIEW_LIST ? (
+          <div className="table-responsive">
+            {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
+              <Table
+                columns={tableColumns}
+                dataSource={users}
+                rowKey="id"
+                pagination={{
+                  total: users.length,
+                  pageSize: 10,
+                  showSizeChanger: true,
+                  showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                }}
+              />
+            )}
+          </div>
+        ) : (
+          <DealCards data={users} />
+        )}
+
 
       <UserView
         data={selectedUser}

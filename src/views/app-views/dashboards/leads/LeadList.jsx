@@ -71,7 +71,7 @@ const LeadList = () => {
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      console.log("Selected file:", file); // Process the file here (e.g., upload to server)
+      // console.log("Selected file:", file); // Process the file here (e.g., upload to server)
       message.success(`Selected file: ${file.name}`);
     }
   };
