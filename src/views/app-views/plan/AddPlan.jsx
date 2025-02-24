@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Input, Button, Switch, Row, Col, message, Menu, Dropdown, Select } from 'antd';
+import { Input, Button, Switch, Row, Col, message, Menu, Dropdown, Select, Modal } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { CreatePlan, GetPlan } from './PlanReducers/PlanSlice';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { getcurren } from '../setting/currencies/currenciesSlice/currenciesSlice';
+import { PlusOutlined } from '@ant-design/icons';
+import AddCurrencies from '../setting/currencies/AddCurrencies';
 // import { getallcurrencies } from '../setting/currencies/currenciesreducer/currenciesSlice';
 const { Option } = Select;
 const validationSchema = Yup.object().shape({
@@ -38,6 +40,7 @@ const AddPlan = ({ onClose }) => {
   const [durationType, setDurationType] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [selectedYear, setSelectedYear] = useState(null);
+  const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
   useEffect(() => {
     dispatch(getcurren());
@@ -308,34 +311,54 @@ const AddPlan = ({ onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={24} >
+                <Col span={24}>
                   <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label>currency <span style={{ color: 'red' }}>*</span></label>
-                    <Field name="currency">
-                      {({ field }) => (
-                        <Select
-                          {...field}
-                          className="w-full mt-2"
-                          placeholder="Select currency"
-                          onChange={(value) => setFieldValue("currency", value)}
-                          value={values.currency}
-                        >
-                          {fnddatass && fnddatass?.length > 0 ? (
-                            fnddatass?.map((client) => (
-                              <Option key={client.id} value={client?.id}>
-                                {client?.currencyIcon ||
-                                  client?.currencyCode ||
-                                  "Unnamed currency"}
+                    <label>Currency <span style={{ color: 'red' }}>*</span></label>
+                    <div className="flex gap-2">
+                      <Field name="currency">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            className="w-full mt-2"
+                            placeholder="Select currency"
+                            onChange={(value) => setFieldValue("currency", value)}
+                            value={values.currency}
+                            dropdownRender={(menu) => (
+                              <>
+                                {menu}
+                                <div
+                                  style={{
+                                    padding: '8px',
+                                    borderTop: '1px solid #e8e8e8',
+                                  }}
+                                >
+                                  <Button
+                                    type="text"
+                                    icon={<PlusOutlined />}
+                                    onClick={() => setIsAddCurrencyModalVisible(true)}
+                                    block
+                                  >
+                                    Add New Currency
+                                  </Button>
+                                </div>
+                              </>
+                            )}
+                          >
+                            {fnddatass && fnddatass?.length > 0 ? (
+                              fnddatass?.map((client) => (
+                                <Option key={client.id} value={client?.id}>
+                                  {client?.currencyIcon} {client?.currencyCode || "Unnamed currency"}
+                                </Option>
+                              ))
+                            ) : (
+                              <Option value="" disabled>
+                                No currency Available
                               </Option>
-                            ))
-                          ) : (
-                            <Option value="" disabled>
-                              No currency Available
-                            </Option>
-                          )}
-                        </Select>
-                      )}
-                    </Field>
+                            )}
+                          </Select>
+                        )}
+                      </Field>
+                    </div>
                     <ErrorMessage
                       name="currency"
                       component="div"
@@ -374,6 +397,22 @@ const AddPlan = ({ onClose }) => {
           );
         }}
       </Formik>
+
+      {/* Add Currency Modal */}
+      <Modal
+        title="Add New Currency"
+        visible={isAddCurrencyModalVisible}
+        onCancel={() => setIsAddCurrencyModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <AddCurrencies
+          onClose={() => {
+            setIsAddCurrencyModalVisible(false);
+            dispatch(getcurren()); // Refresh currency list after adding
+          }}
+        />
+      </Modal>
     </div>
   );
 };

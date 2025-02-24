@@ -31,31 +31,63 @@ const EditCompany = ({ comnyid, onClose }) => {
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data;
   const allcom = useSelector((state) => state.ClientData);
-  const fndcom = allcom.ClientData?.data;
-
+  const [loading, setLoading] = useState(true);
+  const [clientData, setClientData] = useState(null);
 
   useEffect(() => {
-    if (fndcom) {
-      const ffd = fndcom.find((item) => item.id === comnyid);
-      // console.log("Editing client with ID:", ffd);
+    const fetchData = async () => {
+      try {
+        await dispatch(ClientData());
+      } catch (error) {
+        console.error("Error fetching client data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (allcom?.ClientData?.data) {
+      const foundClient = allcom.ClientData.data.find(
+        (item) => item.id === comnyid
+      );
+      setClientData(foundClient || null);
+    }
+  }, [allcom, comnyid]);
+
+  useEffect(() => {
+    if (clientData) {
       setInitialValues({
-        firstName: ffd.username,
-        email: ffd.email,
-        profilePic: ffd.profilePic,
+        firstName: clientData.firstName || "",
+        lastName: clientData.lastName || "",
+        bankname: clientData.bankname || "",
+        phone: clientData.phone || "",
+        ifsc: clientData.ifsc || "",
+        banklocation: clientData.banklocation || "",
+        accountholder: clientData.accountholder || "",
+        accountnumber: clientData.accountnumber || "",
+        gstIn: clientData.gstIn || "",
+        city: clientData.city || "",
+        state: clientData.state || "",
+        country: clientData.country || "",
+        zipcode: clientData.zipcode || "",
+        profilePic: clientData.profilePic || "",
+        address: clientData.address || "",
+        website: clientData.website || "",
       });
     }
-  }, [fndcom]);
+  }, [clientData]);
+
   const [initialValues, setInitialValues] = useState({
     firstName: "",
     lastName: "",
     bankname: "",
     phone: "",
     ifsc: "",
-    // email: "",
     banklocation: "",
     accountholder: "",
     accountnumber: "",
-    // e_signature: "",
     gstIn: "",
     city: "",
     state: "",
@@ -67,16 +99,9 @@ const EditCompany = ({ comnyid, onClose }) => {
   });
   const validationSchema = Yup.object({
     firstName: Yup.string().required("Please enter a First Name."),
-    // email: Yup.string().required("Please enter a Email."),
-    phone: Yup.string().required("Please enter a Phone."),
     lastName: Yup.string().required("Please enter a Last Name."),
+    phone: Yup.string().required("Please enter a Phone."),
     bankname: Yup.string().required("Please enter a Bankname."),
-    ifsc: Yup.string().optional("Please enter a Ifsc."),
-    banklocation: Yup.string().optional("Please enter a Banklocation."),
-    accountholder: Yup.string().optional("Please enter a Accountholder."),
-    accountnumber: Yup.string().optional("Please enter a Accountnumber."),
-    // e_signature: Yup.string().required("Please enter a Signature."),
-    gstIn: Yup.string().optional("Please enter a GstIn."),
     city: Yup.string().required("Please enter a City."),
     state: Yup.string().required("Please enter a State."),
     country: Yup.string().required("Please enter a Country."),
@@ -87,32 +112,39 @@ const EditCompany = ({ comnyid, onClose }) => {
   const handleSubmit = async (values) => {
     try {
       const formData = new FormData();
+      Object.keys(values).forEach(key => {
+        if (values[key] !== undefined && values[key] !== null) {
+          formData.append(key, values[key]);
+        }
+      });
 
-      // Append all form fields to FormData
-      for (const key in values) {
-        formData.append(key, values[key]);
-      }
-
-      // console.log("Editing client with ID:", comnyid);
-      const response = await dispatch(Editclients({ comnyid, formData })).unwrap();
-      console.log("Company Data Updated Successfully:", formData);
-      // message.success("Client data updated successfully!");
-      onClose(); // Close the form after successful submission
-      await dispatch(ClientData()); // Refresh the client data
+      await dispatch(Editclients({ comnyid, formData })).unwrap();
+      message.success("Profile updated successfully!");
+      await dispatch(ClientData());
+      onClose();
     } catch (error) {
-      // console.error("Error updating client data:", error.message);
-      message.error(error.message); // Show the error message to the user
+      message.error(error.message || "Failed to update profile");
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  // if (!clientData) {
+  //   return <div>No client data found</div>;
+  // }
+
   return (
     <div className="add-job-form">
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
+        enableReinitialize={true}
       >
-        {({ handleSubmit }) => (
-          <Form className="formik-form" onSubmit={handleSubmit}>
+        {({ values, handleSubmit }) => (
+          <Form onSubmit={handleSubmit}>
             <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
             <Row gutter={16}>
               <Col span={12} className="">
@@ -137,25 +169,11 @@ const EditCompany = ({ comnyid, onClose }) => {
                   />
                 </div>
               </Col>
-              {/* <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Email <span className="text-red-500">*</span></label>
-                  <Field name="email" as={Input} placeholder="Enter Email" className="mt-1" />
-                  <ErrorMessage
-  
-                    name="email"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
               <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
                   <Field name="phone" as={Input} placeholder="Enter Phone" className="mt-1" />
                   <ErrorMessage
-
-
                     name="phone"
                     component="div"
                     className="error-message text-red-500 my-1"
@@ -217,17 +235,6 @@ const EditCompany = ({ comnyid, onClose }) => {
                   />
                 </div>
               </Col>
-              {/* <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Signature</label>
-                  <Field name="e_signature" as={Input} placeholder="Enter  Signature" />
-                  <ErrorMessage
-                    name="e_signature"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
               <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">GstIn <span className="text-red-500">*</span></label>
@@ -330,7 +337,6 @@ const EditCompany = ({ comnyid, onClose }) => {
                         beforeUpload={(file) => {
                           form.setFieldValue('profilePic', file); // Set the uploaded file in Formik state
                           return false; // Prevent automatic upload
-
                         }}
                         showUploadList={true}
                       >
@@ -345,10 +351,8 @@ const EditCompany = ({ comnyid, onClose }) => {
                     component="div"
                     className="text-red-500 text-sm"
                   />
-                  
                 </div>
               </Col>
-              
             </Row>
             <div className="form-buttons text-right mt-2">
               <Button type="default" className="mr-2" onClick={onClose}>

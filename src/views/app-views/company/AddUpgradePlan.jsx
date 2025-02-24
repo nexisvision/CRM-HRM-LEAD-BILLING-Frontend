@@ -91,7 +91,7 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
             setFieldTouched,
           }) => (
             <Form layout="vertical" onFinish={handleSubmit}>
-               <div className="border-t border-gray-200 my-6 "></div>
+              <div className="border-t border-gray-200 my-6 "></div>
               <div className="p-2">
                 <Row gutter={16}>
                   <Col span={12} className="">
@@ -128,61 +128,61 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
 
 
 
-<Field name="plan_id">
-  {({ field, form }) => (
-    <Select
-      {...field}
-      className="w-full mt-1"
-      placeholder="Select Plan"
-      loading={!fnsfdtaf}
-      onChange={(value) => {
-        const selectedPlan = fnsfdtaf.find(plan => plan.id === value);
-        if (selectedPlan) {
-          const startDate = moment(); // Today’s date
-          let endDate = moment(startDate); // Clone start date
+                      <Field name="plan_id">
+                        {({ field, form }) => (
+                          <Select
+                            {...field}
+                            className="w-full mt-1"
+                            placeholder="Select Plan"
+                            loading={!fnsfdtaf}
+                            onChange={(value) => {
+                              const selectedPlan = fnsfdtaf.find(plan => plan.id === value);
+                              if (selectedPlan) {
+                                const startDate = moment(); // Today’s date
+                                let endDate = moment(startDate); // Clone start date
 
-          // Extract duration value and unit (e.g., "3 Years" -> 3, "2 Months" -> 2)
-          const durationMatch = selectedPlan.duration.match(/^(\d+)\s*(Month|Year)s?$/i);
-          if (durationMatch) {
-            const durationValue = parseInt(durationMatch[1], 10);
-            const durationUnit = durationMatch[2].toLowerCase(); // 'month' or 'year'
+                                // Extract duration value and unit (e.g., "3 Years" -> 3, "2 Months" -> 2)
+                                const durationMatch = selectedPlan.duration.match(/^(\d+)\s*(Month|Year)s?$/i);
+                                if (durationMatch) {
+                                  const durationValue = parseInt(durationMatch[1], 10);
+                                  const durationUnit = durationMatch[2].toLowerCase(); // 'month' or 'year'
 
-            if (durationUnit === "month") {
-              endDate.add(durationValue, "months");
-            } else if (durationUnit === "year") {
-              endDate.add(durationValue, "years");
-            }
-          }
+                                  if (durationUnit === "month") {
+                                    endDate.add(durationValue, "months");
+                                  } else if (durationUnit === "year") {
+                                    endDate.add(durationValue, "years");
+                                  }
+                                }
 
-          // Set values for start_date and end_date
-          form.setFieldValue("plan_id", value);
-          form.setFieldValue("start_date", startDate.format("YYYY-MM-DD"));
-          form.setFieldValue("end_date", endDate.format("YYYY-MM-DD"));
-        }
-      }}
-      value={values.plan_id}
-    >
-      {fnsfdtaf && fnsfdtaf.length > 0 ? (
-        fnsfdtaf.map((plan) => (
-          <Option key={plan.id} value={plan.id}>
-            {plan.name}
-          </Option>
-        ))
-      ) : (
-        <Option value="" disabled>
-          No Plan available
-        </Option>
-      )}
-    </Select>
-  )}
-</Field>
-
-
+                                // Set values for start_date and end_date
+                                form.setFieldValue("plan_id", value);
+                                form.setFieldValue("start_date", startDate.format("YYYY-MM-DD"));
+                                form.setFieldValue("end_date", endDate.format("YYYY-MM-DD"));
+                              }
+                            }}
+                            value={values.plan_id}
+                          >
+                            {fnsfdtaf && fnsfdtaf.length > 0 ? (
+                              fnsfdtaf.map((plan) => (
+                                <Option key={plan.id} value={plan.id}>
+                                  {plan.name}
+                                </Option>
+                              ))
+                            ) : (
+                              <Option value="" disabled>
+                                No Plan available
+                              </Option>
+                            )}
+                          </Select>
+                        )}
+                      </Field>
 
 
 
 
-{/* <Field name="plan_id">
+
+
+                      {/* <Field name="plan_id">
   {({ field, form }) => (
     <Select
       {...field}
@@ -236,12 +236,12 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                         value={values.start_date}
                         onChange={(date) => setFieldValue("start_date", date)}
                       /> */}
-                     <DatePicker
-  className="w-full mt-1"
-  format="DD-MM-YYYY"
-  value={values.start_date ? moment(values.start_date) : null}
-  disabled
-/>
+                      <DatePicker
+                        className="w-full mt-1"
+                        format="DD-MM-YYYY"
+                        value={values.start_date ? moment(values.start_date) : null}
+                        disabled
+                      />
                       <ErrorMessage
                         name="start_date"
                         component="div"
@@ -261,12 +261,12 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                         onBlur={() => setFieldTouched("end_date", true)}
                       /> */}
 
-<DatePicker
-  className="w-full mt-2"
-  format="DD-MM-YYYY"
-  value={values.end_date ? moment(values.end_date) : null}
-  disabled
-/>
+                      <DatePicker
+                        className="w-full mt-2"
+                        format="DD-MM-YYYY"
+                        value={values.end_date ? moment(values.end_date) : null}
+                        disabled
+                      />
                       <ErrorMessage
                         name="end_date"
                         component="div"
@@ -277,12 +277,12 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
 
                   <Col span={12} className="mt-3">
                     <Form.Item
-                      
+
                       className="font-semibold mt-2"
                     >
                       <label className="font-semibold ">Status <span className="text-red-500">*</span></label>
                       <Select
-                       
+
                         onChange={(value) =>
                           handleChange({
                             target: { name: "status", value },
@@ -306,12 +306,12 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
 
                   <Col span={12} className="">
                     <Form.Item
-                     
+
                       className=" font-semibold mt-2"
                     >
                       <label className="font-semibold">Payment Status <span className="text-red-500">*</span></label>
                       <Select
-                       
+
                         onChange={(value) =>
                           handleChange({
                             target: { name: "payment_status", value },

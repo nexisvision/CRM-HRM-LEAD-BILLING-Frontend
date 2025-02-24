@@ -602,14 +602,7 @@ const dashBoardNavTree = [{
                 breadcrumb: true,
                 submenu: []
               },
-              {
-                key: 'dashboards-sales-billing',
-                path: `${APP_PREFIX_PATH}/dashboards/sales/billing`,
-                title: 'Billing',
-                icon: EuroCircleOutlined,
-                breadcrumb: true,
-                submenu: []
-              },
+              
              
               {
                 key: 'dashboards-sales-revenue',
@@ -619,20 +612,80 @@ const dashBoardNavTree = [{
                 breadcrumb: true,
                 submenu: []
               },
-              {
-                key: 'dashboards-sales-estimates',
-                path: `${APP_PREFIX_PATH}/dashboards/sales/estimates`,
-                title: 'Estimates',
-                icon: RiseOutlined,
-                breadcrumb: true,
-                submenu: []
-              },
+              // {
+              //   key: 'dashboards-sales-estimates',
+              //   path: `${APP_PREFIX_PATH}/dashboards/sales/estimates`,
+              //   title: 'Estimates',
+              //   icon: RiseOutlined,
+              //   breadcrumb: true,
+              //   submenu: []
+              // },
              
               {
                 key: 'dashboards-sales-creditnotes',
                 path: `${APP_PREFIX_PATH}/dashboards/sales/creditnotes`,
                 title: 'Credit Notes',
                 icon: SnippetsOutlined ,
+                breadcrumb: true,
+                submenu: []
+              },
+            ]
+          },
+
+          {
+            key: 'dashboards-banking',
+            path: `${APP_PREFIX_PATH}/dashboards/banking`,
+            title: 'Banking',
+            icon: BankOutlined ,
+            breadcrumb: true,
+            submenu: [
+              {
+                key: 'dashboards-banking-account',
+                path: `${APP_PREFIX_PATH}/dashboards/banking/account`,
+                title: 'Account',
+                icon: UsergroupDeleteOutlined,
+                breadcrumb: true,
+                submenu: []
+              },
+              {
+                key: 'dashboards-banking-transfer',
+                path: `${APP_PREFIX_PATH}/dashboards/banking/transfer`,
+                title: 'Transfer',
+                icon: DollarOutlined,
+                breadcrumb: true,
+                submenu: []
+              },
+            ]
+          },
+
+          {
+            key: 'dashboards-purchase',
+            path: `${APP_PREFIX_PATH}/dashboards/purchase`,
+            title: 'Purchase',
+            icon: BankOutlined ,
+            breadcrumb: true,
+            submenu: [
+              {
+                key: 'dashboards-purchase-vendor',
+                path: `${APP_PREFIX_PATH}/dashboards/purchase/vendor`,
+                title: 'Vendor',
+                icon: UsergroupDeleteOutlined,
+                breadcrumb: true,
+                submenu: []
+              },
+              {
+                key: 'dashboards-purchase-debitnote',
+                path: `${APP_PREFIX_PATH}/dashboards/purchase/debitnote`,
+                title: 'Debit Note',
+                icon: DollarOutlined,
+                breadcrumb: true,
+                submenu: []
+              },
+              {
+                key: 'dashboards-purchase-billing',
+                path: `${APP_PREFIX_PATH}/dashboards/sales/billing`,
+                title: 'Billing',
+                icon: EuroCircleOutlined,
                 breadcrumb: true,
                 submenu: []
               },
@@ -655,6 +708,7 @@ const dashBoardNavTree = [{
           //   breadcrumb: true,
           //   submenu: []
           // },
+         
           {
             key: 'dashboards-lead',
             path: `${APP_PREFIX_PATH}/dashboards/lead`,

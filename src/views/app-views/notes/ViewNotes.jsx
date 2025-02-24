@@ -90,7 +90,7 @@ function ViewNotes() {
     return (
       <Card className="mt-2 w-full" key={note.id}>
         <div>
-          <div className="flex justify-between border-b pb-2">
+          <div className="flex justify-between border-b pb-2"> 
             <h1 className="text-lg font-medium">{note.note_title}</h1>
             <div className="text-center">
               <EllipsisDropdown menu={dropdownMenu(note)} />

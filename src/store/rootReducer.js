@@ -70,6 +70,7 @@ import salesquotation from "views/app-views/dashboards/sales/estimates/estimates
 import esignature from "views/app-views/setting/esignature/EsignatureReducers/EsignatureSlice"
 import generalsetting from "../views/app-views/setting/general/generalReducer/generalSlice"
 import leadestimate from "views/app-views/dashboards/leads/estimates/estimatesReducer/EstimatesSlice"
+import account from "../views/app-views/dashboards/banking/account/AccountReducer/AccountSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -144,6 +145,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
         esignature,
         generalsetting,
         leadestimate,
+        account,
         // employee,
         // department,
         ...asyncReducers,

@@ -247,7 +247,7 @@ export const protectedRoutes = [
         component: React.lazy(() => import('views/app-views/dashboards/sales/expenses')),
     },
     {
-        key: 'dashboards.sales.billing',
+        key: 'dashboards.pur.billing',
         path: `${APP_PREFIX_PATH}/dashboards/sales/billing`,
         component: React.lazy(() => import('views/app-views/dashboards/sales/billing')),
     },
@@ -256,6 +256,37 @@ export const protectedRoutes = [
         path: `${APP_PREFIX_PATH}/dashboards/sales/creditnotes`,
         component: React.lazy(() => import('views/app-views/dashboards/sales/creditnotes')),
     },
+    {
+        key: 'dashboards.banking',
+        path: `${APP_PREFIX_PATH}/dashboards/banking`,
+        component: React.lazy(() => import('views/app-views/dashboards/banking/account')),
+    },
+        {
+            key: 'dashboards.banking.account',
+            path: `${APP_PREFIX_PATH}/dashboards/banking/account`,
+            component: React.lazy(() => import('views/app-views/dashboards/banking/account')),
+        },
+        {
+            key: 'dashboards.banking.transfer',
+            path: `${APP_PREFIX_PATH}/dashboards/banking/transfer`,
+            component: React.lazy(() => import('views/app-views/dashboards/banking/transfer')),
+        },
+
+        {
+            key: 'dashboards.purchase',
+            path: `${APP_PREFIX_PATH}/dashboards/purchase`,
+            component: React.lazy(() => import('views/app-views/dashboards/Purchase/vendor')),
+        },
+            {
+                key: 'dashboards.purchase.vendor',
+                path: `${APP_PREFIX_PATH}/dashboards/purchase/vendor`,
+                component: React.lazy(() => import('views/app-views/dashboards/Purchase/vendor')),
+            },
+            {
+                key: 'dashboards.purchase.debitnote',
+                path: `${APP_PREFIX_PATH}/dashboards/purchase/debitnote`,
+                component: React.lazy(() => import('views/app-views/dashboards/Purchase/debitnotes')),
+            },
 
 
 

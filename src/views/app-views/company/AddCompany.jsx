@@ -13,7 +13,7 @@ import { addClient, ClientData } from "./CompanyReducers/CompanySlice"; // Adjus
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-import { KeyOutlined } from "@ant-design/icons";
+import { KeyOutlined, ToTopOutlined } from "@ant-design/icons";
 
 const AddCompany = ({ onClose }) => {
   const navigate = useNavigate();
@@ -25,8 +25,10 @@ const AddCompany = ({ onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Function to generate random password
-  const generatePassword = () => {
-    const length = 6;
+  const 
+  
+  generatePassword = () => {
+    const length = 8;
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let password = "";
     
@@ -37,7 +39,7 @@ const AddCompany = ({ onClose }) => {
 
     // Ensure at least one number
     const randomNum = Math.floor(Math.random() * 10).toString();
-    password = password.slice(0, 5) + randomNum;
+    password = password.slice(0, 7) + randomNum;
     
     return password;
   };
@@ -112,7 +114,7 @@ const AddCompany = ({ onClose }) => {
   const validationSchema = Yup.object({
     username: Yup.string().required("Please enter a username."),
     password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
+      .min(8, "Password must be at least 8 characters")
       .matches(/\d/, "Password must have at least one number")
       .required("Password is required"),
     email: Yup.string()
@@ -129,6 +131,7 @@ const AddCompany = ({ onClose }) => {
       >
         {({ isSubmitting, setFieldValue }) => (
           <Form className="space-y-4">
+            <h1 className="border-b-2 border-gray-200 pb-2"></h1>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item mt-2">
@@ -157,12 +160,10 @@ const AddCompany = ({ onClose }) => {
                       className="mt-1 w-full"
                     />
                     <Button
-                      type="text"
-                      className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center z-10"
+                      className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
                       onClick={() => setFieldValue("password", generatePassword())}
-                      icon={<KeyOutlined />}
                     >
-                     
+                     <ToTopOutlined/>
                     </Button>
                   </div>
                   <ErrorMessage

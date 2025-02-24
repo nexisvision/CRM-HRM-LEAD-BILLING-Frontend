@@ -316,7 +316,7 @@ const currenciesState = useSelector((state) => state.currencies);
               <Col span={24}>
                 <div className="form-item">
                   <label className="font-semibold flex mt-3">
-                    Lead Title <h1 className="text-rose-500">*</h1>
+                    Lead Title <span className="text-rose-500"> *</span>
                   </label>
                   <Field
                     name="leadTitle"
@@ -334,7 +334,7 @@ const currenciesState = useSelector((state) => state.currencies);
               <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold flex">
-                    First Name<h1 className="text-rose-500">*</h1>
+                    First Name <span className="text-rose-500"> *</span>
                   </label>
                   <Field
                     name="firstName"
@@ -352,7 +352,7 @@ const currenciesState = useSelector((state) => state.currencies);
               <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold flex">
-                    Last Name<h1 className="text-rose-500">*</h1>
+                    Last Name <span className="text-rose-500"> *</span>
                   </label>
                   <Field
                     name="lastName"
@@ -370,7 +370,7 @@ const currenciesState = useSelector((state) => state.currencies);
               <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">Telephone
-                    <span className="text-rose-500">*</span>
+                    <span className="text-rose-500"> *</span>
                   </label>
                   <div className="flex">
                     <Select
@@ -416,7 +416,7 @@ const currenciesState = useSelector((state) => state.currencies);
                     className="block text-sm font-medium text-gray-700"
                   >
                     Lead Stage
-                    <span className="text-rose-500">*</span>
+                    <span className="text-rose-500"> *</span>
                   </label>
                   <div className="flex gap-2">
                     {fndata ? (
@@ -529,7 +529,7 @@ const currenciesState = useSelector((state) => state.currencies);
               <Col span={24} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold flex">
-                    Status <h1 className="text-rose-500">*</h1>
+                    Status <h1 className="text-rose-500"> *</h1>
                   </label>
                   <Field name="status">
                     {({ field }) => (
@@ -751,26 +751,6 @@ const currenciesState = useSelector((state) => state.currencies);
                 {info && (
                   <>
                     <div className="mt-2">
-                      <Col span={24}>
-                        <Card className="w-full border-l-4 border-l-cyan-300 rounded-sm ">
-                          <div>
-                            <div className="flex gap-2">
-                              <ExclamationCircleOutlined className="text-xl text-cyan-300" />
-                              <h1 className="text-xl text-cyan-300">
-                                Demo Info
-                              </h1>
-                            </div>
-                            <div>
-                              <p>
-                                These are custom fields. You can change them or
-                                create your own.
-                              </p>
-                            </div>
-                          </div>
-                        </Card>
-                      </Col>
-                    </div>
-                    <div className="mt-2">
                       <Col span={24} className="mt-3">
                         <div className="form-item">
                           <label className="font-semibold">Total Budget <span className="text-rose-500">*</span></label>
@@ -863,11 +843,11 @@ const currenciesState = useSelector((state) => state.currencies);
                 )}
               </Col>
 
-              <Col className="mt-2">
+              {/* <Col className="mt-2">
                 <h5 className="flex">
                   <h1 className="text-rose-500">*</h1> Required
                 </h5>
-              </Col>
+              </Col> */}
             </Row>
 
             <div className="form-buttons text-right mt-4">
@@ -880,7 +860,7 @@ const currenciesState = useSelector((state) => state.currencies);
                 Cancel
               </Button>
               <Button type="primary" htmlType="submit">
-                Update
+                Create
               </Button>
             </div>
 

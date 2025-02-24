@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { Dropdown, Avatar } from 'antd';
+import { Dropdown, Avatar, Modal, Form, Input, Upload, Button, message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux'
-import { 
-	EditOutlined, 
-	SettingOutlined, 
-	ShopOutlined, 
-	QuestionCircleOutlined, 
-	LogoutOutlined ,
-	UserOutlined
+import {
+	EditOutlined,
+	SettingOutlined,
+	ShopOutlined,
+	QuestionCircleOutlined,
+	LogoutOutlined,
+	UserOutlined,
+	UploadOutlined
 } from '@ant-design/icons';
 import NavItem from './NavItem';
 import Flex from 'components/shared-components/Flex';
 import { signOut } from 'store/slices/authSlice';
 import styled from '@emotion/styled';
 import { FONT_WEIGHT, MEDIA_QUERIES, SPACER, FONT_SIZES } from 'constants/ThemeConstant';
+import EditCompany from 'views/app-views/company/EditCompany';
 // import { Avatar } from 'antd';
 // import { UserOutlined } from '@ant-design/icons';
 
@@ -43,17 +45,20 @@ const Title = styled.span(() => ({
 	opacity: 0.8
 }))
 
-const MenuItem = (props) => (
-	<Flex as="a" href={props.path} alignItems="center" gap={SPACER[2]}>
-		<Icon>{props.icon}</Icon>
-		<span>{props.label}</span>
-	</Flex>
-)
+const MenuItem = (props) => {
+	const { onClick } = props;
+	return (
+		<Flex as="div" onClick={onClick} style={{ cursor: 'pointer' }} alignItems="center" gap={SPACER[2]}>
+			<Icon>{props.icon}</Icon>
+			<span>{props.label}</span>
+		</Flex>
+	);
+}
 
 const MenuItemSignOut = (props) => {
 
 	const dispatch = useDispatch();
-	
+
 
 
 	const handleSignOut = () => {
@@ -72,75 +77,203 @@ const MenuItemSignOut = (props) => {
 	)
 }
 
-const items = [
-	{
-		key: 'Edit Profile',
-		label: <MenuItem path="/" label="Edit Profile" icon={<EditOutlined />} />,
-	},
-	{
-		key: 'Account Setting',
-		label: <MenuItem path="/" label="Account Setting" icon={<SettingOutlined />} />,
-	},
-	{
-		key: 'Account Billing',
-		label: <MenuItem path="/" label="Account Billing" icon={<ShopOutlined />} />,
-	},
-	{
-		key: 'Help Center',
-		label: <MenuItem path="/" label="Help Center" icon={<QuestionCircleOutlined />} />,
-	},
-	{
-		key: 'Sign Out',
-		label: <MenuItemSignOut label="Sign Out" />,
-	}
-]
-
-
 export const NavProfile = ({ mode }) => {
-	
-  const roles = useSelector((state) => state.role);
-  const currentuser = useSelector((state) => state.user);
+	const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+	const dispatch = useDispatch();
+	const roles = useSelector((state) => state.role);
+	const currentuser = useSelector((state) => state.user);
+	const [roleu, setRoleu] = useState("");
+	const [current, setCurrent] = useState("");
+	const [form] = Form.useForm();
 
-  const [roleu, setRoleu] = useState("");
-  const [current, setCurrent] = useState("");
+	// Move items inside the component
+	const items = [
+		{
+			key: 'Edit Profile',
+			label: (
+				<MenuItem
+					label="Edit Profile"
+					icon={<EditOutlined />}
+					onClick={() => setIsEditModalVisible(true)}
+				/>
+			),
+		},
+		{
+			key: 'Account Setting',
+			label: <MenuItem path="/" label="Account Setting" icon={<SettingOutlined />} />,
+		},
+		{
+			key: 'Account Billing',
+			label: <MenuItem path="/" label="Account Billing" icon={<ShopOutlined />} />,
+		},
+		{
+			key: 'Help Center',
+			label: <MenuItem path="/" label="Help Center" icon={<QuestionCircleOutlined />} />,
+		},
+		{
+			key: 'Sign Out',
+			label: <MenuItemSignOut label="Sign Out" />,
+		}
+	]
 
-  useEffect(() => {
-	const roless = roles?.role.data;
-    const userRole = roless && roless?.find(
-      (role) => role?.role_id === currentuser?.loggedInUser?.role_id
-    );
+	useEffect(() => {
+		const roless = roles?.role.data;
+		const userRole = roless && roless?.find(
+			(role) => role?.role_id === currentuser?.loggedInUser?.role_id
+		);
 
-    setRoleu(userRole?.role_name || ""); 
-    setCurrent(currentuser?.loggedInUser?.username || "");
-  }, [roles, currentuser]);
+		setRoleu(userRole?.role_name || "");
+		setCurrent(currentuser?.loggedInUser?.username || "");
 
-  return (
-    <Dropdown placement="bottomRight" menu={{ items }} trigger={["click"]}>
-      <NavItem mode={mode}>
-        <Profile>
-          {currentuser?.loggedInUser?.profilePic ? (
-            <Avatar 
-              src={currentuser?.loggedInUser?.profilePic}
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = "";
-                e.target.style.display = "none";
-              }}
-            />
-          ) : (
-            <Avatar
-              icon={<UserOutlined style={{ color: '#666666' }} />}
-              style={{ backgroundColor: '#f0f0f0' }}
-            />
-          )}
-          <UserInfo className="profile-text">
-            <Name>{current}</Name>
-            <Title>{roleu}</Title>
-          </UserInfo>
-        </Profile>
-      </NavItem>
-    </Dropdown>
-  );
+		// Set initial form values for superadmin
+		if (roleu === "superadmin") {
+			form.setFieldsValue({
+				email: currentuser?.loggedInUser?.email,
+				firstName: currentuser?.loggedInUser?.firstName,
+				lastName: currentuser?.loggedInUser?.lastName,
+				phone: currentuser?.loggedInUser?.phone,
+			});
+		}
+	}, [roles, currentuser, roleu]);
+
+	const handleSuperAdminSubmit = async (values) => {
+		try {
+			// Handle superadmin profile update
+			const formData = new FormData();
+			formData.append('email', values.email);
+			formData.append('firstName', values.firstName);
+			formData.append('lastName', values.lastName);
+			formData.append('phone', values.phone);
+			if (values.password) {
+				formData.append('password', values.password);
+			}
+			if (values.profilePic) {
+				formData.append('profilePic', values.profilePic);
+			}
+
+			// Dispatch your update action here
+			// await dispatch(updateSuperAdminProfile(formData));
+			message.success('Profile updated successfully');
+			setIsEditModalVisible(false);
+		} catch (error) {
+			message.error('Failed to update profile');
+		}
+	};
+
+	const SuperAdminEditForm = () => (
+		<Form
+			form={form}
+			layout="vertical"
+			onFinish={handleSuperAdminSubmit}
+		>
+			<Form.Item
+				label="Email"
+				name="email"
+				rules={[{ required: true, type: 'email', message: 'Please enter a valid email' }]}
+			>
+				<Input />
+			</Form.Item>
+
+			<Form.Item
+				label="First Name"
+				name="firstName"
+				rules={[{ required: true, message: 'Please enter your first name' }]}
+			>
+				<Input />
+			</Form.Item>
+
+			<Form.Item
+				label="Last Name"
+				name="lastName"
+				rules={[{ required: true, message: 'Please enter your last name' }]}
+			>
+				<Input />
+			</Form.Item>
+
+			<Form.Item
+				label="Phone"
+				name="phone"
+				rules={[{ required: true, message: 'Please enter your phone number' }]}
+			>
+				<Input />
+			</Form.Item>
+
+			<Form.Item
+				label="New Password"
+				name="password"
+				rules={[{ min: 6, message: 'Password must be at least 6 characters' }]}
+			>
+				<Input.Password />
+			</Form.Item>
+
+			<Form.Item
+				label="Profile Picture"
+				name="profilePic"
+			>
+				<Upload
+					maxCount={1}
+					beforeUpload={() => false}
+					accept="image/*"
+				>
+					<Button icon={<UploadOutlined />}>Upload Photo</Button>
+				</Upload>
+			</Form.Item>
+
+			<Form.Item>
+				<Button type="primary" htmlType="submit">
+					Update Profile
+				</Button>
+			</Form.Item>
+		</Form>
+	);
+
+	return (
+		<>
+			<Dropdown placement="bottomRight" menu={{ items }} trigger={["click"]}>
+				<NavItem mode={mode}>
+					<Profile>
+						{currentuser?.loggedInUser?.profilePic ? (
+							<Avatar
+								src={currentuser?.loggedInUser?.profilePic}
+								onError={(e) => {
+									e.target.onerror = null;
+									e.target.src = "";
+									e.target.style.display = "none";
+								}}
+							/>
+						) : (
+							<Avatar
+								icon={<UserOutlined style={{ color: '#666666' }} />}
+								style={{ backgroundColor: '#f0f0f0' }}
+							/>
+						)}
+						<UserInfo className="profile-text">
+							<Name>{current}</Name>
+							<Title>{roleu}</Title>
+						</UserInfo>
+					</Profile>
+				</NavItem>
+			</Dropdown>
+
+			{/* Edit Profile Modal */}
+			<Modal
+				title="Edit Profile"
+				visible={isEditModalVisible}
+				onCancel={() => setIsEditModalVisible(false)}
+				footer={null}
+				width={800}
+			>
+				{roleu === "superadmin" ? (
+					<SuperAdminEditForm />
+				) : (
+					<EditCompany
+						comnyid={currentuser?.loggedInUser?.id}
+						onClose={() => setIsEditModalVisible(false)}
+					/>
+				)}
+			</Modal>
+		</>
+	);
 };
 
 export default NavProfile;
