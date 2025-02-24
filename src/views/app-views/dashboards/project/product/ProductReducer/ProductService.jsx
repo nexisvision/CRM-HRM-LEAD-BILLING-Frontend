@@ -84,6 +84,21 @@ const EditPro = async (idd, formData) => {
   }
 };
 
+const GetAllPro = async () => {
+  const token = localStorage.getItem("auth_token");
+  try {
+    const res = await axios.get(`http://localhost:5353/api/v1/products`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    throw error;
+  }
+};
+
 // const getAllUsers = async () => {
 //     const res = await axios.get(`${baseUrl}users/all`, getToken());
 //     return res.data
@@ -110,6 +125,7 @@ const UserService = {
   AddPro,
   DeletePro,
   EditPro,
+  GetAllPro,
   // getAllUsers,
   // getUserById,
   // deleteUser,

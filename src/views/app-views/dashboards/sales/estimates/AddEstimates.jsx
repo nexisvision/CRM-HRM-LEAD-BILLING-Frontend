@@ -38,13 +38,13 @@ import { AddLable, GetLable } from "../LableReducer/LableSlice";
 const { Option } = Select;
 
 const AddEstimates = ({ onClose }) => {
-  const [discountType, setDiscountType] = useState("%");
-   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
-    const [newTag, setNewTag] = useState("");
+  const [discountType, setDiscountType] = useState('percentage');
+  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
+  const [newTag, setNewTag] = useState("");
   
-    const [tags, setTags] = useState([]);
-      const AllLoggeddtaa = useSelector((state) => state.user);
-    
+  const [tags, setTags] = useState([]);
+  const AllLoggeddtaa = useSelector((state) => state.user);
+  
   const [loading, setLoading] = useState(false);
   const [discountValue, setDiscountValue] = useState(0);
   const [discountRate, setDiscountRate] = useState();
@@ -59,15 +59,15 @@ const AddEstimates = ({ onClose }) => {
 
 
   
-    useEffect(() => {
-      dispatch(Getcus());
-      dispatch(getAllTaxes());
-    }, []);
-    const { taxes } = useSelector((state) => state.tax);
-    const customerdata = useSelector((state) => state.customers);
-    const fnddata = customerdata.customers.data;
-    const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
-  
+  useEffect(() => {
+    dispatch(Getcus());
+    dispatch(getAllTaxes());
+  }, []);
+  const { taxes } = useSelector((state) => state.tax);
+  const customerdata = useSelector((state) => state.customers);
+  const fnddata = customerdata.customers.data;
+  const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
+
 
   const [tableData, setTableData] = useState([
     {
@@ -89,40 +89,33 @@ const AddEstimates = ({ onClose }) => {
     try {
       setLoading(true);
   
-      // Create items object
       const items = {};
       
       tableData.forEach((item, index) => {
-        const baseAmount = parseFloat(item.quantity) * parseFloat(item.price);
-        
         items[`item_${index + 1}`] = {
           item: item.item,
           description: item.description || '',
           quantity: parseFloat(item.quantity) || 0,
           price: parseFloat(item.price) || 0,
-          tax_name: selectedTaxDetails[item.id]?.
-          gstName || '',
+          tax_name: selectedTaxDetails[item.id]?.gstName || '',
           tax: parseFloat(item.tax) || 0,
-          amount: parseFloat(item.amount) || 0,
-          discount: parseFloat(discountRate) || 0  // Store the discount rate here
+          amount: parseFloat(item.amount) || 0
         };
       });
   
-      // Calculate the actual discount amount
-      const subtotal = calculateSubTotal();
-      const discountAmount = (subtotal * discountRate) / 100;
-  
       const quotationData = {
-        customer: values.customer,
-        issueDate: values.issueDate.format('YYYY-MM-DD'),
-        category: values.category,
-        items: items,
-        total: totals.finalTotal,
-        tax: totals.totalTax,
-        discount: discountAmount, // Store the calculated discount amount
-        discountRate: discountRate // Optionally store the rate separately if needed
-      };
-  
+      customer: values.customer,
+      issueDate: values.issueDate.format('YYYY-MM-DD'),
+      category: values.category,
+      items: items,
+      total: totals.finalTotal,
+      tax: totals.totalTax,
+      discountType: discountType,
+      discountValue: parseFloat(discountValue) || 0,
+      discount: parseFloat(totals.discount) || 0, // Changed from discountAmount to discount
+      discountAmount: parseFloat(totals.discount) || 0
+    };
+    
       await dispatch(createquotations(quotationData));
       message.success('Quotation created successfully!');
       onClose();
@@ -133,7 +126,6 @@ const AddEstimates = ({ onClose }) => {
       setLoading(false);
     }
   };
-  
 
   // Function to handle adding a new row
   const handleAddRow = () => {
@@ -154,7 +146,7 @@ const AddEstimates = ({ onClose }) => {
     if (tableData.length > 1) {
       const updatedData = tableData.filter(row => row.id !== id);
       setTableData(updatedData);
-      calculateTotal(updatedData, discountRate);
+      calculateTotal(updatedData, discountValue, discountType);
     } else {
       message.warning('At least one item is required');
     }
@@ -171,7 +163,7 @@ const AddEstimates = ({ onClose }) => {
     }, 0);
   };
 
-  const calculateTotal = (data = tableData, discount = discountRate) => {
+  const calculateTotal = (data = tableData, discountVal = discountValue, type = discountType) => {
     if (!Array.isArray(data)) {
       console.error('Invalid data passed to calculateTotal');
       return;
@@ -182,25 +174,27 @@ const AddEstimates = ({ onClose }) => {
       return sum + (parseFloat(row.amount) || 0);
     }, 0);
 
-    // Calculate discount amount
-    const discountAmount = (subtotal * (parseFloat(discount) || 0)) / 100;
+    // Calculate discount amount based on type
+    const discountAmount = type === 'percentage' 
+      ? (subtotal * (parseFloat(discountVal) || 0)) / 100
+      : parseFloat(discountVal) || 0;
 
-    // Calculate total tax (for display purposes)
+    // Calculate total tax
     const totalTax = data.reduce((sum, row) => {
       const quantity = parseFloat(row.quantity) || 0;
       const price = parseFloat(row.price) || 0;
-      const tax = (parseFloat(row.tax) || 0) ;
+      const tax = parseFloat(row.tax) || 0;
       const baseAmount = quantity * price;
       const taxAmount = (baseAmount * tax) / 100;
       return sum + taxAmount;
     }, 0);
 
-    // Calculate final total: subtotal - discount
-    const finalTotal = subtotal - discountAmount;
+    // Calculate final total
+    const finalTotal = subtotal - discountAmount + totalTax;
 
     setTotals({
       subtotal: subtotal.toFixed(2),
-      discount: discountAmount.toFixed(2),
+      discount: discountVal ? discountAmount.toFixed(2) : '',
       totalTax: totalTax.toFixed(2),
       finalTotal: finalTotal.toFixed(2)
     });
@@ -212,40 +206,6 @@ const AddEstimates = ({ onClose }) => {
       finalTotal
     };
   };
-
-  // const calculateTotal = (data, discountPercentage) => {
-  //   if (!Array.isArray(data)) {
-  //     console.error('Invalid data passed to calculateTotal');
-  //     return;
-  //   }
-
-  //   let subtotal = 0;
-  //   let totalTax = 0;
-
-  //   data.forEach((row) => {
-  //     const quantity = parseFloat(row.quantity) || 0;
-  //     const price = parseFloat(row.price) || 0;
-  //     const tax = parseFloat(row.tax) || 0;
-      
-  //     const baseAmount = quantity * price;
-  //     const taxAmount = (baseAmount * tax) / 100;
-      
-  //     subtotal += baseAmount;
-  //     totalTax += taxAmount;
-  //   });
-
-  //   // Calculate discount amount from percentage
-  //   const discountAmount = (subtotal * discountPercentage) / 100;
-  //   const finalTotal = subtotal - discountAmount ;
-
-  //   setTotals({
-  //     subtotal: subtotal.toFixed(2),
-  //     discount: parseFloat(discountAmount.toFixed(2)), // Store the actual discount amount
-  //     discountPercentage: discountPercentage,
-  //     totalTax: parseFloat(totalTax.toFixed(2)),
-  //     finalTotal:  finalTotal.toFixed(2)
-  //   });
-  // };
 
   // Function to handle table data changes
   const handleTableDataChange = (id, field, value) => {
@@ -284,63 +244,63 @@ const AddEstimates = ({ onClose }) => {
     });
 
     setTableData(updatedData);
-    calculateTotal(updatedData, discountRate);
+    calculateTotal(updatedData, discountValue, discountType);
   };
 
 
   
-    const fetchTags = async () => {
-      try {
-        const lid = AllLoggeddtaa.loggedInUser.id;
-        const response = await dispatch(GetLable(lid));
-  
-        if (response.payload && response.payload.data) {
-          const uniqueTags = response.payload.data
-            .filter((label) => label && label.name) // Filter out invalid labels
-            .map((label) => ({
-              id: label.id,
-              name: label.name.trim(),
-            }))
-            .filter(
-              (label, index, self) =>
-                index === self.findIndex((t) => t.name === label.name)
-            ); // Remove duplicates
-  
-          setTags(uniqueTags);
-        }
-      } catch (error) {
-        console.error("Failed to fetch tags:", error);
-        message.error("Failed to load tags");
+  const fetchTags = async () => {
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const response = await dispatch(GetLable(lid));
+
+      if (response.payload && response.payload.data) {
+        const uniqueTags = response.payload.data
+          .filter((label) => label && label.name) // Filter out invalid labels
+          .map((label) => ({
+            id: label.id,
+            name: label.name.trim(),
+          }))
+          .filter(
+            (label, index, self) =>
+              index === self.findIndex((t) => t.name === label.name)
+          ); // Remove duplicates
+
+        setTags(uniqueTags);
       }
-    };
-  
-  
-    const handleAddNewTag = async () => {
-      if (!newTag.trim()) {
-        message.error("Please enter a tag name");
-        return;
-      }
-  
-      try {
-        const lid = AllLoggeddtaa.loggedInUser.id;
-        const payload = {
-          name: newTag.trim(),
-          labelType: "status",
-        };
-  
-        await dispatch(AddLable({ lid, payload }));
-        message.success("Status added successfully");
-        setNewTag("");
-        setIsTagModalVisible(false);
-  
-        // Fetch updated tags
-        await fetchTags();
-      } catch (error) {
-        console.error("Failed to add Status:", error);
-        message.error("Failed to add Status");
-      }
-    };
-  
+    } catch (error) {
+      console.error("Failed to fetch tags:", error);
+      message.error("Failed to load tags");
+    }
+  };
+
+
+  const handleAddNewTag = async () => {
+    if (!newTag.trim()) {
+      message.error("Please enter a tag name");
+      return;
+    }
+
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const payload = {
+        name: newTag.trim(),
+        labelType: "status",
+      };
+
+      await dispatch(AddLable({ lid, payload }));
+      message.success("Status added successfully");
+      setNewTag("");
+      setIsTagModalVisible(false);
+
+      // Fetch updated tags
+      await fetchTags();
+    } catch (error) {
+      console.error("Failed to add Status:", error);
+      message.error("Failed to add Status");
+    }
+  };
+
 
   return (
     <>
@@ -561,27 +521,37 @@ const AddEstimates = ({ onClose }) => {
                       </td>
                     </tr>
                     <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
-                  <td className="font-medium">Discount</td>
-                  <td className="flex items-center space-x-2">
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Discount Rate (%)
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={discountRate}
-                        onChange={(e) => {
-                          const newRate = parseFloat(e.target.value) || 0;
-                          setDiscountRate(newRate);
-                          calculateTotal(tableData, newRate);
-                        }}
-                        className="mt-1 block w-full p-2 border rounded"
-                      />
-                    </div>
-                  </td>
-                </tr>
+                      <td className="font-medium">Discount</td>
+                      <td className="flex items-center space-x-2">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Select
+                            value={discountType}
+                            onChange={(value) => {
+                              setDiscountType(value);
+                              setDiscountValue(0);
+                              calculateTotal(tableData, 0, value);
+                            }}
+                            style={{ width: 120 }}
+                          >
+                            <Option value="percentage">Percentage</Option>
+                            <Option value="fixed">Fixed Amount</Option>
+                          </Select>
+                          <input
+                            type="number"
+                            min="0"
+                            max={discountType === 'percentage' ? 100 : undefined}
+                            value={discountValue || ''}
+                            onChange={(e) => {
+                              const newValue = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                              setDiscountValue(newValue);
+                              calculateTotal(tableData, newValue, discountType);
+                            }}
+                            className="mt-1 block p-2 border rounded"
+                            placeholder="Enter discount"
+                          />
+                        </div>
+                      </td>
+                    </tr>
                     <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
                       <td className="font-medium">Total Tax</td>
                       <td className="font-medium px-4 py-2">

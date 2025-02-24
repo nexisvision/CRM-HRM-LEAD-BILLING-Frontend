@@ -488,7 +488,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                     {/* Invoice Summary */}
                     {parsedInvoice && (
                         <div className="d-flex justify-content-end mb-3 mt-3">
-                            <div className="text-center">
+                            <div className="text-start">
                                 <div className="border-bottom">
                                     <p >
                                         <span className="font-weight-semibold ">Sub-Total : </span>
@@ -763,7 +763,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                     {/* Invoice Summary */}
                     {parsedInvoice && (
                         <div className="d-flex justify-content-end mb-3 mt-3">
-                            <div className="text-center">
+                            <div className="text-start">
                                 <div className="border-bottom">
                                     <p >
                                         <span className="font-weight-semibold ">Sub-Total : </span>
@@ -1029,7 +1029,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                         {/* Invoice Summary */}
                         {parsedInvoice && (
                         <div className="d-flex justify-content-end mb-3 mt-3">
-                            <div className="text-center">
+                            <div className="text-start">
                                 <div className="border-bottom">
                                     <p >
                                         <span className="font-weight-semibold ">Sub-Total : </span>
@@ -1293,7 +1293,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                         {/* Invoice Summary */}
                         {parsedInvoice && (
                         <div className="d-flex justify-content-end mb-3 mt-3">
-                            <div className="text-center">
+                            <div className="text-start">
                                 <div className="border-bottom">
                                     <p >
                                         <span className="font-weight-semibold ">Sub-Total : </span>

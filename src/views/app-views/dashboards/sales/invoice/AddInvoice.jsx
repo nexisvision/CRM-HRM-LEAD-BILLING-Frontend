@@ -10,15 +10,18 @@ import {
   Modal,
   Col,
 } from "antd";
+import Flex from 'components/shared-components/Flex';
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form } from "antd";
 import { AddInvoices, getInvoice } from "./InvoiceReducer/InvoiceSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ErrorMessage, Field } from "formik";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
+import { useParams } from "react-router-dom";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import { getcurren } from "../../../setting/currencies/currenciesSlice/currenciesSlice";
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
+import { GetProdu, GetAllProdu } from "../../project/product/ProductReducer/ProductsSlice";
 
 const { Option } = Select;
 
@@ -30,11 +33,15 @@ const AddInvoice = ({ onClose }) => {
   const [newTag, setNewTag] = useState("");
   const [selectedCurrencyIcon, setSelectedCurrencyIcon] = useState('₹');
 
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
   const [tags, setTags] = useState([]);
   const AllLoggeddtaa = useSelector((state) => state.user);
   const Tagsdetail = useSelector((state) => state.Lable);
 
-  // const { id } = useParams();
+  const [globalDiscountType, setGlobalDiscountType] = useState('percentage');
+  const [globalDiscountValue, setGlobalDiscountValue] = useState(0);
 
   const [tableData, setTableData] = useState([
     {
@@ -43,7 +50,8 @@ const AddInvoice = ({ onClose }) => {
       quantity: 1,
       price: 0,
       tax: 0,
-      discount: 0,
+      discountType: 'percentage',
+      discountValue: 0,
       amount: 0,
       description: "",
     },
@@ -57,6 +65,12 @@ const AddInvoice = ({ onClose }) => {
 
   // Add this state to track selected tax details
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
+
+  // Add loading state
+  const [loading, setLoading] = useState(false);
+
+  // Get products directly from Redux store
+  const productsData = useSelector((state) => state.Product.Product);
 
   // Fetch currencies when component mounts
   useEffect(() => {
@@ -76,8 +90,9 @@ const AddInvoice = ({ onClose }) => {
         item: "",
         quantity: 1,
         price: 0,
-        discount: 0,
         tax: 0,
+        discountType: 'percentage',
+        discountValue: 0,
         amount: 0,
         description: "",
       },
@@ -95,7 +110,7 @@ const AddInvoice = ({ onClose }) => {
     if (tableData.length > 1) {
       const updatedData = tableData.filter((row) => row.id !== id);
       setTableData(updatedData);
-      calculateTotal(updatedData, discountRate);
+      calculateTotal(updatedData, globalDiscountValue, globalDiscountType);
     } else {
       message.warning("At least one item is required");
     }
@@ -123,16 +138,22 @@ const AddInvoice = ({ onClose }) => {
         // Calculate individual item amounts
         const quantity = parseFloat(updatedRow.quantity) || 0;
         const price = parseFloat(updatedRow.price) || 0;
-        const itemDiscountPercentage = parseFloat(updatedRow.discount) || 0;
         const taxPercentage = parseFloat(updatedRow.tax) || 0;
+        
+        // Calculate item discount based on type
+        const itemDiscountValue = parseFloat(updatedRow.discountValue) || 0;
+        let itemDiscountAmount = 0;
+        
+        if (updatedRow.discountType === 'percentage') {
+          itemDiscountAmount = (quantity * price * itemDiscountValue) / 100;
+        } else {
+          itemDiscountAmount = itemDiscountValue;
+        }
 
         const baseAmount = quantity * price;
-        const itemDiscountAmount = (baseAmount * itemDiscountPercentage) / 100;
-        const taxAmount = (baseAmount * taxPercentage) / 100;
-
-        // Calculate final amount with individual discount
+        const taxAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
         const finalAmount = baseAmount - itemDiscountAmount + taxAmount;
-
+        
         updatedRow.amount = finalAmount.toFixed(2);
         return updatedRow;
       }
@@ -140,43 +161,55 @@ const AddInvoice = ({ onClose }) => {
     });
 
     setTableData(updatedData);
-    calculateTotal(updatedData, discountRate);
+    calculateTotal(updatedData, globalDiscountValue, globalDiscountType);
   };
 
-  const calculateTotal = (data,discountRate) => {
+  const calculateTotal = (data, globalDiscValue, globalDiscType) => {
+    // Ensure globalDiscValue is a number
+    const globalDiscountValueNum = parseFloat(globalDiscValue) || 0;
+
     const totals = data.reduce((acc, row) => {
       const quantity = parseFloat(row.quantity) || 0;
       const price = parseFloat(row.price) || 0;
-      const itemDiscountPercentage = parseFloat(row.discount) || 0;
-      const taxPercentage = parseFloat(row.tax) || 0;
-
       const baseAmount = quantity * price;
-      const itemDiscountAmount = (baseAmount * itemDiscountPercentage) / 100;
-      const taxAmount = (baseAmount * taxPercentage) / 100;
+      
+      // Calculate item discount
+      const itemDiscountValue = parseFloat(row.discountValue) || 0;
+      let itemDiscountAmount = 0;
+      
+      if (row.discountType === 'percentage') {
+        itemDiscountAmount = (baseAmount * itemDiscountValue) / 100;
+      } else {
+        itemDiscountAmount = itemDiscountValue;
+      }
 
-      // Calculate item total after individual discount and tax
-      const itemTotal = baseAmount - itemDiscountAmount + taxAmount;
-
+      const taxPercentage = parseFloat(row.tax) || 0;
+      const taxAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
+      
       return {
-        subtotal: acc.subtotal + itemTotal,
+        subtotal: acc.subtotal + baseAmount,
         itemDiscount: acc.itemDiscount + itemDiscountAmount,
-        tax: acc.tax + taxAmount,
-        baseTotal: acc.baseTotal + baseAmount
+        tax: acc.tax + taxAmount
       };
-    }, { subtotal: 0, itemDiscount: 0, tax: 0, baseTotal: 0 });
+    }, { subtotal: 0, itemDiscount: 0, tax: 0 });
 
-    // Calculate global discount rate amount
-    const globalDiscountAmount = (totals.subtotal * discountRate) / 100;
+    // Calculate global discount
+    let globalDiscountAmount = 0;
+    if (globalDiscType === 'percentage') {
+      globalDiscountAmount = (totals.subtotal * globalDiscountValueNum) / 100;
+    } else {
+      globalDiscountAmount = globalDiscountValueNum;
+    }
 
-    // Calculate final total after both discounts
-    const finalTotal = totals.subtotal - globalDiscountAmount;
+    const finalTotal = totals.subtotal - totals.itemDiscount - globalDiscountAmount + totals.tax;
 
+    // Ensure all values are numbers before using toFixed
     setTotals({
-      subtotal: totals.subtotal.toFixed(2),
-      itemDiscount: totals.itemDiscount.toFixed(2),
-      globalDiscount: globalDiscountAmount.toFixed(2),
-      totalTax: totals.tax.toFixed(2),
-      finalTotal: finalTotal.toFixed(2)
+      subtotal: Number(totals.subtotal).toFixed(2),
+      itemDiscount: Number(totals.itemDiscount).toFixed(2),
+      globalDiscount: Number(globalDiscountAmount).toFixed(2),
+      totalTax: Number(totals.tax).toFixed(2),
+      finalTotal: Number(finalTotal).toFixed(2)
     });
   };
 
@@ -189,92 +222,83 @@ const AddInvoice = ({ onClose }) => {
 
   });
 
-  const handleSubmit = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        const itemsForDatabase = tableData.reduce((acc, item, index) => {
-          const quantity = parseFloat(item.quantity) || 0;
-          const price = parseFloat(item.price) || 0;
-          const itemDiscountPercentage = parseFloat(item.discount) || 0;
-          const taxPercentage = parseFloat(item.tax) || 0;
+  const handleFinish = async () => {
+    try {
+        setLoading(true);
+        
+        // Get form values
+        const formValues = await form.validateFields();
+        
+        const items = {};
+        tableData.forEach((item, index) => {
+            items[`item_${index + 1}`] = {
+                item: item.item,
+                description: item.description || '',
+                quantity: parseFloat(item.quantity) || 0,
+                price: parseFloat(item.price) || 0,
+                tax_name: selectedTaxDetails[item.id]?.gstName || '',
+                tax: parseFloat(item.tax) || 0,
+                amount: parseFloat(item.amount) || 0,
+                discountType: item.discountType || 'percentage',
+                discountValue: parseFloat(item.discountValue) || 0
+            };
+        });
 
-          const baseAmount = quantity * price;
-          const itemDiscountAmount = (baseAmount * itemDiscountPercentage) / 100;
-          const taxAmount = (baseAmount * taxPercentage) / 100;
-          const itemTotal = baseAmount - itemDiscountAmount + taxAmount;
+        // Calculate global discount
+        const subtotal = parseFloat(totals.subtotal) || 0;
+        const globalDiscountValueNum = parseFloat(globalDiscountValue) || 0;
+        let globalDiscountAmount = 0;
 
-          acc[`item_${index + 1}`] = {
-            item: item.item,
-            quantity: quantity,
-            price: price,
-            tax_percentage: taxPercentage,
-            tax_amount: taxAmount,
-            tax_name: selectedTaxDetails[item.id]?.gstName || '',
-            discount_percentage: itemDiscountPercentage,
-            discount_amount: itemDiscountAmount,
-            base_amount: baseAmount,
-            final_amount: itemTotal,
-            description: item.description || ""
-          };
-          return acc;
-        }, {});
+        if (globalDiscountType === 'percentage') {
+            globalDiscountAmount = (subtotal * globalDiscountValueNum) / 100;
+        } else {
+            globalDiscountAmount = globalDiscountValueNum;
+        }
 
-        // Calculate global discount on subtotal
-        const subtotal = Object.values(itemsForDatabase).reduce((sum, item) =>
-          sum + item.final_amount, 0);
-        const globalDiscountAmount = (subtotal * discountRate) / 100;
-        const finalTotal = subtotal - globalDiscountAmount;
-
-        const invoiceData = {
-          ...values,
-          items: itemsForDatabase,
-          subtotal: subtotal.toFixed(2),
-          discount: discountRate.toFixed(2),
-          
-          global_discount_amount: globalDiscountAmount.toFixed(2),
-          total_item_discount: totals.itemDiscount,
-          total_global_discount: totals.globalDiscount,
-          tax: totals.totalTax,
-          total: finalTotal.toFixed(2),
-          status: "pending"
+        const updatedValues = {
+            ...formValues,
+            issueDate: formValues.issueDate ? formValues.issueDate.format('YYYY-MM-DD') : null,
+            items: items,
+            discountType: globalDiscountType,
+            discountValue: globalDiscountValueNum,
+            discount: parseFloat(globalDiscountAmount) || 0,
+            itemDiscount: parseFloat(totals.itemDiscount) || 0,
+            tax: parseFloat(totals.totalTax) || 0,
+            total: parseFloat(totals.finalTotal) || 0
         };
 
-        dispatch(AddInvoices(invoiceData))
-          .then(() => {
-            dispatch(getInvoice());
-            form.resetFields();
-            // setDiscountRate(0);
-            setTableData([
-              {
+        await dispatch(AddInvoices(updatedValues));
+        message.success("Invoice created successfully!");
+        dispatch(getInvoice());
+        form.resetFields();
+        setTableData([
+            {
                 id: Date.now(),
                 item: "",
                 quantity: 1,
                 price: 0,
                 tax: 0,
-                discount: 0,
+                discountType: 'percentage',
+                discountValue: 0,
                 amount: 0,
                 description: "",
-              }
-            ]);
-            setTotals({
-              subtotal: "0.00",
-              itemDiscount: "0.00",
-              globalDiscount: "0.00",
-              totalTax: "0.00",
-              finalTotal: "0.00",
-            });
-            onClose();
-          })
-          .catch((error) => {
-            message.error("Failed to add invoice. Please try again.");
-            console.error("Error during invoice submission:", error);
-          });
-      })
-      .catch((error) => {
-        console.error("Validation failed:", error);
-      });
-  };
+            }
+        ]);
+        setTotals({
+            subtotal: "0.00",
+            itemDiscount: "0.00",
+            globalDiscount: "0.00",
+            totalTax: "0.00",
+            finalTotal: "0.00",
+        });
+        onClose();
+    } catch (error) {
+        console.error('Error creating invoice:', error);
+        message.error("Failed to create invoice: " + (error.message || "Unknown error"));
+    } finally {
+        setLoading(false);
+    }
+};
 
   const fetchTags = async () => {
     try {
@@ -327,6 +351,62 @@ const AddInvoice = ({ onClose }) => {
     }
   };
 
+  // Fetch products when component mounts
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await dispatch(GetAllProdu());
+        console.log("Products response:", response); // Debug log
+        
+        if (response?.payload?.data) {
+          setProducts(response.payload.data);
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        message.error("Failed to load products");
+      }
+    };
+
+    fetchProducts();
+  }, [dispatch]);
+
+  // Update local state when Redux store changes
+  useEffect(() => {
+    if (productsData?.data) {
+      console.log("Products from Redux:", productsData.data);
+      setProducts(productsData.data);
+    }
+  }, [productsData]);
+
+  // Product selection handler
+  const handleProductChange = (productId) => {
+    console.log("Selected product ID:", productId); // Debug log
+    
+    if (productId) {
+      const selectedProd = products.find(p => p.id === productId);
+      console.log("Found product:", selectedProd); // Debug log
+      
+      if (selectedProd) {
+        const updatedData = tableData.map((row, index) => {
+          if (index === tableData.length - 1 && !row.item) {
+            return {
+              ...row,
+              item: selectedProd.name,
+              description: selectedProd.description || "",
+              price: selectedProd.price || 0,
+              hsn_sac: selectedProd.hsn_sac || "",
+            };
+          }
+          return row;
+        });
+
+        setTableData(updatedData);
+        setSelectedProduct(productId);
+        calculateTotal(updatedData, globalDiscountValue, globalDiscountType);
+      }
+    }
+  };
+
   // Add a reset function that can be called independently if needed
   const resetForm = () => {
     form.resetFields();
@@ -337,7 +417,8 @@ const AddInvoice = ({ onClose }) => {
         quantity: 1,
         price: 0,
         tax: 0,
-        discount: 0,
+        discountType: 'percentage',
+        discountValue: 0,
         amount: 0,
         description: "",
       }
@@ -354,6 +435,7 @@ const AddInvoice = ({ onClose }) => {
   return (
     <div>
       <Form form={form} layout="vertical">
+      <h2 className="mb-2 border-b pb-[20px] font-medium"></h2>
         <Card className="border-0">
           <Row gutter={16}>
             <Col span={12} className="mt-1">
@@ -454,9 +536,7 @@ const AddInvoice = ({ onClose }) => {
               <Form.Item
                 label="Reference Number"
                 name="refnumber"
-                rules={[
-                  { required: true, message: "Please enter reference number" },
-                ]}
+               
               >
                 <Input placeholder="Enter Reference Number" />
               </Form.Item>
@@ -494,34 +574,61 @@ const AddInvoice = ({ onClose }) => {
         <Card>
           <h4 className="font-semibold text-lg mb-3">Product & Services</h4>
           <div>
-            <div className="form-buttons text-right mb-2">
-              <Button type="primary" onClick={handleAddRow}>
-                <PlusOutlined /> Add Items
-              </Button>
-            </div>
+            <Flex alignItems="center" mobileFlex={false} className='flex mb-4 gap-4'>
+              <Flex className="flex" mobileFlex={false}>
+                <div className="w-full flex gap-4">
+                  <div>
+                    <Select
+                      value={selectedProduct}
+                      onChange={handleProductChange}
+                      className="w-full !rounded-none"
+                      placeholder="Select Product"
+                      rootClassName="!rounded-none"
+                      allowClear
+                      loading={!products.length}
+                    >
+                      {products && products.length > 0 ? (
+                        products.map((product) => (
+                          <Option key={product.id} value={product.id}>
+                            {product.name}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option disabled>No products available</Option>
+                      )}
+                    </Select>
+                  </div>
+                </div>
+
+              </Flex>
+            </Flex>
             <div className="overflow-x-auto">
               <table className="w-full border border-gray-200 bg-white">
                 <thead className="bg-gray-100">
                   <tr>
-                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Description<span className="text-red-500">*</span>
                     </th>
-                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Quantity<span className="text-red-500">*</span>
                     </th>
-                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Unit Price<span className="text-red-500">*</span>
                     </th>
-                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                      Discount (%)
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      HSN/SAC
                     </th>
-                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Discount
+                    </th>
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       TAX (%)
                     </th>
-                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Amount
                     </th>
-                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Actions
                     </th>
                   </tr>
@@ -530,7 +637,7 @@ const AddInvoice = ({ onClose }) => {
                   {tableData.map((row) => (
                     <React.Fragment key={row.id}>
                       <tr>
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                           <input
                             type="text"
                             value={row.item}
@@ -539,7 +646,8 @@ const AddInvoice = ({ onClose }) => {
                             className="w-full p-2 border rounded-s"
                           />
                         </td>
-                        <td className="px-4 py-2 border-b">
+                       
+                        <td className="px-2 py-2 border-b">
                           <input
                             type="number"
                             min="1"
@@ -549,7 +657,7 @@ const AddInvoice = ({ onClose }) => {
                             className="w-full p-2 border rounded"
                           />
                         </td>
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                           <Input
                             prefix={selectedCurrencyIcon}
                             type="number"
@@ -560,18 +668,36 @@ const AddInvoice = ({ onClose }) => {
                             className="w-full p-2 border rounded-s"
                           />
                         </td>
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                           <input
-                            type="number"
-                            min="0"
-                            max="100"
-                            value={row.discount || 0}
-                            onChange={(e) => handleTableDataChange(row.id, "discount", e.target.value)}
-                            placeholder="0"
+                            type="text"
+                            value={row.hsn_sac}
+                            onChange={(e) => handleTableDataChange(row.id, "hsn_sac", e.target.value)}
+                            placeholder="HSN/SAC"
                             className="w-full p-2 border rounded"
+                            readOnly
                           />
                         </td>
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
+                          <div className="flex space-x-2">
+                            <Select
+                              value={row.discountType}
+                              onChange={(value) => handleTableDataChange(row.id, "discountType", value)}
+                              style={{ width: '100px' }}
+                            >
+                              <Option value="percentage">Percentage</Option>
+                              <Option value="fixed">Fixed</Option>
+                            </Select>
+                            <Input
+                              type="number"
+                              min="0"
+                              value={row.discountValue}
+                              onChange={(e) => handleTableDataChange(row.id, "discountValue", e.target.value)}
+                              placeholder="0"
+                            />
+                          </div>
+                        </td>
+                        <td className="px-2 py-2 border-b">
                           <select
                             value={row.tax}
                             onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
@@ -585,7 +711,7 @@ const AddInvoice = ({ onClose }) => {
                             ))}
                           </select>
                         </td>
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                           <span>{selectedCurrencyIcon} {parseFloat(row.amount || 0).toFixed(2)}</span>
                         </td>
                         <td className="px-2 py-1 border-b text-center">
@@ -595,7 +721,7 @@ const AddInvoice = ({ onClose }) => {
                         </td>
                       </tr>
                       <tr>
-                        <td colSpan={6} className="px-4 py-2 border-b">
+                        <td colSpan={7} className="px-2 py-2 border-b">
                           <textarea
                             rows={2}
                             value={row.description}
@@ -609,6 +735,11 @@ const AddInvoice = ({ onClose }) => {
                   ))}
                 </tbody>
               </table>
+              <div className="form-buttons text-left mt-2">
+              <Button type="primary" onClick={handleAddRow}>
+                <PlusOutlined /> Add Items
+              </Button>
+            </div>
             </div>
           </div>
 
@@ -617,30 +748,38 @@ const AddInvoice = ({ onClose }) => {
           <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
             <table className="w-full lg:w-[50%] p-2">
               <tbody>
-                <tr className="flex justify-between px-2 py-2 border-x-2">
+                <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
                   <td className="font-medium">Sub Total</td>
                   <td className="font-medium px-4 py-2">{selectedCurrencyIcon} {totals.subtotal}</td>
                 </tr>
 
-                <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
+                <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
                   <td className="font-medium">Item Discount</td>
                   <td className="flex items-center space-x-2">
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Item Discount Rate (%)
-                      </label>
-                      <input
-                        type="number"
-                        value={discountRate}
-                        onChange={(e) => {
-                          setDiscountRate(parseFloat(e.target.value) || 0);
-                          calculateTotal(tableData, parseFloat(e.target.value) || 0); // Recalculate with new discount rate
-                        }}
-                        className="mt-1 block w-full p-2 border rounded"
-                      />
-                    </div>
+                    <Select
+                      value={globalDiscountType}
+                      onChange={(value) => {
+                        setGlobalDiscountType(value);
+                        calculateTotal(tableData, globalDiscountValue, value);
+                      }}
+                      style={{ width: '100px' }}
+                    >
+                      <Option value="percentage">Percentage</Option>
+                      <Option value="fixed">Fixed</Option>
+                    </Select>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={globalDiscountValue}
+                      onChange={(e) => {
+                        setGlobalDiscountValue(e.target.value);
+                        calculateTotal(tableData, e.target.value, globalDiscountType);
+                      }}
+                      placeholder="0"
+                    />
                   </td>
                 </tr>
+
 
                 {parseFloat(totals.itemDiscount) > 0 && (
                   <tr className="flex justify-between px-2 py-2 border-x-2">
@@ -649,10 +788,6 @@ const AddInvoice = ({ onClose }) => {
                   </tr>
                 )}
 
-                <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
-                  <td className="font-medium">Global Discount</td>
-                  <td className="font-medium px-4 py-2">{selectedCurrencyIcon} {totals.globalDiscount}</td>
-                </tr>
 
                 <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
                   <td className="font-medium">Total Tax</td>
@@ -675,7 +810,7 @@ const AddInvoice = ({ onClose }) => {
           }}>
             Cancel
           </Button>
-          <Button type="primary" onClick={handleSubmit}>
+          <Button type="primary" onClick={handleFinish}>
             Create
           </Button>
         </div>

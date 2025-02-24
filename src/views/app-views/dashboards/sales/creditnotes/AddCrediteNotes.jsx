@@ -105,6 +105,23 @@ const AddCrediteNotes = ({ onClose }) => {
     description: Yup.string().required("Please enter a description."),
   });
 
+  // Add this function to handle invoice selection
+  const handleInvoiceSelect = (invoiceId, setFieldValue) => {
+    if (invoiceId) {
+      const selectedInvoice = invoicesData.find(invoice => invoice.id === invoiceId);
+      if (selectedInvoice) {
+        // Set the invoice field
+        setFieldValue("invoice", invoiceId);
+        // Set the amount field with the invoice's total amount
+        setFieldValue("amount", selectedInvoice.total || selectedInvoice.amount || 0);
+      }
+    } else {
+      // Clear both fields if no invoice is selected
+      setFieldValue("invoice", "");
+      setFieldValue("amount", "");
+    }
+  };
+
   return (
     <>
       <div>
@@ -131,9 +148,7 @@ const AddCrediteNotes = ({ onClose }) => {
                                 {...field}
                                 className="w-full mt-1"
                                 placeholder="Select invoice"
-                                onChange={(value) =>
-                                  setFieldValue("invoice", value)
-                                }
+                                onChange={(value) => handleInvoiceSelect(value, setFieldValue)}
                                 value={values.invoice}
                                 onBlur={() => setFieldTouched("invoice", true)}
                               >
@@ -168,6 +183,7 @@ const AddCrediteNotes = ({ onClose }) => {
                             className="mt-1"
                             placeholder="Enter Amount"
                             type="number"
+                            // disabled // Make the amount field read-only since it's set automatically
                           />
                           <ErrorMessage
                             name="amount"

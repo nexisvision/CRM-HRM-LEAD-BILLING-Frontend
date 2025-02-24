@@ -267,12 +267,17 @@ const EditProduct = ({ idd, onClose }) => {
   const { id } = useParams();
   const [showReceiptUpload, setShowReceiptUpload] = useState(false);
 
+  const CustomInput = ({ field, form, ...props }) => <Input {...field} {...props} />;
+
   // category start
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
 
   const AllLoggedData = useSelector((state) => state.user);
+
+  const [fileList, setFileList] = useState([]);
+
 
   const lid = AllLoggedData.loggedInUser.id;
 
@@ -340,6 +345,11 @@ const EditProduct = ({ idd, onClose }) => {
     dispatch(getcurren());
   }, [dispatch]);
 
+  // Handle file upload changes
+  const handleFileChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+};
+
   // Declare state for initial values
   const [initialValues, setInitialValues] = useState({
     name: "",
@@ -385,9 +395,23 @@ const EditProduct = ({ idd, onClose }) => {
   });
 
   const onSubmit = (values, { resetForm }) => {
+    if (fileList.length === 0) {
+      message.error("Please upload an image");
+      return;
+    }
+
     const formData = new FormData();
-    for (const key in values) {
-      formData.append(key, values[key]);
+    
+    // Append all form values except image
+    Object.keys(values).forEach(key => {
+      if (key !== 'image') {
+        formData.append(key, values[key]);
+      }
+    });
+
+    // Append the file if exists
+    if (fileList[0]?.originFileObj) {
+      formData.append('image', fileList[0].originFileObj);
     }
     
     dispatch(EditProdu({ idd, formData })).then(() => {
@@ -481,34 +505,42 @@ const EditProduct = ({ idd, onClose }) => {
               </Col>
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Sku <span className="text-red-500">*</span></label>
-                  <Field
-                    className="mt-1"
-                    name="sku"
-                    as={Input}
-                    placeholder="Enter Sku"
+                  <label className="font-semibold">SKU <span className="text-red-500">*</span></label>
+                  <Field 
+                    className="mt-2" 
+                    name="sku" 
+                    as={CustomInput} 
+                    placeholder="Enter SKU"
+                    validate={(value) => {
+                      if (!value) {
+                        return 'SKU is required';
+                      }
+                      if (!/^\d{6,8}$/.test(value)) {
+                        return 'SKU must be between 6 to 8 digits';
+                      }
+                    }}
                   />
-                  <ErrorMessage
-                    name="sku"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <ErrorMessage name="sku" component="div" className="error-message text-red-500 my-1" />
                 </div>
               </Col>
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Hsn/Sac <span className="text-red-500">*</span></label>
-                  <Field
-                    className="mt-1"
-                    name="hsn_sac"
-                    as={Input}
-                    placeholder="Enter Hsn/Sac"
+                  <label className="font-semibold">HSN/SAC <span className="text-red-500">*</span></label>
+                  <Field 
+                    className="mt-2" 
+                    name="hsn_sac" 
+                    as={CustomInput} 
+                    placeholder="Enter HSN/SAC"
+                    validate={(value) => {
+                      if (!value) {
+                        return 'HSN/SAC is required';
+                      }
+                      if (!/^\d{6,8}$/.test(value)) {
+                        return 'HSN/SAC must be between 6 to 8 digits';
+                      }
+                    }}
                   />
-                  <ErrorMessage
-                    name="hsn_sac"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <ErrorMessage name="hsn_sac" component="div" className="error-message text-red-500 my-1" />
                 </div>
               </Col>
 
@@ -532,30 +564,31 @@ const EditProduct = ({ idd, onClose }) => {
 
               
 
-              <Col span={24} className="mt-4">
-                <span className="block font-semibold p-2">
-                  Add <QuestionCircleOutlined />
-                </span>
-                <Field name="image">
-                  {({ field }) => (
-                    <div>
-                      <Upload
-                        beforeUpload={(file) => {
-                          setFieldValue("image", file); // Set file in Formik state
-                          return false; // Prevent auto upload
-                        }}
-                        showUploadList={false}
-                      >
-                        <Button icon={<UploadOutlined />}>Choose File</Button>
-                      </Upload>
-                    </div>
-                  )}
-                </Field>
-              </Col>
+              <div className="mt-4 w-full">
+                <span className="block font-semibold p-2">Product Image</span>
+                <Col span={24}>
+                  <Upload
+                    beforeUpload={() => false} // Prevent auto upload
+                    listType="picture"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    maxCount={1}
+                    fileList={fileList}
+                    onChange={handleFileChange}
+                    showUploadList={{ 
+                      showRemoveIcon: true,
+                      showPreviewIcon: true,
+                      className: "upload-list-inline"
+                    }}
+                    className="border-2 flex flex-col justify-center items-center p-10"
+                  >
+                    <Button icon={<UploadOutlined />}>Choose File</Button>
+                  </Upload>
+                </Col>
+              </div>
 
               <Row justify="end" className="mt-6">
                 <Col>
-                  <Space className="flex justify-end">
+                  <Space>
                     <Button 
                       onClick={onClose}
                       className="px-4"
@@ -571,7 +604,7 @@ const EditProduct = ({ idd, onClose }) => {
                     <Button 
                       type="primary" 
                       htmlType="submit"
-                      className="px-4 "
+                      className="px-4"
                       style={{ 
                         borderRadius: '6px',
                         backgroundColor: '#3366FF'

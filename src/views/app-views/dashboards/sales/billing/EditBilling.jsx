@@ -38,7 +38,8 @@ const EditBilling = ({ idd, onClose }) => {
   const Tagsdetail = useSelector((state) => state.Lable);
 
   const [showTax, setShowTax] = useState(false);
-  const [discountRate, setDiscountRate] = useState(0);
+  const [discountType, setDiscountType] = useState('percentage');
+  const [discountValue, setDiscountValue] = useState(0);
   const [totals, setTotals] = useState({
     subtotal: "0.00",
     discount: "0.00",
@@ -53,7 +54,7 @@ const EditBilling = ({ idd, onClose }) => {
       quantity: 1,
       price: 0,
       tax: 0,
-      tax_name: "",
+      // tax_name: "",
       amount: 0,
       description: "",
     },
@@ -88,8 +89,9 @@ const EditBilling = ({ idd, onClose }) => {
       });
 
       // Set tax and discount states
-      setShowTax(!!currentBill.tax);
-      setDiscountRate(currentBill.discount || 0);
+      // setShowTax(!!currentBill.tax);
+      setDiscountType(currentBill.discountType || 'percentage');
+      setDiscountValue(currentBill.discountValue || 0);
 
       // Format items data
       if (items.length > 0) {
@@ -129,7 +131,7 @@ const EditBilling = ({ idd, onClose }) => {
         }
 
         // Calculate totals
-        calculateTotal(formattedItems, currentBill.discount || 0);
+        calculateTotal(formattedItems, currentBill.discountValue || 0, currentBill.discountType || 'percentage');
       } else {
         // Set default empty row if no items
         setTableData([{
@@ -174,7 +176,7 @@ const EditBilling = ({ idd, onClose }) => {
     return (baseAmount + taxAmount).toFixed(2);
   };
 
-  const calculateTotal = (data = tableData, discount = discountRate) => {
+  const calculateTotal = (data = tableData, discountVal = discountValue, type = discountType) => {
     if (!Array.isArray(data)) {
       console.error('Invalid data passed to calculateTotal');
       return;
@@ -195,12 +197,16 @@ const EditBilling = ({ idd, onClose }) => {
       totalTax += taxAmount;
     });
 
-    const discountAmount = (subtotal * (parseFloat(discount) || 0)) / 100;
+    // Calculate discount based on type
+    const discountAmount = type === 'percentage'
+      ? (subtotal * (parseFloat(discountVal) || 0)) / 100
+      : parseFloat(discountVal) || 0;
+
     const finalTotal = subtotal - discountAmount + totalTax;
 
     setTotals({
       subtotal: subtotal.toFixed(2),
-      discount: discountAmount.toFixed(2),
+      discount: discountVal ? discountAmount.toFixed(2) : '',
       totalTax: totalTax.toFixed(2),
       finalTotal: finalTotal.toFixed(2),
     });
@@ -249,7 +255,7 @@ const EditBilling = ({ idd, onClose }) => {
     });
 
     setTableData(updatedData);
-    calculateTotal(updatedData, discountRate);
+    calculateTotal(updatedData, discountValue, discountType);
   };
 
   const handleAddRow = () => {
@@ -270,7 +276,7 @@ const EditBilling = ({ idd, onClose }) => {
   const handleDeleteRow = (id) => {
     const updatedData = tableData.filter((row) => row.id !== id);
     setTableData(updatedData);
-    calculateTotal(updatedData, discountRate);
+    calculateTotal(updatedData, discountValue, discountType);
   };
 
   const handleSubmit = () => {
@@ -308,7 +314,8 @@ const EditBilling = ({ idd, onClose }) => {
           discription: descriptionObject,
           status: values.status,
           billNumber: values.billNumber,
-          discount: parseFloat(discountRate) || 0,
+          discountType: discountType,
+          discountValue: parseFloat(discountValue) || 0,
           tax: showTax ? parseFloat(totals.totalTax) || 0 : 0,
           total: parseFloat(totals.finalTotal) || 0,
           note: values.note || "",
@@ -418,9 +425,10 @@ const EditBilling = ({ idd, onClose }) => {
   return (
     <div>
       <Form form={form} layout="vertical">
+      <h2 className="mb-2 border-b font-medium"></h2>
         <Card className="border-0">
           <Row gutter={16}>
-            <Col span={24} className="mt-1">
+            <Col span={12} className="mt-1">
               <Form.Item
                 label="Vendor"
                 name="vendor"
@@ -479,6 +487,12 @@ const EditBilling = ({ idd, onClose }) => {
             </Col>
 
             <Col span={12}>
+              <Form.Item label="Note" name="note">
+                <Input placeholder="Enter Note (Optional)" />
+              </Form.Item>
+            </Col>
+
+            {/* <Col span={12}>
               <Form.Item
                 label="Bill Number"
                 name="billNumber"
@@ -488,7 +502,7 @@ const EditBilling = ({ idd, onClose }) => {
               >
                 <Input placeholder="Enter Bill Number" />
               </Form.Item>
-            </Col>
+            </Col> */}
 
             <Col span={24}>
               <Form.Item label="Description" name="description">
@@ -496,11 +510,7 @@ const EditBilling = ({ idd, onClose }) => {
               </Form.Item>
             </Col>
 
-            <Col span={12}>
-              <Form.Item label="Note" name="note">
-                <Input placeholder="Enter Note (Optional)" />
-              </Form.Item>
-            </Col>
+            
           </Row>
         </Card>
 
@@ -520,7 +530,7 @@ const EditBilling = ({ idd, onClose }) => {
                       amount: calculateAmount({ ...row, tax: 0 })
                     }));
                     setTableData(updatedData);
-                    calculateTotal(updatedData, discountRate);
+                    calculateTotal(updatedData, discountValue, discountType);
                   }
                 }}
               />
@@ -631,21 +641,31 @@ const EditBilling = ({ idd, onClose }) => {
                 <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
                   <td className="font-medium">Discount</td>
                   <td className="flex items-center space-x-2">
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Discount Rate (%)
-                      </label>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Select
+                        value={discountType}
+                        onChange={(value) => {
+                          setDiscountType(value);
+                          setDiscountValue(0);
+                          calculateTotal(tableData, 0, value);
+                        }}
+                        style={{ width: 120 }}
+                      >
+                        <Option value="percentage">Percentage</Option>
+                        <Option value="fixed">Fixed Amount</Option>
+                      </Select>
                       <input
                         type="number"
                         min="0"
-                        max="100"
-                        value={discountRate}
+                        max={discountType === 'percentage' ? 100 : undefined}
+                        value={discountValue || ''}
                         onChange={(e) => {
-                          const newRate = parseFloat(e.target.value) || 0;
-                          setDiscountRate(newRate);
-                          calculateTotal(tableData, newRate);
+                          const newValue = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                          setDiscountValue(newValue);
+                          calculateTotal(tableData, newValue, discountType);
                         }}
-                        className="mt-1 block w-full p-2 border rounded"
+                        className="mt-1 block p-2 border rounded"
+                        placeholder="Enter discount"
                       />
                     </div>
                   </td>

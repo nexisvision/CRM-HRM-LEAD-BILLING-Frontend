@@ -506,7 +506,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
                     {/* Invoice Summary */}
                         <div className="d-flex justify-content-end mb-3">
-                        <div className="text-center">
+                        <div className="text-start">
                                 <div className="border-bottom">
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Sub-Total : </span>
@@ -712,7 +712,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
                         {/* Invoice Summary */}
                         <div className="d-flex justify-content-end mb-3">
-                            <div className="text-center">
+                            <div className="text-start">
                                 <div className="border-bottom">
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Sub-Total : </span>
@@ -923,7 +923,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
                     {/* Invoice Summary */}
                     <div className="d-flex justify-content-end mb-3">
-                    <div className="text-center">
+                    <div className="text-start">
                                 <div className="border-bottom">
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Sub-Total : </span>
@@ -1133,7 +1133,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
                         {/* Invoice Summary */}
                         <div className="d-flex justify-content-end mb-3">
-                            <div className="text-center">
+                            <div className="text-start">
                                 <div className="border-bottom">
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Sub-Total : </span>

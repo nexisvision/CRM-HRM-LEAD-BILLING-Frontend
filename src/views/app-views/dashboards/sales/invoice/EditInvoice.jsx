@@ -10,6 +10,7 @@ import {
   Select,
   DatePicker,
 } from "antd";
+import Flex from 'components/shared-components/Flex';
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
@@ -22,6 +23,7 @@ import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import { getcurren } from "../../../setting/currencies/currenciesSlice/currenciesSlice";
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
+import { GetAllProdu } from '../../project/product/ProductReducer/ProductsSlice';
 
 const { Option } = Select;
 
@@ -32,6 +34,8 @@ const EditInvoice = ({ idd, onClose }) => {
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState("");
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   const alladatas = useSelector((state) => state?.salesInvoices);
   const fnddata = alladatas?.salesInvoices?.data;
@@ -45,18 +49,21 @@ const EditInvoice = ({ idd, onClose }) => {
   const { taxes } = useSelector((state) => state.tax);
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
 
+  const [globalDiscountType, setGlobalDiscountType] = useState('percentage');
+  const [globalDiscountValue, setGlobalDiscountValue] = useState(0);
 
-
-   const [tableData, setTableData] = useState([
+  const [tableData, setTableData] = useState([
     {
       id: Date.now(),
       item: "",
       quantity: 1,
       price: 0,
+      discountType: 'percentage',
+      discountValue: 0,
       tax: 0,
       amount: 0,
       description: "",
-    },
+    }
   ]);
 
   const [initialValues, setInitialValues] = useState({
@@ -72,6 +79,9 @@ const EditInvoice = ({ idd, onClose }) => {
   // Get currencies from the store
   const currencies = useSelector((state) => state.currencies.currencies.data);
 
+  // Get products directly from Redux store
+  const productsData = useSelector((state) => state.Product.Product);
+
   useEffect(() => {
     dispatch(getInvoice());
     dispatch(Getcus());
@@ -79,6 +89,61 @@ const EditInvoice = ({ idd, onClose }) => {
     dispatch(getAllTaxes());
     fetchTags();
   }, []);
+
+  // Update local state when Redux store changes
+  useEffect(() => {
+    if (productsData?.data) {
+      console.log("Products from Redux:", productsData.data);
+      setProducts(productsData.data);
+    }
+  }, [productsData]);
+
+   // Fetch products when component mounts
+   useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await dispatch(GetAllProdu());
+        console.log("Products response:", response); // Debug log
+        
+        if (response?.payload?.data) {
+          setProducts(response.payload.data);
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        message.error("Failed to load products");
+      }
+    };
+
+    fetchProducts();
+  }, [dispatch]);
+// Product selection handler
+const handleProductChange = (productId) => {
+  console.log("Selected product ID:", productId); // Debug log
+  
+  if (productId) {
+    const selectedProd = products.find(p => p.id === productId);
+    console.log("Found product:", selectedProd); // Debug log
+    
+    if (selectedProd) {
+      const updatedData = tableData.map((row, index) => {
+        if (index === tableData.length - 1 && !row.item) {
+          return {
+            ...row,
+            item: selectedProd.name,
+            description: selectedProd.description || "",
+            price: selectedProd.price || 0,
+            hsn_sac: selectedProd.hsn_sac || "",
+          };
+        }
+        return row;
+      });
+
+      setTableData(updatedData);
+      setSelectedProduct(productId);
+      calculateTotal(updatedData, globalDiscountValue, globalDiscountType);
+    }
+  }
+};
 
   const fetchTags = async () => {
     try {
@@ -132,7 +197,8 @@ const EditInvoice = ({ idd, onClose }) => {
           item: item.item || '',
           quantity: item.quantity || 1,
           price: item.price || 0,
-          discount: item.discount_percentage || 0,
+          discountType: item.discount_type || 'percentage',
+          discountValue: item.discount_percentage || 0,
           tax: item.tax_percentage || 0,
           amount: item.final_amount || 0,
           description: item.description || ''
@@ -145,7 +211,8 @@ const EditInvoice = ({ idd, onClose }) => {
             item: '',
             quantity: 1,
             price: 0,
-            discount: 0,
+            discountType: 'percentage',
+            discountValue: 0,
             tax: 0,
             amount: 0,
             description: ''
@@ -191,7 +258,8 @@ const EditInvoice = ({ idd, onClose }) => {
         item: "",
         quantity: "",
         price: "",
-        discount: "",
+        discountType: 'percentage',
+        discountValue: 0,
         tax: "",
         amount: "0",
         description: "",
@@ -204,39 +272,49 @@ const EditInvoice = ({ idd, onClose }) => {
     if (tableData.length > 1) {
       const updatedData = tableData.filter((row) => row.id !== id);
       setTableData(updatedData);
-      calculateTotal(updatedData, discountRate);
+      calculateTotal(updatedData, globalDiscountValue);
     } else {
       message.warning("At least one item is required");
     }
   };
 
-  const calculateTotal = (data,discountRate) => {
+  const calculateTotal = (data, globalDiscValue) => {
     const totals = data.reduce((acc, row) => {
       const quantity = parseFloat(row.quantity) || 0;
       const price = parseFloat(row.price) || 0;
-      const itemDiscountPercentage = parseFloat(row.discount) || 0;
-      const taxPercentage = parseFloat(row.tax) || 0;
-
       const baseAmount = quantity * price;
-      const itemDiscountAmount = (baseAmount * itemDiscountPercentage) / 100;
-      const taxAmount = (baseAmount * taxPercentage) / 100;
+      
+      // Calculate item discount based on type
+      const itemDiscountValue = parseFloat(row.discountValue) || 0;
+      let itemDiscountAmount = 0;
+      
+      if (row.discountType === 'percentage') {
+        itemDiscountAmount = (baseAmount * itemDiscountValue) / 100;
+      } else {
+        itemDiscountAmount = itemDiscountValue;
+      }
 
-      // Calculate item total after individual discount and tax
-      const itemTotal = baseAmount - itemDiscountAmount + taxAmount;
+      const taxPercentage = parseFloat(row.tax) || 0;
+      const taxAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
 
       return {
-        subtotal: acc.subtotal + itemTotal,
+        subtotal: acc.subtotal + baseAmount,
         itemDiscount: acc.itemDiscount + itemDiscountAmount,
-        tax: acc.tax + taxAmount,
-        baseTotal: acc.baseTotal + baseAmount
+        tax: acc.tax + taxAmount
       };
-    }, { subtotal: 0, itemDiscount: 0, tax: 0, baseTotal: 0 });
+    }, { subtotal: 0, itemDiscount: 0, tax: 0 });
 
-    // Calculate global discount rate amount
-    const globalDiscountAmount = (totals.subtotal * discountRate) / 100;
+    // Calculate global discount
+    let globalDiscountAmount = 0;
+    const globalDiscountValueNum = parseFloat(globalDiscValue) || 0;
 
-    // Calculate final total after both discounts
-    const finalTotal = totals.subtotal - globalDiscountAmount;
+    if (globalDiscountType === 'percentage') {
+      globalDiscountAmount = (totals.subtotal * globalDiscountValueNum) / 100;
+    } else {
+      globalDiscountAmount = globalDiscountValueNum;
+    }
+
+    const finalTotal = totals.subtotal - totals.itemDiscount - globalDiscountAmount + totals.tax;
 
     setTotals({
       subtotal: totals.subtotal.toFixed(2),
@@ -252,40 +330,32 @@ const EditInvoice = ({ idd, onClose }) => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
         
-        if (field === 'tax' && taxes?.data) {
-          const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
-          if (selectedTax) {
-            setSelectedTaxDetails(prev => ({
-              ...prev,
-              [id]: {
-                gstName: selectedTax.gstName,
-                gstPercentage: selectedTax.gstPercentage
-              }
-            }));
-          }
-        }
-        // Recalculate amount when quantity, price, or tax changes
-        // Calculate individual item amounts
+        // Recalculate amount when any value changes
         const quantity = parseFloat(updatedRow.quantity) || 0;
         const price = parseFloat(updatedRow.price) || 0;
-        const itemDiscountPercentage = parseFloat(updatedRow.discount) || 0;
-        const taxPercentage = parseFloat(updatedRow.tax) || 0;
-
         const baseAmount = quantity * price;
-        const itemDiscountAmount = (baseAmount * itemDiscountPercentage) / 100;
-        const taxAmount = (baseAmount * taxPercentage) / 100;
+        
+        // Calculate item discount
+        const itemDiscountValue = parseFloat(updatedRow.discountValue) || 0;
+        let itemDiscountAmount = 0;
+        
+        if (updatedRow.discountType === 'percentage') {
+          itemDiscountAmount = (baseAmount * itemDiscountValue) / 100;
+        } else {
+          itemDiscountAmount = itemDiscountValue;
+        }
 
-        // Calculate final amount with individual discount
-        const finalAmount = baseAmount - itemDiscountAmount + taxAmount;
-
-        updatedRow.amount = finalAmount.toFixed(2);
+        const taxPercentage = parseFloat(updatedRow.tax) || 0;
+        const taxAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
+        
+        updatedRow.amount = (baseAmount - itemDiscountAmount + taxAmount).toFixed(2);
         return updatedRow;
       }
       return row;
     });
 
     setTableData(updatedData);
-    calculateTotal(updatedData, discountRate);
+    calculateTotal(updatedData, globalDiscountValue);
   };
 
  
@@ -349,7 +419,7 @@ const EditInvoice = ({ idd, onClose }) => {
     const itemsForDatabase = tableData.reduce((acc, item, index) => {
       const quantity = parseFloat(item.quantity) || 0;
       const price = parseFloat(item.price) || 0;
-      const itemDiscountPercentage = parseFloat(item.discount) || 0;
+      const itemDiscountPercentage = parseFloat(item.discountValue) || 0;
       const taxPercentage = parseFloat(item.tax) || 0;
 
       const baseAmount = quantity * price;
@@ -436,6 +506,7 @@ const EditInvoice = ({ idd, onClose }) => {
   return (
     <div>
       <Card className="border-0">
+      <h2 className="mb-4 border-b font-medium"></h2>
         <Formik
           initialValues={initialValues}
           enableReinitialize={true}
@@ -451,21 +522,22 @@ const EditInvoice = ({ idd, onClose }) => {
           }) => (
             <Form onSubmit={handleSubmit}>
               <Row gutter={16}>
-                <Col span={12} >
+                <Col span={12}>
                   <div className="form-item">
-                    <label className="font-semibold">Customer</label>
+                    <label className="font-semibold">Customer <span className="text-red-500">*</span></label>
                     <Select
                       style={{ width: "100%" }}
-                      placeholder="Select Client"
+                      placeholder="Select Customer"
+                      className="mt-2"
                       name="customer"
                       value={values.customer}
                       onChange={(value) => setFieldValue("customer", value)}
                       loading={!fnddatas}
                     >
                       {fnddatas && fnddatas.length > 0 ? (
-                        fnddatas.map((client) => (
-                          <Option key={client.id} value={client.id}>
-                            {client.name || "Unnamed Client"}
+                        fnddatas.map((customer) => (
+                          <Option key={customer.id} value={customer.id}>
+                            {customer.name || "Unnamed Customer"}
                           </Option>
                         ))
                       ) : (
@@ -482,11 +554,12 @@ const EditInvoice = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={12} >
-                  <label className="font-semibold">Issue Date</label>
+                <Col span={12}>
+                  <label className="font-semibold">Issue Date <span className="text-red-500">*</span></label>
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-2"
                     format="DD-MM-YYYY"
+
                     value={values.issueDate ? dayjs(values.issueDate) : null}
                     onChange={(issueDate) =>
                       setFieldValue("issueDate", issueDate)
@@ -500,10 +573,10 @@ const EditInvoice = ({ idd, onClose }) => {
                   />
                 </Col>
 
-                <Col span={12} className="mt-2">
-                  <label className="font-semibold">Due Date</label>
+                <Col span={12} className="mt-4">
+                  <label className="font-semibold">Due Date <span className="text-red-500">*</span></label>
                   <DatePicker
-                    className="w-full"
+                    className="w-full mt-2"
                     format="DD-MM-YYYY"
                     value={values.dueDate ? dayjs(values.dueDate) : null}
                     onChange={(dueDate) => setFieldValue("dueDate", dueDate)}
@@ -530,11 +603,12 @@ const EditInvoice = ({ idd, onClose }) => {
                   />
                 </Col> */}
 
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold">Category</label>
+                    <label className="font-semibold">Category <span className="text-red-500">*</span></label>
                     <Select
                       style={{ width: "100%" }}
+                      className="mt-2"
                       placeholder="Select or add new category"
                       name="category"
                       value={values.category}
@@ -572,12 +646,13 @@ const EditInvoice = ({ idd, onClose }) => {
                     />
                   </div>
                 </Col>
-                <Col span={12}>
+                <Col span={12} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold">Currency</label>
+                    <label className="font-semibold">Currency <span className="text-red-500">*</span></label>
                     <Select
                       style={{ width: "100%" }}
                       placeholder="Select Currency"
+                      className="mt-2"
                       name="currency"
                       value={values.currency}
                       onChange={(value) => {
@@ -605,36 +680,63 @@ const EditInvoice = ({ idd, onClose }) => {
                 </Col>
               </Row>
 
-         
+              <h4 className="font-semibold text-lg mb-3 mt-4">Product & Services</h4>
+              <Flex alignItems="center" mobileFlex={false} className='flex mb-4 gap-4 mt-4'>
+              <Flex className="flex" mobileFlex={false}>
+                <div className="w-full flex gap-4">
+                  <div>
+                    <Select
+                      value={selectedProduct}
+                      onChange={handleProductChange}
+                      className="w-full !rounded-none"
+                      placeholder="Select Product"
+                      rootClassName="!rounded-none"
+                      allowClear
+                      loading={!products.length}
+                    >
+                      {products && products.length > 0 ? (
+                        products.map((product) => (
+                          <Option key={product.id} value={product.id}>
+                            {product.name}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option disabled>No products available</Option>
+                      )}
+                    </Select>
+                  </div>
+                </div>
+
+              </Flex>
+            </Flex>
           <div className="mt-4">
-            <div className="form-buttons text-right mb-2">
-              <Button type="primary" onClick={handleAddRow}>
-                <PlusOutlined /> Add Items
-              </Button>
-            </div>
+           
             <div className="overflow-x-auto">
               <table className="w-full border border-gray-200 bg-white">
                 <thead className="bg-gray-100">
                   <tr>
-                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Description<span className="text-red-500">*</span>
                     </th>
-                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Quantity<span className="text-red-500">*</span>
                     </th>
-                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Unit Price<span className="text-red-500">*</span>
                     </th>
-                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      HSN/SAC
+                    </th>
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Discount (%)
                     </th>
-                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       TAX (%)
                     </th>
-                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Amount
                     </th>
-                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Actions
                     </th>
                   </tr>
@@ -643,7 +745,7 @@ const EditInvoice = ({ idd, onClose }) => {
                   {tableData.map((row) => (
                     <React.Fragment key={row.id}>
                       <tr>
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                           <input
                             type="text"
                             value={row.item}
@@ -652,7 +754,7 @@ const EditInvoice = ({ idd, onClose }) => {
                             className="w-full p-2 border rounded-s"
                           />
                         </td>
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                           <input
                             type="number"
                             min="1"
@@ -662,7 +764,7 @@ const EditInvoice = ({ idd, onClose }) => {
                             className="w-full p-2 border rounded"
                           />
                         </td>
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                           <input
                            prefix={selectedCurrencyIcon}
                             type="number"
@@ -673,18 +775,36 @@ const EditInvoice = ({ idd, onClose }) => {
                             className="w-full p-2 border rounded-s"
                           />
                         </td>
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                           <input
-                            type="number"
-                            min="0"
-                            max="100"
-                            value={row.discount || 0}
-                            onChange={(e) => handleTableDataChange(row.id, "discount", e.target.value)}
-                            placeholder="0"
+                            type="text"
+                            value={row.hsn_sac}
+                            onChange={(e) => handleTableDataChange(row.id, "hsn_sac", e.target.value)}
+                            placeholder="HSN/SAC"
                             className="w-full p-2 border rounded"
+                            readOnly
                           />
                         </td>
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
+                          <div className="flex space-x-2">
+                            <Select
+                              value={row.discountType}
+                              onChange={(value) => handleTableDataChange(row.id, "discountType", value)}
+                              style={{ width: '100px' }}
+                            >
+                              <Option value="percentage">Percentage</Option>
+                              <Option value="fixed">Fixed</Option>
+                            </Select>
+                            <Input
+                              type="number"
+                              min="0"
+                              value={row.discountValue}
+                              onChange={(e) => handleTableDataChange(row.id, "discountValue", e.target.value)}
+                              placeholder="0"
+                            />
+                          </div>
+                        </td>
+                        <td className="px-2 py-2 border-b">
                           <select
                             value={row.tax}
                             onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
@@ -698,7 +818,7 @@ const EditInvoice = ({ idd, onClose }) => {
                             ))}
                           </select>
                         </td>
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                         <span>{selectedCurrencyIcon} {parseFloat(row.amount || 0).toFixed(2)}</span>
                         </td>
                         <td className="px-2 py-1 border-b text-center">
@@ -708,7 +828,7 @@ const EditInvoice = ({ idd, onClose }) => {
                         </td>
                       </tr>
                       <tr>
-                        <td colSpan={6} className="px-4 py-2 border-b">
+                        <td colSpan={6} className="px-2 py-2 border-b">
                           <textarea
                             rows={2}
                             value={row.description}
@@ -722,6 +842,11 @@ const EditInvoice = ({ idd, onClose }) => {
                   ))}
                 </tbody>
               </table>
+              <div className="form-buttons text-left mb-2">
+              <Button type="primary" onClick={handleAddRow}>
+                <PlusOutlined /> Add Items
+              </Button>
+            </div>
             </div>
           </div>
 
@@ -734,24 +859,32 @@ const EditInvoice = ({ idd, onClose }) => {
                 </tr>
 
                 <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
-                <td className="font-medium">Item Discount</td>
-                <td className="flex items-center space-x-2">
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Item Discount Rate (%)
-                      </label>
-                      <input
-                        type="number"
-                        value={discountRate}
-                        onChange={(e) => {
-                          setDiscountRate(parseFloat(e.target.value) || 0);
-                          calculateTotal(tableData, parseFloat(e.target.value) || 0); // Recalculate with new discount rate
-                        }}
-                        className="mt-1 block w-full p-2 border rounded"
-                      />
-                    </div>
-                  </td>
-                </tr>
+                      <td className="font-medium">Item Discount</td>
+                      <td className="flex items-center space-x-2">
+                        <Select
+                          value={globalDiscountType}
+                          onChange={(value) => {
+                            setGlobalDiscountType(value);
+                            calculateTotal(tableData, globalDiscountValue);
+                          }}
+                          style={{ width: '100px' }}
+                        >
+                          <Option value="percentage">Percentage</Option>
+                          <Option value="fixed">Fixed</Option>
+                        </Select>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={globalDiscountValue}
+                          onChange={(e) => {
+                            setGlobalDiscountValue(e.target.value);
+                            calculateTotal(tableData, e.target.value);
+                          }}
+                          placeholder="0"
+                        />
+                      </td>
+                    </tr>
+
 
                 {parseFloat(totals.itemDiscount) > 0 && (
                   <tr className="flex justify-between px-2 py-2 border-x-2">
@@ -760,11 +893,7 @@ const EditInvoice = ({ idd, onClose }) => {
                   </tr>
                 )}
 
-                    <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
-                      <td className="font-medium">Global Discount</td>
-                      <td className="font-medium px-4 py-2">{selectedCurrencyIcon} {totals.globalDiscount}</td>
-                    </tr>
-
+                    
                     <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
                   <td className="font-medium">Total Tax</td>
                   <td className="font-medium px-4 py-2">{selectedCurrencyIcon} {totals.totalTax}</td>

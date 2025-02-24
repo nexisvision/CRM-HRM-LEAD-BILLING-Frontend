@@ -18,8 +18,11 @@ import { GetProject } from "../project-list/projectReducer/ProjectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { useNavigate, useParams } from 'react-router-dom';
-import { Modal } from 'antd';
+import { Modal, Tag, Table } from 'antd';
 import { GetTasks } from "../task/TaskReducer/TaskSlice";
+import { Getmins } from "../milestone/minestoneReducer/minestoneSlice";
+import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
+import utils from "utils";
 
 // Register the chart components
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -33,11 +36,12 @@ const OverViewList = () => {
   const [isTaskModalVisible, setIsTaskModalVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(null);
 
-
-
   // Safe access to Redux state with multiple fallback checks
   const allempdata = useSelector((state) => state?.Project) || {};
   const filterdata = allempdata?.Project?.data || [];
+
+  // Add milestone state
+  const milestoneData = useSelector((state) => state.Milestone?.Milestone?.data) || [];
 
   // Fetch data immediately when component mounts
   useEffect(() => {
@@ -49,7 +53,8 @@ const OverViewList = () => {
         // Then load project and task data
         await Promise.all([
           dispatch(GetProject()),
-          dispatch(GetTasks(id))
+          dispatch(GetTasks(id)),
+          dispatch(Getmins(id))
         ]);
       } catch (error) {
         console.error('Error loading data:', error);
@@ -59,7 +64,6 @@ const OverViewList = () => {
     };
     fetchData();
   }, [dispatch, id]);
-
 
   // Calculate progress based on date range
   useEffect(() => {
@@ -344,6 +348,54 @@ const OverViewList = () => {
     };
   }, [fndpro, allclient]);
 
+  // Add milestone status helper function
+  const getMilestoneStatus = (status) => {
+    if (status === "Paid") return "success";
+    if (status === "Pending") return "warning";
+    if (status === "Expired") return "error";
+    return "";
+  };
+
+  // Add milestone table columns
+  const milestoneTableColumns = [
+    {
+      title: "Milestone Title",
+      dataIndex: "milestone_title",
+      sorter: {
+        compare: (a, b) => a.milestone_title.localeCompare(b.milestone_title),
+      },
+    },
+    {
+      title: "Milestone Cost",
+      dataIndex: "milestone_cost",
+      sorter: {
+        compare: (a, b) => a.milestone_cost - b.milestone_cost,
+      },
+    },
+    {
+      title: "Budget",
+      dataIndex: "add_cost_to_project_budget",
+      sorter: {
+        compare: (a, b) => a.add_cost_to_project_budget - b.add_cost_to_project_budget,
+      },
+    },
+    {
+      title: "Status",
+      dataIndex: "milestone_status",
+      render: (status) => (
+        <Tag color={getMilestoneStatus(status)}>
+          {status}
+        </Tag>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "milestone_status"),
+    }
+  ];
+
+  // Add this function to get filtered milestones
+  const getFilteredMilestones = () => {
+    return milestoneData || [];
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -351,7 +403,7 @@ const OverViewList = () => {
   return (
     <>
       <div className="p-2 bg-gray-50">
-      <div className="mb-4 bg-white p-8 rounded-lg shadow">
+      {/* <div className="mb-4 bg-white p-8 rounded-lg shadow">
           <h4 className="text-2xl font-medium text-black mb-4">Project</h4>
           <div className="flex justify-between items-center sm:items-start">
                 <span className="text-gray-500 font-weight-bold text-lg mb-1">Start Date</span>
@@ -362,7 +414,7 @@ const OverViewList = () => {
                 </span>
               </div>
 
-              {/* End Date */}
+          
               <div className="flex justify-between items-center sm:items-start">
                 <span className="text-gray-500 font-weight-bold text-lg mb-1">End Date</span>
                 <span className="text-gray-800 text-sm sm:text-base">
@@ -371,7 +423,7 @@ const OverViewList = () => {
                     : "N/A"}
                 </span>
               </div>
-        </div>
+        </div> */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl font-medium text-black mb-4">
@@ -432,6 +484,7 @@ const OverViewList = () => {
               </div>
             </div>
 
+
             <div className="flex justify-between">
               {/* Start Date */}
               <div className="flex flex-col items-center sm:items-start">
@@ -491,38 +544,17 @@ const OverViewList = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-6">
-          {/* Task */}
-
-          <div className="bg-white rounded-lg shadow p-6 w-full h-full flex flex-col items-center justify-center">
-            <h2 className="text-xl font-semibold mb-4">Tasks Status</h2>
-            {taskData.length > 0 ? (
-              <div className="flex justify-center items-center w-[300px] h-[300px]">
-                <Pie
-                  data={taskStatusData}
-                  options={chartOptions}
-                />
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-[300px]">
-                <p className="text-gray-500 text-lg">No tasks found</p>
-                <p className="text-gray-400 text-sm">Create tasks to see status distribution</p>
-              </div>
-            )}
-          
-          </div>
-
-          <div className="">
+        <div className="">
             <div>
               <p className="text-2xl font-semibold text-black mb-1">
                 Statistics
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-5 gap-6 mb-6">
               <div className="bg-white p-6 rounded-lg shadow">
                 <h3 className="text-gray-600 mb-2 text-lg font-semibold">
                   Project Budget
-                </h3>
+                </h3>  
                 <span className="flex justify-end">
                   <FaCoins className="text-gray-500 text-2xl" />
                 </span>
@@ -541,8 +573,7 @@ const OverViewList = () => {
                   {filterdata[0]?.estimatedhours}
                 </p>
               </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+           
               <div className="bg-white p-6 rounded-lg shadow">
                 <h3 className="text-gray-600 mb-2 text-lg font-semibold ">
                   Earnings
@@ -579,12 +610,35 @@ const OverViewList = () => {
                   30,644.00
                 </p>
               </div>
-            </div>
           </div>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-6">
+          {/* Task */}
 
-        <div className="bg-white p-6 rounded-lg shadow grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="bg-white rounded-lg shadow p-6 w-full h-full flex flex-col items-center justify-center">
+            <h2 className="text-xl font-semibold mb-4">Tasks Status</h2>
+            {taskData.length > 0 ? (
+              <div className="flex justify-center items-center w-[300px] h-[300px]">
+                <Pie
+                  data={taskStatusData}
+                  options={chartOptions}
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-[300px]">
+                <p className="text-gray-500 text-lg">No tasks found</p>
+                <p className="text-gray-400 text-sm">Create tasks to see status distribution</p>
+              </div>
+            )}
+          
+          </div>
+
+          
+        {/* </div> */}
+
+
+        <div className="bg-white p-6 rounded-lg shadow grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"> 
           {/* Hours Logged Chart */}
           <div className="w-full">
             <h2 className="text-xl font-semibold mb-4">Hours Logged</h2>
@@ -623,10 +677,28 @@ const OverViewList = () => {
             </div>
           </div>
         </div>
+        </div>
 
-       
+             
        
          <div className="mb-4 bg-white p-8 rounded-lg shadow">
+          <h4 className="text-2xl font-medium text-black mb-4">Project Milestones</h4>
+          <div className="table-responsive">
+            <Table
+              columns={milestoneTableColumns}
+              dataSource={getFilteredMilestones()}
+              rowKey="id"
+              pagination={{
+                total: getFilteredMilestones().length,
+                pageSize: 10,
+                showSizeChanger: true,
+                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="mb-4 bg-white p-8 rounded-lg shadow">
           <h4 className="text-2xl font-medium text-black mb-4">Project Details</h4>
           <div className="mt-4">
             <ul className="list-disc pl-4">

@@ -14,7 +14,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { empdata } from "../../../hrm/Employee/EmployeeReducers/EmployeeSlice";
+// import { empdata } from "../../../hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { EditExp, Getexp } from "./Expencereducer/ExpenseSlice";
 import dayjs from "dayjs"; // Import dayjs for date handling
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
@@ -29,7 +29,7 @@ const EditExpenses = ({ idd, onClose }) => {
   const Expensedata = allempdata?.Expense?.data || [];
 
 
-  const { data: employee } = useSelector((state) => state.employee.employee);
+  // const { data: employee } = useSelector((state) => state.employee.employee);
   const { currencies } = useSelector((state) => state.currencies);
 
   const allproject = useSelector((state) => state.Project);
@@ -48,7 +48,7 @@ const EditExpenses = ({ idd, onClose }) => {
     ExchangeRate: "",
     price: "",
     purchase_date: null,
-    employee: "",
+    // employee: "",
     project: "",
     ExpenseCategory: "",
     PurchasedFrom: "",
@@ -64,9 +64,9 @@ const EditExpenses = ({ idd, onClose }) => {
     }
   }, [dispatch]);
 
-  useEffect(() => {
-    dispatch(empdata());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(empdata());
+  // }, [dispatch]);
 
   useEffect(() => {
     if (Expensedata.length > 0 && idd) {
@@ -85,7 +85,7 @@ const EditExpenses = ({ idd, onClose }) => {
           ExchangeRate: expdata.ExchangeRate || "",
           price: expdata.price ? expdata.price.toString() : "", // Convert to string for input
           purchase_date: purchaseDate,
-          employee: expdata.employee || "",
+          // employee: expdata.employee || "",
           project: fnddata?.id || "",
           ExpenseCategory: expdata.ExpenseCategory || "",
           PurchasedFrom: expdata.PurchasedFrom || "",
@@ -227,7 +227,7 @@ const EditExpenses = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-4">
+              {/* <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold mb-2">Employee <span className="text-red-500">*</span></label>
                   <div className="flex gap-2">
@@ -264,7 +264,7 @@ const EditExpenses = ({ idd, onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Project <span className="text-red-500">*</span></label>

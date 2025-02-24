@@ -19,7 +19,7 @@ import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Addexp, Getexp } from "./Expencereducer/ExpenseSlice";
-import { empdata } from "../../../hrm/Employee/EmployeeReducers/EmployeeSlice";
+// import { empdata } from "../../../hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
@@ -40,9 +40,9 @@ const curren = currencies?.data || [];
 // const curren = curr?.filter((item) => item.created_by === user);
 
 
-    const { data: employee } = useSelector((state) => state.employee.employee);
+    // const { data: employee } = useSelector((state) => state.employee.employee);
 
-    const employeeData = employee?.filter((item) => item.created_by === user);
+    // const employeeData = employee?.filter((item) => item.created_by === user);
 
     const allproject = useSelector((state) => state.Project);
     const fndrewduxxdaa = allproject.Project.data
@@ -53,9 +53,9 @@ const curren = currencies?.data || [];
         dispatch(getcurren());
     }, [dispatch]);
 
-    useEffect(() => {
-        dispatch(empdata());
-    }, [dispatch]);
+    // useEffect(() => {
+    //     dispatch(empdata());
+    // }, [dispatch]);
 
     const [showReceiptUpload, setShowReceiptUpload] = useState(false);
     // const [uploadModalVisible, setUploadModalVisible] = useState(false);
@@ -65,8 +65,7 @@ const curren = currencies?.data || [];
         ExchangeRate: "",
         price: "",
         purchase_date: "",
-        employee: "",
-        project: fnddata?.id || "",
+        project: id || "",
         ExpenseCategory: "",
         PurchasedFrom: "",
         BankAccount: "",
@@ -76,45 +75,38 @@ const curren = currencies?.data || [];
     const validationSchema = Yup.object({
         item: Yup.string().required("Please enter item."),
         currency: Yup.string().required("Please enter Currency."),
-        // ExchangeRate: Yup.string().optional("Please enter ExchangeRate."),
         price: Yup.string().required("Please enter Price."),
         purchase_date: Yup.date().nullable().required("Date is required."),
-        employee: Yup.string().required("Please enter Employee."),
-        project: Yup.string().required("Please enter Project."),
-        // ExpenseCategory: Yup.string().optional("Please enter ExpenseCategory."),
-        PurchasedFrom: Yup.string().required("Please enter PurchasedFrom."),
-        // BankAccount: Yup.string().optional("Please enter BankAccount."),
-        // Description: Yup.string().required("Please enter a Description."),
-        bill: Yup.string().optional("Please enter Bill."),
-        description: Yup.string().optional("Please enter a description."),
+        project: Yup.mixed().required("Please enter Project."),
+        PurchasedFrom: Yup.string().required("Please enter Purchased From."),
+        description: Yup.string().optional(),
+        bill: Yup.mixed().optional()
     });
 
     const [fileList, setFileList] = useState([]);
 
     const onSubmit = (values, { resetForm }) => {
-        // Create FormData object
         const formData = new FormData();
         
-        // Append all form values
+        formData.append('project', id || values.project || '');
+        
         Object.keys(values).forEach(key => {
-            if (key !== 'bill') {
+            if (key !== 'bill' && key !== 'project' && values[key]) {
                 formData.append(key, values[key]);
             }
         });
 
-        // Append the file if exists
         if (fileList[0]?.originFileObj) {
             formData.append('bill', fileList[0].originFileObj);
         }
 
-        console.log("Form Values Submitted:", values);
         dispatch(Addexp({ id, values: formData }))
             .then(() => {
                 dispatch(Getexp(id));
                 onClose();
                 message.success("Expenses added successfully!");
                 resetForm();
-                setFileList([]); // Reset file list
+                setFileList([]);
             })
             .catch((error) => {
                 console.error("Submission Error:", error);
@@ -122,7 +114,6 @@ const curren = currencies?.data || [];
             });
     };
 
-    // Handle file upload changes
     const handleFileChange = ({ fileList: newFileList }) => {
         setFileList(newFileList);
     };
@@ -259,7 +250,7 @@ const curren = currencies?.data || [];
                                     />
                                 </div>
                             </Col> */}
-                            <Col span={12} className="mt-4">
+                            {/* <Col span={12} className="mt-4">
                                 <div className="form-item">
                                     <label className="font-semibold mb-2">Employee <span className="text-red-500">*</span></label>
 
@@ -296,7 +287,7 @@ const curren = currencies?.data || [];
                                         className="error-message text-red-500 my-1"
                                     />
                                 </div>
-                            </Col>
+                            </Col> */}
                             <Col span={12} className="mt-4">
                                 <div className="form-item">
                                     <label className="font-semibold">Project <span className="text-red-500">*</span></label>
@@ -353,7 +344,7 @@ const curren = currencies?.data || [];
                                 <span className="block font-semibold p-2">Bill</span>
                                 <Col span={24}>
                                     <Upload
-                                        beforeUpload={() => false} // Prevent auto upload
+                                        beforeUpload={() => false}
                                         listType="picture"
                                         accept=".pdf,.jpg,.jpeg,.png"
                                         maxCount={1}

@@ -426,11 +426,11 @@ const ProposalList = () => {
           : '',
       sorter: (a, b) => a.lead_title.length - b.lead_title.length,
     },
-    {
-      title: "Deal title",
-      dataIndex: "deal_title",
-      sorter: (a, b) => a.deal_title.length - b.deal_title.length,
-    },
+    // {
+    //   title: "Deal title",
+    //   dataIndex: "deal_title",
+    //   sorter: (a, b) => a.deal_title.length - b.deal_title.length,
+    // },
     // {
     //   title: "calculatedTax",
     //   dataIndex: "calculatedTax",

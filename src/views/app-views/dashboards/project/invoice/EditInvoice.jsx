@@ -53,10 +53,10 @@ const { Option } = Select;
 
 const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
   const { id } = useParams();
-  const [discountType, setDiscountType] = useState("%");
-  const [loading, setLoading] = useState(false);
+  const [discountType, setDiscountType] = useState('percentage');
   const [discountValue, setDiscountValue] = useState(0);
   const [discountRate, setDiscountRate] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [currenciesList, setCurrenciesList] = useState([]);
   const [selectedCurrencyIcon, setSelectedCurrencyIcon] = useState('₹');
   const [selectedCurrencyDetails, setSelectedCurrencyDetails] = useState(null);
@@ -115,9 +115,12 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
       item: "",
       quantity: 1,
       price: "",
+      discountType: "percentage", // Add default discount type
+      discount: 0, // Add default discount value
       tax: 0,
       amount: "0",
       description: "",
+      hsn_sac: ""
     },
   ]);
   // Handle currencies data when it changes
@@ -147,8 +150,8 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
   const handleProductChange = (value) => {
     if (value) {
       const selectedProd = products?.find(p => p.id === value);
-      setSelectedProduct(value);
       setSelectedMilestone(null); // Reset milestone selection when product is selected
+      setSelectedProduct(value);
 
       if (selectedProd) {
         // Update table data with product information
@@ -158,17 +161,18 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
             item: selectedProd.name,
             quantity: 1,
             price: selectedProd.price,
-            hsn_sac: selectedProd.hsn_sac,
+            hsn_sac: selectedProd.hsn_sac || '', // Set HSN/SAC from product
             tax: selectedProd.tax || 0,
-            // tax: selectedProd.tax || 0,
             amount: selectedProd.price.toString(),
-            description: selectedProd.description
+            description: selectedProd.description,
+            discountType: "percentage",
+            discount: 0
           }
         ]);
         calculateTotal([{
           quantity: 1,
           price: selectedProd.price,
-          // tax: selectedProd.tax || 0,
+          tax: selectedProd.tax || 0,
           discount: 0
         }], discountRate);
       }
@@ -180,9 +184,12 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
         item: "",
         quantity: 1,
         price: "",
-        // tax: 0,
+        hsn_sac: "",
+        tax: 0,
         amount: "0",
         description: "",
+        discountType: "percentage",
+        discount: 0
       }]);
     }
   };
@@ -203,9 +210,12 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
             quantity: 1,
             price: selectedMile.milestone_cost,
             tax: 0,
+            discount: 0,
             amount: selectedMile.milestone_cost.toString(),
             description: selectedMile.milestone_summary,
-            hsn_sac: ""
+            hsn_sac: "", // Clear HSN/SAC for milestone
+            discountType: "percentage",
+            discount: 0
           }
         ]);
         calculateTotal([{
@@ -224,8 +234,12 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
         quantity: 1,
         price: "",
         tax: 0,
+        
         amount: "0",
         description: "",
+        hsn_sac: "",
+        discountType: "percentage",
+        discount: 0
       }]);
     }
   };
@@ -267,7 +281,9 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
                                 base_amount: Number(item.base_amount) || 0,
                                 amount: Number(item.final_amount) || 0,
                                 description: item.description || '',
-                                hsn_sac: item.hsn_sac || ''
+                                hsn_sac: item.hsn_sac || '',
+                                discountType: item.discount_type || "percentage",
+                                discount: Number(item.discount_percentage) || 0
                             };
                         });
 
@@ -341,7 +357,7 @@ useEffect(() => {
     currency: '',
     client: fnddata?.client || "",
     project: fnddata?.id || "",
-    calctax: '',
+    // calctax: '',
   };
 
   // Handle form submission
@@ -373,6 +389,8 @@ useEffect(() => {
         client: fnddata?.client,
         items: itemsForDb,
         discount: discountRate,
+        global_discount_amount: totals.globalDiscount,
+        total_item_discount: totals.itemDiscount,
         tax: totals.totalTax,
         total: totals.finalTotal
       };
@@ -414,6 +432,8 @@ useEffect(() => {
         quantity: 1,
         price: "",
         tax: 0,
+        discountType: "percentage",
+        discount: 0,
         amount: "0",
         description: "",
         hsn_sac: ""
@@ -440,14 +460,19 @@ useEffect(() => {
     const totals = data.reduce((acc, row) => {
       const quantity = parseFloat(row.quantity) || 0;
       const price = parseFloat(row.price) || 0;
-      const itemDiscountPercentage = parseFloat(row.discount) || 0;
+      const baseAmount = quantity * price;
       const taxPercentage = parseFloat(row.tax) || 0;
 
-      const baseAmount = quantity * price;
-      const itemDiscountAmount = (baseAmount * itemDiscountPercentage) / 100;
-      const taxAmount = (baseAmount * taxPercentage) / 100;
+      // Calculate discount amount based on type
+      let itemDiscountAmount = 0;
+      if (row.discountType === "percentage") {
+        const discountPercentage = parseFloat(row.discount) || 0;
+        itemDiscountAmount = (baseAmount * discountPercentage) / 100;
+      } else { // fixed discount
+        itemDiscountAmount = parseFloat(row.discount) || 0;
+      }
 
-      // Calculate item total after individual discount and tax
+      const taxAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
       const itemTotal = baseAmount - itemDiscountAmount + taxAmount;
 
       return {
@@ -478,20 +503,25 @@ useEffect(() => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
 
-        // Calculate individual item amounts
         const quantity = parseFloat(updatedRow.quantity) || 0;
         const price = parseFloat(updatedRow.price) || 0;
-        const itemDiscountPercentage = parseFloat(updatedRow.discount) || 0;
+        const baseAmount = quantity * price;
         const taxPercentage = parseFloat(updatedRow.tax) || 0;
 
-        const baseAmount = quantity * price;
-        const itemDiscountAmount = (baseAmount * itemDiscountPercentage) / 100;
-        const taxAmount = (baseAmount * taxPercentage) / 100;
+        // Calculate discount amount based on type
+        let itemDiscountAmount = 0;
+        if (updatedRow.discountType === "percentage") {
+          const discountPercentage = parseFloat(updatedRow.discount) || 0;
+          itemDiscountAmount = (baseAmount * discountPercentage) / 100;
+        } else { // fixed discount
+          itemDiscountAmount = parseFloat(updatedRow.discount) || 0;
+        }
 
-        // Calculate final amount with individual discount
+        const taxAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
         const finalAmount = baseAmount - itemDiscountAmount + taxAmount;
 
         updatedRow.amount = finalAmount.toFixed(2);
+        updatedRow.discount_amount = itemDiscountAmount.toFixed(2);
         return updatedRow;
       }
       return row;
@@ -553,7 +583,7 @@ useEffect(() => {
       {tableData.map((row) => (
         <React.Fragment key={row.id}>
           <tr>
-            <td className="px-4 py-2 border-b">
+            <td className="px-2 py-2 border-b">
               <input
                 type="text"
                 value={row.item}
@@ -562,7 +592,7 @@ useEffect(() => {
                 className="w-full p-2 border rounded-s"
               />
             </td>
-            <td className="px-4 py-2 border-b">
+            <td className="px-2 py-2 border-b">
               <input
                 type="number"
                 value={row.quantity}
@@ -572,7 +602,7 @@ useEffect(() => {
                 min="1"
               />
             </td>
-            <td className="px-4 py-2 border-b">
+            <td className="px-2 py-2 border-b">
               <Input
                 prefix={selectedCurrencyIcon}
                 type="number"
@@ -583,27 +613,38 @@ useEffect(() => {
                 min="0"
               />
             </td>
-            <td className="px-4 py-2 border-b">
-              <input
-                type="number"
-                value={row.discount}
-                onChange={(e) => handleTableDataChange(row.id, "discount", e.target.value)}
-                placeholder="Discount %"
-                className="w-full p-2 border rounded"
-                min="0"
-                max="100"
-              />
+            <td className="px-2 py-2 border-b">
+              <div className="flex space-x-2">
+                <select
+                  value={row.discountType}
+                  onChange={(e) => handleTableDataChange(row.id, "discountType", e.target.value)}
+                  className="w-1/3 p-2 border rounded"
+                >
+                  <option value="percentage">%</option>
+                  <option value="fixed">Fixed</option>
+                </select>
+                <input
+                  type="number"
+                  value={row.discount}
+                  onChange={(e) => handleTableDataChange(row.id, "discount", e.target.value)}
+                  placeholder="Discount"
+                  className="w-2/3 p-2 border rounded"
+                  min="0"
+                  max={row.discountType === "percentage" ? "100" : undefined}
+                />
+              </div>
             </td>
-            <td className="px-4 py-2 border-b">
+            <td className="px-2 py-2 border-b">
               <input
                 type="text"
-                value={row.hsn_sac}
+                value={row.hsn_sac || ""}
                 onChange={(e) => handleTableDataChange(row.id, "hsn_sac", e.target.value)}
                 placeholder="HSN/SAC"
                 className="w-full p-2 border rounded"
+                disabled={selectedMilestone !== null} // Disable if milestone is selected
               />
             </td>
-            <td className="px-4 py-2 border-b">
+            <td className="px-2 py-2 border-b">
               <select
                 value={row.tax}
                 onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
@@ -617,7 +658,7 @@ useEffect(() => {
                 ))}
               </select>
             </td>
-            <td className="px-4 py-2 border-b">
+            <td className="px-2 py-2 border-b">
               <span>{selectedCurrencyIcon} {row.amount}</span>
             </td>
             <td className="px-2 py-1 border-b text-center">
@@ -627,7 +668,7 @@ useEffect(() => {
             </td>
           </tr>
           <tr>
-            <td colSpan={8} className="px-4 py-2 border-b">
+            <td colSpan={8} className="px-2 py-2 border-b">
               <textarea
                 rows={2}
                 value={row.description}
@@ -815,26 +856,6 @@ useEffect(() => {
                     </Form.Item>
                   </Col>
 
-
-
-
-                  <Col span={12}>
-                    <Form.Item
-                      name="calctax"
-                      label="Calculate Tax"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please select a tax calculation method",
-                        },
-                      ]}
-                    >
-                      <Select placeholder="Select Tax Calculation Method">
-                        <Option value="after">After Discount</Option>
-                        <Option value="before">Before Discount</Option>
-                      </Select>
-                    </Form.Item>
-                  </Col>
                 </Row>
               </div>
             </div>
@@ -916,6 +937,11 @@ useEffect(() => {
                   </thead>
                   {renderTableRows()}
                 </table>
+                <div className="form-buttons text-left mt-2">
+                  <Button type="primary" onClick={handleAddRow}>
+                    <PlusOutlined /> Add Items
+                  </Button>
+                </div>
               </div>
               {renderSummarySection()}
               {/* <div className="mt-4">

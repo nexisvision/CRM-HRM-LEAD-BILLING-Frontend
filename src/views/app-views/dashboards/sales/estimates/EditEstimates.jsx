@@ -17,7 +17,7 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
 
     // const {id} = useParams();
 
-    const [discountType, setDiscountType] = useState("%");
+    const [discountType, setDiscountType] = useState('percentage');
     const [loading, setLoading] = useState(false);
     const [discountValue, setDiscountValue] = useState(0);
     const [discountRate, setDiscountRate] = useState(10);
@@ -195,6 +195,10 @@ console.log("idd", idd);
                             totalTax: Number(quodata.tax) || 0,
                             finalTotal: Number(quodata.total) || 0
                         });
+
+                        // Set discount type and value
+                        setDiscountType(quodata.discountType || 'percentage');
+                        setDiscountValue(quodata.discountValue || 0);
                     }
                 } catch (error) {
                     console.error("Error fetching quotation details:", error);
@@ -210,28 +214,30 @@ console.log("idd", idd);
     try {
         setLoading(true);
         
-        // Convert items array back to object format
-        const itemsObject = tableData.reduce((acc, item, index) => {
-            acc[`item_${index + 1}`] = {
+        // Create items object without stringifying
+        const items = {};
+        tableData.forEach((item, index) => {
+            items[`item_${index + 1}`] = {
                 item: item.item,
                 description: item.description || '',
                 quantity: parseFloat(item.quantity) || 0,
                 price: parseFloat(item.price) || 0,
-                tax_name: item.tax_name || '',
+                tax_name: selectedTaxDetails[item.id]?.gstName || '',
                 tax: parseFloat(item.tax) || 0,
-                amount: parseFloat(item.amount) || 0,
-                discount: parseFloat(item.discount) || 0
+                amount: parseFloat(item.amount) || 0
             };
-            return acc;
-        }, {});
+        });
 
         const updatedValues = {
             ...values,
-            issueDate: values.issueDate.format("YYYY-MM-DD"),
-            items: itemsObject, // Send items as an object
-            discount: discountRate,
-            tax: totals.totalTax,
-            total: totals.finalTotal
+            issueDate: values.issueDate.format('YYYY-MM-DD'),
+            items: items, // Remove JSON.stringify - keep as object
+            discountType: discountType,
+            discountValue: parseFloat(discountValue) || 0,
+            discount: parseFloat(totals.discount) || 0,
+            discountAmount: parseFloat(totals.discount) || 0,
+            tax: parseFloat(totals.totalTax) || 0,
+            total: parseFloat(totals.finalTotal) || 0
         };
 
         await dispatch(updatequotation({ id: idd, values: updatedValues })).unwrap();
@@ -346,36 +352,38 @@ console.log("idd", idd);
     }, 0);
   };
 
-    const calculateTotal = (data = tableData, discount = discountRate) => {
+    const calculateTotal = (data = tableData, discountVal = discountValue, type = discountType) => {
         if (!Array.isArray(data)) {
           console.error('Invalid data passed to calculateTotal');
           return;
         }
     
-        // Calculate subtotal (sum of all item amounts)
+        // Calculate subtotal
         const subtotal = data.reduce((sum, row) => {
           return sum + (parseFloat(row.amount) || 0);
         }, 0);
     
-        // Calculate discount amount
-        const discountAmount = (subtotal * (parseFloat(discount) || 0)) / 100;
+        // Calculate discount based on type
+        const discountAmount = type === 'percentage' 
+          ? (subtotal * (parseFloat(discountVal) || 0)) / 100
+          : parseFloat(discountVal) || 0;
     
-        // Calculate total tax (for display purposes)
+        // Calculate total tax
         const totalTax = data.reduce((sum, row) => {
           const quantity = parseFloat(row.quantity) || 0;
           const price = parseFloat(row.price) || 0;
-          const tax = (parseFloat(row.tax) || 0) ;
+          const tax = parseFloat(row.tax) || 0;
           const baseAmount = quantity * price;
           const taxAmount = (baseAmount * tax) / 100;
           return sum + taxAmount;
         }, 0);
     
-        // Calculate final total: subtotal - discount
-        const finalTotal = subtotal - discountAmount;
+        // Calculate final total
+        const finalTotal = subtotal - discountAmount + totalTax;
     
         setTotals({
           subtotal: subtotal.toFixed(2),
-          discount: discountAmount.toFixed(2),
+          discount: discountVal ? discountAmount.toFixed(2) : '',
           totalTax: totalTax.toFixed(2),
           finalTotal: finalTotal.toFixed(2)
         });
@@ -424,7 +432,7 @@ console.log("idd", idd);
         });
     
         setTableData(updatedData);
-        calculateTotal(updatedData, discountRate);
+        calculateTotal(updatedData, discountValue, discountType);
       };
 
     return (
@@ -638,19 +646,32 @@ console.log("idd", idd);
                                     {/* Discount */}
                                     <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
                                         <td className="font-medium">Discount</td>
-                                        <td className='flex items-center space-x-2'>
-                                            <div className="mb-4">
-                                                <label className="block text-sm font-medium text-gray-700">
-                                                    Discount Rate (%)
-                                                </label>
+                                        <td className="flex items-center space-x-2">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Select
+                                                    value={discountType}
+                                                    onChange={(value) => {
+                                                        setDiscountType(value);
+                                                        setDiscountValue(0);
+                                                        calculateTotal(tableData, 0, value);
+                                                    }}
+                                                    style={{ width: 120 }}
+                                                >
+                                                    <Option value="percentage">Percentage</Option>
+                                                    <Option value="fixed">Fixed Amount</Option>
+                                                </Select>
                                                 <input
                                                     type="number"
-                                                    value={discountRate}
+                                                    min="0"
+                                                    max={discountType === 'percentage' ? 100 : undefined}
+                                                    value={discountValue || ''}
                                                     onChange={(e) => {
-                                                        setDiscountRate(parseFloat(e.target.value) || 0);
-                                                        calculateTotal(tableData, parseFloat(e.target.value) || 0); // Recalculate with new discount rate
+                                                        const newValue = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                                                        setDiscountValue(newValue);
+                                                        calculateTotal(tableData, newValue, discountType);
                                                     }}
-                                                    className="mt-1 block w-full p-2 border rounded"
+                                                    className="mt-1 block p-2 border rounded"
+                                                    placeholder="Enter discount"
                                                 />
                                             </div>
                                         </td>

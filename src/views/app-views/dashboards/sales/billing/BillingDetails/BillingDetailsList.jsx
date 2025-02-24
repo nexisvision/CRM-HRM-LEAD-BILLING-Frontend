@@ -48,9 +48,9 @@ const BillingDetailsList = () => {
                                     <ClockCircleOutlined className="mr-1" />
                                     Created on 05-01-2024
                                 </p>
-                                {/* <Button type="primary" className="mt-4 px-4 bg-blue-500 text-white rounded-md text-sm" onClick= {openEditBillingModal}>
+                                <Button type="primary" className="mt-4 px-4 bg-blue-500 text-white rounded-md text-sm" onClick= {openEditBillingModal}>
                                     <span className="ml-2">Edit</span>
-                                </Button> */}
+                                </Button>
                                 {/* <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md text-sm">
                 Edit
               </button> */}
@@ -81,10 +81,10 @@ const BillingDetailsList = () => {
                                 </div>
                                 <h3 className="text-cyan-500 font-medium text-lg mt-2">Get Paid</h3>
                                 <p className="text-sm text-gray-500 mt-2">Status: Awaiting payment</p>
-                                {/* <Button type="primary" className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md text-sm" onClick={openAddBillingModal}>
+                                <Button type="primary" className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md text-sm" onClick={openAddBillingModal}>
                                     <PlusOutlined />
                                     <span className="ml-2">Add Payment</span>
-                                </Button> */}
+                                </Button>
                                 {/* <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md text-sm">
                                     Add Payment
                                 </button> */}

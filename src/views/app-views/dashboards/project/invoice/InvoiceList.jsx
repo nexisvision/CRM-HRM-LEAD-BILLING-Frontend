@@ -351,7 +351,7 @@ export const InvoiceList = () => {
                         />
                     </div>
                     <Modal
-                        title="Invoice Create"
+                        title="Create Invoice"
                         visible={isAddInvoiceModalVisible}
                         onCancel={closeAddInvoiceModal}
                         footer={null}

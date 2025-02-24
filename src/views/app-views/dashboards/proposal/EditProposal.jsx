@@ -23,7 +23,7 @@ const { Option } = Select;
 const EditProposal = ({ id, onClose }) => {
 
   // const { id } = useParams();
-  const [discountType, setDiscountType] = useState("%");
+  const [discountType, setDiscountType] = useState('percentage');
   const [loading, setLoading] = useState(false);
   const [discountValue, setDiscountValue] = useState(0);
   const [isAddProductModalVisible, setIsAddProductModalVisible] = useState(false);
@@ -62,7 +62,13 @@ const EditProposal = ({ id, onClose }) => {
   ? Dealss.filter((item) => item?.created_by === loggeduser)
   : [];
 
+  const allogged = useSelector((state) => state.user.loggedInUser.username);
+  
+  const fndlead = Leads.filter((item) => item?.created_by === allogged);
 
+
+   // Add state for selected lead details
+   const [selectedLeadDetails, setSelectedLeadDetails] = useState(null);
 
 
   // console.log("SubClient Data:", subClientData.username);
@@ -91,11 +97,11 @@ const EditProposal = ({ id, onClose }) => {
     if (data) {
       form.setFieldsValue({
         lead_title: data.lead_title,
-        deal_title: data.deal_title,
+        // deal_title: data.deal_title,
         // valid_till: data.valid_till,
-        currency: data.currency,
-        calculatedTax: data.calculatedTax,
         description: data.description,
+        currency: data.currency,
+        // calculatedTax: data.calculatedTax,
         items: data.items,
         discount: data.discount,
         tax: data.tax,
@@ -148,10 +154,11 @@ const EditProposal = ({ id, onClose }) => {
           // Set basic form fields
           form.setFieldsValue({
             lead_title: data.lead_title,
-            deal_title: data.deal_title,
+            // deal_title: data.deal_title,
             valid_till: dayjs(data.valid_till),
             currency: data.currency,
-            calculatedTax: data.calculatedTax,
+            description: data.description,
+            // calculatedTax: data.calculatedTax,
           });
 
           // Parse items from JSON string
@@ -308,31 +315,36 @@ const EditProposal = ({ id, onClose }) => {
     }, 0);
   };
 
-  const calculateTotal = (data = tableData, discount = discountRate) => {
+  const calculateTotal = (data = tableData, discountVal = discountValue, discType = discountType) => {
     if (!Array.isArray(data)) {
       console.error('Invalid data passed to calculateTotal');
       return;
     }
 
-    // Calculate subtotal (sum of all item amounts)
+    // Calculate subtotal
     const subtotal = data.reduce((sum, row) => {
       return sum + (parseFloat(row.amount) || 0);
     }, 0);
 
-    // Calculate discount amount
-    const discountAmount = (subtotal * (parseFloat(discount) || 0)) / 100;
+    // Calculate discount amount based on type
+    let discountAmount = 0;
+    if (discType === 'percentage') {
+      discountAmount = (subtotal * (parseFloat(discountVal) || 0)) / 100;
+    } else { // fixed
+      discountAmount = parseFloat(discountVal) || 0;
+    }
 
-    // Calculate total tax (for display purposes)
+    // Calculate total tax
     const totalTax = data.reduce((sum, row) => {
       const quantity = parseFloat(row.quantity) || 0;
       const price = parseFloat(row.price) || 0;
-      const tax = (parseFloat(row.tax) || 0) ;
+      const tax = (parseFloat(row.tax) || 0);
       const baseAmount = quantity * price;
       const taxAmount = (baseAmount * tax) / 100;
       return sum + taxAmount;
     }, 0);
 
-    // Calculate final total: subtotal - discount
+    // Calculate final total
     const finalTotal = subtotal - discountAmount;
 
     setTotals({
@@ -341,13 +353,6 @@ const EditProposal = ({ id, onClose }) => {
       totalTax: totalTax.toFixed(2),
       finalTotal: finalTotal.toFixed(2)
     });
-
-    return {
-      subtotal,
-      discount: discountAmount,
-      totalTax,
-      finalTotal
-    };
   };
 
   const handleTableDataChange = (id, field, value) => {
@@ -386,24 +391,26 @@ const EditProposal = ({ id, onClose }) => {
     });
 
     setTableData(updatedData);
-    calculateTotal(updatedData, discountRate);
+    calculateTotal(updatedData, discountValue, discountType);
   };
 
   const initialValues = {
     leadtitle: null,
-    dealtitle: null,
+    // dealtitle: null,
+    description: "",
     date: '',
     currency: '',
-    calculatedtax: "",
+    // calculatedtax: "",
 
   };
 
   const validationSchema = Yup.object({
     lead_title: Yup.date().nullable().required("Please select Lead Title ."),
-    deal_title: Yup.date().nullable().required("Please select Deal Title ."),
+    // deal_title: Yup.date().nullable().required("Please select Deal Title ."),
     currency: Yup.string().required("Please select crrency."),
     valid_till: Yup.string().required("Date is require"),
-    calculatedTax: Yup.string().required("Please select calculatedtax."),
+    // calculatedTax: Yup.string().required("Please select calculatedtax."),
+    description: Yup.string().required("Please enter description."),
   });
 
 
@@ -433,7 +440,7 @@ const EditProposal = ({ id, onClose }) => {
 
                 <Row gutter={16}>
 
-                  <Col span={12}>
+                <Col span={12}>
                     <Form.Item
                       name="lead_title"
                       label="Lead Title"
@@ -442,12 +449,34 @@ const EditProposal = ({ id, onClose }) => {
                           required: true,
                           message: "Please select a Lead Title",
                         },
-                      ]} // Validation rule
+                      ]}
                     >
-                      <Select placeholder="Select Lead Title">
-                        {/* Populate dropdown options from Leads */}
-                        {Array.isArray(Leads) && Leads.length > 0 ? (
-                          Leads.map((lead) => (
+                      <Select
+                        placeholder="Select Lead Title"
+                        onChange={(value) => {
+                          // Find the selected lead
+                          const selectedLead = fndlead.find(lead => lead.id === value);
+                          if (selectedLead) {
+                            setSelectedLeadDetails(selectedLead);
+
+                            // Create new table data with lead details
+                            const newTableData = [{
+                              id: Date.now(),
+                              item: selectedLead.leadTitle || '',
+                              quantity: 1,
+                              price: selectedLead.leadValue || 0,
+                              tax: 0,
+                              amount: selectedLead.leadValue || '0',
+                              description: selectedLead.description || '',
+                            }];
+
+                            setTableData(newTableData);
+                            calculateTotal(newTableData, discountValue, discountType);
+                          }
+                        }}
+                      >
+                        {Array.isArray(fndlead) && fndlead.length > 0 ? (
+                          fndlead.map((lead) => (
                             <Option key={lead.id} value={lead.id}>
                               {lead.leadTitle}
                             </Option>
@@ -458,7 +487,7 @@ const EditProposal = ({ id, onClose }) => {
                       </Select>
                     </Form.Item>
                   </Col>
-                  <Col span={12}>
+                  {/* <Col span={12}>
                     <Form.Item
                       name="deal_title"
                       label="Deal Title"
@@ -470,7 +499,7 @@ const EditProposal = ({ id, onClose }) => {
                       ]} // Validation rule
                     >
                       <Select placeholder="Select Deal Title">
-                        {/* Populate dropdown options from Deals */}
+                        Populate dropdown options from Deals 
                         {Array.isArray(Deals) && Deals.length > 0 ? (
                           Deals.map((deal) => (
                             <Option key={deal.id} value={deal.id}>
@@ -482,7 +511,7 @@ const EditProposal = ({ id, onClose }) => {
                         )}
                       </Select>
                     </Form.Item>
-                  </Col>
+                  </Col> */}
 
                   <Col span={12}>
                     <Form.Item
@@ -525,7 +554,7 @@ const EditProposal = ({ id, onClose }) => {
                     </Form.Item>
                   </Col>
 
-                  <Col span={12}>
+                  {/* <Col span={12}>
                     <Form.Item
                       name="calculatedtax"
                       label="Calculate Tax"
@@ -536,6 +565,11 @@ const EditProposal = ({ id, onClose }) => {
                         <Option value="before">Before Discount</Option>
                       </Select>
                     </Form.Item>
+                  </Col> */}
+                  <Col span={24}>
+                    <Form.Item label="Description" name="description">
+                      <Input.TextArea placeholder="Enter Description" />
+                    </Form.Item>
                   </Col>
                 </Row>
 
@@ -545,11 +579,7 @@ const EditProposal = ({ id, onClose }) => {
             {/* </Card> */}
 
             {/* <Card> */}
-            <div className="form-buttons text-end mb-2">
-              <Button className='border-0 text-white bg-blue-500' onClick={handleAddRow}>
-                <PlusOutlined />  Add Items
-              </Button>
-            </div>
+            
             <div>
               <div className="overflow-x-auto">
 
@@ -637,6 +667,11 @@ const EditProposal = ({ id, onClose }) => {
                     ))}
                   </tbody>
                 </table>
+                <div className="form-buttons text-start mb-2 mt-2">
+              <Button className='border-0 text-white bg-blue-500' onClick={handleAddRow}>
+                <PlusOutlined />  Add Items
+              </Button>
+            </div>
               </div>
 
 
@@ -653,27 +688,37 @@ const EditProposal = ({ id, onClose }) => {
 
                   {/* Discount */}
                   <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
-                  <td className="font-medium">Discount</td>
-                  <td className="flex items-center space-x-2">
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Discount Rate (%)
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={discountRate}
-                        onChange={(e) => {
-                          const newRate = parseFloat(e.target.value) || 0;
-                          setDiscountRate(newRate);
-                          calculateTotal(tableData, newRate);
-                        }}
-                        className="mt-1 block w-full p-2 border rounded"
-                      />
-                    </div>
-                  </td>
-                </tr>
+                    <td className="font-medium">Discount</td>
+                    <td className="flex items-center space-x-2">
+                      <div className="mb-4">
+                        <div className="flex space-x-2">
+                          <Select
+                            value={discountType}
+                            onChange={(value) => {
+                              setDiscountType(value);
+                              calculateTotal(tableData, discountValue, value);
+                            }}
+                            className="w-32"
+                          >
+                            <Option value="percentage">Percentage (%)</Option>
+                            <Option value="fixed">Fixed Amount</Option>
+                          </Select>
+                          <input
+                            type="number"
+                            min="0"
+                            value={discountValue || ''} // Allow empty value
+                            onChange={(e) => {
+                              const newValue = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                              setDiscountValue(newValue);
+                              calculateTotal(tableData, newValue, discountType);
+                            }}
+                            className="mt-1 block w-32 p-2 border rounded"
+                            placeholder="0"
+                          />
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
 
                   {/* Tax */}
                   <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
@@ -693,6 +738,8 @@ const EditProposal = ({ id, onClose }) => {
 
                   {/* Terms and Conditions */}
                 </table>
+
+                
               </div>
 
             </div>

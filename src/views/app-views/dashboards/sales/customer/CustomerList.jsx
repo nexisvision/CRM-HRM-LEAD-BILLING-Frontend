@@ -306,23 +306,23 @@ const CustomerList = () => {
          
 
           {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                           <Button
-                           type="primary"
-                           className="flex items-center"
-                           onClick={openAddCustomerModal}
-                         >
-                           <PlusOutlined />
-                           <span className="ml-2">New</span>
-                         </Button>
-                        ) : null}
+            <Button
+              type="primary"
+              className="flex items-center"
+              onClick={openAddCustomerModal}
+            >
+              <PlusOutlined />
+              <span className="ml-2">New</span>
+            </Button>
+          ) : null}
           <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
+            type="primary"
+            icon={<FileExcelOutlined />}
+            onClick={exportToExcel} // Call export function when the button is clicked
+            block
+          >
+            Export All
+          </Button>
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
@@ -332,11 +332,11 @@ const CustomerList = () => {
             dataSource={users}
             rowKey="id"
             scroll={{ x: 1200 }}
-            loading={!users.length} // Add loading state
+            // loading={!users.length} // Add loading state
           />
         ) : null}
       </div>
-      <UserView 
+      <UserView
         data={selectedUser}
         visible={userProfileVisible}
         close={closeUserProfile}

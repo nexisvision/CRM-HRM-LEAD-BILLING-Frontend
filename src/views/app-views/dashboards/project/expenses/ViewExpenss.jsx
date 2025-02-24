@@ -35,6 +35,16 @@ const ViewExpenss = ({ data }) => {
                             {data?.employee || '--'}
                         </td>
                     </tr>
+                    <tr className='text-base grid grid-cols-2'>
+                        <td className='text-[#99a5b5] font-semibold p-2'>Bill</td>
+                        <td className='text-[#5b676d] font-medium p-2 hover:text-black'>
+                            {data?.bill ? (
+                                <a href={data.bill} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                                 View  Bill
+                                </a>
+                            ) : '--'}
+                        </td>
+                    </tr>
                     {/* <tr className='text-base grid grid-cols-2'>
                         <td className='text-[#99a5b5] font-semibold p-2'>Created By</td>
                         <td className='text-[#5b676d] font-medium p-2 hover:text-black'>

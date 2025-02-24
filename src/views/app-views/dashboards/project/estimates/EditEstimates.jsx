@@ -11,6 +11,7 @@ import * as Yup from 'yup';
 import { GetLeads } from '../../leads/LeadReducers/LeadSlice';
 import { getAllTaxes } from 'views/app-views/setting/tax/taxreducer/taxSlice';
 
+
 const { Option } = Select;
 
 const EditEstimates = ({ idd, onClose }) => {
@@ -88,7 +89,9 @@ const EditEstimates = ({ idd, onClose }) => {
 
     
 
-    const [discountRate, setDiscountRate] = useState(10);
+    const [discountType, setDiscountType] = useState('');
+    const [discountValue, setDiscountValue] = useState(0);
+
     const [totals, setTotals] = useState({
         subtotal: 0,
         discount: 0,
@@ -190,8 +193,14 @@ const EditEstimates = ({ idd, onClose }) => {
                                 finalTotal: Number(currentEstimate.total) || 0
                             });
 
-                            // Set discount rate
-                            setDiscountRate(Number(currentEstimate.discountRate) || 0);
+                            // Set discount type and value
+                            if (currentEstimate.discountType) {
+                                setDiscountType(currentEstimate.discountType);
+                            } else {
+                                // If no discount type is set, default to 'fixed' if there's a discount value
+                                setDiscountType(currentEstimate.discount > 0 ? 'fixed' : 'percentage');
+                            }
+                            setDiscountValue(Number(currentEstimate.discountValue || currentEstimate.discount) || 0);
 
                         } catch (error) {
                             console.error("Error parsing items:", error);
@@ -214,21 +223,26 @@ const EditEstimates = ({ idd, onClose }) => {
         console.log("Current Table Data:", tableData);
     }, [tableData]);
 
-    const calculateTotal = (data = tableData, discount = discountRate) => {
+    const calculateTotal = (data = tableData, discountVal = discountValue, type = discountType) => {
         if (!Array.isArray(data)) {
             console.error('Invalid data passed to calculateTotal');
             return;
         }
 
-        // Calculate subtotal (sum of all item amounts)
+        // Calculate subtotal
         const subtotal = data.reduce((sum, row) => {
             return sum + (parseFloat(row.amount) || 0);
         }, 0);
 
-        // Calculate discount amount
-        const discountAmount = (subtotal * (parseFloat(discount) || 0)) / 100;
+        // Calculate discount amount based on type
+        let discountAmount = 0;
+        if (type === 'percentage') {
+            discountAmount = (subtotal * (parseFloat(discountVal) || 0)) / 100;
+        } else {
+            discountAmount = parseFloat(discountVal) || 0;
+        }
 
-        // Calculate total tax (for display purposes)
+        // Calculate total tax
         const totalTax = data.reduce((sum, row) => {
             const quantity = parseFloat(row.quantity) || 0;
             const price = parseFloat(row.price) || 0;
@@ -238,8 +252,8 @@ const EditEstimates = ({ idd, onClose }) => {
             return sum + taxAmount;
         }, 0);
 
-        // Calculate final total: subtotal - discount
-        const finalTotal = subtotal - discountAmount;
+        // Calculate final total
+        const finalTotal = subtotal - discountAmount + totalTax;
 
         setTotals({
             subtotal: subtotal.toFixed(2),
@@ -247,13 +261,6 @@ const EditEstimates = ({ idd, onClose }) => {
             totalTax: totalTax.toFixed(2),
             finalTotal: finalTotal.toFixed(2)
         });
-
-        return {
-            subtotal,
-            discount: discountAmount,
-            totalTax,
-            finalTotal
-        };
     };
 
     const calculateSubTotal = () => {
@@ -285,7 +292,7 @@ const EditEstimates = ({ idd, onClose }) => {
             }, {});
 
             const subtotal = calculateSubTotal();
-            const discountAmount = (subtotal * discountRate) / 100;
+            const discountAmount = parseFloat(totals.discount);
 
             const estimateData = {
                 id: idd,
@@ -294,9 +301,10 @@ const EditEstimates = ({ idd, onClose }) => {
                 lead: leadDetails?.id,
                 client: values.client,
                 discount: discountAmount,
-                discountRate: discountRate,
+                discountType: discountType,
+                discountValue: parseFloat(discountValue),
                 calculatedTax: parseFloat(values.calculatedTax) || 0,
-                items: formattedItems, // Now it's an object instead of an array
+                items: formattedItems,
                 tax: parseFloat(totals.totalTax),
                 total: parseFloat(totals.finalTotal),
                 related_id: id
@@ -321,7 +329,7 @@ const EditEstimates = ({ idd, onClose }) => {
         if (tableData.length > 1) {
             const updatedData = tableData.filter(row => row.id !== id);
             setTableData(updatedData);
-            calculateTotal(updatedData, discountRate);
+            calculateTotal(updatedData, discountValue, discountType);
         } else {
             message.warning('At least one item is required');
         }
@@ -367,7 +375,7 @@ const EditEstimates = ({ idd, onClose }) => {
         });
 
         setTableData(updatedData);
-        calculateTotal(updatedData, discountRate);
+        calculateTotal(updatedData, discountValue, discountType);
     };
 
     return (
@@ -503,16 +511,6 @@ const EditEstimates = ({ idd, onClose }) => {
                         </div>
                         <div>
                             <div className="overflow-x-auto">
-
-                                <div className="form-buttons text-left mt-2 mb-2 justify-end flex">
-                                    <Button
-                                        type="primary"
-                                        onClick={handleAddRow}
-                                        icon={<PlusOutlined />}
-                                    >
-                                        Add Items
-                                    </Button>
-                                </div>
                                 <table className="w-full border border-gray-200 bg-white">
                                     <thead className="bg-gray-100">
                                         <tr>
@@ -607,6 +605,12 @@ const EditEstimates = ({ idd, onClose }) => {
                                         ))}
                                     </tbody>
                                 </table>
+
+                                <div className="form-buttons text-left mt-2">
+                                    <Button type="primary" onClick={handleAddRow}>
+                                        <PlusOutlined /> Add Items
+                                    </Button>
+                                </div>
                             </div>
 
 
@@ -624,21 +628,42 @@ const EditEstimates = ({ idd, onClose }) => {
                                     {/* Discount */}
                                     <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
                                         <td className="font-medium">Discount</td>
-                                        <td className='flex items-center space-x-2'>
-                                            <div className="mb-4">
-                                                <label className="block text-sm font-medium text-gray-700">
-                                                    Discount Rate (%)
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    value={discountRate}
-                                                    onChange={(e) => {
-                                                        setDiscountRate(parseFloat(e.target.value) || 0);
-                                                        calculateTotal(tableData, parseFloat(e.target.value) || 0); // Recalculate with new discount rate
-                                                    }}
-                                                    className="mt-1 block w-full p-2 border rounded"
-                                                />
-                                            </div>
+                                        <td className="flex items-center space-x-2">
+                                            <Select
+                                                value={discountType}
+                                                onChange={(value) => {
+                                                    setDiscountType(value);
+                                                    calculateTotal(tableData, discountValue, value);
+                                                }}
+                                                style={{ width: 120 }}
+                                            >
+                                                <Option value="percentage">Percentage (%)</Option>
+                                                <Option value="fixed">Fixed Amount</Option>
+                                            </Select>
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                value={discountValue}
+                                                onFocus={(e) => {
+                                                    if (discountValue === 0) {
+                                                        setDiscountValue('');
+                                                    }
+                                                }}
+                                                onBlur={(e) => {
+                                                    if (e.target.value === '') {
+                                                        setDiscountValue(0);
+                                                        calculateTotal(tableData, 0, discountType);
+                                                    }
+                                                }}
+                                                onChange={(e) => {
+                                                    const newValue = e.target.value;
+                                                    setDiscountValue(newValue);
+                                                    calculateTotal(tableData, newValue || 0, discountType);
+                                                }}
+                                                style={{ width: 120 }}
+                                                prefix={discountType === 'fixed' ? '₹' : ''}
+                                                suffix={discountType === 'percentage' ? '%' : ''}
+                                            />
                                         </td>
                                     </tr>
 

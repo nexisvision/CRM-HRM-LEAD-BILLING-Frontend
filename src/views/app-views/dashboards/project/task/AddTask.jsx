@@ -80,6 +80,8 @@ const AddTask = ({ onClose }) => {
 
   const [selectedLead, setSelectedLead] = useState(null);
 
+  // const [fileList, setFileList] = useState([]);
+
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
   const initialValues = {
@@ -91,7 +93,7 @@ const AddTask = ({ onClose }) => {
     dueDate: null,
     assignTo: [],
     description: "",
-    files: [] // Add files to initial values
+    addfile: "",
   };
 
   const validationSchema = Yup.object({
@@ -103,6 +105,7 @@ const AddTask = ({ onClose }) => {
     dueDate: Yup.date().nullable().required("Date is required."),
     assignTo: Yup.array().min(1, "Please select at least one AssignTo."),
     description: Yup.string().required("Please enter a Description."),
+    addfile: Yup.mixed().required("Please upload a file."),
   });
 
 
@@ -138,7 +141,10 @@ const AddTask = ({ onClose }) => {
 
 
 
-
+// Handle file upload changes
+const handleFileChange = ({ fileList: newFileList }) => {
+  setFileList(newFileList);
+};
 
   
   const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
@@ -181,30 +187,41 @@ const AddTask = ({ onClose }) => {
   };
 
   const onSubmit = async (values, { resetForm }) => {
-    // Create FormData to handle file upload
-    const formData = new FormData();
+    // // Create FormData to handle file upload
+    // const formData = new FormData();
     
-    // Append all regular fields
-    Object.keys(values).forEach(key => {
-      if (key !== 'files') {
-        formData.append(key, values[key]);
-      }
+    // // Append all regular fields
+    // Object.keys(values).forEach(key => {
+    //   if (key !== 'files') {
+    //     formData.append(key, values[key]);
+    //   }
+    // });
+
+    const formData = new FormData();
+
+      // Append all form values
+      Object.keys(values).forEach(key => {
+        if (key !== 'Add File') {
+            formData.append(key, values[key]);
+        }
     });
 
-    // Append files with the key 'task_file'
-    fileList.forEach((file) => {
-      formData.append('task_file', file);
-    });
+    // Append the file if exists
+    if (fileList[0]?.originFileObj) {
+        formData.append('Add File', fileList[0].originFileObj);
+    }
 
-    // Dispatch AddTaskk with formData
-    dispatch(AddTaskk({ id, values: formData }))
-      .then(() => {
-        message.success("Task added successfully!");
+
+    // Dispatch AddTasks with updated values
+    dispatch(AddTaskk({ id, values })).then(() => {
+      message.success("Task added successfully!");
+        // Fetch updated tasks after successfully adding
         dispatch(GetTasks(id))
           .then(() => {
             resetForm();
             setFileList([]); // Reset file list
             onClose();
+            setFileList([]); // Reset file list
           })
           .catch((error) => {
             message.error("Failed to fetch the latest Task data.");
@@ -525,34 +542,27 @@ const AddTask = ({ onClose }) => {
                 </div>
               </Col>
 
-              {/* Add File Upload field */}
-              {/* <Col span={24} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Attachments</label>
+              <div className="mt-4 w-full">
+                <span className="block font-semibold p-2">Add File</span>
+                <Col span={24}>
                   <Upload
-                    {...uploadProps}
-                    listType="picture-card"
+                    beforeUpload={() => false} // Prevent auto upload
+                    listType="picture"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    maxCount={1}
+                    fileList={fileList}
+                    onChange={handleFileChange}
+                    showUploadList={{ 
+                      showRemoveIcon: true,
+                      showPreviewIcon: true,
+                      className: "upload-list-inline"
+                    }}
+                    className="border-2 flex flex-col justify-center items-center p-10"
                   >
-                    <div>
-                      <PlusOutlined />
-                      <div style={{ marginTop: 8 }}>Upload</div>
-                    </div>
+                    <Button icon={<UploadOutlined />}>Choose File</Button>
                   </Upload>
-                </div>
-              </Col> */}
-
-              {/* Alternative simple file upload design */}
-              <Col span={24} className="mt-4">
-                <div className="form-item">
-                  <label className="text-sm font-semibold mb-2 block">Attachments <span className="text-red-500">*</span></label>
-                  <Upload
-                    {...uploadProps}
-                    className="mt-2"
-                  >
-                    <Button icon={<UploadOutlined />} className="hover:bg-gray-50">Click to Upload</Button>
-                  </Upload>
-                </div>
-              </Col>
+                </Col>
+              </div>
 
             </Row>
 

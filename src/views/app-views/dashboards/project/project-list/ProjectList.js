@@ -262,8 +262,9 @@ const ProjectList = () => {
 
 			<PageHeaderAlt className="border-bottom mt-5">
 				<div className="container-fluid">
+					<div className='flex justify-between items-center '>
+						<h2 className='text-xl font-medium'>Projects</h2>
 					<Flex className="p-2 flex justify-end">
-						{/* <h2 className='text-xl font-medium'>Projects</h2> */}
 						<div className='flex gap-3 justify-end'>
 							<Radio.Group defaultValue={VIEW_GRID} onChange={onChangeProjectView}>
 								<Radio.Button value={VIEW_GRID}>
@@ -278,6 +279,8 @@ const ProjectList = () => {
 								</Button>
 						</div>
 					</Flex>
+
+					</div>
 				</div>
 			</PageHeaderAlt>
 
@@ -306,8 +309,8 @@ const ProjectList = () => {
 										
 <Card>
 							<div className='flex items-center justify-between'>
-								<div className="flex flex-col" onClick={() => handleProjectClick(item.id)}>
-									<p className="text-base font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">{item.name}</p>
+								<div className="flex flex-col" >
+									<p onClick={() => handleProjectClick(item.id)} className="text-base font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">{item.name}</p>
 									<p className="text-sm text-gray-600 mt-2">{item.category}</p>
 								</div>
 								
@@ -345,12 +348,14 @@ const ProjectList = () => {
 								<span
 									style={{
 										color: statusColor,
+										fontWeight: 'bold',
+										fontSize: '15px',
 										display: 'flex',
 										alignItems: 'center',
 										gap: '4px',
 									}}
 								>
-									<ClockCircleOutlined />
+									<ClockCircleOutlined className='text-lg font-bold' />
 									{item.dayleft} days left
 								</span>
 							</div>

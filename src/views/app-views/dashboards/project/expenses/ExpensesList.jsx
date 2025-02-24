@@ -288,16 +288,16 @@ const ExpensesList = () => {
                 compare: (a, b) => a.price.length - b.price.length,
             },
         },
-        {
-            title: "Employees",
-            dataIndex: "employee",
-            render: (_, record) => (
-                <div className="d-flex">
-                    <AvatarStatus size={30} src={record.image} name={record.employee} />
-                </div>
-            ),
-            sorter: (a, b) => utils.antdTableSorter(a, b, "employees"),
-        },
+        // {
+        //     title: "Employees",
+        //     dataIndex: "employee",
+        //     render: (_, record) => (
+        //         <div className="d-flex">
+        //             <AvatarStatus size={30} src={record.image} name={record.employee} />
+        //         </div>
+        //     ),
+        //     sorter: (a, b) => utils.antdTableSorter(a, b, "employees"),
+        // },
         {
             title: "currency ",
             dataIndex: "currency",

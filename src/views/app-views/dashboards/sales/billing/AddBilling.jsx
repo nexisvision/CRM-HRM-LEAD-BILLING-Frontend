@@ -47,30 +47,15 @@ const AddBilling = ({ onClose }) => {
 
   const [showTax, setShowTax] = useState(false);
 
-  const [discountRate, setDiscountRate] = useState(0);
+  const [discountType, setDiscountType] = useState('percentage');
+  const [discountValue, setDiscountValue] = useState(0);
+
   const [totals, setTotals] = useState({
     subtotal: "0.00",
     discount: "0.00",
     totalTax: "0.00",
     finalTotal: "0.00",
   });
-
-  const [rows, setRows] = useState([
-    {
-      id: Date.now(),
-      item: "",
-      quantity: 1,
-      price: 0,
-      discount: 0,
-      tax: 0,
-      amount: 0,
-      description: "",
-      status: "",
-      referenceNumber: "",
-      isNew: true,
-
-    },
-  ]);
 
   useEffect(() => {
     dispatch(Getcus());
@@ -100,59 +85,27 @@ const AddBilling = ({ onClose }) => {
     if (tableData.length > 1) {
       const updatedData = tableData.filter((row) => row.id !== id);
       setTableData(updatedData);
-      calculateTotal(updatedData, discountRate);
+      calculateTotal(updatedData, discountValue);
     } else {
       message.warning("At least one item is required");
     }
   };
 
-  // const handleFieldChange = (id, field, value) => {
-  //   const updatedRows = rows.map((row) =>
-  //     row.id === id
-  //       ? { ...row, [field]: value, amount: calculateAmount(row) }
-  //       : row
-  //   );
-  //   setRows(updatedRows);
-  // };
-
   const calculateAmount = (row) => {
-    const { quantity, price, discount, tax } = row;
-    const discountAmount = (price * discount) / 100;
-    const priceAfterDiscount = price - discountAmount;
-    const taxAmount = (priceAfterDiscount * tax) / 100;
-    const totalAmount = (priceAfterDiscount + taxAmount) * quantity;
+    const quantity = parseFloat(row.quantity) || 0;
+    const price = parseFloat(row.price) || 0;
+    const tax = showTax ? (parseFloat(row.tax) || 0) : 0;
+    
+    const baseAmount = quantity * price;
+    const taxAmount = (baseAmount * tax) / 100;
+    const totalAmount = baseAmount + taxAmount;
+    
     return totalAmount.toFixed(2);
   };
 
-  // const calculateTotals = () => {
-  //   let subtotal = 0;
-  //   let totalDiscount = 0;
-  //   let totalTax = 0;
-
-  //   rows.forEach((row) => {
-  //     const { quantity, price, discount, tax } = row;
-  //     const discountAmount = (price * discount) / 100;
-  //     const priceAfterDiscount = price - discountAmount;
-  //     const taxAmount = (priceAfterDiscount * tax) / 100;
-
-  //     subtotal += priceAfterDiscount * quantity;
-  //     totalDiscount += discountAmount * quantity;
-  //     totalTax += taxAmount * quantity;
-  //   });
-
-  //   const totalAmount = subtotal + totalTax - totalDiscount;
-
-  //   return {
-  //     subtotal: subtotal.toFixed(2),
-  //     totalDiscount: totalDiscount.toFixed(2),
-  //     totalTax: totalTax.toFixed(2),
-  //     totalAmount: totalAmount.toFixed(2),
-  //   };
-  // };
-
   const lid = AllLoggeddtaa.loggedInUser.id;
 
-  const calculateTotal = (data = tableData, discount = discountRate) => {
+  const calculateTotal = (data = tableData, discountVal = discountValue, type = discountType) => {
     if (!Array.isArray(data)) {
       console.error('Invalid data passed to calculateTotal');
       return;
@@ -163,8 +116,10 @@ const AddBilling = ({ onClose }) => {
       return sum + (parseFloat(row.amount) || 0);
     }, 0);
 
-    // Calculate discount amount
-    const discountAmount = (subtotal * (parseFloat(discount) || 0)) / 100;
+    // Calculate discount amount based on type
+    const discountAmount = type === 'percentage' 
+      ? (subtotal * (parseFloat(discountVal) || 0)) / 100
+      : parseFloat(discountVal) || 0;
 
     // Calculate total tax (for display purposes)
     const totalTax = data.reduce((sum, row) => {
@@ -198,6 +153,7 @@ const AddBilling = ({ onClose }) => {
     const updatedData = tableData.map((row) => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
+        
         if (field === 'tax' && taxes?.data) {
           const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
           if (selectedTax) {
@@ -216,7 +172,6 @@ const AddBilling = ({ onClose }) => {
           const price = parseFloat(field === 'price' ? value : row.price) || 0;
           const tax = showTax ? (parseFloat(field === 'tax' ? value : row.tax) || 0) : 0;
           
-          // Calculate amount: unit price * quantity + tax
           const baseAmount = quantity * price;
           const taxAmount = (baseAmount * tax) / 100;
           updatedRow.amount = (baseAmount + taxAmount).toFixed(2);
@@ -228,7 +183,7 @@ const AddBilling = ({ onClose }) => {
     });
 
     setTableData(updatedData);
-    calculateTotal(updatedData, discountRate);
+    calculateTotal(updatedData, discountValue);
   };
 
   const handleSubmit = () => {
@@ -269,7 +224,8 @@ const AddBilling = ({ onClose }) => {
           billDate: values.billDate?.format("YYYY-MM-DD"),
           discription: discription,
           status: values.status,
-          discount: parseFloat(discountRate) || 0,
+          discountType: discountType,
+          discountValue: parseFloat(discountValue) || 0,
           tax: totals.totalTax,
           total: totals.finalTotal,
           note: values.note || "",
@@ -281,7 +237,9 @@ const AddBilling = ({ onClose }) => {
             tax: showTax ? parseFloat(row.tax) || 0 : 0,
             tax_name: showTax ? selectedTaxDetails[row.id]?.gstName || '' : '',
             lineTotal: parseFloat(row.amount) || 0
-          }))
+          })),
+          discountType: discountType,
+          discountValue: parseFloat(discountValue) || 0,
         };
 
         const lid = AllLoggeddtaa.loggedInUser.id;
@@ -303,7 +261,7 @@ const AddBilling = ({ onClose }) => {
                 amount: 0,
                 description: "",
               }]);
-              setDiscountRate(0);
+              setDiscountValue(0);
               setShowTax(false);
               onClose();
             }
@@ -374,11 +332,13 @@ const AddBilling = ({ onClose }) => {
 
   return (
     <div>
+      
       <Form form={form} layout="vertical">
+      <h2 className="mb-2 border-b font-medium"></h2>
         <Card className="border-0">
           <h1 className="border-b-2 border-gray-200"></h1>
           <Row gutter={16}>
-            <Col span={24} className="mt-1">
+            <Col span={12} className="mt-1">
               <Form.Item
                 label="Vendor"
                 name="vendor"
@@ -437,14 +397,8 @@ const AddBilling = ({ onClose }) => {
             </Col>
 
             <Col span={12}>
-              <Form.Item
-                label="Bill Number"
-                name="billNumber"
-                rules={[
-                  { required: true, message: "Please enter bill number" },
-                ]}
-              >
-                <Input placeholder="Enter Bill Number" />
+              <Form.Item label="Note" name="note">
+                <Input placeholder="Enter Note (Optional)" />
               </Form.Item>
             </Col>
 
@@ -454,11 +408,7 @@ const AddBilling = ({ onClose }) => {
               </Form.Item>
             </Col>
 
-            <Col span={12}>
-              <Form.Item label="Note" name="note">
-                <Input placeholder="Enter Note (Optional)" />
-              </Form.Item>
-            </Col>
+            
           </Row>
         </Card>
 
@@ -471,15 +421,24 @@ const AddBilling = ({ onClose }) => {
                 checked={showTax}
                 onChange={(checked) => {
                   setShowTax(checked);
-                  if (!checked) {
-                    const updatedData = tableData.map(row => ({
+                  const updatedData = tableData.map(row => {
+                    const newRow = {
                       ...row,
-                      tax: 0,
-                      amount: calculateAmount({ ...row, tax: 0 })
-                    }));
-                    setTableData(updatedData);
-                    calculateTotal(updatedData, discountRate);
-                  }
+                      tax: checked ? row.tax : 0
+                    };
+                    // Recalculate amount with new tax value
+                    const quantity = parseFloat(newRow.quantity) || 0;
+                    const price = parseFloat(newRow.price) || 0;
+                    const tax = checked ? (parseFloat(newRow.tax) || 0) : 0;
+                    
+                    const baseAmount = quantity * price;
+                    const taxAmount = (baseAmount * tax) / 100;
+                    newRow.amount = (baseAmount + taxAmount).toFixed(2);
+                    
+                    return newRow;
+                  });
+                  setTableData(updatedData);
+                  calculateTotal(updatedData, discountValue);
                 }}
               />
             </div>
@@ -609,23 +568,34 @@ const AddBilling = ({ onClose }) => {
                 <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
                   <td className="font-medium">Discount</td>
                   <td className="flex items-center space-x-2">
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Discount Rate (%)
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={discountRate}
-                        onChange={(e) => {
-                          const newRate = parseFloat(e.target.value) || 0;
-                          setDiscountRate(newRate);
-                          calculateTotal(tableData, newRate);
-                        }}
-                        className="mt-1 block w-full p-2 border rounded"
-                      />
-                    </div>
+                   
+                      <div className="flex items-center gap-2 mb-2">
+                        <Select
+                          value={discountType}
+                          onChange={(value) => {
+                            setDiscountType(value);
+                            setDiscountValue(0);
+                            calculateTotal(tableData, 0, value);
+                          }}
+                          style={{ width: 120 }}
+                        >
+                          <Option value="percentage">Percentage</Option>
+                          <Option value="fixed">Fixed Amount</Option>
+                        </Select>
+                        <input
+                          type="number"
+                          min="0"
+                          max={discountType === 'percentage' ? 100 : undefined}
+                          value={discountValue || ''}
+                          onChange={(e) => {
+                            const newValue = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                            setDiscountValue(newValue);
+                            calculateTotal(tableData, newValue, discountType);
+                          }}
+                          className="mt-1 block p-2 border rounded"
+                          placeholder="Enter discount"
+                        />
+                      </div>
                   </td>
                 </tr>
 

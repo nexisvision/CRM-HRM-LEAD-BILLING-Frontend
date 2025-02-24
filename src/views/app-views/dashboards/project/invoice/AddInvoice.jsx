@@ -27,6 +27,8 @@ const AddInvoice = ({ onClose }) => {
     const [selectedMilestone, setSelectedMilestone] = useState(null);
     const [showFields, setShowFields] = useState(false);
     const { data: milestones } = useSelector((state) => state.Milestone.Milestone);
+    const [discountType, setDiscountType] = useState('percentage');
+    const [discountValue, setDiscountValue] = useState(0);
 
 
     // const [selectedProject, setSelectedProject] = useState(null);
@@ -80,7 +82,10 @@ const sub = subClientsss?.SubClient?.data;
         finalTotal: 0,
     });
 
+    // Add new state for row-level discount types
+    const [rowDiscountTypes, setRowDiscountTypes] = useState({});
 
+    // Modify the table data state initialization to include discount type
     const [tableData, setTableData] = useState([
         {
             id: Date.now(),
@@ -88,6 +93,8 @@ const sub = subClientsss?.SubClient?.data;
             quantity: 1,
             price: "",
             tax: 0,
+            discountType: "percentage", // Add default discount type
+            discount: 0, // Add default discount value
             amount: "0",
             description: "",
         }
@@ -143,7 +150,7 @@ const sub = subClientsss?.SubClient?.data;
                 const updatedData = tableData.map(row => ({
                     ...row,
                     item: selectedProd.name,
-                    hsn_sac: selectedProd.hsn_sac,
+                    hsn_sac: selectedProd.hsn_sac || '',
                     price: selectedProd.price,
                     description: selectedProd.description || ""
                 }));
@@ -167,45 +174,22 @@ const sub = subClientsss?.SubClient?.data;
             setSelectedMilestone(value);
 
             if (selectedMile) {
-                // Parse milestone cost to ensure it's a number
-                const milestoneCost = parseFloat(selectedMile.milestone_cost) || 0;
-
                 // Create new table data with milestone information
                 const newTableData = [{
                     id: Date.now(),
                     item: selectedMile.milestone_title || '',
                     quantity: 1,
-                    price: milestoneCost,
+                    price: parseFloat(selectedMile.milestone_cost) || 0,
                     tax: 0,
                     discount: 0,
-                    amount: milestoneCost.toString(),
+                    amount: selectedMile.milestone_cost?.toString() || '0',
                     description: selectedMile.milestone_summary || '',
                     hsn_sac: ''
                 }];
 
                 setTableData(newTableData);
                 calculateTotal(newTableData, discountRate);
-
-                // Update form fields with milestone data
-                form.setFieldsValue({
-                    items: newTableData
-                });
             }
-        } else {
-            // Reset when no milestone is selected
-            setSelectedMilestone(null);
-            setTableData([{
-                id: Date.now(),
-                item: "",
-                quantity: 1,
-                price: "",
-                tax: 0,
-                discount: 0,
-                amount: "0",
-                description: "",
-                hsn_sac: ""
-            }]);
-            calculateTotal([], discountRate);
         }
     };
 
@@ -257,7 +241,7 @@ const sub = subClientsss?.SubClient?.data;
                 currency: values.currency,
                 currencyIcon: selectedCurrencyIcon,
                 currencyCode: selectedCurrencyDetails?.currencyCode,
-                tax_calculation: values.calctax,
+                // tax_calculation: values.calctax,
                 items: itemsArray,
                 subtotal: totals.subtotal,
                 discount: discountRate,
@@ -315,6 +299,7 @@ const sub = subClientsss?.SubClient?.data;
                 quantity: 1,
                 price: "",
                 tax: 0,
+                discountType: "percentage",
                 discount: 0,
                 amount: "0",
                 description: "",
@@ -334,46 +319,48 @@ const sub = subClientsss?.SubClient?.data;
         }
     };
 
-    const calculateTotal = (data, discountRate) => {
-        // Calculate amounts for each row and total
+    const calculateTotal = (data, globalDiscountValue) => {
         const calculatedTotals = data.reduce((acc, row) => {
             const quantity = parseFloat(row.quantity) || 0;
             const unitPrice = parseFloat(row.price) || 0;
-            const itemDiscountPercentage = parseFloat(row.discount) || 0;
-            const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
+            const baseAmount = unitPrice * quantity;
+            
+            // Calculate item discount based on type
+            let itemDiscountAmount = 0;
+            if (row.discountType === "percentage") {
+                const discountPercentage = parseFloat(row.discount) || 0;
+                itemDiscountAmount = (baseAmount * discountPercentage) / 100;
+            } else {
+                itemDiscountAmount = parseFloat(row.discount) || 0;
+            }
 
-            // Calculate discount amount from unit price
-            const discountAmount = (unitPrice * itemDiscountPercentage) / 100;
+            const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
+            const gstAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
             
-            // Calculate GST amount from unit price
-            const gstAmount = (unitPrice * taxPercentage) / 100;
-            
-            // Calculate amount for single unit: unit price - discount + GST
-            const unitAmount = unitPrice - discountAmount + gstAmount;
-            
-            // Calculate total amount for this row
-            const rowAmount = unitAmount * quantity;
+            // Calculate final amount for this row
+            const rowAmount = baseAmount - itemDiscountAmount + gstAmount;
 
             return {
-                totalBaseAmount: acc.totalBaseAmount + (unitPrice * quantity),
-                totalItemDiscount: acc.totalItemDiscount + (discountAmount * quantity),
-                totalTax: acc.totalTax + (gstAmount * quantity),
+                totalBaseAmount: acc.totalBaseAmount + baseAmount,
+                totalItemDiscount: acc.totalItemDiscount + itemDiscountAmount,
+                totalTax: acc.totalTax + gstAmount,
                 totalAmount: acc.totalAmount + rowAmount
             };
         }, { totalBaseAmount: 0, totalItemDiscount: 0, totalTax: 0, totalAmount: 0 });
 
-        // Calculate subtotal
-        const subtotal = calculatedTotals.totalAmount;
-
         // Calculate global discount
-        const globalDiscountAmount = (subtotal * discountRate) / 100;
+        let globalDiscountAmount = 0;
+        if (discountType === 'percentage') {
+            globalDiscountAmount = (calculatedTotals.totalAmount * globalDiscountValue) / 100;
+        } else {
+            globalDiscountAmount = parseFloat(globalDiscountValue) || 0;
+        }
 
         // Calculate final total
-        const finalTotal = subtotal - globalDiscountAmount;
+        const finalTotal = calculatedTotals.totalAmount - globalDiscountAmount;
 
-        // Update totals state
         setTotals({
-            subtotal: subtotal.toFixed(2),
+            subtotal: calculatedTotals.totalAmount.toFixed(2),
             itemDiscount: calculatedTotals.totalItemDiscount.toFixed(2),
             globalDiscount: globalDiscountAmount.toFixed(2),
             totalTax: calculatedTotals.totalTax.toFixed(2),
@@ -384,13 +371,19 @@ const sub = subClientsss?.SubClient?.data;
         const updatedData = data.map(row => {
             const quantity = parseFloat(row.quantity) || 0;
             const unitPrice = parseFloat(row.price) || 0;
-            const itemDiscountPercentage = parseFloat(row.discount) || 0;
-            const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
+            const baseAmount = unitPrice * quantity;
+            
+            let itemDiscountAmount = 0;
+            if (row.discountType === "percentage") {
+                const discountPercentage = parseFloat(row.discount) || 0;
+                itemDiscountAmount = (baseAmount * discountPercentage) / 100;
+            } else {
+                itemDiscountAmount = parseFloat(row.discount) || 0;
+            }
 
-            const discountAmount = (unitPrice * itemDiscountPercentage) / 100;
-            const gstAmount = (unitPrice * taxPercentage) / 100;
-            const unitAmount = unitPrice - discountAmount + gstAmount;
-            const rowAmount = unitAmount * quantity;
+            const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
+            const gstAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
+            const rowAmount = baseAmount - itemDiscountAmount + gstAmount;
 
             return {
                 ...row,
@@ -481,11 +474,12 @@ const sub = subClientsss?.SubClient?.data;
 
     // Modify the table to show currency icons in all price/amount fields
     const renderTableRows = () => (
+        <>
         <tbody>
             {tableData.map((row) => (
                 <React.Fragment key={row.id}>
                     <tr>
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                             <input
                                 type="text"
                                 value={row.item}
@@ -496,7 +490,7 @@ const sub = subClientsss?.SubClient?.data;
                             />
                         </td>
                         
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                             <input
                                 type="number"
                                 min="1"
@@ -506,7 +500,7 @@ const sub = subClientsss?.SubClient?.data;
                                 className="w-full p-2 border rounded"
                             />
                         </td>
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                             <Input
                                 prefix={selectedCurrencyIcon}
                                 type="number"
@@ -517,29 +511,43 @@ const sub = subClientsss?.SubClient?.data;
                                 className="w-full p-2 border rounded-s"
                             />
                         </td>
-                        <td className="px-4 py-2 border-b">
-                            <input
-                                type="number"
-                                min="0"
-                                max="100"
-                                value={row.discount || 0}
-                                onChange={(e) => handleTableDataChange(row.id, "discount", e.target.value)}
-                                placeholder="0"
-                                className="w-full p-2 border rounded"
-                            />
+                        <td className="px-2 py-2 border-b">
+                            <div className="flex space-x-2">
+                                <Select
+                                    value={row.discountType || "percentage"}
+                                    onChange={(value) => handleTableDataChange(row.id, "discountType", value)}
+                                    style={{ width: 100}}
+                                >
+                                    <Option value="fixed">Fixed</Option>
+                                    <Option value="percentage">Percentage</Option>
+                                </Select>
+                                <Input
+                                    type="number"
+                                    min="0"
+                                    max={row.discountType === "percentage" ? 100 : undefined}
+                                    value={row.discount || 0}
+                                    onChange={(e) => {
+                                        const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0;
+                                        handleTableDataChange(row.id, "discount", value);
+                                    }}
+                                    prefix={row.discountType === "fixed" ? selectedCurrencyIcon : ""}
+                                    suffix={row.discountType === "percentage" ? "%" : ""}
+                                    className="w-full"
+                                />
+                            </div>
                         </td>
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                             <input
                                 type="text"
                                 value={row.hsn_sac || ""}
                                 onChange={(e) => handleTableDataChange(row.id, "hsn_sac", e.target.value)}
                                 placeholder="HSN/SAC"
                                 className="w-full p-2 border rounded"
-                                // readOnly={selectedProduct !== null}
+                                disabled={selectedMilestone !== null}
                             />
                         </td>
                         
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                             <select
                                 value={row.tax ? `${row.tax.gstName}|${row.tax.gstPercentage}` : ''}
                                 onChange={(e) => {
@@ -559,13 +567,13 @@ const sub = subClientsss?.SubClient?.data;
                                 ))}
                             </select>
                         </td>
-                        <td className="px-4 py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                             <span>{selectedCurrencyIcon} {parseFloat(row.amount || 0).toFixed(2)}</span>
                         </td>
                     </tr>
                        
                     <tr>
-                        <td colSpan={8} className="px-4 py-2 border-b">
+                        <td colSpan={8} className="px-2 py-2 border-b">
                             <textarea
                                 rows={2}
                                 value={row.description}
@@ -583,9 +591,26 @@ const sub = subClientsss?.SubClient?.data;
                 </React.Fragment>
             ))}
         </tbody>
+        
+    </>
     );
 
-    // Modify the summary section to show currency icons
+    // Add discount type change handler
+    const handleDiscountTypeChange = (value) => {
+        setDiscountType(value);
+        setDiscountValue(0); // Reset discount value when type changes
+        calculateTotal(tableData, 0); // Recalculate with zero discount
+    };
+
+    // Modify the discount input handler
+    const handleDiscountChange = (value) => {
+        // Ensure value is a number and default to 0 if empty or invalid
+        const numValue = value === '' ? 0 : parseFloat(value) || 0;
+        setDiscountValue(numValue);
+        calculateTotal(tableData, numValue);
+    };
+
+    // Modify the summary section to include discount type selector
     const renderSummarySection = () => (
         <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
             <table className="w-full lg:w-[50%] p-2">
@@ -598,38 +623,37 @@ const sub = subClientsss?.SubClient?.data;
                     </tr>
 
                     <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
-                        <td className="font-medium">Item Discount</td>
+                        <td className="font-medium">Items Discount</td>
                         <td className="flex items-center space-x-2">
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700">
-                                    Item Discount Rate (%)
-                                </label>
-                                <input
-                                    type="number"
-                                    value={discountRate}
-                                    onChange={(e) => {
-                                        setDiscountRate(parseFloat(e.target.value) || 0);
-                                        calculateTotal(tableData, parseFloat(e.target.value) || 0); // Recalculate with new discount rate
-                                    }}
-                                    className="mt-1 block w-full p-2 border rounded"
-                                />
-                            </div>
+                            <Select
+                                value={discountType}
+                                onChange={handleDiscountTypeChange}
+                                style={{ width: 120 }}
+                            >
+                                <Option value="fixed">Fixed</Option>
+                                <Option value="percentage">Percentage</Option>
+                            </Select>
+                            <Input
+                                type="number"
+                                value={discountValue || 0} // Ensure 0 is displayed when empty
+                                onChange={(e) => handleDiscountChange(e.target.value)}
+                                style={{ width: 120 }}
+                                min={0}
+                                max={discountType === 'percentage' ? 100 : undefined}
+                                prefix={discountType === 'fixed' ? selectedCurrencyIcon : ''}
+                                suffix={discountType === 'percentage' ? '%' : ''}
+                            />
                         </td>
                     </tr>
 
-                    {parseFloat(totals.itemDiscount) > 0 && (
+                    {parseFloat(totals.globalDiscount) > 0 && (
                         <tr className="flex justify-between px-2 py-2 border-x-2">
-                            <td className="font-medium">Total Item Discount Amount</td>
-                            <td className="font-medium px-4 py-2 text-red-500">-₹{totals.itemDiscount}</td>
+                            <td className="font-medium">Discount Amount</td>
+                            <td className="font-medium px-4 py-2 text-red-500">
+                                -{selectedCurrencyIcon} {totals.globalDiscount}
+                            </td>
                         </tr>
                     )}
-
-                    <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
-                        <td className="font-medium">Global Discount</td>
-                        <td className="font-medium px-4 py-2">
-                            {selectedCurrencyIcon} {totals.globalDiscount}
-                        </td>
-                    </tr>
 
                     <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
                         <td className="font-medium">Total Tax</td>
@@ -646,6 +670,7 @@ const sub = subClientsss?.SubClient?.data;
                     </tr>
                 </tbody>
             </table>
+            
         </div>
     );
 
@@ -724,18 +749,6 @@ const sub = subClientsss?.SubClient?.data;
                                         </Form.Item>
                                     </Col>
 
-                                    <Col span={12}>
-                                        <Form.Item
-                                            name="calctax"
-                                            label="Calculate Tax"
-                                            rules={[{ required: true, message: "Please select a tax calculation method" }]}
-                                        >
-                                            <Select placeholder="Select Tax Calculation Method">
-                                                <Option value="after">After Discount</Option>
-                                                <Option value="before">Before Discount</Option>
-                                            </Select>
-                                        </Form.Item>
-                                    </Col>
                                 </Row>
                             </div>
                         </div>
@@ -743,11 +756,7 @@ const sub = subClientsss?.SubClient?.data;
 
                         {/* <Card> */}
                         <div>
-                            <div className="form-buttons text-right mb-2">
-                                <Button type="primary" onClick={handleAddRow}>
-                                    <PlusOutlined /> Add Items
-                                </Button>
-                            </div>
+                            
                             <div className="overflow-x-auto">
                                 <Flex alignItems="center" mobileFlex={false} className='flex mb-4 gap-4'>
                                     <Flex className="flex" mobileFlex={false}>
@@ -796,32 +805,37 @@ const sub = subClientsss?.SubClient?.data;
                                 <table className="w-full border border-gray-200 bg-white">
                                     <thead className="bg-gray-100">
                                         <tr>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 border-b">
                                                 Description<span className="text-red-500">*</span>
                                             </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 border-b">
                                                 Quantity<span className="text-red-500">*</span>
                                             </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 border-b">
                                                 Unit Price <span className="text-red-500">*</span>
                                             </th>
                                             
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 border-b">
                                                 Discount <span className="text-red-500">*</span>
                                             </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 border-b">
                                                 Hsn/Sac <span className="text-red-500">*</span>
                                             </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 border-b">
                                                 TAX (%)
                                             </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 border-b">
                                                 Amount<span className="text-red-500">*</span>
                                             </th>
                                         </tr>
                                     </thead>
                                     {renderTableRows()}
                                 </table>
+                                <div className="form-buttons text-left mt-2">
+                                    <Button type="primary" onClick={handleAddRow}>
+                                        <PlusOutlined /> Add Items
+                                    </Button>
+                                </div>
                             </div>
                             {renderSummarySection()}
                         </div>
@@ -859,7 +873,7 @@ const sub = subClientsss?.SubClient?.data;
                         <Button type="primary" htmlType="submit">Create</Button>
                     </div> */}
                         <Form.Item>
-                            <Row justify="end" gutter={16}>
+                            <Row justify="end" gutter={16} className='mt-4'>
                                 <Col>
                                     <Button onClick={onClose}>Cancel</Button>
                                 </Col>

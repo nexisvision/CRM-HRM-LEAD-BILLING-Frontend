@@ -85,6 +85,19 @@ export const EditProdu = createAsyncThunk(
   }
 );
 
+// Add new thunk for getting all products
+export const GetAllProdu = createAsyncThunk(
+  "products/GetAllProdu",
+  async (_, thunkAPI) => {
+    try {
+      const response = await UserService.GetAllPro();
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response?.data);
+    }
+  }
+);
+
 // Async thunk for updating a user
 
 const initialUser = () => {
@@ -187,6 +200,20 @@ const ProductsSlice = createSlice({
       .addCase(EditProdu.rejected, (state, action) => {
         state.isLoading = false;
         message.error(action.payload?.message);
+      })
+
+      // Add cases for GetAllProdu
+      .addCase(GetAllProdu.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(GetAllProdu.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.Product = action.payload;
+        message.success("Products fetched successfully");
+      })
+      .addCase(GetAllProdu.rejected, (state, action) => {
+        state.isLoading = false;
+        message.error(action.payload?.message || "Failed to fetch products");
       });
   },
 });

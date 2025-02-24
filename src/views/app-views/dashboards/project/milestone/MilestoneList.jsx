@@ -214,7 +214,7 @@ export const MilestoneList = () => {
       },
     },
     {
-      title: "budget ",
+      title: "Budget ",
       dataIndex: "add_cost_to_project_budget",
       sorter: {
         compare: (a, b) =>
@@ -223,7 +223,7 @@ export const MilestoneList = () => {
       },
     },
     {
-      title: "status",
+      title: "Status",
       dataIndex: "milestone_status",
       render: (_, record) => (
         <>

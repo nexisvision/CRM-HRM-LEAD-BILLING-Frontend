@@ -110,9 +110,9 @@ function ViewBilling({ billingId }) {
             <div className='bg-gray-50 ml-[-51px] mr-[-24px] mt-[-52px] mb-[-30px] rounded-t-lg rounded-b-lg p-10'>
                 <h2 className="mb-6 border-b pb-[30px] font-medium"></h2>
 
-                {/* <div className='p-10 pt-3 pb-3'>
+                <div className='p-10 pt-3 pb-3'>
                     <BillingDetailsList billingId={billingId} />
-                </div> */}
+                </div>
 
                 {/* Container for sections to be downloaded */}
                 <Card className=''>

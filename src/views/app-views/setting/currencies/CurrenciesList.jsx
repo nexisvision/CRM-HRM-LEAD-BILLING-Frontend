@@ -48,7 +48,7 @@ export const CurrenciesList = () => {
         if (!filterdata || filterdata.length === 0) {
             dispatch(getcurren());
         }
-    }, [dispatch, filterdata]); 
+    }, [dispatch]); 
 
     const allcurrdata = filterdata?.filter((item) => item?.created_by === userData?.username);
    

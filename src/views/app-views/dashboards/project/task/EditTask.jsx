@@ -50,6 +50,8 @@ const EditTask = ({ idd, onClose }) => {
   const [statuses, setStatuses] = useState([]);
 
 
+  const CustomInput = ({ field, form, ...props }) => <Input {...field} {...props} />;
+
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
   const [initialValues, setInitialValues] = useState({
@@ -61,7 +63,8 @@ const EditTask = ({ idd, onClose }) => {
     assignTo: [],
     description: "",
     status: "",
-    priority: ""
+    priority: "",
+    addfile: ""
   });
 
   const validationSchema = Yup.object({
@@ -70,6 +73,7 @@ const EditTask = ({ idd, onClose }) => {
     dueDate: Yup.date().nullable(),
     assignTo: Yup.array().min(1, "Please select at least one AssignTo."),
     description: Yup.string().required("Please enter a Description."),
+    addfile: Yup.mixed().required("Please upload a file."),
   });
 
   const allempdata = useSelector((state) => state.Tasks);
@@ -88,6 +92,8 @@ const EditTask = ({ idd, onClose }) => {
   const allproject = useSelector((state) => state.Project);
   const fndrewduxxdaa = allproject.Project.data || [];
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
+
+  const [fileList, setFileList] = useState([]);
 
 
 
@@ -121,7 +127,8 @@ const EditTask = ({ idd, onClose }) => {
           assignTo: assignToArray,
           description: milestone.description || "",
           status: milestone.status || "",
-          priority: milestone.priority || ""
+          priority: milestone.priority || "",
+          // addfile: milestone.addfile || ""
         };
 
         setInitialValues(updatedValues);
@@ -158,9 +165,6 @@ const EditTask = ({ idd, onClose }) => {
   }, []);
 
 
-
-
-
   const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
     if (!newValue.trim()) {
       message.error(`Please enter a ${lableType} name.`);
@@ -184,10 +188,14 @@ const EditTask = ({ idd, onClose }) => {
     }
   };
 
-
+// Handle file upload changes
+const handleFileChange = ({ fileList: newFileList }) => {
+  setFileList(newFileList);
+};
 
 
   const onSubmit = (values, { resetForm }) => {
+     
     // Prepare the data for submission
     const formData = {
       taskName: values.taskTitle,
@@ -198,8 +206,21 @@ const EditTask = ({ idd, onClose }) => {
       assignTo: values.assignTo,
       description: values.description,
       status: values.status,
-      priority: values.priority
+      priority: values.priority,
+      // addfile: values.addfile
     };
+
+     // Append all form values
+     Object.keys(values).forEach(key => {
+      if (key !== 'Add File') {
+          formData.append(key, values[key]);
+      }
+  });
+
+  // Append the file if exists
+  if (fileList[0]?.originFileObj) {
+      formData.append('Add File', fileList[0].originFileObj);
+  }
 
     dispatch(EditTasks({ idd, values: formData }))
       .then(() => {
@@ -488,7 +509,27 @@ const EditTask = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-
+              <div className="mt-4 w-full">
+                <span className="block font-semibold p-2">Add File</span>
+                <Col span={24}>
+                  <Upload
+                    beforeUpload={() => false} // Prevent auto upload
+                    listType="picture"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    maxCount={1}
+                    fileList={fileList}
+                    onChange={handleFileChange}
+                    showUploadList={{ 
+                      showRemoveIcon: true,
+                      showPreviewIcon: true,
+                      className: "upload-list-inline"
+                    }}
+                    className="border-2 flex flex-col justify-center items-center p-10"
+                  >
+                    <Button icon={<UploadOutlined />}>Choose File</Button>
+                  </Upload>
+                </Col>
+              </div>
 
 
 
