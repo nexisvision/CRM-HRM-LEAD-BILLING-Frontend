@@ -71,6 +71,8 @@ import esignature from "views/app-views/setting/esignature/EsignatureReducers/Es
 import generalsetting from "../views/app-views/setting/general/generalReducer/generalSlice"
 import leadestimate from "views/app-views/dashboards/leads/estimates/estimatesReducer/EstimatesSlice"
 import account from "../views/app-views/dashboards/banking/account/AccountReducer/AccountSlice"
+import transfer from "../views/app-views/dashboards/banking/transfer/transferReducers/transferSlice"
+import vendors from "../views/app-views/dashboards/Purchase/vendor/vendorReducers/vendorSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -146,6 +148,8 @@ const rootReducer = (asyncReducers) => (state, action) => {
         generalsetting,
         leadestimate,
         account,
+        transfer,
+        vendors,
         // employee,
         // department,
         ...asyncReducers,

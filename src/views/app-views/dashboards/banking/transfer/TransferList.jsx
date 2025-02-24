@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal ,Select} from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, EditOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -10,19 +10,20 @@ import { AnnualStatisticData } from '../../../dashboards/default/DefaultDashboar
 import AvatarStatus from 'components/shared-components/AvatarStatus';
 // import AddJob from './AddJob';
 import { useNavigate } from 'react-router-dom';
-import userData from 'assets/data/user-list.data.json';
-import OrderListData from 'assets/data/order-list.data.json';
 import utils from 'utils';
 import AddTransfer from './AddTransfer';
 import EditTransfer from './EditTransfer';
+import { transferdatas, transferdeltess } from './transferReducers/transferSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import List from 'rc-virtual-list';
 // import AddAccount from './AddAccount';
 // import EditAccount from './EditAccount';
 // import EditJob from './EditJob'
 const { Option } = Select
 
 const TransferList = () => {
-  const [users, setUsers] = useState(userData);
-  const [list, setList] = useState(OrderListData);
+  const [users, setUsers] = useState([]);
+  const [list, setList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -31,6 +32,7 @@ const TransferList = () => {
   const [isAddAccountModalVisible, setIsAddAccountModalVisible] = useState(false);
   const [isEditAccountModalVisible, setIsEditAccountModalVisible] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch()
   // const [isViewJobModalVisible, setIsViewJobModalVisible] = useState(false);
   const [annualStatisticData] = useState(AnnualStatisticData);
   const [selectedAccount, setSelectedAccount] = useState(null);
@@ -38,9 +40,14 @@ const TransferList = () => {
   const [isAddTransferModalVisible, setIsAddTransferModalVisible] = useState(false);
   const [isEditTransferModalVisible, setIsEditTransferModalVisible] = useState(false);
   const [selectedTransfer, setSelectedTransfer] = useState(null);
+  const [idd, setIdd] = useState("");
 
   // Add account type options
   const accountTypeList = ['All', 'Salary', 'Savings', 'Current'];
+
+  useEffect(()=>{
+    dispatch(transferdatas())
+  },[dispatch])
 
   // Open Add Job Modal
   const openAddJobModal = () => {
@@ -51,7 +58,7 @@ const TransferList = () => {
     setIsAddJobModalVisible(false);
   };
   const handleJob = () => {
-    navigate('/app/hrm/jobs/viewjob', { state: { user: selectedUser } }); // Pass user data as state if needed
+    navigate('/app/hrm/jobs/viewjob', { state: { user: selectedUser } }); 
   };
    // Open Add Job Modal
    const openEditJobModal = () => {
@@ -65,21 +72,18 @@ const TransferList = () => {
   const handleAccountTypeFilter = value => {
     setAccountType(value);
     if (value !== 'All') {
-      const filteredData = OrderListData.filter(item => 
+      const filteredData = list.filter(item => 
         item.accounttype && item.accounttype.toLowerCase() === value.toLowerCase()
       );
       setList(filteredData);
-    } else {
-      setList(OrderListData);
     }
   };
   // Search functionality
   const onSearch = (e) => {
     const value = e.currentTarget.value;
-    const searchArray = value ? list : OrderListData;
+    const searchArray = list;
     let data = utils.wildCardSearch(searchArray, value);
     
-    // Apply account type filter if not 'All'
     if (accountType !== 'All') {
       data = data.filter(item => 
         item.accounttype && item.accounttype.toLowerCase() === accountType.toLowerCase()
@@ -91,9 +95,26 @@ const TransferList = () => {
   };
   // Delete user
   const deleteUser = (userId) => {
-    setUsers(users.filter((item) => item.id !== userId));
-    message.success({ content: `Deleted user ${userId}`, duration: 2 });
+    dispatch(transferdeltess(userId))
+      .then(()=>{
+        dispatch(transferdatas())
+        setList(list.filter((item) => item.id !== userId));
+      })
   };
+
+  const loggeddata = useSelector((state)=>state.user.loggedInUser.username);
+
+  const alltransferdata = useSelector((state)=>state?.transfer?.transfer?.data);
+
+  const fnsadadata = alltransferdata?.filter((item)=>item?.created_by === loggeddata)
+
+
+  useEffect(()=>{
+    if(fnsadadata){
+      setList(fnsadadata)
+    }
+},[alltransferdata])
+
   // Show user profile
   const showUserProfile = (userInfo) => {
     setSelectedUser(userInfo);
@@ -117,10 +138,10 @@ const TransferList = () => {
   const handleShowStatus = value => {
         if (value !== 'All') {
             const key = 'status'
-            const data = utils.filterArray(userData, key, value)
+            const data = utils.filterArray(users, key, value)
             setUsers(data)
         } else {
-            setUsers(userData)
+            setUsers(users)
         }
     }
   
@@ -303,6 +324,7 @@ const TransferList = () => {
   const openEditTransferModal = (transfer) => {
     setSelectedTransfer(transfer);
     setIsEditTransferModalVisible(true);
+    setIdd(transfer.id)
   };
 
   const closeEditTransferModal = () => {
@@ -387,6 +409,7 @@ const TransferList = () => {
         <EditTransfer 
           onClose={closeEditTransferModal} 
           transferData={selectedTransfer}
+          idd={idd}
         />
       </Modal>
     </Card>

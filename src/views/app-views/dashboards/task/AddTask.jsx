@@ -370,8 +370,8 @@ const AddTask = ({ onClose }) => {
               {/* Add File Upload field */}
               <Col span={24} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Attachments <span className="text-rose-500">*</span></label>
-                  <Upload {...uploadProps} className="mt-2">
+                  <label className="font-semibold">Attachments <span className="text-rose-500">*</span></label><br/>
+                  <Upload {...uploadProps} className="mt-3">
                     <Button icon={<UploadOutlined />} className="hover:bg-gray-50">
                       Click to Upload Files
                     </Button>

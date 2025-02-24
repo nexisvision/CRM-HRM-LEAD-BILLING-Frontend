@@ -27,6 +27,7 @@ import { GetLable, AddLable } from "../project/milestone/LableReducer/LableSlice
 import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
+import useSelection from "antd/es/table/hooks/useSelection";
 
 const { Option } = Select;
 
@@ -131,8 +132,12 @@ const currenciesState = useSelector((state) => state.currencies);
     dispatch(getallcountries());
   }, []);
 
+  const alllogeddata =  useSelector((state)=>state.user.loggedInUser.username)
+  
   const allstagedata = useSelector((state) => state.StagesLeadsDeals);
   const fndata = allstagedata?.StagesLeadsDeals?.data || [];
+
+  const filterdatas = fndata.filter((item)=>item.created_by === alllogeddata)
 
   const allcurrency = useSelector((state) => state.currencies);
   const fndcurr = allcurrency?.currencies?.data || [];
@@ -419,7 +424,7 @@ const currenciesState = useSelector((state) => state.currencies);
                     <span className="text-rose-500"> *</span>
                   </label>
                   <div className="flex gap-2">
-                    {fndata ? (
+                    {filterdatas ? (
                       <Field name="leadStage">
                         {({ field, form }) => (
                           <Select
@@ -431,7 +436,7 @@ const currenciesState = useSelector((state) => state.currencies);
                               form.setFieldValue("leadStage", value)
                             }
                           >
-                            {fndata.map((currency) => (
+                            {filterdatas.map((currency) => (
                               <Option key={currency.id} value={currency.id}>
                                 {currency.stageName}
                               </Option>

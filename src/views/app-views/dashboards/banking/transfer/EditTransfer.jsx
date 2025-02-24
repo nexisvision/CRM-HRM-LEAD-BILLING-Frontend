@@ -1,41 +1,82 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, DatePicker, Select, Row, Col, Checkbox, message } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
 import { Formik, Field, Form as FormikForm, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAccounts } from '../account/AccountReducer/AccountSlice';
+import {  eidttransfer, transferdatas } from './transferReducers/transferSlice';
+import moment from 'moment';
 const { Option } = Select;
 
-const EditTransfer = ({ onClose }) => {
+const EditTransfer = ({ onClose, initialData, idd }) => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
-    const initialValues = {
-        date: '',
-        fromaccount: '',
-        toaccount: '',
-        amount: '',
-        description: '',
-    };
+    const [initialValues,setInitialValues] = useState({
+        date: initialData?.date ? moment(initialData.date) : null,
+        fromAccount: initialData?.fromAccount || '',
+        toAccount: initialData?.toAccount || '',
+        amount: initialData?.amount || '',
+        description: initialData?.description || '',
+        // bankaddress: initialData?.bankaddress || '',
+    });
 
     const validationSchema = Yup.object({
         date: Yup.string().required('Please enter a date.'),
-        fromaccount: Yup.string().required('Please enter a from account.'),
-        toaccount: Yup.string().required('Please enter a to account.'),
+        fromAccount: Yup.string().required('Please enter a from account.'),
+        toAccount: Yup.string().required('Please enter a to account.'),
         amount: Yup.string().required('Please enter a amount.'),
         description: Yup.string().required('Please enter a description.'),
-        bankaddress: Yup.string().required('Please enter a bank address.'),
+        // bankaddress: Yup.string().required('Please enter a bank address.'),
     });
 
-    const onSubmit = async (values, { setSubmitting }) => {
+    useEffect(() => {
+        dispatch(getAccounts())
+    }, [dispatch])
+
+    useEffect(()=>{
+        dispatch(transferdatas())
+      },[dispatch])
+
+      const alldata = useSelector((state)=>state?.transfer?.transfer?.data);
+      const loggeddata = useSelector((state)=>state?.user?.loggedInUser?.username);
+
+      const fnsadadata = alldata?.filter((item)=>item?.created_by === loggeddata);
+
+      useEffect(()=>{
+        const data = fnsadadata?.find((item)=>item?.id === idd)
+        if(data){
+            setInitialValues({
+                date: data?.date ? moment(data.date) : null,
+                fromAccount: data?.fromAccount || '',
+                toAccount: data?.toAccount || '',
+                amount: data?.amount || '',
+                description: data?.description || '',
+                // bankaddress: data?.bankaddress || '',   
+            })
+        }
+      },[fnsadadata, idd])
+
+    const accountdata = useSelector((state) => state.account.account.data);
+
+    const onSubmit = async (values, { setSubmitting, resetForm }) => {
         try {
-            // Add your API call here
-            console.log('Form values:', values);
-            message.success('Account created successfully!');
-            onClose();
-            navigate('/app/dashboards/banking/transfer'); // Updated to always navigate to account list
+            const formattedValues = {
+                ...values,
+                date: values.date ? moment(values.date).format('YYYY-MM-DD') : null,
+            };
+            
+            dispatch(eidttransfer({idd, values: formattedValues}))
+                .then(() => {
+                    onClose();
+                    resetForm();
+                    dispatch(transferdatas())
+                })
         } catch (error) {
-            message.error('Failed to create account');
+            message.error('Failed to update account');
         } finally {
             setSubmitting(false);
         }
@@ -49,46 +90,43 @@ const EditTransfer = ({ onClose }) => {
                 initialValues={initialValues}
                 validationSchema={validationSchema}
                 onSubmit={onSubmit}
+                enableReinitialize={true}
             >
                 {({ handleSubmit, isSubmitting, setFieldValue, values, setFieldTouched }) => (
                     <FormikForm onSubmit={handleSubmit}>
                         <Row gutter={16}>
-                            <Col span={12}>
-                                <div className="form-group">
-                                    <label className="font-semibold">Date <span className="text-red-500">*</span></label>
-                                    <Field name="date">
-                                        {({ field }) => (
-                                            <DatePicker
-                                                {...field}
-                                                className="w-full mt-1"
-                                                placeholder="Select date"
-                                                onChange={(date) => field.onChange(date)}
-                                            />
-                                        )}
-                                    </Field>
-                                    <ErrorMessage
-                                        name="date"
-                                        component="div"
-                                        className="text-red-500 mt-1"
-                                    />
-                                </div>
-                            </Col>
+                        <Col span={12} className="">
+                        <div className="form-item">
+                      <label className="font-semibold">Date <span className="text-red-500">*</span></label>
+                      <input
+                        type="date"
+                        className="w-full mt-2 p-2 border rounded "
+                        // value={values.date || ''}
+                      />
+                      <ErrorMessage
+                        name="date"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
 
                             <Col span={12}>
                                 <div className="form-group">
                                     <label className="font-semibold">From Account <span className="text-red-500">*</span></label>
-                                    <Field name="fromaccount">
+                                    <Field name="fromAccount">
                                         {({ field }) => (
                                             <Select
                                                 {...field}
-                                                onChange={(value) => setFieldValue('fromaccount', value)}
+                                                onChange={(value) => setFieldValue('fromAccount', value)}
                                                 placeholder="Select from account"
                                                 className="w-full mt-1"
                                             >
-                                                <Option value="sbi">State Bank of India</Option>
-                                                <Option value="hdfc">HDFC Bank</Option>
-                                                <Option value="icici">ICICI Bank</Option>
-                                                <Option value="axis">Axis Bank</Option>
+                                                {accountdata && accountdata?.map((account) => (
+                                                    <Option key={account.id} value={account.id}>
+                                                        {account.bankName}
+                                                    </Option>
+                                                ))}
                                             </Select>
                                         )}
                                     </Field>
@@ -103,18 +141,30 @@ const EditTransfer = ({ onClose }) => {
                             <Col span={12}>
                                 <div className="form-group mt-2">
                                     <label className="font-semibold">To Account <span className="text-red-500">*</span></label>
-                                    <Field name="toaccount">
+                                    <Field name="toAccount">
                                         {({ field }) => (
-                                            <Input {...field} placeholder="Enter to account" className="w-full mt-1" />
+                                            <Select
+                                                {...field}
+                                                onChange={(value) => setFieldValue('toAccount', value)}
+                                                placeholder="Select to account"
+                                                className="w-full mt-1"
+                                            >
+                                                {accountdata && accountdata.map((account) => (
+                                                    <Option key={account.id} value={account.id}>
+                                                        {account.bankName}
+                                                    </Option>
+                                                ))}
+                                            </Select>
                                         )}
                                     </Field>
                                     <ErrorMessage
-                                        name="toaccount"
+                                        name="toAccount"
                                         component="div"
                                         className="text-red-500 mt-1"
                                     />
                                 </div>
                             </Col>
+
 
                             <Col span={12}>
                                 <div className="form-group mt-2">
@@ -134,7 +184,7 @@ const EditTransfer = ({ onClose }) => {
 
                             
 
-                            <Col span={24}>
+                            {/* <Col span={24}>
                                 <div className="form-group mt-2">
                                     <label className="font-semibold">Bank Address <span className="text-red-500">*</span></label>
                                     <Field
@@ -149,7 +199,7 @@ const EditTransfer = ({ onClose }) => {
                                         className="text-red-500 mt-1"
                                     />
                                 </div>
-                            </Col>
+                            </Col> */}
 
                             <Col span={24} className="">
                                 <div className="form-item mt-3">
