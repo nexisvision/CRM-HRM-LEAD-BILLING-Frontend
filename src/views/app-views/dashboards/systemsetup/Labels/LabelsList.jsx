@@ -156,10 +156,7 @@ const LabelsList = () => {
                 No lead stages available.
               </div>
             )}
-            <div className="font-medium text-sm p-3">
-              Note: You can easily change the order of lead stages using drag &
-              drop.
-            </div>
+            
           </div>
         </div>
       </div>

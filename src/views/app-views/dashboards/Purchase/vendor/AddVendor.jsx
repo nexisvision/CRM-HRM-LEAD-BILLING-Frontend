@@ -40,12 +40,12 @@ const AddVendor = ({ onClose }) => {
       await dispatch(vendordataeaddd(values))
         .then(()=>{
           dispatch(vendordataedata())
-          message.success('Vendor created successfully!');
+          // message.success('Vendor created successfully!');
           onClose();
         })
    
     } catch (error) {
-      message.error('Failed to create vendor');
+      // message.error('Failed to create vendor');
     } finally {
       setLoading(false);
       setSubmitting(false);

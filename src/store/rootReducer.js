@@ -74,6 +74,7 @@ import account from "../views/app-views/dashboards/banking/account/AccountReduce
 import transfer from "../views/app-views/dashboards/banking/transfer/transferReducers/transferSlice"
 import vendors from "../views/app-views/dashboards/Purchase/vendor/vendorReducers/vendorSlice"
 import debitNotes from "../views/app-views/dashboards/Purchase/debitnotes/debitReducer/DebitSlice"
+import payment from "../views/app-views/dashboards/sales/billing/paymentReducer/PaymentSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -152,6 +153,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
         transfer,
         vendors,
         debitNotes,
+        payment,
         // employee,
         // department,
         ...asyncReducers,

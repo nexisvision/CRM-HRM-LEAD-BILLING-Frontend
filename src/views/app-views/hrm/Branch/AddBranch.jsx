@@ -14,7 +14,7 @@ const validationSchema = Yup.object().shape({
   branchManager: Yup.string()
     .required('Branch Manager is required')
     .min(2, 'Branch Manager name must be at least 2 characters'),
-  address: Yup.string()
+    branchAddress: Yup.string()
     .required('Address is required')
     .min(5, 'Address must be at least 5 characters'),
 });
@@ -45,7 +45,7 @@ const AddBranch = ({ onClose }) => {
         initialValues={{
           branchName: '',
         }}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({ errors, touched, setFieldValue, resetForm }) => (
@@ -86,13 +86,13 @@ const AddBranch = ({ onClose }) => {
                   <label className="font-semibold">Address <span className="text-red-500">*</span></label>
                   <Field
                     as={Input}
-                    name="address"
+                    name="branchAddress"
                     className="w-full mt-1"
                     placeholder="Enter Branch Address"
-                    onChange={(e) => setFieldValue('address', e.target.value)}
+                    onChange={(e) => setFieldValue('branchAddress', e.target.value)}
                   />
-                  {errors.address && touched.address && (
-                    <div style={{ color: 'red', fontSize: '12px' }}>{errors.address}</div>
+                  {errors.branchAddress && touched.branchAddress && (
+                    <div style={{ color: 'red', fontSize: '12px' }}>{errors.branchAddress}</div>
                   )}
                 </div>
               </Col>

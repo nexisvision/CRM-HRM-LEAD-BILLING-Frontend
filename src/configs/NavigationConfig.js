@@ -673,19 +673,20 @@ const dashBoardNavTree = [{
                 breadcrumb: true,
                 submenu: []
               },
-              {
-                key: 'dashboards-purchase-debitnote',
-                path: `${APP_PREFIX_PATH}/dashboards/purchase/debitnote`,
-                title: 'Debit Note',
-                icon: DollarOutlined,
-                breadcrumb: true,
-                submenu: []
-              },
+              
               {
                 key: 'dashboards-purchase-billing',
                 path: `${APP_PREFIX_PATH}/dashboards/sales/billing`,
                 title: 'Billing',
                 icon: EuroCircleOutlined,
+                breadcrumb: true,
+                submenu: []
+              },
+              {
+                key: 'dashboards-purchase-debitnote',
+                path: `${APP_PREFIX_PATH}/dashboards/purchase/debitnote`,
+                title: 'Debit Note',
+                icon: DollarOutlined,
                 breadcrumb: true,
                 submenu: []
               },

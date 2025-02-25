@@ -11,13 +11,20 @@ import DateRangeFilter from "../../../../components/DateRangeFilter.jsx";
 import TicketList from "../../../../components/TicketTableList.jsx";
 import RegistionTable from "../../../../components/RegistrationTableList.jsx";
 import { Pie } from "react-chartjs-2";
-import { Row, Col } from "antd";
+import { Table, Row, Col, } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData } from "views/app-views/company/CompanyReducers/CompanySlice.jsx";
 import { GetPlan } from "views/app-views/plan/PlanReducers/PlanSlice.jsx";
 import { getAllTicket } from "views/app-views/pages/customersupports/ticket/TicketReducer/TicketSlice.jsx";
 import { getsubplandata } from "views/app-views/subscribeduserplans/subplanReducer/subplanSlice.jsx";
-import { Empty } from "antd";
+import { Empty,Badge } from "antd";
+import SubscribedUserPlansList from "views/app-views/subscribeduserplans/SubscribedUserPlansList.jsx";
+import Flex from 'components/shared-components/Flex'; // Use your existing Flex component
+import DonutChartWidget from 'components/shared-components/DonutChartWidget';
+import { getallcountries } from 'views/app-views/setting/countries/countriesreducer/countriesSlice';
+import dayjs from "dayjs";
+import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
+import utils from "utils";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -25,6 +32,7 @@ const DashboardList = () => {
   const dispatch = useDispatch();
   const [clientdata, setclientdata] = useState("");
   const [plan, setPlan] = useState("");
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     dispatch(ClientData());
@@ -53,6 +61,31 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
 
   console.log("fnddtat",fnddtat);
 
+  useEffect(() => {
+    dispatch(getsubplandata());
+  }, []);
+
+
+  useEffect(() => {
+    dispatch(GetPlan());
+    dispatch(ClientData());
+  }, []);
+
+
+  const allclient = useSelector((state) => state.ClientData);
+  const fndclient = allclient.ClientData.data || [];
+
+  const allplan = useSelector((state) => state.Plan);
+  const fndplan = allplan?.Plan || [];
+
+
+
+  useEffect(() => {
+    if (fnddtat) {
+      setUsers(fnddtat);
+    }
+  }, [fnddtat]);
+
 
   useEffect(() => {
     setTasks(fnddataticket);
@@ -63,6 +96,58 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
   }, []);
 
   useEffect(() => {
+    dispatch(getallcountries());
+  }, [dispatch]);
+
+    // Update the ticketStatusColors definition
+    const ticketStatusColors = {
+      'Low': '#22c55e',    // Green for low priority
+      'Medium': '#f97316',  // Orange for medium priority
+      'High': '#ef4444',    // Red for high priority
+      'Unknown': '#94a3b8'  // Gray for unknown/undefined priority
+    };
+    
+    // Calculate ticket status data
+    const calculateTicketStatusData = () => {
+      if (!fnddataticket || !Array.isArray(fnddataticket)) {
+        return {
+          sessionData: [],
+          sessionLabels: [],
+          conbinedSessionData: []
+        };
+      }
+  
+      // Count tickets by priority and ensure correct color mapping
+      const statusCounts = fnddataticket.reduce((acc, ticket) => {
+        // Convert priority to proper case to match our color mapping
+        const priority = (ticket.priority || 'Unknown').charAt(0).toUpperCase() + 
+                        (ticket.priority || 'Unknown').slice(1).toLowerCase();
+        acc[priority] = (acc[priority] || 0) + 1;
+        return acc;
+      }, {});
+
+      // Create arrays for chart data
+      const sessionLabels = Object.keys(statusCounts);
+      const sessionData = Object.values(statusCounts);
+      
+      // Create combined data for legend with correct colors
+      const conbinedSessionData = sessionLabels.map((label) => ({
+        label: label,
+        data: statusCounts[label],
+        color: ticketStatusColors[label]
+      }));
+
+      return {
+        sessionData,
+        sessionLabels,
+        conbinedSessionData
+      };
+    };
+
+  // Get the calculated data
+  const { sessionData, sessionLabels, conbinedSessionData } = calculateTicketStatusData();
+
+  useEffect(() => {
     const datalength = fnddataclint?.length; // Getting the length of the array
     setclientdata(datalength); // Storing only the length of the array
   }, [fnddataclint]); // Add fnddataclint as dependency to update when it changes
@@ -71,6 +156,76 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
     const datalength = fnddataplan?.length; // Getting the length of the array
     setPlan(datalength); // Storing only the length of the array
   }, [fnddataclint]);
+
+
+  const tableColumns = [
+    // {
+    //   title: "created_by",
+    //   dataIndex: "created_by",
+    // },
+    {
+      title: "Plan Name",
+      dataIndex: "plan_id",
+      render: (plan_id) => {
+        const plan = fndplan.find((p) => p.id === plan_id);
+        return plan ? plan.name : "Unknown Plan"; // Display the plan name or a fallback
+      },
+    },
+
+    {
+      title: "Client Name",
+      dataIndex: "client_id",
+      render: (client_id) => {
+        const client = fndclient.find((c) => c.id === client_id);
+        return client ? client.username : "Unknown Client"; // Display the client name or a fallback
+      },
+    },
+
+    {
+      title: "Total Client Count",
+      dataIndex: "current_clients_count",
+    },
+
+    {
+      title: "Total Storage Used",
+      dataIndex: "current_storage_used",
+    },
+
+    {
+      title: "Total Users Count",
+      dataIndex: "current_users_count",
+    },
+
+    {
+      title: "Payment Status",
+      dataIndex: "payment_status",
+    },
+
+    {
+      title: "Status",
+      dataIndex: "status",
+    },
+
+    {
+      title: "Start Date",
+      dataIndex: "start_date",
+      render: (_, record) => (
+        <span>{dayjs(record.start_date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "start_date"),
+    },
+    
+    {
+      title: "End Date",
+      dataIndex: "end_date",
+      render: (_, record) => (
+        <span>{dayjs(record.end_date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "end_date"),
+
+    },
+    
+  ];
 
   const [tasks, setTasks] = useState([
     {
@@ -138,6 +293,69 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
   // 	setExpenses(expenses + 50);  // Add 50 to expenses
   // };
 
+  // Add this calculation function after your existing useEffect hooks
+  const calculateYearlyTotal = () => {
+    if (!fnddataplan || !Array.isArray(fnddataplan)) return 0;
+    
+    return fnddataplan.reduce((total, plan) => {
+      const price = parseFloat(plan.price) || 0;
+      const duration = plan.duration?.toLowerCase() || '';
+
+      if (duration.includes('month')) {
+        // If monthly plan, multiply by 12 for yearly amount
+        return total + (price * 12);
+      } else if (duration.includes('year')) {
+        // If yearly plan, add directly
+        return total + price;
+      }
+      return total;
+    }, 0);
+  };
+
+  // Add this calculation function after your existing useEffect hooks
+  const calculateYearlySales = () => {
+    if (!fnddtat || !Array.isArray(fnddtat)) return 0;
+    
+    return fnddtat.reduce((total, subscription) => {
+      const plan = fnddataplan?.find(p => p.id === subscription.plan_id);
+      if (!plan) return total;
+
+      const price = parseFloat(plan.price) || 0;
+      const duration = plan.duration?.toLowerCase() || '';
+
+      if (duration.includes('month')) {
+        // If monthly plan, multiply by 12 for yearly amount
+        return total + (price * 12);
+      } else if (duration.includes('year')) {
+        // If yearly plan, add directly
+        return total + price;
+      }
+      return total;
+    }, 0);
+  };
+
+  const calculateRegionDistribution = () => {
+    if (!fnddataclint || !Array.isArray(fnddataclint)) return [];
+    
+    // Count companies by state
+    const stateCount = fnddataclint.reduce((acc, company) => {
+      const state = company.state || 'Unknown';
+      acc[state] = (acc[state] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Calculate percentages
+    const total = Object.values(stateCount).reduce((a, b) => a + b, 0);
+    const distribution = Object.entries(stateCount).map(([state, count]) => ({
+      state,
+      percentage: ((count / total) * 100).toFixed(1),
+      count
+    }));
+
+    // Sort by percentage in descending order
+    return distribution.sort((a, b) => b.percentage - a.percentage);
+  };
+
   return (
     <div className="p-2 bg-gray-50">
       <div className="flex justify-between items-center mb-6">
@@ -145,6 +363,72 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
         {/* <DateRangeFilter onDateRangeChange={(range) => { 
                   console.log('Selected range:', range);
                 }} /> */}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        {/* Yearly Revenue Card */}
+        {/* <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-lg text-gray-700 font-medium mb-4">Total Yearly Revenue</h2>
+          <div className="flex items-center gap-3">
+            <span className="text-3xl font-bold text-[#1b2559]">
+              ${calculateYearlyTotal().toLocaleString()}
+            </span>
+            <span className="text-green-500 flex items-center font-bold text-lg">
+              Yearly
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
+              </svg>
+            </span>
+          </div>
+          <p className="text-gray-500 text-sm mt-2">Total value of all plans (yearly)</p>
+        </div> */}
+
+        {/* Revenue Card */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-lg text-gray-700 font-medium mb-4">Plan</h2>
+          <div className="flex items-center gap-3">
+            <span className="text-3xl font-bold text-[#1b2559]">$2,454</span>
+            <span className="text-red-500 flex items-center font-bold text-lg">
+              -11.4%
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" />
+              </svg>
+            </span>
+          </div>
+          <p className="text-gray-500 text-sm mt-2">Compare to last year (2019)</p>
+        </div>
+
+        {/* Sales Card */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-lg text-gray-700 font-medium mb-4">Companys</h2>
+          <div className="flex items-center gap-3">
+            <span className="text-3xl font-bold text-[#1b2559]">
+              ${calculateYearlySales().toLocaleString()}
+            </span>
+            <span className="text-green-500 flex items-center font-bold text-lg">
+              Yearly
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
+              </svg>
+            </span>
+          </div>
+          <p className="text-gray-500 text-sm mt-2">Total sales from active subscriptions (yearly)</p>
+        </div>
+
+        {/* Costs Card */}
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-lg text-gray-700 font-medium mb-4">Costs</h2>
+          <div className="flex items-center gap-3">
+            <span className="text-3xl font-bold text-[#1b2559]">$8,310</span>
+            <span className="text-green-500 flex items-center font-bold text-lg">
+              0.7%
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
+              </svg>
+            </span>
+          </div>
+          <p className="text-gray-500 text-sm mt-2">Compare to last year (2019)</p>
+        </div>
       </div>
     
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-6">
@@ -264,6 +548,88 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
         </Col>
       </Row>
 
+
+
+      <Row gutter={[24, 32]} className="mt-4">
+        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+          <div className="bg-white rounded-lg shadow">
+            {sessionData.length > 0 ? (
+              <DonutChartWidget 
+                series={sessionData}
+                labels={sessionLabels}
+                title="Ticket Priority"
+                height={400}
+                customOptions={{
+                  colors: Object.values(ticketStatusColors),
+                  legend: {
+                    show: false
+                  }
+                }}
+                extra={
+                  <Row justify="center">
+                    <Col xs={20} sm={20} md={20} lg={24}>
+                      <div className="mt-4 mx-auto" style={{maxWidth: 200}}>
+                        {conbinedSessionData.map(elm => (
+                          <Flex alignItems="center" justifyContent="space-between" className="mb-3" key={elm.label}>
+                            <Flex gap={5}>
+                              <Badge color={elm.color} />
+                              <span className="text-gray-600">{elm.label}</span>
+                            </Flex>
+                            <span className="font-semibold">{elm.data}</span>
+                          </Flex>
+                        ))}
+                      </div>
+                    </Col>
+                  </Row>
+                }
+              />
+            ) : (
+                  <div className="text-center p-4">
+                    <p className="text-gray-500">Ticket Priority Not Found</p>
+                    <p className="text-sm text-gray-400">No ticket priority data is currently available</p>
+                  </div>
+            )}
+          </div>
+        </Col>
+
+        {/* country */}
+        <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+          <div className="bg-white p-6 rounded-lg shadow">
+            <h2 className="text-xl text-gray-700 font-medium mb-4">Companies in top state</h2>
+            <div className="space-y-4">
+              {/* <div className="flex items-center gap-3 mb-6">
+                <span className="text-3xl font-bold text-[#1b2559]">
+                  {calculateRegionDistribution()[0]?.count || 0}
+                </span>
+                <span className="text-gray-500">Companies in top state</span>
+              </div> */}
+
+              <div className="space-y-3">
+                {calculateRegionDistribution().map((item, index) => (
+                  <div key={item.state} className="flex items-center justify-between text-lg">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${
+                        ['bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500', 'bg-purple-500', 'bg-pink-500'][index % 6]
+                      }`}>
+                      </div>
+                      <span className="text-gray-600">{item.state}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold">{item.percentage}%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Col>
+      </Row>
+
+
+
+     
+     
+
       <div className="container mx-auto p-4 bg-white  rounded-lg shadow mt-8">
         <h1 className="text-xl font-medium text-black">Tickets</h1>
         <div className="">
@@ -280,7 +646,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
         ) : (
           <div className="flex items-center justify-center py-8">
             <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              // image={Empty.PRESENTED_IMAGE_SIMPLE}
               description={
                 <div className="text-center">
                   <p className="text-gray-500">No User Registration Data Available</p>
@@ -290,6 +656,24 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
             />
           </div>
         )}
+      </div>
+      
+      <div className="container mx-auto p-4 bg-white  rounded-lg shadow mt-8">
+        <h1 className="text-xl font-medium text-black">Subscribed User Plans</h1>
+        <div className="table-responsive">
+          <Table
+            columns={tableColumns}
+            dataSource={users}
+            rowKey="id"
+            scroll={{ x: 1200 }}
+            // rowSelection={{
+            // 	selectedRowKeys: selectedRowKeys,
+            // 	type: 'checkbox',
+            // 	preserveSelectedRowKeys: false,
+            // 	...rowSelection,
+            // }}
+          />
+        </div>
       </div>
     </div>
   );

@@ -14,6 +14,7 @@ function ViewBilling({ billingId }) {
     const [isAddBillingModalVisible, setIsAddBillingModalVisible] = useState(false);
     const [isResending, setIsResending] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [billStatus, setBillStatus] = useState(null);
 
     // Modal functions
     const openAddBillingModal = () => setIsAddBillingModalVisible(true);
@@ -105,28 +106,37 @@ function ViewBilling({ billingId }) {
         }
     };
 
+    // Add this function to update bill status
+    const updateBillStatus = (status) => {
+        setBillStatus(status);
+    };
+
     return (
         <>
             <div className='bg-gray-50 ml-[-51px] mr-[-24px] mt-[-52px] mb-[-30px] rounded-t-lg rounded-b-lg p-10'>
                 <h2 className="mb-6 border-b pb-[30px] font-medium"></h2>
 
-                <div className='p-10 pt-3 pb-3'>
-                    <BillingDetailsList billingId={billingId} />
-                </div>
+                {/* Only show BillingDetails if bill is not paid */}
+                {billStatus !== 'paid' && (
+                    <div className='p-10 pt-3 pb-3'>
+                        <BillingDetailsList billingId={billingId} />
+                    </div>
+                )}
 
-                {/* Container for sections to be downloaded */}
                 <Card className=''>
-                <div id="download-sections">
-                    {/* Billing Information Section */}
-                    <div className=' pt-3 pb-3'>
-                        <BillInformationList billingId={billingId} />
-                    </div>
+                    <div id="download-sections">
+                        {/* Pass the updateBillStatus function to BillInformationList */}
+                        <div className=' pt-3 pb-3'>
+                            <BillInformationList 
+                                billingId={billingId} 
+                                onStatusUpdate={updateBillStatus}
+                            />
+                        </div>
 
-                    {/* Product Summary Section */}
-                    <div className=' pb-3'>
-                        <ProductSummaryList billingId={billingId} />
+                        <div className=' pb-3'>
+                            <ProductSummaryList billingId={billingId} />
+                        </div>
                     </div>
-                </div>
                 </Card>
 
                 {/* <div className='px-10 pb-3'>
