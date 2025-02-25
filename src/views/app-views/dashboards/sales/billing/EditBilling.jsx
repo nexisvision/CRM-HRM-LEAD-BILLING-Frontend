@@ -11,6 +11,7 @@ import {
   Col,
   Switch
 } from "antd";
+import Flex from 'components/shared-components/Flex';
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form } from "antd";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,6 +21,9 @@ import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import { addbil, eidtebil, getbil } from "./billing2Reducer/billing2Slice";
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice";
 import moment from "moment";
+import { vendordataedata } from "../../Purchase/vendor/vendorReducers/vendorSlice";
+import { GetAllProdu } from "../../project/product/ProductReducer/ProductsSlice";
+
 
 const { Option } = Select;
 
@@ -37,9 +41,15 @@ const EditBilling = ({ idd, onClose }) => {
   const lid = AllLoggeddtaa.loggedInUser.id;
   const Tagsdetail = useSelector((state) => state.Lable);
 
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
   const [showTax, setShowTax] = useState(false);
   const [discountType, setDiscountType] = useState('percentage');
   const [discountValue, setDiscountValue] = useState(0);
+    // Get products directly from Redux store
+    const productsData = useSelector((state) => state.Product.Product);
+
   const [totals, setTotals] = useState({
     subtotal: "0.00",
     discount: "0.00",
@@ -63,8 +73,12 @@ const EditBilling = ({ idd, onClose }) => {
   const bildata = useSelector((state) => state.salesbilling);
   const fnsdatas = bildata.salesbilling.data;
 
+  const { vendors } = useSelector((state) => state.vendors);
+
   useEffect(() => {
     dispatch(getbil(lid));
+    dispatch(getAllTaxes());
+    dispatch(vendordataedata());
     fetchTags();
   }, []);
 
@@ -164,6 +178,62 @@ const EditBilling = ({ idd, onClose }) => {
   useEffect(() => {
     dispatch(getAllTaxes());
   }, [dispatch]);
+
+  // Fetch products when component mounts
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await dispatch(GetAllProdu());
+        console.log("Products response:", response); // Debug log
+        
+        if (response?.payload?.data) {
+          setProducts(response.payload.data);
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        // message.error("Failed to load products");
+      }
+    };
+
+    fetchProducts();
+  }, [dispatch]);
+
+  // Update local state when Redux store changes
+  useEffect(() => {
+    if (productsData?.data) {
+      console.log("Products from Redux:", productsData.data);
+      setProducts(productsData.data);
+    }
+  }, [productsData]);
+
+  // Product selection handler
+  const handleProductChange = (productId) => {
+    console.log("Selected product ID:", productId); // Debug log
+    
+    if (productId) {
+      const selectedProd = products.find(p => p.id === productId);
+      console.log("Found product:", selectedProd); // Debug log
+      
+      if (selectedProd) {
+        const updatedData = tableData.map((row, index) => {
+          if (index === tableData.length - 1 && !row.item) {
+            return {
+              ...row,
+              item: selectedProd.name,
+              description: selectedProd.description || "",
+              price: selectedProd.price || 0,
+              hsn_sac: selectedProd.hsn_sac || "",
+            };
+          }
+          return row;
+        });
+
+        setTableData(updatedData);
+        setSelectedProduct(productId);
+        calculateTotal(updatedData);
+      }
+    }
+  };
 
   const calculateAmount = (row) => {
     const quantity = Number(row.quantity) || 0;
@@ -432,9 +502,21 @@ const EditBilling = ({ idd, onClose }) => {
               <Form.Item
                 label="Vendor"
                 name="vendor"
-                rules={[{ required: true, message: "Please enter vendor name" }]}
+                rules={[{ required: true, message: "Please select a vendor" }]}
               >
-                <Input placeholder="Enter Vendor Name" />
+                <Select
+                  placeholder="Select Vendor"
+                  showSearch
+                  filterOption={(input, option) =>
+                    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  {vendors?.data?.map((vendor) => (
+                    <Option key={vendor._id} value={vendor.name}>
+                      {vendor.name}
+                    </Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
 
@@ -538,11 +620,35 @@ const EditBilling = ({ idd, onClose }) => {
           </div>
 
           <div>
-            <div className="form-buttons text-right mb-2">
-              <Button type="primary" onClick={handleAddRow}>
-                <PlusOutlined /> Add Items
-              </Button>
-            </div>
+          <Flex alignItems="center" mobileFlex={false} className='flex mb-4 gap-4'>
+              <Flex className="flex" mobileFlex={false}>
+                <div className="w-full flex gap-4">
+                  <div>
+                    <Select
+                      value={selectedProduct}
+                      onChange={handleProductChange}
+                      className="w-full !rounded-none"
+                      placeholder="Select Product"
+                      rootClassName="!rounded-none"
+                      allowClear
+                      loading={!products.length}
+                    >
+                      {products && products.length > 0 ? (
+                        products.map((product) => (
+                          <Option key={product.id} value={product.id}>
+                            {product.name}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option disabled>No products available</Option>
+                      )}
+                    </Select>
+                  </div>
+                </div>
+
+              </Flex>
+            </Flex>
+           
             <div className="overflow-x-auto">
               <table className="w-full border border-gray-200 bg-white">
                 <thead className="bg-gray-100">
@@ -627,6 +733,11 @@ const EditBilling = ({ idd, onClose }) => {
                   ))}
                 </tbody>
               </table>
+              <div className="form-buttons text-right mb-2">
+              <Button type="primary" onClick={handleAddRow}>
+                <PlusOutlined /> Add Items
+              </Button>
+            </div>
             </div>
           </div>
 

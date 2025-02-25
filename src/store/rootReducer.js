@@ -73,6 +73,7 @@ import leadestimate from "views/app-views/dashboards/leads/estimates/estimatesRe
 import account from "../views/app-views/dashboards/banking/account/AccountReducer/AccountSlice"
 import transfer from "../views/app-views/dashboards/banking/transfer/transferReducers/transferSlice"
 import vendors from "../views/app-views/dashboards/Purchase/vendor/vendorReducers/vendorSlice"
+import debitNotes from "../views/app-views/dashboards/Purchase/debitnotes/debitReducer/DebitSlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -150,6 +151,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
         account,
         transfer,
         vendors,
+        debitNotes,
         // employee,
         // department,
         ...asyncReducers,

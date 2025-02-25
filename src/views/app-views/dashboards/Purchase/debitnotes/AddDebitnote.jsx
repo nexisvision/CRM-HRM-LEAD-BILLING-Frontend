@@ -1,13 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, DatePicker, Select, Row, Col, message } from 'antd';
 import { Formik, Field, Form as FormikForm } from 'formik';
 import * as Yup from 'yup';
 import moment from 'moment';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { createDebitNote, clearState } from './debitReducer/DebitSlice';
+import { getbil } from '../../sales/billing/billing2Reducer/billing2Slice';
 
 const AddDebitnote = ({ onClose }) => {
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const { loading, success } = useSelector((state) => state.debitNotes);
+  const AllLoggeddtaa = useSelector((state) => state.user);
+  const { salesbilling } = useSelector((state) => state.salesbilling);
+  const lid = AllLoggeddtaa.loggedInUser.id;
+  const [selectedBillAmount, setSelectedBillAmount] = useState(0);
+
+  useEffect(() => {
+    dispatch(getbil(lid));
+  }, [dispatch, lid]);
+
+  useEffect(() => {
+    if (success) {
+      onClose();
+      dispatch(clearState());
+    }
+  }, [success, dispatch, onClose]);
 
   const initialValues = {
     bill: '',
@@ -17,25 +36,39 @@ const AddDebitnote = ({ onClose }) => {
   };
 
   const validationSchema = Yup.object({
-    bill: Yup.string().required('Please enter a bill'),
+    bill: Yup.string().required('Please select a bill'),
     date: Yup.date().required('Please select a date'),
-    amount: Yup.number().required('Please enter an amount'),
+    amount: Yup.number()
+      .required('Please enter an amount')
+      .positive('Amount must be positive')
+      .max(selectedBillAmount, `Amount cannot exceed bill total of ₹${selectedBillAmount}`),
     description: Yup.string().required('Please enter a description'),
   });
 
-  const handleSubmit = async (values, { setSubmitting }) => {
-    setLoading(true);
-    try {
-      // Add your API call here
-      console.log('Submitted values:', values);
-      message.success('Debit note created successfully!');
-      onClose();
-    } catch (error) {
-      message.error('Failed to create debit note');
-    } finally {
-      setLoading(false);
-      setSubmitting(false);
+  const handleBillChange = (value, setFieldValue) => {
+    const selectedBill = salesbilling?.data?.find(bill => bill.id === value);
+    if (selectedBill) {
+      setSelectedBillAmount(selectedBill.total);
+      // Set the amount field to the selected bill's total amount
+      setFieldValue('amount', selectedBill.total);
     }
+  };
+
+  const handleSubmit = async (values, { setSubmitting }) => {
+    if (parseFloat(values.amount) > selectedBillAmount) {
+      message.error(`Debit amount cannot exceed bill total of ₹${selectedBillAmount}`);
+      setSubmitting(false);
+      return;
+    }
+
+    const formattedData = {
+      ...values,
+      date: moment(values.date).format('YYYY-MM-DD'),
+      amount: parseFloat(values.amount),
+    };
+    
+    dispatch(createDebitNote(formattedData));
+    setSubmitting(false);
   };
 
   return (
@@ -56,11 +89,22 @@ const AddDebitnote = ({ onClose }) => {
                   </label>
                   <Field name="bill">
                     {({ field }) => (
-                      <Input 
+                      <Select
                         {...field}
-                        placeholder="Enter bill"
+                        placeholder="Select bill"
                         className={`w-full mt-1 ${errors.bill && touched.bill ? 'border-red-500' : ''}`}
-                      />
+                        onChange={(value) => {
+                          setFieldValue('bill', value);
+                          handleBillChange(value, setFieldValue);
+                        }}
+                        loading={loading}
+                      >
+                        {Array.isArray(salesbilling?.data) && salesbilling?.data.map((bill) => (
+                          <Select.Option key={bill.id} value={bill.id}>
+                            {bill.billNumber}
+                          </Select.Option>
+                        ))}
+                      </Select>
                     )}
                   </Field>
                   {errors.bill && touched.bill && (
@@ -91,6 +135,9 @@ const AddDebitnote = ({ onClose }) => {
                 <div className="form-group mt-3">
                   <label className="font-semibold">
                     Amount <span className="text-red-500">*</span>
+                    {selectedBillAmount > 0 && (
+                      <span className="text-gray-500 ml-2">(Max: ₹{selectedBillAmount})</span>
+                    )}
                   </label>
                   <Field name="amount">
                     {({ field }) => (
@@ -99,6 +146,9 @@ const AddDebitnote = ({ onClose }) => {
                         type="number"
                         placeholder="Enter amount"
                         className={`w-full mt-1 ${errors.amount && touched.amount ? 'border-red-500' : ''}`}
+                        max={selectedBillAmount}
+                        value={values.amount}
+                        // disabled
                       />
                     )}
                   </Field>

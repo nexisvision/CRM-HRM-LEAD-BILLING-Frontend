@@ -456,46 +456,61 @@ useEffect(() => {
 
 
 
-  const calculateTotal = (data, discountRate) => {
-    const totals = data.reduce((acc, row) => {
-      const quantity = parseFloat(row.quantity) || 0;
-      const price = parseFloat(row.price) || 0;
-      const baseAmount = quantity * price;
-      const taxPercentage = parseFloat(row.tax) || 0;
+  const calculateTotal = (data, globalDiscountValue) => {
+    const calculatedTotals = data.reduce((acc, row) => {
+        const quantity = parseFloat(row.quantity) || 0;
+        const unitPrice = parseFloat(row.price) || 0;
+        const baseAmount = unitPrice * quantity;
+        
+        // Calculate item discount
+        let itemDiscountAmount = 0;
+        if (row.discountType === "percentage") {
+            const discountPercentage = parseFloat(row.discount) || 0;
+            itemDiscountAmount = (baseAmount * discountPercentage) / 100;
+        } else {
+            itemDiscountAmount = parseFloat(row.discount) || 0;
+        }
 
-      // Calculate discount amount based on type
-      let itemDiscountAmount = 0;
-      if (row.discountType === "percentage") {
-        const discountPercentage = parseFloat(row.discount) || 0;
-        itemDiscountAmount = (baseAmount * discountPercentage) / 100;
-      } else { // fixed discount
-        itemDiscountAmount = parseFloat(row.discount) || 0;
-      }
+        const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
+        const gstAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
+        
+        return {
+            totalBaseAmount: acc.totalBaseAmount + baseAmount,
+            totalItemDiscount: acc.totalItemDiscount + itemDiscountAmount,
+            totalTax: acc.totalTax + gstAmount,
+            totalAmount: acc.totalAmount + (baseAmount - itemDiscountAmount + gstAmount)
+        };
+    }, { totalBaseAmount: 0, totalItemDiscount: 0, totalTax: 0, totalAmount: 0 });
 
-      const taxAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
-      const itemTotal = baseAmount - itemDiscountAmount + taxAmount;
+    // Calculate global/invoice discount
+    let globalDiscountAmount = 0;
+    if (discountType === 'percentage') {
+        globalDiscountAmount = (calculatedTotals.totalAmount * globalDiscountValue) / 100;
+    } else {
+        globalDiscountAmount = parseFloat(globalDiscountValue) || 0;
+    }
 
-      return {
-        subtotal: acc.subtotal + itemTotal,
-        itemDiscount: acc.itemDiscount + itemDiscountAmount,
-        tax: acc.tax + taxAmount,
-        baseTotal: acc.baseTotal + baseAmount
-      };
-    }, { subtotal: 0, itemDiscount: 0, tax: 0, baseTotal: 0 });
-
-    // Calculate global discount rate amount
-    const globalDiscountAmount = (totals.subtotal * discountRate) / 100;
-
-    // Calculate final total after both discounts
-    const finalTotal = totals.subtotal - globalDiscountAmount;
+    // Calculate final total after all discounts
+    const finalTotal = calculatedTotals.totalAmount - globalDiscountAmount;
 
     setTotals({
-      subtotal: totals.subtotal.toFixed(2),
-      itemDiscount: totals.itemDiscount.toFixed(2),
-      globalDiscount: globalDiscountAmount.toFixed(2),
-      totalTax: totals.tax.toFixed(2),
-      finalTotal: finalTotal.toFixed(2)
+        subtotal: calculatedTotals.totalBaseAmount.toFixed(2),
+        itemDiscount: calculatedTotals.totalItemDiscount.toFixed(2),
+        globalDiscount: globalDiscountAmount.toFixed(2),
+        totalTax: calculatedTotals.totalTax.toFixed(2),
+        finalTotal: finalTotal.toFixed(2)
     });
+
+    // Update table data with calculated amounts
+    const updatedData = data.map(row => {
+        // ... existing row calculations ...
+        return {
+            ...row,
+            amount: row.amount // Keep existing amount calculation
+        };
+    });
+
+    setTableData(updatedData);
   };
 
   const handleTableDataChange = (id, field, value) => {
@@ -618,9 +633,9 @@ useEffect(() => {
                 <select
                   value={row.discountType}
                   onChange={(e) => handleTableDataChange(row.id, "discountType", e.target.value)}
-                  className="w-1/3 p-2 border rounded"
+                  className="p-2 border rounded"
                 >
-                  <option value="percentage">%</option>
+                  <option value="percentage">Percentage</option>
                   <option value="fixed">Fixed</option>
                 </select>
                 <input
@@ -686,66 +701,87 @@ useEffect(() => {
   // Modify the summary section to show currency icons
   const renderSummarySection = () => (
     <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
-      <table className="w-full lg:w-[50%] p-2">
-        <tbody>
-          <tr className="flex justify-between px-2 py-2 border-x-2">
-            <td className="font-medium">Sub Total</td>
-            <td className="font-medium px-4 py-2">
-              {selectedCurrencyIcon} {totals.subtotal}
-            </td>
-          </tr>
+        <table className="w-full lg:w-[50%] p-2">
+            <tbody>
+                <tr className="flex justify-between px-2 py-2 border-x-2">
+                    <td className="font-medium">Sub Total</td>
+                    <td className="font-medium px-4 py-2">
+                        {selectedCurrencyIcon} {totals.subtotal}
+                    </td>
+                </tr>
 
-          <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
-            <td className="font-medium">Item Discount</td>
-            <td className="flex items-center space-x-2">
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Item Discount Rate (%)
-                </label>
-                <input
-                  type="number"
-                  value={discountRate}
-                  onChange={(e) => {
-                    setDiscountRate(parseFloat(e.target.value) || 0);
-                    calculateTotal(tableData, parseFloat(e.target.value) || 0); // Recalculate with new discount rate
-                  }}
-                  className="mt-1 block w-full p-2 border rounded"
-                />
-              </div>
-            </td>
-          </tr>
+                {/* Item Discount Section */}
+                <tr className="flex justify-between px-2 py-2 border-x-2">
+                    <td className="font-medium">Items Discount</td>
+                    <td className="font-medium px-4 py-2 text-red-500">
+                        -{selectedCurrencyIcon} {totals.itemDiscount}
+                    </td>
+                </tr>
 
-          {parseFloat(totals.itemDiscount) > 0 && (
-            <tr className="flex justify-between px-2 py-2 border-x-2">
-              <td className="font-medium">Total Item Discount Amount</td>
-              <td className="font-medium px-4 py-2 text-red-500">-₹{totals.itemDiscount}</td>
-            </tr>
-          )}
+                {/* Global/Invoice Discount Section */}
+                <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
+                    <td className="font-medium">Invoice Discount</td>
+                    <td className="flex items-center space-x-2">
+                        <Select
+                            value={discountType}
+                            onChange={handleDiscountTypeChange}
+                            style={{ width: 120 }}
+                        >
+                            <Option value="fixed">Fixed</Option>
+                            <Option value="percentage">Percentage</Option>
+                        </Select>
+                        <Input
+                            type="number"
+                            value={discountValue}
+                            onChange={(e) => handleDiscountChange(e.target.value)}
+                            style={{ width: 120 }}
+                            min={0}
+                            max={discountType === 'percentage' ? 100 : undefined}
+                            prefix={discountType === 'fixed' ? selectedCurrencyIcon : ''}
+                            suffix={discountType === 'percentage' ? '%' : ''}
+                        />
+                    </td>
+                </tr>
 
-          <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
-            <td className="font-medium">Global Discount</td>
-            <td className="font-medium px-4 py-2">
-              {selectedCurrencyIcon} {totals.globalDiscount}
-            </td>
-          </tr>
+                {parseFloat(totals.globalDiscount) > 0 && (
+                    <tr className="flex justify-between px-2 py-2 border-x-2">
+                        <td className="font-medium">Global Discount Amount</td>
+                        <td className="font-medium px-4 py-2 text-red-500">
+                            -{selectedCurrencyIcon} {totals.globalDiscount}
+                        </td>
+                    </tr>
+                )}
 
-          <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
-            <td className="font-medium">Total Tax</td>
-            <td className="font-medium px-4 py-2">
-              {selectedCurrencyIcon} {totals.totalTax}
-            </td>
-          </tr>
+                <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
+                    <td className="font-medium">Total Tax</td>
+                    <td className="font-medium px-4 py-2">
+                        {selectedCurrencyIcon} {totals.totalTax}
+                    </td>
+                </tr>
 
-          <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
-            <td className="font-bold text-lg">Total Amount</td>
-            <td className="font-bold text-lg px-4">
-              {selectedCurrencyIcon} {totals.finalTotal}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
+                    <td className="font-bold text-lg">Total Amount</td>
+                    <td className="font-bold text-lg px-4">
+                        {selectedCurrencyIcon} {totals.finalTotal}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
   );
+
+  // Add these handlers for discount management
+  const handleDiscountTypeChange = (value) => {
+    setDiscountType(value);
+    setDiscountValue(0); // Reset discount value when type changes
+    calculateTotal(tableData, 0); // Recalculate with zero discount
+  };
+
+  const handleDiscountChange = (value) => {
+    const numValue = value === '' ? 0 : parseFloat(value) || 0;
+    setDiscountValue(numValue);
+    calculateTotal(tableData, numValue);
+  };
 
   return (
     <>

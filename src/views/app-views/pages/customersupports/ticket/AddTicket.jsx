@@ -64,6 +64,8 @@ const AddTicket = ({ onClose }) => {
         if (values[key] !== null) {
           if (key === 'endDate') {
             formData.append(key, values[key].format('YYYY-MM-DD'));
+          } else if (key === 'file' && values[key]) {
+            formData.append(key, values[key]);
           } else {
             formData.append(key, values[key]);
           }
@@ -253,10 +255,22 @@ const AddTicket = ({ onClose }) => {
               <Col span={24}>
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Attachment
+                    Attachment (Optional)
                   </label>
                   <Upload
                     beforeUpload={(file) => {
+                      const isValidFileType = ['image/jpeg', 'image/png', 'application/pdf'].includes(file.type);
+                      const isValidFileSize = file.size / 1024 / 1024 < 5;
+
+                      if (!isValidFileType) {
+                        message.error('You can only upload JPG/PNG/PDF files!');
+                        return Upload.LIST_IGNORE;
+                      }
+                      if (!isValidFileSize) {
+                        message.error('File must be smaller than 5MB!');
+                        return Upload.LIST_IGNORE;
+                      }
+
                       setFieldValue("file", file);
                       return false;
                     }}
@@ -265,6 +279,9 @@ const AddTicket = ({ onClose }) => {
                     <Button icon={<UploadOutlined />} className="bg-white">
                       Select File
                     </Button>
+                    <span className="ml-2 text-gray-500 text-sm">
+                      Supports: JPG, PNG, PDF (Max: 5MB)
+                    </span>
                   </Upload>
                 </div>
               </Col>

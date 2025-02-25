@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, DatePicker, Select, message, Row, Col } from "antd";
+import { Input, Button, DatePicker, Select, message, Row, Col, Modal } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -13,6 +14,7 @@ import { useDispatch } from "react-redux";
 import moment from "moment";
 import { getcurren } from "../../setting/currencies/currenciesSlice/currenciesSlice";
 import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
+import { GetLable, AddLable } from "../sales/LableReducer/LableSlice";
 
 const { Option } = Select;
 
@@ -21,8 +23,15 @@ const EditContract = ({ id, onClose }) => {
 
   const dispatch = useDispatch();
 
+  const allloggeduser = useSelector((state)=>state.user.loggedInUser.username)
+
+
   const countries = useSelector((state) => state.countries.countries);
   const { currencies } = useSelector((state) => state.currencies);
+
+  const [isContracttypeModalVisible, setIsContracttypeModalVisible] = useState(false);
+  const [newContracttype, setNewContracttype] = useState("");
+  const [contracttypes, setContracttypes] = useState([]);
 
   useEffect(() => {
     dispatch(getallcountries());
@@ -31,6 +40,12 @@ const EditContract = ({ id, onClose }) => {
   useEffect(() => {
     dispatch(getcurren());
   }, []);
+
+  useEffect(() => {
+    fetchLables("contracttype", setContracttypes);
+  }, []);
+
+ 
 
   const [initialValues, setInitialValues] = useState({
     subject: "",
@@ -108,6 +123,45 @@ const EditContract = ({ id, onClose }) => {
   const handlePhoneNumberChange = (e, setFieldValue) => {
     const value = e.target.value.replace(/\D/g, '');
     setFieldValue('phone', value);
+  };
+
+  const fetchLables = async (lableType, setter) => {
+    try {
+      const lid = allloggeduser;
+      const response = await dispatch(GetLable(lid));
+      if (response.payload && response.payload.data) {
+        const filteredLables = response.payload.data
+          .filter((lable) => lable.lableType === lableType)
+          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+        setter(filteredLables);
+      }
+    } catch (error) {
+      console.error(`Failed to fetch ${lableType}:`, error);
+      message.error(`Failed to load ${lableType}`);
+    }
+  };
+
+  const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
+    if (!newValue.trim()) {
+      message.error(`Please enter a ${lableType} name.`);
+      return;
+    }
+
+    try {
+      const lid = allloggeduser;
+      const payload = {
+        name: newValue.trim(),
+        lableType,
+      };
+      await dispatch(AddLable({ lid, payload }));
+      message.success(`${lableType} added successfully.`);
+      setter("");
+      modalSetter(false);
+      await fetchLables(lableType, setContracttypes);
+    } catch (error) {
+      console.error(`Failed to add ${lableType}:`, error);
+      message.error(`Failed to add ${lableType}.`);
+    }
   };
 
   useEffect(() => {
@@ -432,7 +486,7 @@ const EditContract = ({ id, onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Contract Type <span className="text-rose-500">*</span></label>
+                  <label className="font-semibold">Contract Type <span className="text-red-500">*</span></label>
                   <Field name="type">
                     {({ field }) => (
                       <Select
@@ -441,9 +495,26 @@ const EditContract = ({ id, onClose }) => {
                         placeholder="Select Contract Type"
                         onChange={(value) => setFieldValue("type", value)}
                         value={values.type}
+                        dropdownRender={(menu) => (
+                          <div>
+                            {menu}
+                            <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                              <Button
+                                type="link"
+                                icon={<PlusOutlined />}
+                                onClick={() => setIsContracttypeModalVisible(true)}
+                              >
+                                Add New Type
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       >
-                        <Option value="Marketing">Marketing</Option>
-                        <Option value="Planning">Planning</Option>
+                        {contracttypes.map((contracttype) => (
+                          <Option key={contracttype.id} value={contracttype.name}>
+                            {contracttype.name}
+                          </Option>
+                        ))}
                       </Select>
                     )}
                   </Field>
@@ -565,6 +636,21 @@ const EditContract = ({ id, onClose }) => {
           </Form>
         )}
       </Formik>
+
+      <Modal
+        title="Add New Contract Type"
+        visible={isContracttypeModalVisible}
+        onCancel={() => setIsContracttypeModalVisible(false)}
+        onOk={() => handleAddNewLable("contracttype", newContracttype, setNewContracttype, setIsContracttypeModalVisible)}
+        okText="Add Type"
+      >
+        <Input
+          placeholder="Enter new contract type"
+          value={newContracttype}
+          onChange={(e) => setNewContracttype(e.target.value)}
+        />
+      </Modal>
+
     </div>
   );
 };

@@ -19,6 +19,9 @@ import { ErrorMessage, Field } from "formik";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import { addbil, getbil } from "./billing2Reducer/billing2Slice";
+import { vendordataedata } from "../../Purchase/vendor/vendorReducers/vendorSlice";
+import Flex from 'components/shared-components/Flex';
+import { GetAllProdu } from "../../project/product/ProductReducer/ProductsSlice";
 
 const { Option } = Select;
 
@@ -32,7 +35,13 @@ const AddBilling = ({ onClose }) => {
   const AllLoggeddtaa = useSelector((state) => state.user);
   const Tagsdetail = useSelector((state) => state.Lable);
   const { taxes } = useSelector((state) => state.tax);
+  const [products, setProducts] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
+
+   // Get products directly from Redux store
+   const productsData = useSelector((state) => state.Product.Product);
   const [tableData, setTableData] = useState([
     {
       id: Date.now(),
@@ -57,9 +66,13 @@ const AddBilling = ({ onClose }) => {
     finalTotal: "0.00",
   });
 
+  const { vendors } = useSelector((state) => state.vendors);
+  console.log('vendors data:', vendors);
+
   useEffect(() => {
     dispatch(Getcus());
     dispatch(getAllTaxes());
+    dispatch(vendordataedata());
   }, []);
 
   const customerdata = useSelector((state) => state.customers);
@@ -88,6 +101,63 @@ const AddBilling = ({ onClose }) => {
       calculateTotal(updatedData, discountValue);
     } else {
       message.warning("At least one item is required");
+    }
+  };
+
+
+  // Fetch products when component mounts
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await dispatch(GetAllProdu());
+        console.log("Products response:", response); // Debug log
+        
+        if (response?.payload?.data) {
+          setProducts(response.payload.data);
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        // message.error("Failed to load products");
+      }
+    };
+
+    fetchProducts();
+  }, [dispatch]);
+
+  // Update local state when Redux store changes
+  useEffect(() => {
+    if (productsData?.data) {
+      console.log("Products from Redux:", productsData.data);
+      setProducts(productsData.data);
+    }
+  }, [productsData]);
+
+  // Product selection handler
+  const handleProductChange = (productId) => {
+    console.log("Selected product ID:", productId); // Debug log
+    
+    if (productId) {
+      const selectedProd = products.find(p => p.id === productId);
+      console.log("Found product:", selectedProd); // Debug log
+      
+      if (selectedProd) {
+        const updatedData = tableData.map((row, index) => {
+          if (index === tableData.length - 1 && !row.item) {
+            return {
+              ...row,
+              item: selectedProd.name,
+              description: selectedProd.description || "",
+              price: selectedProd.price || 0,
+              hsn_sac: selectedProd.hsn_sac || "",
+            };
+          }
+          return row;
+        });
+
+        setTableData(updatedData);
+        setSelectedProduct(productId);
+        calculateTotal(updatedData);
+      }
     }
   };
 
@@ -224,9 +294,9 @@ const AddBilling = ({ onClose }) => {
           billDate: values.billDate?.format("YYYY-MM-DD"),
           discription: discription,
           status: values.status,
-          discountType: discountType,
+          discountType: discountType || 'fixed',
           discountValue: parseFloat(discountValue) || 0,
-          tax: totals.totalTax,
+          tax: totals.totalTax || 0,
           total: totals.finalTotal,
           note: values.note || "",
           items: items,
@@ -238,8 +308,7 @@ const AddBilling = ({ onClose }) => {
             tax_name: showTax ? selectedTaxDetails[row.id]?.gstName || '' : '',
             lineTotal: parseFloat(row.amount) || 0
           })),
-          discountType: discountType,
-          discountValue: parseFloat(discountValue) || 0,
+          discount: parseFloat(discountValue) || 0,
         };
 
         const lid = AllLoggeddtaa.loggedInUser.id;
@@ -342,9 +411,21 @@ const AddBilling = ({ onClose }) => {
               <Form.Item
                 label="Vendor"
                 name="vendor"
-                rules={[{ required: true, message: "Please enter vendor name" }]}
+                rules={[{ required: true, message: "Please select a vendor" }]}
               >
-                <Input placeholder="Enter Vendor Name" />
+                <Select
+                  placeholder="Select Vendor"
+                  // showSearch
+                  // filterOption={(input, option) =>
+                  //   option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  // }
+                >
+                  {vendors?.data?.map((vendor) => (
+                    <Option key={vendor._id} value={vendor.name}>
+                      {vendor.name}
+                    </Option>
+                  ))}
+                </Select>
               </Form.Item>
             </Col>
 
@@ -415,6 +496,7 @@ const AddBilling = ({ onClose }) => {
         <Card>
           <div className="flex justify-between items-center mb-4">
             <h4 className="font-semibold text-lg">Product & Services</h4>
+           
             <div className="flex items-center gap-2">
               <span>Enable Tax</span>
               <Switch
@@ -445,11 +527,35 @@ const AddBilling = ({ onClose }) => {
           </div>
 
           <div>
-            <div className="form-buttons text-right mb-2">
-              <Button type="primary" onClick={handleAddRow}>
-                <PlusOutlined /> Add Items
-              </Button>
-            </div>
+          <Flex alignItems="center" mobileFlex={false} className='flex mb-4 gap-4'>
+              <Flex className="flex" mobileFlex={false}>
+                <div className="w-full flex gap-4">
+                  <div>
+                    <Select
+                      value={selectedProduct}
+                      onChange={handleProductChange}
+                      className="w-full !rounded-none"
+                      placeholder="Select Product"
+                      rootClassName="!rounded-none"
+                      allowClear
+                      loading={!products.length}
+                    >
+                      {products && products.length > 0 ? (
+                        products.map((product) => (
+                          <Option key={product.id} value={product.id}>
+                            {product.name}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option disabled>No products available</Option>
+                      )}
+                    </Select>
+                  </div>
+                </div>
+
+              </Flex>
+            </Flex>
+           
             <div className="overflow-x-auto">
               <table className="w-full border border-gray-200 bg-white">
                 <thead className="bg-gray-100">
@@ -554,6 +660,11 @@ const AddBilling = ({ onClose }) => {
                   ))}
                 </tbody>
               </table>
+              <div className="form-buttons text-right mb-2">
+              <Button type="primary" onClick={handleAddRow}>
+                <PlusOutlined /> Add Items
+              </Button>
+            </div>
             </div>
           </div>
 

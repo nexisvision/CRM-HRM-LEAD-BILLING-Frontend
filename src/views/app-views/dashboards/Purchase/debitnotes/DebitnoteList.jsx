@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal, Select } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal, Select, DatePicker } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, EditOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from '../../../Users/user-list/UserView';
@@ -15,301 +15,97 @@ import OrderListData from 'assets/data/order-list.data.json';
 import utils from 'utils';
 import AddDebitnote from './AddDebitnote';
 import EditDebitnote from './EditDebitnote';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllDebitNotes } from './debitReducer/DebitSlice';
+import moment from 'moment';
+import { getbil } from '../../sales/billing/billing2Reducer/billing2Slice';
 const { Option } = Select
 
 const DebitnoteList = () => {
-    const [users, setUsers] = useState(userData);
-    const [list, setList] = useState(OrderListData);
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-    const [userProfileVisible, setUserProfileVisible] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
-    const [isAddJobModalVisible, setIsAddJobModalVisible] = useState(false);
-    const [isEditJobModalVisible, setIsEditJobModalVisible] = useState(false);
-    const [isAddAccountModalVisible, setIsAddAccountModalVisible] = useState(false);
-    const [isEditAccountModalVisible, setIsEditAccountModalVisible] = useState(false);
-    const navigate = useNavigate();
-    // const [isViewJobModalVisible, setIsViewJobModalVisible] = useState(false);
-    const [annualStatisticData] = useState(AnnualStatisticData);
-    const [selectedAccount, setSelectedAccount] = useState(null);
+    const dispatch = useDispatch();
+    const { debitNotes, loading } = useSelector((state) => state.debitNotes);
+    const { salesbilling } = useSelector((state) => state.salesbilling);
+   
+    const [list, setList] = useState([]);
+  
     const [accountType, setAccountType] = useState('All');
-    const [isAddTransferModalVisible, setIsAddTransferModalVisible] = useState(false);
-    const [isEditTransferModalVisible, setIsEditTransferModalVisible] = useState(false);
-    const [selectedTransfer, setSelectedTransfer] = useState(null);
+  
     const [isAddDebitnoteModalVisible, setIsAddDebitnoteModalVisible] = useState(false);
-    const [isEditDebitnoteModalVisible, setIsEditDebitnoteModalVisible] = useState(false);
-    const [selectedDebitnote, setSelectedDebitnote] = useState(null);
 
-    // Add account type options
-    //   const accountTypeList = ['All', 'Salary', 'Savings', 'Current'];
+    const AllLoggeddtaa = useSelector((state) => state.user);
+    const lid = AllLoggeddtaa.loggedInUser.id;
 
-    // Open Add Job Modal
-    const openAddJobModal = () => {
-        setIsAddJobModalVisible(true);
-    };
-    // Close Add Job Modal
-    const closeAddJobModal = () => {
-        setIsAddJobModalVisible(false);
-    };
-    const handleJob = () => {
-        navigate('/app/hrm/jobs/viewjob', { state: { user: selectedUser } }); // Pass user data as state if needed
-    };
-    // Open Add Job Modal
-    const openEditJobModal = () => {
-        setIsEditJobModalVisible(true);
-    };
-    // Close Add Job Modal
-    const closeEditJobModal = () => {
-        setIsEditJobModalVisible(false);
-    };
-    // Handle account type filter
-    // const handleAccountTypeFilter = value => {
-    //     setAccountType(value);
-    //     if (value !== 'All') {
-    //         const filteredData = OrderListData.filter(item =>
-    //             item.accounttype && item.accounttype.toLowerCase() === value.toLowerCase()
-    //         );
-    //         setList(filteredData);
-    //     } else {
-    //         setList(OrderListData);
-    //     }
-    // };
-    // Search functionality
-    const onSearch = (e) => {
-        const value = e.currentTarget.value;
-        const searchArray = value ? list : OrderListData;
-        let data = utils.wildCardSearch(searchArray, value);
+    const [searchText, setSearchText] = useState('');
+    const [filteredList, setFilteredList] = useState([]);
 
-        // Apply account type filter if not 'All'
-        if (accountType !== 'All') {
-            data = data.filter(item =>
-                item.accounttype && item.accounttype.toLowerCase() === accountType.toLowerCase()
+    useEffect(() => {
+        dispatch(getAllDebitNotes());
+        dispatch(getbil(lid));
+    }, [dispatch, lid]);
+
+    useEffect(() => {
+        if (debitNotes && salesbilling?.data) {
+            const updatedList = debitNotes.map(debitNote => {
+                const matchingBill = salesbilling.data.find(bill => bill.id === debitNote.bill);
+                return {
+                    ...debitNote,
+                    billNumber: matchingBill?.billNumber || 'N/A'
+                };
+            });
+            setList(updatedList);
+        }
+    }, [debitNotes, salesbilling]);
+
+    useEffect(() => {
+        applyFilters();
+    }, [list, searchText]);
+
+    const applyFilters = () => {
+        let filtered = [...list];
+
+        // Search text filter
+        if (searchText) {
+            filtered = filtered.filter(item => 
+                item.billNumber?.toLowerCase().includes(searchText.toLowerCase()) ||
+                item.description?.toLowerCase().includes(searchText.toLowerCase())
             );
         }
 
-        setList(data);
-        setSelectedRowKeys([]);
+        setFilteredList(filtered);
     };
-    // Delete user
-    const deleteUser = (userId) => {
-        setUsers(users.filter((item) => item.id !== userId));
-        message.success({ content: `Deleted user ${userId}`, duration: 2 });
-    };
-    // Show user profile
-    const showUserProfile = (userInfo) => {
-        setSelectedUser(userInfo);
-        setUserProfileVisible(true);
-    };
-    // Close user profile
-    const closeUserProfile = () => {
-        setSelectedUser(null);
-        setUserProfileVisible(false);
-    };
-    const getjobStatus = status => {
-        if (status === 'active') {
-            return 'blue'
-        }
-        if (status === 'blocked') {
-            return 'cyan'
-        }
-        return ''
-    }
 
-    // const handleShowStatus = value => {
-    //     if (value !== 'All') {
-    //         const key = 'status'
-    //         const data = utils.filterArray(userData, key, value)
-    //         setUsers(data)
-    //     } else {
-    //         setUsers(userData)
-    //     }
-    // }
-
-    const jobStatusList = ['active', 'blocked']
-    const dropdownMenu = (record) => (
-        <Menu>
-            <Menu.Item>
-                <Flex alignItems="center">
-                    <Button
-                        type=""
-                        className=""
-                        icon={<EyeOutlined />}
-                        onClick={handleJob}
-                        size="small"
-                    >
-                        <span className="">View Details</span>
-                    </Button>
-                </Flex>
-            </Menu.Item>
-            <Menu.Item>
-                <Flex alignItems="center">
-                    <Button
-                        type=""
-                        className=""
-                        icon={<MailOutlined />}
-                        onClick={() => showUserProfile(record)}
-                        size="small"
-                    >
-                        <span className="">Send Mail</span>
-                    </Button>
-                </Flex>
-            </Menu.Item>
-            <Menu.Item>
-                <Flex alignItems="center">
-                    <Button
-                        type=""
-                        className=""
-                        icon={<EditOutlined />}
-                        onClick={() => openEditDebitnoteModal(record)}
-                        size="small"
-                    >
-                        <span className="ml-2">Edit</span>
-                    </Button>
-                </Flex>
-            </Menu.Item>
-            <Menu.Item>
-                <Flex alignItems="center">
-                    <Button
-                        type=""
-                        className=""
-                        icon={<DeleteOutlined />}
-                        onClick={() => deleteUser(record.id)}
-                        size="small"
-                    >
-                        <span className="">Delete</span>
-                    </Button>
-                </Flex>
-            </Menu.Item>
-        </Menu>
-    );
+    const onSearch = (e) => {
+        setSearchText(e.target.value);
+    };
+   
     const tableColumns = [
-        // {
-        //   title: 'Chart Of Account	',
-        //   dataIndex: 'chartofaccount',
-        //   sorter: {
-        //     compare: (a, b) => a.chartofaccount.length - b.chartofaccount.length,
-        //   },
-        // },
         {
-            title: 'Bill',
-            dataIndex: 'bill',
-            sorter: {
-                compare: (a, b) => a.bill.length - b.bill.length,
-            },
-        },
-        {
-            title: 'Vendor',
-            dataIndex: 'vendor',
-            sorter: {
-                compare: (a, b) => a.vendor.length - b.vendor.length,
-            },
+            title: 'Bill Number',
+            dataIndex: 'billNumber',
+            render: (billNumber) => billNumber || 'N/A',
+            sorter: (a, b) => (a.billNumber || '').localeCompare(b.billNumber || ''),
         },
         {
             title: 'Date',
             dataIndex: 'date',
-            sorter: {
-                compare: (a, b) => a.date.length - b.date.length,
-            },
+            render: (date) => moment(date).format('DD-MM-YYYY'),
+            sorter: (a, b) => moment(a.date).unix() - moment(b.date).unix(),
         },
         {
             title: 'Amount',
             dataIndex: 'amount',
-            sorter: {
-                compare: (a, b) => a.amount.length - b.amount.length,
-            },
+            render: (amount) => `₹${amount}`,
+            sorter: (a, b) => parseFloat(a.amount) - parseFloat(b.amount),
         },
         {
             title: 'Description',
             dataIndex: 'description',
-            sorter: {
-                compare: (a, b) => a.description.length - b.description.length,
-            },
-        },
-        // {
-        //   title: 'Bank Branch',
-        //   dataIndex: 'bankbranch',
-        //   sorter: {
-        //     compare: (a, b) => a.bankbranch.length - b.bankbranch.length,
-        //   },
-        // },
-        // {
-        //   title: 'Account Type',
-        //   dataIndex: 'accounttype',
-        //   sorter: {
-        //     compare: (a, b) => {
-        //       if (a.accounttype && b.accounttype) {
-        //         return a.accounttype.localeCompare(b.accounttype);
-        //       }
-        //       return 0;
-        //     },
-        //   },
-        //   render: (accounttype) => (
-        //     <Tag color={getAccountTypeColor(accounttype)}>
-        //       {accounttype}
-        //     </Tag>
-        //   ),
-        // },
-        {
-            title: 'Action',
-            dataIndex: 'actions',
-            render: (_, elm) => (
-                <div className="text-center">
-                    <EllipsisDropdown menu={dropdownMenu(elm)} />
-                </div>
+            render: (description) => (
+                <div dangerouslySetInnerHTML={{ __html: description }} />
             ),
         },
     ];
-    // Open Add Account Modal
-    const openAddAccountModal = () => {
-        setIsAddAccountModalVisible(true);
-    };
-
-    // Close Add Account Modal
-    const closeAddAccountModal = () => {
-        setIsAddAccountModalVisible(false);
-    };
-
-    // Add these handler functions
-    const openEditAccountModal = (account) => {
-        setSelectedAccount(account);
-        setIsEditAccountModalVisible(true);
-    };
-
-    const closeEditAccountModal = () => {
-        setIsEditAccountModalVisible(false);
-    };
-
-    // Helper function to get tag color based on account type
-    const getAccountTypeColor = type => {
-        switch (type?.toLowerCase()) {
-            case 'salary':
-                return 'green';
-            case 'savings':
-                return 'blue';
-            case 'current':
-                return 'purple';
-            default:
-                return 'default';
-        }
-    };
-
-    const openAddTransferModal = () => {
-        setIsAddTransferModalVisible(true);
-    };
-
-    const closeAddTransferModal = () => {
-        setIsAddTransferModalVisible(false);
-    };
-
-    const openEditTransferModal = (transfer) => {
-        setSelectedTransfer(transfer);
-        setIsEditTransferModalVisible(true);
-    };
-
-    const closeEditTransferModal = () => {
-        setIsEditTransferModalVisible(false);
-        setSelectedTransfer(null);
-    };
-
+  
     const openAddDebitnoteModal = () => {
         setIsAddDebitnoteModalVisible(true);
     };
@@ -318,50 +114,23 @@ const DebitnoteList = () => {
         setIsAddDebitnoteModalVisible(false);
     };
 
-    const openEditDebitnoteModal = (debitnote) => {
-        setSelectedDebitnote(debitnote);
-        setIsEditDebitnoteModalVisible(true);
-    };
-
-    const closeEditDebitnoteModal = () => {
-        setIsEditDebitnoteModalVisible(false);
-        setSelectedDebitnote(null);
-    };
 
     return (
         <Card bodyStyle={{ padding: '-3px' }}>
-            {/* <Row gutter={16}>
-        {annualStatisticData.map((elm, i) => (
-          <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-            <StatisticWidget
-              title={elm.title}
-              value={elm.value}
-              status={elm.status}
-              subtitle={elm.subtitle}
-            />
-          </Col>
-        ))}
-      </Row> */}
+          
             <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
                 <Flex className="mb-1" mobileFlex={false}>
                     <div className="mr-md-3 mb-3">
-                        <Input placeholder="Search" prefix={<SearchOutlined />} onChange={(e) => onSearch(e)} />
+                        <Input 
+                            placeholder="Search" 
+                            prefix={<SearchOutlined />} 
+                            onChange={onSearch}
+                            value={searchText}
+                        />
                     </div>
-                    <div className="w-full md:w-48 ">
-                        <Select
-                            value={accountType}
-                            className="w-100"
-                            style={{ minWidth: 180 }}
-                            // onChange={handleAccountTypeFilter}
-                            placeholder="Account Type"
-                        >
-                            {/* {accountTypeList.map(type => (
-                <Option key={type} value={type}>
-                  {type}
-                </Option>
-              ))} */}
-                        </Select>
-                    </div>
+                   
+                   
+                   
                 </Flex>
                 <Flex gap="7px">
                     <Button type="primary" onClick={openAddDebitnoteModal}>
@@ -376,12 +145,13 @@ const DebitnoteList = () => {
             <div className="table-responsive mt-2">
                 <Table
                     columns={tableColumns}
-                    dataSource={list}
+                    dataSource={filteredList}
                     rowKey="id"
+                    // loading={loading}
                     scroll={{ x: 1200 }}
                 />
             </div>
-            <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
+            
             <Modal
                 title="Add Debit Note"
                 visible={isAddDebitnoteModalVisible}
@@ -390,17 +160,6 @@ const DebitnoteList = () => {
                 width={1000}
             >
                 <AddDebitnote onClose={closeAddDebitnoteModal} />
-            </Modal>
-            <Modal
-                title="Edit Debit Note"
-                visible={isEditDebitnoteModalVisible}
-                onCancel={closeEditDebitnoteModal}
-                footer={null}
-            >
-                <EditDebitnote 
-                    onClose={closeEditDebitnoteModal} 
-                    debitnoteData={selectedDebitnote}
-                />
             </Modal>
             
         </Card>

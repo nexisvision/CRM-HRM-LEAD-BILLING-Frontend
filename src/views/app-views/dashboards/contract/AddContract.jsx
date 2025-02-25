@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Input,
   Button,
@@ -7,6 +7,7 @@ import {
   message,
   Row,
   Col,
+  Modal,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
@@ -19,35 +20,45 @@ import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/Co
 import { getcurren } from "../../setting/currencies/currenciesSlice/currenciesSlice";
 import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
 import moment from "moment";
+import { PlusOutlined } from "@ant-design/icons";
+import { GetLable, AddLable } from "../sales/LableReducer/LableSlice";
 
 const { Option } = Select;
 
 const AddContract = ({ onClose }) => {
   const dispatch = useDispatch();
 
-
   const allloggeduser = useSelector((state)=>state.user.loggedInUser.username)
 
   const countries = useSelector((state) => state.countries?.countries);
 
-  // const countrydata = countries?.filter((item) => item.created_by === allloggeduser);
- 
   const { currencies } = useSelector((state) => state.currencies);
 
   const curr = currencies?.data || [];
   
-  // const curren = curr?.filter((item) => item.created_by === allloggeduser);
-
   const user = useSelector((state) => state.user.loggedInUser.username);
 
-  // const AllProject = useSelector((state) => state.Project);
-  // const properdata = AllProject.Project.data;
-
-  // const projectdata = properdata?.filter((item) => item.created_by === user);
+  const [isContracttypeModalVisible, setIsContracttypeModalVisible] = useState(false);
+  const [newContracttype, setNewContracttype] = useState("");
+  const [contracttypes, setContracttypes] = useState([]);
 
   useEffect(() => {
     dispatch(getallcountries());
   }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(getcurren());
+    dispatch(getallcountries());
+  }, []);
+
+  useEffect(() => {
+    dispatch(GetProject());
+    dispatch(ClientData());
+  }, [dispatch]);
+
+  useEffect(() => {
+    fetchLables("contracttype", setContracttypes);
+  }, []);
 
   const initialValues = {
     subject: "",
@@ -67,7 +78,6 @@ const AddContract = ({ onClose }) => {
     value: "",
     notes: "",
     description: "",
-    // contract_number: "",
   };
 
   const validationSchema = Yup.object({
@@ -113,13 +123,11 @@ const AddContract = ({ onClose }) => {
   });
 
   const onSubmit = (values, { resetForm }) => {
-    // Format dates to ISO string before sending
     const formattedValues = {
       ...values,
       startDate: values.startDate ? values.startDate.toISOString() : null,
       endDate: values.endDate ? values.endDate.toISOString() : null,
       phone: values.phoneCode + values.phone,
-      // Ensure value is properly converted to number and not null
       value: values.value ? parseFloat(values.value) : 0
     };
 
@@ -129,7 +137,6 @@ const AddContract = ({ onClose }) => {
       .unwrap()
       .then(() => {
         dispatch(ContaractData());
-        // message.success("Contract added successfully!");
         resetForm();
         onClose();
       })
@@ -143,22 +150,49 @@ const AddContract = ({ onClose }) => {
   const filtersubclient = Clientdata.SubClient.data || [];
 
   const clientdata = filtersubclient?.filter((item) => item.created_by === allloggeduser);
-  // const { currencies } = useSelector((state) => state.currencies);
   const Projectdtaa = useSelector((state) => state.Project);
   const filterprojectdata = Projectdtaa.Project.data || [];
 
   const projectdata = filterprojectdata?.filter((item) => item.created_by === allloggeduser);
-  // const [form] = Form.useForm();
 
-  useEffect(() => {
-    dispatch(getcurren());
-    dispatch(getallcountries());
-  }, []);
+  const fetchLables = async (lableType, setter) => {
+    try {
+      const lid = allloggeduser;
+      const response = await dispatch(GetLable(lid));
+      if (response.payload && response.payload.data) {
+        const filteredLables = response.payload.data
+          .filter((lable) => lable.lableType === lableType)
+          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+        setter(filteredLables);
+      }
+    } catch (error) {
+      console.error(`Failed to fetch ${lableType}:`, error);
+      message.error(`Failed to load ${lableType}`);
+    }
+  };
 
-  useEffect(() => {
-    dispatch(GetProject());
-    dispatch(ClientData());
-  }, [dispatch]);
+  const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
+    if (!newValue.trim()) {
+      message.error(`Please enter a ${lableType} name.`);
+      return;
+    }
+
+    try {
+      const lid = allloggeduser;
+      const payload = {
+        name: newValue.trim(),
+        lableType,
+      };
+      await dispatch(AddLable({ lid, payload }));
+      message.success(`${lableType} added successfully.`);
+      setter("");
+      modalSetter(false);
+      await fetchLables(lableType, setContracttypes);
+    } catch (error) {
+      console.error(`Failed to add ${lableType}:`, error);
+      message.error(`Failed to add ${lableType}.`);
+    }
+  };
 
   const handlePhoneNumberChange = (e, setFieldValue) => {
     const value = e.target.value.replace(/\D/g, '');
@@ -171,7 +205,7 @@ const AddContract = ({ onClose }) => {
 
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({ handleSubmit, setFieldValue, values,setFieldTouched }) => (
@@ -193,22 +227,6 @@ const AddContract = ({ onClose }) => {
                   />
                 </div>
               </Col>
-
-              {/* <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Contract Number</label>
-                  <Field
-                    name="contract_number"
-                    as={Input}
-                    placeholder="Enter Contract Number"
-                  />
-                  <ErrorMessage
-                    name="contract_number"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
 
               <Col span={12}>
                 <div className="form-item">
@@ -254,7 +272,6 @@ const AddContract = ({ onClose }) => {
                     <Field name="address" className="mt-1" as={Input} placeholder="Enter Address" />
                     <ErrorMessage
                       name="address"
-
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
@@ -329,7 +346,6 @@ const AddContract = ({ onClose }) => {
                     as={Input}
                     placeholder="Enter Zip Code"
                   />
-
                   <ErrorMessage
                     name="zipcode"
                     component="div"
@@ -382,7 +398,6 @@ const AddContract = ({ onClose }) => {
                           {...field}
                           className="w-full mt-1"
                           placeholder="Select Currency"
-
                           onChange={(value) => {
                             const selectedCurrency = Array.isArray(curr) && 
                             curr.find((c) => c.id === value);
@@ -448,7 +463,6 @@ const AddContract = ({ onClose }) => {
                 </div>
               </Col>
 
-
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Contract Type <span className="text-red-500">*</span></label>
@@ -460,9 +474,26 @@ const AddContract = ({ onClose }) => {
                         placeholder="Select Contract Type"
                         onChange={(value) => setFieldValue("type", value)}
                         value={values.type}
+                        dropdownRender={(menu) => (
+                          <div>
+                            {menu}
+                            <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                              <Button
+                                type="link"
+                                icon={<PlusOutlined />}
+                                onClick={() => setIsContracttypeModalVisible(true)}
+                              >
+                                Add New Type
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       >
-                        <Option value="Marketing">Marketing</Option>
-                        <Option value="Planning">Planning</Option>
+                        {contracttypes.map((contracttype) => (
+                          <Option key={contracttype.id} value={contracttype.name}>
+                            {contracttype.name}
+                          </Option>
+                        ))}
                       </Select>
                     )}
                   </Field>
@@ -473,8 +504,6 @@ const AddContract = ({ onClose }) => {
                   />
                 </div>
               </Col>
-
-              
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
@@ -597,6 +626,20 @@ const AddContract = ({ onClose }) => {
           </Form>
         )}
       </Formik>
+
+      <Modal
+        title="Add New Contract Type"
+        visible={isContracttypeModalVisible}
+        onCancel={() => setIsContracttypeModalVisible(false)}
+        onOk={() => handleAddNewLable("contracttype", newContracttype, setNewContracttype, setIsContracttypeModalVisible)}
+        okText="Add Type"
+      >
+        <Input
+          placeholder="Enter new contract type"
+          value={newContracttype}
+          onChange={(e) => setNewContracttype(e.target.value)}
+        />
+      </Modal>
     </div>
   );
 };

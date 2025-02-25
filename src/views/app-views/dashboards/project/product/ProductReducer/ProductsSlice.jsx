@@ -209,11 +209,11 @@ const ProductsSlice = createSlice({
       .addCase(GetAllProdu.fulfilled, (state, action) => {
         state.isLoading = false;
         state.Product = action.payload;
-        message.success("Products fetched successfully");
+        // message.success("Products fetched successfully");
       })
       .addCase(GetAllProdu.rejected, (state, action) => {
         state.isLoading = false;
-        message.error(action.payload?.message || "Failed to fetch products");
+        // message.error(action.payload?.message || "Failed to fetch products");
       });
   },
 });
