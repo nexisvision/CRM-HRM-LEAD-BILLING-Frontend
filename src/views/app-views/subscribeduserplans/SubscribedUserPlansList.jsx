@@ -224,6 +224,10 @@ export const SubscribedUserPlansList = () => {
       title: "Status",
       dataIndex: "status",
     },
+    {
+      title: "Status",
+      // dataIndex: "status",
+    },
 
 
     {

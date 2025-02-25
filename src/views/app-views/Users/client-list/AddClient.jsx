@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { Modal, Input, Switch, Button, Row, Col, message } from "antd";
 import { useDispatch } from "react-redux";
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { addClient, ClientData } from "./CompanyReducers/CompanySlice";
 import axios from "axios";
+import { ToTopOutlined } from "@ant-design/icons";
 
 const AddClient = ({ visible, onClose, onCreate }) => {
   const dispatch = useDispatch();
@@ -21,6 +22,25 @@ const AddClient = ({ visible, onClose, onCreate }) => {
     password: Yup.string()
       .required('Please enter the client password')
   });
+
+  const 
+  
+  generatePassword = () => {
+    const length = 8;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let password = "";
+    
+    // Generate 6 characters
+    for (let i = 0; i < length; i++) {
+      password += charset[Math.floor(Math.random() * charset.length)];
+    }
+
+    // Ensure at least one number
+    const randomNum = Math.floor(Math.random() * 10).toString();
+    password = password.slice(0, 7) + randomNum;
+    
+    return password;
+  };
 
   const otpapi = async (otp) => {
     try {
@@ -97,7 +117,7 @@ const AddClient = ({ visible, onClose, onCreate }) => {
         validationSchema={validationSchema}
         onSubmit={handleFinish}
       >
-        {({ errors, touched }) => (
+        {({ errors, touched, setFieldValue }) => (
           <Form>
             <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
             
@@ -140,22 +160,28 @@ const AddClient = ({ visible, onClose, onCreate }) => {
                 </div>
               </Col>
 
-                <Col span={12} className="mt-3">
-                <div className="form-group">
-                  <label htmlFor="password" className="font-semibold">Password <span className="text-red-500">*</span></label>
-                  <Field name="password">
-                    {({ field }) => (
-                      <Input.Password 
-                        {...field} 
-                        placeholder="Enter Client Password"
-                        className="mt-1"
-                        status={errors.password && touched.password ? "error" : ""}
-                      />
-                    )}
-                  </Field>
-                  {errors.password && touched.password && (
-                    <div className="error-message">{errors.password}</div>
-                  )}
+              <Col span={12}>
+                <div className="form-item mt-2">
+                <label className="font-semibold">Password <span className="text-red-500">*</span></label>
+                  <div className="relative">
+                    <Field
+                      name="password"
+                      as={Input.Password}
+                      placeholder="Password"
+                      className="mt-1 w-full"
+                    />
+                    <Button
+                      className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
+                      onClick={() => setFieldValue("password", generatePassword())}
+                    >
+                     <ToTopOutlined/>
+                    </Button>
+                  </div>
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
             </Row>

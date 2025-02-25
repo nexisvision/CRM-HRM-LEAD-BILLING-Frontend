@@ -382,6 +382,15 @@ const AddPlan = ({ onClose }) => {
                   <div className="error-message">{errors.description}</div>
                 )}
               </div>
+              
+              <div className='mt-4'>
+                <Switch
+                  checked={isTrialEnabled}
+                  onChange={handleTrialToggle}
+                />
+                <span> Trial Period</span>
+              </div>
+              
               <div style={{ display: 'flex', justifyContent: 'flex-end' }} className='mt-4'>
                 <Button style={{ marginRight: '8px' }} onClick={() => {
                   onClose();

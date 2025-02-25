@@ -1,16 +1,47 @@
-import React, { useEffect } from 'react';
-import { Row, Col, Button, Select } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Row, Col, Button, Select, Modal, Input } from 'antd';
 import { Formik, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
+import { message } from 'antd';
+import { useSelector, useDispatch } from 'react-redux';
+import { getstages } from '../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice';
 
 const { Option } = Select;
 
 const ConvertDeal = ({ onClose, leadData }) => {
+    // States
+    const dispatch = useDispatch();
+    const [isOtpModalVisible, setIsOtpModalVisible] = useState(false);
+    const [otp, setOtp] = useState('');
+    const [formValues, setFormValues] = useState(null);
+    const [isCreatingClient, setIsCreatingClient] = useState(false);
+
+    // Add this to get logged-in user data
+    const { loggedInUser } = useSelector((state) => state.user);
+    const logged = loggedInUser?.username; // or whatever property identifies the logged-in user
+
+    // Mock clients data
+    const clients = [
+        { id: 1, name: 'Client 1', email: 'client1@example.com' },
+        { id: 2, name: 'Client 2', email: 'client2@example.com' },
+    ];
+
+    const { data: StagesLeadsDealss = [] } = useSelector(
+        (state) => state.StagesLeadsDeals.StagesLeadsDeals || {}
+    );
+    
+    const StagesLeadsDeals = logged && Array.isArray(StagesLeadsDealss) 
+        ? StagesLeadsDealss.filter((item) => 
+            item?.created_by === logged && item?.stageType === "deal"
+        )
+        : [];
+
     const initialValues = {
         dealName: leadData?.name || '',
-        price: '0',
-        clientType: 'new', // 'new' or 'existing'
-        clientId: '', // for existing client selection
+        price: '',
+        clientType: 'new',
+        clientId: '',
         clientName: '',
         clientEmail: '',
         clientPassword: '',
@@ -25,9 +56,15 @@ const ConvertDeal = ({ onClose, leadData }) => {
         }
     };
 
+    
+    useEffect(() => {
+        dispatch(getstages());
+      }, [dispatch]);
+
     const validationSchema = Yup.object().shape({
         dealName: Yup.string().required('Deal name is required'),
         price: Yup.number().min(0, 'Price must be positive').required('Price is required'),
+        clientType: Yup.string().required('Please select client type'),
         clientId: Yup.string().when('clientType', {
             is: 'existing',
             then: Yup.string().required('Please select a client')
@@ -46,34 +83,106 @@ const ConvertDeal = ({ onClose, leadData }) => {
         })
     });
 
-    const handleSubmit = (values, { setSubmitting }) => {
-        console.log(values);
-        // Handle form submission
+    const handleSubmit = async (values, { setSubmitting }) => {
+        setSubmitting(true);
+        try {
+            if (values.clientType === 'new') {
+                // Create new client first
+                const clientData = {
+                    username: values.clientName,
+                    email: values.clientEmail,
+                    password: values.clientPassword,
+                    loginEnabled: true
+                };
+
+                try {
+                    const response = await axios.post('http://localhost:5353/api/v1/auth/signup', clientData);
+                    if (response.data?.data?.sessionToken) {
+                        setFormValues({ ...values, clientId: response.data.data.id });
+                        setIsOtpModalVisible(true);
+                    }
+                } catch (error) {
+                    message.error('Failed to create client: ' + (error.response?.data?.message || error.message));
+                    setSubmitting(false);
+                    return;
+                }
+            } else {
+                // For existing client, directly create deal
+                await handleFinalSubmit(values);
+            }
+        } catch (error) {
+            message.error('Error processing request: ' + error.message);
+        }
         setSubmitting(false);
-        onClose();
     };
 
-    // Mock clients data - replace this with your actual clients data
-    const clients = [
-        { id: 1, name: 'Client 1', email: 'client1@example.com' },
-        { id: 2, name: 'Client 2', email: 'client2@example.com' },
-        // ... more clients
-    ];
+    const handleFinalSubmit = async (values) => {
+        try {
+            // Prepare deal data
+            const dealData = {
+                name: values.dealName,
+                price: values.price,
+                clientId: values.clientType === 'new' ? formValues.clientId : values.clientId,
+                copyData: values.copyTo
+            };
+
+            // Call deal creation API
+            const response = await axios.post('http://localhost:5353/api/v1/deals', dealData);
+            
+            if (response.data.success) {
+                message.success('Deal created successfully!');
+                onClose();
+            } else {
+                message.error('Failed to create deal');
+            }
+        } catch (error) {
+            message.error('Error creating deal: ' + (error.response?.data?.message || error.message));
+        }
+    };
+
+    const handleOtpSubmit = async () => {
+        if (otp.length === 6) {
+            try {
+                // Verify OTP
+                const response = await axios.post(
+                    'http://localhost:5353/api/v1/auth/verify-signup',
+                    { otp },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${formValues.sessionToken}`,
+                        },
+                    }
+                );
+
+                if (response.data.success) {
+                    message.success('Client verified successfully!');
+                    setIsOtpModalVisible(false);
+                    // Now create the deal
+                    await handleFinalSubmit(formValues);
+                    setOtp('');
+                } else {
+                    message.error('Invalid OTP');
+                }
+            } catch (error) {
+                message.error('Error verifying OTP: ' + (error.response?.data?.message || error.message));
+            }
+        }
+    };
 
     return (
-        <div className="p-6">
-            
-
+        <div className="">
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
                 onSubmit={handleSubmit}
+                enableReinitialize={true}
             >
-                {({ values, handleSubmit, setFieldValue, isSubmitting }) => (
+                {({ values, handleSubmit, setFieldValue }) => (
                     <form onSubmit={handleSubmit}>
+                            <h1 className='border-b border-gray-200'></h1>
                         <Row gutter={16}>
                             <Col span={12}>
-                                <div className="mb-4">
+                                <div className="mt-3">
                                     <label className="block mb-1 font-medium">Deal Name <span className="text-red-500">*</span></label>
                                     <Field
                                         name="dealName"
@@ -85,7 +194,7 @@ const ConvertDeal = ({ onClose, leadData }) => {
                             </Col>
 
                             <Col span={12}>
-                                <div className="mb-4">
+                                <div className="mt-3">
                                     <label className="block mb-1 font-medium">Price <span className="text-red-500">*</span></label>
                                     <Field
                                         name="price"
@@ -96,9 +205,49 @@ const ConvertDeal = ({ onClose, leadData }) => {
                                     <ErrorMessage name="price" component="div" className="text-red-500 text-sm mt-1" />
                                 </div>
                             </Col>
+                            <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Stage <span className="text-rose-500">*</span></label>
+                  <div className="flex gap-2">
+                    <Field name="stage">
+                      {({ field, form }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-1"
+                          placeholder="Select Stage"
+                          value={field.value} // Ensure the select value is controlled
+                          onChange={(value) => {
+                            // Find the selected stage based on the id
+                            const selectedStage =
+                              Array.isArray(StagesLeadsDeals) &&
+                              StagesLeadsDeals.find((e) => e.id === value);
+                            // Update the form with the selected stage id
+                            form.setFieldValue(
+                              "stage",
+                              selectedStage?.id || ""
+                            );
+                          }}
+                        >
+                          {Array.isArray(StagesLeadsDeals) &&
+                            StagesLeadsDeals.map((stage) => (
+                              <Option key={stage.id} value={stage.id}>
+                                {stage.stageName}
+                              </Option>
+                            ))}
+                        </Select>
+                      )}
+                    </Field>
+                  </div>
+                  <ErrorMessage
+                    name="stage"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
 
                             <Col span={24}>
-                                <div className="mb-4">
+                                <div className="mt-3">
                                     <div className="flex gap-6">
                                         <label className="flex items-center">
                                             <Field
@@ -124,10 +273,8 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
                             {values.clientType === 'existing' ? (
                                 <Col span={24}>
-                                    <div className="mb-4">
-                                        <label className="block mb-1 font-medium">
-                                            Select Client <span className="text-red-500">*</span>
-                                        </label>
+                                    <div className="mt-3">
+                                        <label className="block mb-1 font-medium">Select Client <span className="text-red-500">*</span></label>
                                         <Field name="clientId">
                                             {({ field }) => (
                                                 <Select
@@ -135,36 +282,22 @@ const ConvertDeal = ({ onClose, leadData }) => {
                                                     className="w-full"
                                                     placeholder="Select Client"
                                                     onChange={(value) => setFieldValue('clientId', value)}
-                                                    showSearch
-                                                    filterOption={(input, option) =>
-                                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                                                    }
                                                 >
-                                                    {clients && clients.length > 0 ? (
-                                                        clients.map((client) => (
-                                                            <Option key={client.id} value={client.id}>
-                                                                {client.name || client.email || 'Unnamed Client'}
-                                                            </Option>
-                                                        ))
-                                                    ) : (
-                                                        <Option value="" disabled>
-                                                            No Clients Available
+                                                    {clients.map((client) => (
+                                                        <Option key={client.id} value={client.id}>
+                                                            {client.name || client.email}
                                                         </Option>
-                                                    )}
+                                                    ))}
                                                 </Select>
                                             )}
                                         </Field>
-                                        <ErrorMessage 
-                                            name="clientId" 
-                                            component="div" 
-                                            className="text-red-500 text-sm mt-1" 
-                                        />
+                                        <ErrorMessage name="clientId" component="div" className="text-red-500 text-sm mt-1" />
                                     </div>
                                 </Col>
                             ) : (
                                 <>
                                     <Col span={12}>
-                                        <div className="mb-4">
+                                        <div className="mt-3">
                                             <label className="block mb-1 font-medium">Client Name <span className="text-red-500">*</span></label>
                                             <Field
                                                 name="clientName"
@@ -176,7 +309,7 @@ const ConvertDeal = ({ onClose, leadData }) => {
                                     </Col>
 
                                     <Col span={12}>
-                                        <div className="mb-4">
+                                        <div className="mt-3">
                                             <label className="block mb-1 font-medium">Client Email <span className="text-red-500">*</span></label>
                                             <Field
                                                 name="clientEmail"
@@ -189,7 +322,7 @@ const ConvertDeal = ({ onClose, leadData }) => {
                                     </Col>
 
                                     <Col span={24}>
-                                        <div className="mb-4">
+                                        <div className="mt-3">
                                             <label className="block mb-1 font-medium">Client Password <span className="text-red-500">*</span></label>
                                             <Field
                                                 name="clientPassword"
@@ -203,7 +336,6 @@ const ConvertDeal = ({ onClose, leadData }) => {
                                 </>
                             )}
 
-                            
                         </Row>
 
                         <div className="flex justify-end gap-3 mt-6">
@@ -213,15 +345,57 @@ const ConvertDeal = ({ onClose, leadData }) => {
                             <Button
                                 type="primary"
                                 htmlType="submit"
-                                // disabled={isSubmitting}
                                 className="bg-blue-500 text-white px-4"
+                                onClick={() => {
+                                    if (values.clientType === 'new') {
+                                        setIsOtpModalVisible(true);
+                                    }
+                                }}
                             >
-                                Create
+                                {values.clientType === 'new' ? 'Create' : 'Create'}
                             </Button>
                         </div>
                     </form>
                 )}
             </Formik>
+
+            <Modal
+                title="OTP Verification"
+                visible={isOtpModalVisible}
+                onCancel={() => setIsOtpModalVisible(false)}
+                footer={[
+                    <Button key="cancel" onClick={() => setIsOtpModalVisible(false)}>
+                        Cancel
+                    </Button>,
+                    <Button 
+                        key="submit" 
+                        type="primary" 
+                        onClick={handleOtpSubmit}
+                        disabled={otp.length !== 6}
+                    >
+                        Verify
+                    </Button>
+                ]}
+            >
+                <div className="p-4">
+                    <p className="mb-4">
+                        Please enter the 6-digit OTP sent to your email address: 
+                        <span className="font-semibold ml-1">{formValues?.clientEmail}</span>
+                    </p>
+                    <Input
+                        placeholder="Enter 6-digit OTP"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
+                        className="text-center text-2xl tracking-wider"
+                        maxLength={6}
+                    />
+                    <div className="mt-4 text-center">
+                        <Button type="link" onClick={() => {/* Add resend OTP logic */}}>
+                            Resend OTP
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };

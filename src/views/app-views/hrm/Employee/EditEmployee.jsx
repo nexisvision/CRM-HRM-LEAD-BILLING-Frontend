@@ -12,7 +12,7 @@ import {
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import { Field, ErrorMessage, Formik } from "formik";
-import { UploadOutlined } from "@ant-design/icons";
+import { ToTopOutlined, UploadOutlined } from "@ant-design/icons";
 import moment from "moment";
 import TextArea from "antd/es/input/TextArea";
 import { useSelector } from "react-redux";
@@ -77,6 +77,24 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
     const branchDataa = useSelector((state) => state.Branch?.Branch?.data || []);
   
     
+    const 
+  
+  generatePassword = () => {
+    const length = 8;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let password = "";
+    
+    // Generate 6 characters
+    for (let i = 0; i < length; i++) {
+      password += charset[Math.floor(Math.random() * charset.length)];
+    }
+
+    // Ensure at least one number
+    const randomNum = Math.floor(Math.random() * 10).toString();
+    password = password.slice(0, 7) + randomNum;
+    
+    return password;
+  };
     const getBranchName = (branchId) => {
       const branch = branchDataa.find(item => item.id === branchId);
       console.log("branch", branch);
@@ -423,15 +441,29 @@ const EditEmployee = ({ employeeIdd, onClose }) => {
             </Form.Item>
           </Col> */}
           <Col span={12}>
-            <Form.Item
-              name="password"
-              label="Password"
-              className=" "
-              rules={[{ required: true, message: "Password is required" }]}
-            >
-              <Input.Password placeholder="Strong Password" />
-            </Form.Item>
-          </Col>
+                <div className="form-item mt-2">
+                <label className="font-semibold">Password <span className="text-red-500">*</span></label>
+                  <div className="relative">
+                    <Field
+                      name="password"
+                      as={Input.Password}
+                      placeholder="Password"
+                      className="mt-1 w-full"
+                    />
+                    <Button
+                      className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
+                      onClick={() => setFieldValue("password", generatePassword())}
+                    >
+                     <ToTopOutlined/>
+                    </Button>
+                  </div>
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+              </Col>
           {/* <Col span={12}>
             <Form.Item
               name="email"

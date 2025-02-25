@@ -5,7 +5,9 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { AddUserss, GetUsers } from "../UserReducers/UserSlice"; // Custom Redux actions
 import { roledata } from "views/app-views/hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice"; // Role data action
-import axios from "axios"; // Axios for HTTP requests
+import axios from "axios";
+import { KeyOutlined, ToTopOutlined } from "@ant-design/icons";
+ // Axios for HTTP requests
 
 const { Option } = Select;
 
@@ -39,6 +41,25 @@ const AddUser = ({ visible, onClose }) => {
   const getalllrole = useSelector((state) => state.role);
   const fnddata = getalllrole.role?.data || [];
   const rolefnd = fnddata?.filter((item) => item?.created_by === user) || [];
+
+  const 
+  
+  generatePassword = () => {
+    const length = 8;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let password = "";
+    
+    // Generate 6 characters
+    for (let i = 0; i < length; i++) {
+      password += charset[Math.floor(Math.random() * charset.length)];
+    }
+
+    // Ensure at least one number
+    const randomNum = Math.floor(Math.random() * 10).toString();
+    password = password.slice(0, 7) + randomNum;
+    
+    return password;
+  };
 
   useEffect(() => {
     dispatch(roledata());
@@ -95,7 +116,7 @@ const AddUser = ({ visible, onClose }) => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ errors, touched, setFieldValue }) => (
+        {({ errors, touched, setFieldValue, handleSubmit }) => (
           <Form className="space-y-4">
             <div className="border-b border-gray-200 mb-6"></div>
 
@@ -164,22 +185,27 @@ const AddUser = ({ visible, onClose }) => {
                 </div>
               </Col>
               <Col span={12}>
-                <div className="space-y-2">
-                <div className="form-item">
-                  <label className="font-semibold">Password <span className="text-red-500">*</span> </label>
-                  <Field
-                    name="password"
-                    as={Input}
-                    placeholder="Enter Password"
-                    className="w-full mt-2"
-                    rules={[{ required: true }]}
-                  />
+                <div className="form-item mt-2">
+                <label className="font-semibold">Password <span className="text-red-500">*</span></label>
+                  <div className="relative">
+                    <Field
+                      name="password"
+                      as={Input.Password}
+                      placeholder="Password"
+                      className="mt-1 w-full"
+                    />
+                    <Button
+                      className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
+                      onClick={() => setFieldValue("password", generatePassword())}
+                    >
+                     <ToTopOutlined/>
+                    </Button>
+                  </div>
                   <ErrorMessage
                     name="password"
                     component="div"
-                    className="error-message text-red-500 my-1"
+                    className="text-red-500"
                   />
-                </div>
                 </div>
               </Col>
             </Row>

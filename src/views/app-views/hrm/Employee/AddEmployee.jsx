@@ -471,7 +471,7 @@ import {
   Col,
 } from "antd";
 import { useNavigate } from "react-router-dom";
-import { UploadOutlined } from "@ant-design/icons";
+import { ToTopOutlined, UploadOutlined } from "@ant-design/icons";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -515,6 +515,25 @@ const AddEmployee = ({ onClose, setSub }) => {
 
   const countries = useSelector((state) => state.countries.countries);
 
+
+  const 
+  
+  generatePassword = () => {
+    const length = 8;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let password = "";
+    
+    // Generate 6 characters
+    for (let i = 0; i < length; i++) {
+      password += charset[Math.floor(Math.random() * charset.length)];
+    }
+
+    // Ensure at least one number
+    const randomNum = Math.floor(Math.random() * 10).toString();
+    password = password.slice(0, 7) + randomNum;
+    
+    return password;
+  };
   useEffect(() => {
     dispatch(empdata())
   }, [dispatch])
@@ -722,10 +741,27 @@ const AddEmployee = ({ onClose, setSub }) => {
                 </div>
               </Col>
               <Col span={12}>
-                <div className="form-item">
-                  <label className="">Password <span className="text-red-500">*</span></label>
-                  <Field name="password" as={Input.Password} placeholder="Strong Password" className="mt-1" />
-                  <ErrorMessage name="password" component="div" className="text-red-500" />
+                <div className="form-item mt-2">
+                <label className="font-semibold">Password <span className="text-red-500">*</span></label>
+                  <div className="relative">
+                    <Field
+                      name="password"
+                      as={Input.Password}
+                      placeholder="Password"
+                      className="mt-1 w-full"
+                    />
+                    <Button
+                      className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
+                      onClick={() => setFieldValue("password", generatePassword())}
+                    >
+                     <ToTopOutlined/>
+                    </Button>
+                  </div>
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
             </Row>

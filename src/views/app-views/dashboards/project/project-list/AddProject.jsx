@@ -319,7 +319,17 @@ const AddProject = ({ onClose }) => {
                     className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.startDate}
-                    onChange={(date) => setFieldValue("startDate", date)}
+                    onChange={(date) => {
+                      setFieldValue("startDate", date);
+                      // Calculate months if both dates are set
+                      if (date && values.endDate) {
+                        const startDate = date;
+                        const endDate = values.endDate;
+                        const monthsDiff = endDate.diff(startDate, 'months', true);
+                        const roundedMonths = Math.ceil(monthsDiff);
+                        setFieldValue("estimatedmonths", roundedMonths > 0 ? roundedMonths : 1);
+                      }
+                    }}
                     onBlur={() => setFieldTouched("startDate", true)}
                   />
                   <ErrorMessage
@@ -337,7 +347,17 @@ const AddProject = ({ onClose }) => {
                     className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.endDate}
-                    onChange={(date) => setFieldValue("endDate", date)}
+                    onChange={(date) => {
+                      setFieldValue("endDate", date);
+                      // Calculate months if both dates are set
+                      if (values.startDate && date) {
+                        const startDate = values.startDate;
+                        const endDate = date;
+                        const monthsDiff = endDate.diff(startDate, 'months', true);
+                        const roundedMonths = Math.ceil(monthsDiff);
+                        setFieldValue("estimatedmonths", roundedMonths > 0 ? roundedMonths : 1);
+                      }
+                    }}
                     onBlur={() => setFieldTouched("endDate", true)}
                   />
                   <ErrorMessage
