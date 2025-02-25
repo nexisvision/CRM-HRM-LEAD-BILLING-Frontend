@@ -90,6 +90,8 @@ const LeadCards = () => {
    const [selectedPipeline, setSelectedPipeline] = useState("all");
      const [leadadatafilter, setLeadadatafilter] = useState([]);
 
+  const loggeduserdata = useSelector((state) => state.user.loggedInUser.username);
+
   useEffect(() => {
     dispatch(getstages());
     dispatch(GetLeads());
@@ -116,8 +118,8 @@ const LeadCards = () => {
   useEffect(() => {
     if (fndata.length > 0) {
       const filteredStages = selectedPipeline === "all" 
-        ? fndata 
-        : fndata.filter((stage) => stage.pipeline === selectedPipeline);
+        ? fndata.filter((stage) => stage.stageType === "lead" && stage.created_by === loggeduserdata)
+        : fndata.filter((stage) => stage.pipeline === selectedPipeline && stage.stageType === "lead" && stage.created_by === loggeduserdata);
 
       const leadsGroupedByStage = filteredStages.map((stage) => ({
         status: stage.stageName,
@@ -127,7 +129,7 @@ const LeadCards = () => {
 
       setLeadData(leadsGroupedByStage);
     }
-  }, [fndata, fndleadadat, selectedPipeline]);
+  }, [fndata, fndleadadat, selectedPipeline, loggeduserdata]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -194,7 +196,7 @@ const LeadCards = () => {
         dispatch(
           LeadsEdit({
             id: movedLead.id,
-            values: { leadStage: destinationStageId },
+            formData: { leadStage: destinationStageId },
           })
         );
       }
@@ -291,8 +293,7 @@ const LeadCards = () => {
 
         {/* Add Lead Modal */}
         <Modal
-          title="Add Lead"
-          visible={isAddLeadCardsVisible}
+          title="Add Lead"          visible={isAddLeadCardsVisible}
           onCancel={() => setIsAddLeadCardsVisible(false)}
           footer={null} // Remove the footer since AddLeadCards will have its own buttons
         >

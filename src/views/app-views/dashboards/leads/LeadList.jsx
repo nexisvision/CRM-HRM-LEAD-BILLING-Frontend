@@ -216,12 +216,6 @@ const LeadList = () => {
     dispatch(GetLeads());
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   if (tabledata && tabledata.Leads && tabledata.Leads.data) {
-  //     setUsers(tabledata.Leads.data);
-  //   }
-  // }, [tabledata]);
-
 
   useEffect(() => {
     if (tabledata && tabledata.Leads && tabledata.Leads.data) {
@@ -274,6 +268,8 @@ const LeadList = () => {
             size="small"
           >
             <span className="">Convert to Deal</span>
+
+            
           </Button>
         </Flex>
       </Menu.Item>

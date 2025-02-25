@@ -8,6 +8,7 @@ import useBodyClass from 'utils/hooks/useBodyClass';
 import Routes from 'routes'
 import { getRoles } from 'views/app-views/hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice';
 import { useDispatch } from 'react-redux';
+import { getgeneralsettings } from 'views/app-views/setting/general/generalReducer/generalSlice';
 
 const AppLayout = lazy(() => import('./AppLayout'));
 const AuthLayout = lazy(() => import('./AuthLayout'));
@@ -18,7 +19,9 @@ const dispatch = useDispatch();
 	
 	useEffect(() => {
 		dispatch(getRoles());
+		dispatch(getgeneralsettings());
 	  }, [dispatch]);
+	  
 
 	const token = useSelector(state => state.auth.token);
 	const blankLayout = useSelector(state => state.theme.blankLayout);
