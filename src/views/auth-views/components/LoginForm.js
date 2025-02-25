@@ -308,7 +308,7 @@ export const LoginForm = props => {
 					<span className="text-blue-600 hover:text-blue-700 cursor-pointer ml-1">
 						Sign Up
 					</span>
-				</p> */}
+				</p> */} 
 			</div>
 
 			<Form 

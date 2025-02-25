@@ -38,7 +38,7 @@ const AddDepartment = ({ onClose }) => {
         message.success("Department added successfully!");
         resetForm();
         onClose();
-        navigate("/app/hrm/department");
+        // navigate("/app/hrm/department");
       })
       .catch((error) => {
         message.error("Failed to add department.");

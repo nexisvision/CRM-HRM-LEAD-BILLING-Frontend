@@ -242,6 +242,16 @@ const BranchList = () => {
       sorter: (a, b) => a.branchName.length - b.branchName.length,
     },
     {
+      title: "Branch Manager",
+      dataIndex: "branchManager",
+      sorter: (a, b) => a.branchManager.length - b.branchManager.length,
+    },
+    {
+      title: "Address",
+      dataIndex: "address",
+      sorter: (a, b) => a.address.length - b.address.length,
+    },
+    {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (

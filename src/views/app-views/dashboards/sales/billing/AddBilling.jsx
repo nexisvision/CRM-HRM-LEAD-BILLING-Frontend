@@ -336,7 +336,7 @@ const AddBilling = ({ onClose }) => {
       <Form form={form} layout="vertical">
       <h2 className="mb-2 border-b font-medium"></h2>
         <Card className="border-0">
-          <h1 className="border-b-2 border-gray-200"></h1>
+          
           <Row gutter={16}>
             <Col span={12} className="mt-1">
               <Form.Item

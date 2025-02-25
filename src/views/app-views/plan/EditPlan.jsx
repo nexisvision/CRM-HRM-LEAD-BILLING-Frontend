@@ -40,11 +40,11 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
     currency: Yup.string().required('Please select a currency!'),
     description: Yup.string().required('Please enter a description!'),
     trial: Yup.boolean(),
-    trialDays: Yup.string().when('trial', {
-      is: true,
-      then: (schema) => schema.required('Please enter the number of trial days!'),
-      otherwise: (schema) => schema.notRequired(),
-    })
+    // trialDays: Yup.string().when('trial', {
+    //   is: true,
+    //   then: (schema) => schema.required('Please enter the number of trial days!'),
+    //   otherwise: (schema) => schema.notRequired(),
+    // })
   });
 
   const initialValues = {
@@ -59,7 +59,7 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
     currency: '',
     description: '',
     trial: false,
-    trialDays: '',
+    // trialDays: '',
     ...planData
   };
 
@@ -305,32 +305,6 @@ return (
               <ErrorMessage name="description" component="div" className="text-red-500" />
             </div>
 
-            <div className="mb-4">
-              <label className="block mb-1">Trial is enabled (on/off)</label>
-              <Field name="trial">
-                {({ field }) => (
-                  <Switch
-                    checked={field.value}
-                    onChange={(checked) => {
-                      setFieldValue('trial', checked);
-                      setIsTrialEnabled(checked);
-                    }}
-                  />
-                )}
-              </Field>
-            </div>
-
-            {isTrialEnabled && (
-              <div className="mb-4">
-                <label className="block mb-1">Trial Days <span className="text-red-500">*</span></label>
-                <Field
-                  name="trialDays"
-                  as={Input}
-                  placeholder="Enter Number of Trial Days"
-                />
-                <ErrorMessage name="trialDays" component="div" className="text-red-500" />
-              </div>
-            )}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <Button style={{ marginRight: '8px' }} onClick={onClose}>

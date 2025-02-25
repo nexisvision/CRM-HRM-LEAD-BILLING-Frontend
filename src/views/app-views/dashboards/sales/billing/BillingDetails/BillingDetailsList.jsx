@@ -4,10 +4,17 @@ import { BsCurrencyDollar } from "react-icons/bs";
 import { Row, Card, Col, Table, Select, Input, Button, Badge, Menu, Modal, Tag } from 'antd';
 import EditBilling from '../EditBilling';
 import AddBilling from '../AddBilling';
+import AddPayment from '../AddPayment';
+import { useSelector } from 'react-redux';
 
-const BillingDetailsList = () => {
+const BillingDetailsList = ({ billingId }) => {
     const [isAddBillingModalVisible, setIsAddBillingModalVisible] = useState(false);
     const [isEditBillingModalVisible, setIsEditBillingModalVisible] = useState(false);
+    const [isAddPaymentModalVisible, setIsAddPaymentModalVisible] = useState(false);
+
+    // Get billing data from Redux store
+    const allBillingData = useSelector((state) => state?.salesbilling?.salesbilling?.data || []);
+    const currentBill = allBillingData.find(bill => bill.id === billingId);
 
     // Open Add Job Modal
     const openAddBillingModal = () => {
@@ -29,6 +36,19 @@ const BillingDetailsList = () => {
         setIsEditBillingModalVisible(false);
     };
 
+    // Open Add Payment Modal
+    const openAddPaymentModal = () => {
+        setIsAddPaymentModalVisible(true);
+    };
+
+    // Close Add Payment Modal
+    const closeAddPaymentModal = () => {
+        setIsAddPaymentModalVisible(false);
+    };
+
+    const handleAddPayment = () => {
+        setIsAddPaymentModalVisible(true);
+    };
 
     return (
         <>
@@ -81,7 +101,11 @@ const BillingDetailsList = () => {
                                 </div>
                                 <h3 className="text-cyan-500 font-medium text-lg mt-2">Get Paid</h3>
                                 <p className="text-sm text-gray-500 mt-2">Status: Awaiting payment</p>
-                                <Button type="primary" className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md text-sm" onClick={openAddBillingModal}>
+                                <Button 
+                                    type="primary" 
+                                    className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md text-sm" 
+                                    onClick={handleAddPayment}
+                                >
                                     <PlusOutlined />
                                     <span className="ml-2">Add Payment</span>
                                 </Button>
@@ -101,14 +125,17 @@ const BillingDetailsList = () => {
             </div>
 
             <Modal
-                title="Create Billing"
-                visible={isAddBillingModalVisible}
-                onCancel={closeAddBillingModal}
+                title="Add Payment"
+                visible={isAddPaymentModalVisible}
+                onCancel={closeAddPaymentModal}
                 footer={null}
-                width={1000}
+                width={800}
                 className='mt-[-70px]'
             >
-                <AddBilling onClose={closeAddBillingModal} />
+                <AddPayment 
+                    onClose={closeAddPaymentModal} 
+                    billNumber={currentBill?.billNumber}
+                />
             </Modal>
             <Modal
                 title="Edit Billing"

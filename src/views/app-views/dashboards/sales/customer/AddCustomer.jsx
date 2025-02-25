@@ -48,35 +48,35 @@ const AddCustomer = ({ onClose }) => {
 
   const validationSchema = Yup.object({
     name: Yup.string().required("Please enter a Name."),
-    country_code: Yup.string().required("Country code is required"),
+    country_code: Yup.string().optional("Country code is required"),
     contact: Yup.string()
       .required("Please enter a Contact Number"),
     email: Yup.string()
       .email("Please enter a valid email address with @.")
       .required("please enter a email"),
-    taxnumber: Yup.string().required("Please enter a Tax Number."),
+    taxnumber: Yup.string().optional("Please enter a Tax Number."),
     alternatemobilenumber: Yup.string()
       .nullable()
       .transform((value) => (value === "" ? null : value))
-      .required("Please enter an Alternate Number"),
-    billing_name: Yup.string().required("Please enter a Name."),
-    billing_country_code: Yup.string().required("Country code is required"),
+      .optional("Please enter an Alternate Number"),
+    billing_name: Yup.string().optional("Please enter a Name."),
+    billing_country_code: Yup.string().optional("Country code is required"),
     billing_phone: Yup.string()
-      .required("Please enter a phone number"),
-    billing_address: Yup.string().required("Please enter a Billing Address."),
-    billing_city: Yup.string().required("Please enter a City."),
-    billing_state: Yup.string().required("Please enter a State."),
-    billing_country: Yup.string().required("Please enter a Country."),
-    billing_zipcode: Yup.string().required("Please enter a Zip Code."),
-    shipping_name: Yup.string().required("Please enter a Name."),
-    shipping_country_code: Yup.string().required("Country code is required"),
+      .optional("Please enter a phone number"),
+    billing_address: Yup.string().optional("Please enter a Billing Address."),
+    billing_city: Yup.string().optional("Please enter a City."),
+    billing_state: Yup.string().optional("Please enter a State."),
+    billing_country: Yup.string().optional("Please enter a Country."),
+    billing_zipcode: Yup.string().optional("Please enter a Zip Code."),
+    shipping_name: Yup.string().optional("Please enter a Name."),
+    shipping_country_code: Yup.string().optional("Country code is required"),
     shipping_phone: Yup.string()
-      .required("Please enter a phone number"),
-    shipping_address: Yup.string().required("Please enter a Shipping Address."),
-    shipping_city: Yup.string().required("Please enter a City."),
-    shipping_state: Yup.string().required("Please enter a State."),
-    shipping_country: Yup.string().required("Please enter a Country."),
-    shipping_zipcode: Yup.string().required("Please enter a Zip Code."),
+      .optional("Please enter a phone number"),
+    shipping_address: Yup.string().optional("Please enter a Shipping Address."),
+    shipping_city: Yup.string().optional("Please enter a City."),
+    shipping_state: Yup.string().optional("Please enter a State."),
+    shipping_country: Yup.string().optional("Please enter a Country."),
+    shipping_zipcode: Yup.string().optional("Please enter a Zip Code."),
   });
 
   const handlePhoneNumberChange = (e, setFieldValue, fieldName) => {

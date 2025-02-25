@@ -9,8 +9,14 @@ import { AddBranchs, getBranch } from './BranchReducer/BranchSlice';
 const validationSchema = Yup.object().shape({
   branchName: Yup.string()
     .required('Branch Name is required')
-    .min(2, 'Department name must be at least 2 characters')
-    .max(50, 'Department name cannot exceed 50 characters'),
+    .min(2, 'Branch name must be at least 2 characters')
+    .max(50, 'Branch name cannot exceed 50 characters'),
+  branchManager: Yup.string()
+    .required('Branch Manager is required')
+    .min(2, 'Branch Manager name must be at least 2 characters'),
+  address: Yup.string()
+    .required('Address is required')
+    .min(5, 'Address must be at least 5 characters'),
 });
 
 const AddBranch = ({ onClose }) => {
@@ -39,7 +45,7 @@ const AddBranch = ({ onClose }) => {
         initialValues={{
           branchName: '',
         }}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({ errors, touched, setFieldValue, resetForm }) => (
@@ -51,7 +57,7 @@ const AddBranch = ({ onClose }) => {
                   <Field
                     as={Input}
                     name="branchName"
-                    className="w-full mt-1  "
+                    className="w-full mt-1"
                     placeholder="Enter Branch Name"
                     onChange={(e) => setFieldValue('branchName', e.target.value)}
                   />
@@ -60,6 +66,37 @@ const AddBranch = ({ onClose }) => {
                   )}
                 </div>
               </Col>
+              <Col span={12}>
+                <div style={{ marginBottom: '16px'}}>
+                  <label className="font-semibold">Branch Manager <span className="text-red-500">*</span></label>
+                  <Field
+                    as={Input}
+                    name="branchManager"
+                    className="w-full mt-1"
+                    placeholder="Enter Branch Manager Name"
+                    onChange={(e) => setFieldValue('branchManager', e.target.value)}
+                  />
+                  {errors.branchManager && touched.branchManager && (
+                    <div style={{ color: 'red', fontSize: '12px' }}>{errors.branchManager}</div>
+                  )}
+                </div>
+              </Col>
+              <Col span={12}>
+                <div style={{ marginBottom: '16px'}}>
+                  <label className="font-semibold">Address <span className="text-red-500">*</span></label>
+                  <Field
+                    as={Input}
+                    name="address"
+                    className="w-full mt-1"
+                    placeholder="Enter Branch Address"
+                    onChange={(e) => setFieldValue('address', e.target.value)}
+                  />
+                  {errors.address && touched.address && (
+                    <div style={{ color: 'red', fontSize: '12px' }}>{errors.address}</div>
+                  )}
+                </div>
+              </Col>
+              
             </Row>
 
             <div className="text-right">

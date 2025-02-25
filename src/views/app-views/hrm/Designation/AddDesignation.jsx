@@ -36,7 +36,7 @@ const AddDesignation = ({ onClose }) => {
         message.success("Designation added successfully!");
         resetForm();
         onClose();
-        navigate("/app/hrm/designation");
+        // navigate("/app/hrm/designation");
       })
       .catch((error) => {
         message.error("Failed to add designation.");

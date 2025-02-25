@@ -95,7 +95,7 @@
 //       console.log("values", values);
 //       const response = await dispatch(addEmp(values));
 
-      
+
 //       if (response.payload?.data?.sessionToken) {
 //         setOtpToken(response.payload?.data?.sessionToken);
 //         setShowOtpModal(true);
@@ -458,16 +458,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
 import React, { useEffect, useState } from "react";
 import {
   Modal,
@@ -492,6 +482,10 @@ import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
 import { getallcountries } from "../../setting/countries/countriesreducer/countriesSlice";
 import { getBranch } from "../Branch/BranchReducer/BranchSlice";
+import AddBranch from '../../hrm/Branch/AddBranch';
+import { PlusOutlined } from '@ant-design/icons';
+import AddDepartment from '../Department/AddDepartment';
+import AddDesignation from '../Designation/AddDesignation';
 
 const { Option } = Select;
 
@@ -506,35 +500,28 @@ const AddEmployee = ({ onClose, setSub }) => {
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
 
-  const loggedusername = useSelector((state)=>state.user.loggedInUser.username);
+  const loggedusername = useSelector((state) => state.user.loggedInUser.username);
 
   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
   const fndbranchdata = branchData.filter((item) => item.created_by === loggedusername);
 
-
-  const fnddepart =  departmentData.filter((item)=>item.created_by === loggedusername);
-  const fnddesi = designationData.filter((item)=>item.created_by === loggedusername);
-
-  // console.log("fnddepart", fnddesi);
-
+  const fnddepart = departmentData.filter((item) => item.created_by === loggedusername);
+  const fnddesi = designationData.filter((item) => item.created_by === loggedusername);
 
   const [selectedBranch, setSelectedBranch] = useState(null);
 
-  // Filter departments and designations based on selected branch
   const filteredDepartments = fnddepart.filter((dept) => dept.branch === selectedBranch);
   const filteredDesignations = fnddesi.filter((des) => des.branch === selectedBranch);
 
-
   const countries = useSelector((state) => state.countries.countries);
 
-   useEffect(()=>{
-      dispatch(empdata())
-    },[dispatch])
+  useEffect(() => {
+    dispatch(empdata())
+  }, [dispatch])
 
   useEffect(() => {
     dispatch(getallcountries());
   }, [dispatch]);
-
 
   useEffect(() => {
     dispatch(getDept());
@@ -581,9 +568,8 @@ const AddEmployee = ({ onClose, setSub }) => {
 
   const onSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
-      // console.log("values", values);
       const response = await dispatch(addEmp(values));
-      
+
       if (response.payload?.data?.sessionToken) {
         setOtpToken(response.payload?.data?.sessionToken);
         setShowOtpModal(true);
@@ -600,7 +586,6 @@ const AddEmployee = ({ onClose, setSub }) => {
 
   const onFinishFailed = (errorInfo) => {
     console.error("Form submission failed:", errorInfo);
-    // message.error("Please fill out all required fields.");
   };
 
   const onOpenOtpModal = () => {
@@ -651,18 +636,50 @@ const AddEmployee = ({ onClose, setSub }) => {
     department: Yup.string().required("Please select a department."),
     designation: Yup.string().required("Please select a designation."),
     salary: Yup.string().required("Please enter a salary."),
-    accountholder: Yup.string().required("Please enter an account holder name."),
-    accountnumber: Yup.string().required("Please enter an account number."),
-    bankname: Yup.string().required("Please enter a bank name."),
-    ifsc: Yup.string().required("Please enter an IFSC code."),
-    banklocation: Yup.string().required("Please enter a bank location."),
+    accountholder: Yup.string().optional(),
+    accountnumber: Yup.string().optional(),
+    bankname: Yup.string().optional(),
+    ifsc: Yup.string().optional(),
+    banklocation: Yup.string().optional(),
   });
+
+  const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
+
+  const openAddBranchModal = () => {
+    setIsAddBranchModalVisible(true);
+  };
+
+  const closeAddBranchModal = () => {
+    setIsAddBranchModalVisible(false);
+    dispatch(getBranch());
+  };
+
+  const [isAddDepartmentModalVisible, setIsAddDepartmentModalVisible] = useState(false);
+
+  const openAddDepartmentModal = () => {
+    setIsAddDepartmentModalVisible(true);
+  };
+
+  const closeAddDepartmentModal = () => {
+    setIsAddDepartmentModalVisible(false);
+    dispatch(getDept());
+  };
+
+  const [isAddDesignationModalVisible, setIsAddDesignationModalVisible] = useState(false);
+
+  const openAddDesignationModal = () => {
+    setIsAddDesignationModalVisible(true);
+  };
+
+  const closeAddDesignationModal = () => {
+    setIsAddDesignationModalVisible(false);
+    dispatch(getDes());
+  };
 
   return (
     <div className="add-employee p-6">
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({
@@ -706,7 +723,7 @@ const AddEmployee = ({ onClose, setSub }) => {
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                    <label className="">Password <span className="text-red-500">*</span></label>
+                  <label className="">Password <span className="text-red-500">*</span></label>
                   <Field name="password" as={Input.Password} placeholder="Strong Password" className="mt-1" />
                   <ErrorMessage name="password" component="div" className="text-red-500" />
                 </div>
@@ -721,47 +738,45 @@ const AddEmployee = ({ onClose, setSub }) => {
                 </div>
               </Col>
               <Col span={12} className="mt-2">
-  <div className="form-item">
-    <label className="">Phone <span className="text-red-500">*</span></label>
-    <div className="flex">
-      <Select
-        style={{ width: '30%', marginRight: '8px' }}
-        placeholder="Code"
-        name="phoneCode"
-        onChange={(value) => setFieldValue('phoneCode', value)}
-      >
-        {countries.map((country) => (
-          <Option key={country.id} value={country.phoneCode}>
-            (+{country.phoneCode})
-          </Option>
-        ))}
-      </Select>
-      <Field name="phone">
-        {({ field }) => (
-          <Input
-            {...field}
-            type="string"
-            style={{ width: '70%' }}
-            placeholder="Enter phone number"
-            onKeyPress={(e) => {
-              // Allow only numbers
-              if (!/[0-9]/.test(e.key)) {
-                e.preventDefault();
-              }
-            }}
-            // Remove spinner arrows
-            className="hide-number-spinner"
-          />
-        )}
-      </Field>
-    </div>
-    <ErrorMessage
-      name="phoneNumber"
-      component="div"
-      className="error-message text-red-500 my-1"
-    />
-  </div>
-</Col>
+                <div className="form-item">
+                  <label className="">Phone <span className="text-red-500">*</span></label>
+                  <div className="flex">
+                    <Select
+                      style={{ width: '30%', marginRight: '8px' }}
+                      placeholder="Code"
+                      name="phoneCode"
+                      onChange={(value) => setFieldValue('phoneCode', value)}
+                    >
+                      {countries.map((country) => (
+                        <Option key={country.id} value={country.phoneCode}>
+                          (+{country.phoneCode})
+                        </Option>
+                      ))}
+                    </Select>
+                    <Field name="phone">
+                      {({ field }) => (
+                        <Input
+                          {...field}
+                          type="string"
+                          style={{ width: '70%' }}
+                          placeholder="Enter phone number"
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          }}
+                          className="hide-number-spinner"
+                        />
+                      )}
+                    </Field>
+                  </div>
+                  <ErrorMessage
+                    name="phoneNumber"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
@@ -790,97 +805,118 @@ const AddEmployee = ({ onClose, setSub }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Leave Date <span className="text-red-500">*</span></label>
-                  <Field name="leaveDate">
+                  <label className="">Branch <span className="text-red-500">*</span></label>
+                  <Field name="branch">
                     {({ field }) => (
-                      <DatePicker
-                        className="w-full mt-1"
-                        format="DD-MM-YYYY"
-                        onChange={(date) => setFieldValue("leaveDate", date)}
-                      />
+                      <Select
+                        {...field}
+                        className="w-full mt-2"
+                        placeholder="Select Branch"
+                        dropdownRender={(menu) => (
+                          <>
+                            {menu}
+                            <Button 
+                              type="link" 
+                              block
+                              onClick={() => {
+                                openAddBranchModal();
+                                dispatch(getBranch());
+                              }}
+                            >
+                              + Add New Branch
+                            </Button>
+                          </>
+                        )}
+                        onChange={(value) => {
+                          setFieldValue("branch", value);
+                          setFieldValue("department", "");
+                          setFieldValue("designation", "");
+                          setSelectedBranch(value);
+                        }}
+                      >
+                        {fndbranchdata.map((branch) => (
+                          <Option key={branch.id} value={branch.id}>
+                            {branch.branchName}
+                          </Option>
+                        ))}
+                      </Select>
                     )}
                   </Field>
-                  <ErrorMessage name="leaveDate" component="div" className="text-red-500" />
+                  <ErrorMessage name="branch" component="div" className="text-red-500" />
                 </div>
               </Col>
-              
+
               <Col span={12}>
-            <div className="form-item">
-              <label className="">Branch <span className="text-red-500">*</span></label>
-              <Field name="branch">
-                {({ field }) => (
-                  <Select
-                    {...field}
-                    className="w-full mt-1"
-                    placeholder="Select Branch"
-                    onChange={(value) => {
-                      setFieldValue("branch", value);
-                      setFieldValue("department", "");
-                      setFieldValue("designation", "");
-                      setSelectedBranch(value); // Update selected branch
-                    }}
-                  >
-                    {fndbranchdata.map((branch) => (
-                       <Option key={branch.id} value={branch.id}>
-                       {branch.branchName}
-                     </Option>
-                    ))}
-                  </Select>
-                )}
-              </Field>
-              <ErrorMessage name="branch" component="div" className="text-red-500" />
-            </div>
-          </Col>
+                <div className="form-item mt-1">
+                  <label className="">Department <span className="text-red-500">*</span></label>
+                  <Field name="department">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-1"
+                        placeholder="Select Department"
+                        disabled={!selectedBranch}
+                        onChange={(value) => setFieldValue("department", value)}
+                        dropdownRender={(menu) => (
+                          <>
+                            {menu}
+                            <Button 
+                              type="link"
+                              block
+                              onClick={openAddDepartmentModal}
+                            >
+                              + Add New Department
+                            </Button>
+                          </>
+                        )}
+                      >
+                        {filteredDepartments.map((dept) => (
+                          <Option key={dept.id} value={dept.id}>
+                            {dept.department_name}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage name="department" component="div" className="text-red-500" />
+                </div>
+              </Col>
 
-          {/* Department Selection */}
-          <Col span={12}>
-            <div className="form-item mt-2">
-              <label className="">Department <span className="text-red-500">*</span></label>
-              <Field name="department">
-                {({ field }) => (
-                  <Select
-                    {...field}
-                    className="w-full mt-1"
-                    placeholder="Select Department"
-                    disabled={!selectedBranch}
-                    onChange={(value) => setFieldValue("department", value)}
-                  >
-                    {filteredDepartments.map((dept) => (
-                      <Option key={dept.id} value={dept.id}>
-                        {dept.department_name}
-                      </Option>
-                    ))}
-                  </Select>
-                )}
-              </Field>
-              <ErrorMessage name="department" component="div" className="text-red-500" />
-            </div>
-          </Col>
-
-          {/* Designation Selection */}
-          <Col span={12}>
-            <div className="form-item mt-2">
-              <label className="">Designation <span className="text-red-500">*</span></label>
-              <Field name="designation">
-                {({ field }) => (
-                  <Select
-                    {...field}
-                    className="w-full mt-1"
-                    placeholder="Select Designation"
-                    disabled={!selectedBranch}
-                    onChange={(value) => setFieldValue("designation", value)}
-                  >
-                    {filteredDesignations.map((des) => (
-                      <Option key={des.id} value={des.id}>
-                        {des.designation_name}
-                      </Option>
-                    ))}
-                  </Select>
-                )}
-              </Field>
-              <ErrorMessage name="designation" component="div" className="text-red-500" />
-            </div>
-          </Col>
+              <Col span={12}>
+                <div className="form-item mt-2">
+                  <label className="">Designation <span className="text-red-500">*</span></label>
+                  <Field name="designation">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-1"
+                        placeholder="Select Designation"
+                        disabled={!selectedBranch}
+                        onChange={(value) => setFieldValue("designation", value)}
+                        dropdownRender={(menu) => (
+                          <>
+                            {menu}
+                            <Button 
+                              type="link"
+                              block
+                              onClick={openAddDesignationModal}
+                            >
+                              + Add New Designation
+                            </Button>
+                          </>
+                        )}
+                      >
+                        {filteredDesignations.map((des) => (
+                          <Option key={des.id} value={des.id}>
+                            {des.designation_name}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage name="designation" component="div" className="text-red-500" />
+                </div>
+              </Col>
 
               <Col span={12}>
                 <div className="form-item mt-2">
@@ -936,8 +972,8 @@ const AddEmployee = ({ onClose, setSub }) => {
               <Button type="default" className="mr-2" onClick={() => onClose()}>
                 Cancel
               </Button>
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 htmlType="submit"
                 loading={isSubmitting}
               >
@@ -973,6 +1009,33 @@ const AddEmployee = ({ onClose, setSub }) => {
             </Button>
           </div>
         </div>
+      </Modal>
+      <Modal
+        title="Add Branch"
+        visible={isAddBranchModalVisible}
+        onCancel={closeAddBranchModal}
+        footer={null}
+        width={800}
+      >
+        <AddBranch onClose={closeAddBranchModal} />
+      </Modal>
+      <Modal
+        title="Add Department"
+        visible={isAddDepartmentModalVisible}
+        onCancel={closeAddDepartmentModal}
+        footer={null}
+        width={800}
+      >
+        <AddDepartment onClose={closeAddDepartmentModal} />
+      </Modal>
+      <Modal
+        title="Add Designation"
+        visible={isAddDesignationModalVisible}
+        onCancel={closeAddDesignationModal}
+        footer={null}
+        width={800}
+      >
+        <AddDesignation onClose={closeAddDesignationModal} />
       </Modal>
     </div>
   );

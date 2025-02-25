@@ -135,7 +135,7 @@ const EditClient = ({ comnyid, onClose }) => {
     <div className="add-job-form">
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         onSubmit={onSubmit}
         enableReinitialize
         validateOnSubmit={true}

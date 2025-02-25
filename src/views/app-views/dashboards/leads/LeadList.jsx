@@ -22,6 +22,7 @@ import {
   FileExcelOutlined,
   UnorderedListOutlined,
   AppstoreOutlined,
+  RetweetOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import UserView from "../../Users/user-list/UserView";
@@ -39,6 +40,7 @@ import { GetLeads, LeadsDelete } from "./LeadReducers/LeadSlice";
 import { useNavigate } from "react-router-dom";
 import { AiOutlinePlus } from "react-icons/ai";
 import LeadCards from "./LeadCards/LeadCards";
+import ConvertDeal from "./ConvertDeal";
 // import LeadCardsList from './LeadCards/LeadCardsList'; // Adjust the import path as necessary
 
 const VIEW_LIST = 'LIST';
@@ -66,6 +68,10 @@ const LeadList = () => {
   const dispatch = useDispatch();
 
   const [view, setView] = useState(VIEW_LIST);
+
+  // Add these new state declarations
+  const [isConvertDealModalVisible, setIsConvertDealModalVisible] = useState(false);
+  const [selectedLead, setSelectedLead] = useState(null);
 
   // Handle file selection
   const handleFileChange = (event) => {
@@ -232,6 +238,17 @@ const LeadList = () => {
     openEditLeadModal();
   };
 
+  // Add these new handler functions
+  const openConvertDealModal = (lead) => {
+    setSelectedLead(lead);
+    setIsConvertDealModalVisible(true);
+  };
+
+  const closeConvertDealModal = () => {
+    setSelectedLead(null);
+    setIsConvertDealModalVisible(false);
+  };
+
   const dropdownMenu = (elm) => (
     <Menu>
       {/* <Menu.Item>
@@ -247,19 +264,19 @@ const LeadList = () => {
           </Button>
         </Flex>
       </Menu.Item> */}
-      {/* <Menu.Item>
+      <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
             className=""
-            icon={<MailOutlined />}
-            onClick={() => showUserProfile(elm)}
+            icon={<RetweetOutlined/>}
+            onClick={() => openConvertDealModal(elm)}
             size="small"
           >
-            <span className="">Send Mail</span>
+            <span className="">Convert to Deal</span>
           </Button>
         </Flex>
-      </Menu.Item> */}
+      </Menu.Item>
 
 
 
@@ -527,6 +544,20 @@ const LeadList = () => {
           className="mt-[-70px]"
         >
           <ViewLead onClose={closeViewLeadModal} />
+        </Modal>
+
+        <Modal
+          title="Convert to Deal"
+          visible={isConvertDealModalVisible}
+          onCancel={closeConvertDealModal}
+          footer={null}
+          width={800}
+          className="mt-[-70px]"
+        >
+          <ConvertDeal 
+            onClose={closeConvertDealModal} 
+            leadData={selectedLead}
+          />
         </Modal>
       </Card>
     </div>

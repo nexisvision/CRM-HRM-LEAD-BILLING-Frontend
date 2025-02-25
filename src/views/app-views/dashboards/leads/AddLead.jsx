@@ -187,13 +187,13 @@ const currenciesState = useSelector((state) => state.currencies);
       .required("Please enter a valid number")
       .matches(/^\d+$/, "Please enter only numbers")
       .nullable(),
-    email: Yup.string().required("Please enter a valid email address").nullable(),
+    email: Yup.string().optional("Please enter a valid email address").nullable(),
     leadStage: Yup.string().required("Lead Stage is required"),
-    leadValue: Yup.number().typeError("Lead Value must be a number").nullable(),
+    leadValue: Yup.number().optional("Lead Value must be a number").nullable(),
     currencyIcon: Yup.string().nullable(),
     employee: Yup.string().required("Employee is required"),
     category: Yup.string().required("Category is required"),
-    assigned: Yup.string().required("Assigned is required"),
+    assigned: Yup.string().optional("Assigned is required"),
     status: Yup.string().required("Status is required"),
 
     // Details section

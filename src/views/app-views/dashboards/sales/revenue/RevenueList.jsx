@@ -508,7 +508,7 @@ const RevenueList = () => {
           
         </div>
       </Card>
-      <Card>
+      
         <Modal
           title="Create Revenue"
           visible={isAddRevenueModalVisible}
@@ -530,7 +530,7 @@ const RevenueList = () => {
         >
           <EditRevenue onClose={closeEditRevenueModal} idd={idd} />
         </Modal>
-      </Card>
+      
     </>
   );
 };
