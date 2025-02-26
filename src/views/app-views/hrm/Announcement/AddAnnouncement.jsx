@@ -1,10 +1,12 @@
 import React from 'react';
 import { Formik, Form as FormikForm, Field } from 'formik';
-import { Input, Button, message, Row, Col } from 'antd';
+import { Input, Button, message, Row, Col,Select } from 'antd';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { addAnnounce, GetAnn } from './AnnouncementReducer/AnnouncementSlice';
 import { useDispatch } from 'react-redux';
+
+const { Option } = Select;
 
 // Validation Schema using Yup
 const validationSchema = Yup.object().shape({
@@ -70,12 +72,33 @@ const AddAnnouncement = ({onClose}) => {
               </Col>
 
               <Col span={12}>
+                {/* Branch Field */}
+                <div style={{ marginBottom: '16px' }}>
+                  <label className="font-semibold">Branch <span className="text-red-500">*</span></label>
+                  <Field
+                    as={Select}
+                    name="branch"
+                    mode="multiple"
+                    placeholder="Select branch"
+                    className="w-full mt-1"
+                  >
+                    <Option value="branch1">Branch 1</Option>
+                    <Option value="branch2">Branch 2</Option>
+                    <Option value="branch3">Branch 3</Option>
+                  </Field>
+                  {errors.branch && touched.branch && (
+                    <div style={{ color: 'red', fontSize: '12px' }}>{errors.branch}</div>
+                  )}
+                </div>
+              </Col>
+
+              <Col span={12}>
                 {/* description Field */}
                 <div style={{ marginBottom: '16px' }}>
                   <label className="font-semibold">Description <span className="text-red-500">*</span></label>
                   <Field
                     as={Input}
-                    name="description"
+                    name="description" 
                     placeholder="Enter description"
                     className="w-full mt-1"
                   />

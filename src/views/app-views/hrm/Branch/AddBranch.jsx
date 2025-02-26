@@ -80,7 +80,7 @@ const AddBranch = ({ onClose }) => {
                   <Field
                     as={Input}
                     name="branchName"
-                    className="w-full mt-1"
+                    className="w-full mt-2"
                     placeholder="Enter Branch Name"
                     onChange={(e) => setFieldValue('branchName', e.target.value)}
                   />
