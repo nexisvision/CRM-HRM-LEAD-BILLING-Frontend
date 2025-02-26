@@ -240,21 +240,31 @@ const ProjectList = () => {
 				</div>
 			),
 		},
+		// {
+		// 	title: 'Action',
+		// 	key: 'action',
+		// 	render: (_, record) => (
+		// 		<div className="text-right">
+		// 			<Dropdown 
+		// 				overlay={dropdownMenu(record.id)} 
+		// 				trigger={['click']}
+		// 				placement="bottomRight"
+		// 			>
+		// 				<Button type="text" icon={<EllipsisDropdown />} />
+		// 			</Dropdown>
+		// 		</div>
+		// 	),
+		// },
+
 		{
-			title: 'Action',
-			key: 'action',
-			render: (_, record) => (
-				<div className="text-right">
-					<Dropdown 
-						overlay={dropdownMenu(record.id)} 
-						trigger={['click']}
-						placement="bottomRight"
-					>
-						<Button type="text" icon={<EllipsisDropdown />} />
-					</Dropdown>
-				</div>
-			),
-		},
+      title: "Action",
+      dataIndex: "actions",
+      render: (_, elm) => (
+        <div className="text-center">
+          <EllipsisDropdown menu={dropdownMenu(elm)} />
+        </div>
+      ),
+    },
 	];
 
 	return (

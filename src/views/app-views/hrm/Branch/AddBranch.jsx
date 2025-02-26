@@ -1,10 +1,15 @@
-import React from 'react';
-import { Formik, Form as FormikForm, Field } from 'formik';
-import { Input, Button, Row, Col, message } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
+import { Input, Button, Row, Col, message, Modal, Select } from 'antd';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AddBranchs, getBranch } from './BranchReducer/BranchSlice';
+import { GetUsers } from '../../Users/UserReducers/UserSlice';
+import { PlusOutlined } from '@ant-design/icons';
+import AddUser from '../../Users/user-list/AddUser';
+
+const { Option } = Select;
 
 const validationSchema = Yup.object().shape({
   branchName: Yup.string()
@@ -22,6 +27,24 @@ const validationSchema = Yup.object().shape({
 const AddBranch = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [selectedBranch, setSelectedBranch] = useState(null);
+  const [isAddUserModalVisible, setIsAddUserModalVisible] = useState(false);
+  const [managers, setManagers] = useState([]);
+
+  const alldata = useSelector((state) => state.Users.Users);
+
+  useEffect(() => {
+    dispatch(GetUsers())
+      .then((response) => {
+        if (response.payload?.data) {
+          setManagers(response.payload.data);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching users:', error);
+        message.error('Failed to fetch users');
+      });
+  }, [dispatch]);
 
   const handleSubmit = (values, { resetForm }) => {
     dispatch(AddBranchs(values))
@@ -66,19 +89,46 @@ const AddBranch = ({ onClose }) => {
                   )}
                 </div>
               </Col>
-              <Col span={12}>
-                <div style={{ marginBottom: '16px'}}>
+               <Col span={12}>
+                <div className="form-item">
                   <label className="font-semibold">Branch Manager <span className="text-red-500">*</span></label>
-                  <Field
-                    as={Input}
-                    name="branchManager"
-                    className="w-full mt-1"
-                    placeholder="Enter Branch Manager Name"
-                    onChange={(e) => setFieldValue('branchManager', e.target.value)}
-                  />
-                  {errors.branchManager && touched.branchManager && (
-                    <div style={{ color: 'red', fontSize: '12px' }}>{errors.branchManager}</div>
-                  )}
+                  <Field name="branchManager">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-2"
+                        placeholder="Select Branch Manager"
+                        dropdownRender={(menu) => (
+                          <>
+                            {menu}
+                            <Button 
+                              type="link" 
+                              block
+                              onClick={() => {
+                                setIsAddUserModalVisible(true);
+                                dispatch(GetUsers());
+                              }}
+                            >
+                              + Add New Branch Manager
+                            </Button>
+                          </>
+                        )}
+                        onChange={(value) => {
+                          setFieldValue("branchManager", value);
+                            setFieldValue("department", "");
+                            setFieldValue("designation", "");
+                          setSelectedBranch(value);
+                        }}
+                      >
+                        {managers.map((manager) => (
+                          <Option key={manager.id} value={manager.id}>
+                            {manager.username}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage name="branchManager" component="div" className="text-red-500" />
                 </div>
               </Col>
               <Col span={12}>
@@ -96,7 +146,41 @@ const AddBranch = ({ onClose }) => {
                   )}
                 </div>
               </Col>
-              
+              {/* <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">Branch Manager <span className="text-red-500">*</span></label>
+                  <Field name="branchManager">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-2"
+                        placeholder="Select Branch Manager"
+                        dropdownRender={(menu) => (
+                          <>
+                            {menu}
+                            <Button 
+                              type="link" 
+                              block
+                              icon={<PlusOutlined />}
+                              onClick={() => setIsAddUserModalVisible(true)}
+                            >
+                              Add New Branch Manager
+                            </Button>
+                          </>
+                        )}
+                        onChange={(value) => setFieldValue("branchManager", value)}
+                      >
+                        {managers.map((manager) => (
+                          <Option key={manager.id} value={manager.id}>
+                            {manager.username}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage name="branchManager" component="div" className="text-red-500" />
+                </div>
+              </Col> */}
             </Row>
 
             <div className="text-right">
@@ -110,6 +194,27 @@ const AddBranch = ({ onClose }) => {
           </FormikForm>
         )}
       </Formik>
+
+      <Modal
+        title="Add Branch Manager"
+        visible={isAddUserModalVisible}
+        onCancel={() => setIsAddUserModalVisible(false)}
+        footer={null}
+        width={800}
+      >
+        <AddUser
+          visible={isAddUserModalVisible}
+          onClose={() => {
+            setIsAddUserModalVisible(false);
+            dispatch(GetUsers())
+              .then((response) => {
+                if (response.payload?.data) {
+                  setManagers(response.payload.data);
+                }
+              });
+          }}
+        />
+      </Modal>
     </div>
   );
 };

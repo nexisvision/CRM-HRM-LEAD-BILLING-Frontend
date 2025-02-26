@@ -330,6 +330,20 @@ const EmployeeList = () => {
         </Flex>
       </Menu.Item>
 
+      <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              className=""
+              icon={<EyeOutlined />}
+              onClick={() => openViewEmployeeModal()}
+              size="small"
+            >
+              <span className="ml-2">View</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+
 
       {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
         <Menu.Item>
