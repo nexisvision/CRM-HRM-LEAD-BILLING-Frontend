@@ -144,10 +144,9 @@ const AddProject = ({ onClose }) => {
     budget: Yup.number()
       .required("Please enter a Project Budget.")
       .positive("Budget must be positive."),
-    estimatedmonths: Yup.string(),
-      // .required("Please enter Estimated Months.")
-      // .positive("Months must be positive.")
-      // .integer("Months must be a whole number"),
+    estimatedmonths: Yup.string()
+      .required("Please enter Estimated Months.")
+      .matches(/^[0-9]+$/, "Months must contain only numbers"),
     estimatedhours: Yup.number()
       .required("Please enter Estimated Hours.")
       .positive("Hours must be positive.")
@@ -160,16 +159,20 @@ const AddProject = ({ onClose }) => {
   });
 
   const onSubmit = (values, { resetForm }) => {
-    dispatch(AddPro(values))
+    // Convert estimatedmonths to number before sending
+    const payload = {
+      ...values,
+      estimatedmonths: parseInt(values.estimatedmonths, 10)
+    };
+
+    dispatch(AddPro(payload))
       .then(() => {
         dispatch(GetProject())
           .then(() => {
-            // message.success("Project added successfully!");
             resetForm();
             onClose();
           })
           .catch((error) => {
-            // message.error("Failed to fetch the latest project data.");
             console.error("Project Data API error:", error);
           });
       })
@@ -501,12 +504,13 @@ const AddProject = ({ onClose }) => {
                   <Field
                     name="estimatedmonths"
                     as={Input}
+                    type="text"
                     className="mt-1"
                     // type="string"
                     
                     placeholder="Enter Estimated Months"
                   />
-                  <ErrorMessage
+                  <ErrorMessage 
                     name="estimatedmonths"
                     component="div"
                     className="error-message text-red-500 my-1"

@@ -532,7 +532,7 @@ const sub = subClientsss?.SubClient?.data;
                                     }}
                                     prefix={row.discountType === "fixed" ? selectedCurrencyIcon : ""}
                                     suffix={row.discountType === "percentage" ? "%" : ""}
-                                    className="w-full"
+                                    className="w-[100px]"
                                 />
                             </div>
                         </td>
@@ -805,26 +805,26 @@ const sub = subClientsss?.SubClient?.data;
                                 <table className="w-full border border-gray-200 bg-white">
                                     <thead className="bg-gray-100">
                                         <tr>
-                                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Description<span className="text-red-500">*</span>
                                             </th>
-                                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Quantity<span className="text-red-500">*</span>
                                             </th>
-                                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Unit Price <span className="text-red-500">*</span>
                                             </th>
                                             
-                                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Discount <span className="text-red-500">*</span>
                                             </th>
-                                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Hsn/Sac <span className="text-red-500">*</span>
                                             </th>
-                                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 TAX (%)
                                             </th>
-                                            <th className="px-4 py-2 text-center text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Amount<span className="text-red-500">*</span>
                                             </th>
                                         </tr>

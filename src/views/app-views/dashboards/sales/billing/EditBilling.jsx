@@ -733,7 +733,7 @@ const EditBilling = ({ idd, onClose }) => {
                   ))}
                 </tbody>
               </table>
-              <div className="form-buttons text-right mb-2">
+              <div className="form-buttons text-left mt-2 mb-2">
               <Button type="primary" onClick={handleAddRow}>
                 <PlusOutlined /> Add Items
               </Button>

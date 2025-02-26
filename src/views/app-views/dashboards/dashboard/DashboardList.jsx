@@ -11,7 +11,7 @@ import DateRangeFilter from "../../../../components/DateRangeFilter.jsx";
 import TicketList from "../../../../components/TicketTableList.jsx";
 import RegistionTable from "../../../../components/RegistrationTableList.jsx";
 import { Pie } from "react-chartjs-2";
-import { Table, Row, Col, } from "antd";
+import { Table, Row, Col, Card, Button } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData } from "views/app-views/company/CompanyReducers/CompanySlice.jsx";
 import { GetPlan } from "views/app-views/plan/PlanReducers/PlanSlice.jsx";
@@ -25,8 +25,179 @@ import { getallcountries } from 'views/app-views/setting/countries/countriesredu
 import dayjs from "dayjs";
 import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import utils from "utils";
+import { DownloadOutlined } from '@ant-design/icons';
+import { Bar } from 'react-chartjs-2';
+import ReactApexChart from 'react-apexcharts';
+import moment from 'moment';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
+
+const MonthlyRevenueCard = () => {
+  const [chartData, setChartData] = useState([]);
+  const [totalSubclients, setTotalSubclients] = useState(0);
+  const [growthPercentage, setGrowthPercentage] = useState(0);
+
+  const dispatch = useDispatch();
+  const subclients = useSelector((state) => state?.SubClient?.SubClient?.data || []);
+  const isLoading = useSelector((state) => state?.SubClient?.isLoading);
+
+  useEffect(() => {
+    dispatch(ClientData());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (subclients && subclients.length > 0) {
+      // Get the last 12 months
+      const last12Months = [...Array(12)].map((_, i) => {
+        return moment().subtract(11 - i, 'months').format('MMM YYYY');
+      });
+
+      // Count subclients per month
+      const monthlyCounts = last12Months.map(monthYear => {
+        return subclients.filter(client => 
+          moment(client.createdAt).format('MMM YYYY') === monthYear
+        ).length;
+      });
+
+      // Calculate total subclients
+      const total = monthlyCounts.reduce((sum, count) => sum + count, 0);
+      setTotalSubclients(total);
+
+      // Calculate growth percentage (current month vs previous month)
+      const currentMonthCount = monthlyCounts[monthlyCounts.length - 1];
+      const previousMonthCount = monthlyCounts[monthlyCounts.length - 2];
+      
+      const growth = previousMonthCount !== 0 
+        ? ((currentMonthCount - previousMonthCount) / previousMonthCount) * 100 
+        : 0;
+      setGrowthPercentage(growth.toFixed(1));
+
+      // Update chart data
+      setChartData(monthlyCounts);
+    }
+  }, [subclients]);
+
+  const chartOptions = {
+    chart: {
+      type: 'bar',
+      toolbar: {
+        show: false
+      },
+      sparkline: {
+        enabled: false
+      },
+    },
+    plotOptions: {
+      bar: {
+        borderRadius: 4,
+        columnWidth: '60%',
+      }
+    },
+    colors: ['#3b82f6'],
+    dataLabels: {
+      enabled: false
+    },
+    grid: {
+      show: true,
+      borderColor: '#f0f0f0',
+      strokeDashArray: 0,
+      xaxis: {
+        lines: {
+          show: false
+        }
+      }
+    },
+    xaxis: {
+      categories: [...Array(12)].map((_, i) => 
+        moment().subtract(11 - i, 'months').format('MMM YYYY')
+      ),
+      axisBorder: {
+        show: false
+      },
+      axisTicks: {
+        show: false
+      },
+      labels: {
+        style: {
+          colors: '#64748b',
+          fontSize: '12px'
+        },
+        rotate: -45
+      }
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: '#64748b',
+          fontSize: '12px'
+        }
+      },
+      tickAmount: 6
+    },
+    tooltip: {
+      y: {
+        formatter: (value) => `${value} Subclients`
+      }
+    }
+  };
+
+  const chartSeries = [{
+    name: 'Clients',
+    data: chartData
+  }];
+
+  return (
+    <Card className="w-full shadow-md">
+      <div className="flex flex-col space-y-4">
+        {/* Header */}
+        <div className="flex justify-between items-start">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-700">Monthly Clients</h2>
+            <p className="text-sm text-gray-500">
+              Last 12 Months Overview
+            </p>
+          </div>
+          <Button 
+            icon={<DownloadOutlined />}
+            className="flex items-center gap-2"
+          >
+            Download Report
+          </Button>
+        </div>
+
+        {/* Client Stats */}
+        <div>
+          <h3 className="text-3xl font-bold text-gray-900">{totalSubclients}</h3>
+          <div className="flex items-center gap-2 mt-1">
+            <span className={`text-sm font-medium ${growthPercentage >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
+              {growthPercentage >= 0 ? '↑' : '↓'} {Math.abs(growthPercentage)}%
+            </span>
+            <span className="text-gray-500 text-xs">growth from last month</span>
+          </div>
+          <p className="text-sm text-gray-500 mt-2">
+            Total number of clients registered in the last 12 months
+          </p>
+        </div>
+
+        {/* Chart */}
+        <div className="h-[280px] mt-4"> {/* Increased height for better visibility */}
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <span>Loading...</span>
+            </div>
+          ) : (
+            <ReactApexChart
+              options={chartOptions}
+              series={chartSeries}
+              type="bar"
+              height="100%"
+            />
+          )}
+        </div>
+      </div>
+    </Card>
+  );
+};
 
 const DashboardList = () => {
   const dispatch = useDispatch();
@@ -287,52 +458,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
   const [overdueTasks, setOverdueTasks] = useState(4);
   const [expenses, setExpenses] = useState(0);
 
-  // Function to handle any updates dynamically (example)
-  // const updateProfile = () => {
-  // 	setOpenTasks(openTasks + 1); // Increase open tasks dynamically
-  // 	setExpenses(expenses + 50);  // Add 50 to expenses
-  // };
-
-  // Add this calculation function after your existing useEffect hooks
-  const calculateYearlyTotal = () => {
-    if (!fnddataplan || !Array.isArray(fnddataplan)) return 0;
-    
-    return fnddataplan.reduce((total, plan) => {
-      const price = parseFloat(plan.price) || 0;
-      const duration = plan.duration?.toLowerCase() || '';
-
-      if (duration.includes('month')) {
-        // If monthly plan, multiply by 12 for yearly amount
-        return total + (price * 12);
-      } else if (duration.includes('year')) {
-        // If yearly plan, add directly
-        return total + price;
-      }
-      return total;
-    }, 0);
-  };
-
-  // Add this calculation function after your existing useEffect hooks
-  const calculateYearlySales = () => {
-    if (!fnddtat || !Array.isArray(fnddtat)) return 0;
-    
-    return fnddtat.reduce((total, subscription) => {
-      const plan = fnddataplan?.find(p => p.id === subscription.plan_id);
-      if (!plan) return total;
-
-      const price = parseFloat(plan.price) || 0;
-      const duration = plan.duration?.toLowerCase() || '';
-
-      if (duration.includes('month')) {
-        // If monthly plan, multiply by 12 for yearly amount
-        return total + (price * 12);
-      } else if (duration.includes('year')) {
-        // If yearly plan, add directly
-        return total + price;
-      }
-      return total;
-    }, 0);
-  };
+ 
 
   const calculateRegionDistribution = () => {
     if (!fnddataclint || !Array.isArray(fnddataclint)) return [];
@@ -355,6 +481,17 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
     // Sort by percentage in descending order
     return distribution.sort((a, b) => b.percentage - a.percentage);
   };
+
+  const calculateTotalPlanAmount = () => {
+    if (!fnddataplan || !Array.isArray(fnddataplan)) return 0;
+    
+    return fnddataplan.reduce((total, plan) => {
+      const price = parseFloat(plan.price) || 0;
+      return total + price;
+    }, 0);
+  };
+
+  
 
   return (
     <div className="p-2 bg-gray-50">
@@ -383,36 +520,39 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
           <p className="text-gray-500 text-sm mt-2">Total value of all plans (yearly)</p>
         </div> */}
 
-        {/* Revenue Card */}
-        <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg text-gray-700 font-medium mb-4">Plan</h2>
-          <div className="flex items-center gap-3">
-            <span className="text-3xl font-bold text-[#1b2559]">$2,454</span>
-            <span className="text-red-500 flex items-center font-bold text-lg">
-              -11.4%
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                <path d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z" />
-              </svg>
-            </span>
-          </div>
-          <p className="text-gray-500 text-sm mt-2">Compare to last year (2019)</p>
+        {/* Plan Card */}
+       
+          <div className="bg-white p-6 rounded-lg shadow">
+        <h2 className="text-lg text-gray-700 font-medium mb-4">Plan</h2>
+        <div className="flex items-center gap-3">
+          <span className="text-3xl font-bold text-[#1b2559]">
+            ${calculateTotalPlanAmount().toLocaleString()}
+          </span>
+          <span className="text-green-500 flex items-center font-bold text-lg">
+          Yearly
+            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
+            </svg>
+          </span>
         </div>
+        <p className="text-gray-500 text-sm mt-2">Total value of all plans</p>
+      </div>
 
-        {/* Sales Card */}
+        {/* Companies Card */}
         <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg text-gray-700 font-medium mb-4">Companys</h2>
+          <h2 className="text-lg text-gray-700 font-medium mb-4">Companies</h2>
           <div className="flex items-center gap-3">
             <span className="text-3xl font-bold text-[#1b2559]">
-              ${calculateYearlySales().toLocaleString()}
+              {fndclient?.length || 0}
             </span>
             <span className="text-green-500 flex items-center font-bold text-lg">
-              Yearly
+              Total
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                 <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
               </svg>
             </span>
           </div>
-          <p className="text-gray-500 text-sm mt-2">Total sales from active subscriptions (yearly)</p>
+          <p className="text-gray-500 text-sm mt-2">Total number of registered companies</p>
         </div>
 
         {/* Costs Card */}
@@ -597,13 +737,6 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
           <div className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-xl text-gray-700 font-medium mb-4">Companies in top state</h2>
             <div className="space-y-4">
-              {/* <div className="flex items-center gap-3 mb-6">
-                <span className="text-3xl font-bold text-[#1b2559]">
-                  {calculateRegionDistribution()[0]?.count || 0}
-                </span>
-                <span className="text-gray-500">Companies in top state</span>
-              </div> */}
-
               <div className="space-y-3">
                 {calculateRegionDistribution().map((item, index) => (
                   <div key={item.state} className="flex items-center justify-between text-lg">
@@ -625,10 +758,11 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
         </Col>
       </Row>
 
-
-
-     
-     
+      <Row gutter={[24, 32]} className="mt-4">
+        <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+          <MonthlyRevenueCard />
+        </Col>
+      </Row>
 
       <div className="container mx-auto p-4 bg-white  rounded-lg shadow mt-8">
         <h1 className="text-xl font-medium text-black">Tickets</h1>

@@ -253,7 +253,7 @@ const EditEstimates = ({ idd, onClose }) => {
         }, 0);
 
         // Calculate final total
-        const finalTotal = subtotal - discountAmount + totalTax;
+        const finalTotal = subtotal - discountAmount;
 
         setTotals({
             subtotal: subtotal.toFixed(2),
@@ -315,7 +315,7 @@ const EditEstimates = ({ idd, onClose }) => {
                 data: estimateData
             })).unwrap();
 
-            message.success('Estimate updated successfully');
+            // message.success('Estimate updated successfully');
             onClose();
             // navigate("/app/dashboards/project/list");
         } catch (error) {
@@ -687,7 +687,7 @@ const EditEstimates = ({ idd, onClose }) => {
                         </div>
 
                         <Form.Item>
-                            <Row justify="end" gutter={16} cl>
+                            <Row justify="end" gutter={16} className="mt-2">
                                 <Col>
                                     <Button onClick={() => navigate("/app/dashboards/sales/estimates")}>Cancel</Button>
                                 </Col>

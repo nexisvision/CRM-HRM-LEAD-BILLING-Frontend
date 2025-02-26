@@ -8,7 +8,7 @@ const BillInformationList = () => {
     const [customerData, setCustomerData] = useState(null);
     
     // Get data from Redux store
-    const billingData = useSelector((state) => state?.salesbilling?.salesbilling?.data?.[0]);
+    const billingData = useSelector((state) => state?.salesbilling?.salesbilling?.data);
     const customers = useSelector((state) => state?.customers?.customers?.data);
     const loggedInUser = useSelector((state) => state?.user?.loggedInUser);
     const payments = useSelector((state) => state?.payment?.payment || []); // Get payments data
@@ -81,10 +81,16 @@ const BillInformationList = () => {
             <div className="p-4">
                 {/* Header */}
                 <div className="flex justify-between items-start border-b pb-4 mb-4">
-                    <h2 className="text-xl font-bold text-gray-800">Bill</h2>
+                    <div>
+                        <h2 className="text-xl font-bold text-gray-800">Bill</h2>
+                        <p className="text-sm text-gray-600 mt-1">
+                            Date: {billingData?.createdAt ? new Date(billingData.createdAt).toLocaleDateString() : 'N/A'}
+                        </p>
+                    </div>
                     <div className="text-right">
-                        <p className="text-sm font-semibold text-gray-700">
-                            {billingData?.billNumber || 'N/A'}
+                        <p className="text-sm text-gray-600">Bill Number</p>
+                        <p className="text-lg font-semibold text-gray-800">
+                            #{billingData?.billNumber || 'N/A'}
                         </p>
                     </div>
                 </div>

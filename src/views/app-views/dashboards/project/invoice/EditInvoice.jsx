@@ -457,11 +457,64 @@ useEffect(() => {
 
 
   const calculateTotal = (data, globalDiscountValue) => {
+    // Calculate row-level totals first
     const calculatedTotals = data.reduce((acc, row) => {
+        // Base calculations
         const quantity = parseFloat(row.quantity) || 0;
         const unitPrice = parseFloat(row.price) || 0;
-        const baseAmount = unitPrice * quantity;
-        
+        const baseAmount = quantity * unitPrice;
+
+        // Item discount calculation
+        let itemDiscountAmount = 0;
+        if (row.discountType === "percentage") {
+            const discountPercentage = parseFloat(row.discount) || 0;
+            itemDiscountAmount = (baseAmount * discountPercentage) / 100;
+        } else {
+            itemDiscountAmount = parseFloat(row.discount) || 0;
+        }
+
+        // Tax calculation
+        const taxPercentage = parseFloat(row.tax) || 0;
+        const amountAfterDiscount = baseAmount - itemDiscountAmount;
+        const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
+
+        // Row total amount
+        const rowAmount = baseAmount - itemDiscountAmount + taxAmount;
+
+        return {
+            totalBaseAmount: acc.totalBaseAmount + baseAmount,
+            totalItemDiscount: acc.totalItemDiscount + itemDiscountAmount,
+            totalTax: acc.totalTax + taxAmount,
+            totalAmount: acc.totalAmount + rowAmount
+        };
+    }, { totalBaseAmount: 0, totalItemDiscount: 0, totalTax: 0, totalAmount: 0 });
+
+    // Calculate global discount
+    let globalDiscountAmount = 0;
+    if (discountType === 'percentage') {
+        globalDiscountAmount = (calculatedTotals.totalAmount * globalDiscountValue) / 100;
+    } else {
+        globalDiscountAmount = parseFloat(globalDiscountValue) || 0;
+    }
+
+    // Calculate final total
+    const finalTotal = calculatedTotals.totalAmount - globalDiscountAmount;
+
+    // Update totals state
+    setTotals({
+        subtotal: calculatedTotals.totalAmount.toFixed(2),
+        itemDiscount: calculatedTotals.totalItemDiscount.toFixed(2),
+        globalDiscount: globalDiscountAmount.toFixed(2),
+        totalTax: calculatedTotals.totalTax.toFixed(2),
+        finalTotal: finalTotal.toFixed(2)
+    });
+
+    // Update table data with calculated amounts
+    const updatedData = data.map(row => {
+        const quantity = parseFloat(row.quantity) || 0;
+        const unitPrice = parseFloat(row.price) || 0;
+        const baseAmount = quantity * unitPrice;
+
         // Calculate item discount
         let itemDiscountAmount = 0;
         if (row.discountType === "percentage") {
@@ -471,42 +524,20 @@ useEffect(() => {
             itemDiscountAmount = parseFloat(row.discount) || 0;
         }
 
-        const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
-        const gstAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
-        
-        return {
-            totalBaseAmount: acc.totalBaseAmount + baseAmount,
-            totalItemDiscount: acc.totalItemDiscount + itemDiscountAmount,
-            totalTax: acc.totalTax + gstAmount,
-            totalAmount: acc.totalAmount + (baseAmount - itemDiscountAmount + gstAmount)
-        };
-    }, { totalBaseAmount: 0, totalItemDiscount: 0, totalTax: 0, totalAmount: 0 });
+        // Calculate tax
+        const taxPercentage = parseFloat(row.tax) || 0;
+        const amountAfterDiscount = baseAmount - itemDiscountAmount;
+        const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
 
-    // Calculate global/invoice discount
-    let globalDiscountAmount = 0;
-    if (discountType === 'percentage') {
-        globalDiscountAmount = (calculatedTotals.totalAmount * globalDiscountValue) / 100;
-    } else {
-        globalDiscountAmount = parseFloat(globalDiscountValue) || 0;
-    }
+        // Calculate row total
+        const rowAmount = baseAmount - itemDiscountAmount + taxAmount;
 
-    // Calculate final total after all discounts
-    const finalTotal = calculatedTotals.totalAmount - globalDiscountAmount;
-
-    setTotals({
-        subtotal: calculatedTotals.totalBaseAmount.toFixed(2),
-        itemDiscount: calculatedTotals.totalItemDiscount.toFixed(2),
-        globalDiscount: globalDiscountAmount.toFixed(2),
-        totalTax: calculatedTotals.totalTax.toFixed(2),
-        finalTotal: finalTotal.toFixed(2)
-    });
-
-    // Update table data with calculated amounts
-    const updatedData = data.map(row => {
-        // ... existing row calculations ...
         return {
             ...row,
-            amount: row.amount // Keep existing amount calculation
+            base_amount: baseAmount.toFixed(2),
+            discount_amount: itemDiscountAmount.toFixed(2),
+            tax_amount: taxAmount.toFixed(2),
+            amount: rowAmount.toFixed(2)
         };
     });
 
@@ -514,37 +545,15 @@ useEffect(() => {
   };
 
   const handleTableDataChange = (id, field, value) => {
-    const updatedData = tableData.map((row) => {
-      if (row.id === id) {
-        const updatedRow = { ...row, [field]: value };
-
-        const quantity = parseFloat(updatedRow.quantity) || 0;
-        const price = parseFloat(updatedRow.price) || 0;
-        const baseAmount = quantity * price;
-        const taxPercentage = parseFloat(updatedRow.tax) || 0;
-
-        // Calculate discount amount based on type
-        let itemDiscountAmount = 0;
-        if (updatedRow.discountType === "percentage") {
-          const discountPercentage = parseFloat(updatedRow.discount) || 0;
-          itemDiscountAmount = (baseAmount * discountPercentage) / 100;
-        } else { // fixed discount
-          itemDiscountAmount = parseFloat(updatedRow.discount) || 0;
+    const updatedData = tableData.map(row => {
+        if (row.id === id) {
+            return { ...row, [field]: value };
         }
-
-        const taxAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
-        const finalAmount = baseAmount - itemDiscountAmount + taxAmount;
-
-        updatedRow.amount = finalAmount.toFixed(2);
-        updatedRow.discount_amount = itemDiscountAmount.toFixed(2);
-        return updatedRow;
-      }
-      return row;
+        return row;
     });
-
     setTableData(updatedData);
-    calculateTotal(updatedData, discountRate);
-  };
+    calculateTotal(updatedData, discountValue);
+};
 
   // Modified currency selection handler
   const handleCurrencyChange = (currencyId) => {
@@ -629,26 +638,30 @@ useEffect(() => {
               />
             </td>
             <td className="px-2 py-2 border-b">
-              <div className="flex space-x-2">
-                <select
-                  value={row.discountType}
-                  onChange={(e) => handleTableDataChange(row.id, "discountType", e.target.value)}
-                  className="p-2 border rounded"
-                >
-                  <option value="percentage">Percentage</option>
-                  <option value="fixed">Fixed</option>
-                </select>
-                <input
-                  type="number"
-                  value={row.discount}
-                  onChange={(e) => handleTableDataChange(row.id, "discount", e.target.value)}
-                  placeholder="Discount"
-                  className="w-2/3 p-2 border rounded"
-                  min="0"
-                  max={row.discountType === "percentage" ? "100" : undefined}
-                />
-              </div>
-            </td>
+                            <div className="flex space-x-2">
+                                <Select
+                                    value={row.discountType || "percentage"}
+                                    onChange={(value) => handleTableDataChange(row.id, "discountType", value)}
+                                    style={{ width: 100}}
+                                >
+                                    <Option value="fixed">Fixed</Option>
+                                    <Option value="percentage">Percentage</Option>
+                                </Select>
+                                <Input
+                                    type="number"
+                                    min="0"
+                                    max={row.discountType === "percentage" ? 100 : undefined}
+                                    value={row.discount || 0}
+                                    onChange={(e) => {
+                                        const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0;
+                                        handleTableDataChange(row.id, "discount", value);
+                                    }}
+                                    prefix={row.discountType === "fixed" ? selectedCurrencyIcon : ""}
+                                    suffix={row.discountType === "percentage" ? "%" : ""}
+                                    className="w-[100px]"
+                                />
+                            </div>
+                        </td>
             <td className="px-2 py-2 border-b">
               <input
                 type="text"
@@ -710,47 +723,39 @@ useEffect(() => {
                     </td>
                 </tr>
 
-                {/* Item Discount Section */}
-                <tr className="flex justify-between px-2 py-2 border-x-2">
-                    <td className="font-medium">Items Discount</td>
-                    <td className="font-medium px-4 py-2 text-red-500">
-                        -{selectedCurrencyIcon} {totals.itemDiscount}
-                    </td>
-                </tr>
-
                 {/* Global/Invoice Discount Section */}
                 <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
-                    <td className="font-medium">Invoice Discount</td>
-                    <td className="flex items-center space-x-2">
-                        <Select
-                            value={discountType}
-                            onChange={handleDiscountTypeChange}
-                            style={{ width: 120 }}
-                        >
-                            <Option value="fixed">Fixed</Option>
-                            <Option value="percentage">Percentage</Option>
-                        </Select>
-                        <Input
-                            type="number"
-                            value={discountValue}
-                            onChange={(e) => handleDiscountChange(e.target.value)}
-                            style={{ width: 120 }}
-                            min={0}
-                            max={discountType === 'percentage' ? 100 : undefined}
-                            prefix={discountType === 'fixed' ? selectedCurrencyIcon : ''}
-                            suffix={discountType === 'percentage' ? '%' : ''}
-                        />
-                    </td>
-                </tr>
-
-                {parseFloat(totals.globalDiscount) > 0 && (
-                    <tr className="flex justify-between px-2 py-2 border-x-2">
-                        <td className="font-medium">Global Discount Amount</td>
-                        <td className="font-medium px-4 py-2 text-red-500">
-                            -{selectedCurrencyIcon} {totals.globalDiscount}
+                        <td className="font-medium">Items Discount</td>
+                        <td className="flex items-center space-x-2">
+                            <Select
+                                value={discountType}
+                                onChange={handleDiscountTypeChange}
+                                style={{ width: 120 }}
+                            >
+                                <Option value="fixed">Fixed</Option>
+                                <Option value="percentage">Percentage</Option>
+                            </Select>
+                            <Input
+                                type="number"
+                                value={discountValue || 0} // Ensure 0 is displayed when empty
+                                onChange={(e) => handleDiscountChange(e.target.value)}
+                                style={{ width: 120 }}
+                                min={0}
+                                max={discountType === 'percentage' ? 100 : undefined}
+                                prefix={discountType === 'fixed' ? selectedCurrencyIcon : ''}
+                                suffix={discountType === 'percentage' ? '%' : ''}
+                            />
                         </td>
                     </tr>
-                )}
+
+                    {parseFloat(totals.globalDiscount) > 0 && (
+                        <tr className="flex justify-between px-2 py-2 border-x-2">
+                            <td className="font-medium">Discount Amount</td>
+                            <td className="font-medium px-4 py-2 text-red-500">
+                                -{selectedCurrencyIcon} {totals.globalDiscount}
+                            </td>
+                        </tr>
+                    )}
 
                 <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
                     <td className="font-medium">Total Tax</td>

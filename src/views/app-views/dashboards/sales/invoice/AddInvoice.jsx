@@ -185,9 +185,10 @@ const AddInvoice = ({ onClose }) => {
 
       const taxPercentage = parseFloat(row.tax) || 0;
       const taxAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
+      const finalAmount = baseAmount - itemDiscountAmount + taxAmount;
       
       return {
-        subtotal: acc.subtotal + baseAmount,
+        subtotal: acc.subtotal + finalAmount,
         itemDiscount: acc.itemDiscount + itemDiscountAmount,
         tax: acc.tax + taxAmount
       };
@@ -201,7 +202,7 @@ const AddInvoice = ({ onClose }) => {
       globalDiscountAmount = globalDiscountValueNum;
     }
 
-    const finalTotal = totals.subtotal - totals.itemDiscount - globalDiscountAmount + totals.tax;
+    const finalTotal = totals.subtotal - globalDiscountAmount;
 
     // Ensure all values are numbers before using toFixed
     setTotals({
@@ -218,8 +219,7 @@ const AddInvoice = ({ onClose }) => {
     itemDiscount: "0.00",
     globalDiscount: "0.00",
     totalTax: "0.00",
-    finalTotal: "0.00",
-
+    finalTotal: "0.00"
   });
 
   const handleFinish = async () => {
@@ -697,19 +697,19 @@ const AddInvoice = ({ onClose }) => {
                             />
                           </div>
                         </td>
-                        <td className="px-2 py-2 border-b">
-                          <select
+                        <td className="py-2 border-b">
+                          <Select
                             value={row.tax}
                             onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
-                            className="w-full p-2 border"
+                            className="w-[100px] p-2"
                           >
-                            <option value="0">Nothing Selected</option>
+                            <Option value="0">No Tax</Option>
                             {taxes && taxes.data && taxes.data.map(tax => (
-                              <option key={tax.id} value={tax.gstPercentage}>
-                                {tax.gstName}: {tax.gstPercentage}%
-                              </option>
+                              <Option key={tax.id} value={tax.gstPercentage}>
+                                {tax.gstName} ({tax.gstPercentage}%)
+                              </Option>
                             ))}
-                          </select>
+                          </Select>
                         </td>
                         <td className="px-2 py-2 border-b">
                           <span>{selectedCurrencyIcon} {parseFloat(row.amount || 0).toFixed(2)}</span>

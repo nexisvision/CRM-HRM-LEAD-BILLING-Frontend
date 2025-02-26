@@ -153,8 +153,8 @@ const AddEstimates = ({ onClose }) => {
 
             // Calculate subtotal from tableData directly
             const subtotal = calculateSubTotal();
-      const discountAmount = (subtotal * discountRate) / 100;
-      const finalTotal = parseFloat(totals.finalTotal);
+            const discountAmount = (subtotal * discountRate) / 100;
+            const finalTotal = parseFloat(totals.finalTotal);
             
             // Format items for the database
             const formattedItems = {};
@@ -194,13 +194,13 @@ const AddEstimates = ({ onClose }) => {
                 form.resetFields();
                 onClose();
                 dispatch(getallestimate(id));
-                message.success('Estimate created successfully');
+                // message.success('Estimate created successfully');
             } else {
                 throw new Error(result.payload?.message || 'Failed to create estimate');
             }
         } catch (error) {
             console.error("Estimate Creation Error:", error);
-            message.error(error.message);
+            //  message.error(error.message);
         } finally {
             setLoading(false);
         }
@@ -249,27 +249,6 @@ const AddEstimates = ({ onClose }) => {
 
     const navigate = useNavigate();
 
-
-    // Calculate discount amount
-    // const calculateDiscount = () => {
-    //     const subTotal = calculateSubTotal();
-    //     if (discountType === '%') {
-    //         return subTotal * (parseFloat(discountValue) || 0) / 100;
-    //     }
-    //     return parseFloat(discountValue) || 0;
-    // };
-
-    // Calculate total tax
-    const calculateTotalTax = () => {
-        return tableData.reduce((sum, row) => {
-          const quantity = parseFloat(row.quantity) || 0;
-          const price = parseFloat(row.price) || 0;
-          const tax = parseFloat(row.tax) || 0;
-          const baseAmount = quantity * price;
-          return sum + ((baseAmount * tax) / 100);
-        }, 0);
-      };
-
     // Calculate subtotal (sum of all row amounts before discount)
     const calculateSubTotal = () => {
         return tableData.reduce((sum, row) => {
@@ -310,7 +289,7 @@ const AddEstimates = ({ onClose }) => {
         }, 0);
     
         // Calculate final total: subtotal - discount + tax
-        const finalTotal = subtotal - discountAmount + totalTax;
+        const finalTotal = subtotal - discountAmount;
     
         setTotals({
             subtotal: subtotal.toFixed(2),

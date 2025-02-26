@@ -4,6 +4,7 @@ import {
   FileTextOutlined,
   // SettingOutlined,
   // DollarOutlined,
+  TrophyOutlined,
   MoneyCollectOutlined,
   AntDesignOutlined,
   BugOutlined,
@@ -129,7 +130,7 @@ const extraNavvTree = [
                 key: 'extra-hrm-performance-appraisal',
                 path: `${APP_PREFIX_PATH}/hrm/performance/appraisal`,
                 title: 'Appraisal',
-                icon: '',
+                icon: TrophyOutlined,
                 breadcrumb: true,
                 submenu: []
               },
@@ -181,7 +182,7 @@ const extraNavvTree = [
                 key: 'extra-hrm-attendance-attendancelist',
                 path: `${APP_PREFIX_PATH}/hrm/attendance/attendancelist`,
                 title: 'Attendance List',
-                icon: '',
+                icon: CheckSquareOutlined,
                 breadcrumb: true,
                 submenu: []
               },
@@ -199,7 +200,7 @@ const extraNavvTree = [
                 key: 'extra-hrm-leave-leavelist',
                 path: `${APP_PREFIX_PATH}/hrm/leave/leavelist`,
                 title: 'Leave List',
-                icon: '',
+                icon: ScheduleOutlined,
                 breadcrumb: true,
                 submenu: []
               },
