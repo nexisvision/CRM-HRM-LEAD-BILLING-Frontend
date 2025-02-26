@@ -24,8 +24,6 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
     const dispatch = useDispatch();
 
-    console.log("leadData", leadData);
-
     const [isOtpModalVisible, setIsOtpModalVisible] = useState(false);
 
     const [otp, setOtp] = useState('');

@@ -14,7 +14,7 @@ const validationSchema = Yup.object().shape({
   branchManager: Yup.string()
     .required('Branch Manager is required')
     .min(2, 'Branch Manager name must be at least 2 characters'),
-    branchAddress: Yup.string()
+  branchAddress: Yup.string()
     .required('Address is required')
     .min(5, 'Address must be at least 5 characters'),
 });

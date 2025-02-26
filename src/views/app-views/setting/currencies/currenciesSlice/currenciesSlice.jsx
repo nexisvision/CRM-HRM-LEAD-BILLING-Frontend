@@ -22,7 +22,7 @@ export const addcurren = createAsyncThunk(
 
 
 export const getcurren = createAsyncThunk(
-    "leave/getLeave",
+    "leave/getcurr",
     async (thunkAPI) => {
         try {
             const response = await UserService.getcurr();
