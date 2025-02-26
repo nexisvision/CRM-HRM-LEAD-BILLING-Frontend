@@ -21,6 +21,7 @@ import { EditMeet, MeetData } from "./MeetingReducer/MeetingSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
+import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 
 const { Option } = Select;
 
@@ -40,6 +41,10 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
     dispatch(getDept());
   }, [dispatch]);
 
+  useEffect(() => {
+    dispatch(ClientData());
+  }, [dispatch]);
+
   const tabledata = useSelector((state) => state.Meeting);
 
   const dataM = tabledata.Meeting.data.find((item) => item.id === meetid);
@@ -53,11 +58,12 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data || [];
 
+  const allClients = useSelector((state) => state.SubClient);
+  const clientData = allClients?.SubClient?.data || [];
 
   const [selectedDept, setSelectedDept] = useState(null);
 
   const filteredEmpData = empData?.filter((item) => item.created_by === user);
-
 
   const filteredEmpDataa = filteredEmpData.filter((emp) => emp.department === selectedDept);
   const [initialValues, setInitialValues] = useState({
@@ -70,6 +76,7 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
     status: "",
     meetingLink: "",
     description: "",
+    client: "",
   });
 
   useEffect(() => {
@@ -88,6 +95,7 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
           meetingLink: dataM.meetingLink || "",
           status: dataM.status || "",
           description: dataM.description || "",
+          client: dataM.client || "",
         });
 
         // Set selected department to filter employees
@@ -140,6 +148,7 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
     description: Yup.string().required("Please enter a description."),
     meetingLink: Yup.string().required("Please enter a meeting link."),
     status: Yup.string().required("Please select a status."),
+    client: Yup.string().required("Please select a client."),
   });
 
   return (
@@ -358,6 +367,43 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
                   <Field name="meetingLink" as={Input} placeholder="Meeting Link" className="w-full mt-1" />
                   <ErrorMessage
                     name="meetingLink"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={24} className="mt-2">
+                <div className="form-item">
+                  <label className="font-semibold">Client <span className="text-red-500">*</span></label>
+                  <Field name="client">
+                    {({ field, form }) => (
+                      <Select
+                        style={{ width: "100%" }}
+                        {...field}
+                        placeholder="Select Client"
+                        loading={!clientData}
+                        value={form.values.client}
+                        className="w-full mt-1"
+                        onChange={(value) => form.setFieldValue("client", value)}
+                        onBlur={() => form.setFieldTouched("client", true)}
+                      >
+                        {clientData && clientData.length > 0 ? (
+                          clientData.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.username || "Unnamed Client"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Clients Available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="client"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />

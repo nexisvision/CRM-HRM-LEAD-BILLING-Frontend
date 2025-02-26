@@ -31,6 +31,8 @@ import { MdOutlineEmail } from "react-icons/md";
 import EmailVerification from "views/app-views/company/EmailVerification";
 
 import { Option } from "antd/es/mentions";
+import AddAttendance from "../Attendance/AddAttendance";
+import { addAttendance, editAttendance } from "../Attendance/AttendanceReducer/AttendanceSlice";
 
 const EmployeeList = () => {
   // State declarations
@@ -312,6 +314,7 @@ const EmployeeList = () => {
         </Menu.Item>
       ) : null}
 
+
 <Menu.Item>
         <Flex alignItems="center">
           <Button
@@ -340,6 +343,35 @@ const EmployeeList = () => {
               size="small"
             >
               <span className="ml-2">View</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+
+
+      <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              className=""
+              icon={<EditOutlined />}
+              onClick={() => handleCheckIn(elm.id)}
+              size="small"
+            >
+              <span className="ml-2">Check In</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              className=""
+              icon={<EditOutlined />}
+              onClick={() => handleCheckOut(elm.id)}
+              size="small"
+            >
+              <span className="ml-2">Check Out</span>
             </Button>
           </Flex>
         </Menu.Item>
@@ -528,6 +560,46 @@ const EmployeeList = () => {
       </Select>
     </div>
   );
+
+  const handleCheckIn = (empId) => {
+    const currentDate = moment().format('YYYY-MM-DD'); // Get current date
+    const currentTime = moment().format('HH:mm:ss'); // Get current time
+
+    const values = {
+      employee: empId,
+      date: currentDate,
+      startTime: currentTime,
+    };
+
+    dispatch(addAttendance(values))
+      .then(() => {
+        message.success("Checked in successfully!");
+      })
+      .catch((error) => {
+        console.error("Error checking in:", error);
+        message.error("Failed to check in. Please try again.");
+      });
+  };
+
+  const handleCheckOut = (empId) => {
+    const currentDate = moment().format('YYYY-MM-DD'); // Get current date
+    const currentTime = moment().format('HH:mm:ss'); // Get current time
+
+    const values = {
+      employee: empId,
+      endTime: currentTime,
+      date: currentDate,
+    };
+
+    dispatch(editAttendance({ id: empId, values }))
+      .then(() => {
+        message.success("Checked out successfully!");
+      })
+      .catch((error) => {
+        console.error("Error checking out:", error);
+        message.error("Failed to check out. Please try again.");
+      });
+  };
 
   return (
     <Card bodyStyle={{ padding: "-3px" }}>

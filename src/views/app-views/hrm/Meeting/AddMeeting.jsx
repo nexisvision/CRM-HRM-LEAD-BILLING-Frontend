@@ -17,6 +17,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
 import { AddMeet, MeetData } from "./MeetingReducer/MeetingSlice";
+import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 
 const { Option } = Select;
 
@@ -30,6 +31,10 @@ const AddMeeting = ({ onClose }) => {
 
   useEffect(() => {
     dispatch(getDept());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(ClientData());
   }, [dispatch]);
 
   const user = useSelector((state) => state.user.loggedInUser.username);
@@ -52,6 +57,9 @@ const AddMeeting = ({ onClose }) => {
 
 // console.log('filteredEmpDataa',filteredEmpDataa);
 // console.log('selectedDept',selectedDept);
+
+  const allClients = useSelector((state) => state.SubClient);
+  const clientData = allClients?.SubClient?.data || [];
 
   const onSubmit = (values, { resetForm }) => {
     dispatch(AddMeet(values))
@@ -84,6 +92,7 @@ const AddMeeting = ({ onClose }) => {
     meetingLink: "",
     status: "",
     description: "",
+    client: "",
   };
 
   const validationSchema = Yup.object({
@@ -96,6 +105,7 @@ const AddMeeting = ({ onClose }) => {
     description: Yup.string().required("Please enter a description."),
     status: Yup.string().required("Please select a status."),
     meetingLink: Yup.string().required("Please enter a description."),
+    client: Yup.string().required("Please select a client."),
   });
 
   return (
@@ -333,6 +343,46 @@ const AddMeeting = ({ onClose }) => {
                   <Field name="meetingLink" as={Input} placeholder="Event meetingLink" className="w-full mt-1" />
                   <ErrorMessage
                     name="meetingLink"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              {/* Client Field */}
+              <Col span={24} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">
+                    Client <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="client">
+                    {({ field, form }) => (
+                      <Select
+                        style={{ width: "100%" }}
+                        {...field}
+                        placeholder="Select Client"
+                        loading={!clientData}
+                        value={form.values.client}
+                        className="w-full mt-1"
+                        onChange={(value) => form.setFieldValue("client", value)}
+                        onBlur={() => form.setFieldTouched("client", true)}
+                      >
+                        {clientData && clientData.length > 0 ? (
+                          clientData.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.username || "Unnamed Client"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Clients Available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="client"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
