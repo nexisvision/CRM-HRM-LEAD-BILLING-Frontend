@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Formik, Form as FormikForm, Field } from 'formik';
 import { Input, Button, message, Row, Col,Select } from 'antd';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { addAnnounce, GetAnn } from './AnnouncementReducer/AnnouncementSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { getBranch } from '../Branch/BranchReducer/BranchSlice';
 
 const { Option } = Select;
 
@@ -18,6 +19,13 @@ const AddAnnouncement = ({onClose}) => {
   const navigate = useNavigate();
   
   const dispatch = useDispatch();
+
+   
+  useEffect(()=>{
+    dispatch(getBranch())
+  },[dispatch])
+
+  const branchdata = useSelector((state)=>state.Branch.Branch.data)
 
   const handleSubmit = (values,{resetForm}) => {
     // dispatch(addAnnounce(values));
@@ -78,13 +86,14 @@ const AddAnnouncement = ({onClose}) => {
                   <Field
                     as={Select}
                     name="branch"
-                    mode="multiple"
                     placeholder="Select branch"
                     className="w-full mt-1"
                   >
-                    <Option value="branch1">Branch 1</Option>
-                    <Option value="branch2">Branch 2</Option>
-                    <Option value="branch3">Branch 3</Option>
+                    {branchdata && branchdata.map(branch => (
+                      <Option key={branch.id} value={branch.id}>
+                        {branch.branchName}
+                      </Option>
+                    ))}
                   </Field>
                   {errors.branch && touched.branch && (
                     <div style={{ color: 'red', fontSize: '12px' }}>{errors.branch}</div>

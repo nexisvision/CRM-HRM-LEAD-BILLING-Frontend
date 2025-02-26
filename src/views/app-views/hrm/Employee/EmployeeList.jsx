@@ -233,6 +233,14 @@ const EmployeeList = () => {
   }, [dispatch])
 
 
+  const viewfunction = (empId) => {
+    setSelectedEmployeeId(empId);
+    openViewEmployeeModal();
+  };
+
+
+
+
 
 
   // useEffect(() => {
@@ -339,7 +347,8 @@ const EmployeeList = () => {
               type=""
               className=""
               icon={<EyeOutlined />}
-              onClick={() => openViewEmployeeModal()}
+              // onClick={() => openViewEmployeeModal()}
+              onClick={() => viewfunction(elm.id)}
               size="small"
             >
               <span className="ml-2">View</span>
@@ -696,7 +705,7 @@ const EmployeeList = () => {
         width={1000}
         className="mt-[-80px]"
       >
-        <ViewEmployee onClose={closeViewEmployeeModal} />
+        <ViewEmployee onClose={closeViewEmployeeModal} employeeIdd={selectedEmployeeId} />
       </Modal>
 
       {/* <Modal
