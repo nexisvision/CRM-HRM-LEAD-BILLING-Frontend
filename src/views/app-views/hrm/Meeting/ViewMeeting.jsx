@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Row, Typography } from 'antd';
+import { Modal, Row, Typography, message } from 'antd';
 import moment from 'moment';
 
 const { Text } = Typography;
@@ -75,7 +75,15 @@ const ViewMeeting = ({ visible, onClose }) => {
 
                 <Row style={rowStyle}>
                     <Text style={labelStyle}>Meeting Link</Text>
-                    <Text style={valueStyle}>{meetingData.meetingLink}</Text>
+                    <Text 
+                        style={{...valueStyle, cursor: 'pointer', color: '#1890ff'}}
+                        onClick={() => {
+                            navigator.clipboard.writeText(meetingData.meetingLink);
+                            message.success('Meeting link copied to clipboard!');
+                        }}
+                    >
+                        {meetingData.meetingLink}
+                    </Text>
                 </Row>
 
                 <Row style={rowStyle}>
