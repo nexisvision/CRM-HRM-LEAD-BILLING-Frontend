@@ -243,7 +243,7 @@ const AddMeeting = ({ onClose }) => {
               {/* Meeting Time Field */}
               <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Meeting Time <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Start Time <span className="text-red-500">*</span></label>
                   <TimePicker
                     className="w-full mt-1"
                     format="HH:mm"
@@ -263,7 +263,7 @@ const AddMeeting = ({ onClose }) => {
 
               <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Meeting end Time <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">End Time <span className="text-red-500">*</span></label>
                   <TimePicker
                     className="w-full mt-1"
                     format="HH:mm"

@@ -144,10 +144,10 @@ const AddProject = ({ onClose }) => {
     budget: Yup.number()
       .required("Please enter a Project Budget.")
       .positive("Budget must be positive."),
-    estimatedmonths: Yup.number()
-      .required("Please enter Estimated Months.")
-      .positive("Months must be positive.")
-      .integer("Months must be a whole number"),
+    estimatedmonths: Yup.string(),
+      // .required("Please enter Estimated Months.")
+      // .positive("Months must be positive.")
+      // .integer("Months must be a whole number"),
     estimatedhours: Yup.number()
       .required("Please enter Estimated Hours.")
       .positive("Hours must be positive.")
@@ -502,7 +502,8 @@ const AddProject = ({ onClose }) => {
                     name="estimatedmonths"
                     as={Input}
                     className="mt-1"
-                    type="number"
+                    // type="string"
+                    
                     placeholder="Enter Estimated Months"
                   />
                   <ErrorMessage

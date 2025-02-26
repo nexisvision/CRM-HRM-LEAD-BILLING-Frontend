@@ -205,7 +205,7 @@ const dfnddata = dfnddataa.filter((item) => item.created_by === user);
         title="Add Salary"
         visible={isAddSalaryModalVisible}
         onCancel={closeAddSalaryModal}
-        width={800}
+        width={1000}
         footer={null}
       >
         <AddSalary onClose={closeAddSalaryModal} />

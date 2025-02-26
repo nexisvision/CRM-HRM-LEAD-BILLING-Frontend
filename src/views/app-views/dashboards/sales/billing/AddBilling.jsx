@@ -346,6 +346,11 @@ const AddBilling = ({ onClose }) => {
       });
   };
 
+  useEffect(() => {
+    // Fetch existing tags/status when component mounts
+    fetchTags();
+  }, []);
+
   const fetchTags = async () => {
     try {
       const lid = AllLoggeddtaa.loggedInUser.id;
@@ -370,34 +375,6 @@ const AddBilling = ({ onClose }) => {
       message.error("Failed to load tags");
     }
   };
-
-  const handleAddNewTag = async () => {
-    if (!newTag.trim()) {
-      message.error("Please enter a status name");
-      return;
-    }
-
-
-    try {
-      const lid = AllLoggeddtaa.loggedInUser.id;
-      const payload = {
-        name: newTag.trim(),
-        labelType: "status",
-      };
-
-      await dispatch(AddLable({ lid, payload }));
-      message.success("Status added successfully");
-      setNewTag("");
-      setIsTagModalVisible(false);
-
-
-      await fetchTags();
-    } catch (error) {
-      console.error("Failed to add status:", error);
-      message.error("Failed to add status");
-    }
-  };
-
 
   return (
     <div>
@@ -475,6 +452,29 @@ const AddBilling = ({ onClose }) => {
                     ))}
                 </Select>
               </Form.Item>
+
+              <Modal
+                title="Add New Status"
+                visible={isTagModalVisible}
+                onOk={() => {
+                  if (newTag.trim()) {
+                    // Add new tag logic here
+                    setTags([...tags, { id: Date.now(), name: newTag.trim() }]);
+                    setNewTag("");
+                    setIsTagModalVisible(false);
+                  }
+                }}
+                onCancel={() => {
+                  setNewTag("");
+                  setIsTagModalVisible(false);
+                }}
+              >
+                <Input
+                  placeholder="Enter new status"
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                />
+              </Modal>
             </Col>
 
             <Col span={12}>
@@ -734,21 +734,6 @@ const AddBilling = ({ onClose }) => {
           </Button>
         </div>
       </Form>
-
-      <Modal
-        title="Add New Status"
-        visible={isTagModalVisible}
-        onOk={handleAddNewTag}
-        onCancel={() => setIsTagModalVisible(false)}
-        okText="Add"
-
-      >
-        <Input
-          value={newTag}
-          onChange={(e) => setNewTag(e.target.value)}
-          placeholder="Enter new status name"
-        />
-      </Modal>
 
     </div>
   );

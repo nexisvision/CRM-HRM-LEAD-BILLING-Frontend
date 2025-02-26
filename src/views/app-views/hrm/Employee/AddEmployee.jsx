@@ -966,14 +966,14 @@ const AddEmployee = ({ onClose, setSub }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Account Holder Name <span className="text-red-500">*</span></label>
+                  <label className="">Account Holder Name </label>
                   <Field name="accountholder" as={Input} placeholder="John Doe" className="mt-1" />
                   <ErrorMessage name="accountholder" component="div" className="text-red-500" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Account Number <span className="text-red-500">*</span></label>
+                  <label className="">Account Number </label>
                   <Field name="accountnumber" as={Input} placeholder="123456789" type="number" className="mt-1" />
                   <ErrorMessage name="accountnumber" component="div" className="text-red-500" />
                 </div>
@@ -982,14 +982,14 @@ const AddEmployee = ({ onClose, setSub }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Bank Name <span className="text-red-500">*</span></label>
+                  <label className="">Bank Name </label>
                   <Field name="bankname" as={Input} placeholder="Bank Name" className="mt-1" />
                   <ErrorMessage name="bankname" component="div" className="text-red-500" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">IFSC <span className="text-red-500">*</span></label>
+                  <label className="">IFSC </label>
                   <Field name="ifsc" as={Input} placeholder="IFSC" className="mt-1" />
                   <ErrorMessage name="ifsc" component="div" className="text-red-500" />
                 </div>
@@ -998,7 +998,7 @@ const AddEmployee = ({ onClose, setSub }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Bank Location <span className="text-red-500">*</span>  </label>
+                  <label className="">Bank Location   </label>
                   <Field name="banklocation" as={Input} placeholder="Bank Location" className="mt-1" />
                   <ErrorMessage name="banklocation" component="div" className="text-red-500" />
                 </div>

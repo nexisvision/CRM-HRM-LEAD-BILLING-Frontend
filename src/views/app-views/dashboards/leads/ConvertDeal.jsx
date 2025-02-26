@@ -113,7 +113,6 @@ const ConvertDeal = ({ onClose, leadData }) => {
     };
 
 
-
     useEffect(() => {
 
         dispatch(getstages());
@@ -760,16 +759,14 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
                     />
 
-                    <div className="mt-4 text-center">
-
-                        <Button type="link" onClick={() => {/* Add resend OTP logic */}}>
-
-                            Resend OTP
-
-                        </Button>
-
-                    </div>
-
+                    <Button 
+                        type="primary"
+                        onClick={handleOtpSubmit}
+                        disabled={otp.length !== 6}
+                        className="bg-blue-500 hover:bg-blue-600"
+                    >
+                        Verify OTP
+                    </Button>
                 </div>
 
             </Modal>

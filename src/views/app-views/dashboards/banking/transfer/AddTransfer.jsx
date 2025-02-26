@@ -71,7 +71,7 @@ const AddTransfer = ({ onClose }) => {
                       <label className="font-semibold">Date <span className="text-red-500">*</span></label>
                       <input
                         type="date"
-                        className="w-full mt-2 p-2 border rounded "
+                        className="w-full mt-1 p-2 border rounded "
                         // value={values.date || ''}
                       />
                       <ErrorMessage

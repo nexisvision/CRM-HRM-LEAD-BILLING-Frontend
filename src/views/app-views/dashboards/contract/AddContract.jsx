@@ -480,8 +480,9 @@ const AddContract = ({ onClose }) => {
                             <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
                               <Button
                                 type="link"
-                                icon={<PlusOutlined />}
+                                icon={<PlusOutlined /> }
                                 onClick={() => setIsContracttypeModalVisible(true)}
+                                className="w-full items-center flex"
                               >
                                 Add New Type
                               </Button>

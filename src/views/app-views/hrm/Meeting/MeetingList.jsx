@@ -15,6 +15,7 @@ import { utils, writeFile } from "xlsx";
 import EditMeeting from './EditMeeting';
 import { deleteM, MeetData } from './MeetingReducer/MeetingSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import ViewMeeting from './ViewMeeting';
 
 const MeetingList = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -24,6 +25,7 @@ const MeetingList = () => {
   const [isEditMeetingModalVisible, setIsEditMeetingModalVisible] = useState(false);
   const [meetid, setMeetid] = useState("");
   const [searchText, setSearchText] = useState('');
+  const [isViewMeetingModalVisible, setIsViewMeetingModalVisible] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -55,35 +57,35 @@ const MeetingList = () => {
   };
 
   //// permission
-                                
-                  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                  const roles = useSelector((state) => state.role?.role?.data || []);
-                  const roleData = roles?.find(role => role.id === roleId);
-               
-                  const whorole = roleData.role_name;
-               
-                  const parsedPermissions = Array.isArray(roleData?.permissions)
-                  ? roleData.permissions
-                  : typeof roleData?.permissions === 'string'
-                  ? JSON.parse(roleData.permissions)
-                  : [];
-                
-                  let allpermisson;  
-               
-                  if (parsedPermissions["extra-hrm-meeting"] && parsedPermissions["extra-hrm-meeting"][0]?.permissions) {
-                    allpermisson = parsedPermissions["extra-hrm-meeting"][0].permissions;
-                    // console.log('Parsed Permissions:', allpermisson);
-                  
-                  } else {
-                    // console.log('extra-hrm-meeting is not available');
-                  }
-                  
-                  const canCreateClient = allpermisson?.includes('create');
-                  const canEditClient = allpermisson?.includes('edit');
-                  const canDeleteClient = allpermisson?.includes('delete');
-                  const canViewClient = allpermisson?.includes('view');
-               
-                  ///endpermission
+
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data || []);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+  let allpermisson;
+
+  if (parsedPermissions["extra-hrm-meeting"] && parsedPermissions["extra-hrm-meeting"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-meeting"][0].permissions;
+    // console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    // console.log('extra-hrm-meeting is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+  ///endpermission
 
 
 
@@ -97,7 +99,7 @@ const MeetingList = () => {
   // Add this function to filter meetings
   const getFilteredMeetings = () => {
     if (!filteredData) return [];
-    
+
     if (!searchText) return filteredData;
 
     return filteredData.filter(meeting => {
@@ -162,52 +164,72 @@ const MeetingList = () => {
   useEffect(() => {
     if (filteredData) {
       // Filter meetings by created_by matching the logged-in user's username
-          setSelectedUser(filteredData[0]);
+      setSelectedUser(filteredData[0]);
     }
-  }, [tabledata]); 
+  }, [tabledata]);
 
   const EditMeet = (id) => {
     openEditMeetingModal();
     setMeetid(id)
   }
 
+  const closeViewMeetingModal = () => {
+    setIsViewMeetingModalVisible(false);
+  };
+
+  const openViewMeetingModal = (id) => {
+    setMeetid(id);
+    setIsViewMeetingModalVisible(true);
+  };
+
   const dropdownMenu = (elm) => (
     <Menu>
-      
-     
+      <Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className=""
+            icon={<EyeOutlined />}
+            onClick={() => openViewMeetingModal(elm.id)}
+            size="small"
+          >
+            <span className="">View</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                   <Menu.Item>
-                                   <Flex alignItems="center">
-                                     <Button
-                                       type=""
-                                       className=""
-                                       icon={<EditOutlined />}
-                                       onClick={() => EditMeet(elm.id)}
-                                       size="small"
-                                     >
-                                       <span className="">Edit</span>
-                                     </Button>
-                                   </Flex>
-                                 </Menu.Item>
-                                ) : null}
-                  
-                  
-                  {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                  <Menu.Item>
-                                  <Flex alignItems="center">
-                                    <Button
-                                      type=""
-                                      className=""
-                                      icon={<DeleteOutlined />}
-                                      onClick={() => deleteUser(elm.id)}
-                                      size="small"
-                                    >
-                                      <span className="">Delete</span>
-                                    </Button>
-                                  </Flex>
-                                </Menu.Item>
-                                ) : null}
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              className=""
+              icon={<EditOutlined />}
+              onClick={() => EditMeet(elm.id)}
+              size="small"
+            >
+              <span className="">Edit</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
+
+
+      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              className=""
+              icon={<DeleteOutlined />}
+              onClick={() => deleteUser(elm.id)}
+              size="small"
+            >
+              <span className="">Delete</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
     </Menu>
   );
 
@@ -267,15 +289,15 @@ const MeetingList = () => {
           </div>
         </Flex>
         <Flex gap="7px">
-         
 
-             {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                   <Button type="primary" className="ml-2" onClick={openAddMeetingModal}>
-                                                                                   <PlusOutlined />
-                                                                                   <span>New</span>
-                                                                                 </Button>                                                                                                                                   
-                                                                                                                                                                                                                  
-                                                                                                ) : null}
+
+          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+            <Button type="primary" className="ml-2" onClick={openAddMeetingModal}>
+              <PlusOutlined />
+              <span>New</span>
+            </Button>
+
+          ) : null}
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
@@ -288,28 +310,28 @@ const MeetingList = () => {
       </Flex>
       <div className="table-responsive mt-2">
 
-         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                   <Table
-                                   columns={tableColumns}
-                                   dataSource={getFilteredMeetings()}
-                                   rowKey="id"
-                                   pagination={{
-                                     total: getFilteredMeetings().length,
-                                     pageSize: 10,
-                                     showSizeChanger: true,
-                                     showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-                                   }}
-                                 />
-                                     ) : null}
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredMeetings()}
+            rowKey="id"
+            pagination={{
+              total: getFilteredMeetings().length,
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+            }}
+          />
+        ) : null}
 
 
-       
+
       </div>
       {/* <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} /> */}
 
       {/* Add Job Modal */}
       <Modal
-        title="Add Metting"
+        title="Add Meeting"
         visible={isAddMeetingModalVisible}
         onCancel={closeAddMeetingModal}
         footer={null}
@@ -318,13 +340,22 @@ const MeetingList = () => {
         <AddMeeting onClose={closeAddMeetingModal} />
       </Modal>
       <Modal
-        title="Edit Metting"
+        title="Edit Meeting"
         visible={isEditMeetingModalVisible}
         onCancel={closeEditMeetingModal}
         footer={null}
         width={1000}
       >
         <EditMeeting onClose={closeEditMeetingModal} meetid={meetid} />
+      </Modal>
+      <Modal
+        title="View Meeting"
+        visible={isViewMeetingModalVisible}
+        onCancel={closeViewMeetingModal}
+        footer={null}
+        width={1000}
+      >
+        <ViewMeeting onClose={closeViewMeetingModal} meetid={meetid} />
       </Modal>
     </Card>
   );

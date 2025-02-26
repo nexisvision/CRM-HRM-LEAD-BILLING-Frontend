@@ -84,23 +84,14 @@ const AddAccount = ({ onClose }) => {
               <Col span={12}>
                 <div className="form-group">
                   <label className="font-semibold">Bank Name <span className="text-red-500">*</span></label>
-                  <Field name="bankName">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        onChange={(value) => setFieldValue('bankName', value)}
-                        placeholder="Select bank"
-                        className="w-full mt-1"
-                      >
-                        <Option value="sbi">State Bank of India</Option>
-                        <Option value="hdfc">HDFC Bank</Option>
-                        <Option value="icici">ICICI Bank</Option>
-                        <Option value="axis">Axis Bank</Option>
-                      </Select>
-                    )}
-                  </Field>
+                  <Field
+                    name="bankName"
+                    as={Input}
+                    className="w-full mt-1"
+                    placeholder="Enter bank name"
+                  />
                   <ErrorMessage
-                    name="bankname"
+                    name="bankName"
                     component="div"
                     className="text-red-500 mt-1"
                   />

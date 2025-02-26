@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Dropdown, Avatar, Modal, Form, Input, Upload, Button, message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -79,6 +79,9 @@ const MenuItemSignOut = (props) => {
 
 export const NavProfile = ({ mode }) => {
 	const [isEditModalVisible, setIsEditModalVisible] = useState(false);
+	const [showProfileMenu, setShowProfileMenu] = useState(false);
+	const [menuPosition, setMenuPosition] = useState();
+	const profileRef = useRef(null);
 	const dispatch = useDispatch();
 	const roles = useSelector((state) => state.role);
 	const currentuser = useSelector((state) => state.user);
@@ -94,6 +97,7 @@ export const NavProfile = ({ mode }) => {
 				<MenuItem
 					label="Edit Profile"
 					icon={<EditOutlined />}
+					className="mb-3"
 					onClick={() => setIsEditModalVisible(true)}
 				/>
 			),
@@ -135,6 +139,17 @@ export const NavProfile = ({ mode }) => {
 			});
 		}
 	}, [roles, currentuser, roleu]);
+
+	const handleProfileClick = () => {
+		if (profileRef.current) {
+			const rect = profileRef.current.getBoundingClientRect();
+			setMenuPosition({
+				top: rect.bottom + 5,
+				right: window.innerWidth - rect.right
+			});
+			setShowProfileMenu(!showProfileMenu);
+		}
+	};
 
 	const handleSuperAdminSubmit = async (values) => {
 		try {
@@ -227,11 +242,53 @@ export const NavProfile = ({ mode }) => {
 		</Form>
 	);
 
+	const ProfileMenu = () => (
+		<div
+			style={{
+				position: 'fixed',
+				top: menuPosition.top,
+				right: menuPosition.right,
+				backgroundColor: 'white',
+				boxShadow: '0 3px 6px -4px rgba(0,0,0,.12), 0 6px 16px 0 rgba(0,0,0,.08), 0 9px 28px 8px rgba(0,0,0,.05)',
+				borderRadius: '8px',
+				padding: '4px 0',
+				zIndex: 1000,
+				minWidth: '160px'
+			}}
+		>
+			{items.map(item => (
+				<div
+					key={item.key}
+					style={{
+						padding: '5px 12px',
+						lineHeight: '22px',
+						cursor: 'pointer',
+						transition: 'all 0.3s',
+						display: 'flex',
+						alignItems: 'center',
+						gap: '8px'
+					}}
+					className="ant-dropdown-menu-item mt-[12px]" 
+					
+					onClick={() => {
+						setShowProfileMenu(false);
+						if (item.key === 'Edit Profile') {
+							setIsEditModalVisible(true);
+						}
+						// Handle other menu item clicks
+					}}
+				>
+					{item.label}
+				</div>
+			))}
+		</div>
+	);
+
 	return (
 		<>
-			<Dropdown placement="bottomRight" menu={{ items }} trigger={["click"]}>
+			<div ref={profileRef} onClick={handleProfileClick} style={{ cursor: 'pointer', margin: 'auto', alignItems: 'center' }}>
 				<NavItem mode={mode}>
-					<Profile>
+					<Profile >
 						{currentuser?.loggedInUser?.profilePic ? (
 							<Avatar
 								src={currentuser?.loggedInUser?.profilePic}
@@ -253,7 +310,9 @@ export const NavProfile = ({ mode }) => {
 						</UserInfo>
 					</Profile>
 				</NavItem>
-			</Dropdown>
+			</div>
+
+			{showProfileMenu && <ProfileMenu />}
 
 			{/* Edit Profile Modal */}
 			<Modal

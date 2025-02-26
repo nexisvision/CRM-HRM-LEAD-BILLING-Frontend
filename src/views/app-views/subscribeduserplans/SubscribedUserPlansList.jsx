@@ -15,6 +15,7 @@ import {
   Menu,
   Modal,
   Switch,
+  message,
 } from "antd";
 // import { invoiceData } from '../../../pages/invoice/invoiceData';
 // import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
@@ -44,6 +45,7 @@ import { getsubplandata } from "./subplanReducer/subplanSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { GetPlan } from "../plan/PlanReducers/PlanSlice";
 import { ClientData } from "../company/CompanyReducers/CompanySlice";
+import axios from 'axios';
 
 // import userData from '../../../../../assets/data/user-list.data.json';
 
@@ -166,11 +168,48 @@ export const SubscribedUserPlansList = () => {
   );
 
   // Add this function to handle status changes
-  const handleStatusChange = (checked, userId) => {
-    const newStatus = checked ? "active" : "inactive";
-    // Update your data/API here
-    // console.log(`User ${userId} status changed to ${newStatus}`);
+  const handleStatusChange = async (checked, id) => {
+    try {
+      if (!checked) {
+        Modal.confirm({
+          title: 'Deactivate Plan',
+          content: 'Are you sure you want to deactivate this plan? This action cannot be undone.',
+          okText: 'Yes', 
+          cancelText: 'No',
+          onOk: async () => {
+            try {
+              const token = localStorage.getItem('auth_token');
+              
+              const response = await axios.delete(`http://localhost:5353/api/v1/subscriptions/remove/${id}`, {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+              
+              if (response.data.success) {
+                message.success('Plan removed successfully');
+                dispatch(getsubplandata());
+              } else {
+                message.error('Failed to remove plan');
+                return false;
+              }
+            } catch (error) {
+              message.error('Failed to update status: ' + (error.response?.data?.message || error.message));
+              console.error('Error updating status:', error);
+              return false;
+            }
+          },
+        });
+      }
+      // Always return false to prevent switch from being toggled
+      return false;
+    } catch (error) {
+      message.error('Error processing request');
+      console.error('Error:', error);
+      return false;
+    }
   };
+  
 
   const tableColumns = [
     // {
@@ -223,10 +262,16 @@ export const SubscribedUserPlansList = () => {
     {
       title: "Status",
       dataIndex: "status",
-    },
-    {
-      title: "Status",
-      // dataIndex: "status",
+      render: (_, record) => (
+        <Switch
+          defaultChecked={record.status !== 'inactive'}
+          onChange={(checked) => handleStatusChange(checked, record.id)}
+          size="small"
+          checkedChildren="Active"
+          unCheckedChildren="Inactive"
+          disabled={record.status === 'inactive'} // Disable switch if status is already inactive
+        />
+      ),
     },
 
 

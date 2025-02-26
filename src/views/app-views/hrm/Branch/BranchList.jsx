@@ -248,8 +248,8 @@ const BranchList = () => {
     },
     {
       title: "Address",
-      dataIndex: "address",
-      sorter: (a, b) => a.address.length - b.address.length,
+      dataIndex: "branchAddress",
+      sorter: (a, b) => a.branchAddress.length - b.branchAddress.length,
     },
     {
       title: "Action",
