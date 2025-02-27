@@ -1,4 +1,4 @@
-import {    message } from 'antd';
+import {    message, Row, Typography } from 'antd';
 import React, { useEffect } from 'react';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
