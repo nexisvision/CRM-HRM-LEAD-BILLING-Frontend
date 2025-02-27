@@ -19,8 +19,8 @@ const MailItem = () => {
 
 	const onStarTicked = elm => {
 		const { id, starred } = elm;
-		setMails(prevMails => prevMails.map( item => {
-			if(item.id === id) {
+		setMails(prevMails => prevMails.map(item => {
+			if (item.id === id) {
 				item.starred = !starred
 				return item
 			}
@@ -56,7 +56,7 @@ const MailItem = () => {
 		let data = mails
 		selectedKey.forEach(num => {
 			data = data.map(elm => {
-				if(elm.id === num) {
+				if (elm.id === num) {
 					elm.starred = true
 					return elm
 				} else return elm
@@ -70,7 +70,7 @@ const MailItem = () => {
 		let data = mails
 		selectedKey.forEach(num => {
 			data = data.map(elm => {
-				if(elm.id === num) {
+				if (elm.id === num) {
 					elm.label = label
 					return elm
 				} else return elm
@@ -93,7 +93,7 @@ const MailItem = () => {
 		let query = e.target.value;
 		let data = []
 		data = getCurrentCategory().filter(item => {
-			return query === ''? item : item.name.toLowerCase().includes(query)
+			return query === '' ? item : item.name.toLowerCase().includes(query)
 		});
 		setMails(data);
 	}
@@ -112,9 +112,9 @@ const MailItem = () => {
 			case 'draft':
 				return MailData.draft
 			case 'starred':
-				return  MailData.inbox.filter( elm => elm.starred )
+				return MailData.inbox.filter(elm => elm.starred)
 			case 'deleted':
-				return  MailData.deleted
+				return MailData.deleted
 			default:
 				break;
 		}
@@ -128,28 +128,28 @@ const MailItem = () => {
 	const locale = {
 		emptyText: (
 			<div className="text-center my-5">
-				<img src="/img/others/img-10.png" alt="Add credit card"/>
+				<img src="/img/others/img-10.png" alt="Add credit card" />
 				<h3 className="mt-3 font-weight-light">There is no mail!</h3>
 			</div>
 		)
 	};
-	
+
 	const tableColumns = [
 		{
 			title: () => (
 				<div className="mail-list-action">
 					<div>
-						{	hasSelected? 
+						{hasSelected ?
 							<div>
-								<Dropdown  overlay={
+								<Dropdown overlay={
 									<Menu>
 										{
-											labels.map( elm => (
-												<Menu.Item 
-													key={`key-${elm}`} 
-													onClick={() => {massCategorize(elm, selectedRowKeys)}}
+											labels.map(elm => (
+												<Menu.Item
+													key={`key-${elm}`}
+													onClick={() => { massCategorize(elm, selectedRowKeys) }}
 												>
-													<Badge color={getLabelColor(elm)}/>
+													<Badge color={getLabelColor(elm)} />
 													<span className="text-capitalize">{elm}</span>
 												</Menu.Item>
 											))
@@ -160,12 +160,12 @@ const MailItem = () => {
 										<TagOutlined />
 									</span>
 								</Dropdown>
-								<span className="mail-list-action-icon" onClick={() => {massDeleted(selectedRowKeys)}}>
+								<span className="mail-list-action-icon" onClick={() => { massDeleted(selectedRowKeys) }}>
 									<Tooltip title="Delete">
 										<DeleteOutlined />
 									</Tooltip>
 								</span>
-								<span className="mail-list-action-icon" onClick={() => {massStar(selectedRowKeys)}}>
+								<span className="mail-list-action-icon" onClick={() => { massStar(selectedRowKeys) }}>
 									<Tooltip title="Star">
 										<StarOutlined />
 									</Tooltip>
@@ -176,26 +176,26 @@ const MailItem = () => {
 						}
 					</div>
 					<div>
-						<Input size="small" placeholder="Search" onChange={e => {search(e)}}/>
+						<Input size="small" placeholder="Search" onChange={e => { search(e) }} />
 					</div>
-				</div> 
+				</div>
 			),
 			colSpan: 4,
 			dataIndex: 'name',
 			className: 'mail-list-sender',
 			render: (_, elm) => (
 				<div className="d-flex align-items-center">
-					<div 
+					<div
 						onClick={(e) => {
 							e.stopPropagation()
 							onStarTicked(elm)
 						}}
-						className={`mail-list-star font-size-md ${elm.starred? 'checked' : 'uncheck'}`}
+						className={`mail-list-star font-size-md ${elm.starred ? 'checked' : 'uncheck'}`}
 					>
-						{elm.starred? <StarFilled /> : <StarOutlined />}
+						{elm.starred ? <StarFilled /> : <StarOutlined />}
 					</div>
 					<div className="d-flex align-items-center">
-						<Avatar src={elm.avatar} size={30}/>
+						<Avatar src={elm.avatar} size={30} />
 						<h4 className="mb-0 ml-2">{elm.name}</h4>
 					</div>
 				</div>
@@ -207,7 +207,7 @@ const MailItem = () => {
 			className: 'mail-list-content',
 			render: (_, elm) => (
 				<div className=" mail-list-content-msg">
-					<Badge color={getLabelColor(elm.label)}/>
+					<Badge color={getLabelColor(elm.label)} />
 					<span className="font-weight-semibold text-dark ml-1">{elm.title}</span>
 					<span className="mx-2"> - </span>
 					<span className="p mb-0">{formatBody(elm.content)}</span>
@@ -228,10 +228,10 @@ const MailItem = () => {
 
 	return (
 		<div className="mail-list">
-			<Table 
-				rowSelection={rowSelection} 
-				columns={tableColumns} 
-				dataSource={mails} 
+			<Table
+				rowSelection={rowSelection}
+				columns={tableColumns}
+				dataSource={mails}
 				locale={locale}
 				onRow={(elm) => {
 					return {

@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Menu, Input, message, Button, Modal, Space } from "antd";
+import { Card, Table, Menu, Input, message, Button, Modal, Space, Badge, Switch } from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
   PlusOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import AddSalary from "./AddSalary";
 import SetSalary from "./SetSalary";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteSalaryss, getSalaryss } from "./SalaryReducers/SalarySlice";
+import { deleteSalaryss, getSalaryss, editSalaryss } from "./SalaryReducers/SalarySlice";
 import { empdata } from "../../Employee/EmployeeReducers/EmployeeSlice";
 import { useNavigate } from "react-router-dom";
 
@@ -33,12 +34,12 @@ const SalaryList = () => {
     dispatch(getSalaryss());
   }, []);
 
-const user = useSelector((state) => state.user.loggedInUser.username);
+  const user = useSelector((state) => state.user.loggedInUser.username);
 
   const alldata = useSelector((state) => state.salary);
   const dfnddataa = alldata.salary.data || [];
 
-const dfnddata = dfnddataa.filter((item) => item.created_by === user);
+  const dfnddata = dfnddataa.filter((item) => item.created_by === user);
 
   useEffect(() => {
     if (dfnddata) {
@@ -59,8 +60,8 @@ const dfnddata = dfnddataa.filter((item) => item.created_by === user);
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === 'string'
-    ? JSON.parse(roleData.permissions)
-    : [];
+      ? JSON.parse(roleData.permissions)
+      : [];
 
   let allpermisson;
 
@@ -80,7 +81,7 @@ const dfnddata = dfnddataa.filter((item) => item.created_by === user);
 
   const openSetSalaryModall = (id) => {
     setId(id);
-    console.log("userId",id);
+    console.log("userId", id);
     openSetSalaryModal();
   };
 
@@ -95,7 +96,7 @@ const dfnddata = dfnddataa.filter((item) => item.created_by === user);
 
   const getFilteredSalaries = () => {
     if (!list) return [];
-    
+
     if (!searchText) return list;
 
     return list.filter(salary => {
@@ -116,27 +117,55 @@ const dfnddata = dfnddataa.filter((item) => item.created_by === user);
     });
   };
 
-  const dropdownMenu = (user) => (
+  const handleStatusChange = (record, checked) => {
+    handleSalaryStatusChange(dispatch, record, checked)
+      .then(() => {
+        dispatch(getSalaryss());
+        dispatch(empdata());
+      });
+  };
+
+  const dropdownMenu = (record) => (
     <Menu>
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Button type="text" icon={<EyeOutlined />} onClick={ () => openSetSalaryModall(user.employeeId)}>
-            Set Salary
-          </Button>
-        </Menu.Item>
-      ) : null}
-      
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
+      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) && (
+        <>
+          <Menu.Item key="setSalary">
+            <Button
+              type="text"
+              className="w-full text-left flex items-center gap-2"
+              onClick={() => openSetSalaryModall(record.employeeId)}
+            >
+              <EyeOutlined className="text-blue-600" />
+              <span>Set Salary</span>
+            </Button>
+          </Menu.Item>
+        </>
+      )}
+
+      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) && (
+        <Menu.Item key="delete">
           <Button
             type="text"
-            icon={<DeleteOutlined />}
-            onClick={() => deleteUser(user.id)}
+            className="w-full text-left flex items-center gap-2 text-red-600 hover:text-red-500"
+            onClick={() => {
+              Modal.confirm({
+                title: 'Delete Salary Record',
+                content: 'Are you sure you want to delete this salary record?',
+                okText: 'Yes',
+                okType: 'danger',
+                cancelText: 'No',
+                onOk: () => {
+                  deleteUser(record.id);
+                  message.success('Salary record deleted successfully');
+                }
+              });
+            }}
           >
-            Delete
+            <DeleteOutlined />
+            <span>Delete</span>
           </Button>
         </Menu.Item>
-      ) : null}
+      )}
     </Menu>
   );
 
@@ -158,12 +187,37 @@ const dfnddata = dfnddataa.filter((item) => item.created_by === user);
       dataIndex: "bankAccount",
     },
     {
-      title: "status",
+      title: "Status",
       dataIndex: "status",
+      render: (status, record) => (
+        <div className="flex items-center gap-2">
+          <Switch
+            checked={status === 'paid'}
+            onChange={(checked) => handleStatusChange(record, checked)}
+            checkedChildren="Paid"
+            unCheckedChildren="Unpaid"
+            disabled={!(whorole === "super-admin" || whorole === "client" || canEditClient)}
+          />
+          <Badge
+            status={status === 'paid' ? 'success' : 'error'}
+            text={status ? status.charAt(0).toUpperCase() + status.slice(1) : 'N/A'}
+          />
+        </div>
+      ),
     },
     {
       title: "Action",
-      render: (_, record) => <EllipsisDropdown menu={dropdownMenu(record)} />,
+      key: "actions",
+      width: 100,
+      render: (_, record) => (
+        <div className="text-center">
+          <EllipsisDropdown
+            menu={dropdownMenu(record)}
+            placement="bottomRight"
+            trigger={["click"]}
+          />
+        </div>
+      ),
     },
   ];
 
@@ -179,7 +233,7 @@ const dfnddata = dfnddataa.filter((item) => item.created_by === user);
           style={{ width: 300 }}
           className="search-input"
         />
-   
+
         {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
           <Button type="primary" onClick={openAddSalaryModal}>
             <PlusOutlined /> Add Salary
@@ -188,9 +242,9 @@ const dfnddata = dfnddataa.filter((item) => item.created_by === user);
       </Space>
 
       {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Table 
-          columns={tableColumns} 
-          dataSource={getFilteredSalaries()} 
+        <Table
+          columns={tableColumns}
+          dataSource={getFilteredSalaries()}
           rowKey="id"
           pagination={{
             total: getFilteredSalaries().length,
@@ -269,3 +323,21 @@ const SalaryListWithStyles = () => (
 );
 
 export default SalaryListWithStyles;
+
+export const handleSalaryStatusChange = (dispatch, record, checked) => {
+  const newStatus = checked ? 'paid' : 'unpaid';
+
+  const payload = {
+    id: record.id,
+    status: newStatus
+  };
+
+  return dispatch(editSalaryss(payload))
+    .unwrap()
+    .then(() => {
+      message.success(`Status updated to ${newStatus}`);
+    })
+    .catch((error) => {
+      message.error(error?.message || "Failed to update status");
+    });
+};

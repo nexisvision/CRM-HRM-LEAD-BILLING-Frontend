@@ -66,18 +66,36 @@ const deletsal = async (id) => {
 const editsal = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
+    // Make sure all required fields are included in the request
+    const payload = {
+      employeeId: values.employeeId,
+      payslipType: values.payslipType,
+      currency: values.currency,
+      salary: values.salary,
+      netSalary: values.netSalary,
+      status: values.status,
+      bankAccount: values.bankAccount,
+      created_by: values.created_by
+    };
+
     const res = await axios.put(
       `http://localhost:5353/api/v1/salary/${idd}`,
-      values,
+      payload,
       {
         headers: {
           Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
       }
     );
+
+    if (res.data.success === false) {
+      throw new Error(res.data.message);
+    }
+
     return res.data;
   } catch (error) {
-    console.error("Error updating employee data:", error);
+    console.error("Error updating salary data:", error);
     throw error;
   }
 };

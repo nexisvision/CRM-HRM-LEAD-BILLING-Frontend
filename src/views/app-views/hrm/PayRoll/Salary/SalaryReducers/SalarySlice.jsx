@@ -1,11 +1,37 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import UserService from "./SalaryService";
 import { toast } from "react-toastify";
-import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
-// Async thunk for adding user
+// Fix the editSalaryss action to match your API expectations
+export const editSalaryss = createAsyncThunk(
+  "users/editSalaryss",
+  async (payload, thunkAPI) => {
+    try {
+      // Ensure all fields are included in the payload
+      const salaryData = {
+        id: payload.id,
+        employeeId: payload.employeeId,
+        payslipType: payload.payslipType,
+        currency: payload.currency,
+        salary: payload.salary,
+        netSalary: payload.netSalary,
+        status: payload.status,
+        bankAccount: payload.bankAccount,
+        created_by: payload.created_by
+      };
 
+      const response = await UserService.editsal(salaryData.id, salaryData);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(
+        error.response?.data || "Error updating salary"
+      );
+    }
+  }
+);
+
+// Keep your existing actions but update the error handling
 export const AddSalaryss = createAsyncThunk(
   "users/AddSalaryss",
   async (userData, thunkAPI) => {
@@ -13,12 +39,10 @@ export const AddSalaryss = createAsyncThunk(
       const response = await UserService.addsal(userData);
       return response;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      return thunkAPI.rejectWithValue(error.response?.data || "Error adding salary");
     }
   }
 );
-
-// Async thunk for user login
 
 export const getSalaryss = createAsyncThunk(
   "emp/getSalaryss",
@@ -27,38 +51,11 @@ export const getSalaryss = createAsyncThunk(
       const response = await UserService.getsal();
       return response;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      return thunkAPI.rejectWithValue(error.response?.data || "Error fetching salaries");
     }
   }
 );
 
-// Async thunk for getting all users
-export const getAllUsers = createAsyncThunk(
-  "users/getAllUsers",
-  async (thunkAPI) => {
-    try {
-      const response = await UserService.getAllUsers();
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// Async thunk for getting user by id
-export const getUserById = createAsyncThunk(
-  "users/getUserById",
-  async (userId, thunkAPI) => {
-    try {
-      const response = await UserService.getUserById(userId);
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// Async thunk for deleting a user
 export const deleteSalaryss = createAsyncThunk(
   "users/deleteSalaryss",
   async (userId, thunkAPI) => {
@@ -66,33 +63,10 @@ export const deleteSalaryss = createAsyncThunk(
       const response = await UserService.deletsal(userId);
       return response;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
+      return thunkAPI.rejectWithValue(error.response?.data || "Error deleting salary");
     }
   }
 );
-export const editSalaryss = createAsyncThunk(
-  "users/editSalaryss",
-  async ({ idd, values }, thunkAPI) => {
-    try {
-      const response = await UserService.editsal(idd, values);
-      return response; // Return the updated data
-    } catch (error) {
-      return thunkAPI.rejectWithValue(
-        error.response?.data || "Error updating employee"
-      );
-    }
-  }
-);
-
-const initialUser = () => {
-  const item = window.localStorage.getItem("USER");
-  return item ? JSON.parse(item) : null;
-};
-
-const initialIsAuth = () => {
-  const item = window.localStorage.getItem("isAuth");
-  return item ? JSON.parse(item) : false;
-};
 
 const SalarySlice = createSlice({
   name: "salary",
@@ -102,6 +76,7 @@ const SalarySlice = createSlice({
     isLoading: false,
     addModel: false,
     editModal: false,
+    error: null
   },
   reducers: {
     toggleAddModal: (state, action) => {
@@ -121,21 +96,14 @@ const SalarySlice = createSlice({
       localStorage.removeItem("isAuth");
       localStorage.removeItem("USER");
       localStorage.removeItem("TOKEN");
-    },
-    toggleDetailModal: (state, action) => {
-      state.detailItem = action.payload;
-      state.detailModal = !state.editModal;
-    },
-    closeDetailModal: (state, action) => {
-      state.detailModal = action.payload;
-      state.detailItem = {};
-    },
+    }
   },
   extraReducers: (builder) => {
     builder
-      //add
+      // Add salary
       .addCase(AddSalaryss.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
       })
       .addCase(AddSalaryss.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -146,52 +114,60 @@ const SalarySlice = createSlice({
         message.error(action.payload?.message);
       })
 
+      // Get salaries
       .addCase(getSalaryss.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
       })
       .addCase(getSalaryss.fulfilled, (state, action) => {
         state.isLoading = false;
         state.salary = action?.payload;
-        toast.success(action.payload?.message);
       })
       .addCase(getSalaryss.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.message);
+        state.error = action.payload?.message;
       })
 
-      //delete
+      // Delete salary
       .addCase(deleteSalaryss.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
       })
       .addCase(deleteSalaryss.fulfilled, (state, action) => {
         state.isLoading = false;
         message.success(action.payload.message);
       })
-
       .addCase(deleteSalaryss.rejected, (state, action) => {
         state.isLoading = false;
-        message.error(action.payload?.response?.message);
+        message.error(action.payload?.message);
       })
-      //update
 
+      // Edit salary
       .addCase(editSalaryss.pending, (state) => {
-        state.isLoading = false;
+        state.isLoading = true;
         state.error = null;
       })
       .addCase(editSalaryss.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload;
-        message.success(action.payload?.message);
+        // Update the salary in the state
+        if (state.salary.data) {
+          const index = state.salary.data.findIndex(
+            (item) => item.id === action.payload.data.id
+          );
+          if (index !== -1) {
+            state.salary.data[index] = action.payload.data;
+          }
+        }
+        state.editItem = action.payload.data;
+        message.success(action.payload?.message || "Salary updated successfully");
       })
-
       .addCase(editSalaryss.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
-        message.error(action.payload?.message);
+        state.error = action.payload?.message;
+        message.error(action.payload?.message || "Failed to update salary");
       });
   },
 });
 
-export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-  SalarySlice.actions;
+export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } = SalarySlice.actions;
 export default SalarySlice.reducer;

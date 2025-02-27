@@ -1,4 +1,4 @@
-import React, { useEffect ,useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
   Input,
   Button,
@@ -8,6 +8,7 @@ import {
   Row,
   Col,
   Checkbox,
+  Badge,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
@@ -44,7 +45,7 @@ const AddSalary = ({ onClose }) => {
 
   const allloged = useSelector((state) => state.user.loggedInUser.username)
 
-  const filterdata = fnddata.filter((item)=>item.created_by === allloged)
+  const filterdata = fnddata.filter((item) => item.created_by === allloged)
 
   const { currencies } = useSelector((state) => state.currencies);
 
@@ -54,75 +55,9 @@ const AddSalary = ({ onClose }) => {
   }, []);
 
   // status start
-  const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
-  const [newStatus, setNewStatus] = useState("");
-  const [statuses, setStatuses] = useState([]);
-
   const AllLoggedData = useSelector((state) => state.user);
 
   const lid = AllLoggedData.loggedInUser.id;
-
-
-
-  const fetchLables = async (lableType, setter) => {
-    try {
-      const lid = AllLoggedData.loggedInUser.id;
-      const response = await dispatch(GetLable(lid));
-
-      if (response.payload && response.payload.data) {
-        const uniqueStatuses = response.payload.data
-          .filter((label) => label && label.name) // Filter out invalid labels
-          .map((label) => ({
-            id: label.id,
-            name: label.name.trim(),
-          }))
-          .filter(
-            (label, index, self) =>
-              index === self.findIndex((t) => t.name === label.name)
-          ); // Remove duplicates
-
-        setStatuses(uniqueStatuses);
-      }
-    } catch (error) {
-      console.error("Failed to fetch statuses:", error);
-      // message.error("Failed to load statuses");
-    }
-  };
-
-  useEffect(() => {
-    fetchLables("status", setStatuses);
-  }, []);
-
-  const handleAddNewStatus = async () => {
-    if (!newStatus.trim()) {
-      message.error("Please enter a status name");
-      return;
-    }
-
-    try {
-      const lid = AllLoggedData.loggedInUser.id;
-      const payload = {
-        name: newStatus.trim(),
-        labelType: "status",
-      };
-
-      await dispatch(AddLable({ lid, payload }));
-      message.success("Status added successfully");
-      setNewStatus("");
-      setIsStatusModalVisible(false);
-
-      // Fetch updated statuses
-      await fetchLables();
-    } catch (error) {
-      console.error("Failed to add Status:", error);
-      message.error("Failed to add Status");
-    }
-  };
-
-  // status end
-
-  // const allempdatass = useSelector((state) => state.currencies);
-  // const fnddatass = allempdatass?.currencies;
 
   const onSubmit = (values, { resetForm }) => {
     dispatch(AddSalaryss(values)).then(() => {
@@ -193,9 +128,7 @@ const AddSalary = ({ onClose }) => {
                         {filterdata && filterdata.length > 0 ? (
                           filterdata.map((client) => (
                             <Option key={client.id} value={client.id}>
-                              {client.firstName ||
-                                client.username ||
-                                "Unnamed employee"}
+                              {client.username}
                             </Option>
                           ))
                         ) : (
@@ -253,21 +186,16 @@ const AddSalary = ({ onClose }) => {
                           className="w-full mt-1"
                           placeholder="Select Currency"
                           onChange={(value) => {
-                            const selectedCurrency = currencies?.data?.find(
-                              (c) => c.id === value
-                            );
-                            form.setFieldValue(
-                              "currency",
-                              selectedCurrency?.currencyCode || ""
-                            );
+                            form.setFieldValue("currency", value);
                           }}
                         >
                           {currencies?.data?.map((currency) => (
-                            <Option key={currency.id} value={currency.id}>
-                              {currency.currencyCode}
-                              ({currency.currencyIcon})
+                            <Option key={currency.id} value={currency.currencyIcon}>
+                              <div className="flex items-center">
+                                <span className="text-lg">{currency.currencyIcon}</span>
+                              </div>
                             </Option>
-                          )) || []}
+                          ))}
                         </Select>
                       )}
                     </Field>
@@ -319,33 +247,27 @@ const AddSalary = ({ onClose }) => {
               <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">Status <span className="text-red-500">*</span></label>
-                  <Select
-                    style={{ width: "100%" }}
-                    placeholder="Select or add new status"
-                    value={values.status}
-                    onChange={(value) => setFieldValue("status", value)}
-                    dropdownRender={(menu) => (
-                      <div>
-                        {menu}
-                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                          <Button
-                            type="link"
-                            icon={<PlusOutlined />}
-                            className="w-full mt-2"
-                            onClick={() => setIsStatusModalVisible(true)}
-                          >
-                            Add New Status
-                          </Button>
-                        </div>
-                      </div>
+                  <Field name="status">
+                    {({ field, form }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-1"
+                        placeholder="Select Status"
+                        onChange={(value) => setFieldValue("status", value)}
+                      >
+                        <Option value="paid">
+                          <div className="flex items-center">
+                            <Badge status="success" text="Paid" />
+                          </div>
+                        </Option>
+                        <Option value="unpaid">
+                          <div className="flex items-center">
+                            <Badge status="error" text="Unpaid" />
+                          </div>
+                        </Option>
+                      </Select>
                     )}
-                  >
-                    {statuses.map((status) => (
-                      <Option key={status.id} value={status.name}>
-                        {status.name}
-                      </Option>
-                    ))}
-                  </Select>
+                  </Field>
                   <ErrorMessage
                     name="status"
                     component="div"
@@ -389,20 +311,6 @@ const AddSalary = ({ onClose }) => {
           </Form>
         )}
       </Formik>
-
-      <Modal
-        title="Add New Status"
-        open={isStatusModalVisible}
-        onCancel={() => setIsStatusModalVisible(false)}
-        onOk={() => handleAddNewStatus("status", newStatus, setNewStatus, setIsStatusModalVisible)}
-        okText="Add Status"
-      >
-        <Input
-          placeholder="Enter new status name"
-          value={newStatus}
-          onChange={(e) => setNewStatus(e.target.value)}
-        />
-      </Modal>
     </div>
   );
 };

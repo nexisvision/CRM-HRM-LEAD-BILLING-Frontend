@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Menu, Input, message, Button, Modal, Select } from "antd";
+import { Card, Table, Menu, Input, message, Button, Modal, Select, Switch, Badge } from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
@@ -29,6 +29,8 @@ import { getBranch } from "../Branch/BranchReducer/BranchSlice";
 import moment from "moment";
 import { MdOutlineEmail } from "react-icons/md";
 import EmailVerification from "views/app-views/company/EmailVerification";
+import { handleSalaryStatusChange } from '../PayRoll/Salary/SalaryList';
+import { editSalaryss, getSalaryss } from '../PayRoll/Salary/SalaryReducers/SalarySlice';
 
 import { Option } from "antd/es/mentions";
 import AddAttendance from "../Attendance/AddAttendance";
@@ -48,8 +50,8 @@ const EmployeeList = () => {
     useState(false);
   const [isViewEmployeeModalVisible, setIsViewEmployeeModalVisible] =
     useState(false);
-    const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
-    const [comnyid, setCompnyid] = useState("");
+  const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
+  const [comnyid, setCompnyid] = useState("");
   const [initialValues, setInitialValues] = useState({ email: '' });
   const [isOtpModalVisible, setIsOtpModalVisible] = useState(false);
   const [otp, setOtp] = useState('');
@@ -77,6 +79,8 @@ const EmployeeList = () => {
 
   // console.log("branchData", branchData);
 
+  const salaryData = useSelector((state) => state.salary?.salary?.data || []);
+
   useEffect(() => {
     dispatch(roledata());
   }, []);
@@ -84,6 +88,7 @@ const EmployeeList = () => {
   useEffect(() => {
     // Fetch all required data
     dispatch(empdata());
+    dispatch(getSalaryss());
     dispatch(getDept());
     dispatch(getDes());
     dispatch(getBranch());
@@ -323,18 +328,18 @@ const EmployeeList = () => {
       ) : null}
 
 
-<Menu.Item>
+      <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
             className="flex items-center gap-2"
-            icon={<MdOutlineEmail/>}
+            icon={<MdOutlineEmail />}
             onClick={() => {
               setIsEmailVerificationModalVisible(true);
               setCompnyid(elm.id);
             }}
             size="small"
-            // style={{ display: "block", marginBottom: "8px" }}
+          // style={{ display: "block", marginBottom: "8px" }}
           >
             <span>Update Email</span>
           </Button>
@@ -342,48 +347,48 @@ const EmployeeList = () => {
       </Menu.Item>
 
       <Menu.Item>
-          <Flex alignItems="center">
-            <Button
-              type=""
-              className=""
-              icon={<EyeOutlined />}
-              // onClick={() => openViewEmployeeModal()}
-              onClick={() => viewfunction(elm.id)}
-              size="small"
-            >
-              <span className="ml-2">View</span>
-            </Button>
-          </Flex>
-        </Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className=""
+            icon={<EyeOutlined />}
+            // onClick={() => openViewEmployeeModal()}
+            onClick={() => viewfunction(elm.id)}
+            size="small"
+          >
+            <span className="ml-2">View</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
 
 
       <Menu.Item>
-          <Flex alignItems="center">
-            <Button
-              type=""
-              className=""
-              icon={<EditOutlined />}
-              onClick={() => handleCheckIn(elm.id)}
-              size="small"
-            >
-              <span className="ml-2">Check In</span>
-            </Button>
-          </Flex>
-        </Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className=""
+            icon={<EditOutlined />}
+            onClick={() => handleCheckIn(elm.id)}
+            size="small"
+          >
+            <span className="ml-2">Check In</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
 
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button
-              type=""
-              className=""
-              icon={<EditOutlined />}
-              onClick={() => handleCheckOut(elm.id)}
-              size="small"
-            >
-              <span className="ml-2">Check Out</span>
-            </Button>
-          </Flex>
-        </Menu.Item>
+      <Menu.Item>
+        <Flex alignItems="center">
+          <Button
+            type=""
+            className=""
+            icon={<EditOutlined />}
+            onClick={() => handleCheckOut(elm.id)}
+            size="small"
+          >
+            <span className="ml-2">Check Out</span>
+          </Button>
+        </Flex>
+      </Menu.Item>
 
 
       {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
@@ -406,6 +411,39 @@ const EmployeeList = () => {
     </Menu>
   );
 
+  // Add this component at the top of the file after the imports
+  const SalaryStatusSwitch = ({ record }) => {
+    const [status, setStatus] = useState(record.salaryStatus || 'unpaid');
+
+    const handleStatusChange = (checked) => {
+      setStatus(checked ? 'paid' : 'unpaid');
+      message.success(`Salary status changed to ${checked ? 'paid' : 'unpaid'}`);
+    };
+
+    return (
+      <div className="flex items-center gap-2">
+        <Switch
+          checked={status === 'paid'}
+          onChange={handleStatusChange}
+          className={status === 'paid' ? 'bg-green-500' : 'bg-red-500'}
+        />
+        <Badge
+          status={status === 'paid' ? 'success' : 'error'}
+          text={status.charAt(0).toUpperCase() + status.slice(1)}
+        />
+      </div>
+    );
+  };
+
+  // Add this function to get salary status for an employee
+  const getEmployeeSalaryStatus = (employeeId) => {
+    const salaryRecord = salaryData.find(
+      salary => salary.employeeId === employeeId && salary.created_by === user
+    );
+    return salaryRecord;
+  };
+
+  // Update your tableColumns to include salary status
   const tableColumns = [
     {
       title: "profilePic",
@@ -487,6 +525,31 @@ const EmployeeList = () => {
       },
     },
     {
+      title: "Salary Status",
+      key: "salaryStatus",
+      render: (_, record) => {
+        const salaryRecord = getEmployeeSalaryStatus(record.id);
+
+        return (
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={salaryRecord?.status === 'paid'}
+              onChange={(checked) => handleEmployeeSalaryStatus(record, checked)}
+              checkedChildren="Paid"
+              unCheckedChildren="Unpaid"
+              disabled={!(whorole === "super-admin" || whorole === "client" || canEditClient)}
+            />
+            <Badge
+              status={salaryRecord?.status === 'paid' ? 'success' : 'error'}
+              text={salaryRecord?.status
+                ? salaryRecord.status.charAt(0).toUpperCase() + salaryRecord.status.slice(1)
+                : 'No Salary'}
+            />
+          </div>
+        );
+      },
+    },
+    {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (
@@ -496,6 +559,22 @@ const EmployeeList = () => {
       ),
     },
   ];
+
+  // Update handleEmployeeSalaryStatus function
+  const handleEmployeeSalaryStatus = (record, checked) => {
+    const salaryRecord = getEmployeeSalaryStatus(record.id);
+
+    if (salaryRecord) {
+      handleSalaryStatusChange(dispatch, salaryRecord, checked)
+        .then(() => {
+          // Refresh both employee and salary data
+          dispatch(empdata());
+          dispatch(getSalaryss());
+        });
+    } else {
+      message.warning('No salary record found for this employee');
+    }
+  };
 
   const handleEmailVerification = (email) => {
     setInitialValues({ email });
@@ -511,13 +590,13 @@ const EmployeeList = () => {
   // Add this handler for OTP verification
   const handleVerifyOTP = () => {
     // Add your OTP verification logic here
-    
+
     // Close the OTP modal
     setIsOtpModalVisible(false);
-    
+
     // Clear the OTP input
     setOtp('');
-    
+
     // Optionally show a success message
     message.success('Email verified successfully');
   };
@@ -525,7 +604,7 @@ const EmployeeList = () => {
   // Add this function to filter employees by branch
   const getFilteredEmployees = () => {
     if (!users) return [];
-    
+
     let filteredData = users;
 
     // Filter by branch
