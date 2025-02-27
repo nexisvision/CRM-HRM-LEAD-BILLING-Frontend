@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Form, Input, Button, message, Col, Row, Card, Select } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { SendOutlined } from '@ant-design/icons';
-import EmailService from './mailService/mailservice.jsx';
 import { sendmailslice } from './mailReducer/mailSlice.jsx';
 import { useDispatch } from 'react-redux';
 
