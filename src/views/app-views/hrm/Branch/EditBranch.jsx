@@ -1,17 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { Formik, Form as FormikForm, Field } from "formik";
-import { Input, Button, Row, Col, message } from "antd";
+import { Formik, Form as FormikForm, Field, ErrorMessage } from "formik";
+import { Input, Button, Row, Col, message, Select } from "antd";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AiFillAndroid } from "react-icons/ai";
 import { editBranch, getBranch } from "./BranchReducer/BranchSlice";
+import { GetUsers } from '../../Users/UserReducers/UserSlice';
+
+const { Option } = Select;
 
 const validationSchema = Yup.object().shape({
   branchName: Yup.string()
-    .required("Department Name is required")
-    .min(2, "Department name must be at least 2 characters")
-    .max(50, "Department name cannot exceed 50 characters"),
+    .required("Branch Name is required")
+    .min(2, "Branch name must be at least 2 characters")
+    .max(50, "Branch name cannot exceed 50 characters"),
+  branchManager: Yup.string()
+    .required("Branch Manager is required")
+    .min(2, "Branch Manager name must be at least 2 characters"),
+  branchAddress: Yup.string()
+    .required("Address is required")
+    .min(5, "Address must be at least 5 characters"),
 });
 
 const EditBranch = ({ idd, onClose }) => {
@@ -20,6 +29,8 @@ const EditBranch = ({ idd, onClose }) => {
 
   const [initialValues, setInitialValues] = useState({
     branchName: "",
+    branchManager: "",
+    branchAddress: "",
   });
 
   const alldata = useSelector((state) => state.Branch);
@@ -27,10 +38,27 @@ const EditBranch = ({ idd, onClose }) => {
 
   const fnddataitem = fnddata.find((item) => item.id === idd);
 
+  const [managers, setManagers] = useState([]);
+
+  useEffect(() => {
+    dispatch(GetUsers())
+      .then((response) => {
+        if (response.payload?.data) {
+          setManagers(response.payload.data);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching users:', error);
+        message.error('Failed to fetch users');
+      });
+  }, [dispatch]);
+
   useEffect(() => {
     if (fnddataitem) {
       setInitialValues({
         branchName: fnddataitem.branchName || "",
+        branchManager: fnddataitem.branchManager || "",
+        branchAddress: fnddataitem.branchAddress || "",
       });
     }
   }, [fnddataitem]);
@@ -81,6 +109,45 @@ const EditBranch = ({ idd, onClose }) => {
                   {errors.branchName && touched.branchName && (
                     <div style={{ color: "red", fontSize: "12px" }}>
                       {errors.branchName}
+                    </div>
+                  )}
+                </div>
+              </Col>
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="font-semibold">Branch Manager <span className="text-red-500">*</span></label>
+                  <Field name="branchManager">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-2"
+                        placeholder="Select Branch Manager"
+                        onChange={(value) => setFieldValue("branchManager", value)}
+                      >
+                        {managers.map((manager) => (
+                          <Option key={manager.id} value={manager.id}>
+                            {manager.username}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage name="branchManager" component="div" className="text-red-500" />
+                </div>
+              </Col>
+              <Col span={12}>
+                <div style={{ marginBottom: "16px" }}>
+                  <label className="font-semibold">Address <span className="text-red-500">*</span></label>
+                  <Field
+                    as={Input}
+                    name="branchAddress"
+                    className="w-full mt-1"
+                    placeholder="Enter Branch Address"
+                    onChange={(e) => setFieldValue("branchAddress", e.target.value)}
+                  />
+                  {errors.branchAddress && touched.branchAddress && (
+                    <div style={{ color: "red", fontSize: "12px" }}>
+                      {errors.branchAddress}
                     </div>
                   )}
                 </div>

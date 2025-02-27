@@ -27,6 +27,7 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { DeleteLea, GetLeave } from "./LeaveReducer/LeaveSlice";
 import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
+import axios from "axios";
 const LeaveList = () => {
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -188,6 +189,29 @@ const LeaveList = () => {
     openViewLeaveModal();
     setEditid(id);
   };
+
+  const functionleaveok = async (id, status) => {
+    const token = localStorage.getItem("auth_token");
+    try {
+        const res = await axios.put(
+            `http://localhost:5353/api/v1/leaves/approve/${id}`,
+            {
+                status: status,
+                remarks: status === "approved" ? "Leave approved." : "Leave rejected."
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+        dispatch(GetLeave());
+        return res.data;
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        throw error; 
+    }
+  }
   const dropdownMenu = (elm) => (
     <Menu>
       {/* <Menu.Item>
@@ -328,8 +352,8 @@ const LeaveList = () => {
             okText: 'Yes',
             okType: 'primary',
             cancelText: 'No',
-            onOk: () => {
-              // Add your approve logic here
+            onOk: async () => {
+              await functionleaveok(record.id, "approved");
               message.success('Leave approved successfully');
             }
           });
@@ -342,12 +366,15 @@ const LeaveList = () => {
             okText: 'Yes',
             okType: 'danger',
             cancelText: 'No',
-            onOk: () => {
-              // Add your reject logic here
+            onOk: async () => {
+              await functionleaveok(record.id, "rejected");
               message.error('Leave rejected');
             }
           });
         };
+
+        // Check if the leave has been approved or rejected
+        const isActionTaken = record.status === "approved" || record.status === "rejected";
 
         return (
           <Flex gap="8px" justifyContent="center">
@@ -358,6 +385,7 @@ const LeaveList = () => {
               onClick={handleApprove}
               className="bg-green-500 hover:bg-green-600"
               title="Approve"
+              disabled={isActionTaken} // Disable if action is taken
             />
             <Button
               type="primary"
@@ -366,6 +394,7 @@ const LeaveList = () => {
               size="small"
               onClick={handleReject}
               title="Reject"
+              disabled={isActionTaken} // Disable if action is taken
             />
           </Flex>
         );

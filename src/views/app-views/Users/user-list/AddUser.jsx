@@ -47,6 +47,8 @@ const AddUser = ({ visible, onClose }) => {
   // Find the role of logged in user
   const userRole = roleData.find(role => role.id === loggedInUser?.role_id);
 
+  const filterdata = roleData.filter((role) => role.created_by == loggedInUser?.username);
+
   // Filter roles based on user's role
   const filteredRoles = roleData.filter(role => {
     if (userRole?.role_name === 'client') {
@@ -200,7 +202,7 @@ const AddUser = ({ visible, onClose }) => {
                       </>
                     )}
                   >
-                    {filteredRoles.map((tag) => (
+                    {filterdata.map((tag) => (
                       <Option key={tag?.id} value={tag?.id}>
                         {tag?.role_name}
                       </Option>

@@ -178,7 +178,6 @@ const AddRole = ({ onClose,resetForm }) => {
             resetForm();
         })
         .catch((error) => {
-            message.error('Failed to add role.');
         });
 };
 

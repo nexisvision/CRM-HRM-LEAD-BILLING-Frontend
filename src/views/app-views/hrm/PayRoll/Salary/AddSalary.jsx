@@ -60,13 +60,19 @@ const AddSalary = ({ onClose }) => {
   const lid = AllLoggedData.loggedInUser.id;
 
   const onSubmit = (values, { resetForm }) => {
-    dispatch(AddSalaryss(values)).then(() => {
+    // Convert netSalary to string
+    const payload = {
+      ...values,
+      netSalary: values.netSalary.toString(),
+    };
+
+    dispatch(AddSalaryss(payload)).then(() => {
       dispatch(getSalaryss());
       onClose();
       resetForm();
       // message.success("salary added successfully");
     });
-    console.log("Submitted values:", values);
+    console.log("Submitted values:", payload);
     // message.success("Job added successfully!");
   };
 
@@ -214,9 +220,15 @@ const AddSalary = ({ onClose }) => {
                   <Field
                     name="salary"
                     as={Input}
-                    type="string"
+                    type="text"
                     className="w-full mt-1"
                     placeholder="Enter Salary Amount"
+                    onChange={(e) => {
+                      const monthlySalary = e.target.value;
+                      setFieldValue("salary", monthlySalary);
+                      const yearlySalary = monthlySalary * 12;
+                      setFieldValue("netSalary", yearlySalary);
+                    }}
                   />
                   <ErrorMessage
                     name="salary"
@@ -232,9 +244,10 @@ const AddSalary = ({ onClose }) => {
                   <Field
                     name="netSalary"
                     as={Input}
-                    type="string"
+                    type="text"
                     className="w-full mt-1"
                     placeholder="Enter Yearly Pay Amount"
+                    readOnly
                   />
                   <ErrorMessage
                     name="netSalary"
