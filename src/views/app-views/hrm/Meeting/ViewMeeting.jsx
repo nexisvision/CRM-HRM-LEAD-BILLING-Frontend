@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 import { message } from 'antd';
+=======
+import {    message } from 'antd';
+>>>>>>> Stashed changes
 import React, { useEffect } from 'react';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
@@ -78,6 +82,7 @@ const ViewMeeting = ({ visible, onClose, meetid }) => {
                 </Text>
             </Row>
 
+<<<<<<< Updated upstream
             <Row style={rowStyle}>
                 <Text style={labelStyle}>Meeting Link</Text>
                 <Text
@@ -90,6 +95,20 @@ const ViewMeeting = ({ visible, onClose, meetid }) => {
                     {alladata.meetingLink}
                 </Text>
             </Row>
+=======
+                <Row style={rowStyle}>
+                    <Text style={labelStyle}>Meeting Link</Text>
+                    <Text 
+                        style={{...valueStyle, cursor: 'pointer', color: '#1890ff'}}
+                        onClick={() => {
+                            navigator.clipboard.writeText(alladata?.meetingLink);
+                            message.success('Meeting link copied to clipboard!');
+                        }}
+                    >
+                        {alladata?.meetingLink}
+                    </Text>
+                </Row>
+>>>>>>> Stashed changes
 
             <Row style={rowStyle}>
                 <Text style={labelStyle}>Description</Text>

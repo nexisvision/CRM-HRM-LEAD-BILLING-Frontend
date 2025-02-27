@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Card, Row, Col, Button, Modal, Input, Form, Select } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Card, Row, Col, Button, Modal, Input, Form, Select, Avatar } from "antd";
+import { PlusOutlined, CalendarOutlined, MessageOutlined, CommentOutlined } from "@ant-design/icons";
 import {
   DndContext,
   useDroppable,
@@ -38,10 +38,83 @@ const DraggableItem = ({ lead, id }) => {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <Card>
-        <h4>{`${lead.firstName} ${lead.lastName}`}</h4>
-        <p>Email: {lead.email}</p>
-        <p>Phone: {lead.phone}</p>
+      <Card 
+        className="cursor-pointer hover:shadow-md transition-all relative overflow-hidden"
+        bodyStyle={{ padding: '8px' }}
+      >
+        <div 
+          className="absolute left-0 top-0 bottom-0 w-1" 
+          style={{ 
+            backgroundColor: '#1677ff',  // Ant Design's primary blue
+            content: '""',
+            position: 'absolute',
+            left: 0,
+            top: '-1px',  // Extend slightly above
+            bottom: '-1px',  // Extend slightly below
+            width: '4px',  // Slightly thicker
+          }} 
+        />
+        
+        <div className="pl-2"> {/* Increased padding to account for thicker line */}
+          <div className="flex justify-between items-start">
+            <div>
+              <h4 className="text-lg font-medium mb-2">{lead.leadTitle}</h4>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center text-gray-500 text-sm mt-1">
+                  <CalendarOutlined className="mr-1" />
+                  {new Date(lead.createdAt).toLocaleDateString('en-US', {
+                    day: 'numeric',
+                    month: 'short'
+                  })}
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center text-gray-500 text-sm mt-1">
+                    <CommentOutlined className="mr-1" />
+                    {lead.commentCount || 1}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* <div className="mt-2">
+              <Avatar.Group>
+                <Avatar 
+                  size="small"
+                  src={lead.assigned?.profilePicture || "https://www.gravatar.com/avatar/?d=mp"}
+                  alt={lead.assigned?.name || "User Avatar"}
+                />
+                <Avatar 
+                  size="small"
+                  src="https://www.gravatar.com/avatar/?d=mp"
+                  alt="Team Member"
+                />
+                <Avatar 
+                  size="small"
+                  src="https://www.gravatar.com/avatar/?d=mp"
+                  alt="Team Member"
+                />
+              </Avatar.Group>
+            </div> */}
+          </div>
+          <div className="mt-2">
+            <Avatar.Group size={20}>
+              <Avatar 
+                className="w-10 h-10"
+                src={lead.assigned?.profilePicture || "https://www.gravatar.com/avatar/?d=mp"}
+                alt={lead.assigned?.name || "User Avatar"}
+              />
+              <Avatar
+                className="w-5 h-5" 
+                src="https://www.gravatar.com/avatar/?d=mp"
+                alt="Team Member"
+              />
+              <Avatar
+                className="w-5 h-5"
+                src="https://www.gravatar.com/avatar/?d=mp"
+                alt="Team Member"
+              />
+            </Avatar.Group>
+          </div>
+        </div>
       </Card>
     </div>
   );
@@ -280,7 +353,7 @@ const LeadCards = () => {
               <Col xs={24} sm={12} md={8} lg={6} key={leadGroup?.stageId}>
                 <Card title={leadGroup?.status} className="mb-4">
                   <DroppableColumn
-                    status={leadGroup?.status}
+                    // status={leadGroup?.status}
                     leads={leadGroup?.leads || []}
                   />
                 </Card>

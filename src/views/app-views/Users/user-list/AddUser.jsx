@@ -6,8 +6,8 @@ import * as Yup from 'yup';
 import { AddUserss, GetUsers } from "../UserReducers/UserSlice"; // Custom Redux actions
 import { roledata } from "views/app-views/hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice"; // Role data action
 import axios from "axios";
-import { KeyOutlined, ToTopOutlined } from "@ant-design/icons";
- // Axios for HTTP requests
+import { KeyOutlined, ReloadOutlined, SyncOutlined, ToTopOutlined, PlusOutlined } from "@ant-design/icons";
+import AddRole from "views/app-views/hrm/RoleAndPermission/Role/AddRole";
 
 const { Option } = Select;
 
@@ -34,6 +34,7 @@ const initialValues = {
 const AddUser = ({ visible, onClose }) => {
   const dispatch = useDispatch();
   const [showOtpModal, setShowOtpModal] = useState(false);
+  const [showRoleModal, setShowRoleModal] = useState(false);
   const [otpToken, setOtpToken] = useState(null);
   const [otp, setOtp] = useState("");
 
@@ -57,9 +58,7 @@ const AddUser = ({ visible, onClose }) => {
     }
   });
 
-  const 
-  
-  generatePassword = () => {
+  const generatePassword = () => {
     const length = 8;
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let password = "";
@@ -187,6 +186,19 @@ const AddUser = ({ visible, onClose }) => {
                     placeholder="Select Role"
                     onChange={(value) => setFieldValue('role_id', value)}
                     status={errors.role_id && touched.role_id ? 'error' : ''}
+                    dropdownRender={(menu) => (
+                      <>
+                        {menu}
+                        <Button 
+                          type="link" 
+                          block
+                          // icon={<PlusOutlined />}
+                          onClick={() => setShowRoleModal(true)}
+                        >
+                          + Add New Role
+                        </Button>
+                      </>
+                    )}
                   >
                     {filteredRoles.map((tag) => (
                       <Option key={tag?.id} value={tag?.id}>
@@ -213,7 +225,7 @@ const AddUser = ({ visible, onClose }) => {
                       className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
                       onClick={() => setFieldValue("password", generatePassword())}
                     >
-                     <ToTopOutlined/>
+                     <ReloadOutlined/>
                     </Button>
                   </div>
                   <ErrorMessage
@@ -273,6 +285,23 @@ const AddUser = ({ visible, onClose }) => {
             Verify OTP
           </Button>
         </div>
+      </Modal>
+
+      {/* Role Modal */}
+      <Modal
+        title="Add Role"
+        visible={showRoleModal}
+        onCancel={() => setShowRoleModal(false)}
+        footer={null}
+        width={1000}
+        style={{ top: 20 }}
+      >
+        <AddRole
+          onClose={() => {
+            setShowRoleModal(false);
+            dispatch(roledata()); // Refresh roles after adding
+          }}
+        />
       </Modal>
     </div>
   );

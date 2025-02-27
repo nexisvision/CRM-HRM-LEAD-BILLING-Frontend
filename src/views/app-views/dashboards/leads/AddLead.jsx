@@ -531,7 +531,7 @@ const currenciesState = useSelector((state) => state.currencies);
                 </div>
               </Col>
 
-              <Col span={24} className="mt-3">
+              {/* <Col span={24} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold flex">
                     Status <h1 className="text-rose-500"> *</h1>
@@ -566,6 +566,39 @@ const currenciesState = useSelector((state) => state.currencies);
                             {status.name}
                           </Option>
                         ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="status"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col> */}
+
+
+              <Col span={24}>
+                <div className="form-item mt-3">
+                  <label className="font-semibold flex">
+                    Status <h1 className="text-rose-500">*</h1>
+                  </label>
+                  <Field name="status">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-1"
+                        placeholder="Select status"
+                        onChange={(value) => setFieldValue("status", value)}
+                        value={values.status}
+                        onBlur={() => setFieldTouched("status", true)}
+                      >
+                        <Option value="New">New</Option>
+                        <Option value="In Progress">In Progress</Option>
+                        <Option value="Qualified">Qualified</Option>
+                        <Option value="Unqualified">Unqualified</Option>
+                        <Option value="Won">Won</Option>
+                        <Option value="Lost">Lost</Option>
                       </Select>
                     )}
                   </Field>
