@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { Select, Button, message, Col, Input } from "antd";
+import { Select, Button, message, Col, Input, Row } from "antd";
 import axios from "axios";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -77,150 +77,161 @@ const AddAllowance = ({ id, onClose}) => {
       >
         {({ errors, touched, setFieldValue, values }) => (
           <Form className="formik-form">
-            <Col span={24} className="mt-4">
-              <div className="form-item">
-                <label className="font-semibold">employee<span className="text-red-500">*</span></label>
-                <Field name="employeeId">
-                  {({ field }) => (
-                    <Select
-                      {...field}
-                      className="w-full mt-1"
-                      placeholder="Select Employee"
-                      onChange={(value) => setFieldValue("employeeId", value)}
-                      value={values.employeeId}
-                    >
-                      {filteredEmployees && filteredEmployees.length > 0 ? (
-                        filteredEmployees.map((employee) => (
-                          <Option key={employee.id} value={employee.id}>
-                            {employee.firstName ||
-                              employee.username ||
-                              "Unnamed employee"}
+            <Row gutter={16}>
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="block mb-2">Employee<span className="text-red-500">*</span></label>
+                  <Field name="employeeId">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full "
+                        placeholder="Select Employee"
+                        onChange={(value) => setFieldValue("employeeId", value)}
+                        value={values.employeeId}
+                      >
+                        {filteredEmployees && filteredEmployees.length > 0 ? (
+                          filteredEmployees.map((employee) => (
+                            <Option key={employee.id} value={employee.id}>
+                              {employee.firstName ||
+                                employee.username ||
+                                "Unnamed employee"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Employee Available
                           </Option>
-                        ))
-                      ) : (
-                        <Option value="" disabled>
-                          No Employee Available
-                        </Option>
-                      )}
-                    </Select>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="employeeId"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12}>
+                <div className="form-item">
+                  <label className="block mb-2">Allowance Option <span className="text-red-500">*</span></label>
+                  <Select
+                    placeholder="Select Allowance Option"
+                    value={values.allowanceOption}
+                    className="w-full"
+                    onChange={(value) => setFieldValue("allowanceOption", value)}
+                  >
+                    <Option value="transportation">Transportation Allowance</Option>
+                    <Option value="education">Education or Training Allowance</Option>
+                    <Option value="health">Health and Wellness Allowance</Option>
+                  </Select>
+                  {errors.allowanceOption && touched.allowanceOption && (
+                    <div className="text-red-500 text-sm mt-1">{errors.allowanceOption}</div>
                   )}
-                </Field>
-                <ErrorMessage
-                  name="employeeId"
-                  component="div"
-                  className="error-message text-red-500 my-1"
-                />
-              </div>
-            </Col>
+                </div>
+              </Col>
 
-            <div className="form-group">
-              <label className="mt-2">Allowance Option <span className="text-red-500">*</span></label>
-              <Select
-                placeholder="Select Allowance Option"
-                value={values.allowanceOption}
-                className="w-full mt-1"
-                onChange={(value) => setFieldValue("allowanceOption", value)}
-                style={{ width: "100%" }}
-              >
-                <Option value="transportation">Transportation Allowance</Option>
-                <Option value="education">
-                  Education or Training Allowance
-                </Option>
-                <Option value="health">Health and Wellness Allowance</Option>
-              </Select>
-              {errors.allowanceOption && touched.allowanceOption && (
-                <div className="error-message">{errors.allowanceOption}</div>
-              )}
-            </div>
+              <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="block mb-2">Title <span className="text-red-500">*</span></label>
+                  <Field name="title">
+                    {({ field }) => <Input {...field} placeholder="Enter Title" />}
+                  </Field>
+                  <ErrorMessage
+                    name="title"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+              </Col>
 
-            <div>
-              <label className="mt-2">Title <span className="text-red-500">*</span></label>
-              <Field name="title">
-                {({ field }) => <Input {...field} placeholder="Enter Title" />}
-              </Field>
-              <ErrorMessage
-                name="title"
-                component="div"
-                className="text-red-500"
-              />
-            </div>
+              <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="block mb-2">Type <span className="text-red-500">*</span></label>
+                  <Select
+                    placeholder="Select Type"
+                    className="w-full"
+                    value={values.type}
+                    onChange={(value) => setFieldValue("type", value)}
+                  >
+                    <Option value="fixed">Fixed</Option>
+                    <Option value="percentage">Percentage</Option>
+                  </Select>
+                  {errors.type && touched.type && (
+                    <div className="text-red-500 text-sm mt-1">{errors.type}</div>
+                  )}
+                </div>
+              </Col>
 
-            <div className="form-group">
-                <label className="mt-2">Type <span className="text-red-500">*</span></label>
-              <Select
-                placeholder="Select Type"
-                className="w-full mt-1"
-                value={values.type}
-                onChange={(value) => setFieldValue("type", value)}
-                style={{ width: "100%" }}
-              >
-                <Option value="fixed">Fixed</Option>
-                <Option value="percentage">Percentage</Option>
-              </Select>
-              {errors.type && touched.type && (
-                <div className="error-message">{errors.type}</div>
-              )}
-            </div>
-
-            <Col span={24} className="mt-4">
-              <div className="form-item">
-                <label className="font-semibold">currency <span className="text-red-500">*</span></label>
-                <Field name="currency">
-                  {({ field }) => (
-                    <Select
-                      {...field}
-                      className="w-full mt-1"
-                      placeholder="Select Currency"
-                      onChange={(value) => setFieldValue("currency", value)}
-                      value={values.currency}
-                    >
-                      {fnddatass && fnddatass?.length > 0 ? (
-                        fnddatass?.map((client) => (
-                          <Option key={client.id} value={client?.id}>
-                               {client?.currencyCode}
-                               ({client?.currencyIcon})
-                             
+              <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="block mb-2">Currency <span className="text-red-500">*</span></label>
+                  <Field name="currency">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full"
+                        placeholder="Select Currency"
+                        onChange={(value) => setFieldValue("currency", value)}
+                        value={values.currency}
+                      >
+                        {fnddatass && fnddatass?.length > 0 ? (
+                          fnddatass?.map((client) => (
+                            <Option key={client.id} value={client?.id}>
+                              {client?.currencyCode} ({client?.currencyIcon})
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            {/* No Clients Available */}
                           </Option>
-                        ))
-                      ) : (
-                        <Option value="" disabled>
-                          {/* No Clients Available */}
-                        </Option>
-                      )}
-                    </Select>
-                  )}
-                </Field>
-                <ErrorMessage
-                  name="currency"
-                  component="div"
-                  className="error-message text-red-500 my-1"
-                />
-              </div>
-            </Col>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="currency"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+              </Col>
 
-           
-            <div>
-              <label className="mt-2">Amount <span className="text-red-500">*</span></label>
-              <Field name="amount">
-                {({ field }) => <Input {...field} placeholder="Enter Amount" type="number" />}
-              </Field>
-              <ErrorMessage
-                name="amount"
-                component="div"
-                className="text-red-500"
-              />
-            </div>
+              <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="block mb-2">Amount <span className="text-red-500">*</span></label>
+                  <Field name="amount">
+                    {({ field }) => <Input {...field} placeholder="Enter Amount" type="number" />}
+                  </Field>
+                  <ErrorMessage
+                    name="amount"
+                    component="div"
+                    className="text-red-500 text-sm mt-1"
+                  />
+                </div>
+              </Col>
+            </Row>
 
-            <Button type="primary" htmlType="submit" onClick={onClose} className="mt-4" >
-             Submit
+            <Button 
+              type="primary" 
+              htmlType="submit" 
+              onClick={onClose} 
+              className="mt-4 mb-0"
+            >
+              Submit
             </Button>
           </Form>
         )}
       </Formik>
 
       <style jsx>{`
+        .allowance {
+          padding-bottom: 0;
+        }
         .formik-form {
-          max-width: 600px;
+          margin-bottom: 0;
         }
         .form-group {
           margin-bottom: 20px;

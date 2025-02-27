@@ -128,42 +128,18 @@ const SalaryList = () => {
   const dropdownMenu = (record) => (
     <Menu>
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) && (
-        <>
-          <Menu.Item key="setSalary">
-            <Button
-              type="text"
-              className="w-full text-left flex items-center gap-2"
-              onClick={() => openSetSalaryModall(record.employeeId)}
-            >
-              <EyeOutlined className="text-blue-600" />
-              <span>Set Salary</span>
-            </Button>
-          </Menu.Item>
-        </>
+        <Menu.Item>
+          <span onClick={() => openSetSalaryModall(record.employeeId)}>
+            <EyeOutlined /> Set Salary
+          </span>
+        </Menu.Item>
       )}
-
+      
       {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) && (
-        <Menu.Item key="delete">
-          <Button
-            type="text"
-            className="w-full text-left flex items-center gap-2 text-red-600 hover:text-red-500"
-            onClick={() => {
-              Modal.confirm({
-                title: 'Delete Salary Record',
-                content: 'Are you sure you want to delete this salary record?',
-                okText: 'Yes',
-                okType: 'danger',
-                cancelText: 'No',
-                onOk: () => {
-                  deleteUser(record.id);
-                  message.success('Salary record deleted successfully');
-                }
-              });
-            }}
-          >
-            <DeleteOutlined />
-            <span>Delete</span>
-          </Button>
+        <Menu.Item>
+          <span onClick={() => deleteUser(record.id)}>
+            <DeleteOutlined /> Delete
+          </span>
         </Menu.Item>
       )}
     </Menu>
@@ -171,7 +147,7 @@ const SalaryList = () => {
 
   const tableColumns = [
     {
-      title: "salary",
+      title: "Salary Per Month",
       dataIndex: "salary",
     },
     {
@@ -179,7 +155,7 @@ const SalaryList = () => {
       dataIndex: "payslipType",
     },
     {
-      title: "netSalary",
+      title: "Yearly Package",
       dataIndex: "netSalary",
     },
     {
