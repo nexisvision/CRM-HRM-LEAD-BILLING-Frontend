@@ -4,16 +4,47 @@ import { Card, Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal }
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import NumberFormat from 'react-number-format';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { getAllPayment } from "../paymentReducer/PaymentSlice";
 
 function ProductSummaryList({ billingId }) {
     const [billingData, setBillingData] = useState([]);
     const [totals, setTotals] = useState({
-        subtotal: 0,
         discount: 0,
         tax: 0,
-        total: 0
+        total: 0,
+        amount: 0,
+        updated_total: 0
     });
+    
+    const dispatch = useDispatch();
+    const payments = useSelector((state) => state.payment?.payment || []);
+
+    useEffect(() => {
+        dispatch(getAllPayment());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (billingId && payments.length > 0) {
+            // Filter payments for current billing
+            const currentBillingPayments = payments.filter(
+                payment => payment.bill === billingId  // Changed from billing_id to bill to match API data
+            );
+
+            // Calculate total paid amount for this billing
+            const totalPaidAmount = currentBillingPayments.reduce(
+                (sum, payment) => sum + Number(payment.amount || 0), 
+                0
+            );
+
+            // Update totals with the paid amount
+            setTotals(prev => ({
+                ...prev,
+                amount: totalPaidAmount,
+                updated_total: prev.total - totalPaidAmount // Calculate remaining amount
+            }));
+        }
+    }, [billingId, payments]);
 
     // Get billing data from Redux store
     const allBillingItems = useSelector((state) => state.salesbilling?.salesbilling?.data || []);
@@ -148,7 +179,7 @@ function ProductSummaryList({ billingId }) {
             title: "GST Name",
             dataIndex: "tax_name",
             key: "tax_name",
-            render: (tax_name) => tax_name || 'N/A'
+            render: (tax_name) => tax_name || '--'
         },
         {
             title: "Amount",
@@ -184,8 +215,8 @@ function ProductSummaryList({ billingId }) {
 
                     {/* Summary Section */}
                     <div className="d-flex justify-content-end mb-3">
-                        <div className="text-center">
-                            <div className="border-bottom">
+                        <div className="text-left">
+                            <div>
                                 <p className="mb-2">
                                     <span className='font-weight-semibold'>Sub-Total : </span>
                                     <NumberFormat
@@ -214,8 +245,8 @@ function ProductSummaryList({ billingId }) {
                                     />
                                 </p>
                             </div>
-                            <h2 className=" mt-3">
-                                <span className="mr-1 font-weight-semibold">Final Total: </span>
+                            <h2 className="mt-2">
+                                <span className="font-weight-semibold"> Total: </span>
                                 <NumberFormat
                                     displayType="text"
                                     value={totals.total}
@@ -223,6 +254,38 @@ function ProductSummaryList({ billingId }) {
                                     thousandSeparator={true}
                                 />
                             </h2>
+                            <div className=" mt-2">
+                                <p className="mb-2">
+                                    <span className='font-weight-semibold'>Paid : </span>
+                                    <NumberFormat
+                                        displayType="text"
+                                        value={totals.amount}
+                                        prefix="₹"
+                                        thousandSeparator={true}
+                                        // className="text-success"  // Added success color for paid amount
+                                    />
+                                </p>
+                                <p className="mb-2 border-bottom">
+                                    <span className='font-weight-semibold'>Debit Note : </span>
+                                    <NumberFormat
+                                        displayType="text"
+                                        value={totals.amount}
+                                        prefix="₹"
+                                        thousandSeparator={true}
+                                        // className={totals.updated_total > 0 ? "text-danger" : "text-success"}  // Added conditional color
+                                    />
+                                </p>
+                                <p>
+                                    <span className='font-weight-semibold'>Due : </span>
+                                    <NumberFormat
+                                        displayType="text"
+                                        value={totals.updated_total}
+                                        prefix="₹"
+                                        thousandSeparator={true}
+                                        // className={totals.updated_total > 0 ? "text-danger" : "text-success"}  // Added conditional color
+                                    />
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>

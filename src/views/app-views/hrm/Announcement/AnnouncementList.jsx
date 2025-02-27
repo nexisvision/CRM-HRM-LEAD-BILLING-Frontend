@@ -148,6 +148,14 @@ const AnnouncementList = () => {
         }
       }, [tabledata]);
 
+  // Function to strip HTML tags from text
+  const stripHtmlTags = (html) => {
+    if (!html) return '';
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  };
+
   // Convert dropdownMenu to a regular function
   const dropdownMenu = (elm) => (
     <Menu>
@@ -205,17 +213,18 @@ const AnnouncementList = () => {
 
   const tableColumns = [
     {
-      title: 'Titile',
+      title: 'Title',
       dataIndex: 'title',
       sorter: {
-        compare: (a, b) => a.intime.title - b.intime.title,
+        compare: (a, b) => a.title.localeCompare(b.title),
       },
     },
     {
       title: 'Description',
       dataIndex: 'description',
+      render: (text) => stripHtmlTags(text),
       sorter: {
-        compare: (a, b) => a.description.length - b.description.length,
+        compare: (a, b) => stripHtmlTags(a.description).localeCompare(stripHtmlTags(b.description)),
       },
     },
     {

@@ -3,23 +3,28 @@ import { useDispatch, useSelector } from 'react-redux';
 import Qr from '../../../../../../assets/svg/Qr.png';
 import { Getcus } from '../../customer/CustomerReducer/CustomerSlice';
 
-const BillInformationList = () => {
+const BillInformationList = ({ billingId }) => {
     const dispatch = useDispatch();
     const [customerData, setCustomerData] = useState(null);
     
     // Get data from Redux store
-    const billingData = useSelector((state) => state?.salesbilling?.salesbilling?.data);
+    const billingData = useSelector((state) => state?.salesbilling?.salesbilling?.data || []);
     const customers = useSelector((state) => state?.customers?.customers?.data);
     const loggedInUser = useSelector((state) => state?.user?.loggedInUser);
     const payments = useSelector((state) => state?.payment?.payment || []); // Get payments data
 
+    // Find the selected bill using billingId
+    const selectedBill = Array.isArray(billingData) 
+        ? billingData.find(bill => bill.id === billingId)
+        : null;
+
     // Calculate payment status
     const calculatePaymentStatus = () => {
-        if (!billingData || !payments) return 'Pending';
+        if (!selectedBill || !payments) return 'Pending';
 
         // Get all payments for this bill
         const billPayments = payments.filter(
-            payment => payment.bill === billingData.id
+            payment => payment.bill === selectedBill.id
         );
 
         // Calculate total paid amount
@@ -29,7 +34,7 @@ const BillInformationList = () => {
         );
 
         // Compare with bill total
-        const billTotal = parseFloat(billingData.total);
+        const billTotal = parseFloat(selectedBill.total);
         
         if (totalPaid >= billTotal) {
             return 'Paid';
@@ -50,16 +55,16 @@ const BillInformationList = () => {
 
     // Find and set customer data when billing data and customers are available
     useEffect(() => {
-        if (billingData && customers && customers.length > 0) {
+        if (selectedBill && customers && customers.length > 0) {
             const foundCustomer = customers.find(
-                customer => String(customer._id) === String(billingData.customer_id)
+                customer => String(customer._id) === String(selectedBill.customer_id)
             );
             
             if (foundCustomer) {
                 setCustomerData(foundCustomer);
             }
         }
-    }, [billingData, customers]);
+    }, [selectedBill, customers]);
 
     // Parse billing address safely
     const billingAddress = React.useMemo(() => {
@@ -76,22 +81,43 @@ const BillInformationList = () => {
 
     const cleanStreet = billingAddress?.street ? billingAddress.street.replace(/<\/?p>/g, '') : '';
 
+    // Function to get status badge style
+    const getStatusBadgeStyle = (status) => {
+        switch (status?.toLowerCase()) {
+            case 'paid':
+                return 'bg-green-100 text-green-800';
+            case 'partially_paid':
+                return 'bg-orange-100 text-orange-800';
+            case 'draft':
+                return 'bg-gray-100 text-gray-800';
+            default:
+                return 'bg-gray-100 text-gray-600';
+        }
+    };
+
+    // Function to format status text
+    const formatStatusText = (status) => {
+        if (!status) return 'N/A';
+        return status
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+    };
+
+    console.log("Current Bill Status:", selectedBill?.bill_status); // Debug log
+
     return (
         <div className="">
             <div className="p-4">
-                {/* Header */}
-                <div className="flex justify-between items-start border-b pb-4 mb-4">
+                {/* Header with Bill Number and Status */}
+                <div className="flex justify-between items-center border-b pb-4 mb-4">
                     <div>
                         <h2 className="text-xl font-bold text-gray-800">Bill</h2>
-                        <p className="text-sm text-gray-600 mt-1">
-                            Date: {billingData?.createdAt ? new Date(billingData.createdAt).toLocaleDateString() : 'N/A'}
-                        </p>
                     </div>
                     <div className="text-right">
-                        <p className="text-sm text-gray-600">Bill Number</p>
                         <p className="text-lg font-semibold text-gray-800">
-                            #{billingData?.billNumber || 'N/A'}
-                        </p>
+                            {selectedBill?.billNumber || 'N/A'}
+                        </p>   
                     </div>
                 </div>
 
@@ -122,17 +148,11 @@ const BillInformationList = () => {
                                     <span className="font-weight-semibold">GSTIN: </span>
                                     {loggedInUser?.gstin || 'N/A'}
                                 </span><br />
-                                {/* <p className={`text-sm font-semibold ${paymentStatus === 'Paid' ? 'text-green-600' :
-                                        paymentStatus === 'Partially Paid' ? 'text-orange-600' :
-                                            'text-red-600'
-                                    }`}>
-                                    Status: {paymentStatus}
-                                </p> */}
                                 <span>
-                                    <span className="font-weight-semibold">Bill Status: </span>
-                                    <p >
-                                        { billingData?.bill_status || 'N/A'}
-                                    </p>
+                                    <span className="font-weight-semibold">Bill Status: </span><br/>
+                                    <span className={`px-2 py-1 mt-1 rounded-lg text-sm ${getStatusBadgeStyle(selectedBill?.bill_status)}`}>
+                                        {formatStatusText(selectedBill?.bill_status)}
+                                    </span>
                                 </span>
                             </p>
                         </address>
@@ -146,10 +166,6 @@ const BillInformationList = () => {
                                 <span>
                                     <span className='font-weight-semibold'>Name: </span>
                                     {customerData?.name || 'N/A'}
-                                </span><br />
-                                <span>
-                                    <span className='font-weight-semibold'>Customer Number: </span>
-                                    {customerData?.customerNumber || 'N/A'}
                                 </span><br />
                                 <span>
                                     <span className='font-weight-semibold'>Address: </span>

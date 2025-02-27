@@ -255,9 +255,20 @@ const MeetingList = () => {
 
 
     {
-      title: 'Meeting Time',
+      title: 'Start Time',
       dataIndex: 'startTime',
-      sorter: (a, b) => utils.antdTableSorter(a, b, 'name')
+      render: (startTime) => {
+        return startTime ? dayjs(`2000-01-01 ${startTime}`).format('h:mm A') : '-';
+      },
+      sorter: (a, b) => utils.antdTableSorter(a, b, 'startTime')
+    },
+    {
+      title: 'End Time',
+      dataIndex: 'endTime',
+      render: (endTime) => {
+        return endTime ? dayjs(`2000-01-01 ${endTime}`).format('h:mm A') : '-';
+      },
+      sorter: (a, b) => utils.antdTableSorter(a, b, 'endTime')
     },
     {
       title: 'Action',

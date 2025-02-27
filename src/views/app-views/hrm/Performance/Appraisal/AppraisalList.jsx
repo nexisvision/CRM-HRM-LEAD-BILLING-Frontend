@@ -264,7 +264,7 @@ useEffect(() => {
       title: 'Overall Rating',
       dataIndex: 'overallRating',
       key: 'overallRating',
-      render: (rating) => <Rate disabled defaultValue={rating} />,
+      // render: (rating) => <Rate disabled defaultValue={rating} />,
       sorter: {
         compare: (a, b) => a.overallRating - b.overallRating,
       },
@@ -274,7 +274,7 @@ useEffect(() => {
           title: 'Business Process',
           dataIndex: 'businessProcess',
           key: 'businessProcess',
-          render: (rating) => <Rate disabled defaultValue={rating} />,
+          // render: (rating) => <Rate disabled defaultValue={rating} />,
           sorter: {
             compare: (a, b) => a.businessProcess - b.businessProcess,
           },
@@ -283,7 +283,7 @@ useEffect(() => {
           title: 'Oral Communication',
           dataIndex:'oralCommunication',
           key: 'oralCommunication',
-          render: (rating) => <Rate disabled defaultValue={rating} />,
+          // render: (rating) => <Rate disabled defaultValue={rating} />,
           sorter: {
             compare: (a, b) => a.oralCommunication - b.oralCommunication,
           },
@@ -293,7 +293,7 @@ useEffect(() => {
           title: 'Leadership',
           dataIndex: 'leadership',
           key: 'leadership',
-          render: (rating) => <Rate disabled defaultValue={rating} />,
+          // render: (rating) => <Rate disabled defaultValue={rating} />,
           sorter: {
             compare: (a, b) => a.leadership - b.leadership,
           },
@@ -303,7 +303,7 @@ useEffect(() => {
           title: 'Project Management',
           dataIndex: 'projectManagement',
           key: 'projectManagement',
-          render: (rating) => <Rate disabled defaultValue={rating} />,
+          // render: (rating) => <Rate disabled defaultValue={rating} />,
           sorter: {
             compare: (a, b) => a.projectManagement - b.projectManagement,
           },
@@ -312,7 +312,7 @@ useEffect(() => {
           title: 'Allocating Resources',
           dataIndex: 'allocatingResources',
           key: 'allocatingResources',
-          render: (rating) => <Rate disabled defaultValue={rating} />,
+          // render: (rating) => <Rate disabled defaultValue={rating} />,
           sorter: {
             compare: (a, b) => a.allocatingResources - b.allocatingResources,
           },

@@ -157,12 +157,12 @@ const MonthlyRevenueCard = () => {
               Last 12 Months Overview
             </p>
           </div>
-          <Button 
+          {/* <Button 
             icon={<DownloadOutlined />}
             className="flex items-center gap-2"
           >
             Download Report
-          </Button>
+          </Button> */}
         </div>
 
         {/* Client Stats */}
@@ -204,6 +204,8 @@ const DashboardList = () => {
   const [clientdata, setclientdata] = useState("");
   const [plan, setPlan] = useState("");
   const [users, setUsers] = useState([]);
+  const planSales = useSelector((state) => state?.Plan?.planSales || []);
+  const plans = useSelector((state) => state?.Plan?.Plan || []);
 
   useEffect(() => {
     dispatch(ClientData());
@@ -224,7 +226,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
 
   const allticket = useSelector((state) => state.Ticket);
   const fnddataticket = allticket.Ticket.data;
-
+  const subscriptions = useSelector((state) => state?.subplan?.subplan?.data || []);
 
   
   const alldatas = useSelector((state) => state.subplan);
@@ -424,22 +426,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
       dueDate: "Wed 14 Feb 2024",
     },
   ]);
-  const data = [
-    { date: "29-Dec", income: 100 },
-    { date: "30-Dec", income: 200 },
-    { date: "31-Dec", income: 300 },
-    { date: "01-Jan", income: 400 },
-    { date: "02-Jan", income: 500 },
-    { date: "03-Jan", income: 450 },
-    { date: "04-Jan", income: 350 },
-    { date: "05-Jan", income: 250 },
-    { date: "06-Jan", income: 300 },
-    { date: "07-Jan", income: 350 },
-    { date: "08-Jan", income: 400 },
-    { date: "09-Jan", income: 500 },
-    { date: "10-Jan", income: 400 },
-    { date: "11-Jan", income: 300 },
-  ];
+  
 
   const chartData = {
     labels: planNames, // Dynamically setting labels
@@ -451,12 +438,6 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
       },
     ],
   };
-  // State for managing profile data
-  const [openTasks, setOpenTasks] = useState(4);
-  const [projects, setProjects] = useState(2);
-  const [pendingTasks, setPendingTasks] = useState(4);
-  const [overdueTasks, setOverdueTasks] = useState(4);
-  const [expenses, setExpenses] = useState(0);
 
  
 
@@ -493,6 +474,33 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
 
   
 
+  // Calculate plan sales statistics
+  const calculatePlanStats = () => {
+    if (!plans.length || !subscriptions.length) return {
+      totalSales: 0,
+      totalRevenue: 0,
+      planBreakdown: []
+    };
+
+    const planStats = plans.map(plan => {
+      const planSales = subscriptions.filter(sub => sub.plan_id === plan.id);
+      return {
+        planId: plan.id,
+        planName: plan.name,
+        salesCount: planSales.length,
+        revenue: planSales.length * parseFloat(plan.price || 0)
+      };
+    });
+
+    return {
+      totalSales: subscriptions.length,
+      totalRevenue: planStats.reduce((total, plan) => total + plan.revenue, 0),
+      planBreakdown: planStats
+    };
+  };
+
+  const planStats = calculatePlanStats();
+
   return (
     <div className="p-2 bg-gray-50">
       <div className="flex justify-between items-center mb-6">
@@ -504,39 +512,39 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         {/* Yearly Revenue Card */}
-        {/* <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-lg text-gray-700 font-medium mb-4">Total Yearly Revenue</h2>
-          <div className="flex items-center gap-3">
-            <span className="text-3xl font-bold text-[#1b2559]">
-              ${calculateYearlyTotal().toLocaleString()}
-            </span>
-            <span className="text-green-500 flex items-center font-bold text-lg">
-              Yearly
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
-              </svg>
-            </span>
-          </div>
-          <p className="text-gray-500 text-sm mt-2">Total value of all plans (yearly)</p>
-        </div> */}
+        
 
         {/* Plan Card */}
-       
-          <div className="bg-white p-6 rounded-lg shadow">
-        <h2 className="text-lg text-gray-700 font-medium mb-4">Plan</h2>
-        <div className="flex items-center gap-3">
-          <span className="text-3xl font-bold text-[#1b2559]">
-            ${calculateTotalPlanAmount().toLocaleString()}
-          </span>
-          <span className="text-green-500 flex items-center font-bold text-lg">
-          Yearly
-            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-              <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
-            </svg>
-          </span>
+        <div className="bg-white p-6 rounded-lg shadow">
+          <h2 className="text-lg text-gray-700 font-medium mb-4">Plan Sales</h2>
+          <div className="flex items-center gap-3">
+            <span className="text-3xl font-bold text-[#1b2559]">
+              ${planStats.totalRevenue.toLocaleString()}
+            </span>
+            <div className="flex flex-col">
+              <span className="text-green-500 flex items-center font-bold text-lg">
+                  {(planStats.totalSales * 0.01).toFixed(2)}%
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
+                </svg>
+              </span>
+            </div>
+          </div>
+          <div className="mt-2 space-y-3">
+              {planStats.planBreakdown.map(plan => (
+                <div key={plan.planId} className="flex flex-col">
+                  <div className="flex items-center space-x-4">
+                    <span className="text-sm font-bold text-gray-500">{plan.salesCount}
+                      <span className="text-sm text-gray-500"> sales</span>
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-500">{plans.length} active plans</span>
+                  </div>
+                </div>
+              ))}
+          </div>
         </div>
-        <p className="text-gray-500 text-sm mt-2">Total value of all plans</p>
-      </div>
 
         {/* Companies Card */}
         <div className="bg-white p-6 rounded-lg shadow">

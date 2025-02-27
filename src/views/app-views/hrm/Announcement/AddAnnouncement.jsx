@@ -1,25 +1,32 @@
 import React, { useEffect } from 'react';
 import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
-import { Input, Button, message, Row, Col, Select } from 'antd';
+import { Input, Button, message, Row, Col, Select, DatePicker, TimePicker } from 'antd';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { addAnnounce, GetAnn } from './AnnouncementReducer/AnnouncementSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { getBranch } from '../Branch/BranchReducer/BranchSlice';
+import ReactQuill from 'react-quill';
 
 const { Option } = Select;
 
-// Validation Schema using Yup
+// Update validation schema to include branch
 const validationSchema = Yup.object().shape({
   title: Yup.string().required('title is required'),
   description: Yup.string().required('description is required'),
-  branch: Yup.array().required('Please select at least one branch.'),
+  date: Yup.string().required('date is required'),
+  time: Yup.string().required('time is required'),
+  branch: Yup.array().required('Branch is required'),
 });
 
 const AddAnnouncement = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  
+  // Get branches from Redux store
+  const branches = useSelector((state) => state.Branch?.Branch?.data || []);
 
+  // Fetch branches when component mounts
   useEffect(() => {
     dispatch(getBranch());
   }, [dispatch]);
@@ -55,17 +62,19 @@ const AddAnnouncement = ({ onClose }) => {
         initialValues={{
           title: '',
           description: '',
+          date: '',
+          time: '',
           branch: [],
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ errors, touched, handleSubmit,setFieldValue,values,setFieldTouched }) => (
+        {({ errors, touched, handleSubmit, resetForm, setFieldTouched, values, setFieldValue}) => (
           <FormikForm onSubmit={handleSubmit}>
             <Row gutter={16}>
               <Col span={12}>
                 {/* title Field */}
-                <div style={{ marginBottom: '16px' }}>
+                <div>
                   <label className="font-semibold">Title <span className="text-red-500">*</span></label>
                   <Field
                     as={Input}
@@ -79,37 +88,24 @@ const AddAnnouncement = ({ onClose }) => {
                 </div>
               </Col>
 
-             
-
-              <Col span={24} className="mt-2">
-                <div className="form-item">
-                  <Field name="branch">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-2"
-                        mode="multiple"
-                        placeholder="Select AddProjectMember"
-                        onChange={(value) =>
-                          setFieldValue("branch", value)
-                        }
-                        value={values.branch}
-                        onBlur={() => setFieldTouched("branch", true)}
-                      >
-                        {branchdata && branchdata.length > 0 ? (
-                          branchdata.map((client) => (
-                            <Option key={client.id} value={client.id}>
-                              {client.branchName ||
-                                "Unnamed Branch"}
-                            </Option>
-                          ))
-                        ) : (
-                          <Option value="" disabled>
-                            No Clients Available
-                          </Option>
-                        )}
-                      </Select>
-                    )}
+              <Col span={12}>
+                {/* Branch Field */}
+                <div>
+                  <label className="font-semibold">Branch <span className="text-red-500">*</span></label>
+                  <Field
+                    as={Select}
+                    name="branch"
+                    mode="multiple"
+                    placeholder="Select branch"
+                    className="w-full mt-1"
+                    onChange={(value) => setFieldValue("branch", value)}
+                    onBlur={() => setFieldTouched("branch", true)}
+                  >
+                    {branches.map((branch) => (
+                      <Option key={branch.id} value={branch.id}>
+                        {branch.branchName}
+                      </Option>
+                    ))}
                   </Field>
                   <ErrorMessage
                     name="branch"
@@ -118,9 +114,66 @@ const AddAnnouncement = ({ onClose }) => {
                   />
                 </div>
               </Col>
+              <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Date <span className="text-red-500">*</span></label>
+                  <DatePicker
+                    className="w-full mt-1"
+                    format="DD-MM-YYYY"
+                    value={values.date}
+                    onChange={(date) => setFieldValue("date", date)}
+                    onBlur={() => setFieldTouched("date", true)}
+                  />
+                  <ErrorMessage
+                    name="date"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+              <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Time <span className="text-red-500">*</span></label>
+                  <TimePicker
+                    className="w-full mt-1"
+                    format="HH:mm"
+                    value={values.time}
+                    onChange={(time) =>
+                      setFieldValue("time", time)
+                    }
+                    onBlur={() => setFieldTouched("time", true)}
+                  />
+                  <ErrorMessage
+                    name="time"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
 
-              <Col span={12}>
-                {/* description Field */}
+              <Col span={24} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Description <span className="text-red-500">*</span></label>
+                  <ReactQuill
+                    className="mt-1"
+                    name="description"
+                    value={values.description}
+                    onChange={(value) =>
+                      setFieldValue("description", value)
+                    }
+                    placeholder="Enter description"
+                    onBlur={() => setFieldTouched("description", true)}
+                  />
+                  <ErrorMessage
+                    name="description"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              {/* <Col span={12}>
+              
                 <div style={{ marginBottom: '16px' }}>
                   <label className="font-semibold">Description <span className="text-red-500">*</span></label>
                   <Field
@@ -133,7 +186,7 @@ const AddAnnouncement = ({ onClose }) => {
                     <div style={{ color: 'red', fontSize: '12px' }}>{errors.description}</div>
                   )}
                 </div>
-              </Col>
+              </Col> */}
             </Row>
 
             <div className="text-right">
