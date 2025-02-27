@@ -127,9 +127,6 @@ const loggeduserdata = useSelector((state)=>state.user.loggedInUser.username)
             <Row gutter={16}>
               <Col span={24} className="mt-2">
                 <div className="form-item">
-                  {/* <label className="font-semibold text-[12] text-dark-gray-500 ">
-                    Add Project Member
-                  </label> */}
                   <Field name="project_members">
                     {({ field }) => (
                       <Select

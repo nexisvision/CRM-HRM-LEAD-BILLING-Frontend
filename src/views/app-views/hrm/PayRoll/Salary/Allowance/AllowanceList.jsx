@@ -179,7 +179,7 @@ const AllowanceList = ({ id, onClose }) => {
         footer={null}
         width={800}
       >
-        <AddAllowance id={id} onClose={onClose} />
+        <AddAllowance id={id} onClose={closeModal} />
       </Modal>
     </Card>
   );

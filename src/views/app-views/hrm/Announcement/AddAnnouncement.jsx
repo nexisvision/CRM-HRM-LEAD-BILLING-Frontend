@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { Formik, Form as FormikForm, Field } from 'formik';
-import { Input, Button, message, Row, Col,Select } from 'antd';
+import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
+import { Input, Button, message, Row, Col, Select } from 'antd';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { addAnnounce, GetAnn } from './AnnouncementReducer/AnnouncementSlice';
@@ -13,38 +13,37 @@ const { Option } = Select;
 const validationSchema = Yup.object().shape({
   title: Yup.string().required('title is required'),
   description: Yup.string().required('description is required'),
+  branch: Yup.array().required('Please select at least one branch.'),
 });
 
-const AddAnnouncement = ({onClose}) => {
+const AddAnnouncement = ({ onClose }) => {
   const navigate = useNavigate();
-  
   const dispatch = useDispatch();
 
-   
-  useEffect(()=>{
-    dispatch(getBranch())
-  },[dispatch])
+  useEffect(() => {
+    dispatch(getBranch());
+  }, [dispatch]);
 
-  const branchdata = useSelector((state)=>state.Branch.Branch.data)
+  const branchdata = useSelector((state) => state.Branch.Branch.data);
 
-  const handleSubmit = (values,{resetForm}) => {
-    // dispatch(addAnnounce(values));
-    // console.log('Submitted values:', values);
-    // message.success('Announcement added successfully!');
-    // navigate('/app/hrm/announcement');
+  const handleSubmit = (values, { resetForm }) => {
+    const payload = {
+      ...values,
+      branch: {
+        branch: values.branch,
+      },
+    };
 
-    dispatch(addAnnounce(values))
-          .then(() => {
-            dispatch(GetAnn());
-            // message.success('Announcement added successfully!');
-            resetForm();
-            onClose();
-            navigate('/app/hrm/announcement');
-          })
-          .catch((error) => {
-            // message.error('Failed to add Announcement.');
-            console.error('Add API error:', error);
-          });
+    dispatch(addAnnounce(payload))
+      .then(() => {
+        dispatch(GetAnn());
+        resetForm();
+        onClose();
+        navigate('/app/hrm/announcement');
+      })
+      .catch((error) => {
+        console.error('Add API error:', error);
+      });
   };
 
   return (
@@ -56,11 +55,12 @@ const AddAnnouncement = ({onClose}) => {
         initialValues={{
           title: '',
           description: '',
+          branch: [],
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ errors, touched, handleSubmit ,resetForm}) => (
+        {({ errors, touched, handleSubmit,setFieldValue,values,setFieldTouched }) => (
           <FormikForm onSubmit={handleSubmit}>
             <Row gutter={16}>
               <Col span={12}>
@@ -79,25 +79,43 @@ const AddAnnouncement = ({onClose}) => {
                 </div>
               </Col>
 
-              <Col span={12}>
-                {/* Branch Field */}
-                <div style={{ marginBottom: '16px' }}>
-                  <label className="font-semibold">Branch <span className="text-red-500">*</span></label>
-                  <Field
-                    as={Select}
-                    name="branch"
-                    placeholder="Select branch"
-                    className="w-full mt-1"
-                  >
-                    {branchdata && branchdata.map(branch => (
-                      <Option key={branch.id} value={branch.id}>
-                        {branch.branchName}
-                      </Option>
-                    ))}
+             
+
+              <Col span={24} className="mt-2">
+                <div className="form-item">
+                  <Field name="branch">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-2"
+                        mode="multiple"
+                        placeholder="Select AddProjectMember"
+                        onChange={(value) =>
+                          setFieldValue("branch", value)
+                        }
+                        value={values.branch}
+                        onBlur={() => setFieldTouched("branch", true)}
+                      >
+                        {branchdata && branchdata.length > 0 ? (
+                          branchdata.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.branchName ||
+                                "Unnamed Branch"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Clients Available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
                   </Field>
-                  {errors.branch && touched.branch && (
-                    <div style={{ color: 'red', fontSize: '12px' }}>{errors.branch}</div>
-                  )}
+                  <ErrorMessage
+                    name="branch"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 
@@ -107,7 +125,7 @@ const AddAnnouncement = ({onClose}) => {
                   <label className="font-semibold">Description <span className="text-red-500">*</span></label>
                   <Field
                     as={Input}
-                    name="description" 
+                    name="description"
                     placeholder="Enter description"
                     className="w-full mt-1"
                   />

@@ -1,4 +1,4 @@
-import { Modal, Row, Typography, message } from 'antd';
+import {  message } from 'antd';
 import React, { useEffect } from 'react';
 import { Modal, Row, Typography } from 'antd';
 import moment from 'moment';
@@ -78,11 +78,11 @@ const ViewMeeting = ({ visible, onClose ,meetid}) => {
                     <Text 
                         style={{...valueStyle, cursor: 'pointer', color: '#1890ff'}}
                         onClick={() => {
-                            navigator.clipboard.writeText(meetingData.meetingLink);
+                            navigator.clipboard.writeText(alladata.meetingLink);
                             message.success('Meeting link copied to clipboard!');
                         }}
                     >
-                        {meetingData.meetingLink}
+                        {alladata.meetingLink}
                     </Text>
                 </Row>
 

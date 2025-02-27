@@ -27,6 +27,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import AddDepartment from '../Department/AddDepartment';
 import AddDesignation from '../Designation/AddDesignation';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import { AddSalaryss, getSalaryss } from "../PayRoll/Salary/SalaryReducers/SalarySlice";
 
 const { Option } = Select;
 
@@ -38,6 +39,8 @@ const AddEmployee = ({ onClose, setSub }) => {
   const [otpToken, setOtpToken] = useState(null);
   const [otp, setOtp] = useState("");
   const [salary, setSalary] = useState(false);
+  const [formValues, setFormValues] = useState({});
+  const [formValues2, setFormValues2] = useState({});
 
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
@@ -118,10 +121,21 @@ const AddEmployee = ({ onClose, setSub }) => {
 
     try {
       const response = await otpapi(otp);
+      console.log("Response:", response);
       if (response.success) {
         message.success("OTP Verified Successfully");
         setShowOtpModal(false);
         dispatch(empdata());
+
+        // Debugging: Log formValues to ensure it's populated
+        console.log("Form Values:", formValues);
+
+        const payloadss = {
+          ...formValues2,
+          employeeId: response.data.user.id,
+        }
+
+        await dispatch(AddSalaryss(payloadss));
       } else {
         message.error("Invalid OTP. Please try again.");
       }
@@ -132,12 +146,23 @@ const AddEmployee = ({ onClose, setSub }) => {
 
   const onSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
-      const response = await dispatch(addEmp(values));
+      console.log("Form Values:", values);
+      setFormValues2(values);
+      // Store employeeId in formValues
+      const updatedFormValues = { ...values };
+
+      const response = await dispatch(addEmp(updatedFormValues));
 
       if (response.payload?.data?.sessionToken) {
         setOtpToken(response.payload?.data?.sessionToken);
         setShowOtpModal(true);
       }
+
+      if (response.payload?.data?.employeeId) {
+        updatedFormValues.employeeId = response.payload.data.employeeId;
+        setFormValues(updatedFormValues); // Set formValues here
+      }
+
       resetForm();
       onClose();
     } catch (error) {
@@ -178,7 +203,7 @@ const AddEmployee = ({ onClose, setSub }) => {
     bankname: "",
     banklocation: "",
     payroll: "",
-    bankaccount: "",
+    bankAccount: "",
     netSalary: "",
     status: "",
     currency: "",
@@ -211,7 +236,7 @@ const AddEmployee = ({ onClose, setSub }) => {
     ifsc: Yup.string().optional(),
     banklocation: Yup.string().optional(),
     payroll: Yup.string().optional(),
-    bankaccount: Yup.string().optional(),
+    bankAccount: Yup.string().optional(),
     netSalary: Yup.string().optional(),
     status: Yup.string().optional(),
     currency: Yup.string().optional(),
@@ -679,14 +704,14 @@ const AddEmployee = ({ onClose, setSub }) => {
                     <div className="form-item mt-3">
                       <label className="">Bank Account</label>
                       <Field
-                        name="bankaccount"
+                        name="bankAccount"
                         as={Input}
                         type="string"
                         className="w-full mt-1"
                         placeholder="Enter Bank Account"
                       />
                       <ErrorMessage
-                        name="bankaccount"
+                        name="bankAccount"
                         component="div"
                         className="error-message text-red-500 my-1"
                       />
