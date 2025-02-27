@@ -61,7 +61,7 @@ const PlanList = () => {
 
   const userplanstatuss = allPlans.find((item) => item.id === selectedPlan);
 
-  console.log("userplan", userplanstatuss);
+  // console.log("userplan", userplanstatuss);
 
   
 

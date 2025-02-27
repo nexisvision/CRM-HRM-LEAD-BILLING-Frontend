@@ -27,6 +27,8 @@ const AddPayment = ({ onClose, billNumber }) => {
     dispatch(getAccounts());
   }, []);
 
+
+  
   const initialValues = {
     billNumber: billNumber || '',
     date: null,
@@ -35,6 +37,7 @@ const AddPayment = ({ onClose, billNumber }) => {
     reference: '',
     description: '',
   };
+
 
   const validationSchema = Yup.object().shape({
     billNumber: Yup.string()
@@ -45,8 +48,8 @@ const AddPayment = ({ onClose, billNumber }) => {
     amount: Yup.number()
       .typeError('Amount must be a number')
       .required('Amount is required')
-      .min(0, 'Amount must be greater than 0'),
-      // .max(billAmount, `Amount cannot exceed ${billAmount}`),
+      .min(0, 'Amount must be greater than or equal to 0'),
+      // .max(finalTotal, `Amount cannot exceed ${finalTotal}`),
     account: Yup.string()
       .required('Account is required'),
     reference: Yup.string()

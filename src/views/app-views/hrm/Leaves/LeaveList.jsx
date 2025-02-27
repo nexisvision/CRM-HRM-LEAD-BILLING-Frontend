@@ -9,6 +9,8 @@ import {
   PushpinOutlined,
   FileExcelOutlined,
   EditOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import UserView from "../../Users/user-list/UserView";
@@ -316,6 +318,60 @@ const LeaveList = () => {
       sorter: (a, b) => a.status.length - b.status.length,
     },
     {
+      title: "Approval Actions",
+      dataIndex: "approval",
+      render: (_, record) => {
+        const handleApprove = () => {
+          Modal.confirm({
+            title: 'Approve Leave',
+            content: 'Are you sure you want to approve this leave request?',
+            okText: 'Yes',
+            okType: 'primary',
+            cancelText: 'No',
+            onOk: () => {
+              // Add your approve logic here
+              message.success('Leave approved successfully');
+            }
+          });
+        };
+
+        const handleReject = () => {
+          Modal.confirm({
+            title: 'Reject Leave',
+            content: 'Are you sure you want to reject this leave request?',
+            okText: 'Yes',
+            okType: 'danger',
+            cancelText: 'No',
+            onOk: () => {
+              // Add your reject logic here
+              message.error('Leave rejected');
+            }
+          });
+        };
+
+        return (
+          <Flex gap="8px" justifyContent="center">
+            <Button
+              type="primary"
+              icon={<CheckCircleOutlined />}
+              size="small"
+              onClick={handleApprove}
+              className="bg-green-500 hover:bg-green-600"
+              title="Approve"
+            />
+            <Button
+              type="primary"
+              danger
+              icon={<CloseCircleOutlined />}
+              size="small"
+              onClick={handleReject}
+              title="Reject"
+            />
+          </Flex>
+        );
+      }
+    },
+    {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (
@@ -477,6 +533,45 @@ const styles = `
 
   .table-responsive {
     overflow-x: auto;
+  }
+
+  .bg-green-500 {
+    background-color: #10B981;
+    border-color: #10B981;
+  }
+
+  .bg-green-500:hover {
+    background-color: #059669;
+    border-color: #059669;
+  }
+
+  .ant-btn-primary.bg-green-500:hover {
+    background-color: #059669;
+    border-color: #059669;
+  }
+
+  .ant-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ant-btn[title] {
+    position: relative;
+  }
+
+  .ant-btn[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
   }
 `;
 

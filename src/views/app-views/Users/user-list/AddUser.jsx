@@ -37,10 +37,25 @@ const AddUser = ({ visible, onClose }) => {
   const [otpToken, setOtpToken] = useState(null);
   const [otp, setOtp] = useState("");
 
-  const user = useSelector((state) => state.user?.loggedInUser?.username);
-  const getalllrole = useSelector((state) => state.role);
-  const fnddata = getalllrole.role?.data || [];
-  const rolefnd = fnddata?.filter((item) => item?.created_by === user) || [];
+
+  const loggedInUser = useSelector((state) => state.user?.loggedInUser);
+
+  const allRoles = useSelector((state) => state.role);
+  const roleData = allRoles.role?.data || [];
+
+  // Find the role of logged in user
+  const userRole = roleData.find(role => role.id === loggedInUser?.role_id);
+
+  // Filter roles based on user's role
+  const filteredRoles = roleData.filter(role => {
+    if (userRole?.role_name === 'client') {
+      // If user is client, match roles with user's ID as client_id
+      return role.client_id === loggedInUser?.id;
+    } else {
+      // For other roles, match with user's client_id
+      return role.client_id === loggedInUser?.client_id;
+    }
+  });
 
   const 
   
@@ -173,7 +188,7 @@ const AddUser = ({ visible, onClose }) => {
                     onChange={(value) => setFieldValue('role_id', value)}
                     status={errors.role_id && touched.role_id ? 'error' : ''}
                   >
-                    {rolefnd.map((tag) => (
+                    {filteredRoles.map((tag) => (
                       <Option key={tag?.id} value={tag?.id}>
                         {tag?.role_name}
                       </Option>

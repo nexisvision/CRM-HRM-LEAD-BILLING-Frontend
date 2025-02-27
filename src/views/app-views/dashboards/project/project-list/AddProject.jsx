@@ -145,8 +145,9 @@ const AddProject = ({ onClose }) => {
       .required("Please enter a Project Budget.")
       .positive("Budget must be positive."),
     estimatedmonths: Yup.string()
-      .required("Please enter Estimated Months.")
-      .matches(/^[0-9]+$/, "Months must contain only numbers"),
+      .required("Please enter Estimated Months."),
+      // .positive("Months must be positive.")
+      // .integer("Months must be a whole number"),
     estimatedhours: Yup.number()
       .required("Please enter Estimated Hours.")
       .positive("Hours must be positive.")
@@ -183,7 +184,9 @@ const AddProject = ({ onClose }) => {
   };
 
   useEffect(() => {
-    const lid = AllLoggeddtaa.loggedInUser.id;
+    
+    const lid = AllLoggeddtaa.loggedInUser.role_id;
+
     GetLablee(lid);
   }, []);
 
@@ -324,13 +327,22 @@ const AddProject = ({ onClose }) => {
                     value={values.startDate}
                     onChange={(date) => {
                       setFieldValue("startDate", date);
-                      // Calculate months if both dates are set
+                      // Calculate duration if both dates are set
                       if (date && values.endDate) {
                         const startDate = date;
                         const endDate = values.endDate;
+                        const daysDiff = endDate.diff(startDate, 'days');
                         const monthsDiff = endDate.diff(startDate, 'months', true);
-                        const roundedMonths = Math.ceil(monthsDiff);
-                        setFieldValue("estimatedmonths", roundedMonths > 0 ? roundedMonths : 1);
+                        
+                        let displayValue;
+                        if (daysDiff < 30) {
+                          displayValue = `${daysDiff} day${daysDiff !== 1 ? 's' : ''}`; // Show days if less than 30 days
+                        } else {
+                          const roundedMonths = Math.max(1, Math.ceil(monthsDiff));
+                          displayValue = `${roundedMonths} month${roundedMonths !== 1 ? 's' : ''}`;
+                        }
+                        
+                        setFieldValue("estimatedmonths", displayValue);
                       }
                     }}
                     onBlur={() => setFieldTouched("startDate", true)}
@@ -352,19 +364,46 @@ const AddProject = ({ onClose }) => {
                     value={values.endDate}
                     onChange={(date) => {
                       setFieldValue("endDate", date);
-                      // Calculate months if both dates are set
+                      // Calculate duration if both dates are set
                       if (values.startDate && date) {
                         const startDate = values.startDate;
                         const endDate = date;
+                        const daysDiff = endDate.diff(startDate, 'days');
                         const monthsDiff = endDate.diff(startDate, 'months', true);
-                        const roundedMonths = Math.ceil(monthsDiff);
-                        setFieldValue("estimatedmonths", roundedMonths > 0 ? roundedMonths : 1);
+                        
+                        let displayValue;
+                        if (daysDiff < 30) {
+                          displayValue = `${daysDiff} day${daysDiff !== 1 ? 's' : ''}`; // Show days if less than 30 days
+                        } else {
+                          const roundedMonths = Math.max(1, Math.ceil(monthsDiff));
+                          displayValue = `${roundedMonths} month${roundedMonths !== 1 ? 's' : ''}`;
+                        }
+                        
+                        setFieldValue("estimatedmonths", displayValue);
                       }
                     }}
                     onBlur={() => setFieldTouched("endDate", true)}
                   />
                   <ErrorMessage
                     name="endDate"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">Estimated Duration <span className="text-red-500">*</span></label>
+                  <Field
+                    name="estimatedmonths"
+                    as={Input}
+                    className="mt-1"
+                    placeholder="Duration will be calculated automatically"
+                    disabled={values.startDate && values.endDate}
+                  />
+                  <ErrorMessage
+                    name="estimatedmonths"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />

@@ -32,7 +32,7 @@ const ProjectList = () => {
 	//   console.log("opopopopop",properdata)
 
 	  const loggedInUser = useSelector((state) => state.user.loggedInUser);
-	  const username = loggedInUser ? loggedInUser.username : "";
+	  const username = loggedInUser ? loggedInUser.client_id : "";
 
 	  const {state} = useLocation();
  
@@ -65,17 +65,17 @@ const ProjectList = () => {
 	  useEffect(() => {
 		if (!properdata) return;
 
-		let filteredProjects = [];
+		// let filteredProjects = [];
 		
-		if (clientid && properdata.length > 0) {
-		  filteredProjects = properdata.filter(item => item.client === clientid);
-		} else {
-		  filteredProjects = properdata;
-		}
+		// if (clientid && properdata.length > 0) {
+		//   filteredProjects = properdata.filter(item => item.client === clientid);
+		// } else {
+		//   filteredProjects = properdata;
+		// }
 
-		filteredProjects = filteredProjects.filter(item => item.created_by === username);
+		// filteredProjects = filteredProjects.filter(item => item.client_id === username);
 
-		const formattedData = filteredProjects.map((item) => {
+		const formattedData = properdata.map((item) => {
 			// Parse project_members and files for each project individually
 			let projectMembers = [];
 			let filesArray = [];
@@ -273,7 +273,7 @@ const ProjectList = () => {
 			<PageHeaderAlt className="border-bottom mt-5">
 				<div className="container-fluid">
 					<div className='flex justify-between items-center '>
-						<h2 className='text-xl font-medium'>Projects</h2>
+						<h2 className='text-xl font-medium font-family-Roboto'>Projects</h2>
 					<Flex className="p-2 flex justify-end">
 						<div className='flex gap-3 justify-end'>
 							<Radio.Group defaultValue={VIEW_GRID} onChange={onChangeProjectView}>
