@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { addRole, getRoles } from '../RoleAndPermissionReducers/RoleAndPermissionSlice';
 
-const AddRole = ({ onClose }) => {
+const AddRole = ({ onClose,resetForm }) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -175,6 +175,7 @@ const AddRole = ({ onClose }) => {
             dispatch(getRoles());
             message.success('Role added successfully!');
             onClose();
+            resetForm();
         })
         .catch((error) => {
             message.error('Failed to add role.');

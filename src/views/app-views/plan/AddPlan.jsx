@@ -22,7 +22,10 @@ const validationSchema = Yup.object().shape({
   description: Yup.string().required('Please enter a description!'),
   trial_period: Yup.string().when('trial', {
     is: true,
-    then: Yup.string().required('Please enter trial period!')
+    then: Yup.string()
+      .required('Please enter trial period!')
+      .matches(/^[0-9]+$/, 'Must be a number')
+      .min(1, 'Must be at least 1 day')
   })
 });
 const AddPlan = ({ onClose }) => {
@@ -102,7 +105,7 @@ const AddPlan = ({ onClose }) => {
     <div>
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({ values, errors, touched, setFieldValue, handleChange }) => {
@@ -366,6 +369,49 @@ const AddPlan = ({ onClose }) => {
                     />
                   </div>
                 </Col>
+              </Row>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <div className="form-group" style={{ marginBottom: '16px' }}>
+                    <label>Trial Period</label>
+                    <div className="d-flex align-items-center">
+                      <Switch
+                        checked={values.trial}
+                        onChange={(checked) => {
+                          setFieldValue('trial', checked);
+                          if (!checked) {
+                            setFieldValue('trial_period', '');
+                          }
+                        }}
+                        className="mr-2"
+                      />
+                      <span className="ml-2">Enable Trial Period</span>
+                    </div>
+                  </div>
+                </Col>
+                {values.trial && (
+                  <Col span={12}>
+                    <div className="form-group" style={{ marginBottom: '16px' }}>
+                      <label>Trial Period (Days) <span style={{ color: 'red' }}>*</span></label>
+                      <Field name="trial_period">
+                        {({ field }) => (
+                          <Input
+                            {...field}
+                            
+                            min="1"
+                            placeholder="Enter trial period in days"
+                            suffix="Days"
+                          />
+                        )}
+                      </Field>
+                      {errors.trial_period && touched.trial_period && (
+                        <div className="error-message" style={{ color: 'red' }}>
+                          {errors.trial_period}
+                        </div>
+                      )}
+                    </div>
+                  </Col>
+                )}
               </Row>
               <div className="form-group">
                 <label>Description</label>

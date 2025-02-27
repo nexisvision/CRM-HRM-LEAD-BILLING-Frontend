@@ -210,7 +210,7 @@ const AddSalary = ({ onClose }) => {
 
               <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Salary <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Salary Per Month <span className="text-red-500">*</span></label>
                   <Field
                     name="salary"
                     as={Input}
@@ -228,13 +228,13 @@ const AddSalary = ({ onClose }) => {
 
               <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Net Salary <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Yearly Package <span className="text-red-500">*</span></label>
                   <Field
                     name="netSalary"
                     as={Input}
                     type="string"
                     className="w-full mt-1"
-                    placeholder="Enter Net Salary Amount"
+                    placeholder="Enter Yearly Pay Amount"
                   />
                   <ErrorMessage
                     name="netSalary"

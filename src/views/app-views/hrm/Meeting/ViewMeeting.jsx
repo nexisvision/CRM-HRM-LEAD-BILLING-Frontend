@@ -1,4 +1,4 @@
-import { Modal, Row, Typography, message } from 'antd';
+import { message } from 'antd';
 import React, { useEffect } from 'react';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
@@ -82,9 +82,12 @@ const ViewMeeting = ({ visible, onClose, meetid }) => {
                 <Text style={labelStyle}>Meeting Link</Text>
                 <Text
                     style={{ ...valueStyle, cursor: 'pointer', color: '#1890ff' }}
-                    onClick={handleCopyLink}
+                    onClick={() => {
+                        navigator.clipboard.writeText(alladata.meetingLink);
+                        message.success('Meeting link copied to clipboard!');
+                    }}
                 >
-                    {alladata?.meeting_link || 'No link available'}
+                    {alladata.meetingLink}
                 </Text>
             </Row>
 

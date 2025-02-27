@@ -52,11 +52,11 @@ const UserList = () => {
   }, [dispatch]);
 
   const alluserdata = useSelector((state) => state.Users);
-  const fndfdata = alluserdata.Users.data;
+  const finddata = alluserdata.Users.data;
+    
+  const loggeddata = useSelector((state) => state?.user?.loggedInUser.client_id);
   
-  const loggeddata = useSelector((state) => state?.user?.loggedInUser.username);
-  
-  const finddata = fndfdata?.filter((item) => item.created_by === loggeddata);
+  // const finddata = fndfdata?.filter((item) => item.client_id === loggeddata);
   
   const allroledata = useSelector((state) => state.role);
   const fnddata = allroledata.role.data;
@@ -68,7 +68,7 @@ const UserList = () => {
     if (finddata) {
       setUsers(finddata);
     }
-  }, [fndfdata]);
+  }, [finddata]);
 
 
    //// permission
