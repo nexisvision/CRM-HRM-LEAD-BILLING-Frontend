@@ -3,6 +3,9 @@ import React, { useState } from 'react';
 import { Form, Input, Button, message, Col, Row, Card, Select } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { SendOutlined } from '@ant-design/icons';
+import EmailService from './mailService/mailservice.jsx';
+import { sendmailslice } from './mailReducer/mailSlice.jsx';
+import { useDispatch } from 'react-redux';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -77,6 +80,7 @@ Details:
 const MailCompose = () => {
 	const [form] = Form.useForm();
 	const navigate = useNavigate();
+	const dispatch = useDispatch()
 	const [loading, setLoading] = useState(false);
 	const [selectedTemplate, setSelectedTemplate] = useState("Select Template");
 	const [placeholders, setPlaceholders] = useState({});
@@ -92,23 +96,42 @@ const MailCompose = () => {
 		});
 	};
 
+	// Replace placeholders in template with actual values
+	const replacePlaceholders = (template, data) => {
+		let message = template;
+		Object.entries(data).forEach(([key, value]) => {
+			message = message.replace(new RegExp(`{${key}}`, 'g'), value);
+		});
+		return message;
+	};
+
 	const onFinish = async (values) => {
 		try {
 			setLoading(true);
 
+			let finalMessage = values.message;
+			if (selectedTemplate !== "Select Template") {
+				finalMessage = replacePlaceholders(emailMessage, placeholders);
+			}
+
+			// Format the payload exactly as required
 			const emailData = {
-				to: values.to,
+				to: values.to, // Now values.to is already a string
 				subject: values.subject,
-				message: values.message
+				html: finalMessage
 			};
 
-			// Call your API endpoint here
-			// await emailService.sendEmail(emailData);
+			dispatch(sendmailslice(emailData))
+				.then(() => {
+					message.success('Email sent successfully');
+					navigate('/app/apps/mail/inbox');
+				})
+				.catch((error) => {
+					message.error('Failed to send email: ' + (error.message || 'Unknown error'));
+				});
 
-			message.success('Email sent successfully');
-			navigate('/app/apps/mail/inbox');
 		} catch (error) {
-			message.error('Failed to send email');
+			message.error('Failed to send email: ' + (error.message || 'Unknown error'));
 		} finally {
 			setLoading(false);
 		}
@@ -142,7 +165,16 @@ const MailCompose = () => {
 								<Row gutter={[16, 8]}>
 									{Object.entries(placeholders).map(([key, value]) => (
 										<Col xs={24} sm={12} md={8} key={key}>
-											<strong>{key}:</strong> {value}
+											<Form.Item label={key} name={['placeholders', key]} initialValue={value}>
+												<Input
+													onChange={(e) => {
+														setPlaceholders(prev => ({
+															...prev,
+															[key]: e.target.value
+														}));
+													}}
+												/>
+											</Form.Item>
 										</Col>
 									))}
 								</Row>
@@ -154,13 +186,20 @@ const MailCompose = () => {
 					<Col span={24}>
 						<Form.Item
 							name="to"
-							rules={[{ required: true, message: 'Please enter recipient email' }]}
+							rules={[
+								{
+									required: true,
+									message: 'Please enter recipient email'
+								},
+								{
+									type: 'email',
+									message: 'Please enter a valid email address'
+								}
+							]}
 						>
-							<Select
-								mode="tags"
-								style={{ width: '100%' }}
-								placeholder="To:"
-								tokenSeparators={[',']}
+							<Input
+								placeholder="To: example@gmail.com"
+								type="email"
 							/>
 						</Form.Item>
 					</Col>
@@ -192,9 +231,6 @@ const MailCompose = () => {
 				<div className="text-right">
 					<Button className="mr-2" onClick={() => navigate(-1)}>
 						Discard
-					</Button>
-					<Button className="mr-2" type="default">
-						Save Draft
 					</Button>
 					<Button
 						type="primary"

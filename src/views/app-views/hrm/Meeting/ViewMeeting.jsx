@@ -1,16 +1,13 @@
 import { Modal, Row, Typography, message } from 'antd';
 import React, { useEffect } from 'react';
-import { Modal, Row, Typography } from 'antd';
 import moment from 'moment';
 import { useDispatch, useSelector } from 'react-redux';
 import { MeetData } from './MeetingReducer/MeetingSlice';
 
 const { Text } = Typography;
 
-const ViewMeeting = ({ visible, onClose ,meetid}) => {
+const ViewMeeting = ({ visible, onClose, meetid }) => {
     const dispatch = useDispatch();
-    // Static meeting data
-
 
     const rowStyle = {
         display: 'flex',
@@ -29,85 +26,91 @@ const ViewMeeting = ({ visible, onClose ,meetid}) => {
         fontSize: '14px',
     };
 
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(MeetData())
-    },[dispatch])
+    }, [dispatch])
 
-    const alladatas = useSelector((state)=>state.Meeting.Meeting.data);
+    const alladatas = useSelector((state) => state.Meeting.Meeting.data);
     const fndata = alladatas;
+    const alladata = fndata?.find((item) => item.id === meetid);
 
-    const alladata = fndata?.find((item)=>item.id === meetid);
+    // Handle copying meeting link
+    const handleCopyLink = () => {
+        if (alladata?.meeting_link) {
+            navigator.clipboard.writeText(alladata.meeting_link);
+            message.success('Meeting link copied to clipboard!');
+        } else {
+            message.warning('No meeting link available');
+        }
+    };
 
     return (
-       
-            <div style={{  }}>
-                <h1 className='border-b border-gray-300 pb-2 '></h1>
-                <Row style={rowStyle} className='mt-2'>
-                    <Text style={labelStyle}>Title</Text>
-                    <Text style={valueStyle}>{alladata?.title}</Text>
-                </Row>
+        <div>
+            <h1 className='border-b border-gray-300 pb-2 '></h1>
+            <Row style={rowStyle} className='mt-2'>
+                <Text style={labelStyle}>Title</Text>
+                <Text style={valueStyle}>{alladata?.title}</Text>
+            </Row>
 
-                <Row style={rowStyle}>
-                    <Text style={labelStyle}>Status</Text>
-                    <Text style={valueStyle}>{alladata?.status}</Text>
-                </Row>
+            <Row style={rowStyle}>
+                <Text style={labelStyle}>Status</Text>
+                <Text style={valueStyle}>{alladata?.status}</Text>
+            </Row>
 
-                <Row style={rowStyle}>
-                    <Text style={labelStyle}>Date</Text>
-                    <Text style={valueStyle}>
-                        {moment(alladata?.date).format('DD-MM-YYYY')}
-                    </Text>
-                </Row>
+            <Row style={rowStyle}>
+                <Text style={labelStyle}>Date</Text>
+                <Text style={valueStyle}>
+                    {moment(alladata?.date).format('DD-MM-YYYY')}
+                </Text>
+            </Row>
 
-                <Row style={rowStyle}>
-                    <Text style={labelStyle}>Start Time</Text>
-                    <Text style={valueStyle}>
-                        {moment(alladata?.startTime, 'HH:mm:ss').format('h:mm A')}
-                    </Text>
-                </Row>
+            <Row style={rowStyle}>
+                <Text style={labelStyle}>Start Time</Text>
+                <Text style={valueStyle}>
+                    {moment(alladata?.startTime, 'HH:mm:ss').format('h:mm A')}
+                </Text>
+            </Row>
 
-                <Row style={rowStyle}>
-                    <Text style={labelStyle}>End Time</Text>
-                    <Text style={valueStyle}>
-                        {moment(alladata?.endTime, 'HH:mm:ss').format('h:mm A')}
-                    </Text>
-                </Row>
+            <Row style={rowStyle}>
+                <Text style={labelStyle}>End Time</Text>
+                <Text style={valueStyle}>
+                    {moment(alladata?.endTime, 'HH:mm:ss').format('h:mm A')}
+                </Text>
+            </Row>
 
-                <Row style={rowStyle}>
-                    <Text style={labelStyle}>Meeting Link</Text>
-                    <Text 
-                        style={{...valueStyle, cursor: 'pointer', color: '#1890ff'}}
-                        onClick={() => {
-                            navigator.clipboard.writeText(meetingData.meetingLink);
-                            message.success('Meeting link copied to clipboard!');
-                        }}
-                    >
-                        {meetingData.meetingLink}
-                    </Text>
-                </Row>
+            <Row style={rowStyle}>
+                <Text style={labelStyle}>Meeting Link</Text>
+                <Text
+                    style={{ ...valueStyle, cursor: 'pointer', color: '#1890ff' }}
+                    onClick={handleCopyLink}
+                >
+                    {alladata?.meeting_link || 'No link available'}
+                </Text>
+            </Row>
 
-                <Row style={rowStyle}>
-                    <Text style={labelStyle}>Description</Text>
-                    <div style={valueStyle} dangerouslySetInnerHTML={{ __html: alladata?.description }} />
-                </Row>
+            <Row style={rowStyle}>
+                <Text style={labelStyle}>Description</Text>
+                <div style={valueStyle} dangerouslySetInnerHTML={{ __html: alladata?.description }} />
+            </Row>
 
-                <Row style={rowStyle}>
-                    <Text style={labelStyle}>Created By</Text>
-                    <Text style={valueStyle}>{alladata?.created_by}</Text>
-                </Row>
+            <Row style={rowStyle}>
+                <Text style={labelStyle}>Created By</Text>
+                <Text style={valueStyle}>{alladata?.created_by}</Text>
+            </Row>
 
-                {/* <Row style={rowStyle}>
-                    <Text style={labelStyle}>Department</Text>
-                    <Text style={valueStyle}>{alladata.department}</Text>
-                </Row>
+            {/* Commented sections can be uncommented when department and employee data is available */}
+            {/* <Row style={rowStyle}>
+                <Text style={labelStyle}>Department</Text>
+                <Text style={valueStyle}>{alladata?.department}</Text>
+            </Row>
 
-                <Row style={rowStyle}>
-                    <Text style={labelStyle}>Employees</Text>
-                    <Text style={valueStyle}>
-                        {JSON.parse(alladata.employee).join(', ')}
-                    </Text>
-                </Row> */}
-            </div>
+            <Row style={rowStyle}>
+                <Text style={labelStyle}>Employees</Text>
+                <Text style={valueStyle}>
+                    {alladata?.employee && JSON.parse(alladata.employee).join(', ')}
+                </Text>
+            </Row> */}
+        </div>
     );
 };
 
