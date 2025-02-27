@@ -11,7 +11,7 @@ import DateRangeFilter from "../../../../components/DateRangeFilter.jsx";
 import TicketList from "../../../../components/TicketTableList.jsx";
 import RegistionTable from "../../../../components/RegistrationTableList.jsx";
 import { Pie } from "react-chartjs-2";
-import { Table, Row, Col, Card, Button } from "antd";
+import { Table, Row, Col, Card, Button,Empty,Badge } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData } from "views/app-views/company/CompanyReducers/CompanySlice.jsx";
 import { GetPlan } from "views/app-views/plan/PlanReducers/PlanSlice.jsx";
