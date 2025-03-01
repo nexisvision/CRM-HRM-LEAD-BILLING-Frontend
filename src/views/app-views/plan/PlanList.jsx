@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Card, Button, Modal, message, Switch, Tag, Row, Col, Typography, Empty, Dropdown } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined, UserOutlined, CloudUploadOutlined, TeamOutlined, CalendarOutlined, CrownOutlined, MoreOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusOutlined, UserOutlined, CloudUploadOutlined, TeamOutlined, CalendarOutlined, CrownOutlined, MoreOutlined, InfoCircleOutlined, EyeOutlined, CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import AddPlan from "./AddPlan";
 import EditPlan from "./EditPlan";
 import { useDispatch, useSelector } from "react-redux";
-import { DeleteP, Editplan, GetPlan,planbutus } from "./PlanReducers/PlanSlice";
+import { DeleteP, Editplan, GetPlan, planbutus } from "./PlanReducers/PlanSlice";
 import './PlanList.css'; // Import the CSS file
 import { getcurren } from "../setting/currencies/currenciesSlice/currenciesSlice";
 import { getRoles } from "../hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice";
@@ -20,6 +20,8 @@ const PlanList = () => {
   const [idd, setIdd] = useState("");
   const [isPurchaseModalVisible, setIsPurchaseModalVisible] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("");
+  const [viewPlanModalVisible, setViewPlanModalVisible] = useState(false);
+  const [selectedViewPlan, setSelectedViewPlan] = useState(null);
   const dispatch = useDispatch();
   const Plandata = useSelector((state) => state.Plan);
   const allPlans = Plandata.Plan || [];
@@ -30,7 +32,7 @@ const PlanList = () => {
   const role = useSelector((state) => state.role.role.data || []);
 
   const roleidd = role.find((item) => item.id === roleid);
-  const isAdmin = roleidd?.role_name === 'super-admin';  
+  const isAdmin = roleidd?.role_name === 'super-admin';
 
   const filteredPlans = isAdmin ? allPlans : [];
 
@@ -63,7 +65,7 @@ const PlanList = () => {
 
   // console.log("userplan", userplanstatuss);
 
-  
+
 
   // const 
 
@@ -90,9 +92,9 @@ const PlanList = () => {
       await dispatch(DeleteP(planId)).then(() => {
         dispatch(GetPlan());
       });
-      message.success({ content: 'Plan deleted successfully', duration: 2 });
+      message.success('Plan deleted successfully');
     } catch (error) {
-      message.error({ content: 'Failed to delete plan', duration: 2 });
+      message.error('Failed to delete plan');
       console.error('Error deleting plan:', error);
     }
   };
@@ -103,24 +105,22 @@ const PlanList = () => {
   const closeEditPlanModal = () => setIsEditPlanModalVisible(false);
 
   const togglePlan = (id, currentStatus, plan) => {
-    if (currentStatus === 'active') {
-      const submitValues = {
-        ...plan,  // Keep all existing plan data
-        status: 'inactive'  // Set status to inactive
-      };
-  
-      dispatch(Editplan({ id, values: submitValues }))
-        .then(() => {
-          dispatch(GetPlan()); // Refresh plans after update
-          message.success("Plan status updated to inactive");
-        })
-        .catch((error) => {
-          message.error("Failed to update plan status");
-          console.error("Error updating status:", error);
-        });
-    } else {
-      message.info("Plan is already inactive");
-    }
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+
+    const submitValues = {
+      ...plan,
+      status: newStatus
+    };
+
+    dispatch(Editplan({ id, values: submitValues }))
+      .then(() => {
+        dispatch(GetPlan());
+        message.success(`Plan ${newStatus} successfully`);
+      })
+      .catch((error) => {
+        message.error("Failed to update plan status");
+        console.error("Error updating status:", error);
+      });
   };
 
   const EditP = (id) => {
@@ -128,19 +128,25 @@ const PlanList = () => {
     setIdd(id);
   };
 
-  const getMenuItems = (planId) => [
+  const getMenuItems = (plan) => [
     {
-      key: '1',
-      icon: <EditOutlined />,
-      label: 'Edit',
-      onClick: () => EditP(planId)
+      key: 'view',
+      icon: <EyeOutlined />,
+      label: 'View Details',
+      onClick: () => handleViewPlan(plan)
     },
     {
-      key: '2',
+      key: 'edit',
+      icon: <EditOutlined />,
+      label: 'Edit',
+      onClick: () => EditP(plan.id)
+    },
+    {
+      key: 'delete',
       icon: <DeleteOutlined />,
       label: 'Delete',
       danger: true,
-      onClick: () => deletePlan(planId)
+      onClick: () => deletePlan(plan.id)
     }
   ];
 
@@ -157,8 +163,8 @@ const PlanList = () => {
       try {
         setLoading(true);
         const startDate = moment().format('YYYY-MM-DD');
-        const endDate = userplanstatuss?.duration === 'Lifetime' 
-          ? null 
+        const endDate = userplanstatuss?.duration === 'Lifetime'
+          ? null
           : calculateEndDate(moment(), userplanstatuss?.duration).format('YYYY-MM-DD');
 
         const purchasePayload = {
@@ -181,7 +187,7 @@ const PlanList = () => {
       }
     };
 
-    const selectedCurrency = Array.isArray(currencyData) && 
+    const selectedCurrency = Array.isArray(currencyData) &&
       currencyData.find((item) => item.id === plan?.currency);
 
     return (
@@ -328,7 +334,7 @@ const PlanList = () => {
   const renderUserPlanStatus = () => {
     // Assuming you have the user's current plan data in your state
     // const userCurrentPlan = allPlans?.find(plan => plan.status === 'active');
-    
+
     return (
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div className="flex items-center justify-between mb-4">
@@ -389,7 +395,7 @@ const PlanList = () => {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3">
               <TeamOutlined className="text-green-500" />
               <div>
@@ -427,24 +433,213 @@ const PlanList = () => {
 
   const calculateEndDate = (startDate, duration) => {
     if (!duration) return null;
-    
+
     // Parse the duration string (e.g., "4 Months", "1 Year", "Lifetime")
     const [amount, unit] = duration.split(' ');
-    
+
     if (unit.toLowerCase() === 'lifetime') {
       return 'Lifetime';
     }
-    
+
     const start = moment(startDate);
-    
+
     // Add the duration based on the unit
     if (unit.toLowerCase().includes('month')) {
       return start.clone().add(amount, 'months');
     } else if (unit.toLowerCase().includes('year')) {
       return start.clone().add(amount, 'years');
     }
-    
+
     return null;
+  };
+
+  const handleViewPlan = (plan) => {
+    setSelectedViewPlan(plan);
+    setViewPlanModalVisible(true);
+  };
+
+  const ViewPlanModal = ({ visible, onClose, plan, currencyData }) => {
+    const selectedCurrency = Array.isArray(currencyData) &&
+      currencyData.find((item) => item.id === plan?.currency);
+
+    return (
+      <Modal
+        title={
+          <div className="flex items-center gap-2">
+            <CrownOutlined className="text-2xl text-yellow-500" />
+            <span className="text-xl font-bold text-blue-600">
+              {plan?.name}
+            </span>
+            {plan?.status === 'active' ? (
+              <Tag color="success" className="ml-2">Active</Tag>
+            ) : (
+              <Tag color="error" className="ml-2">Inactive</Tag>
+            )}
+          </div>
+        }
+        visible={visible}
+        onCancel={onClose}
+        footer={
+          <div className="flex justify-end gap-4">
+            <Button onClick={onClose}>Close</Button>
+            {!isAdmin && plan?.status === 'active' ? (
+              <Button
+                type="primary"
+                onClick={() => {
+                  handleBuyClick(plan);
+                  onClose();
+                }}
+                className="bg-blue-600 hover:bg-blue-700 border-0"
+              >
+                Choose Plan
+              </Button>
+            ) : isAdmin && (
+              <div className="flex gap-2">
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    EditP(plan.id);
+                    onClose();
+                  }}
+                >
+                  Edit Plan
+                </Button>
+                <Button
+                  danger
+                  onClick={() => {
+                    deletePlan(plan.id);
+                    onClose();
+                  }}
+                >
+                  Delete Plan
+                </Button>
+              </div>
+            )}
+          </div>
+        }
+        width={800}
+        className="plan-details-modal"
+      >
+        <div className="space-y-8 py-6">
+          {/* Price Section */}
+          <div className="text-center bg-blue-50 p-8 rounded-xl shadow-inner">
+            <div className="text-6xl font-bold text-blue-600">
+              <span className="text-3xl">{selectedCurrency?.currencyIcon || ''}</span>
+              {plan?.price}
+            </div>
+            <div className="text-gray-600 font-medium mt-2">
+              per {plan?.duration ? plan?.duration.toLowerCase() : 'N/A'}
+            </div>
+            {plan?.trial && (
+              <Tag color="gold" className="mt-4 px-4 py-2 rounded-full text-sm font-medium">
+                {plan?.trial_period} Days Free Trial
+              </Tag>
+            )}
+          </div>
+
+          {/* Basic Details */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <InfoCircleOutlined className="text-blue-500" />
+              Basic Details
+            </h3>
+            <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+              <div>
+                <span className="text-gray-500">Plan Name</span>
+                <p className="font-medium text-gray-800">{plan?.name}</p>
+              </div>
+              <div>
+                <span className="text-gray-500">Duration</span>
+                <p className="font-medium text-gray-800">{plan?.duration}</p>
+              </div>
+              <div>
+                <span className="text-gray-500">Currency</span>
+                <p className="font-medium text-gray-800 flex items-center gap-1">
+                  {selectedCurrency?.currencyIcon} {selectedCurrency?.currencyName}
+                  <span className="text-gray-400 text-sm">({selectedCurrency?.currencyCode})</span>
+                </p>
+              </div>
+              <div>
+                <span className="text-gray-500">Trial Period</span>
+                <p className="font-medium text-gray-800">
+                  {plan?.trial ? `${plan.trial_period} Days` : 'No Trial'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Usage Limits */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <TeamOutlined className="text-green-500" />
+              Usage Limits
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <UserOutlined className="text-blue-600" />
+                  <div>
+                    <div className="text-sm text-gray-500">Maximum Users</div>
+                    <div className="font-semibold text-lg">{plan?.max_users} users</div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <TeamOutlined className="text-green-500" />
+                  <div>
+                    <div className="text-sm text-gray-500">Maximum Customers</div>
+                    <div className="font-semibold text-lg">{plan?.max_customers} customers</div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <TeamOutlined className="text-purple-500" />
+                  <div>
+                    <div className="text-sm text-gray-500">Maximum Vendors</div>
+                    <div className="font-semibold text-lg">{plan?.max_vendors} vendors</div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <TeamOutlined className="text-cyan-500" />
+                  <div>
+                    <div className="text-sm text-gray-500">Maximum Clients</div>
+                    <div className="font-semibold text-lg">{plan?.max_clients} clients</div>
+                  </div>
+                </div>
+              </div>
+              <div className="col-span-2 bg-gray-50 p-4 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <CloudUploadOutlined className="text-amber-500" />
+                  <div>
+                    <div className="text-sm text-gray-500">Storage Limit</div>
+                    <div className="font-semibold text-lg">{plan?.storage_limit} GB</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Description Section */}
+          {plan?.description && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <InfoCircleOutlined className="text-indigo-500" />
+                Description
+              </h3>
+              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-4 rounded-lg">
+                <p className="text-gray-600 whitespace-pre-line leading-relaxed">
+                  {plan.description}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      </Modal>
+    );
   };
 
   return (
@@ -479,110 +674,127 @@ const PlanList = () => {
           <Empty description="No plans found" className="my-12" />
         ) : (
           <Row gutter={[24, 24]}>
-            {allPlans?.map((plan) => (
-              <Col xs={24} sm={24} md={12} lg={8} xl={6} key={plan.id}>
-                <Card
-                  className="plan-card h-full rounded-xl"
-                  hoverable
-                  title={
-                    <div className="flex justify-between items-center py-2">
-                      <span className="text-xl font-bold text-gray-800">{plan.name}</span>
-                      {isAdmin && (
+            {allPlans?.map((plan) => {
+              const selectedCurrency = Array.isArray(currencyData) &&
+                currencyData.find((item) => item.id === plan.currency);
+
+              return (
+                <Col xs={24} sm={24} md={12} lg={8} xl={6} key={plan.id}>
+                  <Card
+                    className="plan-card h-full rounded-xl transform transition-all duration-300 hover:scale-105 cursor-pointer"
+                    hoverable
+                    onClick={() => handleViewPlan(plan)}
+                    title={
+                      <div className="flex justify-between items-center py-2">
                         <div className="flex items-center gap-2">
-                          <Switch
-                            checked={plan.status === 'active'}
-                            onChange={() => togglePlan(plan.id)}
-                            checkedChildren="Active"
-                            unCheckedChildren="Inactive"
-                          />
-                          <Dropdown
-                            menu={{ items: getMenuItems(plan.id) }}
-                            placement="bottomRight"
-                            trigger={['click']}
+                          <CrownOutlined className="text-2xl text-yellow-500" />
+                          <div
+                            style={{
+                              maxWidth: '180px',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              marginBottom: '8px'
+                            }}
+                            title={plan.name}
                           >
-                            <Button type="text" icon={<MoreOutlined />} />
-                          </Dropdown>
+                            {plan.name}
+                          </div>
+                        </div>
+                        {isAdmin && (
+                          <div
+                            className="flex items-center gap-2"
+                            onClick={e => e.stopPropagation()}
+                          >
+                            <Switch
+                              checked={plan.status === 'active'}
+                              onChange={() => togglePlan(plan.id, plan.status, plan)}
+                              className={plan.status === 'active' ? 'bg-blue-600' : ''}
+                            />
+                            <Dropdown
+                              menu={{ items: getMenuItems(plan) }}
+                              placement="bottomRight"
+                              trigger={['click']}
+                            >
+                              <Button type="text" icon={<MoreOutlined className="text-gray-600" />} />
+                            </Dropdown>
+                          </div>
+                        )}
+                      </div>
+                    }
+                  >
+                    <div className="space-y-6">
+                      {/* Price Section */}
+                      <div className="text-center bg-blue-50 p-8 rounded-xl shadow-inner">
+                        <div className="text-6xl font-bold text-blue-600">
+                          <span className="text-3xl">{selectedCurrency?.currencyIcon || ''}</span>
+                          {plan?.price}
+                        </div>
+                        <div className="text-gray-600 font-medium mt-2">
+                          per {plan?.duration ? plan?.duration.toLowerCase() : 'N/A'}
+                        </div>
+                      </div>
+
+                      {/* Features Grid */}
+                      <div className="grid grid-cols-1 gap-3">
+                        <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
+                          <CalendarOutlined className="text-blue-500 text-xl" />
+                          <div>
+                            <div className="text-sm text-gray-500">Duration</div>
+                            <div className="font-semibold">{plan.duration}</div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
+                          <UserOutlined className="text-blue-500 text-xl" />
+                          <div>
+                            <div className="text-sm text-gray-500">Users</div>
+                            <div className="font-semibold">{plan.max_users} users</div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
+                          <TeamOutlined className="text-blue-500 text-xl" />
+                          <div>
+                            <div className="text-sm text-gray-500">Clients</div>
+                            <div className="font-semibold">{plan.max_clients} clients</div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
+                          <CloudUploadOutlined className="text-blue-500 text-xl" />
+                          <div>
+                            <div className="text-sm text-gray-500">Storage</div>
+                            <div className="font-semibold">{plan.storage_limit} GB</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Trial Badge */}
+                      {plan.trial && (
+                        <div className="absolute top-4 right-4">
+                          <Tag color="gold" className="px-3 py-1 rounded-full text-sm font-medium">
+                            {plan.trial_period} Days Trial
+                          </Tag>
                         </div>
                       )}
+
+                      {/* Buy Button */}
+                      {!isAdmin && (
+                        <Button
+                          type="primary"
+                          block
+                          onClick={() => handleBuyClick(plan)}
+                          className="mt-6 h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 border-0 rounded-lg transform transition-all duration-300 hover:scale-105"
+                        >
+                          {plan.status === 'active' ? 'Choose Plan' : ''}
+                        </Button>
+                      )}
                     </div>
-                  }
-                >
-                  <div className="space-y-6">
-                    <div className="text-center bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg">
-                      {(() => {
-                        const selectedCurrency = Array.isArray(currencyData) && 
-                          currencyData.find((item) => item.id === plan.currency);
-                        return (
-                          <>
-                            <div className="text-4xl font-bold text-indigo-600">
-                              <span className="text-xl">{selectedCurrency?.currencyIcon || ''}</span>
-                              {plan.price}
-                            </div>
-                            <div className="text-gray-600 font-medium">per {plan.duration ? plan.duration.toLowerCase() : 'N/A'}</div>
-                          </>
-                        );
-                      })()}
-                    </div>
-
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3 bg-gray-50 p-2 rounded">
-                        <CalendarOutlined className="text-blue-500" />
-                        <span className="font-medium">{plan.duration}</span>
-                      </div>
-
-                      <div className="flex items-center gap-3 bg-gray-50 p-2 rounded">
-                        <UserOutlined className="text-green-500" />
-                        <span className="font-medium">Max Users: {plan.max_users}</span>
-                      </div>
-
-                      <div className="flex items-center gap-3 bg-gray-50 p-2 rounded">
-                        <TeamOutlined className="text-purple-500" />
-                        <span className="font-medium">Max Clients: {plan.max_clients}</span>
-                      </div>
-
-                      <div className="flex items-center gap-3 bg-gray-50 p-2 rounded">
-                        <CloudUploadOutlined className="text-cyan-500" />
-                        <span className="font-medium">Storage: {plan.storage_limit} GB</span>
-                      </div>
-                    </div>
-
-                    {/* <div className="pt-2">
-                      <Tag color="blue" className="px-3 py-1 rounded-full">
-                        Trial Period: {plan.trial_period} days
-                      </Tag>
-                    </div> */}
-
-                    {!isAdmin && (
-                      <Button 
-                        type="primary" 
-                        block
-                        onClick={() => handleBuyClick(plan)}
-                        className="mt-4 h-10 bg-blue-600 hover:bg-blue-700"
-                      >
-                        {plan.status === 'active' ? 'Buy' : ''}
-                      </Button>
-                    )}
-
-                    {/* {plan.features && (
-                      <div className="border-t pt-4">
-                        <Text strong className="block mb-3">Features:</Text>
-                        <div className="flex flex-wrap gap-2">
-                          {Object.entries(JSON.parse(plan.features)).map(([key, value]) => (
-                            <Tag
-                              key={key}
-                              color={value ? 'success' : 'error'}
-                              className="px-3 py-1 rounded-full"
-                            >
-                              {key}: {value ? 'Enabled' : 'Disabled'}
-                            </Tag>
-                          ))}
-                        </div>
-                      </div>
-                    )} */}
-                  </div>
-                </Card>
-              </Col>
-            ))}
+                  </Card>
+                </Col>
+              );
+            })}
           </Row>
         )}
 
@@ -614,6 +826,16 @@ const PlanList = () => {
           plan={selectedPlan}
           currencyData={currencyData}
 
+        />
+
+        <ViewPlanModal
+          visible={viewPlanModalVisible}
+          onClose={() => {
+            setViewPlanModalVisible(false);
+            setSelectedViewPlan(null);
+          }}
+          plan={selectedViewPlan}
+          currencyData={currencyData}
         />
       </div>
     </div>

@@ -64,7 +64,7 @@ const AddUser = ({ visible, onClose }) => {
     const length = 8;
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let password = "";
-    
+
     // Generate 6 characters
     for (let i = 0; i < length; i++) {
       password += charset[Math.floor(Math.random() * charset.length)];
@@ -73,7 +73,7 @@ const AddUser = ({ visible, onClose }) => {
     // Ensure at least one number
     const randomNum = Math.floor(Math.random() * 10).toString();
     password = password.slice(0, 7) + randomNum;
-    
+
     return password;
   };
 
@@ -112,7 +112,7 @@ const AddUser = ({ visible, onClose }) => {
           },
         }
       );
-      
+
       if (response.data.success) {
         message.success("OTP Verified Successfully");
         setShowOtpModal(false);
@@ -139,40 +139,40 @@ const AddUser = ({ visible, onClose }) => {
             <Row gutter={[16, 16]}>
               <Col span={12}>
                 <div className="space-y-2">
-                <div className="form-item">
-                  <label className="font-semibold">Name <span className="text-red-500">*</span></label>
-                  <Field
-                    name="username"
-                    as={Input}
-                    placeholder="Enter Name"
-                    className="w-full mt-2"
-                    rules={[{ required: true }]}
-                  />
-                  <ErrorMessage
-                    name="username"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
+                  <div className="form-item">
+                    <label className="font-semibold">Name <span className="text-red-500">*</span></label>
+                    <Field
+                      name="username"
+                      as={Input}
+                      placeholder="Enter Name"
+                      className="w-full mt-2"
+                      rules={[{ required: true }]}
+                    />
+                    <ErrorMessage
+                      name="username"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
                 </div>
               </Col>
               <Col span={12}>
                 <div className="space-y-2">
-                <div className="form-item">
-                  <label className="font-semibold">Email <span className="text-red-500">*</span></label>
-                  <Field
-                    name="email"
-                    as={Input}
-                    className="w-full mt-2"
-                    placeholder="Enter Email"
-                    rules={[{ required: true }]}
-                  />
-                  <ErrorMessage
-                    name="email"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
+                  <div className="form-item">
+                    <label className="font-semibold">Email <span className="text-red-500">*</span></label>
+                    <Field
+                      name="email"
+                      as={Input}
+                      className="w-full mt-2"
+                      placeholder="Enter Email"
+                      rules={[{ required: true }]}
+                    />
+                    <ErrorMessage
+                      name="email"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
                 </div>
               </Col>
             </Row>
@@ -191,8 +191,8 @@ const AddUser = ({ visible, onClose }) => {
                     dropdownRender={(menu) => (
                       <>
                         {menu}
-                        <Button 
-                          type="link" 
+                        <Button
+                          type="link"
                           block
                           // icon={<PlusOutlined />}
                           onClick={() => setShowRoleModal(true)}
@@ -215,7 +215,7 @@ const AddUser = ({ visible, onClose }) => {
               </Col>
               <Col span={12}>
                 <div className="form-item mt-2">
-                <label className="font-semibold">Password <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Password <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <Field
                       name="password"
@@ -227,7 +227,7 @@ const AddUser = ({ visible, onClose }) => {
                       className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
                       onClick={() => setFieldValue("password", generatePassword())}
                     >
-                     <ReloadOutlined/>
+                      <ReloadOutlined />
                     </Button>
                   </div>
                   <ErrorMessage
@@ -240,7 +240,7 @@ const AddUser = ({ visible, onClose }) => {
             </Row>
 
             <div className="flex justify-end gap-2 mt-6">
-              <Button 
+              <Button
                 onClick={onClose}
                 className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md"
               >

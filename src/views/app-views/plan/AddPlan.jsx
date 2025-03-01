@@ -12,7 +12,18 @@ import AddCurrencies from '../setting/currencies/AddCurrencies';
 const { Option } = Select;
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Please enter the plan name!'),
-  price: Yup.string().required('Please enter the plan price!'),
+  price: Yup.number()
+    .typeError('Price must be a number')
+    .required('Please enter the plan price!')
+    .min(0, 'Price cannot be negative')
+    .test(
+      'decimal',
+      'Price cannot have more than 2 decimal places',
+      (value) => {
+        if (!value) return true;
+        return /^\d*\.?\d{0,2}$/.test(value.toString());
+      }
+    ),
   // duration: Yup.string().required('Please select a duration!'),
   max_users: Yup.string().required('Please enter the maximum users!'),
   max_customers: Yup.string().required('Please enter the maximum customers!'),
@@ -30,14 +41,6 @@ const validationSchema = Yup.object().shape({
 });
 const AddPlan = ({ onClose }) => {
   const [isTrialEnabled, setIsTrialEnabled] = useState(false);
-  const [featureStates, setFeatureStates] = useState({
-    CRM: false,
-    Project: false,
-    HRM: false,
-    Account: false,
-    POS: false,
-    ChatGPT: false,
-  });
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [durationType, setDurationType] = useState(null);
@@ -47,9 +50,18 @@ const AddPlan = ({ onClose }) => {
 
   useEffect(() => {
     dispatch(getcurren());
-  }, []);
+  }, [dispatch]);
+
   const allempdatass = useSelector((state) => state.currencies);
   const fnddatass = allempdatass?.currencies?.data;
+
+  const getInitialCurrency = () => {
+    if (fnddatass?.length > 0) {
+      const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
+      return usdCurrency?.id || fnddatass[0]?.id;
+    }
+    return '';
+  };
 
   const initialValues = {
     name: '',
@@ -60,29 +72,33 @@ const AddPlan = ({ onClose }) => {
     max_vendors: '',
     max_clients: '',
     storage_limit: '',
-    description: '',
+    currency: getInitialCurrency(),
     trial: false,
-    trial_period: ''
+    trial_period: '',
   };
   const handleSubmit = (values, { resetForm }) => {
     let formattedDuration = 'Lifetime';
-    
+
     if (durationType === 'Monthly' && selectedMonth) {
       formattedDuration = `${selectedMonth} Month${selectedMonth > 1 ? 's' : ''}`;
     } else if (durationType === 'Yearly' && selectedYear) {
       formattedDuration = `${selectedYear} Year${selectedYear > 1 ? 's' : ''}`;
     }
-                      
-    const payload = { 
-      ...values, 
+
+    const payload = {
+      ...values,
       duration: formattedDuration,
-      features: featureStates 
+      max_users: String(values.max_users),
+      max_customers: String(values.max_customers),
+      max_vendors: String(values.max_vendors),
+      max_clients: String(values.max_clients),
+      storage_limit: String(values.storage_limit),
+      price: String(values.price),
+      trial_period: values.trial ? String(values.trial_period) : ''
     };
 
+    console.log('Payload:', payload);
 
-    console.log('Payload:', payload); // Log payload before dispatching API request
-
-    
     dispatch(CreatePlan(payload))
       .then(() => {
         dispatch(GetPlan());
@@ -98,14 +114,12 @@ const AddPlan = ({ onClose }) => {
   const handleTrialToggle = (checked) => {
     setIsTrialEnabled(checked);
   };
-  const handleFeatureToggle = (feature, checked) => {
-    setFeatureStates((prev) => ({ ...prev, [feature]: checked }));
-  };
+
   return (
     <div>
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}
+        enableReinitialize={true}
         onSubmit={handleSubmit}
       >
         {({ values, errors, touched, setFieldValue, handleChange }) => {
@@ -125,7 +139,7 @@ const AddPlan = ({ onClose }) => {
               setFieldValue('duration', 'Per Year');
             }}>
               <Menu.Item className='w-full'>
-                <Input 
+                <Input
                   placeholder="Enter years"
                   type="number"
                   onChange={(e) => {
@@ -159,7 +173,7 @@ const AddPlan = ({ onClose }) => {
                 {monthlyMenu}
               </Menu.SubMenu>
             </Menu>
-          );  
+          );
 
           const handleMonthlySelect = ({ key }) => {
             setDurationType('Monthly');
@@ -175,278 +189,314 @@ const AddPlan = ({ onClose }) => {
           };
           return (
             <Form>
-              <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
-              <Row gutter={16}>
-                <Col span={12}>
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label>Name <span style={{ color: 'red' }}>*</span></label>
-                    <Field name="name">
-                      {({ field }) => (
-                        <Input 
-                          {...field} 
-                          placeholder="Enter Plan Name" 
-                        />
-                      )}
-                    </Field>
-                    {errors.name && touched.name && (
-                      <div className="error-message">{errors.name}</div>
-                    )}
-                  </div>
-                </Col>
-                <Col span={12}>
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label>Price <span style={{ color: 'red' }}>*</span></label>
-                    <Field name="price">
-                      {({ field }) => (
-                        <Input 
-                          {...field} 
-                          placeholder="Enter Plan Price" 
-                        />
-                      )}
-                    </Field>
-                    {errors.price && touched.price && (
-                      <div className="error-message">{errors.price}</div>
-                    )}
-                  </div>
-                </Col>
-                <Col span={12}>
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label>Duration <span style={{ color: 'red' }}>*</span></label>
-                    <Dropdown 
-                      overlay={mainMenu} 
-                      trigger={['click']} 
-                      className='w-full'
-                    >
-                      <Button>
-                        {durationType === 'Monthly' && selectedMonth
-                          ? `${selectedMonth} Month${selectedMonth > 1 ? 's' : ''}`
-                          : durationType === 'Yearly' && selectedYear
-                            ? `${selectedYear} Year${selectedYear > 1 ? 's' : ''}`
-                            : durationType === 'Lifetime'
-                              ? 'Lifetime'
-                              : 'Select Duration'}
-                      </Button>
-                    </Dropdown>
-                    {errors.duration && touched.duration && (
-                      <div className="error-message">{errors.duration}</div>
-                    )}
-                  </div>
-                </Col>
-                <Col span={12}>
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label>Maximum Users <span style={{ color: 'red' }}>*</span></label>
-                    <Field name="max_users">
-                      {({ field }) => (
-                        <Input 
-                          {...field} 
-                          placeholder="Enter Maximum Users" 
-                        />
-                      )}
-                    </Field>
-                    {errors.max_users && touched.max_users && (
-                      <div className="error-message">{errors.max_users}</div>
-                    )}
-                  </div>
-                </Col>
-                <Col span={12}>
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label>Maximum Customers <span style={{ color: 'red' }}>*</span></label>
-                    <Field name="max_customers">
-                      {({ field }) => (
-                        <Input 
-                          {...field} 
-                          placeholder="Enter Maximum Customers" 
-                        />
-                      )}
-                    </Field>
-                    {errors.max_customers && touched.max_customers && (
-                      <div className="error-message">{errors.max_customers}</div>
-                    )}
-                  </div>
-                </Col>
-                <Col span={12}>
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label>Maximum Vendors <span style={{ color: 'red' }}>*</span></label>
-                    <Field name="max_vendors">
-                      {({ field }) => (
-                        <Input 
-                          {...field} 
-                          placeholder="Enter Maximum Vendors" 
-                        />
-                      )}
-                    </Field>
-                    {errors.max_vendors && touched.max_vendors && (
-                      <div className="error-message">{errors.max_vendors}</div>
-                    )}
-                  </div>
-                </Col>
-                <Col span={12}>
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label>Maximum Clients <span style={{ color: 'red' }}>*</span></label>
-                    <Field name="max_clients">
-                      {({ field }) => (
-                        <Input 
-                          {...field} 
-                          placeholder="Enter Maximum Clients" 
-                        />
-                      )}
-                    </Field>
-                    {errors.max_clients && touched.max_clients && (
-                      <div className="error-message">{errors.max_clients}</div>
-                    )}
-                  </div>
-                </Col>
-                <Col span={12}>
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label>Storage Limit (MB) <span style={{ color: 'red' }}>*</span></label>
-                    <Field name="storage_limit">
-                      {({ field }) => (
-                        <Input 
-                          {...field} 
-                          placeholder="Maximum Storage Limit" 
-                          suffix="MB" 
-                        />
-                      )}
-                    </Field>
-                    {errors.storage_limit && touched.storage_limit && (
-                      <div className="error-message">{errors.storage_limit}</div>
-                    )}
-                  </div>
-                </Col>
+              <div className="bg-white p-6 rounded-lg">
+                {/* Basic Plan Details */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Basic Plan Details</h3>
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <div className="form-group mb-4">
+                        <label className="text-gray-600 mb-2 block">Plan Name <span className="text-blue-600">*</span></label>
+                        <Field name="name">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter Plan Name"
+                              className="w-full rounded-md"
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="name" component="div" className="text-red-500 mt-1 text-sm" />
+                      </div>
+                    </Col>
 
-                <Col span={24}>
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label>Currency <span style={{ color: 'red' }}>*</span></label>
-                    <div className="flex gap-2">
-                      <Field name="currency">
-                        {({ field }) => (
-                          <Select
-                            {...field}
-                            className="w-full mt-2"
-                            placeholder="Select currency"
-                            onChange={(value) => setFieldValue("currency", value)}
-                            value={values.currency}
-                            dropdownRender={(menu) => (
-                              <>
-                                {menu}
-                                <div
-                                  style={{
-                                    padding: '8px',
-                                    borderTop: '1px solid #e8e8e8',
-                                  }}
-                                >
-                                  <Button
-                                    type="text"
-                                    icon={<PlusOutlined />}
-                                    onClick={() => setIsAddCurrencyModalVisible(true)}
-                                    block
-                                  >
-                                    Add New Currency
-                                  </Button>
-                                </div>
-                              </>
+                    <Col span={12}>
+                      <div className="form-group mb-4">
+                        <label className="text-gray-600 mb-2 block">Price & Currency <span className="text-red-500">*</span></label>
+                        <div className="flex gap-0">
+                          <Field name="currency">
+                            {({ field }) => (
+                              <Select
+                                {...field}
+                                className="currency-select"
+                                style={{
+                                  width: '60px',
+                                  borderTopRightRadius: 0,
+                                  borderBottomRightRadius: 0,
+                                  borderRight: 0,
+                                  backgroundColor: '#f8fafc',
+                                }}
+                                placeholder={<span className="text-gray-400">$</span>}
+                                onChange={(value) => {
+                                  if (value === 'add_new') {
+                                    setIsAddCurrencyModalVisible(true);
+                                  } else {
+                                    setFieldValue("currency", value);
+                                  }
+                                }}
+                                value={values.currency}
+                                dropdownStyle={{ minWidth: '180px' }}
+                                suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                                loading={!fnddatass}
+                                dropdownRender={menu => (
+                                  <div>
+                                    <div
+                                      className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                      onClick={() => setIsAddCurrencyModalVisible(true)}
+                                    >
+                                      <PlusOutlined className="mr-2" />
+                                      <span className="text-sm">Add New</span>
+                                    </div>
+                                    {menu}
+                                  </div>
+                                )}
+                              >
+                                {fnddatass?.map((currency) => (
+                                  <Option key={currency.id} value={currency.id}>
+                                    <div className="flex items-center w-full px-1">
+                                      <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                      <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                      <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                                    </div>
+                                  </Option>
+                                ))}
+                              </Select>
                             )}
-                          >
-                            {fnddatass && fnddatass?.length > 0 ? (
-                              fnddatass?.map((client) => (
-                                <Option key={client.id} value={client?.id}>
-                                  {client?.currencyIcon} {client?.currencyCode || "Unnamed currency"}
-                                </Option>
-                              ))
-                            ) : (
-                              <Option value="" disabled>
-                                No currency Available
-                              </Option>
+                          </Field>
+                          <Field name="price">
+                            {({ field, form }) => (
+                              <Input
+                                {...field}
+                                className="price-input"
+                                style={{
+                                  borderTopLeftRadius: 0,
+                                  borderBottomLeftRadius: 0,
+                                  borderLeft: '1px solid #d9d9d9',
+                                  width: 'calc(100% - 100px)'
+                                }}
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder="0.00"
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                    form.setFieldValue('price', value);
+                                  }
+                                }}
+                                onKeyPress={(e) => {
+                                  const charCode = e.which ? e.which : e.keyCode;
+                                  if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                    e.preventDefault();
+                                  }
+                                  if (charCode === 46 && field.value.includes('.')) {
+                                    e.preventDefault();
+                                  }
+                                }}
+                                prefix={
+                                  values.currency && (
+                                    <span className="text-gray-600 font-medium mr-1">
+                                      {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                                    </span>
+                                  )
+                                }
+                              />
                             )}
-                          </Select>
-                        )}
-                      </Field>
-                    </div>
-                    <ErrorMessage
-                      name="currency"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-              </Row>
-              <Row gutter={16}>
-                <Col span={12}>
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label>Trial Period</label>
-                    <div className="d-flex align-items-center">
-                      <Switch
-                        checked={values.trial}
-                        onChange={(checked) => {
-                          setFieldValue('trial', checked);
-                          if (!checked) {
-                            setFieldValue('trial_period', '');
-                          }
-                        }}
-                        className="mr-2"
-                      />
-                      <span className="ml-2">Enable Trial Period</span>
-                    </div>
-                  </div>
-                </Col>
-                {values.trial && (
-                  <Col span={12}>
-                    <div className="form-group" style={{ marginBottom: '16px' }}>
-                      <label>Trial Period (Days) <span style={{ color: 'red' }}>*</span></label>
-                      <Field name="trial_period">
-                        {({ field }) => (
-                          <Input
-                            {...field}
-                            
-                            min="1"
-                            placeholder="Enter trial period in days"
-                            suffix="Days"
-                          />
-                        )}
-                      </Field>
-                      {errors.trial_period && touched.trial_period && (
-                        <div className="error-message" style={{ color: 'red' }}>
-                          {errors.trial_period}
+                          </Field>
                         </div>
-                      )}
-                    </div>
-                  </Col>
-                )}
-              </Row>
-              <div className="form-group">
-                <label>Description</label>
-                <Field name="description">
-                  {({ field }) => (
-                    <Input.TextArea 
-                      {...field} 
-                      placeholder="Enter Description" 
-                      rows={4} 
-                    />
-                  )}
-                </Field>
-                {errors.description && touched.description && (
-                  <div className="error-message">{errors.description}</div>
-                )}
-              </div>
-              
-              <div className='mt-4'>
-                <Switch
-                  checked={isTrialEnabled}
-                  onChange={handleTrialToggle}
-                />
-                <span> Trial Period</span>
-              </div>
-              
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }} className='mt-4'>
-                <Button style={{ marginRight: '8px' }} onClick={() => {
-                  onClose();
-                  setIsTrialEnabled(false);
-                }}>
-                  Cancel
-                </Button>
-                <Button type="primary" htmlType="submit">
-                  Create
-                </Button>
+                        <ErrorMessage name="price" component="div" className="text-red-500 mt-1 text-sm" />
+                      </div>
+                    </Col>
+
+                    <Col span={12}>
+                      <div className="form-group mb-4">
+                        <label className="text-gray-600 mb-2 block">Duration <span className="text-red-500">*</span></label>
+                        <Dropdown
+                          overlay={mainMenu}
+                          trigger={['click']}
+                          className="w-full"
+                        >
+                          <Button className="w-full flex justify-between items-center">
+                            <span>
+                              {durationType === 'Monthly' && selectedMonth
+                                ? `${selectedMonth} Month${selectedMonth > 1 ? 's' : ''}`
+                                : durationType === 'Yearly' && selectedYear
+                                  ? `${selectedYear} Year${selectedYear > 1 ? 's' : ''}`
+                                  : durationType === 'Lifetime'
+                                    ? 'Lifetime'
+                                    : 'Select Duration'}
+                            </span>
+                            <span className="text-gray-400">▼</span>
+                          </Button>
+                        </Dropdown>
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
+
+                {/* Usage Limits */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Usage Limits</h3>
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <div className="form-group mb-4">
+                        <label className="text-gray-600 mb-2 block">Maximum Users <span className="text-red-500">*</span></label>
+                        <Field name="max_users">
+                          {({ field, form }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter Maximum Users"
+                              type="number"
+                              min="1"
+                              className="w-full rounded-md"
+                              onChange={(e) => {
+                                form.setFieldValue('max_users', String(e.target.value));
+                              }}
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="max_users" component="div" className="text-red-500 mt-1 text-sm" />
+                      </div>
+                    </Col>
+
+                    <Col span={12}>
+                      <div className="form-group mb-4">
+                        <label className="text-gray-600 mb-2 block">Maximum Customers <span className="text-red-500">*</span></label>
+                        <Field name="max_customers">
+                          {({ field, form }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter Maximum Customers"
+                              type="number"
+                              min="1"
+                              className="w-full rounded-md"
+                              onChange={(e) => {
+                                form.setFieldValue('max_customers', String(e.target.value));
+                              }}
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="max_customers" component="div" className="text-red-500 mt-1 text-sm" />
+                      </div>
+                    </Col>
+
+                    <Col span={12}>
+                      <div className="form-group mb-4">
+                        <label className="text-gray-600 mb-2 block">Maximum Vendors <span className="text-red-500">*</span></label>
+                        <Field name="max_vendors">
+                          {({ field, form }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter Maximum Vendors"
+                              type="number"
+                              min="1"
+                              className="w-full rounded-md"
+                              onChange={(e) => {
+                                form.setFieldValue('max_vendors', String(e.target.value));
+                              }}
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="max_vendors" component="div" className="text-red-500 mt-1 text-sm" />
+                      </div>
+                    </Col>
+
+                    <Col span={12}>
+                      <div className="form-group mb-4">
+                        <label className="text-gray-600 mb-2 block">Maximum Clients <span className="text-red-500">*</span></label>
+                        <Field name="max_clients">
+                          {({ field, form }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter Maximum Clients"
+                              type="number"
+                              min="1"
+                              className="w-full rounded-md"
+                              onChange={(e) => {
+                                form.setFieldValue('max_clients', String(e.target.value));
+                              }}
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="max_clients" component="div" className="text-red-500 mt-1 text-sm" />
+                      </div>
+                    </Col>
+
+                    <Col span={12}>
+                      <div className="form-group mb-4">
+                        <label className="text-gray-600 mb-2 block">Storage Limit (MB) <span className="text-red-500">*</span></label>
+                        <Field name="storage_limit">
+                          {({ field, form }) => (
+                            <Input
+                              {...field}
+                              placeholder="Maximum Storage Limit"
+                              type="number"
+                              min="1"
+                              suffix="MB"
+                              className="w-full rounded-md"
+                              onChange={(e) => {
+                                form.setFieldValue('storage_limit', String(e.target.value));
+                              }}
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="storage_limit" component="div" className="text-red-500 mt-1 text-sm" />
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
+
+                {/* Trial Period */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Trial Period</h3>
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <div className="form-group mb-4">
+                        <Switch
+                          checked={values.trial}
+                          onChange={(checked) => {
+                            setFieldValue('trial', checked);
+                            if (!checked) setFieldValue('trial_period', '');
+                          }}
+                          className="mr-2"
+                        />
+                        <span className="text-gray-600">Enable Trial Period</span>
+                      </div>
+                    </Col>
+                    {values.trial && (
+                      <Col span={12}>
+                        <div className="form-group mb-4">
+                          <Field name="trial_period">
+                            {({ field, form }) => (
+                              <Input
+                                {...field}
+                                placeholder="Enter trial period in days"
+                                type="number"
+                                min="1"
+                                suffix="Days"
+                                className="w-full rounded-md"
+                                onChange={(e) => {
+                                  form.setFieldValue('trial_period', String(e.target.value));
+                                }}
+                              />
+                            )}
+                          </Field>
+                          <ErrorMessage name="trial_period" component="div" className="text-red-500 mt-1 text-sm" />
+                        </div>
+                      </Col>
+                    )}
+                  </Row>
+                </div>
+
+                {/* Form Actions */}
+                <div className="flex justify-end gap-2">
+                  <Button onClick={onClose}>
+                    Cancel
+                  </Button>
+                  <Button type="primary" htmlType="submit">
+                    Create Plan
+                  </Button>
+                </div>
               </div>
             </Form>
           );
@@ -468,6 +518,35 @@ const AddPlan = ({ onClose }) => {
           }}
         />
       </Modal>
+
+      {/* Custom render for selected value */}
+      <style jsx>{`
+        .currency-select .ant-select-selection-item {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 16px !important;
+        }
+
+        .currency-select .ant-select-selection-item > div {
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .currency-select .ant-select-selection-item span:not(:first-child) {
+          display: none !important;
+        }
+
+        .ant-select-dropdown .ant-select-item {
+          padding: 8px 12px !important;
+        }
+
+        .ant-select-dropdown .ant-select-item-option-content > div {
+          display: flex !important;
+          align-items: center !important;
+          width: 100% !important;
+        }
+      `}</style>
     </div>
   );
 };

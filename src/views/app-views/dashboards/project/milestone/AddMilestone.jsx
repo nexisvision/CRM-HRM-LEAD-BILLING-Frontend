@@ -50,25 +50,31 @@ const curr = currencies?.data || [];
   const AllLoggeddtaa = useSelector((state) => state.user);
   const AllTags = Tagsdetail?.Lable?.data;
   const onSubmit = (values, { resetForm }) => {
+    // Convert the values before sending
+    const formattedValues = {
+      ...values,
+      milestone_cost: Number(values.milestone_cost),
+      add_cost_to_project_budget: values.add_cost_to_project_budget ? "yes" : "no"
+    };
+
     // Check if the selected tag is new or existing
     const selectedTag = tags.find(
-      (tag) => tag.name === values.milestone_status
+      (tag) => tag.name === formattedValues.milestone_status
     );
+
     if (!selectedTag) {
       // Call AddLable API only if the selected tag is new
       const lid = AllLoggeddtaa.loggedInUser.id;
-      const newTagPayload = { name: values.milestone_status.trim() };
+      const newTagPayload = { name: formattedValues.milestone_status.trim() };
       dispatch(AddLable({ id, payload: newTagPayload }))
         .then(() => {
-          dispatch(AddMins({ id, values }))
+          dispatch(AddMins({ id, values: formattedValues }))
             .then(() => {
               dispatch(Getmins(id));
-              // message.success("Milestone added successfully!");
               resetForm();
               onClose();
             })
             .catch((error) => {
-              // message.error("Failed to add Milestone.");
               console.error("Add Milestone API error:", error);
             });
         })
@@ -78,15 +84,13 @@ const curr = currencies?.data || [];
         });
     } else {
       // If tag exists, directly add the milestone
-      dispatch(AddMins({ id, values }))
+      dispatch(AddMins({ id, values: formattedValues }))
         .then(() => {
           dispatch(Getmins(id));
-          // message.success("Milestone added successfully!");
           resetForm();
           onClose();
         })
         .catch((error) => {
-          // message.error("Failed to add Milestone.");
           console.error("Add Milestone API error:", error);
         });
     }
@@ -95,7 +99,7 @@ const curr = currencies?.data || [];
     milestone_title: "",
     milestone_cost: "",
     milestone_status: "",
-    add_cost_to_project_budget: "",
+    add_cost_to_project_budget: false,
     milestone_summary: "",
     milestone_start_date: null,
     milestone_end_date: null,
@@ -248,7 +252,7 @@ const curr = currencies?.data || [];
                       <Select
                         value={values.add_cost_to_project_budget}
                         onChange={(value) =>
-                          setFieldValue("add_cost_to_project_budget", value)
+                          setFieldValue("add_cost_to_project_budget", value === 'yes')
                         }
                         onBlur={() =>
                           setFieldTouched("add_cost_to_project_budget", true)
@@ -745,8 +749,9 @@ export default AddMilestone;
 //                             <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
 //                               <Button
 //                                 type="link"
-//                                 icon={<PlusOutlined />}
+//                                 // icon={<PlusOutlined />}
 //                                 onClick={() => setIsStatusModalVisible(true)}
+//                                 block
 //                               >
 //                                 Add New Status
 //                               </Button>
@@ -899,7 +904,7 @@ export default AddMilestone;
 //       const lid = AllLoggeddtaa.loggedInUser.id;
 //       const newTagPayload = { name: values.milestone_status.trim() };
 
-//       dispatch(AddLable({ lid, payload: newTagPayload }))
+//       dispatch(AddLable({ id, payload: newTagPayload }))
 //         .then(() => {
 //           dispatch(AddMins({ id, values }))
 //             .then(() => {

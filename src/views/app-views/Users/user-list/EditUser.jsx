@@ -49,7 +49,7 @@ const EditUser = ({ idd, visible, onClose, onUpdate }) => {
         email: values.email,
         role_id: values.role_id
       };
-      
+
       await dispatch(Edituser({ idd, values: updateData }));
       dispatch(GetUsers());
       onClose();
@@ -60,6 +60,7 @@ const EditUser = ({ idd, visible, onClose, onUpdate }) => {
       setSubmitting(false);
     }
   };
+
 
   return (
     <div className="">
@@ -74,23 +75,23 @@ const EditUser = ({ idd, visible, onClose, onUpdate }) => {
             <div className="border-b border-gray-200 mb-6"></div>
 
             <Row gutter={[16, 16]}>
-            <Col span={12}>
+              <Col span={12}>
                 <div className="space-y-2">
-                <div className="form-item">
-                  <label className="font-semibold">Name <span className="text-red-500">*</span></label>
-                  <Field
-                    name="username"
-                    as={Input}
-                    placeholder="Enter Name"
-                    className="w-full mt-2"
-                    rules={[{ required: true }]}
-                  />
-                  <ErrorMessage
-                    name="username"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
+                  <div className="form-item">
+                    <label className="font-semibold">Name <span className="text-red-500">*</span></label>
+                    <Field
+                      name="username"
+                      as={Input}
+                      placeholder="Enter Name"
+                      className="w-full mt-2"
+                      rules={[{ required: true }]}
+                    />
+                    <ErrorMessage
+                      name="username"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
                 </div>
               </Col>
               <Col span={12}>
@@ -118,7 +119,7 @@ const EditUser = ({ idd, visible, onClose, onUpdate }) => {
               </Col>
             </Row>
             <div className="flex justify-end gap-2 mt-6">
-              <Button 
+              <Button
                 onClick={onClose}
                 className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-md"
               >

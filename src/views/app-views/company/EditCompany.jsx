@@ -23,7 +23,7 @@ import { Editclients } from "./CompanyReducers/CompanySlice";
 import { UploadOutlined } from '@ant-design/icons';
 const { Option } = Select;
 const { EditClient, ClientData } = CompanyService;
-const EditCompany = ({ comnyid, onClose }) => {
+const EditCompany = ({ comnyid, initialData, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const AllDepart = useSelector((state) => state.Department);
@@ -56,47 +56,26 @@ const EditCompany = ({ comnyid, onClose }) => {
     }
   }, [allcom, comnyid]);
 
-  useEffect(() => {
-    if (clientData) {
-      setInitialValues({
-        firstName: clientData.firstName || "",
-        lastName: clientData.lastName || "",
-        bankname: clientData.bankname || "",
-        phone: clientData.phone || "",
-        ifsc: clientData.ifsc || "",
-        banklocation: clientData.banklocation || "",
-        accountholder: clientData.accountholder || "",
-        accountnumber: clientData.accountnumber || "",
-        gstIn: clientData.gstIn || "",
-        city: clientData.city || "",
-        state: clientData.state || "",
-        country: clientData.country || "",
-        zipcode: clientData.zipcode || "",
-        profilePic: clientData.profilePic || "",
-        address: clientData.address || "",
-        website: clientData.website || "",
-      });
-    }
-  }, [clientData]);
-
   const [initialValues, setInitialValues] = useState({
-    firstName: "",
-    lastName: "",
-    bankname: "",
-    phone: "",
-    ifsc: "",
-    banklocation: "",
-    accountholder: "",
-    accountnumber: "",
-    gstIn: "",
-    city: "",
-    state: "",
-    country: "",
-    zipcode: "",
-    profilePic: "",
-    address: "",
-    website: "",
+    firstName: initialData?.firstName || "",
+    lastName: initialData?.lastName || "",
+    bankname: initialData?.bankname || "",
+    phone: initialData?.phone || "",
+    ifsc: initialData?.ifsc || "",
+    banklocation: initialData?.banklocation || "",
+    accountholder: initialData?.accountholder || "",
+    accountnumber: initialData?.accountnumber || "",
+    gstIn: initialData?.gstIn || "",
+    city: initialData?.city || "",
+    state: initialData?.state || "",
+    country: initialData?.country || "",
+    zipcode: initialData?.zipcode || "",
+    profilePic: initialData?.profilePic || "",
+    address: initialData?.address || "",
+    website: initialData?.website || "",
+    accountType: initialData?.accountType || "",
   });
+
   const validationSchema = Yup.object({
     firstName: Yup.string().required("Please enter a First Name."),
     lastName: Yup.string().required("Please enter a Last Name."),
@@ -108,32 +87,58 @@ const EditCompany = ({ comnyid, onClose }) => {
     zipcode: Yup.string().required("Please enter a Zipcode."),
     address: Yup.string().required("Please enter an Address."),
     website: Yup.string().required("Please enter a Website."),
+    accountType: Yup.string().required("Please select an Account Type"),
   });
+
   const handleSubmit = async (values) => {
     try {
       const formData = new FormData();
       Object.keys(values).forEach(key => {
         if (values[key] !== undefined && values[key] !== null) {
-          formData.append(key, values[key]);
+          if (key === 'profilePic' && typeof values[key] === 'object') {
+            formData.append(key, values[key]);
+          } else {
+            formData.append(key, values[key]);
+          }
         }
       });
 
       await dispatch(Editclients({ comnyid, formData })).unwrap();
-      message.success("Profile updated successfully!");
+      message.success("Company updated successfully!");
       await dispatch(ClientData());
       onClose();
     } catch (error) {
-      message.error(error.message || "Failed to update profile");
+      message.error(error.message || "Failed to update company");
     }
   };
+
+  useEffect(() => {
+    if (initialData) {
+      setInitialValues({
+        firstName: initialData.firstName || "",
+        lastName: initialData.lastName || "",
+        bankname: initialData.bankname || "",
+        phone: initialData.phone || "",
+        ifsc: initialData.ifsc || "",
+        banklocation: initialData.banklocation || "",
+        accountholder: initialData.accountholder || "",
+        accountnumber: initialData.accountnumber || "",
+        gstIn: initialData.gstIn || "",
+        city: initialData.city || "",
+        state: initialData.state || "",
+        country: initialData.country || "",
+        zipcode: initialData.zipcode || "",
+        profilePic: initialData.profilePic || "",
+        address: initialData.address || "",
+        website: initialData.website || "",
+        accountType: initialData.accountType || "",
+      });
+    }
+  }, [initialData]);
 
   if (loading) {
     return <div>Loading...</div>;
   }
-
-  // if (!clientData) {
-  //   return <div>No client data found</div>;
-  // }
 
   return (
     <div className="add-job-form">
@@ -150,7 +155,7 @@ const EditCompany = ({ comnyid, onClose }) => {
               <Col span={12} className="">
                 <div className="form-item ">
                   <label className="font-semibold ">First Name <span className="text-red-500">*</span></label>
-                  <Field name="firstName" as={Input} placeholder="Enter First Name" className="mt-1"/>
+                  <Field name="firstName" as={Input} placeholder="Enter First Name" className="mt-1" />
                   <ErrorMessage
                     name="firstName"
                     component="div"
@@ -302,31 +307,44 @@ const EditCompany = ({ comnyid, onClose }) => {
                 </div>
               </Col>
               <Col span={12} className="mt-3">
-                    <div className="form-item">
-                      <label className="font-semibold ">Website <span className="text-red-500">*</span></label>
-                        <Field name="website" as={Input} placeholder="Enter  Website" className="mt-2"  />
-                      <ErrorMessage
-                        name="website"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
-                    </div>
-                  </Col>
-                  <Col span={12} className="mt-3">
-                    <div className="flex flex-col space-y-2">
-                      <label className="text-sm font-semibold text-gray-700">Account Type <span className="text-red-500">*</span></label>
-                        <Field name="accountType" as={Select} placeholder="Select Account Type" className="w-full rounded-md border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                          <Option value="current">Current</Option>
-                          <Option value="saving">Saving</Option>
-                          <Option value="business">Business</Option>
-                        </Field>
-                      <ErrorMessage
-                        name="accountType"
-                        component="div"
-                        className="text-sm text-red-500"
-                      />
-                    </div>
-                  </Col>
+                <div className="form-item">
+                  <label className="font-semibold ">Website <span className="text-red-500">*</span></label>
+                  <Field name="website" as={Input} placeholder="Enter  Website" className="mt-2" />
+                  <ErrorMessage
+                    name="website"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+              <Col span={12} className="mt-3">
+                <div className="flex flex-col space-y-2">
+                  <label className="text-sm font-semibold text-gray-700">
+                    Account Type <span className="text-red-500">*</span>
+                  </label>
+                  <Field name="accountType">
+                    {({ field, form }) => (
+                      <Select
+                        {...field}
+                        value={field.value || undefined}
+                        onChange={(value) => form.setFieldValue('accountType', value)}
+                        placeholder="Select Account Type"
+                        className="w-full rounded-md"
+                        style={{ width: '100%' }}
+                      >
+                        <Option value="current">Current</Option>
+                        <Option value="saving">Saving</Option>
+                        <Option value="business">Business</Option>
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="accountType"
+                    component="div"
+                    className="text-sm text-red-500"
+                  />
+                </div>
+              </Col>
               <Col span={12} className="mt-3">
                 <div className="flex flex-col gap-3">
                   <label className="font-semibold text-gray-700">Profile Picture <span className="text-red-500">*</span></label>
@@ -335,8 +353,8 @@ const EditCompany = ({ comnyid, onClose }) => {
                       <Upload
                         accept="image/*"
                         beforeUpload={(file) => {
-                          form.setFieldValue('profilePic', file); // Set the uploaded file in Formik state
-                          return false; // Prevent automatic upload
+                          form.setFieldValue('profilePic', file);
+                          return false;
                         }}
                         showUploadList={true}
                       >

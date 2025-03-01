@@ -1,3 +1,59 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:where(.css-dev-only-do-not-override-10jqpyg).ant-select-single.ant-select-show-arrow .ant-select-selection-item,
+:where(.css-dev-only-do-not-override-10jqpyg).ant-select-single.ant-select-show-arrow .ant-select-selection-placeholder {
+    padding-inline-end: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-right: 8px;
+}
+
+.ant-select-dropdown {
+    padding: 0 !important;
+}
+
+.ant-select-item {
+    padding: 8px 12px !important;
+}
+
+.ant-select-item-option-content {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    white-space: nowrap !important;
+}
+
+.currency-select .ant-select-selector {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-right: 0 !important;
+    background-color: #f4f6f8 !important;
+    padding: 0 8px !important;
+    height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+.currency-select .ant-select-selection-item {
+    padding: 0 4px !important;
+    line-height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    font-weight: 500 !important;
+}
+
+.currency-select .ant-select-arrow {
+    right: 8px !important;
+}
+
+.price-input {
+    height: 36px !important;
+}
+
+.price-input .ant-input-prefix {
+    margin-right: 8px !important;
+}

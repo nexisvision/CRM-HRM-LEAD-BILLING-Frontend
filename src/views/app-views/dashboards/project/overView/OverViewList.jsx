@@ -18,11 +18,12 @@ import { GetProject } from "../project-list/projectReducer/ProjectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { useNavigate, useParams } from 'react-router-dom';
-import { Modal, Tag, Table } from 'antd';
+import { Modal, Tag, Table, Timeline, Progress } from 'antd';
 import { GetTasks } from "../task/TaskReducer/TaskSlice";
 import { Getmins } from "../milestone/minestoneReducer/minestoneSlice";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import utils from "utils";
+import { ClockCircleOutlined, CheckCircleOutlined, LoadingOutlined, UserOutlined, MailOutlined, PhoneOutlined, GlobalOutlined, TeamOutlined, CalendarOutlined } from '@ant-design/icons';
 
 // Register the chart components
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -36,21 +37,70 @@ const OverViewList = () => {
   const [isTaskModalVisible, setIsTaskModalVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(null);
 
-  // Safe access to Redux state with multiple fallback checks
+  // Move all selectors to the top
   const allempdata = useSelector((state) => state?.Project) || {};
   const filterdata = allempdata?.Project?.data || [];
-
-  // Add milestone state
+  const taskData = useSelector((state) => state?.Tasks?.Tasks?.data) || [];
   const milestoneData = useSelector((state) => state.Milestone?.Milestone?.data) || [];
+  const allclient = useSelector((state) => state?.SubClient?.SubClient?.data) || [];
+  const logged = useSelector((state) => state.user.loggedInUser);
 
-  // Fetch data immediately when component mounts
+  // Enhanced progress calculation
+  const projectMetrics = useMemo(() => {
+    try {
+      const totalTasks = taskData.length;
+      const totalMilestones = milestoneData.length;
+      const completedTasks = taskData.filter(task => task.status?.toLowerCase() === 'completed').length;
+      const completedMilestones = milestoneData.filter(milestone => milestone.milestone_status?.toLowerCase() === 'completed').length;
+
+      const start = dayjs(filterdata?.[0]?.startDate);
+      const end = dayjs(filterdata?.[0]?.endDate);
+      const now = dayjs();
+
+      const taskProgress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+      const milestoneProgress = totalMilestones > 0 ? (completedMilestones / totalMilestones) * 100 : 0;
+      const totalDuration = end.diff(start, 'day');
+      const elapsed = now.diff(start, 'day');
+      const remaining = end.diff(now, 'day');
+      const timeProgress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+
+      const weightedProgress = totalTasks === 0 && totalMilestones === 0 ? timeProgress :
+        totalTasks === 0 ? milestoneProgress :
+          totalMilestones === 0 ? taskProgress :
+            (taskProgress * 0.4) + (milestoneProgress * 0.6);
+
+      return {
+        progress: weightedProgress.toFixed(1),
+        tasks: { total: totalTasks, completed: completedTasks },
+        milestones: { total: totalMilestones, completed: completedMilestones },
+        time: { total: totalDuration, elapsed, remaining },
+        isComplete: weightedProgress >= 100 ||
+          (completedTasks === totalTasks &&
+            completedMilestones === totalMilestones)
+      };
+    } catch (error) {
+      console.error("Error calculating metrics:", error);
+      return {
+        progress: "0",
+        tasks: { total: 0, completed: 0 },
+        milestones: { total: 0, completed: 0 },
+        time: { total: 0, elapsed: 0, remaining: 0 },
+        isComplete: false
+      };
+    }
+  }, [taskData, milestoneData, filterdata]);
+
+  // Update progress calculation
+  useEffect(() => {
+    setProo(projectMetrics.progress);
+  }, [projectMetrics.progress]);
+
+  // Fetch data
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Load client data first
         await dispatch(ClientData());
-        // Then load project and task data
         await Promise.all([
           dispatch(GetProject()),
           dispatch(GetTasks(id)),
@@ -65,73 +115,6 @@ const OverViewList = () => {
     fetchData();
   }, [dispatch, id]);
 
-  // Calculate progress based on date range
-  useEffect(() => {
-    if (!filterdata || !Array.isArray(filterdata) || filterdata.length === 0) {
-      setProo("0");
-      return;
-    }
-
-    const projectData = filterdata[0];
-    if (!projectData?.startDate || !projectData?.endDate) {
-      setProo("0");
-      return;
-    }
-
-    try {
-      const startDate = new Date(projectData.startDate);
-      const endDate = new Date(projectData.endDate);
-      const currentDate = new Date();
-
-      // Validate dates
-      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-        setProo("0");
-        return;
-      }
-
-      // Calculate total project duration in milliseconds
-      const totalDuration = endDate.getTime() - startDate.getTime();
-
-      // Calculate elapsed time in milliseconds
-      const elapsedTime = currentDate.getTime() - startDate.getTime();
-
-      // Calculate progress percentage
-      let progressPercentage;
-
-      if (currentDate < startDate) {
-        // Project hasn't started yet
-        progressPercentage = 0;
-      } else if (currentDate > endDate) {
-        // Project has passed end date
-        progressPercentage = 100;
-      } else {
-        // Project is in progress
-        progressPercentage = (elapsedTime / totalDuration) * 100;
-      }
-
-      // Round to 2 decimal places and ensure it's between 0 and 100
-      progressPercentage = Math.min(Math.max(progressPercentage, 0), 100);
-      setProo(progressPercentage.toFixed(2));
-
-      // Optional: Log details for debugging
-      console.log({
-        startDate: startDate.toLocaleDateString(),
-        endDate: endDate.toLocaleDateString(),
-        currentDate: currentDate.toLocaleDateString(),
-        totalDays: Math.ceil(totalDuration / (1000 * 60 * 60 * 24)),
-        elapsedDays: Math.ceil(elapsedTime / (1000 * 60 * 60 * 24)),
-        progress: `${progressPercentage.toFixed(2)}%`
-      });
-
-    } catch (error) {
-      console.error("Error calculating progress:", error);
-      setProo("0");
-    }
-  }, [filterdata]);
-
-  // Update the selector to properly access client data from Redux store
-  const allclient = useSelector((state) => state?.SubClient?.SubClient?.data) || [];
-  
   // Remove console.logs and add proper error handling
   const fndpro = filterdata.find((item) => item.id === id);
   const fndclient = allclient?.find((item) => item?.id === fndpro?.client);
@@ -173,8 +156,6 @@ const OverViewList = () => {
     }
   };
 
-  const logged = useSelector((state)=>state.user.loggedInUser)
-
   const dateendd = filterdata?.[0]?.startDate
     ? formatDate(filterdata[0].startDate)
     : "N/A";
@@ -188,8 +169,6 @@ const OverViewList = () => {
   const progress = 50;
   const startDate = "Wed 24 Jul 2024";
   const deadline = "Sun 24 Nov 2024";
-
-  const taskData = useSelector((state) => state?.Tasks?.Tasks?.data) || [];
 
   // Define status colors mapping with more color options
   const statusColors = {
@@ -334,7 +313,7 @@ const OverViewList = () => {
 
     // Find the client using the project's client ID
     const client = allclient.find(item => item.id === fndpro.client);
-    
+
     if (!client) {
       return {
         username: 'Client Not Found',
@@ -396,320 +375,514 @@ const OverViewList = () => {
     return milestoneData || [];
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  // Add this status color mapping at the top of the component
+  const timelineStatusColors = {
+    'Not Started': '#1890ff',  // Blue
+    'In Progress': '#52c41a',  // Green
+    'Overdue': '#f5222d',     // Red
+  };
 
-  return (
-    <>
-      <div className="p-2 bg-gray-50">
-      {/* <div className="mb-4 bg-white p-8 rounded-lg shadow">
-          <h4 className="text-2xl font-medium text-black mb-4">Project</h4>
-          <div className="flex justify-between items-center sm:items-start">
-                <span className="text-gray-500 font-weight-bold text-lg mb-1">Start Date</span>
-                <span className="text-gray-800 text-sm sm:text-base">
-                  {filterdata?.[0]?.startDate
-                    ? dayjs(filterdata[0].startDate).format('DD/MM/YYYY')  // Changed format here
-                    : "N/A"}
-                </span>
-              </div>
+  const ProjectProgress = () => (
+    <div className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-semibold text-gray-800">Project Progress</h2>
+        <span className={`px-3 py-1 rounded-full text-sm ${projectMetrics.isComplete ? 'bg-green-100 text-green-800' :
+          parseFloat(projectMetrics.progress) > 70 ? 'bg-blue-100 text-blue-800' :
+            'bg-yellow-100 text-yellow-800'
+          }`}>
+          {projectMetrics.isComplete ? 'Completed' : 'In Progress'}
+        </span>
+      </div>
 
-          
-              <div className="flex justify-between items-center sm:items-start">
-                <span className="text-gray-500 font-weight-bold text-lg mb-1">End Date</span>
-                <span className="text-gray-800 text-sm sm:text-base">
-                  {filterdata?.[0]?.endDate
-                    ? dayjs(filterdata[0].endDate).format('DD/MM/YYYY')  // Changed format here
-                    : "N/A"}
-                </span>
-              </div>
-        </div> */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-medium text-black mb-4">
-              Project Progress
-            </h2>
-
-            <div className="flex flex-col items-center justify-center w-full">
-              <div className="relative w-32 h-32">
-                <CircularProgressbar
-                  value={parseFloat(proo)}
-                  text={`${proo}%`}
-                  circleRatio={0.5}
-                  rotation={0.50}
-                  styles={{
-                    root: {
-                      transform: "rotate(0.50turn)",
-                    },
-                    path: {
-                      stroke: `${parseFloat(proo) < 50
-                          ? "#FFA500"  // Orange for less than 50%
-                          : parseFloat(proo) < 80
-                            ? "#2E8B57"  // Sea Green for 50-80%
-                            : "#008000"  // Green for above 80%
-                        }`,
-                      strokeLinecap: "round",
-                      strokeWidth: "6",
-                      transition: "stroke-dashoffset 0.5s ease 0s",
-                      transform: "rotate(0.50turn)",
-                      transformOrigin: "center center",
-                    },
-                    trail: {
-                      stroke: "#edf2f7",
-                      strokeLinecap: "round",
-                      strokeWidth: "6",
-                      transform: "rotate(0.25turn)",
-                      transformOrigin: "center center",
-                    },
-                    text: {
-                      fill: "#333",
-                      fontSize: "14px",
-                      fontWeight: 500,
-                      transform: "rotate(0.50turn)",
-                      transformOrigin: "center center",
-                      dominantBaseline: "middle",
-                      textAnchor: "middle",
-                    },
-                  }}
-                />
-                {/* Scale markers */}
-                <div className="relative mt-2">
-                  <span className="absolute left-0 top-[-73px] sm:top-[-60px] text-xs text-gray-500">
-                    0%
-                  </span>
-                  <span className="absolute right-[-12px] top-[-73px] sm:top-[-60px] text-xs text-gray-500">
-                    100%
-                  </span>
-                </div>
-              </div>
-            </div>
-
-
-            <div className="flex justify-between">
-              {/* Start Date */}
-              <div className="flex flex-col items-center sm:items-start">
-                <span className="text-gray-500 font-weight-bold text-lg mb-1">Start Date</span>
-                <span className="text-gray-800 text-sm sm:text-base">
-                  {filterdata?.[0]?.startDate
-                    ? dayjs(filterdata[0].startDate).format('DD/MM/YYYY')  // Changed format here
-                    : "N/A"}
-                </span>
-              </div>
-
-              {/* End Date */}
-              <div className="flex flex-col items-center sm:items-start">
-                <span className="text-gray-500 font-weight-bold text-lg mb-1">End Date</span>
-                <span className="text-gray-800 text-sm sm:text-base">
-                  {filterdata?.[0]?.endDate
-                    ? dayjs(filterdata[0].endDate).format('DD/MM/YYYY')  // Changed format here
-                    : "N/A"}
-                </span>
-              </div>
-            </div>
-
-          </div>
-       
-          <div className="bg-white p-6 rounded-lg shadow flex flex-col">
-            <h2 className="text-xl font-medium mb-0 text-black">Client</h2>
-            {fndclient ? (
-              <div className="flex items-center gap-4">
-                <div className="mt-6">
-                  {/* Profile Picture with error handling */}
-                  <div className="w-16 h-16 rounded-full overflow-hidden">
-                    <img 
-                      src={fndclient?.profilePic } 
-                      alt="Client profile"
-                      className="w-full h-full object-cover"
-                      // onError={(e) => {
-                      //   e.target.onerror = null;
-                      //   e.target.src = 'https://via.placeholder.com/64';
-                      // }}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="f-18 f-w-500 mb-0 text-black mt-6">
-                    {fndclient?.firstName || fndclient?.username || 'No Name Available'}
-                  </h3>
-                  <p className="f-14 mb-0 text-lightest">
-                    {fndclient?.email || 'No Email Available'}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="mt-4 text-gray-500">
-                No client information available
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="">
-            <div>
-              <p className="text-2xl font-semibold text-black mb-1">
-                Statistics
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-5 xl:grid-cols-5 gap-6 mb-6">
-              <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-gray-600 mb-2 text-lg font-semibold">
-                  Project Budget
-                </h3>  
-                <span className="flex justify-end">
-                  <FaCoins className="text-gray-500 text-2xl" />
-                </span>
-                <p className="text-xl font-medium md:text-base text-blue-500">
-                  {filterdata[0]?.budget}
-                </p>
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-gray-600 mb-2 text-lg font-semibold">
-                  Hours Logged
-                </h3>
-                <span className="flex justify-end mb-2">
-                  <TbClockHour3Filled className="text-gray-500 text-2xl" />
-                </span>
-                <p className="text-xl font-medium md:text-base text-blue-500">
-                  {filterdata[0]?.estimatedhours}
-                </p>
-              </div>
-           
-              <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-gray-600 mb-2 text-lg font-semibold ">
-                  Earnings
-                </h3>
-                <span className="flex justify-end mb-2">
-                  {" "}
-                  <FaCoins className="text-gray-500 text-2xl" />
-                </span>
-                <p className="text-xl font-medium md:text-base text-blue-500">
-                  30,644.00
-                </p>
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-gray-600 mb-2 text-lg font-semibold">
-                  Expenses
-                </h3>
-                <span className="flex justify-end">
-                  {" "}
-                  <FaCoins className="text-gray-500 text-2xl mb-2" />
-                </span>
-                <p className="text-xl font-medium md:text-base text-blue-500">
-                  0.00
-                </p>
-              </div>
-              <div className="bg-white p-6 rounded-lg shadow">
-                <h3 className="text-gray-600 mb-2 text-lg font-semibold">
-                  Profit
-                </h3>
-                <span className="flex justify-end mb-2">
-                  {" "}
-                  <FaCoins className="text-gray-500 text-2xl" />
-                </span>
-                <p className="text-xl font-medium md:text-base text-blue-500">
-                  30,644.00
-                </p>
-              </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 mb-6">
-          {/* Task */}
-
-          <div className="bg-white rounded-lg shadow p-6 w-full h-full flex flex-col items-center justify-center">
-            <h2 className="text-xl font-semibold mb-4">Tasks Status</h2>
-            {taskData.length > 0 ? (
-              <div className="flex justify-center items-center w-[300px] h-[300px]">
-                <Pie
-                  data={taskStatusData}
-                  options={chartOptions}
-                />
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-[300px]">
-                <p className="text-gray-500 text-lg">No tasks found</p>
-                <p className="text-gray-400 text-sm">Create tasks to see status distribution</p>
-              </div>
-            )}
-          
-          </div>
-
-          
-        {/* </div> */}
-
-
-        <div className="bg-white p-6 rounded-lg shadow grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"> 
-          {/* Hours Logged Chart */}
-          <div className="w-full">
-            <h2 className="text-xl font-semibold mb-4">Hours Logged</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={hoursData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip
-                    content={<CustomTooltip />}
-                    cursor={{ fill: "rgba(255, 0, 0, 0.1)" }}
-                  />
-                  <Bar dataKey="value" fill="#ef4444" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* Project Budget Chart */}
-          <div className="w-full">
-            <h2 className="text-xl font-semibold mb-4">Project Budget</h2>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={budgetData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip
-                    content={<CustomTooltip />}
-                    cursor={{ fill: "rgba(255, 0, 0, 0.1)" }}
-                  />
-                  <Bar dataKey="value" fill="#ef4444" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-        </div>
-        </div>
-
-             
-       
-         <div className="mb-4 bg-white p-8 rounded-lg shadow">
-          <h4 className="text-2xl font-medium text-black mb-4">Project Milestones</h4>
-          <div className="table-responsive">
-            <Table
-              columns={milestoneTableColumns}
-              dataSource={getFilteredMilestones()}
-              rowKey="id"
-              pagination={{
-                total: getFilteredMilestones().length,
-                pageSize: 10,
-                showSizeChanger: true,
-                showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Progress Circle */}
+        <div className="flex flex-col items-center">
+          <div className="w-48 h-48">
+            <CircularProgressbar
+              value={parseFloat(projectMetrics.progress)}
+              text={`${projectMetrics.progress}%`}
+              styles={{
+                root: { width: '100%', height: '100%' },
+                path: {
+                  stroke: `${projectMetrics.isComplete ? '#059669' :
+                    parseFloat(projectMetrics.progress) >= 70 ? '#10B981' :
+                      parseFloat(projectMetrics.progress) >= 30 ? '#F59E0B' :
+                        '#EF4444'
+                    }`,
+                  strokeLinecap: 'round',
+                  transition: 'stroke-dashoffset 0.5s ease',
+                  strokeWidth: '8',
+                },
+                trail: {
+                  stroke: '#edf2f7',
+                  strokeLinecap: 'round',
+                  strokeWidth: '8',
+                },
+                text: {
+                  fill: '#374151',
+                  fontSize: '20px',
+                  fontWeight: '600',
+                }
               }}
             />
           </div>
         </div>
 
-        <div className="mb-4 bg-white p-8 rounded-lg shadow">
-          <h4 className="text-2xl font-medium text-black mb-4">Project Details</h4>
-          <div className="mt-4">
-            <ul className="list-disc pl-4">
-              <li dangerouslySetInnerHTML={{ __html: filterdata?.[0]?.project_description?.replace(/<[^>]*>/g, '') || 'No project description available' }}>
-              </li>
-            </ul>
+        {/* Progress Stats */}
+        <div className="flex flex-col justify-center space-y-6">
+          <div className="space-y-4">
+            <div>
+              <div className="flex justify-between mb-2">
+                <span className="text-gray-600">Tasks</span>
+                <span className="text-gray-900 font-medium">
+                  {projectMetrics.tasks.completed}/{projectMetrics.tasks.total}
+                </span>
+              </div>
+              <Progress
+                percent={(projectMetrics.tasks.completed / projectMetrics.tasks.total) * 100}
+                strokeColor="#10B981"
+                size="small"
+              />
+            </div>
+
+            <div>
+              <div className="flex justify-between mb-2">
+                <span className="text-gray-600">Milestones</span>
+                <span className="text-gray-900 font-medium">
+                  {projectMetrics.milestones.completed}/{projectMetrics.milestones.total}
+                </span>
+              </div>
+              <Progress
+                percent={(projectMetrics.milestones.completed / projectMetrics.milestones.total) * 100}
+                strokeColor="#3B82F6"
+                size="small"
+              />
+            </div>
+
+            <div>
+              <div className="flex justify-between mb-2">
+                <span className="text-gray-600">Timeline</span>
+                <span className="text-gray-900 font-medium">
+                  {projectMetrics.time.elapsed}/{projectMetrics.time.total} days
+                </span>
+              </div>
+              <Progress
+                percent={(projectMetrics.time.elapsed / projectMetrics.time.total) * 100}
+                strokeColor="#8B5CF6"
+                size="small"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+            <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-500">Start Date</p>
+              <p className="font-semibold">
+                {filterdata?.[0]?.startDate
+                  ? dayjs(filterdata[0].startDate).format('DD MMM YYYY')
+                  : 'N/A'}
+              </p>
+            </div>
+            <div className="text-center p-3 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-500">End Date</p>
+              <p className="font-semibold">
+                {filterdata?.[0]?.endDate
+                  ? dayjs(filterdata[0].endDate).format('DD MMM YYYY')
+                  : 'N/A'}
+              </p>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+  );
 
-    </>
+  const ClientCard = ({ client }) => (
+    <div className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+        <TeamOutlined className="mr-2" />
+        Client Details
+      </h2>
+      {client ? (
+        <div className="flex flex-col">
+          {/* Client Header */}
+          <div className="flex items-start space-x-6 mb-6">
+            <div className="flex-shrink-0">
+              {client?.profilePic ? (
+                <div className="w-24 h-24 rounded-xl overflow-hidden border-4 border-gray-100 shadow-sm hover:border-blue-200 transition-colors">
+                  <img
+                    src={client.profilePic}
+                    alt={client.firstName || client.username}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/img/avatars/default.png';
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="w-24 h-24 rounded-xl bg-blue-50 flex items-center justify-center border-4 border-gray-100">
+                  <UserOutlined className="text-4xl text-blue-400" />
+                </div>
+              )}
+            </div>
+            <div className="flex-grow">
+              <h3 className="text-xl font-semibold text-gray-800 mb-1">
+                {client?.firstName || client?.username || 'No Name Available'}
+              </h3>
+              <p className="text-gray-500 text-sm mb-2">
+                {client?.company || 'Company Not Specified'}
+              </p>
+              <div className="flex items-center space-x-2">
+                <span className={`px-2 py-1 rounded-full text-xs font-medium 
+                  ${client?.status === 'active' ? 'bg-green-100 text-green-700' :
+                    client?.status === 'inactive' ? 'bg-red-100 text-red-700' :
+                      'bg-gray-100 text-gray-700'}`}>
+                  {client?.status?.toUpperCase() || 'STATUS N/A'}
+                </span>
+                <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                  Client since {dayjs(client?.createdAt).format('MMM YYYY')}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Client Details Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <MailOutlined className="text-lg text-blue-500" />
+              <div>
+                <p className="text-xs text-gray-500">Email</p>
+                <p className="text-sm font-medium">{client?.email || 'No Email'}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <PhoneOutlined className="text-lg text-green-500" />
+              <div>
+                <p className="text-xs text-gray-500">Phone</p>
+                <p className="text-sm font-medium">{client?.phone || 'No Phone'}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <GlobalOutlined className="text-lg text-purple-500" />
+              <div>
+                <p className="text-xs text-gray-500">Website</p>
+                <p className="text-sm font-medium">
+                  {client?.website ? (
+                    <a href={client.website} target="_blank" rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800">
+                      {client.website}
+                    </a>
+                  ) : 'No Website'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <CalendarOutlined className="text-lg text-orange-500" />
+              <div>
+                <p className="text-xs text-gray-500">Projects</p>
+                <p className="text-sm font-medium">{client?.totalProjects || '1'} Active</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Info */}
+          {client?.address && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-500 mb-1">Address</p>
+              <p className="text-sm">{client.address}</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="text-center py-8 bg-gray-50 rounded-lg">
+          <UserOutlined className="text-4xl text-gray-300 mb-2" />
+          <p className="text-gray-500">No client information available</p>
+        </div>
+      )}
+    </div>
+  );
+
+  // Add this new component after the CompactTimeline component
+  const ProjectActivities = ({ milestoneData, taskData }) => {
+    const [activeTab, setActiveTab] = useState('milestones');
+    const [selectedMilestone, setSelectedMilestone] = useState(null);
+
+    const getMilestoneProgress = (milestone) => {
+      const tasks = taskData.filter(task => task.milestone_id === milestone.id);
+      if (!tasks.length) return 0;
+      const completed = tasks.filter(task => task.status?.toLowerCase() === 'completed').length;
+      return Math.round((completed / tasks.length) * 100);
+    };
+
+    return (
+      <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 mb-8">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800">Project Activities</h2>
+            <p className="text-sm text-gray-500 mt-1">
+              {activeTab === 'milestones'
+                ? `${milestoneData.length} Milestones`
+                : `${taskData.length} Tasks`}
+            </p>
+          </div>
+          <div className="flex space-x-2 bg-gray-100 p-1 rounded-lg">
+            <button
+              onClick={() => setActiveTab('milestones')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all
+                ${activeTab === 'milestones'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'}`}
+            >
+              Milestones
+            </button>
+            <button
+              onClick={() => setActiveTab('tasks')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all
+                ${activeTab === 'tasks'
+                  ? 'bg-white text-blue-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'}`}
+            >
+              Tasks
+            </button>
+          </div>
+        </div>
+
+        <div className="overflow-hidden">
+          {activeTab === 'milestones' ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {milestoneData.map((milestone) => {
+                const progress = getMilestoneProgress(milestone);
+                const isSelected = selectedMilestone?.id === milestone.id;
+
+                return (
+                  <div
+                    key={milestone.id}
+                    className={`p-4 rounded-lg border transition-all cursor-pointer
+                      ${isSelected
+                        ? 'border-blue-200 bg-blue-50 shadow-md'
+                        : 'border-gray-200 bg-white hover:border-blue-200 hover:shadow-sm'}`}
+                    onClick={() => setSelectedMilestone(isSelected ? null : milestone)}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-grow">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`w-2 h-2 rounded-full ${milestone.milestone_status?.toLowerCase() === 'completed'
+                              ? 'bg-green-500'
+                              : progress >= 50
+                                ? 'bg-blue-500'
+                                : 'bg-yellow-500'
+                              }`}
+                          />
+                          <h3 className="font-medium text-gray-800 line-clamp-1">
+                            {milestone.milestone_title}
+                          </h3>
+                        </div>
+                        <div className="flex items-center gap-4 mt-2">
+                          <Tag color={milestone.milestone_status?.toLowerCase() === 'completed'
+                            ? 'success'
+                            : progress >= 50 ? 'processing' : 'warning'}
+                          >
+                            {milestone.milestone_status}
+                          </Tag>
+                          <span className="text-xs text-gray-500">
+                            Due: {dayjs(milestone.milestone_end_date).format('DD MMM YYYY')}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <div className="text-sm font-medium text-gray-900">
+                          ${milestone.milestone_cost || 0}
+                        </div>
+                        <div className="text-xs text-gray-500">Budget</div>
+                      </div>
+                    </div>
+
+                    <div className="mt-3">
+                      <div className="flex justify-between mb-1">
+                        <span className="text-xs text-gray-500">Progress</span>
+                        <span className="text-xs font-medium text-gray-700">{progress}%</span>
+                      </div>
+                      <Progress
+                        percent={progress}
+                        size="small"
+                        strokeColor={{
+                          '0%': '#1890ff',
+                          '100%': '#52c41a',
+                        }}
+                        showInfo={false}
+                      />
+                    </div>
+
+                    {isSelected && (
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <p className="text-sm text-gray-600 mb-3">
+                          {milestone.milestone_summary || 'No description available'}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {taskData
+                            .filter(task => task.milestone_id === milestone.id)
+                            .map(task => (
+                              <Tag
+                                key={task.id}
+                                color={task.status?.toLowerCase() === 'completed' ? 'success' : 'default'}
+                                className="px-2 py-1"
+                              >
+                                {task.task_title}
+                              </Tag>
+                            ))
+                          }
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            // Tasks view remains the same but with improved styling
+            <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
+              {Object.entries(tasksByStatus).map(([status, tasks]) => (
+                <div key={status} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="p-4 bg-gray-50 border-b border-gray-200">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-gray-800 flex items-center gap-2">
+                        <span
+                          className="w-3 h-3 rounded-full"
+                          style={{ backgroundColor: getStatusColor(status) }}
+                        />
+                        {status}
+                      </h3>
+                      <Tag color="blue">{tasks.length}</Tag>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <div className="space-y-2">
+                      {tasks.map(task => (
+                        <div
+                          key={task.id}
+                          className="p-3 rounded-md border border-gray-200 hover:border-blue-300 
+                                   hover:shadow-sm cursor-pointer transition-all bg-white"
+                        >
+                          <p className="text-sm font-medium text-gray-700 mb-2">
+                            {task.task_title}
+                          </p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-500">
+                              Due: {dayjs(task.end_date).format('DD MMM')}
+                            </span>
+                            {task.assignee && (
+                              <div className="flex items-center gap-1">
+                                <UserOutlined className="text-gray-400" />
+                                <span className="text-xs text-gray-600">
+                                  {task.assignee}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <ProjectProgress />
+        <ClientCard client={fndclient} />
+      </div>
+
+      <ProjectActivities
+        milestoneData={milestoneData}
+        taskData={taskData}
+      />
+
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6">Statistics</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+          {[
+            {
+              title: 'Project Budget',
+              value: filterdata[0]?.budget || '0',
+              icon: <FaCoins />,
+              color: 'blue',
+            },
+            {
+              title: 'Hours Logged',
+              value: filterdata[0]?.estimatedhours || '0',
+              icon: <TbClockHour3Filled />,
+              color: 'green',
+            },
+            {
+              title: 'Earnings',
+              value: '30,644.00',
+              icon: <FaCoins />,
+              color: 'indigo',
+            },
+            {
+              title: 'Expenses',
+              value: '0.00',
+              icon: <FaCoins />,
+              color: 'red',
+            },
+            {
+              title: 'Profit',
+              value: '30,644.00',
+              icon: <FaCoins />,
+              color: 'emerald',
+            },
+          ].map((stat, index) => (
+            <div
+              key={index}
+              className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-gray-600 font-medium">{stat.title}</h3>
+                <span className={`text-${stat.color}-500 text-2xl`}>
+                  {stat.icon}
+                </span>
+              </div>
+              <p className="text-2xl font-semibold text-gray-800">
+                {stat.value}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-8">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+          Project Details
+        </h2>
+        <div className="prose max-w-none">
+          <div
+            dangerouslySetInnerHTML={{
+              __html:
+                filterdata?.[0]?.project_description?.replace(/<[^>]*>/g, '') ||
+                'No project description available',
+            }}
+            className="text-gray-600 leading-relaxed"
+          />
+        </div>
+      </div>
+    </div>
   );
 };
 

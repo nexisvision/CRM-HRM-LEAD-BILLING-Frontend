@@ -14,6 +14,8 @@ import {
   Select,
   Form,
   Avatar,
+  Dropdown,
+  Tooltip,
 } from "antd";
 import {
   EyeOutlined,
@@ -26,15 +28,24 @@ import {
   FileExcelOutlined,
   EditOutlined,
   UserOutlined,
+  MoreOutlined,
+  PhoneOutlined,
+  BankOutlined,
+  RocketOutlined,
+  GlobalOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
 } from "@ant-design/icons";
 import EditCompany from "./EditCompany";
 import { ClientData, deleteClient } from "./CompanyReducers/CompanySlice";
+import { getsubplandata } from "../subscribeduserplans/subplanReducer/subplanSlice";
 import AddUpgradePlan from "./AddUpgradePlan";
 import { useNavigate } from "react-router-dom";
 import { MdOutlineEmail } from "react-icons/md";
 import EmailVerification from './EmailVerification';
+import { navigate } from "react-big-calendar/lib/utils/constants";
 
-const CompanyCard = ({ company }) => {
+const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) => {
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isEditCompanyCardModalVisible, setIsEditCompanyCardModalVisible] =
@@ -44,9 +55,17 @@ const CompanyCard = ({ company }) => {
   const [comnyid, setCompnyid] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const[idd,setIdd]= useState("");
-  const[emails,setEmail]= useState("");
+  const [idd, setIdd] = useState("");
+  const [emails, setEmail] = useState("");
   const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
+
+  // Get subscribed plans data from Redux store
+  const subscribedPlans = useSelector((state) => state.subplan?.subplan?.data || []);
+
+  // Check if company has an active subscription
+  const hasActiveSubscription = subscribedPlans.some(
+    plan => plan.client_id === company.id && plan.status !== 'inactive'
+  );
 
   const showUserProfile = (idd) => {
     // setUserProfileVisible(true);
@@ -61,11 +80,11 @@ const CompanyCard = ({ company }) => {
 
   const ClickFun = (idd) => {
     // console.log("dsfvysdvf", idd);
-   
+
   };
 
 
-  const eidtfun = (idd) => {
+  const handleEdit = () => {
     setIsEditCompanyCardModalVisible(true);
     setSelectedUser(company);
     setCompnyid(company.id);
@@ -81,209 +100,318 @@ const CompanyCard = ({ company }) => {
       await dispatch(deleteClient(elmId)).then(() => {
         dispatch(ClientData());
       });
-    message.success({ content: 'Plan deleted successfully', duration: 2 });
-  } catch (error) {
-    message.error({ content: 'Failed to delete plan', duration: 2 });
-    console.error('Error deleting plan:', error);
-  }
+      message.success({ content: 'Plan deleted successfully', duration: 2 });
+    } catch (error) {
+      message.error({ content: 'Failed to delete plan', duration: 2 });
+      console.error('Error deleting plan:', error);
+    }
   };
 
   useEffect(() => {
     dispatch(ClientData());
   }, [dispatch]);
 
+  useEffect(() => {
+    dispatch(getsubplandata());
+  }, [dispatch]);
 
-  const Loginfunctioan =  (data) => {
+
+  const handleLoginAsCompany = (data) => {
     try {
-      console.log("data",data);
-      const tokens = localStorage.getItem("auth_token")
-      setTimeout(()=>{
-        localStorage.setItem('autologintoken',tokens);
-         localStorage.removeItem('auth_token');
-         localStorage.removeItem('USER');
-         localStorage.removeItem('isAuth');
-         setEmail(data.email);
-         localStorage.setItem('email',data.email);
-         navigate(`/app/auth/login?email=${encodeURIComponent(data.email)}`);
-         window.location.reload();
-      },1000)
+      const tokens = localStorage.getItem("auth_token");
 
-      setTimeout(()=>{
-        setEmail(data.email);
+      setTimeout(() => {
+        localStorage.setItem('autologintoken', tokens);
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('USER');
+        localStorage.removeItem('isAuth');
+        localStorage.setItem('email', data.email);
         navigate(`/app/auth/login?email=${encodeURIComponent(data.email)}`);
-     },1100)
+        window.location.reload();
+      }, 1000);
+
+      setTimeout(() => {
+        navigate(`/app/auth/login?email=${encodeURIComponent(data.email)}`);
+      }, 1100);
     } catch (error) {
-      console.error('Error during logout:', error);
+      console.error('Error during login:', error);
+      message.error('Failed to login as company');
     }
   };
 
+  // Define menu items
+  const items = [
+    {
+      key: 'login',
+      icon: <LoginOutlined />,
+      label: 'Login as Company',
+      onClick: () => handleLoginAsCompany(company)
+    },
+    {
+      key: 'edit',
+      icon: <EditOutlined />,
+      label: 'Edit',
+      onClick: () => handleEdit()
+    },
+    {
+      key: 'email',
+      icon: <MdOutlineEmail />,
+      label: 'Update Email',
+      onClick: () => onEmailUpdate(company.id)
+    },
+    {
+      key: 'upgrade',
+      icon: <RocketOutlined />,
+      label: 'Upgrade Plans',
+      onClick: () => onUpgrade(company.id)
+    },
+    {
+      key: 'delete',
+      icon: <DeleteOutlined />,
+      label: 'Delete',
+      onClick: () => onDelete(company.id),
+      danger: true
+    }
+  ];
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EditOutlined />}
-            onClick={() => eidtfun(elm.id)}
-            size="small"
-          >
-            <span className="">Edit</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className="flex items-center gap-2"
-            icon={<MdOutlineEmail/>}
-            onClick={() => {
-              setIsEmailVerificationModalVisible(true);
-              setCompnyid(elm.id);
-            }}
-            size="small"
-          >
-            <span>Update Email</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<DeleteOutlined />}
-            onClick={() => deleteUser(elm.id)}
-            size="small"
-          >
-            <span>Delete</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<MailOutlined />}
-            onClick={() => showUserProfile(elm.username)}
-            size="small"
-          >
-            <span>Show Sub-client</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<MailOutlined />}
-            onClick={() => Loginfunctioan(elm)}
-            size="small"
-          >
-            <span>Login As Company</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-
-
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" className="" icon={<EyeOutlined />} size="small">
-            <span>Reset Password</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" className="" icon={<LoginOutlined />} size="small">
-            <span>Login Disable</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-    </Menu>
-  );
+  // Update the getStatusStyles function with refined colors
+  const getStatusStyles = (isActive) => ({
+    active: {
+      background: '#dcfce7', // Light mint green
+      color: '#166534', // Dark green text
+      border: '2px solid #22c55e', // Medium green border
+      boxShadow: '0 2px 4px rgba(22, 101, 52, 0.06)',
+      icon: <CheckCircleOutlined style={{
+        fontSize: '12px',
+        color: '#16a34a',
+        filter: 'drop-shadow(0 1px 1px rgba(22, 101, 52, 0.1))'
+      }} />,
+      hover: {
+        background: '#d1fae5', // Slightly darker on hover
+        boxShadow: '0 3px 6px rgba(22, 101, 52, 0.1)'
+      }
+    },
+    inactive: {
+      background: '#fee2e2', // Light red
+      color: '#991b1b', // Dark red text
+      border: '2px solid #ef4444', // Medium red border
+      boxShadow: '0 2px 4px rgba(153, 27, 27, 0.06)',
+      icon: <CloseCircleOutlined style={{
+        fontSize: '12px',
+        color: '#dc2626',
+        filter: 'drop-shadow(0 1px 1px rgba(153, 27, 27, 0.1))'
+      }} />,
+      hover: {
+        background: '#fecaca', // Slightly darker on hover
+        boxShadow: '0 3px 6px rgba(153, 27, 27, 0.1)'
+      }
+    }
+  })[isActive ? 'active' : 'inactive'];
 
   return (
-    <div className="border rounded-lg p-4 hover:shadow-lg cursor-pointer">
-      <div className="text-end">
-        <EllipsisDropdown menu={dropdownMenu(company)} />
-      </div>
-      <div className="flex flex-col items-center">
-        {company.profilePic ? (
-          <img
-            src={company.profilePic}
-            alt={company.name}
-            className="rounded-full w-24 h-24 mb-2 object-cover"
-            onError={(e) => {
-              e.target.onerror = null; // Prevent infinite loop
-              e.target.src = ""; // Clear the broken image
-              e.target.style.display = "none"; // Hide the img element
-              e.target.nextSibling.style.display = "inline-flex"; // Show the Avatar
+    <>
+      <Card
+        className="transform transition-all duration-300 hover:shadow-xl rounded-lg border border-gray-200 overflow-hidden"
+        bodyStyle={{ padding: 0 }}
+      >
+        {/* Company Header */}
+        <div className="relative">
+          {/* Background Pattern - Professional Gradient */}
+          <div
+            className="h-28 relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, #F0F7FF 0%, #E6F0FF 100%)',
             }}
-          />
-        ) : (
-          <Avatar 
-            size={96} // 24px * 4 to match the w-24 class
-            icon={<UserOutlined style={{ color: '#666666' }} />}
-            className="mb-2 flex items-center justify-center"
-            style={{ 
-              backgroundColor: '#f0f0f0', // Light gray background
-              display: company.profilePic ? 'none' : 'flex'
-            }}
-          />
-        )}
-        <h3 className="font-semibold text-lg">{company.name}</h3>
-        <p className="text-gray-500">{company.email}</p>
-        <p className="text-gray-400">{company.plan}</p>
-        <p className="text-gray-400">Plan Expired: {company.expiryDate}</p>
-      </div>
-      <div className="flex justify-between mt-4">
-        <Button
-          className="bg-blue-600 text-white py-2 px-4 rounded"
-          onClick={() => addfun(company.id)}
+          >
+            {/* Decorative Elements */}
+            <div
+              className="absolute top-0 right-0 w-32 h-32 transform rotate-45 translate-x-16 -translate-y-16"
+              style={{
+                background: 'linear-gradient(135deg, rgba(24, 144, 255, 0.1) 0%, rgba(24, 144, 255, 0.05) 100%)',
+                borderRadius: '50%'
+              }}
+            />
+            <div
+              className="absolute bottom-0 left-0 w-24 h-24 transform -translate-x-8 translate-y-8"
+              style={{
+                background: 'linear-gradient(135deg, rgba(24, 144, 255, 0.08) 0%, rgba(24, 144, 255, 0.03) 100%)',
+                borderRadius: '50%'
+              }}
+            />
+          </div>
+
+          {/* Company Avatar with Enhanced Styling */}
+          <div className="absolute -bottom-6 left-6">
+            <div className="ring-4 ring-white rounded-full shadow-lg">
+              <Avatar
+                size={68}
+                src={company.profilePic}
+                icon={!company.profilePic && <UserOutlined />}
+                className="shadow-sm"
+                style={{
+                  backgroundColor: !company.profilePic ? '#1890ff' : undefined,
+                  border: '2px solid #fff'
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Action Menu with Improved Styling */}
+          <div className="absolute top-4 right-3">
+            <Dropdown
+              overlay={<Menu items={items} />}
+              trigger={['click']}
+              placement="bottomRight"
+            >
+              <Button
+                type="default"
+                className="border-0 shadow-sm flex items-center justify-center w-9 h-9 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+                style={{
+                  borderRadius: '10px',
+                  padding: 0
+                }}
+              >
+                <MoreOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
+              </Button>
+            </Dropdown>
+          </div>
+
+          {/* Enhanced Status Badge */}
+          <div className="absolute top-4 right-14">
+            {(() => {
+              const statusStyle = getStatusStyles(hasActiveSubscription);
+              return (
+                <Tag
+                  className="rounded-full px-3.5 py-1.5 flex items-center gap-1.5 transition-all duration-300 cursor-default"
+                  style={{
+                    background: statusStyle.background,
+                    color: statusStyle.color,
+                    border: statusStyle.border,
+                    boxShadow: statusStyle.boxShadow,
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    lineHeight: '1',
+                    minHeight: '24px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.04em',
+                    backdropFilter: 'blur(8px)',
+                    transform: 'translateY(1px)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = statusStyle.hover.background;
+                    e.currentTarget.style.boxShadow = statusStyle.hover.boxShadow;
+                    e.currentTarget.style.transform = 'translateY(0px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = statusStyle.background;
+                    e.currentTarget.style.boxShadow = statusStyle.boxShadow;
+                    e.currentTarget.style.transform = 'translateY(1px)';
+                  }}
+                >
+                  <div className="flex items-center gap-1.5">
+                    {statusStyle.icon}
+                    <span style={{
+                      position: 'relative',
+                      top: '0.5px',
+                      textShadow: '0 1px 1px rgba(0,0,0,0.05)'
+                    }}>
+                      {hasActiveSubscription ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                </Tag>
+              );
+            })()}
+          </div>
+        </div>
+
+        {/* Company Info with Enhanced Typography */}
+        <div className="pt-10 pb-4 px-6">
+          <h3
+            className="text-lg font-semibold mb-2 truncate text-gray-800"
+            title={company.name}
+            style={{ letterSpacing: '-0.01em' }}
+          >
+            {company.name}
+          </h3>
+
+          <div className="flex items-center gap-2.5 text-gray-600 mb-2">
+            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+              <MailOutlined className="text-blue-500" />
+            </div>
+            <span className="truncate text-sm" title={company.email}>
+              {company.email}
+            </span>
+          </div>
+        </div>
+
+        {/* Enhanced Button Styling */}
+        <div className="px-6 pb-3">
+          {hasActiveSubscription ? (
+            <Button
+              type="default"
+              icon={<RocketOutlined />}
+              block
+              className="h-10 flex items-center justify-center border-green-400 text-green-600 bg-green-50 hover:bg-green-100 transition-colors duration-200"
+              style={{
+                borderWidth: '1px',
+                borderRadius: '8px'
+              }}
+            >
+              <span className="font-medium">Subscribed Plan Active</span>
+            </Button>
+          ) : (
+            <Button
+              type="default"
+              icon={<RocketOutlined />}
+              block
+              onClick={() => onUpgrade(company.id)}
+              className="h-10 text-blue-600 border-blue-600 hover:bg-blue-50 flex items-center justify-center transition-all duration-200"
+              style={{ borderRadius: '8px' }}
+            >
+              <span className="font-medium">Upgrade to Premium</span>
+            </Button>
+          )}
+        </div>
+
+        {/* Login Button with Enhanced Styling */}
+        <div className="px-6 pb-6">
+          <Button
+            type="primary"
+            icon={<LoginOutlined />}
+            block
+            onClick={() => handleLoginAsCompany(company)}
+            className="bg-blue-600 hover:bg-blue-700 h-10 flex items-center justify-center shadow-sm transition-all duration-200"
+            style={{ borderRadius: '8px' }}
+          >
+            <span className="font-medium">Login as Company</span>
+          </Button>
+        </div>
+      </Card>
+
+      {/* Modal with Enhanced Styling */}
+      {isEditCompanyCardModalVisible && (
+        <Modal
+          title={<span className="text-lg font-semibold">Edit Company</span>}
+          visible={isEditCompanyCardModalVisible}
+          onCancel={() => setIsEditCompanyCardModalVisible(false)}
+          footer={null}
+          width={800}
+          bodyStyle={{ padding: '24px' }}
+          className="company-edit-modal"
         >
-          Upgrade Plan
-        </Button>
-        {/* <Button className="bg-blue-600 text-white py-2 px-4 rounded">
-          AdminHub
-        </Button> */}
-      </div>
-      <Modal
-        title="Add Upgrade Plan"
-        visible={isAddUpgradePlanModalVisible}
-        onCancel={() => setIsAddUpgradePlanModalVisible(false)}
-        footer={null}
-      >
-        <AddUpgradePlan
-          onClose={() => setIsAddUpgradePlanModalVisible(false)}
-          comnyid={comnyid}
-        />
-      </Modal>
-      <Modal
-        title="Edit Company Card"
-        visible={isEditCompanyCardModalVisible}
-        onCancel={() => setIsEditCompanyCardModalVisible(false)}
-        footer={null}
-        width={900}
-      >
-        <EditCompany
-          onClose={() => setIsEditCompanyCardModalVisible(false)}
-          comnyid={comnyid}
-          companyData={selectedUser} // Pass the correct company data to the modal
-        />
-      </Modal>
-      <EmailVerification
-        visible={isEmailVerificationModalVisible}
-        onCancel={() => setIsEmailVerificationModalVisible(false)}
-        initialEmail={company.email}
-      />
-    </div>
+          <EditCompany
+            comnyid={comnyid}
+            initialData={company}
+            onClose={() => setIsEditCompanyCardModalVisible(false)}
+          />
+        </Modal>
+      )}
+    </>
   );
+};
+
+const handleCompanyClick = (id) => {
+  navigate(`/app/company/${id}`);
 };
 
 export default CompanyCard;

@@ -11,22 +11,102 @@ import * as Yup from 'yup';
 const { Option } = Select;
 
 const EditPlan = ({ planData, onUpdate, id, onClose }) => {
-  const [isTrialEnabled, setIsTrialEnabled] = useState(planData?.trial || false);
+  // Get the plan data from the store using id
+  const allPlans = useSelector((state) => state.Plan.Plan || []);
+  const currentPlan = allPlans.find(plan => plan.id === id) || {};
+
+  // Initialize states with current plan data
+  const [isTrialEnabled, setIsTrialEnabled] = useState(currentPlan?.trial || false);
+  const [durationType, setDurationType] = useState(() => {
+    if (currentPlan?.duration?.toLowerCase().includes('month')) return 'Monthly';
+    if (currentPlan?.duration?.toLowerCase().includes('year')) return 'Yearly';
+    if (currentPlan?.duration?.toLowerCase().includes('lifetime')) return 'Lifetime';
+    return null;
+  });
+
+  // Parse duration value
+  const getDurationValue = () => {
+    if (!currentPlan?.duration) return null;
+    const match = currentPlan.duration.match(/(\d+)/);
+    return match ? match[1] : null;
+  };
+
+  const [selectedMonth, setSelectedMonth] = useState(() => {
+    return durationType === 'Monthly' ? getDurationValue() : null;
+  });
+
+  const [selectedYear, setSelectedYear] = useState(() => {
+    return durationType === 'Yearly' ? getDurationValue() : null;
+  });
+
+  // Set initial values from current plan
+  const initialValues = {
+    name: currentPlan?.name || '',
+    price: currentPlan?.price || '',
+    duration: currentPlan?.duration || '',
+    max_users: currentPlan?.max_users || '',
+    max_customers: currentPlan?.max_customers || '',
+    max_vendors: currentPlan?.max_vendors || '',
+    max_clients: currentPlan?.max_clients || '',
+    storage_limit: currentPlan?.storage_limit || '',
+    currency: currentPlan?.currency || getDefaultCurrency(),
+    trial: currentPlan?.trial || false,
+    trial_period: currentPlan?.trial_period || '',
+  };
+
+  // Update duration field when type or value changes
+  useEffect(() => {
+    if (formikRef.current) {
+      const { setFieldValue } = formikRef.current;
+      if (durationType === 'Monthly' && selectedMonth) {
+        setFieldValue('duration', `${selectedMonth} Month${selectedMonth > 1 ? 's' : ''}`);
+      } else if (durationType === 'Yearly' && selectedYear) {
+        setFieldValue('duration', `${selectedYear} Year${selectedYear > 1 ? 's' : ''}`);
+      } else if (durationType === 'Lifetime') {
+        setFieldValue('duration', 'Lifetime');
+      }
+    }
+  }, [durationType, selectedMonth, selectedYear]);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [durationType, setDurationType] = useState(null);
-  const [selectedMonth, setSelectedMonth] = useState(null);
-  const [selectedYear, setSelectedYear] = useState(null);
 
+  const allempdatass = useSelector((state) => state.currencies);
+  const fnddatass = allempdatass?.currencies?.data;
+
+  const alldept = useSelector((state) => state.Plan);
+  const alldept2 = alldept.Plan.data;
+
+  // Add formik ref to access formik methods
+  const formikRef = React.useRef();
+
+  // Move the currency initialization to component level
   useEffect(() => {
     dispatch(getcurren());
   }, [dispatch]);
 
-  const allempdatass = useSelector((state) => state.currencies);
-  const fnddatass = allempdatass?.currencies?.data;
-  
-  const alldept = useSelector((state) => state.Plan);
-  const alldept2 = alldept.Plan.data;
+  // Add another useEffect for currency initialization
+  useEffect(() => {
+    if (formikRef.current && fnddatass?.length > 0) {
+      const { values, setFieldValue } = formikRef.current;
+      if (!values.currency) {
+        const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
+        if (usdCurrency) {
+          setFieldValue('currency', usdCurrency.id);
+        } else {
+          setFieldValue('currency', fnddatass[0].id);
+        }
+      }
+    }
+  }, [fnddatass]);
+
+  const getDefaultCurrency = () => {
+    if (fnddatass?.length > 0) {
+      const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
+      return usdCurrency?.id || fnddatass[0]?.id || '';
+    }
+    return '';
+  };
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required('Please enter the plan name!'),
@@ -38,7 +118,6 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
     max_clients: Yup.string().required('Please enter the maximum clients!'),
     storage_limit: Yup.string().required('Please enter the storage limit!'),
     currency: Yup.string().required('Please select a currency!'),
-    description: Yup.string().required('Please enter a description!'),
     trial: Yup.boolean(),
     // trialDays: Yup.string().when('trial', {
     //   is: true,
@@ -47,26 +126,11 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
     // })
   });
 
-  const initialValues = {
-    name: '',
-    price: '',
-    duration: '',
-    max_users: '',
-    max_customers: '',
-    max_vendors: '',
-    max_clients: '',
-    storage_limit: '',
-    currency: '',
-    description: '',
-    trial: false,
-    // trialDays: '',
-    ...planData
-  };
-
   const handleSubmit = (values) => {
     const submitValues = {
       ...values,
-      trialDays: values.trial ? values.trialDays : ''
+      trial_period: values.trial ? String(values.trial_period) : '',
+      status: currentPlan.status
     };
 
     dispatch(Editplan({ id, values: submitValues }))
@@ -80,18 +144,19 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
         message.error('Failed to update plan.');
         console.error('Edit API error:', error);
       });
-    onUpdate(submitValues);
   };
- 
+
   return (
     <div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
+        enableReinitialize
+        innerRef={formikRef}
       >
         {({ values, handleSubmit, setFieldValue, errors, touched }) => {
-           const handleMenuClick = (e) => {
+          const handleMenuClick = (e) => {
             if (e.key === 'Lifetime') {
               setDurationType('Lifetime');
               setSelectedMonth(null);
@@ -100,224 +165,322 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
             }
           };
 
- const yearlyMenu = (
-  <Menu onClick={({ key }) => {
-    setDurationType('Yearly');
-    setSelectedYear(key);
-    setFieldValue('duration', 'Per Year');
-  }}>
-    <Menu.Item className='w-full'>
-      <Input 
-        placeholder="Enter years"
-        type="number"
-        onChange={(e) => {
-          const value = e.target.value;
-          setSelectedYear(value);
-        }}
-      />
-    </Menu.Item>
-  </Menu>
-);
+          const yearlyMenu = (
+            <Menu onClick={({ key }) => {
+              setDurationType('Yearly');
+              setSelectedYear(key);
+              setFieldValue('duration', 'Per Year');
+            }}>
+              <Menu.Item className='w-full'>
+                <Input
+                  placeholder="Enter years"
+                  type="number"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setSelectedYear(value);
+                  }}
+                />
+              </Menu.Item>
+            </Menu>
+          );
 
-const monthlyMenu = (
-  <Menu onClick={({ key }) => {
-    setDurationType('Monthly');
-    setSelectedMonth(key);
-    setFieldValue('duration', 'Per Month');
-  }}>
-    {Array.from({ length: 12 }, (_, i) => (
-      <Menu.Item key={i + 1}>{`${i + 1} Month${i + 1 > 1 ? 's' : ''}`}</Menu.Item>
-    ))}
-  </Menu>
-);
+          const monthlyMenu = (
+            <Menu onClick={({ key }) => {
+              setDurationType('Monthly');
+              setSelectedMonth(key);
+              setFieldValue('duration', 'Per Month');
+            }}>
+              {Array.from({ length: 12 }, (_, i) => (
+                <Menu.Item key={i + 1}>{`${i + 1} Month${i + 1 > 1 ? 's' : ''}`}</Menu.Item>
+              ))}
+            </Menu>
+          );
 
-const mainMenu = (
-  <Menu onClick={handleMenuClick}>
-    <Menu.Item key="Lifetime">Lifetime</Menu.Item>
-    <Menu.SubMenu key="Yearly" title="Yearly">
-      {yearlyMenu}
-    </Menu.SubMenu>
-    <Menu.SubMenu key="Monthly" title="Monthly">
-      {monthlyMenu}
-    </Menu.SubMenu>
-  </Menu>
-);
+          const mainMenu = (
+            <Menu onClick={handleMenuClick}>
+              <Menu.Item key="Lifetime">Lifetime</Menu.Item>
+              <Menu.SubMenu key="Yearly" title="Yearly">
+                {yearlyMenu}
+              </Menu.SubMenu>
+              <Menu.SubMenu key="Monthly" title="Monthly">
+                {monthlyMenu}
+              </Menu.SubMenu>
+            </Menu>
+          );
 
-return (
-          <form onSubmit={handleSubmit}>
-            <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
-
-            <Row gutter={16}>
-              <Col span={12}>
-                <div className="mb-4">
-                  <label className="block mb-1">Name <span className="text-red-500">*</span></label>
-                  <Field
-                    name="name"
-                    as={Input}
-                    placeholder="Enter Plan Name"
-                  />
-                  <ErrorMessage name="name" component="div" className="text-red-500" />
-                </div>
-              </Col>
-
-              <Col span={12}>
-                <div className="mb-4">
-                  <label className="block mb-1">Price <span className="text-red-500">*</span></label>
-                  <Field
-                    name="price"
-                    as={Input}
-                    placeholder="Enter Plan Price"
-                  />
-                  <ErrorMessage name="price" component="div" className="text-red-500" />
-                </div>
-              </Col>
-
-              <Col span={12}>
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label>Duration <span style={{ color: 'red' }}>*</span></label>
-                    <Dropdown 
-                      overlay={mainMenu} 
-                      trigger={['click']} 
-                      className='w-full'
-                    >
-                      <Button>
-                        {durationType === 'Monthly' && selectedMonth
-                          ? `${selectedMonth} Month${selectedMonth > 1 ? 's' : ''}`
-                          : durationType === 'Yearly' && selectedYear
-                            ? `${selectedYear} Year${selectedYear > 1 ? 's' : ''}`
-                            : durationType === 'Lifetime'
-                              ? 'Lifetime'
-                              : 'Select Duration'}
-                      </Button>
-                    </Dropdown>
-                    {errors.duration && touched.duration && (
-                      <div className="error-message">{errors.duration}</div>
-                    )}
-                  </div>
-                </Col>
-
-              <Col span={12}>
-                <div className="mb-4">
-                  <label className="block mb-1">Maximum Users <span className="text-red-500">*</span></label>
-                  <Field
-                    name="max_users"
-                    as={Input}
-                    placeholder="Enter Maximum Users"
-                  />
-                  <ErrorMessage name="max_users" component="div" className="text-red-500" />
-                </div>
-              </Col>
-
-              <Col span={12}>
-                <div className="mb-4">
-                  <label className="block mb-1">Maximum Customers <span className="text-red-500">*</span></label>
-                  <Field
-                    name="max_customers"
-                    as={Input}
-                    placeholder="Enter Maximum Customers"
-                  />
-                  <ErrorMessage name="max_customers" component="div" className="text-red-500" />
-                </div>
-              </Col>
-
-              <Col span={12}>
-                <div className="mb-4">
-                  <label className="block mb-1">Maximum Vendors <span className="text-red-500">*</span></label>
-                  <Field
-                    name="max_vendors"
-                    as={Input}
-                    placeholder="Enter Maximum Vendors"
-                  />
-                  <ErrorMessage name="max_vendors" component="div" className="text-red-500" />
-                </div>
-              </Col>
-
-              <Col span={12}>
-                <div className="mb-4">
-                  <label className="block mb-1">Maximum Clients <span className="text-red-500">*</span></label>
-                  <Field
-                    name="max_clients"
-                    as={Input}
-                    placeholder="Enter Maximum Clients"
-                  />
-                  <ErrorMessage name="max_clients" component="div" className="text-red-500" />
-                </div>
-              </Col>
-
-              <Col span={12}>
-                <div className="mb-4">
-                  <label className="block mb-1">Storage Limit (MB) <span className="text-red-500">*</span></label>
-                  <Field
-                    name="storage_limit"
-                    as={Input}
-                    placeholder="Maximum Storage Limit"
-                    suffix="MB"
-                  />
-                  <ErrorMessage name="storage_limit" component="div" className="text-red-500" />
-                </div>
-              </Col>
-
-              <Col span={24} >
-                  <div className="form-group" style={{ marginBottom: '16px' }}>
-                    <label>currency <span style={{ color: 'red' }}>*</span></label>
-                    <Field name="currency">
-                      {({ field }) => (
-                        <Select
-                          {...field}
-                          className="w-full mt-2"
-                          placeholder="Select currency"
-                          onChange={(value) => setFieldValue("currency", value)}
-                          value={values.currency}
-                        >
-                          {fnddatass && fnddatass?.length > 0 ? (
-                            fnddatass?.map((client) => (
-                              <Option key={client.id} value={client?.id}>
-                                {client?.currencyIcon ||
-                                  client?.currencyCode ||
-                                  "Unnamed currency"}
-                              </Option>
-                            ))
-                          ) : (
-                            <Option value="" disabled>
-                              No currency Available
-                            </Option>
+          return (
+            <form onSubmit={handleSubmit}>
+              <div className="space-y-6">
+                {/* Basic Information */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Basic Information</h3>
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <div className="form-group mb-4">
+                        <label className="text-gray-600 mb-2 block">Plan Name <span className="text-blue-600">*</span></label>
+                        <Field name="name">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter Plan Name"
+                              className="w-full rounded-md"
+                            />
                           )}
-                        </Select>
-                      )}
-                    </Field>
-                    <ErrorMessage
-                      name="currency"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-            </Row>
+                        </Field>
+                        <ErrorMessage name="name" component="div" className="text-red-500 mt-1 text-sm" />
+                      </div>
+                    </Col>
 
-            <div className="mb-4">
-              <label className="block mb-1">Description <span className="text-red-500">*</span></label>
-              <Field
-                name="description"
-                as={Input.TextArea}
-                rows={4}
-                placeholder="Enter Description"
-              />
-              <ErrorMessage name="description" component="div" className="text-red-500" />
-            </div>
+                    {/* Price & Currency */}
+                    <Col span={12}>
+                      <div className="form-group mb-4">
+                        <label className="text-gray-600 mb-2 block">Price & Currency <span className="text-red-500">*</span></label>
+                        <div className="flex">
+                          <Field name="currency">
+                            {({ field }) => (
+                              <Select
+                                {...field}
+                                className="currency-select"
+                                style={{
+                                  width: '90px',
+                                  borderTopRightRadius: 0,
+                                  borderBottomRightRadius: 0,
+                                  borderRight: 0,
+                                  backgroundColor: '#f4f6f8',
+                                }}
+                                placeholder={<span className="text-gray-400">$</span>}
+                                onChange={(value) => setFieldValue("currency", value)}
+                                value={values.currency || getDefaultCurrency()}
+                                dropdownStyle={{ minWidth: '180px' }}
+                                suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                              >
+                                {fnddatass?.map((currency) => (
+                                  <Option
+                                    key={currency.id}
+                                    value={currency.id}
+                                    className={currency.currencyCode === 'USD' ? 'font-semibold' : ''}
+                                  >
+                                    <div className="flex items-center w-full px-1">
+                                      <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                      <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                      <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                                    </div>
+                                  </Option>
+                                ))}
+                              </Select>
+                            )}
+                          </Field>
+                          <Field name="price">
+                            {({ field, form }) => (
+                              <Input
+                                {...field}
+                                className="price-input"
+                                style={{
+                                  borderTopLeftRadius: 0,
+                                  borderBottomLeftRadius: 0,
+                                  borderLeft: 0,
+                                  width: 'calc(100% - 90px)'
+                                }}
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder="0.00"
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                    form.setFieldValue('price', String(value));
+                                  }
+                                }}
+                              />
+                            )}
+                          </Field>
+                        </div>
+                        <ErrorMessage name="price" component="div" className="text-red-500 mt-1 text-sm" />
+                      </div>
+                    </Col>
 
+                    {/* Duration */}
+                    <Col span={12}>
+                      <div className="form-group mb-4">
+                        <label className="text-gray-600 mb-2 block">Duration <span className="text-red-500">*</span></label>
+                        <Dropdown overlay={mainMenu} trigger={['click']}>
+                          <Button className="w-full text-left flex justify-between items-center">
+                            <span>
+                              {durationType === 'Monthly' && selectedMonth
+                                ? `${selectedMonth} Month${selectedMonth > 1 ? 's' : ''}`
+                                : durationType === 'Yearly' && selectedYear
+                                  ? `${selectedYear} Year${selectedYear > 1 ? 's' : ''}`
+                                  : durationType === 'Lifetime'
+                                    ? 'Lifetime'
+                                    : 'Select Duration'}
+                            </span>
+                            <span className="text-gray-400">▼</span>
+                          </Button>
+                        </Dropdown>
+                        {errors.duration && touched.duration && (
+                          <div className="text-red-500 mt-1 text-sm">{errors.duration}</div>
+                        )}
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Button style={{ marginRight: '8px' }} onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="primary" htmlType="submit">
-             Save Changes
-              </Button>
-            </div>
-          </form>
+                {/* Limits */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Plan Limits</h3>
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <div className="mb-4">
+                        <label className="block mb-1">Maximum Users <span className="text-red-500">*</span></label>
+                        <Field
+                          name="max_users"
+                          as={Input}
+                          placeholder="Enter Maximum Users"
+                        />
+                        <ErrorMessage name="max_users" component="div" className="text-red-500" />
+                      </div>
+                    </Col>
+
+                    <Col span={12}>
+                      <div className="mb-4">
+                        <label className="block mb-1">Maximum Customers <span className="text-red-500">*</span></label>
+                        <Field
+                          name="max_customers"
+                          as={Input}
+                          placeholder="Enter Maximum Customers"
+                        />
+                        <ErrorMessage name="max_customers" component="div" className="text-red-500" />
+                      </div>
+                    </Col>
+
+                    <Col span={12}>
+                      <div className="mb-4">
+                        <label className="block mb-1">Maximum Vendors <span className="text-red-500">*</span></label>
+                        <Field
+                          name="max_vendors"
+                          as={Input}
+                          placeholder="Enter Maximum Vendors"
+                        />
+                        <ErrorMessage name="max_vendors" component="div" className="text-red-500" />
+                      </div>
+                    </Col>
+
+                    <Col span={12}>
+                      <div className="mb-4">
+                        <label className="block mb-1">Maximum Clients <span className="text-red-500">*</span></label>
+                        <Field
+                          name="max_clients"
+                          as={Input}
+                          placeholder="Enter Maximum Clients"
+                        />
+                        <ErrorMessage name="max_clients" component="div" className="text-red-500" />
+                      </div>
+                    </Col>
+
+                    <Col span={12}>
+                      <div className="mb-4">
+                        <label className="block mb-1">Storage Limit (MB) <span className="text-red-500">*</span></label>
+                        <Field
+                          name="storage_limit"
+                          as={Input}
+                          placeholder="Maximum Storage Limit"
+                          suffix="MB"
+                        />
+                        <ErrorMessage name="storage_limit" component="div" className="text-red-500" />
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
+
+                {/* Trial Period */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Trial Period</h3>
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <div className="form-group mb-4">
+                        <Switch
+                          checked={values.trial}
+                          onChange={(checked) => {
+                            setFieldValue('trial', checked);
+                            if (!checked) setFieldValue('trial_period', '');
+                          }}
+                          className="mr-2"
+                        />
+                        <span className="text-gray-600">Enable Trial Period</span>
+                      </div>
+                    </Col>
+                    {values.trial && (
+                      <Col span={12}>
+                        <div className="form-group mb-4">
+                          <Field name="trial_period">
+                            {({ field, form }) => (
+                              <Input
+                                {...field}
+                                placeholder="Enter trial period in days"
+                                type="number"
+                                min="1"
+                                suffix="Days"
+                                className="w-full rounded-md"
+                                onChange={(e) => {
+                                  form.setFieldValue('trial_period', String(e.target.value));
+                                }}
+                              />
+                            )}
+                          </Field>
+                          <ErrorMessage name="trial_period" component="div" className="text-red-500 mt-1 text-sm" />
+                        </div>
+                      </Col>
+                    )}
+                  </Row>
+                </div>
+
+                {/* Form Actions */}
+                <div className="flex justify-end gap-2">
+                  <Button onClick={onClose}>
+                    Cancel
+                  </Button>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    className="bg-blue-600 hover:bg-blue-700 border-0"
+                  >
+                    Save Changes
+                  </Button>
+                </div>
+              </div>
+            </form>
           );
         }}
       </Formik>
+
+      {/* Add the same styles as AddPlan */}
+      <style jsx>{`
+        .currency-select .ant-select-selection-item {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 16px !important;
+        }
+
+        .currency-select .ant-select-selection-item > div {
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .currency-select .ant-select-selection-item span:not(:first-child) {
+          display: none !important;
+        }
+
+        .ant-select-dropdown .ant-select-item {
+          padding: 8px 12px !important;
+        }
+
+        .ant-select-dropdown .ant-select-item-option-content > div {
+          display: flex !important;
+          align-items: center !important;
+          width: 100% !important;
+        }
+      `}</style>
     </div>
   );
 };

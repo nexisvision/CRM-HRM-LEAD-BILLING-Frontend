@@ -77,7 +77,7 @@ const CompanyList = () => {
 
   useEffect(() => {
     dispatch(ClientData());
-    
+
   }, [dispatch]);
 
 
@@ -101,7 +101,7 @@ const CompanyList = () => {
     try {
       // Add your email verification logic here
       // await dispatch(sendVerificationEmail(email));
-      message.success('Verification email sent successfully');  
+      message.success('Verification email sent successfully');
     } catch (error) {
       message.error('Failed to send verification email');
     }
@@ -218,7 +218,7 @@ const CompanyList = () => {
 
     {
       title: "profilePic",
-      dataIndex: 'profilePic', 
+      dataIndex: 'profilePic',
       render: (_, record) => (
         <div className="d-flex align-items-center">
           {record.profilePic ? (
@@ -233,10 +233,10 @@ const CompanyList = () => {
             />
           ) : (
             <div className="d-flex align-items-center">
-              <Avatar 
+              <Avatar
                 size={40}
                 icon={<UserOutlined style={{ color: '#666666' }} />}
-                style={{ 
+                style={{
                   backgroundColor: '#f0f0f0',
                   marginRight: '8px'
                 }}
@@ -247,7 +247,7 @@ const CompanyList = () => {
         </div>
       ),
     },
-  
+
     {
       title: "Company",
       dataIndex: "username",
@@ -281,18 +281,18 @@ const CompanyList = () => {
       dataIndex: "bankname",
       sorter: (a, b) => utils.antdTableSorter(a, b, "bankname"),
     },
-    
+
     {
       title: "IFSC",
       dataIndex: "ifsc",
       sorter: (a, b) => utils.antdTableSorter(a, b, "ifsc"),
     },
 
-    
 
 
 
-   
+
+
     {
       title: "Status",
       dataIndex: "status",
@@ -341,7 +341,7 @@ const CompanyList = () => {
               <AppstoreOutlined />
             </Radio.Button>
             <Radio.Button
-              value={VIEW_LIST} 
+              value={VIEW_LIST}
               className="border-[2px] px-[12px] py-[8px] rounded-[6px] inline-flex items-center justify-center"
             >
               <UnorderedListOutlined />
@@ -371,10 +371,33 @@ const CompanyList = () => {
           />
         </div>
       ) : (
-        <Row gutter={16}>
+        <Row gutter={[24, 24]} className="px-4">
           {users.map((user) => (
-            <Col key={user.id} xs={24} sm={12} lg={8} xl={6}>
-              <CompanyCard company={user} />
+            <Col
+              key={user.id}
+              xs={24}
+              sm={12}
+              lg={8}
+              xl={6}
+              className="mb-6"
+            >
+              <CompanyCard
+                company={user}
+                onEdit={(id) => {
+                  setIsEditCompanyModalVisible(true);
+                  setCompnyid(id);
+                }}
+                onDelete={deleteUser}
+                onUpgrade={(id) => {
+                  setIsUpgradePlanModalVisible(true);
+                  setCompnyid(id);
+                }}
+                onEmailUpdate={(id) => {
+                  setIsEmailVerificationModalVisible(true);
+                  setCompnyid(id);
+                }}
+                onCompanyClick={handleCompanyClick}
+              />
             </Col>
           ))}
         </Row>
@@ -404,15 +427,15 @@ const CompanyList = () => {
         />
       </Modal>
 
-      
+
 
       <EmailVerificationModal
-      visible={isEmailVerificationModalVisible}
-          onCancel={() => setIsEmailVerificationModalVisible(false)}
-          onSubmit={handleEmailVerification}
-          idd={comnyid}
-          initialEmail={initialValues.email}
-        />
+        visible={isEmailVerificationModalVisible}
+        onCancel={() => setIsEmailVerificationModalVisible(false)}
+        onSubmit={handleEmailVerification}
+        idd={comnyid}
+        initialEmail={initialValues.email}
+      />
 
       <Modal
         title="Reset Password"
@@ -430,7 +453,7 @@ const CompanyList = () => {
         footer={null}
         width={800}
       >
-        <AddUpgradePlan 
+        <AddUpgradePlan
           onClose={() => setIsUpgradePlanModalVisible(false)}
           comnyid={comnyid}
         />

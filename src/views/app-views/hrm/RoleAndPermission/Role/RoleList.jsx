@@ -57,7 +57,7 @@ const RoleList = () => {
 
   const getFilteredRoles = () => {
     if (!users) return [];
-    
+
     if (!searchText) return users;
 
     return users.filter(role => {
@@ -75,35 +75,35 @@ const RoleList = () => {
   }, [filteredData]);
 
   //// permission
-                                                
-                                  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-                                  const roles = useSelector((state) => state.role?.role?.data);
-                                  const roleData = roles?.find(role => role.id === roleId);
-                               
-                                  const whorole = roleData.role_name;
-                               
-                                  const parsedPermissions = Array.isArray(roleData?.permissions)
-                                  ? roleData.permissions
-                                  : typeof roleData?.permissions === 'string'
-                                  ? JSON.parse(roleData.permissions)
-                                  : [];
-                                
-                                  let allpermisson;  
-                               
-                                  if (parsedPermissions["extra-hrm-role"] && parsedPermissions["extra-hrm-role"][0]?.permissions) {
-                                    allpermisson = parsedPermissions["extra-hrm-role"][0].permissions;
-                                    // console.log('Parsed Permissions:', allpermisson);
-                                  
-                                  } else {
-                                    // console.log('extra-hrm-role is not available');
-                                  }
-                                  
-                                  const canCreateClient = allpermisson?.includes('create');
-                                  const canEditClient = allpermisson?.includes('edit');
-                                  const canDeleteClient = allpermisson?.includes('delete');
-                                  const canViewClient = allpermisson?.includes('view');
-                               
-                                  ///endpermission
+
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
+    ? roleData.permissions
+    : typeof roleData?.permissions === 'string'
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+  let allpermisson;
+
+  if (parsedPermissions["extra-hrm-role"] && parsedPermissions["extra-hrm-role"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-hrm-role"][0].permissions;
+    // console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    // console.log('extra-hrm-role is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+  ///endpermission
 
 
 
@@ -142,17 +142,17 @@ const RoleList = () => {
                                 </Flex>
                               </Menu.Item>
                                 ) : null} */}
-                  
-                  
-                  {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                     <Menu.Item>
-                                     <Flex alignItems="center">
-                                       <Button type="" icon={<DeleteOutlined />} onClick={() => { deleteRoles(elm.id) }} size="small">
-                                         <span className="">Delete</span>
-                                       </Button>
-                                     </Flex>
-                                   </Menu.Item>
-                                ) : null}
+
+
+      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button type="" icon={<DeleteOutlined />} onClick={() => { deleteRoles(elm.id) }} size="small">
+              <span className="">Delete</span>
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
     </Menu>
   );
 
@@ -160,7 +160,7 @@ const RoleList = () => {
     try {
       const parsedPermissions =
         permissions && typeof permissions === "string" ? JSON.parse(permissions) : {};
-  
+
       return Object.keys(parsedPermissions).map(moduleKey => (
         <div key={moduleKey}>
           {parsedPermissions[moduleKey].map(permission => (
@@ -238,9 +238,9 @@ const RoleList = () => {
       </Flex>
       <div className="table-responsive mt-2">
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-          <Table 
-            columns={tableColumns} 
-            dataSource={getFilteredRoles()} 
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredRoles()}
             rowKey="id"
             pagination={{
               total: getFilteredRoles().length,

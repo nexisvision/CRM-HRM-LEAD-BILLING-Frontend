@@ -35,7 +35,7 @@ const EditMilestone = ({ idd, onClose }) => {
     milestone_title: "",
     milestone_cost: "",
     milestone_status: "",
-    add_cost_to_project_budget: "",
+    add_cost_to_project_budget: false,
     milestone_summary: "",
     milestone_start_date: null,
     milestone_end_date: null,
@@ -48,7 +48,9 @@ const EditMilestone = ({ idd, onClose }) => {
         milestone_title: milestone.milestone_title || "",
         milestone_cost: milestone.milestone_cost || "",
         milestone_status: milestone.milestone_status || "",
-        add_cost_to_project_budget: milestone.add_cost_to_project_budget || "",
+        add_cost_to_project_budget: milestone.add_cost_to_project_budget === true || 
+            milestone.add_cost_to_project_budget === 'true' || 
+            milestone.add_cost_to_project_budget === 'yes',
         milestone_summary: milestone.milestone_summary || "",
         milestone_start_date: milestone.milestone_start_date
           ? moment(milestone.milestone_start_date)
@@ -100,6 +102,8 @@ const EditMilestone = ({ idd, onClose }) => {
     try {
       const formattedValues = {
         ...values,
+        milestone_cost: Number(values.milestone_cost),
+        add_cost_to_project_budget: values.add_cost_to_project_budget ? "yes" : "no",
         milestone_start_date: values.milestone_start_date
           ? values.milestone_start_date.format("YYYY-MM-DD")
           : null,
@@ -127,22 +131,21 @@ const EditMilestone = ({ idd, onClose }) => {
   };
   const validationSchema = Yup.object({
     milestone_title: Yup.string().required("Please enter milestone title."),
-    milestone_cost: Yup.string().required("Please enter milestone cost."),
+    milestone_cost: Yup.number()
+        .typeError("Cost must be a number")
+        .required("Please enter milestone cost."),
     milestone_status: Yup.string().required("Please select status."),
-    add_cost_to_project_budget: Yup.string().required(
-      "Please select add cost to project budget."
-    ),
+    add_cost_to_project_budget: Yup.string()
+        .oneOf(['yes', 'no'], 'Please select yes or no')
+        .required("Please select add cost to project budget option."),
     milestone_summary: Yup.string().required("Please enter milestone summary."),
     milestone_start_date: Yup.date()
-      .nullable()
-      .required("Start Date is required."),
+        .nullable()
+        .required("Start Date is required."),
     milestone_end_date: Yup.date()
-      .nullable()
-      .required("End Date is required")
-      .min(
-        Yup.ref("milestone_start_date"),
-        "End date must be after start date"
-      ),
+        .nullable()
+        .required("End Date is required")
+        .min(Yup.ref("milestone_start_date"), "End date must be after start date"),
   });
   return (
     <div>
@@ -254,9 +257,9 @@ const EditMilestone = ({ idd, onClose }) => {
                         Add Cost To Project Budget <span className="text-red-500">*</span>
                       </label>
                       <Select
-                        value={values.add_cost_to_project_budget}
+                        value={values.add_cost_to_project_budget ? 'yes' : 'no'}
                         onChange={(value) =>
-                          setFieldValue("add_cost_to_project_budget", value)
+                          setFieldValue("add_cost_to_project_budget", value === 'yes')
                         }
                         onBlur={() =>
                           setFieldTouched("add_cost_to_project_budget", true)
