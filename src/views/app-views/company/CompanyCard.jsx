@@ -324,28 +324,86 @@ const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) =>
           </div>
         </div>
 
-        {/* Company Info with Enhanced Typography */}
-        <div className="pt-10 pb-4 px-6">
-          <h3
-            className="text-lg font-semibold mb-2 truncate text-gray-800"
-            title={company.name}
-            style={{ letterSpacing: '-0.01em' }}
-          >
-            {company.name}
-          </h3>
-
-          <div className="flex items-center gap-2.5 text-gray-600 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
-              <MailOutlined className="text-blue-500" />
+        {/* Company Info Section */}
+        <div className="pt-10 px-6 pb-4">
+          {/* Company Name and Basic Info */}
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-gray-800 mb-1">
+              {company.name}
+            </h3>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <MailOutlined className="text-blue-500" />
+                <span className="text-sm text-gray-600">{company.email}</span>
+              </div>
+              {company.phone && (
+                <div className="flex items-center gap-2">
+                  <PhoneOutlined className="text-green-500" />
+                  <span className="text-sm text-gray-600">{company.phone}</span>
+                </div>
+              )}
             </div>
-            <span className="truncate text-sm" title={company.email}>
-              {company.email}
-            </span>
+          </div>
+
+          {/* Company Details */}
+          <div className="border-t border-gray-100 pt-4 mb-4">
+            <h4 className="text-sm font-medium text-gray-700 mb-3">Company Details</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-xs text-gray-500">Registration No.</p>
+                <p className="text-sm font-medium text-gray-800">
+                  {company.registrationNumber || 'Not Available'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Tax ID</p>
+                <p className="text-sm font-medium text-gray-800">
+                  {company.taxId || 'Not Available'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Website</p>
+                <p className="text-sm font-medium text-gray-800">
+                  {company.website || 'Not Available'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Industry</p>
+                <p className="text-sm font-medium text-gray-800">
+                  {company.industry || 'Not Available'}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Banking Information */}
+          <div className="border-t border-gray-100 pt-4">
+            <h4 className="text-sm font-medium text-gray-700 mb-3">Banking Information</h4>
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs text-gray-500">Bank Name</p>
+                <p className="text-sm font-medium text-gray-800">
+                  {company.bankName || 'Not Available'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Account Number</p>
+                <p className="text-sm font-medium text-gray-800">
+                  {company.accountNumber || 'Not Available'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">IFSC Code</p>
+                <p className="text-sm font-medium text-gray-800">
+                  {company.ifscCode || 'Not Available'}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Enhanced Button Styling */}
-        <div className="px-6 pb-3">
+        {/* Action Buttons */}
+        <div className="px-6 pb-6 space-y-3">
           {hasActiveSubscription ? (
             <Button
               type="default"

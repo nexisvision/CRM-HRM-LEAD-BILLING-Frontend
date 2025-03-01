@@ -73,7 +73,7 @@ const EditCompany = ({ comnyid, initialData, onClose }) => {
     profilePic: initialData?.profilePic || "",
     address: initialData?.address || "",
     website: initialData?.website || "",
-    accountType: initialData?.accountType || "",
+    accountType: initialData?.accountType || ""
   });
 
   const validationSchema = Yup.object({
@@ -87,7 +87,6 @@ const EditCompany = ({ comnyid, initialData, onClose }) => {
     zipcode: Yup.string().required("Please enter a Zipcode."),
     address: Yup.string().required("Please enter an Address."),
     website: Yup.string().required("Please enter a Website."),
-    accountType: Yup.string().required("Please select an Account Type"),
   });
 
   const handleSubmit = async (values) => {
@@ -111,30 +110,6 @@ const EditCompany = ({ comnyid, initialData, onClose }) => {
       message.error(error.message || "Failed to update company");
     }
   };
-
-  useEffect(() => {
-    if (initialData) {
-      setInitialValues({
-        firstName: initialData.firstName || "",
-        lastName: initialData.lastName || "",
-        bankname: initialData.bankname || "",
-        phone: initialData.phone || "",
-        ifsc: initialData.ifsc || "",
-        banklocation: initialData.banklocation || "",
-        accountholder: initialData.accountholder || "",
-        accountnumber: initialData.accountnumber || "",
-        gstIn: initialData.gstIn || "",
-        city: initialData.city || "",
-        state: initialData.state || "",
-        country: initialData.country || "",
-        zipcode: initialData.zipcode || "",
-        profilePic: initialData.profilePic || "",
-        address: initialData.address || "",
-        website: initialData.website || "",
-        accountType: initialData.accountType || "",
-      });
-    }
-  }, [initialData]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -319,24 +294,11 @@ const EditCompany = ({ comnyid, initialData, onClose }) => {
               </Col>
               <Col span={12} className="mt-3">
                 <div className="flex flex-col space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">
-                    Account Type <span className="text-red-500">*</span>
-                  </label>
-                  <Field name="accountType">
-                    {({ field, form }) => (
-                      <Select
-                        {...field}
-                        value={field.value || undefined}
-                        onChange={(value) => form.setFieldValue('accountType', value)}
-                        placeholder="Select Account Type"
-                        className="w-full rounded-md"
-                        style={{ width: '100%' }}
-                      >
-                        <Option value="current">Current</Option>
-                        <Option value="saving">Saving</Option>
-                        <Option value="business">Business</Option>
-                      </Select>
-                    )}
+                  <label className="text-sm font-semibold text-gray-700">Account Type <span className="text-red-500">*</span></label>
+                  <Field name="accountType" as={Select} placeholder="Select Account Type" className="w-full rounded-md border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <Option value="current">Current</Option>
+                    <Option value="saving">Saving</Option>
+                    <Option value="business">Business</Option>
                   </Field>
                   <ErrorMessage
                     name="accountType"
