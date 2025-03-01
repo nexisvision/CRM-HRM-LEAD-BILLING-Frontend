@@ -18,7 +18,7 @@ import { GetProject } from "../project-list/projectReducer/ProjectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { useNavigate, useParams } from 'react-router-dom';
-import { Modal, Tag, Table, Timeline, Progress } from 'antd';
+import { Modal, Tag, Table, Timeline, Progress, Avatar, Menu } from 'antd';
 import { GetTasks } from "../task/TaskReducer/TaskSlice";
 import { Getmins } from "../milestone/minestoneReducer/minestoneSlice";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
@@ -722,7 +722,13 @@ const OverViewList = () => {
                     {isSelected && (
                       <div className="mt-4 pt-4 border-t border-gray-200">
                         <p className="text-sm text-gray-600 mb-3">
-                          {milestone.milestone_summary || 'No description available'}
+                          {milestone.milestone_summary ? (
+                            <span className="leading-relaxed">
+                              {milestone.milestone_summary.replace(/<[^>]*>/g, '')}
+                            </span>
+                          ) : (
+                            'No description available'
+                          )}
                         </p>
                         <div className="flex flex-wrap gap-2">
                           {taskData
@@ -745,46 +751,145 @@ const OverViewList = () => {
               })}
             </div>
           ) : (
-            // Tasks view remains the same but with improved styling
-            <div className="grid gap-4 grid-cols-1 lg:grid-cols-3">
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
               {Object.entries(tasksByStatus).map(([status, tasks]) => (
-                <div key={status} className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <div 
+                  key={status} 
+                  className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+                >
+                  {/* Status Header */}
                   <div className="p-4 bg-gray-50 border-b border-gray-200">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-medium text-gray-800 flex items-center gap-2">
+                      <div className="flex items-center gap-2">
                         <span
                           className="w-3 h-3 rounded-full"
                           style={{ backgroundColor: getStatusColor(status) }}
                         />
-                        {status}
-                      </h3>
-                      <Tag color="blue">{tasks.length}</Tag>
+                        <h3 className="font-medium text-gray-800">{status}</h3>
+                      </div>
+                      <Tag 
+                        color={status.toLowerCase() === 'completed' ? 'success' : 'processing'}
+                        className="rounded-full"
+                      >
+                        {tasks.length} Tasks
+                      </Tag>
                     </div>
                   </div>
-                  <div className="p-4">
-                    <div className="space-y-2">
+
+                  {/* Tasks List */}
+                  <div className="p-3">
+                    <div className="space-y-3">
                       {tasks.map(task => (
                         <div
                           key={task.id}
-                          className="p-3 rounded-md border border-gray-200 hover:border-blue-300 
-                                   hover:shadow-sm cursor-pointer transition-all bg-white"
+                          className="group bg-white rounded-lg border border-gray-200 hover:border-blue-300 
+                                   hover:shadow-md transition-all duration-300"
                         >
-                          <p className="text-sm font-medium text-gray-700 mb-2">
-                            {task.task_title}
-                          </p>
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500">
-                              Due: {dayjs(task.end_date).format('DD MMM')}
-                            </span>
-                            {task.assignee && (
-                              <div className="flex items-center gap-1">
-                                <UserOutlined className="text-gray-400" />
-                                <span className="text-xs text-gray-600">
-                                  {task.assignee}
-                                </span>
+                          <div className="p-4">
+                            {/* Task Header */}
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex-grow">
+                                <h4 
+                                  className="text-sm font-medium text-gray-800 hover:text-blue-600 
+                                           cursor-pointer line-clamp-2 mb-1"
+                                  onClick={() => handleTaskClick(task.id)}
+                                >
+                                  {task.task_title}
+                                </h4>
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                  <CalendarOutlined className="text-blue-400" />
+                                  <span>Due: {dayjs(task.end_date).format('DD MMM YYYY')}</span>
+                                </div>
+                              </div>
+                              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                <EllipsisDropdown 
+                                  menu={
+                                    <Menu>
+                                      <Menu.Item key="view">View Details</Menu.Item>
+                                      <Menu.Item key="edit">Edit Task</Menu.Item>
+                                    </Menu>
+                                  }
+                                />
+                              </div>
+                            </div>
+
+                            {/* Task Progress */}
+                            {task.progress !== undefined && (
+                              <div className="mb-3">
+                                <Progress 
+                                  percent={task.progress} 
+                                  size="small" 
+                                  strokeColor={getStatusColor(status)}
+                                  className="mb-1"
+                                />
                               </div>
                             )}
+
+                            {/* Task Footer */}
+                            <div className="flex items-center justify-between pt-2">
+                              <div className="flex items-center gap-3">
+                                {/* Priority Tag */}
+                                {task.priority && (
+                                  <Tag 
+                                    color={
+                                      task.priority.toLowerCase() === 'high' ? 'error' :
+                                      task.priority.toLowerCase() === 'medium' ? 'warning' : 
+                                      'success'
+                                    }
+                                    className="rounded-full text-xs"
+                                  >
+                                    {task.priority}
+                                  </Tag>
+                                )}
+                                
+                                {/* Task Type */}
+                                {task.task_type && (
+                                  <span className="text-xs text-gray-500 flex items-center gap-1">
+                                    <TeamOutlined className="text-gray-400" />
+                                    {task.task_type}
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Assignees */}
+                              <div className="flex items-center">
+                                {task.assignee && (
+                                  <Tooltip title={`Assigned to: ${task.assignee}`}>
+                                    <Avatar.Group maxCount={3} size="small">
+                                      {Array.isArray(task.assignee) ? (
+                                        task.assignee.map((assignee, idx) => (
+                                          <Avatar 
+                                            key={idx}
+                                            size="small"
+                                            className="border-2 border-white"
+                                            src={assignee.avatar}
+                                          >
+                                            {assignee.name?.[0]}
+                                          </Avatar>
+                                        ))
+                                      ) : (
+                                        <Avatar 
+                                          size="small"
+                                          className="border-2 border-white"
+                                        >
+                                          {task.assignee[0]}
+                                        </Avatar>
+                                      )}
+                                    </Avatar.Group>
+                                  </Tooltip>
+                                )}
+                              </div>
+                            </div>
                           </div>
+
+                          {/* Task Description Preview */}
+                          {task.description && (
+                            <div className="px-4 pb-3">
+                              <p className="text-xs text-gray-500 line-clamp-2">
+                                {task.description.replace(/<[^>]*>/g, '')}
+                              </p>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Card, Row, Col, Button, Modal, Input, Form, Select, Avatar } from "antd";
-import { PlusOutlined, CalendarOutlined, MessageOutlined, CommentOutlined } from "@ant-design/icons";
+import { Card, Row, Col, Button, Modal, Input, Form, Select, Avatar, Tag, Badge, Tooltip } from "antd";
+import { PlusOutlined, CalendarOutlined, MessageOutlined, CommentOutlined, UserOutlined, PhoneOutlined, MailOutlined } from "@ant-design/icons";
 import {
   DndContext,
   useDroppable,
@@ -28,91 +28,113 @@ const DraggableItem = ({ lead, id }) => {
     useDraggable({
       id,
     });
+
   const style = {
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
       : undefined,
     transition,
-    marginBottom: "8px",
+    marginBottom: "12px",
   };
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <Card 
-        className="cursor-pointer hover:shadow-md transition-all relative overflow-hidden"
-        bodyStyle={{ padding: '8px' }}
+        className="lead-card cursor-pointer"
+        bodyStyle={{ padding: '16px' }}
+        bordered={false}
+        style={{
+          background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)',
+          borderRadius: '12px',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+          border: '1px solid #e6ebf5',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
       >
+        {/* Status Bar */}
         <div 
-          className="absolute left-0 top-0 bottom-0 w-1" 
+          className="absolute top-0 left-0 right-0 h-1"
           style={{ 
-            backgroundColor: '#1677ff',  // Ant Design's primary blue
-            content: '""',
-            position: 'absolute',
-            left: 0,
-            top: '-1px',  // Extend slightly above
-            bottom: '-1px',  // Extend slightly below
-            width: '4px',  // Slightly thicker
+            background: lead.status === 'Won' ? '#52c41a' : '#1890ff',
           }} 
         />
-        
-        <div className="pl-2"> {/* Increased padding to account for thicker line */}
-          <div className="flex justify-between items-start">
-            <div>
-              <h4 className="text-lg font-medium mb-2">{lead.leadTitle}</h4>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center text-gray-500 text-sm mt-1">
-                  <CalendarOutlined className="mr-1" />
-                  {new Date(lead.createdAt).toLocaleDateString('en-US', {
-                    day: 'numeric',
-                    month: 'short'
-                  })}
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center text-gray-500 text-sm mt-1">
-                    <CommentOutlined className="mr-1" />
-                    {lead.commentCount || 1}
-                  </div>
-                </div>
-              </div>
+
+        {/* Lead Header */}
+        <div className="flex justify-between items-start mb-4 pt-2">
+          <div className="flex-1">
+            <h4 className="text-lg font-medium text-gray-800 mb-1 line-clamp-1">
+              {lead.leadTitle}
+            </h4>
+            <div className="flex items-center gap-2">
+              <Tag 
+                color={lead.status === 'Won' ? 'success' : 'processing'} 
+                className="rounded-full text-xs font-medium"
+              >
+                {lead.status || 'New Lead'}
+              </Tag>
             </div>
-            {/* <div className="mt-2">
-              <Avatar.Group>
-                <Avatar 
-                  size="small"
-                  src={lead.assigned?.profilePicture || "https://www.gravatar.com/avatar/?d=mp"}
-                  alt={lead.assigned?.name || "User Avatar"}
-                />
-                <Avatar 
-                  size="small"
-                  src="https://www.gravatar.com/avatar/?d=mp"
-                  alt="Team Member"
-                />
-                <Avatar 
-                  size="small"
-                  src="https://www.gravatar.com/avatar/?d=mp"
-                  alt="Team Member"
-                />
-              </Avatar.Group>
-            </div> */}
           </div>
-          <div className="mt-2">
-            <Avatar.Group size={20}>
-              <Avatar 
-                className="w-10 h-10"
-                src={lead.assigned?.profilePicture || "https://www.gravatar.com/avatar/?d=mp"}
-                alt={lead.assigned?.name || "User Avatar"}
-              />
-              <Avatar
-                className="w-5 h-5" 
-                src="https://www.gravatar.com/avatar/?d=mp"
-                alt="Team Member"
-              />
-              <Avatar
-                className="w-5 h-5"
-                src="https://www.gravatar.com/avatar/?d=mp"
-                alt="Team Member"
-              />
-            </Avatar.Group>
+          <Avatar
+            size={40}
+            className="bg-blue-50 border-2 border-white shadow-sm"
+            style={{ color: '#1890ff' }}
+          >
+            {lead.firstName?.[0] || lead.lastName?.[0] || '?'}
+          </Avatar>
+        </div>
+
+        {/* Contact Info */}
+        <div className="space-y-2.5 mb-4">
+          <div className="flex items-center text-gray-600">
+            <UserOutlined className="text-blue-400 mr-2" />
+            <span className="text-sm font-medium">
+              {`${lead.firstName || ''} ${lead.lastName || ''}`}
+            </span>
+          </div>
+          {lead.telephone && (
+            <div className="flex items-center text-gray-500">
+              <PhoneOutlined className="text-green-400 mr-2" />
+              <span className="text-sm">{lead.telephone}</span>
+            </div>
+          )}
+          {lead.email && (
+            <div className="flex items-center text-gray-500">
+              <MailOutlined className="text-orange-400 mr-2" />
+              <span className="text-sm truncate">{lead.email}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+          <div className="flex items-center gap-2">
+            <CalendarOutlined className="text-gray-400" />
+            <span className="text-xs text-gray-500">
+              {new Date(lead.createdAt).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric'
+              })}
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Tooltip title="Comments">
+              <Badge 
+                count={1} 
+                size="small"
+                className="cursor-pointer"
+                offset={[-5, 5]}
+              >
+                <MessageOutlined className="text-gray-400 text-lg" />
+              </Badge>
+            </Tooltip>
+            <div 
+              className="w-2 h-2 rounded-full"
+              style={{ 
+                backgroundColor: lead.status === 'Won' ? '#52c41a' : '#1890ff',
+                boxShadow: `0 0 0 3px ${lead.status === 'Won' ? 'rgba(82, 196, 26, 0.1)' : 'rgba(24, 144, 255, 0.1)'}` 
+              }} 
+            />
           </div>
         </div>
       </Card>

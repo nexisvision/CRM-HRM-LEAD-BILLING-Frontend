@@ -150,7 +150,7 @@ const EditCompany = ({ comnyid, initialData, onClose }) => {
       >
         {({ values, handleSubmit }) => (
           <Form onSubmit={handleSubmit}>
-            <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+            <hr style={{ marginBottom: "10px", border: "1px solid #e8e8e8" }} />
             <Row gutter={16}>
               <Col span={12} className="">
                 <div className="form-item ">

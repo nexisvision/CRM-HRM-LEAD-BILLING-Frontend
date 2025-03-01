@@ -54,7 +54,7 @@ const curr = currencies?.data || [];
     const formattedValues = {
       ...values,
       milestone_cost: Number(values.milestone_cost),
-      add_cost_to_project_budget: values.add_cost_to_project_budget ? "yes" : "no"
+      add_cost_to_project_budget: values.add_cost_to_project_budget // Will be "yes" or "no"
     };
 
     // Check if the selected tag is new or existing
@@ -99,7 +99,7 @@ const curr = currencies?.data || [];
     milestone_title: "",
     milestone_cost: "",
     milestone_status: "",
-    add_cost_to_project_budget: false,
+    add_cost_to_project_budget: "no", // Set default value
     milestone_summary: "",
     milestone_start_date: null,
     milestone_end_date: null,
@@ -249,20 +249,21 @@ const curr = currencies?.data || [];
                       <label className="font-semibold mb-2">
                         Add Cost To Project Budget <span className="text-red-500">*</span>
                       </label>
-                      <Select
-                        value={values.add_cost_to_project_budget}
-                        onChange={(value) =>
-                          setFieldValue("add_cost_to_project_budget", value === 'yes')
-                        }
-                        onBlur={() =>
-                          setFieldTouched("add_cost_to_project_budget", true)
-                        }
-                        className="w-full mt-1"
-                        placeholder="Select Option"
-                      >
-                        <Option value="no">No</Option>
-                        <Option value="yes">Yes</Option>
-                      </Select>
+                      <Field name="add_cost_to_project_budget">
+                        {({ field, form }) => (
+                          <Select
+                            {...field}
+                            value={field.value}
+                            onChange={(value) => form.setFieldValue('add_cost_to_project_budget', value)}
+                            onBlur={() => form.setFieldTouched('add_cost_to_project_budget', true)}
+                            className="w-full mt-1"
+                            placeholder="Select Option"
+                          >
+                            <Option value="no">No</Option>
+                            <Option value="yes">Yes</Option>
+                          </Select>
+                        )}
+                      </Field>
                       <ErrorMessage
                         name="add_cost_to_project_budget"
                         component="div"
