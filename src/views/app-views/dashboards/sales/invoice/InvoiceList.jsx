@@ -216,7 +216,6 @@ export const InvoiceList = () => {
         <span
           className="cursor-pointer hover:underline"
           onClick={() => {
-            // Check if user has view permission
             if (whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) {
               Viewfunc(record.id);
             }
@@ -239,6 +238,17 @@ export const InvoiceList = () => {
         const customerA = fnddataCustomers?.find(cust => cust.id === a.customer)?.name || '';
         const customerB = fnddataCustomers?.find(cust => cust.id === b.customer)?.name || '';
         return customerA.localeCompare(customerB);
+      },
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+      render: (category) => <span>{category || 'N/A'}</span>,
+      sorter: (a, b) => {
+        if (a.category && b.category) {
+          return a.category.localeCompare(b.category);
+        }
+        return 0;
       },
     },
     {
@@ -327,7 +337,8 @@ export const InvoiceList = () => {
     }
     
     const filtered = fnddata.filter(invoice => 
-      invoice.salesInvoiceNumber?.toLowerCase().includes(value)
+      invoice.salesInvoiceNumber?.toLowerCase().includes(value) ||
+      invoice.category?.toLowerCase().includes(value)
     );
     
     setList(filtered);
@@ -342,7 +353,8 @@ export const InvoiceList = () => {
     // Apply search filter
     if (searchText) {
       filtered = filtered.filter(invoice => 
-        invoice.salesInvoiceNumber?.toLowerCase().includes(searchText.toLowerCase())
+        invoice.salesInvoiceNumber?.toLowerCase().includes(searchText.toLowerCase()) ||
+        invoice.category?.toLowerCase().includes(searchText.toLowerCase())
       );
     }
 

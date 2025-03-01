@@ -45,6 +45,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { DeleteNotes, GetNote } from "./NotesReducer/NotesSlice";
 import { debounce } from 'lodash';
+import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 
 const { Column } = Table;
 
@@ -102,9 +103,13 @@ export const NotesList = () => {
   const allempdata = useSelector((state) => state.Notes);
   const filtermin = allempdata.Notes.data;
 
+  // Add employee data from Redux store
+  const employeeData = useSelector((state) => state.employee?.employee?.data || []);
+
   useEffect(() => {
     dispatch(GetNote(id));
-  }, [dispatch]);
+    dispatch(empdata()); // Fetch employee data
+  }, [dispatch, id]);
 
   useEffect(() => {
     if (filtermin) {
@@ -187,22 +192,33 @@ export const NotesList = () => {
   );
 
   const tableColumns = [
-    // {
-    //   title: "#",
-    //   dataIndex: "id",
-    // },
     {
       title: "Note Title",
       dataIndex: "note_title",
       sorter: {
-        compare: (a, b) => a.noteTitle.length - b.noteTitle.length,
+        compare: (a, b) => a.note_title.length - b.note_title.length,
       },
     },
     {
       title: "Note Type",
       dataIndex: "notetype",
       sorter: {
-        compare: (a, b) => a.noteType.length - b.noteType.length,
+        compare: (a, b) => a.notetype.length - b.notetype.length,
+      },
+    },
+    {
+      title: "Employee",
+      dataIndex: "employees",
+      render: (employees) => {
+        try {
+          const employeeObj = typeof employees === 'string' ? JSON.parse(employees) : employees;
+          const employeeId = employeeObj?.id;
+          const employee = employeeData?.find(emp => emp.id === employeeId);
+          return <span>{employee?.username || 'N/A'}</span>;
+        } catch (error) {
+          console.error('Error parsing employee data:', error);
+          return <span>N/A</span>;
+        }
       },
     },
     {
@@ -226,26 +242,39 @@ export const NotesList = () => {
   // Create debounced search function
   const debouncedSearch = debounce((value, data) => {
     setIsSearching(true);
-    const searchValue = value.toLowerCase();
     
-    if (!searchValue) {
-      setList(filtermin || []); // Reset to original data
+    if (!value) {
+      setList(filtermin || []);
       setIsSearching(false);
       return;
     }
 
-    const filteredData = filtermin?.filter(note => 
-      note.note_title?.toString().toLowerCase().includes(searchValue) ||
-      note.notetype?.toString().toLowerCase().includes(searchValue)
-    ) || [];
+    const filtered = filtermin?.filter(note => {
+      try {
+        const employeeObj = JSON.parse(note.employees);
+        const employee = employeeData?.find(emp => emp.id === employeeObj?.id);
+        const username = employee?.username || '';
 
-    setList(filteredData);
+        return (
+          note.note_title?.toString().toLowerCase().includes(value) ||
+          note.notetype?.toString().toLowerCase().includes(value) ||
+          username.toLowerCase().includes(value)
+        );
+      } catch (error) {
+        return (
+          note.note_title?.toString().toLowerCase().includes(value) ||
+          note.notetype?.toString().toLowerCase().includes(value)
+        );
+      }
+    }) || [];
+
+    setList(filtered);
     setIsSearching(false);
-  }, 300); // 300ms delay
+  }, 300);
 
   // Modified onSearch function
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
+    const value = e.currentTarget.value.toLowerCase();
     setSearchValue(value);
     debouncedSearch(value, filtermin);
   };

@@ -104,7 +104,7 @@ const ProjectList = () => {
 
 			return {
 				...item,
-				dateRange: `${new Date(item.startDate).toLocaleDateString()}/${new Date(item.endDate).toLocaleDateString()}`,
+				dateRange: `${new Date(item.startDate).toLocaleDateString('en-GB')}/${new Date(item.endDate).toLocaleDateString('en-GB')}`,
 				id: item.id,
 				name: item.project_name || item.name,
 				category: item.project_category,
@@ -169,6 +169,10 @@ const ProjectList = () => {
 		</Menu>
 	);
 
+	// Get employee data from Redux store
+	const allEmployeeData = useSelector((state) => state.employee);
+	const empData = allEmployeeData?.employee?.data || [];
+
 	const tableColumns = [
 		
 		{
@@ -181,7 +185,7 @@ const ProjectList = () => {
                     className="cursor-pointer hover:text-blue-600"
                 >
                     <h4 className="mb-0">{name}</h4>
-                    <span className="text-gray-500">{record.project_category}</span>
+                    {/* <span className="text-gray-500">{record.project_category}</span> */}
                 </div>
             ),
         },
@@ -196,75 +200,102 @@ const ProjectList = () => {
 			),
 		},
 		{
-			title: 'Progress',
-			dataIndex: 'completedTask',
-			key: 'completedTask',
-			render: (completedTask) => (
-				<div>
-					<span>
-						<CheckCircleOutlined className="mr-2" />
-						{completedTask}
-					</span>
-				</div>
-			),
-		},
-		{
-			title: 'Days Left',
-			dataIndex: 'dayleft',
-			key: 'dayleft',
-			render: (dayleft) => {
-				let statusColor = '';
-				if (dayleft > 10) {
-					statusColor = 'green';
-				} else if (dayleft > 5) {
-					statusColor = 'orange';
-				} else {
-					statusColor = 'red';
-				}
-
-				return (
-					<Tag color={statusColor}>
-						<ClockCircleOutlined className="mr-2" />
-						{dayleft} days left
-					</Tag>
-				);
-			},
-		},
-		{
 			title: 'Client',
-			dataIndex: 'member',
-			key: 'member',
-			render: (member) => (
-				<div>
-					<span>{member}</span>
+			dataIndex: 'client',
+			key: 'client',
+			render: (clientId) => {
+				const client = dataclient?.find(c => c.id === clientId);
+				return <span>{client?.username || 'N/A'}</span>;
+			}
+		},
+		{
+			title: 'Project Members',
+			dataIndex: 'project_members',
+			key: 'project_members',
+			render: (members) => {
+				if (!members) return <span>No members</span>;
+				
+				try {
+					// Parse the project_members string to get array of member IDs
+					const parsedMembers = typeof members === 'string' 
+						? JSON.parse(members).project_members 
+						: members.project_members;
+
+					if (!parsedMembers || !Array.isArray(parsedMembers)) {
+						return <span>No members</span>;
+					}
+
+					// Find employee details for each member ID
+					const memberDetails = parsedMembers.map(memberId => {
+						const employee = empData.find(emp => emp.id === memberId);
+						return employee;
+					}).filter(Boolean); // Remove any undefined values
+
+					return (
+						<Avatar.Group maxCount={3}>
+							{memberDetails.map((employee, index) => (
+								<Tooltip 
+									key={employee.id} 
+									title={`${employee.firstName} ${employee.lastName || ''}`}
+								>
+									<Avatar 
+										src={employee.profilePic}
+										className="rounded-full"
+									>
+										{employee.firstName?.[0] || 'U'}
+									</Avatar>
+								</Tooltip>
+							))}
+							{memberDetails.length > 3 && (
+								<div className="ml-2">
+									+{memberDetails.length - 3} more
+								</div>
+							)}
+						</Avatar.Group>
+					);
+				} catch (error) {
+					console.error('Error parsing project members:', error);
+					return <span>Error displaying members</span>;
+				}
+			}
+		},
+		{
+			title: 'Category',
+			dataIndex: 'project_category',
+			key: 'project_category',
+			render: (category) => <span>{category || 'N/A'}</span>
+		},
+		{
+			title: 'Status',
+			dataIndex: 'status',
+			key: 'status',
+			render: (status) => (
+				<Tag color={status ? 'green' : 'default'}>
+					{status || 'Not Set'}
+				</Tag>
+			)
+		},
+		{
+			title: 'Start Date',
+			dataIndex: 'startDate',
+			key: 'startDate',
+			render: (date) => date ? new Date(date).toLocaleDateString('en-GB') : 'N/A'
+		},
+		{
+			title: 'End Date',
+			dataIndex: 'endDate',
+			key: 'endDate',
+			render: (date) => date ? new Date(date).toLocaleDateString('en-GB') : 'N/A'
+		},
+		{
+			title: 'Action',
+			key: 'action',
+			render: (_, record) => (
+				<div className="text-center">
+					<EllipsisDropdown menu={dropdownMenu(record.id)} />
 				</div>
 			),
-		},
-		// {
-		// 	title: 'Action',
-		// 	key: 'action',
-		// 	render: (_, record) => (
-		// 		<div className="text-right">
-		// 			<Dropdown 
-		// 				overlay={dropdownMenu(record.id)} 
-		// 				trigger={['click']}
-		// 				placement="bottomRight"
-		// 			>
-		// 				<Button type="text" icon={<EllipsisDropdown />} />
-		// 			</Dropdown>
-		// 		</div>
-		// 	),
-		// },
-
-		{
-      title: "Action",
-      dataIndex: "actions",
-      render: (_, elm) => (
-        <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
-        </div>
-      ),
-    },
+		}
 	];
 
 	return (

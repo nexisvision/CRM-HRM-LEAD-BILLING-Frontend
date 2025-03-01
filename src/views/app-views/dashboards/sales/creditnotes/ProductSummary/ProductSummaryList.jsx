@@ -78,8 +78,8 @@ const ProductSummaryList = ({ selectedCreditNote, invoiceData }) => {
                     ...item
                 }));
 
-                // Calculate totals
-                const subtotal = itemsArray.reduce((sum, item) => sum + (parseFloat(item.base_amount) || 0), 0);
+                // Calculate subtotal using amount instead of base_amount
+                const subtotal = itemsArray.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
                 
                 // Get discount percentage directly from invoice
                 const discountPercentage = invoiceData.discount || 0;
@@ -142,14 +142,14 @@ const ProductSummaryList = ({ selectedCreditNote, invoiceData }) => {
         },
         {
             title: 'Discount (%)',
-            dataIndex: 'discount_percentage',
-            key: 'discount_percentage',
-            render: (discount_percentage) => `${discount_percentage || 0}%`
+            dataIndex: 'discountValue',
+            key: 'discountValue',
+            render: (discountValue) => `${discountValue || 0}%`
         },
         {
             title: 'Tax (%)',
-            dataIndex: 'tax_percentage',
-            key: 'tax_percentage',
+            dataIndex: 'tax',
+            key: 'tax',
             render: (tax) => `${tax || 0}%`
         },
         {
@@ -160,8 +160,8 @@ const ProductSummaryList = ({ selectedCreditNote, invoiceData }) => {
         },
         {
             title: 'Amount',
-            dataIndex: 'final_amount',
-            key: 'final_amount',
+            dataIndex: 'amount',
+            key: 'amount',
             render: (amount) => (
                 <NumberFormat
                     displayType="text"

@@ -49,6 +49,7 @@ import Invoice from "views/app-views/pages/invoice";
 // import InvoiceView from "./InvoiceView";
 // import AddInvoice from './AddInvoice';
 // import ViewInvoice from './ViewInvoice';
+import { ClientData } from 'views/app-views/Users/client-list/CompanyReducers/CompanySlice';
 const { Column } = Table;
 const { Option } = Select;
 const getPaymentStatus = (status) => {
@@ -96,10 +97,13 @@ export const InvoiceList = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedInvoiceData, setSelectedInvoiceData] = useState(null);
   const [searchText, setSearchText] = useState('');
+  const clientsData = useSelector((state) => state.SubClient);
+  const clients = clientsData.SubClient.data || [];
   // Fetch invoices when component mounts
   useEffect(() => {
     console.log("Fetching invoices for ID:", id);
     dispatch(getAllInvoices(id));
+    dispatch(ClientData());
   }, [dispatch]);
   // Update list when invoices change
   useEffect(() => {
@@ -172,20 +176,21 @@ export const InvoiceList = () => {
     setSearchText(value);
 
     if (!value) {
-      setList(invoices); // Reset to original list if search is empty
+      setList(invoices);
       return;
     }
 
     const filtered = invoices.filter((invoice) => {
-      // Convert all searchable fields to strings and check if they include the search value
+      const clientName = clients.find(c => c.id === invoice.client)?.username || '';
+      
       const searchableFields = [
         invoice.invoiceNumber,
-        invoice.client,
+        invoice.project,
+        clientName,
         invoice.total?.toString(),
         invoice.tax?.toString(),
         dayjs(invoice.issueDate).format("DD/MM/YYYY"),
-        dayjs(invoice.dueDate).format("DD/MM/YYYY"),
-        invoice.status
+        dayjs(invoice.dueDate).format("DD/MM/YYYY")
       ];
 
       return searchableFields.some(field => 
@@ -235,6 +240,27 @@ export const InvoiceList = () => {
       ),
     },
     {
+      title: "Project",
+      dataIndex: "project",
+      sorter: (a, b) => a.project?.localeCompare(b.project),
+      render: (project) => (
+        <span>{project || 'N/A'}</span>
+      ),
+    },
+    {
+      title: "Client",
+      dataIndex: "client",
+      sorter: (a, b) => {
+        const clientNameA = clients.find(c => c.id === a.client)?.username || '';
+        const clientNameB = clients.find(c => c.id === b.client)?.username || '';
+        return clientNameA.localeCompare(clientNameB);
+      },
+      render: (clientId) => {
+        const clientName = clients.find(c => c.id === clientId)?.username;
+        return <span>{clientName || 'N/A'}</span>;
+      },
+    },
+    {
       title: "Issue Date",
       dataIndex: "issueDate",
       render: (date) => dayjs(date).format("DD/MM/YYYY"),
@@ -246,14 +272,14 @@ export const InvoiceList = () => {
       render: (date) => dayjs(date).format("DD/MM/YYYY"),
       sorter: (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
     },
-    {
-      title: "Tax",
-      dataIndex: "tax",
-      sorter: (a, b) => (a.tax || 0) - (b.tax || 0),
-      render: (tax) => (
-        <span>₹{(tax || 0).toLocaleString()}</span>
-      ),
-    },
+    // {
+    //   title: "Tax",
+    //   dataIndex: "tax",
+    //   sorter: (a, b) => (a.tax || 0) - (b.tax || 0),
+    //   render: (tax) => (
+    //     <span>₹{(tax || 0).toLocaleString()}</span>
+    //   ),
+    // },
     {
       title: "Total",
       dataIndex: "total",
@@ -262,11 +288,6 @@ export const InvoiceList = () => {
         <span>₹{(total || 0).toLocaleString()}</span>
       ),
     },
-    // {
-    //   title: "Status",
-    //   dataIndex: "status",
-    //   render: (status) => <Tag color={getPaymentStatus(status)}>{status}</Tag>,
-    // },
     {
       title: "Action",
       dataIndex: "actions",
@@ -355,7 +376,7 @@ export const InvoiceList = () => {
                         visible={isAddInvoiceModalVisible}
                         onCancel={closeAddInvoiceModal}
                         footer={null}
-                        width={1000}
+                        width={1100}
                         className='mt-[-70px]'
                     >
                         <AddInvoice onClose={closeAddInvoiceModal} />
@@ -365,7 +386,7 @@ export const InvoiceList = () => {
                         visible={isEditInvoiceModalVisible}
                         onCancel={closeEditInvoiceModal}
                         footer={null}
-                        width={1000}
+                        width={1100}
                         className='mt-[-70px]'
                     >
                         <EditInvoice onClose={closeEditInvoiceModal} idd={idd} />

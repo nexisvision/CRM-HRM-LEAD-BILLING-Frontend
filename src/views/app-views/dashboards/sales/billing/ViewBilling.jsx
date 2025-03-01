@@ -106,8 +106,7 @@ function ViewBilling({ billingId }) {
         }
     };
 
-    // Add this function to update bill status
-    const updateBillStatus = (status) => {
+    const handleStatusUpdate = (status) => {
         setBillStatus(status);
     };
 
@@ -125,15 +124,13 @@ function ViewBilling({ billingId }) {
 
                 <Card className=''>
                     <div id="download-sections">
-                        {/* Pass the updateBillStatus function to BillInformationList */}
-                        <div className=' pt-3 pb-3'>
+                        <div className='pt-3 pb-3'>
                             <BillInformationList 
                                 billingId={billingId} 
-                                onStatusUpdate={updateBillStatus}
+                                onStatusUpdate={handleStatusUpdate}
                             />
                         </div>
-
-                        <div className=' pb-3'>
+                        <div className='pb-3'>
                             <ProductSummaryList billingId={billingId} />
                         </div>
                     </div>

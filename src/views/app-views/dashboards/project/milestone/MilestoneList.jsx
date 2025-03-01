@@ -195,10 +195,6 @@ export const MilestoneList = () => {
   );
 
   const tableColumns = [
-    // {
-    //   title: "#",
-    //   dataIndex: "id",
-    // },
     {
       title: "Milestone Title",
       dataIndex: "milestone_title",
@@ -206,35 +202,60 @@ export const MilestoneList = () => {
         compare: (a, b) => a.milestone_title.length - b.milestone_title.length,
       },
     },
+    
     {
       title: "Milestone Cost",
       dataIndex: "milestone_cost",
       sorter: {
-        compare: (a, b) => a.milestoneCost.length - b.milestoneCost.length,
+        compare: (a, b) => a.milestone_cost - b.milestone_cost,
+      },
+    },
+    // {
+    //   title: "Budget",
+    //   dataIndex: "add_cost_to_project_budget",
+    //   sorter: {
+    //     compare: (a, b) =>
+    //       a.add_cost_to_project_budget.length -
+    //       b.add_cost_to_project_budget.length,
+    //   },
+    // },
+    {
+      title: "Start Date",
+      dataIndex: "milestone_start_date",
+      render: (date) => date ? new Date(date).toLocaleDateString('en-GB') : 'N/A',
+      sorter: {
+        compare: (a, b) => new Date(a.milestone_start_date) - new Date(b.milestone_start_date),
       },
     },
     {
-      title: "Budget ",
-      dataIndex: "add_cost_to_project_budget",
+      title: "End Date",
+      dataIndex: "milestone_end_date",
+      render: (date) => date ? new Date(date).toLocaleDateString('en-GB') : 'N/A',
       sorter: {
-        compare: (a, b) =>
-          a.add_cost_to_project_budget.length -
-          b.add_cost_to_project_budget.length,
+        compare: (a, b) => new Date(a.milestone_end_date) - new Date(b.milestone_end_date),
       },
+    },
+    {
+      title: "Summary",
+      dataIndex: "milestone_summary",
+      render: (summary) => (
+        <div 
+          dangerouslySetInnerHTML={{ __html: summary }} 
+          className="max-w-md truncate"
+          title={summary?.replace(/<[^>]*>/g, '')} // Show full text on hover
+        />
+      ),
     },
     {
       title: "Status",
       dataIndex: "milestone_status",
       render: (_, record) => (
-        <>
-          <Tag color={getMilestoneStatus(record.milestone_status)}>
-            {record.milestone_status}
-          </Tag>
-        </>
+        <Tag color={getMilestoneStatus(record.milestone_status)}>
+          {record.milestone_status}
+        </Tag>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "milestone_status"),
     },
-
     {
       title: "Action",
       dataIndex: "actions",
@@ -356,6 +377,7 @@ export const MilestoneList = () => {
             columns={tableColumns}
             dataSource={getFilteredMilestones()}
             rowKey="id"
+            scroll={{ x: 1000 }}
             pagination={{
               total: getFilteredMilestones().length,
               pageSize: 10,
@@ -422,6 +444,19 @@ const styles = `
 
   .table-responsive {
     overflow-x: auto;
+  }
+
+  .max-w-md {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 `;
 

@@ -341,42 +341,33 @@ const EditEstimates = ({ idd, onClose }) => {
     // Handle table data changes
     const handleTableDataChange = (id, field, value) => {
         const updatedData = tableData.map((row) => {
-            if (row.id === id) {
-                const updatedRow = { ...row, [field]: value };
-
-                if (field === 'tax' && taxes?.data) {
-                    const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
-                    if (selectedTax) {
-                        setSelectedTaxDetails(prevDetails => ({
-                            ...prevDetails,
-                            [id]: {
-                                gstName: selectedTax.gstName,
-                                gstPercentage: selectedTax.gstPercentage
-                            }
-                        }));
-                    }
-                }
-                // Calculate amount if quantity, price, or tax changes
-                if (field === 'quantity' || field === 'price' || field === 'tax') {
-                    const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
-                    const price = parseFloat(field === 'price' ? value : row.price) || 0;
-                    const tax = parseFloat(field === 'tax' ? value : row.tax) || 0;
-
-                    const baseAmount = quantity * price;
-                    const taxAmount = (baseAmount * tax) / 100;
-                    const totalAmount = baseAmount + taxAmount;
-
-                    updatedRow.amount = totalAmount.toFixed(2);
-                }
-
-                return updatedRow;
+          if (row.id === id) {
+            const updatedRow = { ...row, [field]: value };
+            
+            // Calculate amount if quantity, price, or tax changes
+            if (field === 'quantity' || field === 'price' || field === 'tax') {
+              const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
+              const price = parseFloat(field === 'price' ? value : row.price) || 0;
+              const tax = field === 'tax' ? 
+                (value ? parseFloat(value.gstPercentage) : 0) : 
+                (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
+              
+              const baseAmount = quantity * price;
+              const taxAmount = (baseAmount * tax) / 100;
+              const totalAmount = baseAmount + taxAmount;
+              
+              updatedRow.amount = totalAmount.toFixed(2);
             }
-            return row;
+            
+            return updatedRow;
+          }
+          return row;
         });
-
+      
         setTableData(updatedData);
         calculateTotal(updatedData, discountValue, discountType);
-    };
+      };
+      
 
     return (
         <>
@@ -457,7 +448,7 @@ const EditEstimates = ({ idd, onClose }) => {
                                         </Form.Item>
                                     </Col>
 
-                                    <Col span={12}>
+                                    {/* <Col span={12}>
                                         <Form.Item
                                             name="calculatedTax"
                                             label="Calculate Tax"
@@ -466,7 +457,7 @@ const EditEstimates = ({ idd, onClose }) => {
                                         >
                                             <Input placeholder="Enter Calculate Tax" />
                                         </Form.Item>
-                                    </Col>
+                                    </Col> */}
 
                                     <Col span={12}>
                                         <Form.Item
@@ -515,7 +506,7 @@ const EditEstimates = ({ idd, onClose }) => {
                                     <thead className="bg-gray-100">
                                         <tr>
                                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                                Description<span className="text-red-500">*</span>
+                                            Item<span className="text-red-500">*</span>
                                             </th>
                                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Quantity<span className="text-red-500">*</span>
@@ -528,6 +519,9 @@ const EditEstimates = ({ idd, onClose }) => {
                                             </th>
                                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Amount<span className="text-red-500">*</span>
+                                            </th>
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                                Action
                                             </th>
                                         </tr>
                                     </thead>
@@ -565,18 +559,29 @@ const EditEstimates = ({ idd, onClose }) => {
                                                         />
                                                     </td>
                                                     <td className="px-4 py-2 border-b">
-                                                        <select
-                                                            value={row.tax}
-                                                            onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
-                                                            className="w-full p-2 border"
+                                                        <Select
+                                                            value={row.tax?.gstPercentage ? `${row.tax.gstName}|${row.tax.gstPercentage}` : '0'}
+                                                            onChange={(value) => {
+                                                                if (!value || value === '0') {
+                                                                    handleTableDataChange(row.id, "tax", null);
+                                                                    return;
+                                                                }
+                                                                const [gstName, gstPercentage] = value.split('|');
+                                                                handleTableDataChange(row.id, "tax", {
+                                                                    gstName,
+                                                                    gstPercentage: parseFloat(gstPercentage) || 0
+                                                                });
+                                                            }}
+                                                            placeholder="Select Tax"
+                                                            className="w-[150px] p-2"
+                                                            allowClear
                                                         >
-                                                            <option value="0">Nothing Selected</option>
                                                             {taxes && taxes.data && taxes.data.map(tax => (
-                                                                <option key={tax.id} value={tax.gstPercentage}>
-                                                                    {tax.gstName}: {tax.gstPercentage}%
-                                                                </option>
+                                                                <Option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
+                                                                    {tax.gstName} ({tax.gstPercentage}%)
+                                                                </Option>
                                                             ))}
-                                                        </select>
+                                                        </Select>
                                                     </td>
                                                     <td className="px-4 py-2 border-b">
                                                         <span>{row.amount}</span>

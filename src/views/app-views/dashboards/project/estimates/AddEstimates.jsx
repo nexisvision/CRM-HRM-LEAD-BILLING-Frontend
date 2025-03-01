@@ -124,6 +124,15 @@ const AddEstimates = ({ onClose }) => {
     };
 
 
+     // Modify the discount input handler
+    const handleDiscountChange = (value) => {
+        // Ensure value is a number and default to 0 if empty or invalid
+        const numValue = value === '' ? 0 : parseFloat(value) || 0;
+        setDiscountValue(numValue);
+        calculateTotal(tableData, numValue);
+    };
+    // Add a new state to track the selected currency
+    const [selectedCurrency, setSelectedCurrency] = useState({ code: '₹', icon: '₹' }); // Default to rupees
 
     const handleFinish = async (values) => {
         try {
@@ -299,28 +308,59 @@ const AddEstimates = ({ onClose }) => {
         });
     };
 
-   const handleTableDataChange = (id, field, value) => {
+//    const handleTableDataChange = (id, field, value) => {
+//     const updatedData = tableData.map((row) => {
+//       if (row.id === id) {
+//         const updatedRow = { ...row, [field]: value };
+        
+//         if (field === 'tax' && taxes?.data) {
+//           const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
+//           if (selectedTax) {
+//             setSelectedTaxDetails(prevDetails => ({
+//               ...prevDetails,
+//               [id]: {
+//                 gstName: selectedTax.gstName,
+//                 gstPercentage: selectedTax.gstPercentage
+//               }
+//             }));
+//           }
+//         }
+//         // Calculate amount if quantity, price, or tax changes
+//         if (field === 'quantity' || field === 'price' || field === 'tax') {
+//           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
+//           const price = parseFloat(field === 'price' ? value : row.price) || 0;
+//           const tax = parseFloat(field === 'tax' ? value : row.tax) || 0;
+          
+//           const baseAmount = quantity * price;
+//           const taxAmount = (baseAmount * tax) / 100;
+//           const totalAmount = baseAmount + taxAmount;
+          
+//           updatedRow.amount = totalAmount.toFixed(2);
+//         }
+        
+//         return updatedRow;
+//       }
+//       return row;
+//     });
+
+//     setTableData(updatedData);
+//     calculateTotal(updatedData, discountValue, discountType);
+//   };
+
+// ... existing code ...
+
+const handleTableDataChange = (id, field, value) => {
     const updatedData = tableData.map((row) => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
         
-        if (field === 'tax' && taxes?.data) {
-          const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
-          if (selectedTax) {
-            setSelectedTaxDetails(prevDetails => ({
-              ...prevDetails,
-              [id]: {
-                gstName: selectedTax.gstName,
-                gstPercentage: selectedTax.gstPercentage
-              }
-            }));
-          }
-        }
         // Calculate amount if quantity, price, or tax changes
         if (field === 'quantity' || field === 'price' || field === 'tax') {
           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
           const price = parseFloat(field === 'price' ? value : row.price) || 0;
-          const tax = parseFloat(field === 'tax' ? value : row.tax) || 0;
+          const tax = field === 'tax' ? 
+            (value ? parseFloat(value.gstPercentage) : 0) : 
+            (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
           
           const baseAmount = quantity * price;
           const taxAmount = (baseAmount * tax) / 100;
@@ -333,10 +373,11 @@ const AddEstimates = ({ onClose }) => {
       }
       return row;
     });
-
+  
     setTableData(updatedData);
     calculateTotal(updatedData, discountValue, discountType);
   };
+  
 
     return (
         <>
@@ -426,7 +467,7 @@ const AddEstimates = ({ onClose }) => {
                                         </Form.Item>
                                     </Col>
 
-                                    <Col span={12}>
+                                    {/* <Col span={12}>
                                         <Form.Item
                                             name="calculatedTax"
                                             label="Calculate Tax"
@@ -438,7 +479,7 @@ const AddEstimates = ({ onClose }) => {
                                                 min={0}
                                             />
                                         </Form.Item>
-                                    </Col>
+                                    </Col> */}
 
                                     <Col span={12}>
                                         <Form.Item
@@ -450,12 +491,14 @@ const AddEstimates = ({ onClose }) => {
                                                 className="w-full"
                                                 placeholder="Select Currency"
                                                 onChange={(value) => {
-                                                    const selectedCurrency = condata.find(
-                                                        (c) => c.id === value
-                                                    );
+                                                    const selectedCurr = condata.find(c => c.id === value);
+                                                    setSelectedCurrency({
+                                                        code: selectedCurr?.currencyCode || '₹',
+                                                        icon: selectedCurr?.currencyIcon || '₹'
+                                                    });
                                                     form.setFieldValue(
                                                         "currency",
-                                                        selectedCurrency?.currencyCode || ""
+                                                        selectedCurr?.currencyCode || ""
                                                     );
                                                 }}
                                             >
@@ -516,7 +559,7 @@ const AddEstimates = ({ onClose }) => {
                                     <thead className="bg-gray-100">
                                         <tr>
                                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                                Description<span className="text-red-500">*</span>
+                                            Item<span className="text-red-500">*</span>
                                             </th>
                                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Quantity<span className="text-red-500">*</span>
@@ -529,6 +572,9 @@ const AddEstimates = ({ onClose }) => {
                                             </th>
                                             <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Amount<span className="text-red-500">*</span>
+                                            </th>
+                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                                Action
                                             </th>
                                         </tr>
                                     </thead>
@@ -551,36 +597,50 @@ const AddEstimates = ({ onClose }) => {
                               value={row.quantity}
                               onChange={(e) => handleTableDataChange(row.id, 'quantity', e.target.value)}
                               placeholder="Qty"
-                              className="w-full p-2 border rounded"
+                              className="w-[100px] p-2 border rounded"
                               min="1"
                             />
                           </td>
                           <td className="px-4 py-2 border-b">
-                            <input
-                              type="number"
-                              value={row.price}
-                              onChange={(e) => handleTableDataChange(row.id, 'price', e.target.value)}
-                              placeholder="Price"
-                              className="w-full p-2 border rounded"
-                              min="0"
+                            <Input
+                                type="number"
+                                value={row.price}
+                                onChange={(e) => handleTableDataChange(row.id, 'price', e.target.value)}
+                                placeholder="Price"
+                                className="w-full p-2 border rounded"
+                                min="0"
+                                prefix={selectedCurrency.icon}
                             />
                           </td>
-                          <td className="px-4 py-2 border-b">
-                          <select
-                            value={row.tax}
-                            onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
-                            className="w-full p-2 border"
-                          >
-                            <option value="0">Nothing Selected</option>
-                            {taxes && taxes.data && taxes.data.map(tax => (
-                              <option key={tax.id} value={tax.gstPercentage}>
-                                {tax.gstName}: {tax.gstPercentage}%
-                              </option>
-                            ))}
-                          </select>
-                        </td>
+
+                                                    <td className="px-4 py-2 border-b">
+                                                        <Select
+                                                            value={row.tax?.gstPercentage ? `${row.tax.gstName}|${row.tax.gstPercentage}` : '0'}
+                                                            onChange={(value) => {
+                                                                if (!value || value === '0') {
+                                                                    handleTableDataChange(row.id, "tax", null);
+                                                                    return;
+                                                                }
+                                                                const [gstName, gstPercentage] = value.split('|');
+                                                                handleTableDataChange(row.id, "tax", {
+                                                                    gstName,
+                                                                    gstPercentage: parseFloat(gstPercentage) || 0
+                                                                });
+                                                            }}
+                                                            placeholder="Select Tax"
+                                                            className="w-[150px] p-2"
+                                                            allowClear
+                                                        >
+                                                            {taxes && taxes.data && taxes.data.map(tax => (
+                                                                <Option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
+                                                                    {tax.gstName} ({tax.gstPercentage}%)
+                                                                </Option>
+                                                            ))}
+                                                        </Select>
+                                                    </td>
+
                         <td className="px-4 py-2 border-b">
-                            <span>{row.amount}</span>
+                            <span>{selectedCurrency.icon}{row.amount}</span>
                           </td>
                                                     <td className="px-2 py-1 border-b text-center">
                                                         <Button
@@ -620,7 +680,7 @@ const AddEstimates = ({ onClose }) => {
                                     <tr className="flex justify-between px-2 py-2 border-x-2">
                                         <td className="font-medium">Sub Total</td>
                                         <td className="font-medium px-4 py-2">
-                                            ₹{totals.subtotal}
+                                            {selectedCurrency.icon}{totals.subtotal}
                                         </td>
                                     </tr>
 
@@ -642,25 +702,10 @@ const AddEstimates = ({ onClose }) => {
                                             <Input
                                                 type="number"
                                                 min="0"
-                                                value={discountValue}
-                                                onFocus={(e) => {
-                                                    if (discountValue === 0) {
-                                                        setDiscountValue('');
-                                                    }
-                                                }}
-                                                onBlur={(e) => {
-                                                    if (e.target.value === '') {
-                                                        setDiscountValue(0);
-                                                        calculateTotal(tableData, 0, discountType);
-                                                    }
-                                                }}
-                                                onChange={(e) => {
-                                                    const newValue = e.target.value;
-                                                    setDiscountValue(newValue);
-                                                    calculateTotal(tableData, newValue || 0, discountType);
-                                                }}
+                                                value={discountValue || 0}
+                                                onChange={(e) => handleDiscountChange(e.target.value)}
                                                 style={{ width: 120 }}
-                                                prefix={discountType === 'fixed' ? '₹' : ''}
+                                                prefix={discountType === 'fixed' ? selectedCurrency.icon : ''}
                                                 suffix={discountType === 'percentage' ? '%' : ''}
                                             />
                                         </td>
@@ -670,7 +715,7 @@ const AddEstimates = ({ onClose }) => {
                                     <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
                                         <td className="font-medium">Total Tax</td>
                                         <td className="font-medium px-4 py-2">
-                                            ₹{totals.totalTax}
+                                            {selectedCurrency.icon}{totals.totalTax}
                                         </td>
                                     </tr>
 
@@ -678,7 +723,7 @@ const AddEstimates = ({ onClose }) => {
                                     <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
                                         <td className="font-bold text-lg">Total Amount</td>
                                         <td className="font-bold text-lg px-4">
-                                            ₹{totals.finalTotal}
+                                            {selectedCurrency.icon}{totals.finalTotal}
                                         </td>
                                     </tr>
                                 </table>

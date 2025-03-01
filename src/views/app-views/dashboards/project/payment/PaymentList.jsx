@@ -252,7 +252,7 @@ const PaymentList = () => {
     //   sorter: (a, b) => utils.antdTableSorter(a, b, "paidOn"),
     // },
     {
-      title: "Payment Gateway",
+      title: "Payment Method",
       dataIndex: "paymentMethod",
       sorter: (a, b) => utils.antdTableSorter(a, b, "paymentMethod"),
     },
@@ -331,6 +331,7 @@ const PaymentList = () => {
 
   return (
     <>
+    <Card>
       <Flex
         alignItems="center"
         justifyContent="space-between"
@@ -390,6 +391,7 @@ const PaymentList = () => {
           />
         </div>
       {/* </Card> */}
+      </Card>
      
         <Modal
           title="Add Payment"

@@ -222,6 +222,11 @@ const ProductList = () => {
       sorter: (a, b) => utils.antdTableSorter(a, b, "category"),
     },
     {
+      title: 'HSN/SAC',
+      dataIndex: 'hsn_sac',
+      sorter: (a, b) => utils.antdTableSorter(a, b, "hsn_sac"),
+  },
+    {
       title: "Sku",
       dataIndex: "sku",
       sorter: (a, b) => utils.antdTableSorter(a, b, "sku"),
@@ -348,6 +353,7 @@ const ProductList = () => {
             columns={tableColumns}
             dataSource={getFilteredProducts()}
             rowKey="id"
+            scroll={{ x: 1000 }}
             pagination={{
               total: getFilteredProducts().length,
               pageSize: 10,
@@ -357,7 +363,7 @@ const ProductList = () => {
           />
         </div>
       </Card>
-      <Card>
+     
         <Modal
           title="Add Product"
           visible={isAddProductModalVisible}
@@ -390,7 +396,7 @@ const ProductList = () => {
         >
           <ViewProduct onClose={closeViewProductModal} />
         </Modal>
-      </Card>
+     
     </>
   );
 };

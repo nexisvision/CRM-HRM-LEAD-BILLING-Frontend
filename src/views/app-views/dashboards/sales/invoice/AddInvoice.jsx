@@ -117,107 +117,89 @@ const AddInvoice = ({ onClose }) => {
   };
 
   const handleTableDataChange = (id, field, value) => {
-    const updatedData = tableData.map((row) => {
-      if (row.id === id) {
-        const updatedRow = { ...row, [field]: value };
-
-        // If the field is tax, store the tax details
-        if (field === 'tax' && taxes?.data) {
-          const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
-          if (selectedTax) {
-            setSelectedTaxDetails(prevDetails => ({
-              ...prevDetails,
-              [id]: {
-                gstName: selectedTax.gstName,
-                gstPercentage: selectedTax.gstPercentage
-              }
-            }));
-          }
+    const updatedData = tableData.map(row => {
+        if (row.id === id) {
+            const updatedRow = { ...row, [field]: value };
+            
+            // Recalculate amount whenever quantity, price, discount or tax changes
+            const quantity = parseFloat(updatedRow.quantity) || 0;
+            const price = parseFloat(updatedRow.price) || 0;
+            const baseAmount = quantity * price;
+            
+            // Calculate discount
+            const discountValue = parseFloat(updatedRow.discountValue) || 0;
+            const discountAmount = updatedRow.discountType === 'percentage' 
+                ? (baseAmount * discountValue) / 100 
+                : discountValue;
+            
+            // Calculate tax
+            const taxPercentage = updatedRow.tax ? parseFloat(updatedRow.tax.gstPercentage) || 0 : 0;
+            const taxableAmount = baseAmount - discountAmount;
+            const taxAmount = (taxableAmount * taxPercentage) / 100;
+            
+            // Set final amount
+            updatedRow.amount = (baseAmount - discountAmount + taxAmount).toFixed(2);
+            
+            return updatedRow;
         }
-
-        // Calculate individual item amounts
-        const quantity = parseFloat(updatedRow.quantity) || 0;
-        const price = parseFloat(updatedRow.price) || 0;
-        const taxPercentage = parseFloat(updatedRow.tax) || 0;
-        
-        // Calculate item discount based on type
-        const itemDiscountValue = parseFloat(updatedRow.discountValue) || 0;
-        let itemDiscountAmount = 0;
-        
-        if (updatedRow.discountType === 'percentage') {
-          itemDiscountAmount = (quantity * price * itemDiscountValue) / 100;
-        } else {
-          itemDiscountAmount = itemDiscountValue;
-        }
-
-        const baseAmount = quantity * price;
-        const taxAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
-        const finalAmount = baseAmount - itemDiscountAmount + taxAmount;
-        
-        updatedRow.amount = finalAmount.toFixed(2);
-        return updatedRow;
-      }
-      return row;
+        return row;
     });
 
     setTableData(updatedData);
     calculateTotal(updatedData, globalDiscountValue, globalDiscountType);
-  };
+};
 
-  const calculateTotal = (data, globalDiscValue, globalDiscType) => {
-    // Ensure globalDiscValue is a number
-    const globalDiscountValueNum = parseFloat(globalDiscValue) || 0;
 
-    const totals = data.reduce((acc, row) => {
-      const quantity = parseFloat(row.quantity) || 0;
-      const price = parseFloat(row.price) || 0;
-      const baseAmount = quantity * price;
-      
-      // Calculate item discount
-      const itemDiscountValue = parseFloat(row.discountValue) || 0;
-      let itemDiscountAmount = 0;
-      
-      if (row.discountType === 'percentage') {
-        itemDiscountAmount = (baseAmount * itemDiscountValue) / 100;
-      } else {
-        itemDiscountAmount = itemDiscountValue;
-      }
+  const calculateTotal = (data, globalDiscount, discountType) => {
+    let subtotal = 0;
+    let itemDiscount = 0;
+    let totalTax = 0;
+    let rowTotalSum = 0;
 
-      const taxPercentage = parseFloat(row.tax) || 0;
-      const taxAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
-      const finalAmount = baseAmount - itemDiscountAmount + taxAmount;
-      
-      return {
-        subtotal: acc.subtotal + finalAmount,
-        itemDiscount: acc.itemDiscount + itemDiscountAmount,
-        tax: acc.tax + taxAmount
-      };
-    }, { subtotal: 0, itemDiscount: 0, tax: 0 });
+    data.forEach(row => {
+        const quantity = parseFloat(row.quantity) || 0;
+        const price = parseFloat(row.price) || 0;
+        const rowTotal = quantity * price;
+        rowTotalSum += rowTotal;
+
+        // Calculate row discount
+        const rowDiscountValue = parseFloat(row.discountValue) || 0;
+        const rowDiscountAmount = row.discountType === 'percentage' 
+            ? (rowTotal * rowDiscountValue) / 100 
+            : rowDiscountValue;
+        
+        itemDiscount += rowDiscountAmount;
+
+        // Calculate tax
+        if (row.tax) {
+            const taxRate = parseFloat(row.tax.gstPercentage) || 0;
+            totalTax += ((rowTotal - rowDiscountAmount) * taxRate) / 100;
+        }
+    });
+
+    // Calculate subtotal as sum of row totals plus total tax
+    subtotal = rowTotalSum + totalTax;
 
     // Calculate global discount
-    let globalDiscountAmount = 0;
-    if (globalDiscType === 'percentage') {
-      globalDiscountAmount = (totals.subtotal * globalDiscountValueNum) / 100;
-    } else {
-      globalDiscountAmount = globalDiscountValueNum;
-    }
+    const globalDiscountAmount = discountType === 'percentage'
+        ? (subtotal * parseFloat(globalDiscount)) / 100
+        : parseFloat(globalDiscount) || 0;
 
-    const finalTotal = totals.subtotal - globalDiscountAmount;
+    // Calculate final total as subtotal minus global discount
+    const finalTotal = subtotal - globalDiscountAmount;
 
-    // Ensure all values are numbers before using toFixed
     setTotals({
-      subtotal: Number(totals.subtotal).toFixed(2),
-      itemDiscount: Number(totals.itemDiscount).toFixed(2),
-      globalDiscount: Number(globalDiscountAmount).toFixed(2),
-      totalTax: Number(totals.tax).toFixed(2),
-      finalTotal: Number(finalTotal).toFixed(2)
+        subtotal: subtotal.toFixed(2),
+        itemDiscount: itemDiscount.toFixed(2),
+        totalTax: totalTax.toFixed(2),
+        finalTotal: finalTotal.toFixed(2)
     });
   };
 
   const [totals, setTotals] = useState({
     subtotal: "0.00",
     itemDiscount: "0.00",
-    globalDiscount: "0.00",
+    globalDiscount: "0.00", 
     totalTax: "0.00",
     finalTotal: "0.00"
   });
@@ -231,14 +213,17 @@ const AddInvoice = ({ onClose }) => {
         
         const items = {};
         tableData.forEach((item, index) => {
+            // Convert amount to number and ensure it's not NaN
+            const itemAmount = parseFloat(item.amount) || 0;
+            
             items[`item_${index + 1}`] = {
                 item: item.item,
                 description: item.description || '',
                 quantity: parseFloat(item.quantity) || 0,
                 price: parseFloat(item.price) || 0,
-                tax_name: selectedTaxDetails[item.id]?.gstName || '',
-                tax: parseFloat(item.tax) || 0,
-                amount: parseFloat(item.amount) || 0,
+                tax_name: item.tax?.gstName || '',
+                tax: item.tax?.gstPercentage || 0,
+                amount: itemAmount,
                 discountType: item.discountType || 'percentage',
                 discountValue: parseFloat(item.discountValue) || 0
             };
@@ -264,6 +249,7 @@ const AddInvoice = ({ onClose }) => {
             discount: parseFloat(globalDiscountAmount) || 0,
             itemDiscount: parseFloat(totals.itemDiscount) || 0,
             tax: parseFloat(totals.totalTax) || 0,
+            subtotal: parseFloat(totals.subtotal) || 0,  // Added subtotal
             total: parseFloat(totals.finalTotal) || 0
         };
 
@@ -380,30 +366,42 @@ const AddInvoice = ({ onClose }) => {
 
   // Product selection handler
   const handleProductChange = (productId) => {
-    console.log("Selected product ID:", productId); // Debug log
+    console.log("Selected product ID:", productId);
     
     if (productId) {
-      const selectedProd = products.find(p => p.id === productId);
-      console.log("Found product:", selectedProd); // Debug log
-      
-      if (selectedProd) {
-        const updatedData = tableData.map((row, index) => {
-          if (index === tableData.length - 1 && !row.item) {
-            return {
-              ...row,
-              item: selectedProd.name,
-              description: selectedProd.description || "",
-              price: selectedProd.price || 0,
-              hsn_sac: selectedProd.hsn_sac || "",
-            };
-          }
-          return row;
-        });
+        const selectedProd = products.find(p => p.id === productId);
+        console.log("Found product:", selectedProd);
+        
+        if (selectedProd) {
+            const updatedData = tableData.map((row, index) => {
+                if (index === tableData.length - 1 && !row.item) {
+                    // Calculate initial amount based on product price and default quantity
+                    const quantity = 1;
+                    const price = selectedProd.price || 0;
+                    const baseAmount = quantity * price;
+                    
+                    // Calculate tax if available
+                    const taxPercentage = selectedProd.tax ? parseFloat(selectedProd.tax.gstPercentage) || 0 : 0;
+                    const taxAmount = (baseAmount * taxPercentage) / 100;
+                    
+                    return {
+                        ...row,
+                        item: selectedProd.name,
+                        description: selectedProd.description || "",
+                        price: price,
+                        quantity: quantity,
+                        hsn_sac: selectedProd.hsn_sac || "",
+                        tax: selectedProd.tax || null,
+                        amount: (baseAmount + taxAmount).toFixed(2)
+                    };
+                }
+                return row;
+            });
 
-        setTableData(updatedData);
-        setSelectedProduct(productId);
-        calculateTotal(updatedData, globalDiscountValue, globalDiscountType);
-      }
+            setTableData(updatedData);
+            setSelectedProduct(productId);
+            calculateTotal(updatedData, globalDiscountValue, globalDiscountType);
+        }
     }
   };
 
@@ -607,7 +605,7 @@ const AddInvoice = ({ onClose }) => {
                 <thead className="bg-gray-100">
                   <tr>
                     <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                      Description<span className="text-red-500">*</span>
+                      Item<span className="text-red-500">*</span>
                     </th>
                     
                     <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
@@ -697,19 +695,31 @@ const AddInvoice = ({ onClose }) => {
                             />
                           </div>
                         </td>
-                        <td className="py-2 border-b">
-                          <Select
-                            value={row.tax}
-                            onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
-                            className="w-[100px] p-2"
-                          >
-                            <Option value="0">No Tax</Option>
-                            {taxes && taxes.data && taxes.data.map(tax => (
-                              <Option key={tax.id} value={tax.gstPercentage}>
-                                {tax.gstName} ({tax.gstPercentage}%)
-                              </Option>
-                            ))}
-                          </Select>
+                        <td className="px-2 py-2 border-b">
+                            <Select
+                                value={row.tax?.gstPercentage ? `${row.tax.gstName}|${row.tax.gstPercentage}` : '0'}
+                                onChange={(value) => {
+                                    if (!value || value === '0') {
+                                        handleTableDataChange(row.id, "tax", null);
+                                        return;
+                                    }
+                                    const [gstName, gstPercentage] = value.split('|');
+                                    handleTableDataChange(row.id, "tax", {
+                                        gstName,
+                                        gstPercentage: parseFloat(gstPercentage) || 0
+                                    });
+                                }}
+                                placeholder="Select Tax"
+                                className="w-[100px]"
+                                allowClear
+                            >
+                                {/* <Option value="0">0</Option> */}
+                                {taxes && taxes.data && taxes.data.map(tax => (
+                                    <Option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
+                                        {tax.gstName} ({tax.gstPercentage}%)
+                                    </Option>
+                                ))}
+                            </Select>
                         </td>
                         <td className="px-2 py-2 border-b">
                           <span>{selectedCurrencyIcon} {parseFloat(row.amount || 0).toFixed(2)}</span>
@@ -721,15 +731,15 @@ const AddInvoice = ({ onClose }) => {
                         </td>
                       </tr>
                       <tr>
-                        <td colSpan={7} className="px-2 py-2 border-b">
-                          <textarea
+                         <td colSpan={8} className="px-2 py-2 border-b">
+                        <textarea
                             rows={2}
-                            value={row.description}
+                            value={row.description ? row.description.replace(/<[^>]*>/g, '') : ''} // Remove HTML tags
                             onChange={(e) => handleTableDataChange(row.id, "description", e.target.value)}
                             placeholder="Description"
                             className="w-[70%] p-2 border"
-                          />
-                        </td>
+                        />
+                    </td>
                       </tr>
                     </React.Fragment>
                   ))}

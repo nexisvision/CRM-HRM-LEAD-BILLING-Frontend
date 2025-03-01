@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Qr from '../../../../../../assets/svg/Qr.png';
 import { Getcus } from '../../customer/CustomerReducer/CustomerSlice';
 
-const BillInformationList = ({ billingId }) => {
+const BillInformationList = ({ billingId, onStatusUpdate }) => {
     const dispatch = useDispatch();
     const [customerData, setCustomerData] = useState(null);
     
@@ -17,6 +17,13 @@ const BillInformationList = ({ billingId }) => {
     const selectedBill = Array.isArray(billingData) 
         ? billingData.find(bill => bill.id === billingId)
         : null;
+
+    // Notify parent component about bill status
+    useEffect(() => {
+        if (selectedBill?.bill_status) {
+            onStatusUpdate(selectedBill.bill_status.toLowerCase());
+        }
+    }, [selectedBill, onStatusUpdate]);
 
     // Calculate payment status
     const calculatePaymentStatus = () => {
@@ -34,9 +41,10 @@ const BillInformationList = ({ billingId }) => {
         );
 
         // Compare with bill total
-        const billTotal = parseFloat(selectedBill.total);
+        const billTotal = parseFloat(selectedBill.updated_total);
         
         if (totalPaid >= billTotal) {
+            onStatusUpdate('paid'); // Notify parent when payment status is paid
             return 'Paid';
         } else if (totalPaid > 0) {
             return 'Partially Paid';

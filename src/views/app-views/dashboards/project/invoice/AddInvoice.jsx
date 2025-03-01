@@ -547,28 +547,41 @@ const sub = subClientsss?.SubClient?.data;
                             />
                         </td>
                         
+                      
+
                         <td className="px-2 py-2 border-b">
-                            <select
-                                value={row.tax ? `${row.tax.gstName}|${row.tax.gstPercentage}` : ''}
-                                onChange={(e) => {
-                                    const [gstName, gstPercentage] = e.target.value.split('|');
+                            <Select
+                                value={row.tax?.gstPercentage ? `${row.tax.gstName}|${row.tax.gstPercentage}` : '0'}
+                                onChange={(value) => {
+                                    if (!value || value === '0') {
+                                        handleTableDataChange(row.id, "tax", null);
+                                        return;
+                                    }
+                                    const [gstName, gstPercentage] = value.split('|');
                                     handleTableDataChange(row.id, "tax", {
                                         gstName,
                                         gstPercentage: parseFloat(gstPercentage) || 0
                                     });
                                 }}
-                                className="w-full p-2 border"
+                                placeholder="Select Tax"
+                                className="w-[100px]"
+                                allowClear
                             >
-                                <option value="">Nothing Selected</option>
+                                <Option value="0">0</Option>
                                 {taxes && taxes.data && taxes.data.map(tax => (
-                                    <option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
+                                    <Option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
                                         {tax.gstName} ({tax.gstPercentage}%)
-                                    </option>
+                                    </Option>
                                 ))}
-                            </select>
+                            </Select>
                         </td>
                         <td className="px-2 py-2 border-b">
                             <span>{selectedCurrencyIcon} {parseFloat(row.amount || 0).toFixed(2)}</span>
+                        </td>
+                        <td className="px-2 py-1 border-b text-center">
+                            <Button danger onClick={() => handleDeleteRow(row.id)}>
+                                <DeleteOutlined />
+                            </Button>
                         </td>
                     </tr>
                        
@@ -582,11 +595,7 @@ const sub = subClientsss?.SubClient?.data;
                                 className="w-[70%] p-2 border"
                             />
                         </td>
-                        <td className="px-2 py-1 border-b text-center">
-                            <Button danger onClick={() => handleDeleteRow(row.id)}>
-                                <DeleteOutlined />
-                            </Button>
-                        </td>
+                        
                     </tr>
                 </React.Fragment>
             ))}
@@ -805,27 +814,30 @@ const sub = subClientsss?.SubClient?.data;
                                 <table className="w-full border border-gray-200 bg-white">
                                     <thead className="bg-gray-100">
                                         <tr>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                                                Description<span className="text-red-500">*</span>
+                                            <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                            Item<span className="text-red-500">*</span>
                                             </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Quantity<span className="text-red-500">*</span>
                                             </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Unit Price <span className="text-red-500">*</span>
                                             </th>
                                             
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Discount <span className="text-red-500">*</span>
                                             </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Hsn/Sac <span className="text-red-500">*</span>
                                             </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 TAX (%)
                                             </th>
-                                            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                            <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                                                 Amount<span className="text-red-500">*</span>
+                                            </th>
+                                            <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                                                Action
                                             </th>
                                         </tr>
                                     </thead>

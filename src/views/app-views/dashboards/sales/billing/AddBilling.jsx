@@ -561,7 +561,7 @@ const AddBilling = ({ onClose }) => {
                 <thead className="bg-gray-100">
                   <tr>
                     <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                      Description<span className="text-red-500">*</span>
+                      Item<span className="text-red-500">*</span>
                     </th>
                     <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Quantity<span className="text-red-500">*</span>
@@ -607,9 +607,17 @@ const AddBilling = ({ onClose }) => {
                           <input
                             type="number"
                             min="0"
-                            value={row.price}
-                            onChange={(e) => handleTableDataChange(row.id, "price", e.target.value)}
-                            placeholder="Price"
+                            value={row.price || ""}
+                            onChange={(e) => {
+                              const value = e.target.value === "" ? 0 : parseFloat(e.target.value);
+                              handleTableDataChange(row.id, "price", value);
+                            }}
+                            onBlur={(e) => {
+                              if (e.target.value === "") {
+                                handleTableDataChange(row.id, "price", 0);
+                              }
+                            }}
+                            placeholder="0"
                             className="w-full p-2 border rounded-s"
                           />
                         </td>
@@ -646,15 +654,15 @@ const AddBilling = ({ onClose }) => {
                         </td>
                       </tr>
                       <tr>
-                        <td colSpan={6} className="px-4 py-2 border-b">
-                          <textarea
+                      <td colSpan={8} className="px-2 py-2 border-b">
+                        <textarea
                             rows={2}
-                            value={row.description}
+                            value={row.description ? row.description.replace(/<[^>]*>/g, '') : ''} // Remove HTML tags
                             onChange={(e) => handleTableDataChange(row.id, "description", e.target.value)}
                             placeholder="Description"
                             className="w-[70%] p-2 border"
-                          />
-                        </td>
+                        />
+                    </td>
                       </tr>
                     </React.Fragment>
                   ))}
@@ -697,14 +705,20 @@ const AddBilling = ({ onClose }) => {
                           type="number"
                           min="0"
                           max={discountType === 'percentage' ? 100 : undefined}
-                          value={discountValue || ''}
+                          value={discountValue || ""}
                           onChange={(e) => {
                             const newValue = e.target.value === '' ? 0 : parseFloat(e.target.value);
                             setDiscountValue(newValue);
                             calculateTotal(tableData, newValue, discountType);
                           }}
+                          onBlur={(e) => {
+                            if (e.target.value === "") {
+                              setDiscountValue(0);
+                              calculateTotal(tableData, 0, discountType);
+                            }
+                          }}
                           className="mt-1 block p-2 border rounded"
-                          placeholder="Enter discount"
+                          placeholder="0"
                         />
                       </div>
                   </td>

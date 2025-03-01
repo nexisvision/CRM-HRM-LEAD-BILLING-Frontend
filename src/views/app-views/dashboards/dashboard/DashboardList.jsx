@@ -11,7 +11,7 @@ import DateRangeFilter from "../../../../components/DateRangeFilter.jsx";
 import TicketList from "../../../../components/TicketTableList.jsx";
 import RegistionTable from "../../../../components/RegistrationTableList.jsx";
 import { Pie } from "react-chartjs-2";
-import { Table, Row, Col, Card, Button,Empty,Badge } from "antd";
+import { Table, Row, Col, Card, Button,Empty,Badge, Select } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData } from "views/app-views/company/CompanyReducers/CompanySlice.jsx";
 import { GetPlan } from "views/app-views/plan/PlanReducers/PlanSlice.jsx";
@@ -36,6 +36,7 @@ const MonthlyRevenueCard = () => {
   const [chartData, setChartData] = useState([]);
   const [totalSubclients, setTotalSubclients] = useState(0);
   const [growthPercentage, setGrowthPercentage] = useState(0);
+  const [selectedYear, setSelectedYear] = useState(moment().year());
 
   const dispatch = useDispatch();
   const subclients = useSelector((state) => state?.SubClient?.SubClient?.data || []);
@@ -45,27 +46,34 @@ const MonthlyRevenueCard = () => {
     dispatch(ClientData());
   }, [dispatch]);
 
+  // Handle year change
+  const handleYearChange = (year) => {
+    setSelectedYear(year);
+  };
+
   useEffect(() => {
     if (subclients && subclients.length > 0) {
-      // Get the last 12 months
-      const last12Months = [...Array(12)].map((_, i) => {
-        return moment().subtract(11 - i, 'months').format('MMM YYYY');
+      // Get all months of selected year
+      const monthsInYear = [...Array(12)].map((_, i) => {
+        return moment().year(selectedYear).month(i).format('MMM YYYY');
       });
 
-      // Count subclients per month
-      const monthlyCounts = last12Months.map(monthYear => {
+      // Filter and count subclients for selected year
+      const monthlyCounts = monthsInYear.map(monthYear => {
         return subclients.filter(client => 
+          moment(client.createdAt).format('YYYY') === selectedYear.toString() &&
           moment(client.createdAt).format('MMM YYYY') === monthYear
         ).length;
       });
 
-      // Calculate total subclients
+      // Calculate total subclients for selected year
       const total = monthlyCounts.reduce((sum, count) => sum + count, 0);
       setTotalSubclients(total);
 
       // Calculate growth percentage (current month vs previous month)
-      const currentMonthCount = monthlyCounts[monthlyCounts.length - 1];
-      const previousMonthCount = monthlyCounts[monthlyCounts.length - 2];
+      const currentMonth = moment().month();
+      const currentMonthCount = monthlyCounts[currentMonth];
+      const previousMonthCount = monthlyCounts[currentMonth - 1] || 0;
       
       const growth = previousMonthCount !== 0 
         ? ((currentMonthCount - previousMonthCount) / previousMonthCount) * 100 
@@ -75,7 +83,7 @@ const MonthlyRevenueCard = () => {
       // Update chart data
       setChartData(monthlyCounts);
     }
-  }, [subclients]);
+  }, [subclients, selectedYear]);
 
   const chartOptions = {
     chart: {
@@ -83,36 +91,58 @@ const MonthlyRevenueCard = () => {
       toolbar: {
         show: false
       },
-      sparkline: {
-        enabled: false
-      },
+      height: 350,
     },
     plotOptions: {
       bar: {
-        borderRadius: 4,
-        columnWidth: '60%',
+        borderRadius: 2,
+        columnWidth: '40%',
+        dataLabels: {
+          position: 'top'
+        }
       }
     },
     colors: ['#3b82f6'],
     dataLabels: {
-      enabled: false
+      enabled: true,
+      formatter: function (val) {
+        return val > 0 ? val : '';
+      },
+      offsetY: -20,
+      style: {
+        fontSize: '12px',
+        colors: ['#64748b']
+      }
     },
     grid: {
       show: true,
       borderColor: '#f0f0f0',
       strokeDashArray: 0,
+      position: 'back',
       xaxis: {
         lines: {
           show: false
         }
-      }
+      },
+      yaxis: {
+        lines: {
+          show: true
+        }
+      },
+      padding: {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0
+      },
     },
     xaxis: {
       categories: [...Array(12)].map((_, i) => 
-        moment().subtract(11 - i, 'months').format('MMM YYYY')
+        moment().month(i).format('MMM')
       ),
       axisBorder: {
-        show: false
+        show: true,
+        color: '#e0e0e0',
       },
       axisTicks: {
         show: false
@@ -122,47 +152,68 @@ const MonthlyRevenueCard = () => {
           colors: '#64748b',
           fontSize: '12px'
         },
-        rotate: -45
+        rotate: 0
+      },
+      title: {
+        text: selectedYear.toString(),
+        offsetY: 75,
+        style: {
+          color: '#64748b',
+          fontSize: '12px',
+          fontWeight: 600
+        }
       }
     },
     yaxis: {
+      min: 0,
+      max: Math.max(...chartData, 2) + 0.5, // Add some padding above highest value
+      tickAmount: 4,
       labels: {
         style: {
           colors: '#64748b',
           fontSize: '12px'
+        },
+        formatter: function(val) {
+          return val.toFixed(1);
         }
-      },
-      tickAmount: 6
+      }
     },
     tooltip: {
       y: {
-        formatter: (value) => `${value} Subclients`
+        formatter: (value) => `${value} Clients`
       }
     }
   };
 
-  const chartSeries = [{
-    name: 'Clients',
-    data: chartData
-  }];
+  // Generate year options (e.g., last 5 years)
+  const yearOptions = [];
+  const currentYear = moment().year();
+  for (let i = 0; i < 5; i++) {
+    yearOptions.unshift(currentYear - i);
+  }
 
   return (
     <Card className="w-full shadow-md">
       <div className="flex flex-col space-y-4">
-        {/* Header */}
+        {/* Header with Year Select */}
         <div className="flex justify-between items-start">
           <div>
             <h2 className="text-lg font-semibold text-gray-700">Monthly Clients</h2>
             <p className="text-sm text-gray-500">
-              Last 12 Months Overview
+              Year {selectedYear} Overview
             </p>
           </div>
-          {/* <Button 
-            icon={<DownloadOutlined />}
-            className="flex items-center gap-2"
+          <Select
+            value={selectedYear}
+            onChange={handleYearChange}
+            style={{ width: 120 }}
           >
-            Download Report
-          </Button> */}
+            {yearOptions.map(year => (
+              <Select.Option key={year} value={year}>
+                {year}
+              </Select.Option>
+            ))}
+          </Select>
         </div>
 
         {/* Client Stats */}
@@ -175,12 +226,12 @@ const MonthlyRevenueCard = () => {
             <span className="text-gray-500 text-xs">growth from last month</span>
           </div>
           <p className="text-sm text-gray-500 mt-2">
-            Total number of clients registered in the last 12 months
+            Total number of clients in {selectedYear}
           </p>
         </div>
 
         {/* Chart */}
-        <div className="h-[280px] mt-4"> {/* Increased height for better visibility */}
+        <div className="h-[350px] mt-4">
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <span>Loading...</span>
@@ -188,7 +239,10 @@ const MonthlyRevenueCard = () => {
           ) : (
             <ReactApexChart
               options={chartOptions}
-              series={chartSeries}
+              series={[{ 
+                name: 'Clients',
+                data: chartData
+              }]}
               type="bar"
               height="100%"
             />
@@ -530,7 +584,8 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
               </span>
             </div>
           </div>
-          <div className="mt-2 space-y-3">
+          <p className="text-gray-500 text-sm mt-2">Total number of Sales Plan</p>
+          {/* <div className="mt-2 space-y-3">
               {planStats.planBreakdown.map(plan => (
                 <div key={plan.planId} className="flex flex-col">
                   <div className="flex items-center space-x-4">
@@ -543,7 +598,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
                   </div>
                 </div>
               ))}
-          </div>
+          </div> */}
         </div>
 
         {/* Companies Card */}
@@ -553,12 +608,14 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
             <span className="text-3xl font-bold text-[#1b2559]">
               {fndclient?.length || 0}
             </span>
-            <span className="text-green-500 flex items-center font-bold text-lg">
-              Total
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
-              </svg>
-            </span>
+            <div className="flex flex-col">
+              <span className="text-green-500 flex items-center font-bold text-lg">
+                {((fndclient?.length || 0) * 0.01).toFixed(2)}%
+                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                  <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z" />
+                </svg>
+              </span>
+            </div>
           </div>
           <p className="text-gray-500 text-sm mt-2">Total number of registered companies</p>
         </div>

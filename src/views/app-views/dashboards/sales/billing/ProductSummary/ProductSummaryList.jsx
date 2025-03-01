@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import NumberFormat from 'react-number-format';
 import { useSelector, useDispatch } from 'react-redux';
 import { getAllPayment } from "../paymentReducer/PaymentSlice";
+import { getAllDebitNotes } from "../../../Purchase/debitnotes/debitReducer/DebitSlice";
 
 function ProductSummaryList({ billingId }) {
     const [billingData, setBillingData] = useState([]);
@@ -14,14 +15,17 @@ function ProductSummaryList({ billingId }) {
         tax: 0,
         total: 0,
         amount: 0,
+        debitNote: 0,
         updated_total: 0
     });
     
     const dispatch = useDispatch();
     const payments = useSelector((state) => state.payment?.payment || []);
+    const debitNotes = useSelector((state) => state.debitNotes?.debitNotes || []);
 
     useEffect(() => {
         dispatch(getAllPayment());
+        dispatch(getAllDebitNotes());
     }, [dispatch]);
 
     useEffect(() => {
@@ -31,20 +35,32 @@ function ProductSummaryList({ billingId }) {
                 payment => payment.bill === billingId  // Changed from billing_id to bill to match API data
             );
 
-            // Calculate total paid amount for this billing
+            // Filter debit notes for current billing
+            const currentBillingDebitNotes = debitNotes.filter(
+                note => note.bill === billingId
+            );
+
+            // Calculate total paid amount
             const totalPaidAmount = currentBillingPayments.reduce(
                 (sum, payment) => sum + Number(payment.amount || 0), 
                 0
             );
 
-            // Update totals with the paid amount
+            // Calculate total debit note amount
+            const totalDebitNoteAmount = currentBillingDebitNotes.reduce(
+                (sum, note) => sum + Number(note.amount || 0),
+                0
+            );
+
+            // Update totals with both paid and debit note amounts
             setTotals(prev => ({
                 ...prev,
                 amount: totalPaidAmount,
-                updated_total: prev.total - totalPaidAmount // Calculate remaining amount
+                debitNote: totalDebitNoteAmount,
+                updated_total: prev.total - totalPaidAmount - totalDebitNoteAmount // Subtract both payments and debit notes
             }));
         }
-    }, [billingId, payments]);
+    }, [billingId, payments, debitNotes]);
 
     // Get billing data from Redux store
     const allBillingItems = useSelector((state) => state.salesbilling?.salesbilling?.data || []);
@@ -54,6 +70,9 @@ function ProductSummaryList({ billingId }) {
             // Find the specific billing item
             const selectedBilling = allBillingItems.find(item => item.id === billingId);
             
+
+console.log("selectedBilertretling",selectedBilling);
+
             if (selectedBilling) {
                 try {
                     // Parse description if it's a string
@@ -269,10 +288,9 @@ function ProductSummaryList({ billingId }) {
                                     <span className='font-weight-semibold'>Debit Note : </span>
                                     <NumberFormat
                                         displayType="text"
-                                        value={totals.amount}
+                                        value={totals.debitNote}
                                         prefix="₹"
                                         thousandSeparator={true}
-                                        // className={totals.updated_total > 0 ? "text-danger" : "text-success"}  // Added conditional color
                                     />
                                 </p>
                                 <p>

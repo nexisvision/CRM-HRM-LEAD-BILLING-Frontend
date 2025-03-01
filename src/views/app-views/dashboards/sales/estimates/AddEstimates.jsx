@@ -416,7 +416,7 @@ const AddEstimates = ({ onClose }) => {
                   <thead className="bg-gray-100">
                     <tr>
                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                        Description<span className="text-red-500">*</span>
+                      Item<span className="text-red-500">*</span>
                       </th>
                       <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
                         Quantity<span className="text-red-500">*</span>

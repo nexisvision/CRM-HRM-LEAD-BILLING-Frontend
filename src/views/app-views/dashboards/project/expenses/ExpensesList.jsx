@@ -37,6 +37,7 @@ import { utils, writeFile } from "xlsx";
 import AddExpenses from "./AddExpenss";
 import EditExpenses from "./EditExpenss";
 import ViewExpenss from "./ViewExpenss";
+import { GetProject } from '../project-list/projectReducer/ProjectSlice';
 
 const { Option } = Select;
 const getShippingStatus = (orderStatus) => {
@@ -74,6 +75,9 @@ const ExpensesList = () => {
     const [selectedStatus, setSelectedStatus] = useState('all');
     const [loading, setLoading] = useState(false);
 
+    const projectData = useSelector((state) => state.Project);
+    const projects = projectData.Project.data || [];
+
     const openAddExpensesModal = () => {
         setIsAddExpensesModalVisible(true);
     };
@@ -103,6 +107,7 @@ const ExpensesList = () => {
             try {
                 if (id) {
                     await dispatch(Getexp(id));
+                    await dispatch(GetProject());
                 }
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -128,13 +133,17 @@ const ExpensesList = () => {
 
             // Apply search text filter
             if (searchText) {
-                filtered = filtered.filter(item => 
-                    item.item?.toLowerCase().includes(searchText.toLowerCase()) ||
-                    item.employee?.toLowerCase().includes(searchText.toLowerCase()) ||
-                    item.currency?.toLowerCase().includes(searchText.toLowerCase())
-                );
+                filtered = filtered.filter(item => {
+                    const projectName = projects.find(p => p.id === item.project)?.project_name || '';
+                    
+                    return (
+                        item.item?.toLowerCase().includes(searchText.toLowerCase()) ||
+                        projectName.toLowerCase().includes(searchText.toLowerCase()) ||
+                        item.description?.toLowerCase().replace(/<[^>]*>/g, '').includes(searchText.toLowerCase()) ||
+                        item.currency?.toLowerCase().includes(searchText.toLowerCase())
+                    );
+                });
             }
-
 
             setFilteredData(filtered);
         } catch (error) {
@@ -149,7 +158,26 @@ const ExpensesList = () => {
     }, [searchText, selectedStatus, list]);
 
     const onSearch = (e) => {
-        setSearchText(e.currentTarget.value);
+        const value = e.currentTarget.value.toLowerCase();
+        setSearchText(value);
+
+        if (!value) {
+            handleFilters(list);
+            return;
+        }
+
+        const filtered = list.filter(item => {
+            const projectName = projects.find(p => p.id === item.project)?.project_name || '';
+            
+            return (
+                item.item?.toLowerCase().includes(value) ||
+                projectName.toLowerCase().includes(value) ||
+                item.description?.toLowerCase().replace(/<[^>]*>/g, '').includes(value) ||
+                item.currency?.toLowerCase().includes(value)
+            );
+        });
+
+        setFilteredData(filtered);
     };
 
     const getUniqueStatuses = () => {
@@ -261,10 +289,6 @@ const ExpensesList = () => {
         </Menu>
     );
     const tableColumns = [
-        // {
-        //   title: "ID",
-        //   dataIndex: "id",
-        // },
         {
             title: "ItemName",
             dataIndex: "item",
@@ -282,45 +306,54 @@ const ExpensesList = () => {
             sorter: (a, b) => utils.antdTableSorter(a, b, "item"),
         },
         {
-            title: "Price",
-            dataIndex: "price",
-            sorter: {
-                compare: (a, b) => a.price.length - b.price.length,
+            title: "Project",
+            dataIndex: "project",
+            render: (projectId) => {
+                const projectName = projects.find(p => p.id === projectId)?.project_name || 'N/A';
+                return <span>{projectName}</span>;
+            },
+            sorter: (a, b) => {
+                const projectNameA = projects.find(p => p.id === a.project)?.project_name || '';
+                const projectNameB = projects.find(p => p.id === b.project)?.project_name || '';
+                return projectNameA.localeCompare(projectNameB);
             },
         },
-        // {
-        //     title: "Employees",
-        //     dataIndex: "employee",
-        //     render: (_, record) => (
-        //         <div className="d-flex">
-        //             <AvatarStatus size={30} src={record.image} name={record.employee} />
-        //         </div>
-        //     ),
-        //     sorter: (a, b) => utils.antdTableSorter(a, b, "employees"),
-        // },
         {
-            title: "currency ",
+            title: "Description",
+            dataIndex: "description",
+            render: (description) => (
+                <div 
+                    dangerouslySetInnerHTML={{ __html: description }} 
+                    className="max-w-md truncate"
+                    title={description?.replace(/<[^>]*>/g, '')}
+                />
+            ),
+        },
+        {
+            title: "Price",
+            dataIndex: "price",
+            render: (price) => (
+                <span>₹{(price || 0).toLocaleString()}</span>
+            ),
+            sorter: (a, b) => (a.price || 0) - (b.price || 0),
+        },
+        {
+            title: "currency",
             dataIndex: "currency",
             sorter: {
-                compare: (a, b) => a.purchasedFrom.length - b.purchasedFrom.length,
+                compare: (a, b) => a.currency?.length - b.currency?.length,
             },
         },
         {
             title: "Purchase Date",
             dataIndex: "purchase_date",
-            render: (_, record) => (
-              <span>
-                {record.purchase_date ? dayjs(record.purchase_date).format('DD-MM-YYYY') : ''}
-              </span>
+            render: (date) => (
+                <span>
+                    {date ? dayjs(date).format('DD/MM/YYYY') : 'N/A'}
+                </span>
             ),
-            sorter: (a, b) => utils.antdTableSorter(a, b, "date"),
-          },
-        // {
-        //   title: "Status",
-        //   dataIndex: "status",produc
-        //   render: (_, record) => <span className="font-weight-semibold"></span>,
-        //   sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
-        // },
+            sorter: (a, b) => new Date(a.purchase_date) - new Date(b.purchase_date),
+        },
         {
             title: "Action",
             dataIndex: "actions",
@@ -329,15 +362,7 @@ const ExpensesList = () => {
                     <EllipsisDropdown menu={dropdownMenu(elm)} />
                 </div>
             ),
-            sorter: (a, b) => utils.antdTableSorter(a, b, "actions"),
         },
-        // {
-        //  title: 'Payment Method',
-        //  dataIndex: 'method',
-        //  sorter: {
-        //      compare: (a, b) => a.method.length - b.method.length,
-        //  },
-        // },
     ];
     const rowSelection = {
         onChange: (key, rows) => {

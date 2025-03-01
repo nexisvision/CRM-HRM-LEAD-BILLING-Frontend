@@ -137,15 +137,15 @@ const CustomerList = () => {
 
   // Update search functionality to use users instead of list
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
+    const value = e.currentTarget.value.toLowerCase();
     if (!value) {
-      setUsers(filterdata); // Reset to original filtered data
+      setUsers(filterdata);
       return;
     }
     const filteredUsers = filterdata.filter(user => 
-      Object.values(user).some(val => 
-        val && val.toString().toLowerCase().includes(value.toLowerCase())
-      )
+      user.customerNumber?.toLowerCase().includes(value) ||
+      user.name?.toLowerCase().includes(value) ||
+      user.tax_number?.toLowerCase().includes(value)
     );
     setUsers(filteredUsers);
   };
@@ -232,58 +232,47 @@ const CustomerList = () => {
 
   const tableColumns = [
     {
-      title: "Name",
-      dataIndex: "name",
-      sorter: (a, b) => {
-        if (a.name && b.name) {
-          return a.name.length - b.name.length;
-        }
-        return 0;
-      },
+        title: "Customer Number",
+        dataIndex: "customerNumber",
+        sorter: (a, b) => {
+            if (a.customerNumber && b.customerNumber) {
+                return a.customerNumber.localeCompare(b.customerNumber);
+            }
+            return 0;
+        },
     },
     {
-      title: "Contact",
-      dataIndex: "contact",
-      render: (contact) => contact || 'N/A',
-      sorter: (a, b) => {
-        if (a.contact && b.contact) {
-          return a.contact.length - b.contact.length;
-        }
-        return 0;
-      },
+        title: "Name",
+        dataIndex: "name",
+        render: (name) => name || 'N/A',
+        sorter: (a, b) => {
+            if (a.name && b.name) {
+                return a.name.length - b.name.length;
+            }
+            return 0;
+        },
     },
     {
-      title: "Email",
-      dataIndex: "email",
-      render: (email) => email || 'N/A',
-      sorter: (a, b) => {
-        if (a.email && b.email) {
-          return a.email.length - b.email.length;
-        }
-        return 0;
-      },
+        title: "Tax Number",
+        dataIndex: "tax_number",
+        render: (tax_number) => tax_number || 'N/A',
+        sorter: (a, b) => {
+            if (a.tax_number && b.tax_number) {
+                return a.tax_number.localeCompare(b.tax_number);
+            }
+            return 0;
+        },
     },
     {
-      title: "Tax Number",
-      dataIndex: "tax_number",
-      render: (tax_number) => tax_number || 'N/A',
-      sorter: (a, b) => {
-        if (a.tax_number && b.tax_number) {
-          return a.tax_number.length - b.tax_number.length;
-        }
-        return 0;
-      },
+        title: "Action",
+        dataIndex: "actions",
+        render: (_, elm) => (
+            <div className="text-center">
+                <EllipsisDropdown menu={dropdownMenu(elm)} />
+            </div>
+        ),
     },
-    {
-      title: "Action",
-      dataIndex: "actions",
-      render: (_, elm) => (
-        <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
-        </div>
-      ),
-    },
-  ];
+];
 
   return (
     <Card bodyStyle={{ padding: "-3px" }}>

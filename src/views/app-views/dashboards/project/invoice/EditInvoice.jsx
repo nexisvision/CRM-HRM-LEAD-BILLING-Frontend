@@ -149,98 +149,102 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
   // Handle product selection
   const handleProductChange = (value) => {
     if (value) {
-      const selectedProd = products?.find(p => p.id === value);
-      setSelectedMilestone(null); // Reset milestone selection when product is selected
-      setSelectedProduct(value);
+        const selectedProd = products?.find(p => p.id === value);
+        setSelectedMilestone(null); // Reset milestone selection when product is selected
+        setSelectedProduct(value);
 
-      if (selectedProd) {
-        // Update table data with product information
-        setTableData([
-          {
-            id: Date.now(),
-            item: selectedProd.name,
-            quantity: 1,
-            price: selectedProd.price,
-            hsn_sac: selectedProd.hsn_sac || '', // Set HSN/SAC from product
-            tax: selectedProd.tax || 0,
-            amount: selectedProd.price.toString(),
-            description: selectedProd.description,
-            discountType: "percentage",
-            discount: 0
-          }
-        ]);
-        calculateTotal([{
-          quantity: 1,
-          price: selectedProd.price,
-          tax: selectedProd.tax || 0,
-          discount: 0
-        }], discountRate);
-      }
+        if (selectedProd) {
+            // Update table data with product information
+            const newTableData = [{
+                id: Date.now(),
+                item: selectedProd.name || '', // Product name
+                quantity: 1,
+                price: selectedProd.price || 0, // Product price
+                hsn_sac: selectedProd.hsn_sac || '', // HSN/SAC code
+                tax: 0,
+                discountType: "percentage",
+                discount: 0,
+                amount: selectedProd.price?.toString() || "0",
+                description: selectedProd.description || '', // Product description
+                base_amount: selectedProd.price || 0,
+                tax_amount: 0,
+                discount_amount: 0
+            }];
+
+            setTableData(newTableData);
+            calculateTotal(newTableData, discountRate);
+        }
     } else {
-      // If deselecting product, clear the table data
-      setSelectedProduct(null);
-      setTableData([{
-        id: Date.now(),
-        item: "",
-        quantity: 1,
-        price: "",
-        hsn_sac: "",
-        tax: 0,
-        amount: "0",
-        description: "",
-        discountType: "percentage",
-        discount: 0
-      }]);
+        // If deselecting product, clear the table data
+        setSelectedProduct(null);
+        const emptyRow = {
+            id: Date.now(),
+            item: "",
+            quantity: 1,
+            price: "",
+            hsn_sac: "",
+            tax: 0,
+            discountType: "percentage",
+            discount: 0,
+            amount: "0",
+            description: "",
+            base_amount: 0,
+            tax_amount: 0,
+            discount_amount: 0
+        };
+        setTableData([emptyRow]);
+        calculateTotal([emptyRow], discountRate);
     }
   };
 
   // Handle milestone selection
   const handleMilestoneChange = (value) => {
     if (value) {
-      const selectedMile = milestones?.find(m => m.id === value);
-      setSelectedMilestone(value);
-      setSelectedProduct(null); // Reset product selection when milestone is selected
+        const selectedMile = milestones?.find(m => m.id === value);
+        setSelectedMilestone(value);
+        setSelectedProduct(null); // Reset product selection when milestone is selected
 
-      if (selectedMile) {
-        // Update table data with milestone information
-        setTableData([
-          {
-            id: Date.now(),
-            item: selectedMile.milestone_title,
-            quantity: 1,
-            price: selectedMile.milestone_cost,
-            tax: 0,
-            discount: 0,
-            amount: selectedMile.milestone_cost.toString(),
-            description: selectedMile.milestone_summary,
-            hsn_sac: "", // Clear HSN/SAC for milestone
-            discountType: "percentage",
-            discount: 0
-          }
-        ]);
-        calculateTotal([{
-          quantity: 1,
-          price: selectedMile.milestone_cost,
-          tax: 0,
-          discount: 0
-        }], discountRate);
-      }
+        if (selectedMile) {
+            // Update table data with milestone information
+            const newTableData = [{
+                id: Date.now(),
+                item: selectedMile.milestone_title || '', // Milestone name
+                quantity: 1,
+                price: selectedMile.milestone_cost || 0, // Milestone cost
+                tax: 0,
+                discountType: "percentage",
+                discount: 0,
+                amount: selectedMile.milestone_cost?.toString() || "0",
+                description: selectedMile.milestone_summary || '', // Milestone description
+                hsn_sac: "",
+                base_amount: selectedMile.milestone_cost || 0,
+                tax_amount: 0,
+                discount_amount: 0
+            }];
+
+            setTableData(newTableData);
+            calculateTotal(newTableData, discountRate);
+        }
     } else {
-      // If deselecting milestone, clear the table data
-      setSelectedMilestone(null);
-      setTableData([{
-        id: Date.now(),
-        item: "",
-        quantity: 1,
-        price: "",
-        tax: 0,
-        
-        amount: "0",
-        description: "",
-        hsn_sac: "",
-        discountType: "percentage",
-        discount: 0
-      }]);
+        // If deselecting milestone, clear the table data
+        setSelectedMilestone(null);
+        const emptyRow = {
+            id: Date.now(),
+            item: "",
+            quantity: 1,
+            price: "",
+            tax: 0,
+            discountType: "percentage",
+            discount: 0,
+            amount: "0",
+            description: "",
+            hsn_sac: "",
+            base_amount: 0,
+            tax_amount: 0,
+            discount_amount: 0
+        };
+        setTableData([emptyRow]);
+        calculateTotal([emptyRow], discountRate);
     }
   };
 
@@ -622,7 +626,7 @@ useEffect(() => {
                 value={row.quantity}
                 onChange={(e) => handleTableDataChange(row.id, "quantity", e.target.value)}
                 placeholder="Qty"
-                className="w-full p-2 border rounded"
+                className="w-[100px] p-2 border rounded"
                 min="1"
               />
             </td>
@@ -673,19 +677,31 @@ useEffect(() => {
               />
             </td>
             <td className="px-2 py-2 border-b">
-              <select
-                value={row.tax}
-                onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
-                className="w-full p-2 border"
-              >
-                <option value="0">Select Tax</option>
-                {taxes?.data?.map(tax => (
-                  <option key={tax.id} value={tax.gstPercentage}>
-                    {tax.gstName}: {tax.gstPercentage}%
-                  </option>
-                ))}
-              </select>
-            </td>
+                            <Select
+                                value={row.tax?.gstPercentage ? `${row.tax.gstName}|${row.tax.gstPercentage}` : '0'}
+                                onChange={(value) => {
+                                    if (!value || value === '0') {
+                                        handleTableDataChange(row.id, "tax", null);
+                                        return;
+                                    }
+                                    const [gstName, gstPercentage] = value.split('|');
+                                    handleTableDataChange(row.id, "tax", {
+                                        gstName,
+                                        gstPercentage: parseFloat(gstPercentage) || 0
+                                    });
+                                }}
+                                placeholder="Select Tax"
+                                className="w-[150px]"
+                                allowClear
+                            >
+                                {/* <Option value="0">0</Option> */}
+                                {taxes && taxes.data && taxes.data.map(tax => (
+                                    <Option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
+                                        {tax.gstName} ({tax.gstPercentage}%)
+                                    </Option>
+                                ))}
+                            </Select>
+                        </td>
             <td className="px-2 py-2 border-b">
               <span>{selectedCurrencyIcon} {row.amount}</span>
             </td>
@@ -699,7 +715,7 @@ useEffect(() => {
             <td colSpan={8} className="px-2 py-2 border-b">
               <textarea
                 rows={2}
-                value={row.description}
+                value={row.description ? row.description.replace(/<[^>]*>/g, '') : ''} // Remove HTML tags
                 onChange={(e) => handleTableDataChange(row.id, "description", e.target.value)}
                 placeholder="Description"
                 className="w-[70%] p-2 border"
@@ -953,26 +969,29 @@ useEffect(() => {
                 <table className="w-full border border-gray-200 bg-white">
                   <thead className="bg-gray-100">
                     <tr>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                        Description<span className="text-red-500">*</span>
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Item<span className="text-red-500">*</span>
                       </th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                         Quantity<span className="text-red-500">*</span>
                       </th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                         Unit Price <span className="text-red-500">*</span>
                       </th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                         Discount <span className="text-red-500">*</span>
                       </th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                         Hsn/Sac <span className="text-red-500">*</span>
                       </th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                         TAX (%)
                       </th>
-                      <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                         Amount<span className="text-red-500">*</span>
+                      </th>
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Action
                       </th>
                     </tr>
                   </thead>

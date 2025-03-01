@@ -82,6 +82,14 @@ const EditInvoice = ({ idd, onClose }) => {
   // Get products directly from Redux store
   const productsData = useSelector((state) => state.Product.Product);
 
+  const [totals, setTotals] = useState({
+    subtotal: "0.00",
+    itemDiscount: "0.00",
+    globalDiscount: "0.00",
+    totalTax: "0.00",
+    finalTotal: "0.00"
+  });
+
   useEffect(() => {
     dispatch(getInvoice());
     dispatch(Getcus());
@@ -195,12 +203,15 @@ const handleProductChange = (productId) => {
         const formattedTableData = itemsArray.map(item => ({
           id: Date.now() + Math.random(),
           item: item.item || '',
-          quantity: item.quantity || 1,
-          price: item.price || 0,
+          quantity: Math.max(parseFloat(item.quantity) || 1, 1),
+          price: parseFloat(item.price) || 0,
           discountType: item.discount_type || 'percentage',
-          discountValue: item.discount_percentage || 0,
-          tax: item.tax_percentage || 0,
-          amount: item.final_amount || 0,
+          discountValue: parseFloat(item.discount_value) || 0,
+          tax: item.tax_percentage ? {
+            gstName: item.tax_name || '',
+            gstPercentage: parseFloat(item.tax_percentage) || 0
+          } : null,
+          amount: parseFloat(item.amount) || 0,
           description: item.description || ''
         }));
 
@@ -213,7 +224,7 @@ const handleProductChange = (productId) => {
             price: 0,
             discountType: 'percentage',
             discountValue: 0,
-            tax: 0,
+            tax: null,
             amount: 0,
             description: ''
           });
@@ -243,12 +254,6 @@ const handleProductChange = (productId) => {
   }, [fnd, currencies]);
 
   // const [rows, setRows] = useState(initialValues.items);
-  const [totals, setTotals] = useState({
-    subtotal: "0.00",
-    discount: "0.00",
-    totalTax: "0.00",
-    finalTotal: "0.00",
-  });
 
   const handleAddRow = () => {
     setTableData([
@@ -256,12 +261,12 @@ const handleProductChange = (productId) => {
       {
         id: Date.now(),
         item: "",
-        quantity: "",
-        price: "",
+        quantity: 1,
+        price: 0,
         discountType: 'percentage',
         discountValue: 0,
-        tax: "",
-        amount: "0",
+        tax: null,
+        amount: 0,
         description: "",
         isNew: true,
       },
@@ -272,120 +277,92 @@ const handleProductChange = (productId) => {
     if (tableData.length > 1) {
       const updatedData = tableData.filter((row) => row.id !== id);
       setTableData(updatedData);
-      calculateTotal(updatedData, globalDiscountValue);
+      calculateTotal(updatedData, globalDiscountValue, globalDiscountType);
     } else {
       message.warning("At least one item is required");
     }
   };
 
-  const calculateTotal = (data, globalDiscValue) => {
-    const totals = data.reduce((acc, row) => {
-      const quantity = parseFloat(row.quantity) || 0;
-      const price = parseFloat(row.price) || 0;
-      const baseAmount = quantity * price;
-      
-      // Calculate item discount based on type
-      const itemDiscountValue = parseFloat(row.discountValue) || 0;
-      let itemDiscountAmount = 0;
-      
-      if (row.discountType === 'percentage') {
-        itemDiscountAmount = (baseAmount * itemDiscountValue) / 100;
-      } else {
-        itemDiscountAmount = itemDiscountValue;
-      }
+  const calculateTotal = (data, globalDiscount, discountType) => {
+    let subtotal = 0;
+    let itemDiscount = 0;
+    let totalTax = 0;
+    let rowTotalSum = 0;
 
-      const taxPercentage = parseFloat(row.tax) || 0;
-      const taxAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
-      const finalAmount = baseAmount - itemDiscountAmount + taxAmount;
+    data.forEach(row => {
+        // Calculate base amount for each row (quantity * price)
+        const quantity = parseFloat(row.quantity) || 0;
+        const price = parseFloat(row.price) || 0;
+        const rowTotal = quantity * price;
+        rowTotalSum += rowTotal;
 
-      return {
-        subtotal: acc.subtotal + finalAmount,
-        itemDiscount: acc.itemDiscount + itemDiscountAmount,
-        tax: acc.tax + taxAmount
-      };
-    }, { subtotal: 0, itemDiscount: 0, tax: 0 });
+        // Calculate row discount
+        const rowDiscountValue = parseFloat(row.discountValue) || 0;
+        const rowDiscountAmount = row.discountType === 'percentage' 
+            ? (rowTotal * rowDiscountValue) / 100 
+            : rowDiscountValue;
+        
+        itemDiscount += rowDiscountAmount;
+
+        // Calculate tax
+        if (row.tax) {
+            const taxRate = parseFloat(row.tax.gstPercentage) || 0;
+            totalTax += ((rowTotal - rowDiscountAmount) * taxRate) / 100;
+        }
+    });
+
+    // Set subtotal as sum of row totals (before tax and discounts)
+    subtotal = rowTotalSum;
 
     // Calculate global discount
-    let globalDiscountAmount = 0;
-    const globalDiscountValueNum = parseFloat(globalDiscValue) || 0;
+    const globalDiscountAmount = discountType === 'percentage'
+        ? (subtotal * parseFloat(globalDiscount)) / 100
+        : parseFloat(globalDiscount) || 0;
 
-    if (globalDiscountType === 'percentage') {
-      globalDiscountAmount = (totals.subtotal * globalDiscountValueNum) / 100;
-    } else {
-      globalDiscountAmount = globalDiscountValueNum;
-    }
-
-    const finalTotal = totals.subtotal - globalDiscountAmount;
+    // Calculate final total
+    const finalTotal = subtotal - globalDiscountAmount - itemDiscount + totalTax;
 
     setTotals({
-      subtotal: totals.subtotal.toFixed(2),
-      itemDiscount: totals.itemDiscount.toFixed(2),
-      globalDiscount: globalDiscountAmount.toFixed(2),
-      totalTax: totals.tax.toFixed(2),
-      finalTotal: finalTotal.toFixed(2)
+        subtotal: subtotal.toFixed(2),
+        itemDiscount: itemDiscount.toFixed(2),
+        globalDiscount: globalDiscountAmount.toFixed(2),
+        totalTax: totalTax.toFixed(2),
+        finalTotal: finalTotal.toFixed(2)
     });
   };
 
   const handleTableDataChange = (id, field, value) => {
-    const updatedData = tableData.map((row) => {
-      if (row.id === id) {
-        const updatedRow = { ...row, [field]: value };
-        
-        // Recalculate amount when any value changes
-        const quantity = parseFloat(updatedRow.quantity) || 0;
-        const price = parseFloat(updatedRow.price) || 0;
-        const baseAmount = quantity * price;
-        
-        // Calculate item discount
-        const itemDiscountValue = parseFloat(updatedRow.discountValue) || 0;
-        let itemDiscountAmount = 0;
-        
-        if (updatedRow.discountType === 'percentage') {
-          itemDiscountAmount = (baseAmount * itemDiscountValue) / 100;
-        } else {
-          itemDiscountAmount = itemDiscountValue;
+    const updatedData = tableData.map(row => {
+        if (row.id === id) {
+            const updatedRow = { ...row, [field]: value };
+            
+            // Calculate base amount
+            const quantity = parseFloat(updatedRow.quantity) || 0;
+            const price = parseFloat(updatedRow.price) || 0;
+            const baseAmount = quantity * price;
+            
+            // Calculate discount
+            const discountValue = parseFloat(updatedRow.discountValue) || 0;
+            const discountAmount = updatedRow.discountType === 'percentage' 
+                ? (baseAmount * discountValue) / 100 
+                : discountValue;
+            
+            // Calculate tax
+            const taxPercentage = updatedRow.tax ? parseFloat(updatedRow.tax.gstPercentage) || 0 : 0;
+            const taxableAmount = baseAmount - discountAmount;
+            const taxAmount = (taxableAmount * taxPercentage) / 100;
+            
+            // Set final amount
+            updatedRow.amount = (baseAmount - discountAmount + taxAmount).toFixed(2);
+            
+            return updatedRow;
         }
-
-        const taxPercentage = parseFloat(updatedRow.tax) || 0;
-        const taxAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
-        
-        updatedRow.amount = (baseAmount - itemDiscountAmount + taxAmount).toFixed(2);
-        return updatedRow;
-      }
-      return row;
+        return row;
     });
 
     setTableData(updatedData);
-    calculateTotal(updatedData, globalDiscountValue);
+    calculateTotal(updatedData, globalDiscountValue, globalDiscountType);
   };
-
- 
-
-  // const calculateTotals = () => {
-  //   let subtotal = 0;
-  //   let totalDiscount = 0;
-  //   let totalTax = 0;
-
-  //   rows.forEach((row) => {
-  //     const { quantity, price, discount, tax } = row;
-  //     const discountAmount = (price * discount) / 100;
-  //     const priceAfterDiscount = price - discountAmount;
-  //     const taxAmount = (priceAfterDiscount * tax) / 100;
-
-  //     subtotal += priceAfterDiscount * quantity;
-  //     totalDiscount += discountAmount * quantity;
-  //     totalTax += taxAmount * quantity;
-  //   });
-
-  //   const totalAmount = subtotal + totalTax - totalDiscount;
-
-  //   return {
-  //     subtotal: subtotal.toFixed(2),
-  //     totalDiscount: totalDiscount.toFixed(2),
-  //     totalTax: totalTax.toFixed(2),
-  //     totalAmount: totalAmount.toFixed(2),
-  //   };
-  // };
 
   const handleAddNewTag = async () => {
     if (!newTag.trim()) {
@@ -415,21 +392,20 @@ const handleProductChange = (productId) => {
   };
 
   const onSubmit = (values) => {
-    // const { subtotal, totalDiscount, totalTax, totalAmount } = calculateTotals();
-
     const itemsForDatabase = tableData.reduce((acc, item, index) => {
-      const quantity = parseFloat(item.quantity) || 0;
+      // Ensure quantity is at least 1
+      const quantity = Math.max(parseFloat(item.quantity) || 1, 1);
       const price = parseFloat(item.price) || 0;
-      const itemDiscountPercentage = parseFloat(item.discountValue) || 0;
-      const taxPercentage = parseFloat(item.tax) || 0;
+      const itemDiscountValue = parseFloat(item.discountValue) || 0;
+      const taxPercentage = item.tax ? parseFloat(item.tax.gstPercentage) || 0 : 0;
 
+      // Calculate amounts
       const baseAmount = quantity * price;
-      const itemDiscountAmount = (baseAmount * itemDiscountPercentage) / 100;
-      const taxAmount = (baseAmount * taxPercentage) / 100;
-      const itemTotal = baseAmount - itemDiscountAmount + taxAmount;
-
-       // Get tax details for the current item
-       const taxDetails = selectedTaxDetails[item.id];
+      const itemDiscountAmount = item.discountType === 'percentage'
+          ? (baseAmount * itemDiscountValue) / 100
+          : itemDiscountValue;
+      const taxAmount = ((baseAmount - itemDiscountAmount) * taxPercentage) / 100;
+      const finalAmount = baseAmount - itemDiscountAmount + taxAmount;
 
       acc[`item_${index + 1}`] = {
         item: item.item,
@@ -437,11 +413,13 @@ const handleProductChange = (productId) => {
         price: price,
         tax_percentage: taxPercentage,
         tax_amount: taxAmount,
-        tax_name: taxDetails ? taxDetails.gstName : '', // Use tax details if available
-        discount_percentage: itemDiscountPercentage,
+        tax_name: item.tax ? item.tax.gstName : '',
+        discount_type: item.discountType,
+        discount_value: itemDiscountValue,
         discount_amount: itemDiscountAmount,
         base_amount: baseAmount,
-        final_amount: itemTotal,
+        final_amount: finalAmount,
+        amount: finalAmount,
         description: item.description || ""
       };
       return acc;
@@ -503,6 +481,11 @@ const handleProductChange = (productId) => {
     }
   };
 
+  useEffect(() => {
+    if (tableData.length > 0) {
+        calculateTotal(tableData, globalDiscountValue, globalDiscountType);
+    }
+  }, [tableData, globalDiscountValue, globalDiscountType]);
 
   return (
     <div>
@@ -717,7 +700,7 @@ const handleProductChange = (productId) => {
                 <thead className="bg-gray-100">
                   <tr>
                     <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                      Description<span className="text-red-500">*</span>
+                    Item<span className="text-red-500">*</span>
                     </th>
                     <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
                       Quantity<span className="text-red-500">*</span>
@@ -805,19 +788,30 @@ const handleProductChange = (productId) => {
                             />
                           </div>
                         </td>
-                        <td className="py-2 border-b">
+                        <td className="px-2 py-2 border-b">
                           <Select
-                            value={row.tax}
-                            onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
-                            className="w-[100px] p-2"
-                          >
-                            <Option value="0">No Tax</Option>
+                            value={row.tax?.gstPercentage ? `${row.tax.gstName}|${row.tax.gstPercentage}` : '0'}
+                            onChange={(value) => {
+                                if (!value || value === '0') {
+                                    handleTableDataChange(row.id, "tax", null);
+                                    return;
+                                }
+                                const [gstName, gstPercentage] = value.split('|');
+                                handleTableDataChange(row.id, "tax", {
+                                    gstName,
+                                    gstPercentage: parseFloat(gstPercentage) || 0
+                                });
+                            }}
+                            placeholder="Select Tax"
+                            className="w-[100px]"
+                            allowClear
+                        >
                             {taxes && taxes.data && taxes.data.map(tax => (
-                              <Option key={tax.id} value={tax.gstPercentage}>
-                                {tax.gstName} ({tax.gstPercentage}%)
-                              </Option>
+                                <Option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
+                                    {tax.gstName} ({tax.gstPercentage}%)
+                                </Option>
                             ))}
-                          </Select>
+                        </Select>
                         </td>
                         <td className="px-2 py-2 border-b">
                         <span>{selectedCurrencyIcon} {parseFloat(row.amount || 0).toFixed(2)}</span>
@@ -829,15 +823,15 @@ const handleProductChange = (productId) => {
                         </td>
                       </tr>
                       <tr>
-                        <td colSpan={6} className="px-2 py-2 border-b">
-                          <textarea
+                      <td colSpan={8} className="px-2 py-2 border-b">
+                        <textarea
                             rows={2}
-                            value={row.description}
+                            value={row.description ? row.description.replace(/<[^>]*>/g, '') : ''} // Remove HTML tags
                             onChange={(e) => handleTableDataChange(row.id, "description", e.target.value)}
                             placeholder="Description"
                             className="w-[70%] p-2 border"
-                          />
-                        </td>
+                        />
+                    </td>
                       </tr>
                     </React.Fragment>
                   ))}
@@ -854,12 +848,12 @@ const handleProductChange = (productId) => {
           <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
             <table className="w-full lg:w-[50%] p-2">
               <tbody>
-                <tr className="flex justify-between px-2 py-2 border-x-2">
+                <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
                   <td className="font-medium">Sub Total</td>
                   <td className="font-medium px-4 py-2">{selectedCurrencyIcon} {totals.subtotal}</td>
                 </tr>
 
-                <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
+                <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
                       <td className="font-medium">Item Discount</td>
                       <td className="flex items-center space-x-2">
                         <Select
@@ -941,3 +935,4 @@ const handleProductChange = (productId) => {
 
 
 export default EditInvoice;
+

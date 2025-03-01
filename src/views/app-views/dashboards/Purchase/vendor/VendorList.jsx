@@ -109,18 +109,21 @@ const VendorList = () => {
   };
   // Search functionality
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = value ? list : [];
-    let data = utils.wildCardSearch(searchArray, value);
-    
-    // Apply account type filter if not 'All'
-    if (accountType !== 'All') {
-      data = data.filter(item => 
-        item.accounttype && item.accounttype.toLowerCase() === accountType.toLowerCase()
-      );
+    const value = e.currentTarget.value.toLowerCase();
+    if (!value) {
+        setList(fnsddta);
+        return;
     }
     
-    setList(data);
+    const searchArray = fnsddta.filter(item => 
+        item.name?.toLowerCase().includes(value) ||
+        item.address?.toLowerCase().includes(value) ||
+        item.city?.toLowerCase().includes(value) ||
+        item.state?.toLowerCase().includes(value) ||
+        item.country?.toLowerCase().includes(value)
+    );
+    
+    setList(searchArray);
     setSelectedRowKeys([]);
   };
   // Delete user
@@ -220,13 +223,6 @@ const VendorList = () => {
     </Menu>
   );
   const tableColumns = [
-    // {
-    //   title: 'Chart Of Account	',
-    //   dataIndex: 'chartofaccount',
-    //   sorter: {
-    //     compare: (a, b) => a.chartofaccount.length - b.chartofaccount.length,
-    //   },
-    // },
     {
       title: 'Name',
       dataIndex: 'name',
@@ -235,24 +231,43 @@ const VendorList = () => {
       },
     },
     {
-      title: 'Contact',
-      dataIndex: 'contact',
+      title: 'Address',
+      dataIndex: 'address',
+      render: (address) => (
+        <span>{address || 'N/A'}</span>
+      ),
       sorter: {
-        compare: (a, b) => a.contact.length - b.contact.length,
+        compare: (a, b) => (a.address || '').localeCompare(b.address || ''),
       },
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
+      title: 'City',
+      dataIndex: 'city',
+      render: (city) => (
+        <span>{city || 'N/A'}</span>
+      ),
       sorter: {
-        compare: (a, b) => a.email.length - b.email.length,
+        compare: (a, b) => (a.city || '').localeCompare(b.city || ''),
       },
     },
     {
-      title: 'taxNumber',
-      dataIndex: 'taxNumber',
+      title: 'State',
+      dataIndex: 'state',
+      render: (state) => (
+        <span>{state || 'N/A'}</span>
+      ),
       sorter: {
-        compare: (a, b) => a.taxNumber.length - b.taxNumber.length,
+        compare: (a, b) => (a.state || '').localeCompare(b.state || ''),
+      },
+    },
+    {
+      title: 'Country',
+      dataIndex: 'country',
+      render: (country) => (
+        <span>{country || 'N/A'}</span>
+      ),
+      sorter: {
+        compare: (a, b) => (a.country || '').localeCompare(b.country || ''),
       },
     },
     {

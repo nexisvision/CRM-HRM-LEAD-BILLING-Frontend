@@ -166,7 +166,7 @@ const delfun = (idd) => {
           columns={tableColumns}
           dataSource={filteredTaxes}
           rowKey="id"
-          loading={loading}
+          // loading={loading}
         />
       </div>
 

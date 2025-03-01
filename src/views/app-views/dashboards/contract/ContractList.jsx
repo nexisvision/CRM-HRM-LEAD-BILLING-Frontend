@@ -123,20 +123,16 @@ const ContractList = () => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
     
-    // If search value is empty, show all data
     if (!value) {
-      setUsers(tabledata?.Contract?.data || []);
-      return;
+        setUsers(tabledata?.Contract?.data || []);
+        return;
     }
     
-    // Filter the data based on client name
-    const filtered = tabledata?.Contract?.data?.filter(contract => {
-      const clientName = clientData?.find(client => 
-        client.id === contract.client
-      )?.username?.toLowerCase();
-      
-      return clientName?.includes(value);
-    }) || [];
+    const filtered = tabledata?.Contract?.data?.filter(contract => 
+        contract.contract_number?.toLowerCase().includes(value) ||
+        contract.phone?.toLowerCase().includes(value) ||
+        contract.country?.toLowerCase().includes(value)
+    ) || [];
     
     setUsers(filtered);
   };
@@ -355,19 +351,11 @@ const ContractList = () => {
     </Menu>
   );
   const tableColumns = [
-    // {
-    //   title: 'Name',
-    //   dataIndex: 'name',
-    //   sorter: {
-    //     compare: (a, b) => a.branch.length - b.branch.length,
-    //   },
-    // },
     {
-      title: "Subject",
-      dataIndex: "subject",
-      sorter: {
-        compare: (a, b) => a.subject.length - b.subject.length,
-      },
+        title: 'Contract Number',
+        dataIndex: 'contract_number',
+       
+        sorter: (a, b) => a.contract_number.localeCompare(b.contract_number)
     },
     {
       title: "Client",
@@ -402,10 +390,33 @@ const ContractList = () => {
       }
     },
     {
-      title: "Contract Type",
-      dataIndex: "type",
-      compare: (a, b) => a.type.length - b.type.length,
+      title: 'Phone',
+      dataIndex: 'phone',
+      render: phone => (
+          <span>{phone || '-'}</span>
+      ),
+      sorter: (a, b) => (a.phone || '').localeCompare(b.phone || '')
+  },
+  {
+      title: 'Country',
+      dataIndex: 'country',
+      render: country => (
+          <span>{country || '-'}</span>
+      ),
+      sorter: (a, b) => (a.country || '').localeCompare(b.country || '')
+  },
+  {
+    title: "Subject",
+    dataIndex: "subject",
+    sorter: {
+      compare: (a, b) => a.subject.length - b.subject.length,
     },
+  },
+    // {
+    //   title: "Contract Type",
+    //   dataIndex: "type",
+    //   compare: (a, b) => a.type.length - b.type.length,
+    // },
     {
       title: "Contract Value",
       dataIndex: "value",
@@ -470,7 +481,7 @@ const ContractList = () => {
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input
-              placeholder="Search by client name..."
+              placeholder="Search by contract number, phone, country..."
               prefix={<SearchOutlined />}
               onChange={onSearch}
               value={searchText}

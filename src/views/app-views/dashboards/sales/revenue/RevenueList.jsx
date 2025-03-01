@@ -292,18 +292,28 @@ const RevenueList = () => {
       dataIndex: "category",
       sorter: (a, b) => utils.antdTableSorter(a, b, "category"),
     },
-    // {
-    //   title: "Reference",
-    //   dataIndex: "reference",
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "reference"),
-    // },
-    // {
-    //   title: "Description",
-    //   dataIndex: "description",
-    //   sorter: {
-    //     compare: (a, b) => a.description.length - b.description.length,
-    //   },
-    // },
+    {
+        title: "Description",
+        dataIndex: "description",
+        render: (description) => (
+            <div
+                dangerouslySetInnerHTML={{
+                    __html: description || 'N/A'
+                }}
+                style={{
+                    maxWidth: '300px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap'
+                }}
+            />
+        ),
+        sorter: (a, b) => {
+            const descA = a.description?.replace(/<[^>]+>/g, '') || '';
+            const descB = b.description?.replace(/<[^>]+>/g, '') || '';
+            return descA.localeCompare(descB);
+        }
+    },
     // {
     //   title: "Payment Receipt",
     //   dataIndex: "paymentreceipt",
@@ -333,19 +343,18 @@ const RevenueList = () => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
     
-    // If search value is empty, show all data
     if (!value) {
-      setList(fnddata);
-      return;
+        setList(fnddata);
+        return;
     }
     
-    // Filter the data based on customer name
     const filtered = fnddata.filter(revenue => {
-      const customerName = fnddataCustomers?.find(cust => 
-        cust.id === revenue.customer
-      )?.name?.toLowerCase();
-      
-      return customerName?.includes(value);
+        const customerName = fnddataCustomers?.find(cust => 
+            cust.id === revenue.customer
+        )?.name?.toLowerCase();
+        const plainDescription = revenue.description?.replace(/<[^>]+>/g, '').toLowerCase() || '';
+        
+        return customerName?.includes(value) || plainDescription.includes(value);
     });
     
     setList(filtered);
@@ -569,3 +578,4 @@ const RevenueListWithStyles = () => (
 );
 
 export default RevenueListWithStyles;
+/* eslint-disable no-unused-vars */

@@ -19,6 +19,7 @@ import { useParams } from 'react-router-dom';
 import AddEstimates from './AddEstimates';
 import EditEstimates from './EditEstimates';
 import ViewEstimates from './ViewEstimates';
+import { GetLeads } from '../../leads/LeadReducers/LeadSlice'
 
 const { Option } = Select
 
@@ -38,6 +39,8 @@ const EstimatesList = () => {
     const [idd, setIdd] = useState("");
 
 	const { estimates, loading, error } = useSelector((state) => state.estimate);
+	const leadsState = useSelector((state) => state.Lead?.Lead) || {};  // Safely access Lead state
+	const leads = leadsState?.data || [];  // Safely access leads data
 
 	const [list, setList] = useState([])
 	const [selectedRows, setSelectedRows] = useState([])
@@ -53,6 +56,7 @@ const EstimatesList = () => {
 
 	useEffect(() => {
 		dispatch(getallestimate(id));
+		dispatch(GetLeads());
 	}, [dispatch, id]);
 
 	useEffect(() => {
@@ -191,28 +195,38 @@ const EstimatesList = () => {
 			)
 		},
 		{
-			title: 'Date',
-			 dataIndex: "valid_till",
-				  render: (date) => dayjs(date).format("DD/MM/YYYY"),
-				  sorter: (a, b) => new Date(a.valid_till) - new Date(b.valid_till),
+			title: 'Valid Till',
+			dataIndex: 'valid_till',
+			render: (date) => dayjs(date).format("DD/MM/YYYY"),
+			sorter: (a, b) => new Date(a.valid_till) - new Date(b.valid_till),
 		},
 		{
-			title: 'Created By',
-			dataIndex: 'created_by',
-			render: (_, record) => (
-				<div className="d-flex">
-					<AvatarStatus size={30} src={record.image} name={record.created_by} />
-				</div>
+			title: 'Client',
+			dataIndex: 'client',
+			render: (client) => (
+				<span>{client || 'N/A'}</span>
 			),
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'created_by')
+			sorter: (a, b) => (a.client || '').localeCompare(b.client || ''),
 		},
-
 		{
-			title: 'Tax',
-			dataIndex: 'tax',
-			render: (_, record) => <span>{record.tax}</span>,
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'tax')
+			title: 'Lead',
+			dataIndex: 'lead',
+			render: (leadId) => {
+				const lead = leads.find(l => l.id === leadId);
+				return <span>{lead?.leadTitle || 'N/A'}</span>;
+			},
+			sorter: (a, b) => {
+				const leadNameA = leads.find(l => l.id === a.lead)?.leadTitle || '';
+				const leadNameB = leads.find(l => l.id === b.lead)?.leadTitle || '';
+				return leadNameA.localeCompare(leadNameB);
+			},
 		},
+		// {
+		// 	title: 'Tax',
+		// 	dataIndex: 'tax',
+		// 	render: (_, record) => <span>{record.tax}</span>,
+		// 	sorter: (a, b) => utils.antdTableSorter(a, b, 'tax')
+		// },
 		
 		{
 			title: 'Currency',
@@ -242,14 +256,14 @@ const EstimatesList = () => {
 			),
 			sorter: (a, b) => utils.antdTableSorter(a, b, 'total')
 		},
-		{
-			title: 'Status',
-			dataIndex: 'orderStatus',
-			render: (_, record) => (
-				<><Tag color={getShippingStatus(record.orderStatus)}>{record.orderStatus}</Tag></>
-			),
-			sorter: (a, b) => utils.antdTableSorter(a, b, 'orderStatus')
-		},
+		// {
+		// 	title: 'Status',
+		// 	dataIndex: 'orderStatus',
+		// 	render: (_, record) => (
+		// 		<><Tag color={getShippingStatus(record.orderStatus)}>{record.orderStatus}</Tag></>
+		// 	),
+		// 	sorter: (a, b) => utils.antdTableSorter(a, b, 'orderStatus')
+		// },
 		
 		{
 			title: 'Action',
@@ -278,9 +292,17 @@ const EstimatesList = () => {
 			return;
 		}
 		
-		const filtered = estimates.filter(estimate => 
-			estimate.quotationNumber?.toLowerCase().includes(value)
-		);
+		const filtered = estimates.filter(estimate => {
+			const leadName = leads.find(l => l.id === estimate.lead)?.lead_name || '';
+			
+			return (
+				estimate.quotationNumber?.toLowerCase().includes(value) ||
+				estimate.client?.toLowerCase().includes(value) ||
+				leadName.toLowerCase().includes(value) ||
+				dayjs(estimate.valid_till).format("DD/MM/YYYY").includes(value) ||
+				estimate.total?.toString().includes(value)
+			);
+		});
 		
 		setList(filtered);
 	};
@@ -306,7 +328,7 @@ const EstimatesList = () => {
 				<Flex alignItems="center" justifyContent="space-between" mobileFlex={false} className='flex flex-wrap  gap-4'>
 					<Flex cclassName="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
 						<div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48 me-2">
-							<Input placeholder="Search by estimate number..." prefix={<SearchOutlined />} onChange={onSearch} value={searchText} allowClear className="search-input" />
+							<Input placeholder="Search by estimate #, client, lead..." prefix={<SearchOutlined />} onChange={onSearch} value={searchText} allowClear className="search-input" />
 						</div>
 						{/* <div className="w-full md:w-48 ">
 							<Col span={12}>
@@ -340,8 +362,7 @@ const EstimatesList = () => {
 					/>
 				</div>
 			</Card>
-
-			<Card>
+			
 				<Modal
 					title="Add Estimate"
 					visible={isAddEstimatesModalVisible}
@@ -377,7 +398,7 @@ const EstimatesList = () => {
 				>
 					<ViewEstimates estimateId={selectedEstimateId} />
 				</Modal>
-			</Card>
+		
 		</>
 	)
 }

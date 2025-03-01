@@ -135,9 +135,6 @@ const AddDebitnote = ({ onClose }) => {
                 <div className="form-group mt-3">
                   <label className="font-semibold">
                     Amount <span className="text-red-500">*</span>
-                    {selectedBillAmount > 0 && (
-                      <span className="text-gray-500 ml-2">(Max: ₹{selectedBillAmount})</span>
-                    )}
                   </label>
                   <Field name="amount">
                     {({ field }) => (

@@ -350,8 +350,12 @@ const curren = currencies?.data || [];
                                         maxCount={1}
                                         fileList={fileList}
                                         onChange={handleFileChange}
-                                        showUploadList={{ showRemoveIcon: true }}
-                                        className="border-2 flex justify-center items-center p-10"
+                                        showUploadList={{ 
+                                            showRemoveIcon: true,
+                                            showPreviewIcon: true,
+                                            className: "upload-list-inline"
+                                          }}
+                                         className="border-2 flex flex-col justify-center items-center p-10"
                                     >
                                         <Button icon={<UploadOutlined />}>Choose File</Button>
                                     </Upload>

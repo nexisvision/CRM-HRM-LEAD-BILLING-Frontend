@@ -34,6 +34,7 @@ const AddPayment = ({ onClose, billNumber }) => {
     date: null,
     amount: billAmount, // Set initial amount to bill amount
     account: '',
+    paymentMode: '', // Add payment mode to initial values
     reference: '',
     description: '',
   };
@@ -52,6 +53,8 @@ const AddPayment = ({ onClose, billNumber }) => {
       // .max(finalTotal, `Amount cannot exceed ${finalTotal}`),
     account: Yup.string()
       .required('Account is required'),
+    paymentMode: Yup.string()  // Add validation for payment mode
+      .required('Payment mode is required'),
     reference: Yup.string()
       .required('Reference is required'),
     description: Yup.string()
@@ -68,6 +71,7 @@ const AddPayment = ({ onClose, billNumber }) => {
         date: dayjs(values.date).format('YYYY-MM-DD'),
         amount: parseFloat(values.amount),
         account: values.account, // This will be the account ID
+        paymentMode: values.paymentMode,
         reference: values.reference,
         description: values.description
       };
@@ -172,6 +176,22 @@ const AddPayment = ({ onClose, billNumber }) => {
                     ))}
                   </Select>
                   <ErrorMessage name="account" component="div" className="text-red-500 mt-1" />
+                </div>
+              </Col>
+
+              <Col span={12}>
+                <div className="form-item mb-4">
+                  <label className="block mb-1">Payment Method <span className="text-red-500">*</span></label>
+                  <Select
+                    className="w-full"
+                    placeholder="Select Payment Mode"
+                    value={values.paymentMode}
+                    onChange={(value) => setFieldValue('paymentMode', value)}
+                  >
+                    <Option value="online">Online</Option>
+                    <Option value="offline">Offline</Option>
+                  </Select>
+                  <ErrorMessage name="paymentMode" component="div" className="text-red-500 mt-1" />
                 </div>
               </Col>
 

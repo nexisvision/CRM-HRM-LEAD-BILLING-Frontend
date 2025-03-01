@@ -80,7 +80,7 @@ const AddContract = ({ onClose }) => {
     description: "",
   };
 
-  const validationSchema = Yup.object({
+  const validationSchema = Yup.object().shape({
     subject: Yup.string().required("Please enter a Subject Name."),
     client: Yup.string().required("Please select a Client."),
     project: Yup.string().required("Please select a Project."),
@@ -89,10 +89,11 @@ const AddContract = ({ onClose }) => {
     phoneCode: Yup.string().required("Please select a Country Code."),
     phone: Yup.string()
       .required("Please enter a Phone Number.")
-      .matches(/^\d+$/, "Phone number must contain only digits"),
+      .matches(/^\d+$/, "Phone number must contain only digits")
+      .min(6, "Phone number must be at least 6 digits")
+      .max(15, "Phone number must not exceed 15 digits"),
     city: Yup.string().required("Please enter a City."),
     notes: Yup.string().required("Please enter Notes."),
-    contract_number: Yup.string().required("Please enter a Contract Number."),
     country: Yup.string().required("Please select a Country."),
     state: Yup.string().required("Please enter a State."),
     currency: Yup.string().required("Please select Contract currency."),
@@ -101,7 +102,9 @@ const AddContract = ({ onClose }) => {
       .nullable()
       .test("startDate", "Start date cannot be in the past", function(value) {
         if (!value) return true;
-        return moment(value).startOf('day').isSameOrAfter(moment().startOf('day'));
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return value >= today;
       }),
     endDate: Yup.date()
       .required("End date is required.")
@@ -109,13 +112,17 @@ const AddContract = ({ onClose }) => {
       .test("endDate", "End date must be after start date", function(value) {
         const { startDate } = this.parent;
         if (!startDate || !value) return true;
-        return moment(value).isAfter(moment(startDate));
+        return value > startDate;
       }),
-    zipcode: Yup.number()
-      .required("Please enter a Zip Code."),
+    zipcode: Yup.string()
+      .required("Please enter a Zip Code.")
+      .matches(/^\d+$/, "Zip code must contain only digits")
+      .min(5, "Zip code must be at least 5 digits")
+      .max(10, "Zip code must not exceed 10 digits"),
     value: Yup.number()
       .required("Please enter a Contract Value.")
       .positive("Contract Value must be positive.")
+      .min(0.01, "Contract Value must be greater than 0")
       .typeError("Contract Value must be a number"),
     description: Yup.string()
       .required("Please enter a Description.")
@@ -196,7 +203,9 @@ const AddContract = ({ onClose }) => {
 
   const handlePhoneNumberChange = (e, setFieldValue) => {
     const value = e.target.value.replace(/\D/g, '');
-    setFieldValue('phone', value);
+    if (value.length <= 15) {
+      setFieldValue('phone', value);
+    }
   };
 
   return (
