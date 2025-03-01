@@ -15,6 +15,8 @@ import { AddLable, GetLable } from "../../dashboards/sales/LableReducer/LableSli
 import { GetProject } from "../project/project-list/projectReducer/ProjectSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import {getallcountries} from "../../setting/countries/countriesreducer/countriesSlice";
+import AddDealStages from "../systemsetup/DealStages/AddDealStages";
+import AddPipeLine from "../systemsetup/Pipeline/AddPipeLine";
 const { Option } = Select;
 const AddDeal = ({ onClose }) => {
   const navigate = useNavigate();
@@ -190,6 +192,26 @@ const AddDeal = ({ onClose }) => {
     dispatch(GetProject());
   }, [dispatch]);
  
+  const [isAddDealStagesModalVisible, setIsAddDealStagesModalVisible] = useState(false);
+
+  const openAddDealStagesModal = () => {
+    setIsAddDealStagesModalVisible(true);
+  };
+
+  const closeAddDealStagesModal = () => {
+    setIsAddDealStagesModalVisible(false);
+  };
+
+  const [isAddPipeLineModalVisible, setIsAddPipeLineModalVisible] = useState(false);
+
+  const openAddPipeLineModal = () => {
+    setIsAddPipeLineModalVisible(true);
+  };
+
+  const closeAddPipeLineModal = () => {
+    setIsAddPipeLineModalVisible(false);
+  };
+
   return (
     <div className="add-job-form">
       <Formik
@@ -423,6 +445,21 @@ const AddDeal = ({ onClose }) => {
                               selectedPipeline?.pipeline_name || ""
                             );
                           }}
+                          dropdownRender={(menu) => (
+                            <div>
+                              {menu}
+                              <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                <Button
+                                  type="link"
+                                  icon={<PlusOutlined />}
+                                  className="w-full mt-1"
+                                  onClick={openAddPipeLineModal}
+                                >
+                                  Add New Pipeline
+                                </Button>
+                              </div>
+                            </div>
+                          )}
                         >
                           {Array.isArray(fnddatas) &&
                             fnddatas.map((pipeline) => (
@@ -453,16 +490,29 @@ const AddDeal = ({ onClose }) => {
                           placeholder="Select Stage"
                           value={field.value} // Ensure the select value is controlled
                           onChange={(value) => {
-                            // Find the selected stage based on the id
                             const selectedStage =
                               Array.isArray(StagesLeadsDeals) &&
                               StagesLeadsDeals.find((e) => e.id === value);
-                            // Update the form with the selected stage id
                             form.setFieldValue(
                               "stage",
                               selectedStage?.id || ""
                             );
                           }}
+                          dropdownRender={(menu) => (
+                            <div>
+                              {menu}
+                              <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                <Button
+                                  type="link"
+                                  icon={<PlusOutlined />}
+                                  className="w-full mt-1"
+                                  onClick={openAddDealStagesModal}
+                                >
+                                  Add New Deal Stage
+                                </Button>
+                              </div>
+                            </div>
+                          )}
                         >
                           {Array.isArray(StagesLeadsDeals) &&
                             StagesLeadsDeals.map((stage) => (
@@ -565,6 +615,29 @@ const AddDeal = ({ onClose }) => {
           value={newCategory}
           onChange={(e) => setNewCategory(e.target.value)}
         />
+      </Modal>
+
+      {/* Add Deal Stages Modal */}
+      <Modal
+        title="Add Deal Stages"
+        visible={isAddDealStagesModalVisible}
+        onCancel={closeAddDealStagesModal}
+        footer={null}
+        width={700}
+        className="mt-[-70px]"
+      >
+        <AddDealStages onClose={closeAddDealStagesModal} />
+      </Modal>
+
+      {/* Add Pipeline Modal */}
+      <Modal
+        title="Add Pipeline"
+        visible={isAddPipeLineModalVisible}
+        onCancel={closeAddPipeLineModal}
+        footer={null}
+        width={700}
+      >
+        <AddPipeLine onClose={closeAddPipeLineModal} />
       </Modal>
     </div>
   );

@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Formik, Form as FormikForm, Field, ErrorMessage } from 'formik';
-import { Input, Button, message, Row, Col, Select, DatePicker, TimePicker } from 'antd';
+import { Input, Button, message, Row, Col, Select, DatePicker, TimePicker, Modal } from 'antd';
 import * as Yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import { addAnnounce, GetAnn } from './AnnouncementReducer/AnnouncementSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { getBranch } from '../Branch/BranchReducer/BranchSlice';
 import ReactQuill from 'react-quill';
+import AddBranch from '../Branch/AddBranch';
 
 const { Option } = Select;
 
@@ -32,6 +33,8 @@ const AddAnnouncement = ({ onClose }) => {
   }, [dispatch]);
 
   const branchdata = useSelector((state) => state.Branch.Branch.data);
+
+  const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
 
   const handleSubmit = (values, { resetForm }) => {
     const payload = {
@@ -100,6 +103,18 @@ const AddAnnouncement = ({ onClose }) => {
                     className="w-full mt-1"
                     onChange={(value) => setFieldValue("branch", value)}
                     onBlur={() => setFieldTouched("branch", true)}
+                    dropdownRender={menu => (
+                      <>
+                        {menu}
+                        <Button 
+                          type="link" 
+                          block
+                          onClick={() => setIsAddBranchModalVisible(true)}
+                        >
+                          + Add New Branch
+                        </Button>
+                      </>
+                    )}
                   >
                     {branches.map((branch) => (
                       <Option key={branch.id} value={branch.id}>
@@ -204,6 +219,17 @@ const AddAnnouncement = ({ onClose }) => {
           </FormikForm>
         )}
       </Formik>
+
+      {/* Add Branch Modal */}
+      <Modal
+        title="Add Branch"
+        visible={isAddBranchModalVisible}
+        onCancel={() => setIsAddBranchModalVisible(false)}
+        footer={null}
+        width={800}
+      >
+        <AddBranch onClose={() => setIsAddBranchModalVisible(false)} />
+      </Modal>
     </div>
   );
 };

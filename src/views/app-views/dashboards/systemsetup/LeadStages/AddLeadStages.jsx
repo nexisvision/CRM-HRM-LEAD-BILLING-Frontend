@@ -41,11 +41,13 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { Addstages, getstages } from "./LeadsReducer/LeadsstageSlice";
 import { GetPip } from "../Pipeline/PiplineReducer/piplineSlice";
+import AddPipeLine from "../Pipeline/AddPipeLine";
 
 const { Option } = Select;
 
 const AddLeadStages = ({ onClose }) => {
   const [users, setUsers] = useState(userData);
+  const [isAddPipeLineModalVisible, setIsAddPipeLineModalVisible] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -56,7 +58,7 @@ const AddLeadStages = ({ onClose }) => {
   const loggd = useSelector((state) => state.user?.loggedInUser?.username);
 
   const fnddd = Array.isArray(fndpip) && loggd
-    ? fndpip.filter((item) => item?.created_by === loggd)
+  ? fndpip.filter((item) => item?.created_by === loggd)
     : [];
 
   useEffect(() => {
@@ -83,6 +85,14 @@ const AddLeadStages = ({ onClose }) => {
     stageName: Yup.string().required("Please enter lead stage name."),
     pipeline: Yup.string().required("Please select pipeline."),
   });
+
+  const openAddPipeLineModal = () => {
+    setIsAddPipeLineModalVisible(true);
+  };
+
+  const closeAddPipeLineModal = () => {
+    setIsAddPipeLineModalVisible(false);
+  };
 
   return (
     <>
@@ -111,7 +121,7 @@ const AddLeadStages = ({ onClose }) => {
                           <label className="font-semibold">
                             Lead Stage Name <span className="text-rose-500">*</span>  
                           </label>
-                          <Field
+                          <Field  
                             name="stageName"
                             as={Input}
                             className="w-full mt-1"
@@ -132,12 +142,35 @@ const AddLeadStages = ({ onClose }) => {
                               <Select
                                 {...field}
                                 className="w-full mt-1"
+
+
+
                                 placeholder="Select Pipeline"
                                 onChange={(value) =>
                                   setFieldValue("pipeline", value)
                                 }
                                 value={values.pipeline}
                                 onBlur={() => setFieldTouched("pipeline", true)}
+                                dropdownRender={menu => (
+                                  <>
+                                    {menu}
+                                    <div
+                                      style={{
+                                        display: 'flex',
+                                        flexWrap: 'nowrap',
+                                        padding: 8,
+                                      }}
+                                    >
+                                      <Button
+                                        type="link"
+                                        icon={<PlusOutlined />}
+                                        onClick={openAddPipeLineModal}
+                                      >
+                                        Add Pipeline
+                                      </Button>
+                                    </div>
+                                  </>
+                                )}
                               >
                                 {fnddd && fnddd.length > 0 ? (
                                   fnddd.map((client) => (
@@ -176,6 +209,16 @@ const AddLeadStages = ({ onClose }) => {
           </div>
         </div>
       </div>
+
+      <Modal
+        title="Add Pipeline"
+        visible={isAddPipeLineModalVisible}
+        onCancel={closeAddPipeLineModal}
+        footer={null}
+        width={700}
+      >
+        <AddPipeLine onClose={closeAddPipeLineModal} />
+      </Modal>
     </>
   );
 };

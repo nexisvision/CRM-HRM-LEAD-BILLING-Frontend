@@ -45,6 +45,7 @@ import {
   getstages,
 } from "./LeadsReducer/LeadsstageSlice";
 import { GetPip } from "../Pipeline/PiplineReducer/piplineSlice";
+import AddPipeLine from "../Pipeline/AddPipeLine";
 
 const { Option } = Select;
 
@@ -59,6 +60,14 @@ const EditLeadStages = ({ idd, onClose }) => {
 
   const allpiplines = useSelector((state) => state.Piplines);
   const fndpips = allpiplines.Piplines.data;
+
+  const [isAddPipeLineModalVisible, setIsAddPipeLineModalVisible] = useState(false);
+
+  const loggd = useSelector((state) => state.user?.loggedInUser?.username);
+
+  const fnddd = Array.isArray(fndpips) && loggd
+    ? fndpips.filter((item) => item?.created_by === loggd)
+    : [];
 
   useEffect(() => {
     dispatch(GetPip());
@@ -98,6 +107,14 @@ const EditLeadStages = ({ idd, onClose }) => {
     pipeline: Yup.string().required("Please select pipeline."),
   });
 
+  const openAddPipeLineModal = () => {
+    setIsAddPipeLineModalVisible(true);
+  };
+
+  const closeAddPipeLineModal = () => {
+    setIsAddPipeLineModalVisible(false);
+  };
+
   return (
     <div>
       <div className="">
@@ -127,10 +144,10 @@ const EditLeadStages = ({ idd, onClose }) => {
                         as={Input}
                         className="w-full mt-1"
                         placeholder="Enter Lead Stage Name"
-                        value={values.stageName} // Controlled by Formik
+                        value={values.stageName}
                         onChange={(e) =>
                           setFieldValue("stageName", e.target.value)
-                        } // Ensure user can edit
+                        }
                       />
                       <ErrorMessage
                         name="stageName"
@@ -148,16 +165,36 @@ const EditLeadStages = ({ idd, onClose }) => {
                         {({ field }) => (
                           <Select
                             {...field}
-                            className="w-full mt-1  "
+                            className="w-full mt-1"
                             placeholder="Select Pipeline"
-                            value={values.pipeline} // Controlled by Formik
+                            value={values.pipeline}
                             onChange={(value) =>
                               setFieldValue("pipeline", value)
-                            } // Ensure user can select
+                            }
                             onBlur={() => setFieldTouched("pipeline", true)}
+                            dropdownRender={menu => (
+                              <>
+                                {menu}
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    flexWrap: 'nowrap',
+                                    padding: 8,
+                                  }}
+                                >
+                                  <Button
+                                    type="link"
+                                    icon={<PlusOutlined />}
+                                    onClick={openAddPipeLineModal}
+                                  >
+                                    Add Pipeline
+                                  </Button>
+                                </div>
+                              </>
+                            )}
                           >
-                            {fndpips && fndpips.length > 0 ? (
-                              fndpips.map((client) => (
+                            {fnddd && fnddd.length > 0 ? (
+                              fnddd.map((client) => (
                                 <Option key={client.id} value={client.id}>
                                   {client.pipeline_name || "Unnamed Client"}
                                 </Option>
@@ -193,6 +230,16 @@ const EditLeadStages = ({ idd, onClose }) => {
           </Formik>
         </div>
       </div>
+
+      <Modal
+        title="Add Pipeline"
+        visible={isAddPipeLineModalVisible}
+        onCancel={closeAddPipeLineModal}
+        footer={null}
+        width={700}
+      >
+        <AddPipeLine onClose={closeAddPipeLineModal} />
+      </Modal>
     </div>
   );
 };

@@ -24,6 +24,7 @@ import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import { getcurren } from "../../../setting/currencies/currenciesSlice/currenciesSlice";
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
 import { GetAllProdu } from '../../project/product/ProductReducer/ProductsSlice';
+import AddCustomer from "../customer/AddCustomer";
 
 const { Option } = Select;
 
@@ -36,6 +37,7 @@ const EditInvoice = ({ idd, onClose }) => {
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] = useState(false);
 
   const alladatas = useSelector((state) => state?.salesInvoices);
   const fnddata = alladatas?.salesInvoices?.data;
@@ -517,6 +519,27 @@ const handleProductChange = (productId) => {
                       value={values.customer}
                       onChange={(value) => setFieldValue("customer", value)}
                       loading={!fnddatas}
+                      dropdownRender={(menu) => (
+                        <div>
+                          {menu}
+                          <div
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              padding: '8px',
+                              borderTop: '1px solid #e8e8e8',
+                            }}
+                          >
+                            <Button
+                              type="link"
+                              icon={<PlusOutlined />}
+                              onClick={() => setIsAddCustomerModalVisible(true)}
+                            >
+                              Add Customer
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     >
                       {fnddatas && fnddatas.length > 0 ? (
                         fnddatas.map((customer) => (
@@ -927,6 +950,17 @@ const handleProductChange = (productId) => {
             value={newTag}
             onChange={(e) => setNewTag(e.target.value)}
           />
+        </Modal>
+
+        <Modal
+          title="Add Customer"
+          visible={isAddCustomerModalVisible}
+          onCancel={() => setIsAddCustomerModalVisible(false)}
+          footer={null}
+          width={1000}
+          className="mt-[-70px]"
+        >
+          <AddCustomer onClose={() => setIsAddCustomerModalVisible(false)} />
         </Modal>
       </Card>
     </div>

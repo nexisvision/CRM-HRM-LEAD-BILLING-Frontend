@@ -25,6 +25,8 @@ import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/Co
 import { AddLablee, GetLablee } from "../milestone/LableReducer/LableSlice";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import AddUser from "views/app-views/Users/user-list/AddUser";
+import AddClient from "views/app-views/Users/client-list/AddClient";
 
 const { Option } = Select;
 
@@ -47,6 +49,9 @@ const AddProject = ({ onClose }) => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [isAddUserModalVisible, setIsAddUserModalVisible] = useState(false);
+  const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
 
   useEffect(() => {
     dispatch(empdata());
@@ -418,10 +423,23 @@ const AddProject = ({ onClose }) => {
                     className="mt-1"
                     placeholder="Select Client"
                     loading={!fnd2}
-                    value={values.client} // Bind value to Formik's field
-                    // value="sdfsdf"
-                    onChange={(value) => setFieldValue("client", value)} // Update Formik's field value
-                    onBlur={() => setFieldTouched("client", true)} // Set touched state
+                    value={values.client}
+                    onChange={(value) => setFieldValue("client", value)}
+                    onBlur={() => setFieldTouched("client", true)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsAddClientModalVisible(true)}
+                          >
+                            Add New Client
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   >
                     {fnd2 && fnd2?.length > 0 ? (
                       fnd2
@@ -453,9 +471,23 @@ const AddProject = ({ onClose }) => {
                     className="mt-1"
                     placeholder="Select User"
                     loading={!fnd}
-                    value={values.user} // Bind value to Formik's field
-                    onChange={(value) => setFieldValue("user", value)} // Update Formik's field value
-                    onBlur={() => setFieldTouched("user", true)} // Set touched state
+                    value={values.user}
+                    onChange={(value) => setFieldValue("user", value)}
+                    onBlur={() => setFieldTouched("user", true)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsAddUserModalVisible(true)}
+                          >
+                            Add New User
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   >
                     {fnd && fnd.length > 0 ? (
                       fnd.map((employee) => (
@@ -723,6 +755,28 @@ const AddProject = ({ onClose }) => {
           value={newStatus}
           onChange={(e) => setNewStatus(e.target.value)}
         />
+      </Modal>
+
+      {/* Add User Modal */}
+      <Modal
+        title="Add User"
+        visible={isAddUserModalVisible}
+        onCancel={() => setIsAddUserModalVisible(false)}
+        footer={null}
+        width={1000}
+      >
+        <AddUser onClose={() => setIsAddUserModalVisible(false)} />
+      </Modal>
+
+      {/* Add Client Modal */}
+      <Modal
+        title="Add Client"
+        visible={isAddClientModalVisible}
+        onCancel={() => setIsAddClientModalVisible(false)}
+        footer={null}
+        width={800}
+      >
+        <AddClient onClose={() => setIsAddClientModalVisible(false)} />
       </Modal>
     </div>
   );

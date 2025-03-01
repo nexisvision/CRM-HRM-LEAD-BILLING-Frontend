@@ -22,8 +22,9 @@ import { GetTagspro, AddTags } from "./tagReducer/TagSlice";
 import { PlusOutlined } from "@ant-design/icons";
 import { GetLable, AddLable } from "../../sales/LableReducer/LableSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
-import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import { AddUserss, GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
+import { addClient } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 // import { AllLoggedData } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 
 const { Option } = Select;
@@ -235,6 +236,9 @@ const EditProject = ({ id, onClose }) => {
     status: Yup.string().required("Please select Status."),
   });
 
+  const [isAddUserModalVisible, setIsAddUserModalVisible] = useState(false);
+  const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
+
   return (
     <div className="add-job-form">
       <Formik
@@ -347,15 +351,28 @@ const EditProject = ({ id, onClose }) => {
                     style={{ width: "100%" }}
                     className="mt-1"
                     placeholder="Select Client"
-                    loading={!fnd}
-                    value={values.client} // Bind value to Formik's field
-                    // value="sdfsdf"
-                    onChange={(value) => setFieldValue("client", value)} // Update Formik's field value
-                    onBlur={() => setFieldTouched("client", true)} // Set touched state
+                    loading={!fnd2}
+                    value={values.client}
+                    onChange={(value) => setFieldValue("client", value)}
+                    onBlur={() => setFieldTouched("client", true)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsAddClientModalVisible(true)}
+                          >
+                            Add New Client
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   >
-                    {fnd && fnd?.length > 0 ? (
-                      fnd
-                        .filter(client => client.created_by === AllLoggedData.loggedInUser.username) // Filter clients based on created_by
+                    {fnd2 && fnd2?.length > 0 ? (
+                      fnd2
+                        .filter(client => client.created_by === AllLoggedData.loggedInUser.username)
                         .map((client) => (
                           <Option key={client.id} value={client.id}>
                             {client.firstName || client.username || "Unnamed Client"}
@@ -382,13 +399,27 @@ const EditProject = ({ id, onClose }) => {
                     style={{ width: "100%" }}
                     className="mt-1"
                     placeholder="Select User"
-                    loading={!fnd2}
-                    value={values.user} // Bind value to Formik's field
-                    onChange={(value) => setFieldValue("user", value)} // Update Formik's field value
-                    onBlur={() => setFieldTouched("user", true)} // Set touched state
+                    loading={!fnd}
+                    value={values.user}
+                    onChange={(value) => setFieldValue("user", value)}
+                    onBlur={() => setFieldTouched("user", true)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            onClick={() => setIsAddUserModalVisible(true)}
+                          >
+                            Add New User
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   >
-                    {fnd2 && fnd2.length > 0 ? (
-                      fnd2.map((employee) => (
+                    {fnd && fnd.length > 0 ? (
+                      fnd.map((employee) => (
                         <Option key={employee.id} value={employee.id}>
                           {employee.username || "Unnamed User"}
                         </Option>
@@ -650,6 +681,28 @@ const EditProject = ({ id, onClose }) => {
           value={newStatus}
           onChange={(e) => setNewStatus(e.target.value)}
         />
+      </Modal>
+
+      {/* Add User Modal */}
+      <Modal
+        title="Add User"
+        visible={isAddUserModalVisible}
+        onCancel={() => setIsAddUserModalVisible(false)}
+        footer={null}
+        width={1000}
+      >
+        <AddUserss onClose={() => setIsAddUserModalVisible(false)} />
+      </Modal>
+
+      {/* Add Client Modal */}
+      <Modal
+        title="Add Client"
+        visible={isAddClientModalVisible}
+        onCancel={() => setIsAddClientModalVisible(false)}
+        footer={null}
+        width={800}
+      >
+        <addClient onClose={() => setIsAddClientModalVisible(false)} />
       </Modal>
     </div>
   );

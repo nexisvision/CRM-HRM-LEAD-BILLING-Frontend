@@ -23,6 +23,7 @@ import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice";
 import moment from "moment";
 import { vendordataedata } from "../../Purchase/vendor/vendorReducers/vendorSlice";
 import { GetAllProdu } from "../../project/product/ProductReducer/ProductsSlice";
+import AddVendor from '../../Purchase/vendor/AddVendor';
 
 
 const { Option } = Select;
@@ -74,6 +75,8 @@ const EditBilling = ({ idd, onClose }) => {
   const fnsdatas = bildata.salesbilling.data;
 
   const { vendors } = useSelector((state) => state.vendors);
+
+  const [isAddVendorModalVisible, setIsAddVendorModalVisible] = useState(false);
 
   useEffect(() => {
     dispatch(getbil(lid));
@@ -506,10 +509,26 @@ const EditBilling = ({ idd, onClose }) => {
               >
                 <Select
                   placeholder="Select Vendor"
-                  showSearch
-                  filterOption={(input, option) =>
-                    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                  }
+                  dropdownRender={menu => (
+                    <div>
+                      {menu}
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          padding: 8,
+                        }}
+                      >
+                        <Button
+                          type="link"
+                          icon={<PlusOutlined />}
+                          onClick={() => setIsAddVendorModalVisible(true)}
+                        >
+                          Add Vendor
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 >
                   {vendors?.data?.map((vendor) => (
                     <Option key={vendor._id} value={vendor.name}>
@@ -833,6 +852,17 @@ const EditBilling = ({ idd, onClose }) => {
           onChange={(e) => setNewTag(e.target.value)}
           placeholder="Enter new status name"
         />
+      </Modal>
+
+      <Modal
+        title="Create Vendor"
+        visible={isAddVendorModalVisible}
+        onCancel={() => setIsAddVendorModalVisible(false)}
+        footer={null}
+        width={1100}
+        className='mt-[-70px]'
+      >
+        <AddVendor onClose={() => setIsAddVendorModalVisible(false)} />
       </Modal>
     </div>
   );

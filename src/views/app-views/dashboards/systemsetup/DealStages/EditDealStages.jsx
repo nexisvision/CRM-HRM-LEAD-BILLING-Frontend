@@ -45,6 +45,7 @@ import {
   getstages,
 } from "../LeadStages/LeadsReducer/LeadsstageSlice";
 import { GetPip } from "../Pipeline/PiplineReducer/piplineSlice";
+import AddPipeLine from "../Pipeline/AddPipeLine";
 
 const { Option } = Select;
 
@@ -59,6 +60,8 @@ const EditDealStages = ({ idd, onClose }) => {
 
   const allpiplines = useSelector((state) => state.Piplines);
   const fndpips = allpiplines.Piplines.data;
+
+  const [isAddPipelineModalVisible, setAddPipelineModalVisible] = useState(false);
 
   useEffect(() => {
     dispatch(GetPip());
@@ -100,6 +103,14 @@ const EditDealStages = ({ idd, onClose }) => {
     stageName: Yup.string().required("Please enter lead stage name."),
     pipeline: Yup.string().required("Please select pipeline."),
   });
+
+  const showAddPipelineModal = () => {
+    setAddPipelineModalVisible(true);
+  };
+
+  const closeAddPipelineModal = () => {
+    setAddPipelineModalVisible(false);
+  };
 
   return (
     <div>
@@ -158,6 +169,26 @@ const EditDealStages = ({ idd, onClose }) => {
                               setFieldValue("pipeline", value)
                             } // Ensure user can select
                             onBlur={() => setFieldTouched("pipeline", true)}
+                            dropdownRender={menu => (
+                              <>
+                                {menu}
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    padding: 8,
+                                  }}
+                                >
+                                  <Button
+                                    type="link"
+                                    icon={<PlusOutlined />}
+                                    onClick={showAddPipelineModal}
+                                  >
+                                    Add Pipeline
+                                  </Button>
+                                </div>
+                              </>
+                            )}
                           >
                             {fndpips && fndpips.length > 0 ? (
                               fndpips.map((client) => (
@@ -196,6 +227,14 @@ const EditDealStages = ({ idd, onClose }) => {
           </Formik>
         </div>
       </div>
+
+      <Modal
+        visible={isAddPipelineModalVisible}
+        onCancel={closeAddPipelineModal}
+        footer={null}
+      >
+        <AddPipeLine onClose={closeAddPipelineModal} />
+      </Modal>
     </div>
   );
 };

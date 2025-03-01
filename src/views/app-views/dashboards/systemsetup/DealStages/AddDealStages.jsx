@@ -44,11 +44,13 @@ import {
   Addstages,
   getstages,
 } from "../LeadStages/LeadsReducer/LeadsstageSlice";
+import AddPipeLine from "../Pipeline/AddPipeLine";
 
 const { Option } = Select;
 
 const AddDealStages = ({ onClose }) => {
   const [users, setUsers] = useState(userData);
+  const [isAddPipelineModalVisible, setAddPipelineModalVisible] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -86,6 +88,14 @@ const AddDealStages = ({ onClose }) => {
     stageName: Yup.string().required("Please enter lead stage name."),
     pipeline: Yup.string().required("Please select pipeline."),
   });
+
+  const showAddPipelineModal = () => {
+    setAddPipelineModalVisible(true);
+  };
+
+  const closeAddPipelineModal = () => {
+    setAddPipelineModalVisible(false);
+  };
 
   return (
     <>
@@ -141,6 +151,26 @@ const AddDealStages = ({ onClose }) => {
                                 }
                                 value={values.pipeline}
                                 onBlur={() => setFieldTouched("pipeline", true)}
+                                dropdownRender={menu => (
+                                  <>
+                                    {menu}
+                                    <div
+                                      style={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        padding: 8,
+                                      }}
+                                    >
+                                      <Button
+                                        type="link"
+                                        icon={<PlusOutlined />}
+                                        onClick={showAddPipelineModal}
+                                      >
+                                        Add Pipeline
+                                      </Button>
+                                    </div>
+                                  </>
+                                )}
                               >
                                 {fndpip && fndpip.length > 0 ? (
                                   fndpip.map((client) => (
@@ -179,6 +209,14 @@ const AddDealStages = ({ onClose }) => {
           </div>
         </div>
       </div>
+
+      <Modal
+        visible={isAddPipelineModalVisible}
+        onCancel={closeAddPipelineModal}
+        footer={null}
+      >
+        <AddPipeLine onClose={closeAddPipelineModal} />
+      </Modal>
     </>
   );
 };

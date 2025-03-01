@@ -1,11 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form as FormikForm, Field, ErrorMessage } from "formik";
-import { Input, Button, Row, Col, message, Select } from "antd";
+import { Input, Button, Row, Col, message, Select, Modal } from "antd";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AddDept, getDept } from "./DepartmentReducers/DepartmentSlice";
 import { getBranch } from "../Branch/BranchReducer/BranchSlice";
+import AddBranch from "../Branch/AddBranch";
 
 const { Option } = Select;
 // Validation Schema using Yup
@@ -19,6 +20,7 @@ const validationSchema = Yup.object().shape({
 const AddDepartment = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
 
   useEffect(() => {
     dispatch(getBranch());
@@ -28,7 +30,6 @@ const AddDepartment = ({ onClose }) => {
   const alldatas = useSelector((state) => state.Branch);
   const fnddata = alldatas.Branch.data || [];
   const fndbranchdata = fnddata.filter((item) => item.created_by === user);
-
 
   const handleSubmit = (values, { resetForm }) => {
     dispatch(AddDept(values))
@@ -44,6 +45,14 @@ const AddDepartment = ({ onClose }) => {
         message.error("Failed to add department.");
         console.error("Add API error:", error);
       });
+  };
+
+  const openAddBranchModal = () => {
+    setIsAddBranchModalVisible(true);
+  };
+
+  const closeAddBranchModal = () => {
+    setIsAddBranchModalVisible(false);
   };
 
   return (
@@ -98,6 +107,18 @@ const AddDepartment = ({ onClose }) => {
                         onChange={(value) => setFieldValue("branch", value)}
                         value={values.branch}
                         onBlur={() => setFieldTouched("branch", true)}
+                        dropdownRender={menu => (
+                          <>
+                            {menu}
+                            <Button 
+                              type="link" 
+                              block
+                              onClick={openAddBranchModal}
+                            >
+                              + Add New Branch
+                            </Button>
+                          </>
+                        )}
                       >
                         {fndbranchdata?.map((branch) => (
                           <Option key={branch.id} value={branch.id}>
@@ -134,6 +155,16 @@ const AddDepartment = ({ onClose }) => {
           </FormikForm>
         )}
       </Formik>
+
+      <Modal
+        title="Add Branch"
+        visible={isAddBranchModalVisible}
+        onCancel={closeAddBranchModal}
+        footer={null}
+        width={800}
+      >
+        <AddBranch onClose={closeAddBranchModal} />
+      </Modal>
     </div>
   );
 };

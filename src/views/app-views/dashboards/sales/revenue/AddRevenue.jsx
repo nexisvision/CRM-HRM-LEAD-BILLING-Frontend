@@ -22,6 +22,7 @@ import { AddRevenues, getRevenue } from "./RevenueReducer/RevenueSlice";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import { useParams } from "react-router-dom";
+import AddCustomer from "../customer/AddCustomer";
 // import { GetAccounts } from '../accounts/AccountReducer/AccountSlice';
 
 const { Option } = Select;
@@ -136,6 +137,19 @@ const AddRevenue = ({ onClose }) => {
   // useEffect(() => {
   //   dispatch(GetAccounts());
   // }, [dispatch]);
+
+  // State to manage AddCustomer modal visibility
+  const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] = useState(false);
+
+  // Function to open AddCustomer modal
+  const openAddCustomerModal = () => {
+    setIsAddCustomerModalVisible(true);
+  };
+
+  // Function to close AddCustomer modal
+  const closeAddCustomerModal = () => {
+    setIsAddCustomerModalVisible(false);
+  };
 
   const initialValues = {
     date: null,
@@ -258,13 +272,6 @@ const AddRevenue = ({ onClose }) => {
                             placeholder="Select Account"
                             maxLength={18}
                             className="mt-1"
-                            // onChange={(e) => {
-                            //   const value = e.target.value.replace(/\D/g, '');
-                            //   setFieldValue("accountNumber", value);
-                            // }}
-                            onBlur={() => setFieldTouched("account", true)}
-
-
                           />
                         )}
                       </Field>
@@ -272,7 +279,6 @@ const AddRevenue = ({ onClose }) => {
                         name="account"
                         component="div"
                         className="error-message text-red-500 my-1"
-
                       />
                     </div>
                   </Col>
@@ -286,10 +292,6 @@ const AddRevenue = ({ onClose }) => {
                             className="mt-1"
                             placeholder="Enter Account Number"
                             maxLength={18}
-                            // onChange={(e) => {
-                            //   const value = e.target.value.replace(/\D/g, '');
-                            //   setFieldValue("accountNumber", value);
-                            // }}
                             onBlur={() => setFieldTouched("accountNumber", true)}
                           />
                         )}
@@ -348,6 +350,21 @@ const AddRevenue = ({ onClose }) => {
                             }
                             value={values.customer}
                             onBlur={() => setFieldTouched("customer", true)}
+                            dropdownRender={menu => (
+                              <div>
+                                {menu}
+                                <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                  <Button
+                                    type="link"
+                                    icon={<PlusOutlined />}
+                                    className="w-full mt-2"
+                                    onClick={openAddCustomerModal}
+                                  >
+                                    Add New Customer
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
                           >
                             {fnddata && fnddata.length > 0 ? (
                               fnddata.map((client) => (
@@ -472,7 +489,6 @@ const AddRevenue = ({ onClose }) => {
                       <Field
                         name="paymentReceipt"
                         type="file"
-                        // as={Input}
                         placeholder="Enter payment receipt"
                         className="mt-2.5"
                       />
@@ -542,83 +558,17 @@ const AddRevenue = ({ onClose }) => {
         />
       </Modal>
 
-      {/* <Form
-        layout="vertical"
-        form={form}
-        name="add-job"
-        onFinish={onFinish}
+      {/* AddCustomer Modal */}
+      <Modal
+        title="Add Customer"
+        visible={isAddCustomerModalVisible}
+        onCancel={closeAddCustomerModal}
+        footer={null}
+        width={1000}
       >
-        <Row gutter={16}>
-          
-
-          <Col span={12}>
-            <Form.Item name="date" label="Date" rules={[{ required: true, message: 'date is required.' }]}>
-              <DatePicker style={{ width: '100%' }} placeholder='DD-MM-YYYY' format="DD-MM-YYYY" />
-            </Form.Item>
-          </Col>
-
-          <Col span={12}>
-            <Form.Item name="amount" label="Amount" rules={[{ required: true, message: 'Please enter a Amount.' }]}>
-              <Input type='number' placeholder="Enter Amount" />
-            </Form.Item>
-          </Col>
-
-          <Col span={12}>
-            <Form.Item name="account" label="Account" rules={[{ required: true, message: 'Please select a Account.' }]}>
-              <Select placeholder="Select Account">
-                <Option value="all">All</Option>
-                <Option value="branch1">Branch 1</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-
-          <Col span={12}>
-            <Form.Item name="customer" label="Customer" rules={[{ required: true, message: 'Please enter Customer Name.' }]}>
-            <Select placeholder="--">
-                <Option value="xyz">xyz</Option>
-                <Option value="abc">abc</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-
-          <Col span={24}>
-            <Form.Item name="description" label="Description">
-              <ReactQuill placeholder="Enter Description" />
-            </Form.Item>
-          </Col>
-
-          <Col span={12}>
-            <Form.Item name="category" label="Category" rules={[{ required: true, message: 'Please enter Category.' }]}>
-            <Select placeholder="--">
-                <Option value="xyz">Income</Option>
-                <Option value="abc">Sales</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-
-          <Col span={12}>
-            <Form.Item name="reference" label="Reference" rules={[{ required: true, message: 'Please enter a Reference.' }]}>
-              <Input type='number' placeholder="Enter Reference" />
-            </Form.Item>
-          </Col>
-
-          <Col span={12}>
-            <Form.Item name="paymentreceipt" label="Payment Receipt" rules={[{ required: true, message: 'Please enter a Reference.' }]}>
-              <Input type='file'/>
-            </Form.Item>
-          </Col>
-
-        </Row>
-
-        <Form.Item>
-          <div className="form-buttons text-right">
-            <Button type="default" className="mr-2" onClick={() => navigate('/app/hrm/jobs')}>Cancel</Button>
-            <Button type="primary" htmlType="submit">Create</Button>
-          </div>
-        </Form.Item>
-      </Form> */}
+        <AddCustomer onClose={closeAddCustomerModal} />
+      </Modal>
     </div>
-
   );
 };
 

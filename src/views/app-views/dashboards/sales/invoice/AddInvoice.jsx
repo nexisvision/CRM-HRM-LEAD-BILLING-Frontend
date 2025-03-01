@@ -22,6 +22,7 @@ import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import { getcurren } from "../../../setting/currencies/currenciesSlice/currenciesSlice";
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
 import { GetProdu, GetAllProdu } from "../../project/product/ProductReducer/ProductsSlice";
+import AddCustomer from "../customer/AddCustomer";
 
 const { Option } = Select;
 
@@ -430,6 +431,8 @@ const AddInvoice = ({ onClose }) => {
     });
   };
 
+  const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] = useState(false);
+
   return (
     <div>
       <Form form={form} layout="vertical">
@@ -448,6 +451,28 @@ const AddInvoice = ({ onClose }) => {
                   style={{ width: "100%" }}
                   placeholder="Select Customer"
                   loading={!fnddata}
+                  dropdownRender={(menu) => (
+                    <div>
+                      {menu}
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          padding: '8px',
+                          borderTop: '1px solid #e8e8e8',
+                        }}
+                      >
+                        <Button
+                          type="link"
+                          // icon={<PlusOutlined />}
+                          className="w-full"
+                          onClick={() => setIsAddCustomerModalVisible(true)}
+                        >
+                         + Add Customer
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 >
                   {fnddata && fnddata.length > 0 ? (
                     fnddata.map((customer) => (
@@ -837,6 +862,16 @@ const AddInvoice = ({ onClose }) => {
           value={newTag}
           onChange={(e) => setNewTag(e.target.value)}
         />
+      </Modal>
+      <Modal
+        title="Add Customer"
+        visible={isAddCustomerModalVisible}
+        onCancel={() => setIsAddCustomerModalVisible(false)}
+        footer={null}
+        width={1000}
+        className="mt-[-70px]"
+      >
+        <AddCustomer onClose={() => setIsAddCustomerModalVisible(false)} />
       </Modal>
     </div>
   );

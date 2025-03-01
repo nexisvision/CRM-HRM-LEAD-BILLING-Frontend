@@ -8,6 +8,7 @@ import {
   Row,
   Col,
   TimePicker,
+  Modal,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
@@ -19,6 +20,7 @@ import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
 import { AddMeet, MeetData } from "./MeetingReducer/MeetingSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import dayjs from 'dayjs';
+import AddDepartment from '../Department/AddDepartment';
 
 const { Option } = Select;
 
@@ -44,23 +46,27 @@ const AddMeeting = ({ onClose }) => {
   const datadept = AllDepart.Department.data || [];
   const filteredDept = datadept?.filter((item) => item.created_by === user);
 
-
-
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data || [];
 
   const [selectedDept, setSelectedDept] = useState(null);
 
-
   const filteredEmpData = empData?.filter((item) => item.created_by === user);
 
   const filteredEmpDataa = filteredEmpData.filter((emp) => emp.department === selectedDept);
 
-// console.log('filteredEmpDataa',filteredEmpDataa);
-// console.log('selectedDept',selectedDept);
-
   const allClients = useSelector((state) => state.SubClient);
   const clientData = allClients?.SubClient?.data || [];
+
+  const [isAddDepartmentModalVisible, setIsAddDepartmentModalVisible] = useState(false);
+
+  const openAddDepartmentModal = () => {
+    setIsAddDepartmentModalVisible(true);
+  };
+
+  const closeAddDepartmentModal = () => {
+    setIsAddDepartmentModalVisible(false);
+  };
 
   const handleSubmit = (values, { resetForm }) => {
     // Format the time values
@@ -151,29 +157,40 @@ const AddMeeting = ({ onClose }) => {
                     <Field name="department">
                       {({ field, form }) => (
                         <Select
-                        style={{ width: "100%" }}
-                        {...field}
-                        placeholder="Select Department"
-                        loading={!filteredDept}
-                        className="w-full mt-1"
-                        value={form.values.department}
-                        onChange={(value) => {
-                          form.setFieldValue("department", value);
-                          setSelectedDept(value); // ✅ Set selected department here
-                          form.setFieldValue("employee", []); // Reset employee field when department changes
-                        }}
-                        onBlur={() => form.setFieldTouched("department", true)}
-                      >
+                          style={{ width: "100%" }}
+                          {...field}
+                          placeholder="Select Department"
+                          loading={!filteredDept}
+                          className="w-full mt-1"
+                          value={form.values.department}
+                          onChange={(value) => {
+                            form.setFieldValue("department", value);
+                            setSelectedDept(value);
+                            form.setFieldValue("employee", []);
+                          }}
+                          onBlur={() => form.setFieldTouched("department", true)}
+                          dropdownRender={menu => (
+                            <>
+                              {menu}
+                              <Button 
+                                type="link" 
+                                block
+                                onClick={openAddDepartmentModal}
+                              >
+                                + Add New Department
+                              </Button>
+                            </>
+                          )}
+                        >
                           {filteredDept && filteredDept.length > 0 ? (
                             filteredDept.map((dept) => (
                               <Option key={dept.id} value={dept.id}>
                                 {dept.department_name || "Unnamed Department"}
-
                               </Option>
                             ))
                           ) : (
                             <Option value="" disabled>
-                              {/* No Department Available */}
+                              No Department Available
                             </Option>
                           )}
                         </Select>
@@ -442,6 +459,17 @@ const AddMeeting = ({ onClose }) => {
           );
         }}
       </Formik>
+
+      {/* Add Department Modal */}
+      <Modal
+        title="Add Department"
+        visible={isAddDepartmentModalVisible}
+        onCancel={closeAddDepartmentModal}
+        footer={null}
+        width={800}
+      >
+        <AddDepartment onClose={closeAddDepartmentModal} />
+      </Modal>
     </div>
   );
 };

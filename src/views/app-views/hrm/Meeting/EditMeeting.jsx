@@ -8,6 +8,7 @@ import {
   Row,
   Col,
   TimePicker,
+  Modal,
 } from "antd";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
+import AddDepartment from '../Department/AddDepartment';
 
 const { Option } = Select;
 
@@ -78,6 +80,16 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
     description: "",
     client: "",
   });
+
+  const [isAddDepartmentModalVisible, setIsAddDepartmentModalVisible] = useState(false);
+
+  const openAddDepartmentModal = () => {
+    setIsAddDepartmentModalVisible(true);
+  };
+
+  const closeAddDepartmentModal = () => {
+    setIsAddDepartmentModalVisible(false);
+  };
 
   useEffect(() => {
     if (dataM) {
@@ -178,10 +190,22 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
                         value={form.values.department}
                         onChange={(value) => {
                           form.setFieldValue("department", value);
-                          setSelectedDept(value); // ✅ Set selected department here
-                          form.setFieldValue("employee", []); // Reset employee field when department changes
+                          setSelectedDept(value);
+                          form.setFieldValue("employee", []);
                         }}
                         onBlur={() => form.setFieldTouched("department", true)}
+                        dropdownRender={menu => (
+                          <>
+                            {menu}
+                            <Button 
+                              type="link" 
+                              block
+                              onClick={openAddDepartmentModal}
+                            >
+                              + Add New Department
+                            </Button>
+                          </>
+                        )}
                       >
                         {filteredDept && filteredDept.length > 0 ? (
                           filteredDept.map((dept) => (
@@ -422,6 +446,17 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
           </Form>
         )}
       </Formik>
+
+      {/* Add Department Modal */}
+      <Modal
+        title="Add Department"
+        visible={isAddDepartmentModalVisible}
+        onCancel={closeAddDepartmentModal}
+        footer={null}
+        width={800}
+      >
+        <AddDepartment onClose={closeAddDepartmentModal} />
+      </Modal>
     </div>
   );
 };

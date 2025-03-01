@@ -353,7 +353,7 @@ const LeadCards = () => {
               <Col xs={24} sm={12} md={8} lg={6} key={leadGroup?.stageId}>
                 <Card title={leadGroup?.status} className="mb-4">
                   <DroppableColumn
-                    // status={leadGroup?.status}
+                    status={leadGroup?.status}
                     leads={leadGroup?.leads || []}
                   />
                 </Card>

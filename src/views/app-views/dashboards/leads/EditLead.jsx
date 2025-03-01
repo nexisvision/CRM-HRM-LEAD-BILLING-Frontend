@@ -27,6 +27,7 @@ import { GetLable, AddLable } from "../project/milestone/LableReducer/LableSlice
 import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
+import AddLeadStages from "../systemsetup/LeadStages/AddLeadStages";
 
 const { Option } = Select;
 
@@ -77,6 +78,8 @@ const currenciesState = useSelector((state) => state.currencies);
   const AllLoggedData = useSelector((state) => state.user);
   const loggedInUserId = AllLoggedData?.loggedInUser?.id;
   const countries = useSelector((state) => state.countries.countries || []);
+
+  const [isAddLeadStageModalVisible, setIsAddLeadStageModalVisible] = useState(false);
 
   const fetchLables = async (lableType, setter) => {
     try {
@@ -323,6 +326,14 @@ const currenciesState = useSelector((state) => state.currencies);
      </Col>
    );
 
+  const openAddLeadStageModal = () => {
+    setIsAddLeadStageModalVisible(true);
+  };
+
+  const closeAddLeadStageModal = () => {
+    setIsAddLeadStageModalVisible(false);
+  };
+
   return (
     <div className="add-job-form">
       <Formik
@@ -458,6 +469,21 @@ const currenciesState = useSelector((state) => state.currencies);
                             onChange={(value) =>
                               form.setFieldValue("leadStage", value)
                             }
+                            dropdownRender={(menu) => (
+                              <div>
+                                {menu}
+                                <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                  <Button
+                                    type="link"
+                                    icon={<PlusOutlined />}
+                                    className="w-full mt-2"
+                                    onClick={openAddLeadStageModal}
+                                  >
+                                    Add New Lead Stage
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
                           >
                             {filterdatas.map((currency) => (
                               <Option key={currency.id} value={currency.id}>
@@ -957,6 +983,16 @@ const currenciesState = useSelector((state) => state.currencies);
                 value={newStatus}
                 onChange={(e) => setNewStatus(e.target.value)}
               />
+            </Modal>
+
+            <Modal
+              title="Add Lead Stage"
+              visible={isAddLeadStageModalVisible}
+              onCancel={closeAddLeadStageModal}
+              footer={null}
+              width={700}
+            >
+              <AddLeadStages onClose={closeAddLeadStageModal} />
             </Modal>
 
           </Form>

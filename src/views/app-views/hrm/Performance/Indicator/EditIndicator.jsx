@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, Select, Rate, Row, Col, message } from 'antd';
+import { Form, Input, Button, Select, Rate, Row, Col, message, Modal } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { getBranch } from '../../Branch/BranchReducer/BranchSlice';
 import { getDept } from '../../Department/DepartmentReducers/DepartmentSlice';
 import { getDes } from '../../Designation/DesignationReducers/DesignationSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { editIndicator, getIndicators } from './IndicatorReducers/indicatorSlice';
+import AddBranch from '../../Branch/AddBranch';
+
 const { Option } = Select;
 
-const EditIndicator = ({ id , onClose }) => {
+const EditIndicator = ({ id, onClose }) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -22,15 +24,13 @@ const EditIndicator = ({ id , onClose }) => {
   const fnddepartmentdata = departmentData.filter((item) => item.created_by === user);
   const fnddesignationdata = designationData.filter((item) => item.created_by === user);
   const [singleEmp, setSingleEmp] = useState(null);
-
+  const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
 
   useEffect(() => {
-    // Find the specific indicator data by ID
     const empData = alldept?.Indicators?.data || [];
     const data = empData.find((item) => item.id === id);
     setSingleEmp(data || null);
 
-    // Update form values when singleEmp is set
     if (data) {
       form.setFieldsValue({
         branch: data.branch,
@@ -46,7 +46,6 @@ const EditIndicator = ({ id , onClose }) => {
     }
   }, [id, alldept, form]);
 
-  // Dispatch initial data
   useEffect(() => {
     dispatch(getBranch());
     dispatch(getDept());
@@ -54,26 +53,32 @@ const EditIndicator = ({ id , onClose }) => {
   }, [dispatch]);
 
   const onFinish = (values) => {
-     if (!id) {
-          message.error('Indicator ID is missing.');
-          return;
-        }
-        dispatch(editIndicator({ id, values }))
-          .then(() => {
-            dispatch(getIndicators());
-            // message.success('Indicator updated successfully!');
-            onClose();
-            navigate('/app/hrm/performance/indicator');
-          })
-          .catch((error) => {
-            // message.error('Failed to update indicator.');
-            console.error('Edit API error:', error);
-          });
+    if (!id) {
+      message.error('Indicator ID is missing.');
+      return;
+    }
+    dispatch(editIndicator({ id, values }))
+      .then(() => {
+        dispatch(getIndicators());
+        onClose();
+        navigate('/app/hrm/performance/indicator');
+      })
+      .catch((error) => {
+        console.error('Edit API error:', error);
+      });
   };
 
   const onFinishFailed = (errorInfo) => {
     console.error('Form submission failed:', errorInfo);
     message.error('Please fill out all required fields.');
+  };
+
+  const openAddBranchModal = () => {
+    setIsAddBranchModalVisible(true);
+  };
+
+  const closeAddBranchModal = () => {
+    setIsAddBranchModalVisible(false);
   };
 
   return (
@@ -94,13 +99,26 @@ const EditIndicator = ({ id , onClose }) => {
               label="Branch"
               rules={[{ required: true, message: 'Please select a branch' }]}
             >
-              <Select placeholder="Select Branch">
+              <Select
+                placeholder="Select Branch"
+                dropdownRender={menu => (
+                  <>
+                    {menu}
+                    <Button 
+                      type="link" 
+                      block
+                      onClick={openAddBranchModal}
+                    >
+                      + Add New Branch
+                    </Button>
+                  </>
+                )}
+              >
                 {fndbranchdata.map((branch) => (
                   <Option key={branch.id} value={branch.id}>
                     {branch.branchName}
                   </Option>
                 ))}
-
               </Select>
             </Form.Item>
           </Col>
@@ -117,7 +135,6 @@ const EditIndicator = ({ id , onClose }) => {
                     {dept.department_name}
                   </Option>
                 ))}
-
               </Select>
             </Form.Item>
           </Col>
@@ -220,6 +237,16 @@ const EditIndicator = ({ id , onClose }) => {
           </div>
         </Form.Item>
       </Form>
+
+      <Modal
+        title="Add Branch"
+        visible={isAddBranchModalVisible}
+        onCancel={closeAddBranchModal}
+        footer={null}
+        width={800}
+      >
+        <AddBranch onClose={closeAddBranchModal} />
+      </Modal>
     </div>
   );
 };

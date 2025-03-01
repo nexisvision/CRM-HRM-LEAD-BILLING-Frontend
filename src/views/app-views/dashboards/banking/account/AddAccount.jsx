@@ -40,7 +40,6 @@ const AddAccount = ({ onClose }) => {
           message.success(result.payload.message);
           dispatch(getAccounts());
           onClose();
-          navigate('/app/dashboards/banking/account'); // Updated to always navigate to account list
         } else {
           message.error(result.payload.message);
         }

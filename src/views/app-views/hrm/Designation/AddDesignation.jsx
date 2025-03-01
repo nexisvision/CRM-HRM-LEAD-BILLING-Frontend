@@ -1,11 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form as FormikForm, Field, ErrorMessage } from "formik";
-import { Input, Button, Row, Col, Select, message } from "antd";
+import { Input, Button, Row, Col, Select, message, Modal } from "antd";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AddDes, getDes } from "./DesignationReducers/DesignationSlice";
 import { getBranch } from "../Branch/BranchReducer/BranchSlice";
+import AddBranch from "../Branch/AddBranch";
 
 const { Option } = Select;
 
@@ -27,6 +28,18 @@ const AddDesignation = ({ onClose }) => {
   useEffect(() => {
     dispatch(getBranch());
   }, [dispatch]);
+
+  const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
+
+  // Function to open AddBranch modal
+  const openAddBranchModal = () => {
+    setIsAddBranchModalVisible(true);
+  };
+
+  // Function to close AddBranch modal
+  const closeAddBranchModal = () => {
+    setIsAddBranchModalVisible(false);
+  };
 
   // Handle form submission
   const handleSubmit = (values, { resetForm }) => {
@@ -96,6 +109,18 @@ const AddDesignation = ({ onClose }) => {
                         placeholder="Select Branch"
                         onChange={(value) => setFieldValue("branch", value)}
                         onBlur={() => setFieldTouched("branch", true)}
+                        dropdownRender={(menu) => (
+                          <>
+                            {menu}
+                            <Button
+                              type="link"
+                              block
+                              onClick={openAddBranchModal}
+                            >
+                              + Add New Branch
+                            </Button>
+                          </>
+                        )}
                       >
                         {userBranches.map((branch) => (
                           <Option key={branch.id} value={branch.id}>
@@ -125,6 +150,17 @@ const AddDesignation = ({ onClose }) => {
           </FormikForm>
         )}
       </Formik>
+
+      {/* Add Branch Modal */}
+      <Modal
+        title="Add Branch"
+        visible={isAddBranchModalVisible}
+        onCancel={closeAddBranchModal}
+        footer={null}
+        width={800}
+      >
+        <AddBranch onClose={closeAddBranchModal} />
+      </Modal>
     </div>
   );
 };

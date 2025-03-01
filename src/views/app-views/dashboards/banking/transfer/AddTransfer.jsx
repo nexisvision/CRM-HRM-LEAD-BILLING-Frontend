@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Form, Input, Button, DatePicker, Select, Row, Col, Checkbox, message } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Form, Input, Button, DatePicker, Select, Row, Col, Checkbox, message, Modal } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
@@ -8,11 +8,14 @@ import * as Yup from 'yup';
 import { addaccountsss, transferdatas } from './transferReducers/transferSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAccounts } from '../account/AccountReducer/AccountSlice';
+import { PlusOutlined } from '@ant-design/icons';
+import AddAccount from '../account/AddAccount';
 const { Option } = Select;
 
 const AddTransfer = ({ onClose }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [isAddAccountModalVisible, setIsAddAccountModalVisible] = useState(false);
 
     const initialValues = {
         date: '',
@@ -54,6 +57,14 @@ const AddTransfer = ({ onClose }) => {
         }
     };
 
+    const openAddAccountModal = () => {
+        setIsAddAccountModalVisible(true);
+    };
+
+    const closeAddAccountModal = () => {
+        setIsAddAccountModalVisible(false);
+    };
+
     return (
         <div className="create-account-form">
             {/* <h2>Create Job</h2> */}
@@ -91,6 +102,20 @@ const AddTransfer = ({ onClose }) => {
                                                 onChange={(value) => setFieldValue('fromAccount', value)}
                                                 placeholder="Select from account"
                                                 className="w-full mt-1"
+                                                dropdownRender={menu => (
+                                                    <>
+                                                        {menu}
+                                                        <div style={{ display: 'flex', justifyContent: 'center', padding: 8 }}>
+                                                            <Button
+                                                                type="link"
+                                                                icon={<PlusOutlined />}
+                                                                onClick={openAddAccountModal}
+                                                            >
+                                                                Add Account
+                                                            </Button>
+                                                        </div>
+                                                    </>
+                                                )}
                                             >
                                                 {accountdata && accountdata.map((account) => (
                                                     <Option key={account.id} value={account.id}>
@@ -134,6 +159,20 @@ const AddTransfer = ({ onClose }) => {
                                                 onChange={(value) => setFieldValue('toAccount', value)}
                                                 placeholder="Select to account"
                                                 className="w-full mt-1"
+                                                dropdownRender={menu => (
+                                                    <>
+                                                        {menu}
+                                                        <div style={{ display: 'flex', justifyContent: 'center', padding: 8 }}>
+                                                            <Button
+                                                                type="link"
+                                                                icon={<PlusOutlined />}
+                                                                onClick={openAddAccountModal}
+                                                            >
+                                                                Add Account
+                                                            </Button>
+                                                        </div>
+                                                    </>
+                                                )}
                                             >
                                                 {accountdata && accountdata.map((account) => (
                                                     <Option key={account.id} value={account.id}>
@@ -221,6 +260,17 @@ const AddTransfer = ({ onClose }) => {
                     </FormikForm>
                 )}
             </Formik>
+
+            {/* AddAccount Modal */}
+            <Modal
+                title="Add Account"
+                visible={isAddAccountModalVisible}
+                onCancel={closeAddAccountModal}
+                footer={null}
+                width={1000}
+            >
+                <AddAccount onClose={closeAddAccountModal} />
+            </Modal>
         </div>
     );
 };

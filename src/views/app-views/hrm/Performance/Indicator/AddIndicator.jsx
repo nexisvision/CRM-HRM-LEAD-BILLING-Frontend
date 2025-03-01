@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Button, Select, Rate, Row, Col, message } from 'antd';
+import { Form, Button, Select, Rate, Row, Col, message, Modal } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getBranch } from '../../Branch/BranchReducer/BranchSlice';
 import { getDept } from '../../Department/DepartmentReducers/DepartmentSlice';
 import { getDes } from '../../Designation/DesignationReducers/DesignationSlice';
 import { getIndicators, addIndicator } from './IndicatorReducers/indicatorSlice';
-// import AddIndicator from './IndicatorReducer/IndicatorSlice';
+import AddBranch from '../../Branch/AddBranch';
 
 const { Option } = Select;
 
@@ -32,6 +32,7 @@ const AddIndicator = ({ onClose }) => {
 
 
   const [selectedBranch, setSelectedBranch] = useState(null);
+  const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
 
   // Filter departments and designations based on selected branch
   const filteredDepartments = fnddepartmentdata.filter((dept) => dept.branch === selectedBranch);
@@ -84,6 +85,14 @@ const AddIndicator = ({ onClose }) => {
     message.error('Please fill out all required fields.');
   };
 
+  const openAddBranchModal = () => {
+    setIsAddBranchModalVisible(true);
+  };
+
+  const closeAddBranchModal = () => {
+    setIsAddBranchModalVisible(false);
+  };
+
   return (
     <div className="add-indicator">
       <Form
@@ -107,8 +116,20 @@ const AddIndicator = ({ onClose }) => {
                 placeholder="Select Branch"
                 onChange={(value) => {
                   setSelectedBranch(value);
-                  form.setFieldsValue({ department: "", designation: "" }); // Reset department & designation
+                  form.setFieldsValue({ department: "", designation: "" });
                 }}
+                dropdownRender={menu => (
+                  <>
+                    {menu}
+                    <Button 
+                      type="link" 
+                      block
+                      onClick={openAddBranchModal}
+                    >
+                      + Add New Branch
+                    </Button>
+                  </>
+                )}
               >
                 {fndbranchdata.map((branch) => (
                   <Option key={branch.id} value={branch.id}>
@@ -235,6 +256,16 @@ const AddIndicator = ({ onClose }) => {
           </div>
         </Form.Item>
       </Form>
+
+      <Modal
+        title="Add Branch"
+        visible={isAddBranchModalVisible}
+        onCancel={closeAddBranchModal}
+        footer={null}
+        width={800}
+      >
+        <AddBranch onClose={closeAddBranchModal} />
+      </Modal>
     </div>
   );
 };

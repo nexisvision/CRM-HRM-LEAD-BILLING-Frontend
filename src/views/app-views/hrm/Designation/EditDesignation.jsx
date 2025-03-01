@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Formik, Form as FormikForm, Field, ErrorMessage } from "formik";
-import { Input, Button, Row, Col, message, Select } from "antd";
+import { Input, Button, Row, Col, message, Select, Modal } from "antd";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { EditDes, getDes } from "./DesignationReducers/DesignationSlice";
 import { getBranch } from "../Branch/BranchReducer/BranchSlice";
+import AddBranch from "../Branch/AddBranch";
 import { Option } from "antd/es/mentions";
 
 // Validation Schema using Yup
@@ -24,12 +25,10 @@ const EditDesignation = ({ id, onClose }) => {
     dispatch(getBranch());
   }, [dispatch]);
 
-
   const user = useSelector((state) => state.user.loggedInUser.username);
   const alldatas = useSelector((state) => state.Branch);
   const fnddata = alldatas?.Branch?.data || [];
   const fndbranchdata = fnddata.filter((item) => item.created_by === user);
-
 
   const alldept = useSelector((state) => state.Designation);
   const [singleEmp, setSingleEmp] = useState(null);
@@ -39,6 +38,18 @@ const EditDesignation = ({ id, onClose }) => {
     const data = empData.find((item) => item.id === id);
     setSingleEmp(data || null);
   }, [id, alldept]);
+
+  const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
+
+  // Function to open AddBranch modal
+  const openAddBranchModal = () => {
+    setIsAddBranchModalVisible(true);
+  };
+
+  // Function to close AddBranch modal
+  const closeAddBranchModal = () => {
+    setIsAddBranchModalVisible(false);
+  };
 
   const handleSubmit = (values) => {
     if (!id) {
@@ -106,6 +117,18 @@ const EditDesignation = ({ id, onClose }) => {
                         placeholder="Select Branch"
                         onChange={(value) => form.setFieldValue("branch", value)}
                         disabled={fndbranchdata.length === 0}
+                        dropdownRender={(menu) => (
+                          <>
+                            {menu}
+                            <Button
+                              type="link"
+                              block
+                              onClick={openAddBranchModal}
+                            >
+                              + Add New Branch
+                            </Button>
+                          </>
+                        )}
                       >
                         {fndbranchdata.length > 0 ? (
                           fndbranchdata.map((branch) => (
@@ -139,6 +162,17 @@ const EditDesignation = ({ id, onClose }) => {
           </FormikForm>
         )}
       </Formik>
+
+      {/* Add Branch Modal */}
+      <Modal
+        title="Add Branch"
+        visible={isAddBranchModalVisible}
+        onCancel={closeAddBranchModal}
+        footer={null}
+        width={800}
+      >
+        <AddBranch onClose={closeAddBranchModal} />
+      </Modal>
     </div>
   );
 };

@@ -22,6 +22,7 @@ import { editRevenue, getRevenue } from "./RevenueReducer/RevenueSlice";
 import moment from "moment/moment";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
+import AddCustomer from "../customer/AddCustomer";
 
 const { Option } = Select;
 
@@ -95,7 +96,18 @@ const EditRevenue = ({ idd, onClose }) => {
 
   // category end
 
+  // State to manage AddCustomer modal visibility
+  const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] = useState(false);
 
+  // Function to open AddCustomer modal
+  const openAddCustomerModal = () => {
+    setIsAddCustomerModalVisible(true);
+  };
+
+  // Function to close AddCustomer modal
+  const closeAddCustomerModal = () => {
+    setIsAddCustomerModalVisible(false);
+  };
 
   const alldata = useSelector((state) => state.Revenue);
   const fnddata = alldata.Revenue.data;
@@ -282,6 +294,21 @@ const EditRevenue = ({ idd, onClose }) => {
                             }
                             value={values.customer}
                             onBlur={() => setFieldTouched("customer", true)}
+                            dropdownRender={menu => (
+                              <div>
+                                {menu}
+                                <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                  <Button
+                                    type="link"
+                                    icon={<PlusOutlined />}
+                                    className="w-full mt-2"
+                                    onClick={openAddCustomerModal}
+                                  >
+                                    Add New Customer
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
                           >
                             {fnddatas && fnddatas.length > 0 ? (
                               fnddatas.map((client) => (
@@ -461,6 +488,16 @@ const EditRevenue = ({ idd, onClose }) => {
         />
       </Modal>
 
+      {/* AddCustomer Modal */}
+      <Modal
+        title="Add Customer"
+        visible={isAddCustomerModalVisible}
+        onCancel={closeAddCustomerModal}
+        footer={null}
+        width={1000}
+      >
+        <AddCustomer onClose={closeAddCustomerModal} />
+      </Modal>
     </div>
   );
 };

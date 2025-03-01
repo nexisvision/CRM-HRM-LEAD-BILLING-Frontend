@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Formik, Form as FormikForm, Field, ErrorMessage } from "formik";
-import { Input, Button, Row, Col, message, Select } from "antd";
+import { Input, Button, Row, Col, message, Select, Modal } from "antd";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { EditDept, getDept } from "./DepartmentReducers/DepartmentSlice";
 import { getBranch } from "../Branch/BranchReducer/BranchSlice";
-import { Option } from "antd/es/mentions";
+import AddBranch from "../Branch/AddBranch";
+
+const { Option } = Select;
 
 // Validation Schema using Yup
 const validationSchema = Yup.object().shape({
@@ -19,7 +21,7 @@ const validationSchema = Yup.object().shape({
 const EditDepartment = ({ comnyid, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const alldept = useSelector((state) => state.Department);
@@ -32,7 +34,6 @@ const EditDepartment = ({ comnyid, onClose }) => {
   const alldatas = useSelector((state) => state.Branch);
   const fnddata = alldatas.Branch.data || [];
   const fndbranchdata = fnddata.filter((item) => item.created_by === user);
-
 
   useEffect(() => {
     const empData = alldept?.Department?.data || [];
@@ -59,6 +60,14 @@ const EditDepartment = ({ comnyid, onClose }) => {
       });
   };
 
+  const openAddBranchModal = () => {
+    setIsAddBranchModalVisible(true);
+  };
+
+  const closeAddBranchModal = () => {
+    setIsAddBranchModalVisible(false);
+  };
+
   return (
     <div className="edit-department">
       <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
@@ -66,6 +75,7 @@ const EditDepartment = ({ comnyid, onClose }) => {
       <Formik
         initialValues={{
           department_name: singleEmp ? singleEmp.department_name : "",
+          branch: singleEmp ? singleEmp.branch : "",
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
@@ -104,6 +114,18 @@ const EditDepartment = ({ comnyid, onClose }) => {
                         className="w-full mt-1"
                         placeholder="Select Branch"
                         onChange={(value) => setFieldValue("branch", value)}
+                        dropdownRender={menu => (
+                          <>
+                            {menu}
+                            <Button 
+                              type="link" 
+                              block
+                              onClick={openAddBranchModal}
+                            >
+                              + Add New Branch
+                            </Button>
+                          </>
+                        )}
                       >
                         {fndbranchdata?.map((branch) => (
                           <Option key={branch.id} value={branch.id}>
@@ -133,6 +155,16 @@ const EditDepartment = ({ comnyid, onClose }) => {
           </FormikForm>
         )}
       </Formik>
+
+      <Modal
+        title="Add Branch"
+        visible={isAddBranchModalVisible}
+        onCancel={closeAddBranchModal}
+        footer={null}
+        width={800}
+      >
+        <AddBranch onClose={closeAddBranchModal} />
+      </Modal>
     </div>
   );
 };
