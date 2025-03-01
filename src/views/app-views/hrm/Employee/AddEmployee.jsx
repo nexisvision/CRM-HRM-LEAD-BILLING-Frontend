@@ -31,7 +31,7 @@ import { AddSalaryss, getSalaryss } from "../PayRoll/Salary/SalaryReducers/Salar
 
 const { Option } = Select;
 
-const AddEmployee = ({ onClose, setSub }) => {
+const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -185,11 +185,11 @@ const AddEmployee = ({ onClose, setSub }) => {
   };
 
   const initialValues = {
-    firstName: "",
-    lastName: "",
+    firstName: initialData.firstName || "",
+    lastName: initialData.lastName || "",
     username: "",
     password: "",
-    email: "",
+    email: initialData.email || "",
     phone: "",
     address: "",
     branch: "",

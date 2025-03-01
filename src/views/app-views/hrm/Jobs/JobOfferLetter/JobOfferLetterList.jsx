@@ -33,6 +33,9 @@ import {
   deletejobofferss,
   getjobofferss,
 } from "./jobOfferletterReducer/jobofferlateerSlice";
+import { getjobapplication } from "../JobApplication/JobapplicationReducer/JobapplicationSlice";
+import { GetJobdata } from "../JobReducer/JobSlice";
+import AddEmployee from "../../Employee/AddEmployee";
 // import {
 //   deletejobapplication,
 //   getjobapplication,
@@ -55,14 +58,27 @@ const JobOfferLetterList = () => {
   const [idd, setIdd] = useState("");
   const [searchText, setSearchText] = useState('');
 
+  const [isAddEmployeeModalVisible, setIsAddEmployeeModalVisible] = useState(false);
+  const [employeeData, setEmployeeData] = useState(null);
+
   useEffect(() => {
     dispatch(getjobofferss());
-  }, []);
+    dispatch(getjobapplication());
+    dispatch(GetJobdata());
+  }, [dispatch]);
  
 const user = useSelector((state) => state.user.loggedInUser.username);
 
   const alldatas = useSelector((state) => state.joboffers);
   const fnddata = alldatas.joboffers.data || [];
+
+  console.log('fnddata',fnddata);
+
+  const alljob = useSelector((state)=>state?.Jobs?.Jobs?.data);
+  console.log('alljob',alljob);
+
+  const jobappliaction = useSelector((state)=>state?.jobapplications?.jobapplications?.data);
+  console.log('jobappliaction',jobappliaction);
 
   const fnddtaa = fnddata.filter((item) => item.created_by === user);
 
@@ -229,6 +245,27 @@ const user = useSelector((state) => state.user.loggedInUser.username);
     setIdd(idd);
   };
 
+  const convertemployee = (idd) => {
+    const fndoffer = fnddata.find((item) => item.id === idd);
+    const jobappdata = jobappliaction.find((item) => item.job === fndoffer.job_applicant);
+
+    // Prepare the data to be passed to the AddEmployee component
+    const data = {
+      firstName: jobappdata?.firstName || '',
+      lastName: jobappdata?.lastName || '',
+      email: jobappdata?.email || '',
+      // Add other fields as necessary
+    };
+
+    setEmployeeData(data);
+    setIsAddEmployeeModalVisible(true);
+  };
+
+  const closeAddEmployeeModal = () => {
+    setIsAddEmployeeModalVisible(false);
+    setEmployeeData(null);
+  };
+
   const dropdownMenu = (elm) => (
     <Menu>
       {/* <Menu.Item>
@@ -264,6 +301,20 @@ const user = useSelector((state) => state.user.loggedInUser.username);
           </Button>
         </Flex>
       </Menu.Item> */}
+
+<Menu.Item>
+                                    <Flex alignItems="center">
+                                      <Button
+                                        type=""
+                                        className=""
+                                        icon={<EditOutlined />}
+                                        onClick={() => convertemployee(elm.id)}
+                                        size="small"
+                                      >
+                                        <span className="ml-2">Convert To Employee</span>
+                                      </Button>
+                                    </Flex>
+                                  </Menu.Item>
     
      
 
@@ -474,6 +525,17 @@ const user = useSelector((state) => state.user.loggedInUser.username);
         className="mt-[-70px]"
       >
         <EditJobOfferLetter onClose={closeEditJobOfferLetterModal} idd={idd} />
+      </Modal>
+
+      <Modal
+        title="Add Employee"
+        visible={isAddEmployeeModalVisible}
+        onCancel={closeAddEmployeeModal}
+        footer={null}
+        width={1000}
+        className="mt-[-70px]"
+      >
+        <AddEmployee onClose={closeAddEmployeeModal} initialData={employeeData} />
       </Modal>
       {/* <Modal
         title=""

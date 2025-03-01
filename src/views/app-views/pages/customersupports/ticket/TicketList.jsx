@@ -40,6 +40,8 @@ import { DeleteTicket, getAllTicket } from "./TicketReducer/TicketSlice";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { debounce } from 'lodash';
+import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+import { use } from "react";
 
 const { Column } = Table;
 
@@ -92,6 +94,12 @@ export const TicketList = () => {
   const loggeddata = useSelector((state) => state?.user?.loggedInUser.username);
 
   const finddata = fnddata?.filter((item) => item.created_by === loggeddata);
+
+  useEffect(()=>{
+    dispatch(empdata())
+  },[dispatch])
+
+  const alldatass = useSelector((state)=>state.employee.employee.data);
 
   useEffect(() => {
     // Load pinned tasks from local storage on component mount
@@ -269,8 +277,14 @@ export const TicketList = () => {
     {
       title: "requestor",
       dataIndex: "requestor",
-      sorter: {
-        compare: (a, b) => a.subject.length - b.subject.length,
+      sorter: (a, b) => {
+        const requestorNameA = alldatass.find(emp => emp.id === a.requestor)?.username || '';
+        const requestorNameB = alldatass.find(emp => emp.id === b.requestor)?.username || '';
+        return requestorNameA.localeCompare(requestorNameB);
+      },
+      render: (requestorId) => {
+        const requestorName = alldatass.find(emp => emp.id === requestorId)?.username;
+        return <span>{requestorName || 'N/A'}</span>;
       },
     },
     {

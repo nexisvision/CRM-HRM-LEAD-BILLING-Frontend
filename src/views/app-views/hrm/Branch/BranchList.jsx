@@ -24,6 +24,7 @@ import OrderListData from "assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteBranch, getBranch } from "./BranchReducer/BranchSlice";
+import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 // import { DeleteDept, getDept } from './DepartmentReducers/DepartmentSlice';
 
 const BranchList = () => {
@@ -50,7 +51,10 @@ const BranchList = () => {
 
   useEffect(() => {
     dispatch(getBranch());
-  }, []);
+    dispatch(GetUsers())
+  }, [dispatch]);
+
+  const alluserdata = useSelector((state)=>state.Users.Users.data);
 
   useEffect(() => {
     if (tabledata && tabledata.Branch && tabledata.Branch.data) {
@@ -244,7 +248,15 @@ const BranchList = () => {
     {
       title: "Branch Manager",
       dataIndex: "branchManager",
-      sorter: (a, b) => a.branchManager.length - b.branchManager.length,
+      render: (branchManagerId) => {
+        const manager = alluserdata?.find((item) => item?.id === branchManagerId);
+        return manager ? manager?.username : 'Unknown';
+      },
+      sorter: (a, b) => {
+        const nameA = alluserdata?.find((item) => item?.id === a?.branchManager)?.username || '';
+        const nameB = alluserdata?.find((item) => item?.id === b?.branchManager)?.username || '';
+        return nameA?.length - nameB?.length;
+      },
     },
     {
       title: "Address",

@@ -54,6 +54,8 @@ const ContractList = () => {
   const tabledata = useSelector((state) => state.Contract);
   const clientData = useSelector((state) => state.SubClient?.SubClient?.data);
   const projectData = useSelector((state) => state.Project?.Project?.data);
+  console.log('projectData',projectData);
+  console.log('clientData',clientData);
 
   // First useEffect to fetch initial data
   useEffect(() => {
@@ -367,9 +369,10 @@ const ContractList = () => {
       ),
       sorter: {
         compare: (a, b) => {
-          const clientA = clientData?.find(client => client.id === a.client)?.username || a.client;
-          const clientB = clientData?.find(client => client.id === b.client)?.username || b.client;
-          return String(clientA).localeCompare(String(clientB));
+          const clientA = String(clientData?.find(client => client.id === a.client)?.username || a.client);
+          const clientB = String(clientData?.find(client => client.id === b.client)?.username || b.client);
+          console.log('Comparing clients:', clientA, clientB); // Debugging line
+          return clientA.localeCompare(clientB);
         }
       }
     },
@@ -383,9 +386,10 @@ const ContractList = () => {
       ),
       sorter: {
         compare: (a, b) => {
-          const projectA = projectData?.find(project => project.id === a.project)?.project_name || a.project;
-          const projectB = projectData?.find(project => project.id === b.project)?.project_name || b.project;
-          return String(projectA).localeCompare(String(projectB));
+          const projectA = String(projectData?.find(project => project.id === a.project)?.project_name || a.project);
+          const projectB = String(projectData?.find(project => project.id === b.project)?.project_name || b.project);
+          console.log('Comparing projects:', projectA, projectB); // Debugging line
+          return projectA.localeCompare(projectB);
         }
       }
     },

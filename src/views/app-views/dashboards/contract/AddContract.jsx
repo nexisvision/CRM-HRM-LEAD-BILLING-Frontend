@@ -41,6 +41,7 @@ const AddContract = ({ onClose }) => {
   const [isContracttypeModalVisible, setIsContracttypeModalVisible] = useState(false);
   const [newContracttype, setNewContracttype] = useState("");
   const [contracttypes, setContracttypes] = useState([]);
+  const [filteredProjects, setFilteredProjects] = useState([]);
 
   useEffect(() => {
     dispatch(getallcountries());
@@ -157,10 +158,15 @@ const AddContract = ({ onClose }) => {
   const filtersubclient = Clientdata.SubClient.data || [];
 
   const clientdata = filtersubclient?.filter((item) => item.created_by === allloggeduser);
+
+
+
   const Projectdtaa = useSelector((state) => state.Project);
   const filterprojectdata = Projectdtaa.Project.data || [];
 
+
   const projectdata = filterprojectdata?.filter((item) => item.created_by === allloggeduser);
+
 
   const fetchLables = async (lableType, setter) => {
     try {
@@ -206,6 +212,15 @@ const AddContract = ({ onClose }) => {
     if (value.length <= 15) {
       setFieldValue('phone', value);
     }
+  };
+
+  const handleClientChange = (clientId, setFieldValue) => {
+    setFieldValue("client", clientId);
+    const associatedProjects = filterprojectdata.filter(
+      (project) => project.client === clientId
+    );
+    setFilteredProjects(associatedProjects);
+    setFieldValue("project", ""); // Reset project selection when client changes
   };
 
   return (
@@ -372,7 +387,7 @@ const AddContract = ({ onClose }) => {
                         {...field}
                         className="w-full mt-1"
                         placeholder="Select Client"
-                        onChange={(value) => setFieldValue("client", value)}
+                        onChange={(value) => handleClientChange(value, setFieldValue)}
                         value={values.client}
                       >
                         {clientdata && clientdata.length > 0 ? (
@@ -450,8 +465,8 @@ const AddContract = ({ onClose }) => {
                         onChange={(value) => setFieldValue("project", value)}
                         value={values.project}
                       >
-                        {projectdata && projectdata.length > 0 ? (
-                          projectdata.map((project) => (
+                        {filteredProjects && filteredProjects.length > 0 ? (
+                          filteredProjects.map((project) => (
                             <Option key={project.id} value={project.id}>
                               {project.project_name || "Unnamed Project"}
                             </Option>

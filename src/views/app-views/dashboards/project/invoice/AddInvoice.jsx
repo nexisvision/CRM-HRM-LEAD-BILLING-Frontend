@@ -436,7 +436,7 @@ const sub = subClientsss?.SubClient?.data;
         issueDate: Yup.date().nullable().required('Invoice Date is required.'),
         dueDate: Yup.date().nullable().required('Due Date is required.'),
         currency: Yup.string().required('Please select currency.'),
-        client: Yup.string().required('Please enter client name.'),
+        client: Yup.string().required('Please select the client name.'),
         project: Yup.string().required('Please enter project name.'),
         calctax: Yup.string().required('Please select tax.'),
     });
@@ -729,10 +729,19 @@ const sub = subClientsss?.SubClient?.data;
                                         <Form.Item
                                             name="client"
                                             label="Client Name"
-                                            initialValue={subClientData?.username}
-                                            rules={[{ required: true, message: "Please enter the client name" }]}
+                                            rules={[{ required: true, message: "Please select the client name" }]}
                                         >
-                                            <Input placeholder="Enter client name" disabled />
+                                            <Select
+                                                placeholder="Select Client"
+                                                disabled
+                                                value={subClientData?.id}
+                                            >
+                                                {sub?.map((subClient) => (
+                                                    <Option key={subClient.id} value={subClient.id}>
+                                                        {subClient.username}
+                                                    </Option>
+                                                ))}
+                                            </Select>
                                         </Form.Item>
                                         {/* Hidden field to pass the client ID */}
                                         <Form.Item name="client" initialValue={fnddata?.client} hidden>

@@ -50,6 +50,7 @@ import Invoice from "views/app-views/pages/invoice";
 // import AddInvoice from './AddInvoice';
 // import ViewInvoice from './ViewInvoice';
 import { ClientData } from 'views/app-views/Users/client-list/CompanyReducers/CompanySlice';
+import { GetProject } from "../project-list/projectReducer/ProjectSlice";
 const { Column } = Table;
 const { Option } = Select;
 const getPaymentStatus = (status) => {
@@ -99,15 +100,17 @@ export const InvoiceList = () => {
   const [searchText, setSearchText] = useState('');
   const clientsData = useSelector((state) => state.SubClient);
   const clients = clientsData.SubClient.data || [];
+  const projectsData = useSelector((state) => state.Project);
+  const projects = projectsData.Project.data || [];
   // Fetch invoices when component mounts
   useEffect(() => {
     console.log("Fetching invoices for ID:", id);
     dispatch(getAllInvoices(id));
     dispatch(ClientData());
+    dispatch(GetProject());
   }, [dispatch]);
   // Update list when invoices change
   useEffect(() => {
-    console.log("Invoices updated:", invoices);
     if (invoices) {
       setList(invoices);
     }
@@ -242,10 +245,15 @@ export const InvoiceList = () => {
     {
       title: "Project",
       dataIndex: "project",
-      sorter: (a, b) => a.project?.localeCompare(b.project),
-      render: (project) => (
-        <span>{project || 'N/A'}</span>
-      ),
+      sorter: (a, b) => {
+        const projectNameA = projects.find(p => p.id === a.project)?.project_name || '';
+        const projectNameB = projects.find(p => p.id === b.project)?.project_name || '';
+        return projectNameA.localeCompare(projectNameB);
+      },
+      render: (projectId) => {
+        const projectName = projects.find(p => p.id === projectId)?.project_name;
+        return <span>{projectName || 'N/A'}</span>;
+      },
     },
     {
       title: "Client",

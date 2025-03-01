@@ -33,6 +33,8 @@ const EditContract = ({ id, onClose }) => {
   const [newContracttype, setNewContracttype] = useState("");
   const [contracttypes, setContracttypes] = useState([]);
 
+  const [filteredProjects, setFilteredProjects] = useState([]);
+
   useEffect(() => {
     dispatch(getallcountries());
   }, [dispatch]);
@@ -164,6 +166,15 @@ const EditContract = ({ id, onClose }) => {
     }
   };
 
+  const handleClientChange = (clientId, setFieldValue) => {
+    setFieldValue("client", clientId);
+    const associatedProjects = filPro.filter(
+      (project) => project.client === clientId
+    );
+    setFilteredProjects(associatedProjects);
+    setFieldValue("project", ""); // Reset project selection when client changes
+  };
+
   useEffect(() => {
     const filcon = filcon0.find((item) => item.id === id);
     console.log("ioi", filcon);
@@ -179,19 +190,22 @@ const EditContract = ({ id, onClose }) => {
         description: filcon.description || "",
         phone: filcon.phone || "",
         phoneCode: filcon.phoneCode || "",
-        // contract_number: filcon.contract_number || "",
-
         currency: filcon.currency || "",
         address: filcon.address || "",
         city: filcon.city || "",
         country: filcon.country || "",
-
         state: filcon.state || "",
         zipcode: filcon.zipcode || "",
         notes: filcon.notes || "",
       });
+
+      // Set filtered projects based on the initial client
+      const associatedProjects = filPro.filter(
+        (project) => project.client === filcon.client
+      );
+      setFilteredProjects(associatedProjects);
     }
-  }, [id, filcon0]);
+  }, [id, filcon0, filPro]);
 
 
   return (
@@ -377,15 +391,13 @@ const EditContract = ({ id, onClose }) => {
                         {...field}
                         className="w-full mt-1"
                         placeholder="Select Client"
-                        onChange={(value) => setFieldValue("client", value)}
+                        onChange={(value) => handleClientChange(value, setFieldValue)}
                         value={values.client}
                       >
                         {filsubc && filsubc.length > 0 ? (
                           filsubc.map((client) => (
                             <Option key={client.id} value={client.id}>
-                              {client.username ||
-                                client?.username ||
-                                "Unnamed Client"}
+                              {client.username || client.name || "Unnamed Client"}
                             </Option>
                           ))
                         ) : (
@@ -459,12 +471,10 @@ const EditContract = ({ id, onClose }) => {
                         onChange={(value) => setFieldValue("project", value)}
                         value={values.project}
                       >
-                        {filPro && filPro.length > 0 ? (
-                          filPro.map((client) => (
-                            <Option key={client.id} value={client.id}>
-                              {client.project_name ||
-                                client?.username ||
-                                "Unnamed Client"}
+                        {filteredProjects && filteredProjects.length > 0 ? (
+                          filteredProjects.map((project) => (
+                            <Option key={project.id} value={project.id}>
+                              {project.project_name || "Unnamed Project"}
                             </Option>
                           ))
                         ) : (
@@ -477,7 +487,7 @@ const EditContract = ({ id, onClose }) => {
                   </Field>
 
                   <ErrorMessage
-                    name="user"
+                    name="project"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
