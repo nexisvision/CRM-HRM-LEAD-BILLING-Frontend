@@ -44,11 +44,11 @@ const EditVendor = ({ onClose, vendorData, idd }) => {
         throw new Error(response.error.message);
       }
       await dispatch(vendordataedata());
-      console.log('Updated values:', values);
-      message.success('Vendor updated successfully!');
+      // console.log('Updated values:', values);
+      // message.success('Vendor updated successfully!');
       onClose();
     } catch (error) {
-      message.error('Failed to update vendor: ' + error.message);
+      // message.error('Failed to update vendor: ' + error.message);
     } finally {
       setLoading(false);
       setSubmitting(false);

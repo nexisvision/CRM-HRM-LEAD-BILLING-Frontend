@@ -32,31 +32,6 @@ export const getDept = createAsyncThunk(
     }
 );
 
-// Async thunk for getting all users
-export const getAllUsers = createAsyncThunk(
-    "users/getAllUsers",
-    async (thunkAPI) => {
-        try {
-            const response = await UserService.getAllUsers();
-            return response;
-        } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data);
-        }
-    }
-);
-
-// Async thunk for getting user by id
-export const getUserById = createAsyncThunk(
-    "users/getUserById",
-    async (userId, thunkAPI) => {
-        try {
-            const response = await UserService.getUserById(userId);
-            return response;
-        } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data);
-        }
-    }
-);
 
 // Async thunk for deleting a user
 export const DeleteDept = createAsyncThunk(
@@ -144,11 +119,11 @@ const DepartmentSlice = createSlice({
             })
             .addCase(AddDept.fulfilled, (state, action) => {
                 state.isLoading = false;
-                // message.success(action.payload?.message);
+                message.success(action.payload?.message);
             })
             .addCase(AddDept.rejected, (state, action) => {
                 state.isLoading = false;
-                // message.error(action.payload?.message);
+                message.error(action.payload?.message);
             })
 
 
@@ -171,11 +146,11 @@ const DepartmentSlice = createSlice({
             })
             .addCase(DeleteDept.fulfilled, (state, action) => {
                 state.isLoading = false;
-                // message.success(action.payload?.message);
+                message.success(action.payload?.message);
             })
             .addCase(DeleteDept.rejected, (state, action) => {
                 state.isLoading = false;
-                // message.error(action.payload?.message);
+                message.error(action.payload?.message);
             })
             //update
 
@@ -186,13 +161,13 @@ const DepartmentSlice = createSlice({
               .addCase(EditDept.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
-                // message.success(action.payload?.message);
+                message.success(action.payload?.message);
               })
 
               .addCase(EditDept.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-                // message.error(action.payload?.message);
+                message.error(action.payload?.message);
               });
     },
 });

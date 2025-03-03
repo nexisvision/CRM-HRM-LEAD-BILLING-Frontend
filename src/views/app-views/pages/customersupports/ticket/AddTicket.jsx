@@ -17,6 +17,7 @@ import { UploadOutlined } from "@ant-design/icons";
 import { AddTickets, getAllTicket } from "./TicketReducer/TicketSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -26,17 +27,29 @@ const AddTicket = ({ onClose }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(empdata());
+    // dispatch(empdata());
+    dispatch(GetUsers());
   }, []);
 
-  const alldata = useSelector((state) => state.employee);
-  const fnddata = alldata.employee.data || [];
+ 
+  const allempdata = useSelector((state) => state.Users);
+  const empData = allempdata?.Users?.data || [];
+  const loggedInUser = useSelector((state) => state.user.loggedInUser);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const userRole = roles?.find(role => role.id === loggedInUser.role_id);
+
+  const fnddatass = empData.filter(emp => {
+    if (userRole?.role_name === 'client') {
+      return emp.client_id === loggedInUser.id;
+    } else {
+      return emp.client_id === loggedInUser.client_id;
+    }
+  });
+
+  // const llogedid = useSelector((state) => state.user.loggedInUser.username || []);
 
 
-  const llogedid = useSelector((state) => state.user.loggedInUser.username || []);
-
-
-  const fnddatass = fnddata?.filter((item)=>item?.created_by === llogedid);
+  // const fnddatass = fnddata?.filter((item)=>item?.created_by === llogedid);
 
   const initialValues = {
     ticketSubject: "",
@@ -73,12 +86,12 @@ const AddTicket = ({ onClose }) => {
       });
 
       await dispatch(AddTickets(formData)).unwrap();
-      message.success('Ticket created successfully!');
+      // message.success('Ticket created successfully!');
       dispatch(getAllTicket());
       onClose();
       resetForm();
     } catch (error) {
-      message.error(error?.message || 'Failed to create ticket');
+      // message.error(error?.message || 'Failed to create ticket');
     } finally {
       setSubmitting(false);
     }

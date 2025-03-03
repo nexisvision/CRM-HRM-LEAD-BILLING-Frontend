@@ -136,12 +136,12 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
     dispatch(Editplan({ id, values: submitValues }))
       .then(() => {
         dispatch(GetPlan());
-        message.success("Plan details updated successfully!");
+        // message.success("Plan details updated successfully!");
         onClose();
         navigate('/app/superadmin/plan');
       })
       .catch((error) => {
-        message.error('Failed to update plan.');
+        // message.error('Failed to update plan.');
         console.error('Edit API error:', error);
       });
   };

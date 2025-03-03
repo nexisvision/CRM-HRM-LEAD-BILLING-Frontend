@@ -139,12 +139,12 @@ const DepartmentList = () => {
     dispatch(DeleteDept( userId ))
       .then(() => {
         dispatch(getDept());
-        message.success('Department Deleted successfully!');
+        // message.success('Department Deleted successfully!');
         setUsers(users.filter(item => item.id !== userId));
         navigate('/app/hrm/department');
       })
       .catch((error) => {
-        message.error('Failed to delete department.');
+        // message.error('Failed to delete department.');
         console.error('Edit API error:', error);
       });
   };

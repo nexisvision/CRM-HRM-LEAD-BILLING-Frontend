@@ -109,7 +109,7 @@ const EditEstimates = ({ idd, onClose }) => {
 
 
     useEffect(() => {
-        dispatch(GetLeads());
+        // dispatch(GetLeads());
         dispatch(getAllTaxes());
     }, [dispatch]);
 
@@ -125,7 +125,7 @@ const EditEstimates = ({ idd, onClose }) => {
                     form.setFieldsValue({
                         valid_till: dayjs(currentEstimate.valid_till),
                         currency: currentEstimate.currency,
-                        lead: leadDetails?.id,
+                        // lead: leadDetails?.id,
                         client: currentEstimate.client,
                         calculatedTax: currentEstimate.calculatedTax,
                         projectName: fnddata?.project_name
@@ -298,7 +298,7 @@ const EditEstimates = ({ idd, onClose }) => {
                 id: idd,
                 valid_till: values.valid_till.format('YYYY-MM-DD'),
                 currency: values.currency,
-                lead: leadDetails?.id,
+                // lead: leadDetails?.id,
                 client: values.client,
                 discount: discountAmount,
                 discountType: discountType,
@@ -387,7 +387,7 @@ const EditEstimates = ({ idd, onClose }) => {
                             <div className=" p-2">
 
                                 <Row gutter={16}>
-                                    <Col span={12}>
+                                    {/* <Col span={12}>
                                         <Form.Item
                                             name="lead"
                                             label="Lead Title"
@@ -414,7 +414,7 @@ const EditEstimates = ({ idd, onClose }) => {
                                                 ))}
                                             </Select>
                                         </Form.Item>
-                                    </Col>
+                                    </Col> */}
 
                                     <Col span={12}>
                                         <Form.Item

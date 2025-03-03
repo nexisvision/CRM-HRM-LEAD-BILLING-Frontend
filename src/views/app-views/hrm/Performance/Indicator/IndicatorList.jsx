@@ -50,12 +50,12 @@ const dispatch = useDispatch();
     const tabledata = useSelector((state) => state.indicator);
 
 
-const branchDaata = useSelector((state) => state.Branch?.Branch?.data || []);
+const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
 
 
-  const branchData = branchDaata.filter(item => item.created_by === user);
+  // const branchData = branchDaata.filter(item => item.created_by === user);
    //// permission
                    
      const roleId = useSelector((state) => state.user.loggedInUser.role_id);

@@ -50,12 +50,12 @@ const EditDepartment = ({ comnyid, onClose }) => {
     dispatch(EditDept({ comnyid, values }))
       .then(() => {
         dispatch(getDept());
-        message.success("Department updated successfully!");
+        // message.success("Department updated successfully!");
         onClose();
         navigate("/app/hrm/department");
       })
       .catch((error) => {
-        message.error("Failed to update department.");
+        // message.error("Failed to update department.");
         console.error("Edit API error:", error);
       });
   };

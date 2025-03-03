@@ -26,6 +26,7 @@ import useSelection from "antd/es/table/hooks/useSelection";
 import { assign, values } from "lodash";
 import { AddLable, GetLable } from "./LableReducer/LableSlice";
 import { GetLeads } from '../../leads/LeadReducers/LeadSlice';
+import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 
 
@@ -61,7 +62,7 @@ const AddTask = ({ onClose }) => {
 
   const { data: Leads, isLoading: isLeadsLoading, error: leadsError } = useSelector((state) => state.Leads.Leads || []);
 
-  const lead = Leads?.filter((item) => item.created_by === user);
+  // const lead = Leads?.filter((item) => item.created_by === user);
 
   const allproject = useSelector((state) => state.Project);
   const fndrewduxxdaa = allproject.Project.data
@@ -72,13 +73,26 @@ const AddTask = ({ onClose }) => {
   
   const AllLoggedData = useSelector((state) => state.user);
 
-  const allempdata = useSelector((state) => state.employee);
-  const empData = allempdata?.employee?.data || [];
+
+
+  const allempdata = useSelector((state) => state.Users);
+  const empData = allempdata?.Users?.data || [];
+  const loggedInUser = useSelector((state) => state.user.loggedInUser);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const userRole = roles?.find(role => role.id === loggedInUser.role_id);
+
+  const fnduserdatas = empData.filter(emp => {
+    if (userRole?.role_name === 'client') {
+      return emp.client_id === loggedInUser.id;
+    } else {
+      return emp.client_id === loggedInUser.client_id;
+    }
+  });
 
   // const fnd = empData.filter((item) => item.created_by === user);
-  const loggeduser = useSelector((state)=>state.user.loggedInUser.username);
+  // const loggeduser = useSelector((state)=>state.user.loggedInUser.username);
 
-  const fnduserdatas = empData.filter((item)=>item.created_by === loggeduser);
+  // const fnduserdatas = empData.filter((item)=>item.created_by === loggeduser);
 
   const [selectedLead, setSelectedLead] = useState(null);
 
@@ -105,11 +119,12 @@ const AddTask = ({ onClose }) => {
     dueDate: Yup.date().nullable().required("Date is required."),
     assignTo: Yup.array().min(1, "Please select at least one AssignTo."),
     description: Yup.string().required("Please enter a Description."),
+    
   });
 
+    useEffect(() => {
+    dispatch(GetUsers());
 
-   useEffect(() => {
-      
          dispatch(GetLeads());
 
     }, [dispatch]);
@@ -198,10 +213,11 @@ const AddTask = ({ onClose }) => {
       formData.append('task_file', file);
     });
 
-    // Dispatch AddTaskk with formData
-    dispatch(AddTaskk({ id, values: formData }))
-      .then(() => {
-        message.success("Task added successfully!");
+
+    // Dispatch AddTasks with updated values
+    dispatch(AddTaskk({ id, values })).then(() => {
+      // message.success("Task added successfully!");
+        // Fetch updated tasks after successfully adding
         dispatch(GetTasks(id))
           .then(() => {
             resetForm();
@@ -209,7 +225,7 @@ const AddTask = ({ onClose }) => {
             onClose();
           })
           .catch((error) => {
-            message.error("Failed to fetch the latest Task data.");
+            // message.error("Failed to fetch the latest Task data.");
             console.error("Task API error:", error);
           });
       })

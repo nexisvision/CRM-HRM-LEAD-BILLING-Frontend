@@ -28,9 +28,10 @@ import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 // import { DeleteDept, getDept } from './DepartmentReducers/DepartmentSlice';
 
 const BranchList = () => {
-  const [users, setUsers] = useState(userData);
+  const [users, setUsers] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
 
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -58,8 +59,11 @@ const BranchList = () => {
 
   useEffect(() => {
     if (tabledata && tabledata.Branch && tabledata.Branch.data) {
-      const filteredData = tabledata.Branch.data.filter((item) => item.created_by === user);
-      setUsers(filteredData);
+      // Simply set the data without filtering
+      const branchData = Array.isArray(tabledata.Branch.data) 
+        ? tabledata.Branch.data 
+        : [];
+      setUsers(branchData);
     }
   }, [tabledata]);
 
@@ -125,13 +129,13 @@ const BranchList = () => {
   };
 
   const getFilteredBranches = () => {
-    if (!users) return [];
+    if (!Array.isArray(users)) return [];
     
     if (!searchText) return users;
 
     return users.filter(branch => {
       return (
-        branch.branchName?.toLowerCase().includes(searchText.toLowerCase())
+        branch?.branchName?.toLowerCase().includes(searchText.toLowerCase())
       );
     });
   };
@@ -144,7 +148,7 @@ const BranchList = () => {
     dispatch(deleteBranch(userId))
       .then(() => {
         dispatch(getBranch());
-        message.success("Branch Deleted successfully!");
+        // message.success("Branch Deleted successfully!");
         setUsers(users.filter((item) => item.id !== userId));
       })
       .catch((error) => {
@@ -315,18 +319,20 @@ const BranchList = () => {
         </Flex>
       </Flex>
       <div className="table-responsive mt-2">
-
-         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                                                                                  
-                    <Table columns={tableColumns} dataSource={getFilteredBranches()} rowKey="id" pagination={{
-                      total: getFilteredBranches().length,
-                      pageSize: 10,
-                      showSizeChanger: true,
-                      showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
-                    }} />
-                       ) : null}
-
-
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
+          <Table 
+            loading={loading}
+            columns={tableColumns} 
+            dataSource={getFilteredBranches()} 
+            rowKey="id"
+            pagination={{
+              total: getFilteredBranches()?.length || 0,
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+            }}
+          />
+        ) : null}
       </div>
       <UserView
         data={selectedUser}

@@ -11,6 +11,8 @@ import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeS
 import moment from "moment/moment";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
+import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
+// import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 const { Option } = Select;
 
@@ -25,19 +27,31 @@ const EditTask = ({ onClose, idd, projectId }) => {
   const id = loggedUserData?.id;
 
   useEffect(() => {
-    dispatch(empdata());
+     dispatch(GetUsers());
+   
   }, [dispatch]);
 
   useEffect(()=>{
     dispatch(GetTasks(id))
   },[])
 
-  const allempdata = useSelector((state) => state.employee);
-  const empData = allempdata?.employee?.data || [];
+  const allempdata = useSelector((state) => state.Users);
+  const empData = allempdata?.Users?.data || [];
+  const loggedInUser = useSelector((state) => state.user.loggedInUser);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const userRole = roles?.find(role => role.id === loggedInUser.role_id);
 
-  const loggedusername = useSelector((state) => state.user.loggedInUser.username || [])
+  const fndassine = empData.filter(emp => {
+    if (userRole?.role_name === 'client') {
+      return emp.client_id === loggedInUser.id;
+    } else {
+      return emp.client_id === loggedInUser.client_id;
+    }
+  });
+
+  // const loggedusername = useSelector((state) => state.user.loggedInUser.username || [])
  
-    const fndassine = empData.filter(((item)=>item.created_by === loggedusername || []))
+    // const fndassine = empData.filter(((item)=>item.created_by === loggedusername || []))
 
 
   const taskadata = useSelector((state)=>state.Tasks.Tasks);

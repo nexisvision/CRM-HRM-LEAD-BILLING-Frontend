@@ -34,10 +34,10 @@ const AddAppraisal = ({ onClose }) => {
 
   const { data: employeee } = useSelector((state) => state.employee.employee);
 
-  const employee = employeee.filter((item) => item.created_by === user);
-console.log("sdfsdf",selectedBranch );
+  // const employeee = employeee.filter((item) => item.created_by === user);
+// console.log("sdfsdf",selectedBranch );
 
-  const filteredEmployees = employee.filter((emp) => emp.branch === selectedBranch);
+  const filteredEmployees = employeee.filter((emp) => emp.branch === selectedBranch);
 
   useEffect(() => {
     dispatch(getBranch());

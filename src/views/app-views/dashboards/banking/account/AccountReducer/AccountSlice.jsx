@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AccountService from "./AccountService";
 import toast from "react-hot-toast";
+import { message } from "antd";
 
 
 
@@ -126,11 +127,13 @@ export const addAccount = createAsyncThunk(
         })
         .addCase(addAccount.fulfilled, (state, action) => {
           state.isLoading = false;
-          toast.success(action.payload?.data?.message);
+          // toast.success(action.payload?.data?.message);
+          message.success(action.payload?.message);
         })
         .addCase(addAccount.rejected, (state, action) => {
           state.isLoading = false;
-          toast.error(action.payload?.message);
+          // toast.error(action.payload?.message);
+          message.error(action.payload?.message);
         })
   
         .addCase(getAccounts.pending, (state) => {
@@ -139,11 +142,13 @@ export const addAccount = createAsyncThunk(
         .addCase(getAccounts.fulfilled, (state, action) => {
           state.isLoading = false;
           state.account = action?.payload;
-          toast.success(action.payload?.data?.message);
+          // toast.success(action.payload?.data?.message);
+          // message.success(action.payload?.data?.message);
         })
         .addCase(getAccounts.rejected, (state, action) => {
           state.isLoading = false;
-          toast.error(action.payload?.message);
+          // toast.error(action.payload?.message);
+          message.error(action.payload?.message);
         })
   
         //getall
@@ -157,7 +162,7 @@ export const addAccount = createAsyncThunk(
         })
         .addCase(getAllAccounts.rejected, (state, action) => {
           state.isLoading = false;
-          toast.error(action.payload?.response?.data?.message);
+          toast.error(action.payload?.message);
         })
   
         //getuserbyid
@@ -167,11 +172,13 @@ export const addAccount = createAsyncThunk(
         })
         .addCase(deleteAccount.fulfilled, (state, action) => {
           state.isLoading = false;
-          toast.success(action.payload.message);
+          // toast.success(action.payload.message);
+          message.success(action.payload?.message);
         })
         .addCase(deleteAccount.rejected, (state, action) => {
           state.isLoading = false;
-          toast.error(action.payload?.response?.data?.message);
+          // toast.error(action.payload?.response?.data?.message);
+          message.error(action.payload?.message);
         })
         //update
         .addCase(editAccount.pending, (state) => {
@@ -180,11 +187,13 @@ export const addAccount = createAsyncThunk(
         })
         .addCase(editAccount.fulfilled, (state, action) => {
           state.isLoading = false;
-          state.editItem = action.payload; // Update the state with the updated employee data
+          state.editItem = action.payload;
+          message.success(action.payload?.message); // Update the state with the updated employee data
         })
         .addCase(editAccount.rejected, (state, action) => {
           state.isLoading = false;
-          state.error = action.payload || "Failed to update employee";
+          state.error = action.payload;
+          message.error(action.payload?.message);
         });
     },
   });

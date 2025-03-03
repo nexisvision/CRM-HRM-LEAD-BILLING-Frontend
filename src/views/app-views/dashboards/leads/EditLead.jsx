@@ -29,6 +29,7 @@ import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/cu
 import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
 import AddLeadStages from "../systemsetup/LeadStages/AddLeadStages";
 import moment from 'moment';
+import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 const { Option } = Select;
 
@@ -49,15 +50,28 @@ const currenciesState = useSelector((state) => state.currencies);
   // const { data: employee } = useSelector((state) => state.employee.employee);
   
   useEffect(()=>{
-    dispatch(empdata())
+    // dispatch(empdata())
+    dispatch(GetUsers())
   },[dispatch])
 
 
-  const filterdata = useSelector((state)=>state.employee.employee.data || []);
+  const allempdata = useSelector((state) => state.Users);
+  const empData = allempdata?.Users?.data || [];
+  const loggedInUser = useSelector((state) => state.user.loggedInUser);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const userRole = roles?.find(role => role.id === loggedInUser.role_id);
 
-  const loggeduser = useSelector((state)=>state.user.loggedInUser.username);
+  const employee = empData.filter(emp => {
+    if (userRole?.role_name === 'client') {
+      return emp.client_id === loggedInUser.id;
+    } else {
+      return emp.client_id === loggedInUser.client_id;
+    }
+  });
 
-  const employee = filterdata.filter((item)=>item.created_by === loggeduser)
+  // const loggeduser = useSelector((state)=>state.user.loggedInUser.username);
+
+  // const employee = filterdata.filter((item)=>item.created_by === loggeduser)
 
 
   const [selectedCurrency, setSelectedCurrency] = useState(null);
@@ -137,12 +151,12 @@ const currenciesState = useSelector((state) => state.currencies);
     dispatch(getallcountries());
   }, []);
 
-    const alllogeddata =  useSelector((state)=>state.user.loggedInUser.username)
+    // const alllogeddata =  useSelector((state)=>state.user.loggedInUser.username)
 
   const allstagedata = useSelector((state) => state.StagesLeadsDeals);
-  const fndata = allstagedata?.StagesLeadsDeals?.data || [];
+  const filterdatas = allstagedata?.StagesLeadsDeals?.data?.filter(item => item.stageType === "lead") || [];
 
-  const filterdatas = fndata.filter((item)=>item.created_by === alllogeddata)
+  // const filterdatas = fndata.filter((item)=>item.created_by === alllogeddata)
 
   const allcurrency = useSelector((state) => state.currencies);
   const fndcurr = allcurrency?.currencies?.data || [];

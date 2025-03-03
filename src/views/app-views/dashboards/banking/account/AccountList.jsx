@@ -105,12 +105,12 @@ const AccountList = () => {
         dispatch(getAccounts());
         const updatedAccounts = accounts.filter((item) => item.id !== accountId);
         setAccounts(updatedAccounts);
-        message.success('Account deleted successfully');
+        // message.success('Account deleted successfully');
       } else {
-        message.error('Failed to delete account');
+        // message.error('Failed to delete account');
       }
     } catch (error) {
-      message.error('Failed to delete account');
+      // message.error('Failed to delete account');
     }
   };
 

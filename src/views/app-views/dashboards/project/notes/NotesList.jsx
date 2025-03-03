@@ -120,7 +120,7 @@ export const NotesList = () => {
   const DeleteFun = async (exid) => {
     try {
       const response = await dispatch(DeleteNotes(exid));
-      message.success("Note deleted successfully!");
+      // message.success("Note deleted successfully!");
       if (response.error) {
         throw new Error(response.error.message);
       }

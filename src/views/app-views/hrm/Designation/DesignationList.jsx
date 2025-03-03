@@ -150,12 +150,12 @@ const DesignationList = () => {
     dispatch(DeleteDes(userId))
       .then(() => {
         dispatch(getDes());
-        message.success('designation Deleted successfully!');
+        // message.success('designation Deleted successfully!');
         setUsers(users.filter(item => item.id !== userId));
         navigate('/app/hrm/designation');
       })
       .catch((error) => {
-        message.error('Failed to delete designation.');
+        // message.error('Failed to delete designation.');
         console.error('Edit API error:', error);
       });
   };

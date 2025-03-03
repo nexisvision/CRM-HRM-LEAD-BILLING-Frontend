@@ -307,17 +307,17 @@ const ESignaturePage = () => {
       setIsEditMode(false);
       setEditingSignature(null);
 
-      notification.success({
-        message: 'Success',
-        description: 'Signature saved successfully!',
-      });
+      // notification.success({
+      //   message: 'Success',
+      //   description: 'Signature saved successfully!',
+      // });
 
     } catch (error) {
       console.error('Error saving signature:', error);
-      notification.error({
-        message: 'Error',
-        description: error.message || 'Failed to save signature.',
-      });
+      // notification.error({
+      //   message: 'Error',
+      //   description: error.message || 'Failed to save signature.',
+      // });
     }
   };
 

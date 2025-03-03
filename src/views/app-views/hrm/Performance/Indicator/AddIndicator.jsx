@@ -17,18 +17,18 @@ const AddIndicator = ({ onClose }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loggedInUser.username);
 
-  const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
-  const fndbranchdata = branchData.filter((item) => item.created_by === user);
+  const fndbranchdata = useSelector((state) => state.Branch?.Branch?.data || []);
+  // const fndbranchdata = branchData.filter((item) => item.created_by === user);
   
 // console.log('fndbranchdata',fndbranchdata);
 
-  const departmentData = useSelector((state) => state.Department?.Department?.data || []);
-  const fnddepartmentdata = departmentData.filter((item) => item.created_by === user);
+  const fnddepartmentdata = useSelector((state) => state.Department?.Department?.data || []);
+  // const fnddepartmentdata = departmentData.filter((item) => item.created_by === user);
 
 // console.log('fnddepartmentdata',fnddepartmentdata);
 
-  const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
-  const fnddesignationdata = designationData.filter((item) => item.created_by === user);
+  const fnddesignationdata = useSelector((state) => state.Designation?.Designation?.data || []);
+  // const fnddesignationdata = designationData.filter((item) => item.created_by === user);
 
 
   const [selectedBranch, setSelectedBranch] = useState(null);

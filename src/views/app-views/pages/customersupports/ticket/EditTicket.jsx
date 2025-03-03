@@ -18,7 +18,8 @@ import moment from "moment";
 import dayjs from "dayjs";
 import { useSelector, useDispatch } from "react-redux";
 import { Editicket, getAllTicket } from "./TicketReducer/TicketSlice";
-import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+// import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -39,15 +40,28 @@ const EditTicket = ({ idd, onClose }) => {
   const dispatch = useDispatch();
   const [fileList, setFileList] = useState([]);
 
-  const alldata = useSelector((state) => state.employee);
-  const fnddatas = alldata.employee.data;
+
+  const allempdata = useSelector((state) => state.Users);
+  const empData = allempdata?.Users?.data || [];
+  const loggedInUser = useSelector((state) => state.user.loggedInUser);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const userRole = roles?.find(role => role.id === loggedInUser.role_id);
+
+  const fnddatass = empData.filter(emp => {
+    if (userRole?.role_name === 'client') {
+      return emp.client_id === loggedInUser.id;
+    } else {
+      return emp.client_id === loggedInUser.client_id;
+    }
+  });
+
   const alldatat = useSelector((state) => state.Ticket);
   const fndfdata = alldatat.Ticket.data;
-  const llogedid = useSelector((state) => state.user.loggedInUser.username);
-  const fnddatass = fnddatas?.filter((item) => item?.created_by === llogedid);
+  // const llogedid = useSelector((state) => state.user.loggedInUser.username);
+  // const fnddatass = fnddatas?.filter((item) => item?.created_by === llogedid);
 
   useEffect(() => {
-    dispatch(empdata());
+    dispatch(GetUsers());
   }, [dispatch]);
 
   const perfectdata = fndfdata.find((item) => item.id === idd);
@@ -83,11 +97,11 @@ const EditTicket = ({ idd, onClose }) => {
       });
 
       await dispatch(Editicket({ idd, formData })).unwrap();
-      message.success('Ticket updated successfully!');
+      // message.success('Ticket updated successfully!');
       dispatch(getAllTicket());
       onClose();
     } catch (error) {
-      message.error(error?.message || 'Failed to update ticket');
+      // message.error(error?.message || 'Failed to update ticket');
     } finally {
       setSubmitting(false);
     }

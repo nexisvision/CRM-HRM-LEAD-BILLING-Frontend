@@ -18,7 +18,8 @@ import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSelector } from "react-redux";
-import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+// import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 import { useDispatch } from "react-redux";
 import {
@@ -57,7 +58,7 @@ const AddProjectMember = ({ onClose }) => {
           },
         }
       );
-      console.log("Addmember API response:", res.data); // Log response
+      // console.log("Addmember API response:", res.data); // Log response
       return res.data;
     } catch (error) {
       if (error.response) {
@@ -99,22 +100,38 @@ const AddProjectMember = ({ onClose }) => {
     }
   };
 
-const loggeduserdata = useSelector((state)=>state.user.loggedInUser.username)
+// const loggeduserdata = useSelector((state)=>state.user.loggedInUser.username)
 
-  const allempdata = useSelector((state) => state.employee);
-  const empData = allempdata?.employee?.data || [];
+  const allempdata = useSelector((state) => state.Users);
+  const empData = allempdata?.Users?.data || [];
+  const loggedInUser = useSelector((state) => state.user.loggedInUser);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const userRole = roles?.find(role => role.id === loggedInUser.role_id);
 
-  const fndemp = empData.filter((item)=>item?.created_by === loggeduserdata) || [];
+  const fndemp = empData.filter(emp => {
+    if (userRole?.role_name === 'client') {
+      return emp.client_id === loggedInUser.id;
+    } else {
+      return emp.client_id === loggedInUser.client_id;
+    }
+  });
+
+  
+
+
+  // const fndemp = empData.filter((item)=>item?.created_by === loggeduserdata) || [];
 
   const Allpeoject = useSelector((state) => state.Project);
   const Filterdta = Allpeoject?.Project?.data || [];
 
   const project = Filterdta.find((item) => item.id === id);
 
-  console.log("swswswsw", project.project_members);
+  // console.log("swswswsw", project.project_members);
 
   useEffect(() => {
-    dispatch(empdata());
+    // dispatch(empdata());
+    dispatch(GetUsers());
+
     dispatch(GetProject());
   }, [dispatch]);
 

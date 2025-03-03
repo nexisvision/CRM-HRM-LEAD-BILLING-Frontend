@@ -76,7 +76,7 @@ const SourcesList = () => {
 
   // console.log("fndddata", fndddata);
 
-  const datas = fndddata?.filter(item => item.lableType === "source");  
+  const datas = alltaggdata?.filter(item => item.lableType === "source");  
 
 
 

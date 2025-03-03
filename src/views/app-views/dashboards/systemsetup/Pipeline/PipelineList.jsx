@@ -28,11 +28,11 @@ const PipelineList = () => {
   const [idd, setIdd] = useState("");
 
   const Allpipline = useSelector((state) => state.Piplines);
-  const Filterpipline = Allpipline?.Piplines?.data || [];
+  const fnddatas = Allpipline?.Piplines?.data || [];
 
   const logged = useSelector((state)=>state.user.loggedInUser.username)
 
-  const fnddatas = Filterpipline.filter((item)=>item.created_by === logged)
+  // const fnddatas = Filterpipline.filter((item)=>item.created_by === logged)
 
   const dispatch = useDispatch();
 

@@ -58,7 +58,7 @@ const NotesList = () => {
   }, []);
 
   const allnotedata = useSelector((state) => state.notes);
-  const fnddata = allnotedata.notes.data;
+  const fnddata = allnotedata.notes?.data;
 
   useEffect(() => {
     if (fnddata) {

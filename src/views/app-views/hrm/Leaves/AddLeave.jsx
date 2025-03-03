@@ -58,11 +58,11 @@ const AddLeave = ({ onClose }) => {
     try {
       await dispatch(CreateL(values)).unwrap();
       dispatch(GetLeave());
-      message.success("Leave added successfully!");
+      // message.success("Leave added successfully!");
       resetForm();
       onClose();
     } catch (error) {
-      message.error(error?.message || "Failed to add leave");
+      // message.error(error?.message || "Failed to add leave");
     } finally {
       setSubmitting(false);
     }

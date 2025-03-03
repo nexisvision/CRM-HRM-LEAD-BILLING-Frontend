@@ -91,9 +91,9 @@ export const TicketList = () => {
   const alldatat = useSelector((state) => state?.Ticket);
   const fnddata = alldatat?.Ticket?.data || [];
 
-  const loggeddata = useSelector((state) => state?.user?.loggedInUser.username);
+  // const loggeddata = useSelector((state) => state?.user?.loggedInUser.username);
 
-  const finddata = fnddata?.filter((item) => item.created_by === loggeddata);
+  // const finddata = fnddata?.filter((item) => item.created_by === loggeddata);
 
   useEffect(()=>{
     dispatch(empdata())
@@ -142,7 +142,7 @@ export const TicketList = () => {
       const data = utils.filterArray(list, key, value);
       setList(data);
     } else {
-      setList(finddata);
+      setList(fnddata);
     }
   };
 
@@ -151,10 +151,10 @@ export const TicketList = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (finddata) {
-      setList(finddata);
+    if (fnddata) {
+      setList(fnddata);
     }
-  }, [finddata]);
+  }, [fnddata]);
 
   const exportToExcel = () => {
     try {
@@ -221,7 +221,7 @@ export const TicketList = () => {
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     setSearchValue(value);
-    debouncedSearch(value, finddata, setList);
+    debouncedSearch(value, fnddata, setList);
   };
 
   const tableColumns = [

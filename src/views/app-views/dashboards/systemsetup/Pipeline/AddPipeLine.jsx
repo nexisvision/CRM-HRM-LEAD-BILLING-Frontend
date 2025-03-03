@@ -55,7 +55,7 @@ const AddPipeLine = ({ onClose }) => {
     dispatch(GetPip());
     resetForm();
     onClose();
-    message.success("Pipeline added successfully!");
+    // message.success("Pipeline added successfully!");
     onClose(); // Close modal after submission
     setSubmitting(false); // Reset submitting state
   };

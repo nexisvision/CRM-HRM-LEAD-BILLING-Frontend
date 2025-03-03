@@ -60,12 +60,12 @@ const EditDesignation = ({ id, onClose }) => {
     dispatch(EditDes({ id, values }))
       .then(() => {
         dispatch(getDes());
-        message.success("Designation updated successfully!");
+        // message.success("Designation updated successfully!");
         onClose();
         navigate("/app/hrm/designation");
       })
       .catch((error) => {
-        message.error("Failed to update designation.");
+        // message.error("Failed to update designation.");
         console.error("Edit API error:", error);
       });
   };

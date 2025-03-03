@@ -51,11 +51,11 @@ const EditAccount = ({ onClose, idd }) => {
     setLoading(true);
     try {
       await dispatch(editAccount({ id: idd, payload: values })).unwrap();
-      message.success('Account updated successfully!');
-      dispatch(getAccounts());
+      // message.success('Account updated successfully!');
+      dispatch(getAccounts()); // Refresh the accounts list
       onClose();
     } catch (error) {
-      message.error('Failed to update account');
+      // message.error('Failed to update account');
     } finally {
       setLoading(false);
       setSubmitting(false);

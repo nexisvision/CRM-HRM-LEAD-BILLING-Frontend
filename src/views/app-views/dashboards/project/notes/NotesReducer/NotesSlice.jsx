@@ -139,11 +139,11 @@ const NotesSlice = createSlice({
       })
       .addCase(AddNote.fulfilled, (state, action) => {
         state.isLoading = false;
-        // message.success(action.payload?.message);
+        message.success(action.payload?.message);
       })
       .addCase(AddNote.rejected, (state, action) => {
         state.isLoading = false;
-        // message.error(action.payload?.message);
+        message.error(action.payload?.message);
       })
 
       .addCase(GetNote.pending, (state) => {
@@ -165,11 +165,11 @@ const NotesSlice = createSlice({
       })
       .addCase(DeleteNotes.fulfilled, (state, action) => {
         state.isLoading = false;
-        // message.success(action.payload?.message);
+        message.success(action.payload?.message);
       })
       .addCase(DeleteNotes.rejected, (state, action) => {
         state.isLoading = false;
-        // message.error(action.payload?.message);
+        message.error(action.payload?.message);
       })
       //update
       .addCase(EditeNotes.pending, (state) => {
@@ -179,12 +179,12 @@ const NotesSlice = createSlice({
       .addCase(EditeNotes.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload;
-        // message.success(action.payload?.message);
+        message.success(action.payload?.message);
       })
       .addCase(EditeNotes.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-        // message.error(action.payload?.message);
+        message.error(action.payload?.message);
       });
   },
 });

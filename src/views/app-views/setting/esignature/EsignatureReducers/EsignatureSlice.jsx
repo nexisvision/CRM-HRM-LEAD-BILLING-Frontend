@@ -31,32 +31,6 @@ export const getsignaturesss = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
-export const getAllUsers = createAsyncThunk(
-  "users/getAllUsers",
-  async (thunkAPI) => {
-    try {
-      const response = await UserService.getAllUsers();
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// Async thunk for getting user by id
-export const getUserById = createAsyncThunk(
-  "users/getUserById",
-  async (userId, thunkAPI) => {
-    try {
-      const response = await UserService.getUserById(userId);
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
-
 // Async thunk for deleting a user
 export const deletesigssss = createAsyncThunk(
   "users/deletesigssss",
@@ -70,19 +44,6 @@ export const deletesigssss = createAsyncThunk(
   }
 );
 
-export const editpolicys = createAsyncThunk(
-  "users/editpolicys",
-  async ({ idd, formData }, thunkAPI) => {
-    try {
-      const response = await UserService.editpolicy(idd, formData);
-      return response; // Return the updated data
-    } catch (error) {
-      return thunkAPI.rejectWithValue(
-        error.response?.data || "Error updating employee"
-      );
-    }
-  }
-);
 
 const initialUser = () => {
   const item = window.localStorage.getItem("USER");
@@ -139,12 +100,12 @@ const EsignatureSlice = createSlice({
       })
       .addCase(addesig.fulfilled, (state, action) => {
         state.isLoading = false;
-        // message.success(action.payload?.message);
+        message.success(action.payload?.message);
       })
 
       .addCase(addesig.rejected, (state, action) => {
         state.isLoading = false;
-        // message.error(action.payload?.message);
+        message.error(action.payload?.message);
       })
 
       .addCase(getsignaturesss.pending, (state) => {
@@ -160,33 +121,7 @@ const EsignatureSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-      //getall
-      .addCase(getAllUsers.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getAllUsers.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.users = action.payload;
-        toast.success(`Users fetched successfully`);
-      })
-      .addCase(getAllUsers.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
-      })
-
-      //getuserbyid
-      .addCase(getUserById.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getUserById.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.detailItem = action.payload?.user;
-        toast.success(action.payload.message);
-      })
-      .addCase(getUserById.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
-      })
+     
       //delete
       .addCase(deletesigssss.pending, (state) => {
         state.isLoading = true;
@@ -197,24 +132,24 @@ const EsignatureSlice = createSlice({
       })
       .addCase(deletesigssss.rejected, (state, action) => {
         state.isLoading = false;
-        message.error(action.payload?.response?.data?.message);
+        message.error(action.payload?.message);
       })
 
-      //update
-      .addCase(editpolicys.pending, (state) => {
-        state.isLoading = false;
-        state.error = null;
-      })
-      .addCase(editpolicys.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.editItem = action.payload; // Update the state with the updated employee data
-        // message.success(action.payload?.message);
-      })
+      // //update
+      // .addCase(editpolicys.pending, (state) => {
+      //   state.isLoading = false;
+      //   state.error = null;
+      // })
+      // .addCase(editpolicys.fulfilled, (state, action) => {
+      //   state.isLoading = false;
+      //   state.editItem = action.payload; // Update the state with the updated employee data
+      //   // message.success(action.payload?.message);
+      // })
 
-      .addCase(editpolicys.rejected, (state, action) => {
-        state.isLoading = false;
-        // message.error(action.payload?.message);
-      });
+      // .addCase(editpolicys.rejected, (state, action) => {
+      //   state.isLoading = false;
+      //   // message.error(action.payload?.message);
+      // });
 
   },
 });

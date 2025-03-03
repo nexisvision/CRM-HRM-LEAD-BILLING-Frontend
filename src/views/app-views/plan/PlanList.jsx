@@ -92,9 +92,9 @@ const PlanList = () => {
       await dispatch(DeleteP(planId)).then(() => {
         dispatch(GetPlan());
       });
-      message.success('Plan deleted successfully');
+      // message.success({ content: 'Plan deleted successfully', duration: 2 });
     } catch (error) {
-      message.error('Failed to delete plan');
+      // message.error({ content: 'Failed to delete plan', duration: 2 });
       console.error('Error deleting plan:', error);
     }
   };

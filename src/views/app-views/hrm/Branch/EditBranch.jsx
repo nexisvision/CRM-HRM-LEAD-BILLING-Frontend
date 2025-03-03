@@ -71,12 +71,12 @@ const EditBranch = ({ idd, onClose }) => {
     dispatch(editBranch({ idd, values }))
       .then(() => {
         dispatch(getBranch());
-        message.success("Branch updated successfully!");
+        // message.success("Branch updated successfully!");
         resetForm();
         onClose();
       })
       .catch((error) => {
-        message.error("Failed to update branch.");
+        // message.error("Failed to update branch.");
         console.error("Edit API error:", error);
       });
   };

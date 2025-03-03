@@ -142,7 +142,7 @@ const AddEstimates = ({ onClose }) => {
             const requiredFields = {
                 valid_till: values.valid_till,
                 currency: values.currency,
-                lead: values.lead,
+                // lead: values.lead,
                 client: values.client,
                 calculatedTax: values.calculatedTax
             };
@@ -184,7 +184,7 @@ const AddEstimates = ({ onClose }) => {
             const estimateData = {
                 valid_till: values.valid_till.format('YYYY-MM-DD'),
                 currency: values.currency,
-                lead: values.lead,
+                // lead: values.lead,
                 client: values.client,
                 related_id: id,
                 subtotal: subtotal.toFixed(2),
@@ -205,7 +205,7 @@ const AddEstimates = ({ onClose }) => {
                 dispatch(getallestimate(id));
                 // message.success('Estimate created successfully');
             } else {
-                throw new Error(result.payload?.message || 'Failed to create estimate');
+                // throw new Error(result.payload?.message || 'Failed to create estimate');
             }
         } catch (error) {
             console.error("Estimate Creation Error:", error);
@@ -428,7 +428,7 @@ const handleTableDataChange = (id, field, value) => {
                                         </Form.Item>
                                     </Col>
 
-                                    <Col span={12}>
+                                    {/* <Col span={12}>
                                         <Form.Item
                                             name="lead"
                                             label="Lead Title"
@@ -465,7 +465,7 @@ const handleTableDataChange = (id, field, value) => {
                                                 ))}
                                             </Select>
                                         </Form.Item>
-                                    </Col>
+                                    </Col> */}
 
                                     {/* <Col span={12}>
                                         <Form.Item

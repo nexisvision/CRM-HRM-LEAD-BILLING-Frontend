@@ -62,19 +62,19 @@ const AttendanceList = () => {
 
   const tabledata = useSelector((state) => state.attendance);
   const fnddat = tabledata.Attendances.data || [];
-  const fndattendancedata = fnddat.filter((item) => item.created_by === user);
+  // const fndattendancedata = fnddat.filter((item) => item.created_by === user);
 
 
   const employeeData = useSelector((state) => state.employee?.employee?.data || []);
-  const fndemployeeData = employeeData.filter((item) => item.created_by === user);
+  // const fndemployeeData = employeeData.filter((item) => item.created_by === user);
   
   const leaveData = useSelector((state) => state.Leave?.Leave?.data || []);
   const fndleavedata = leaveData.filter((item) => item.created_by === user);
 
 
   useEffect(() => {
-    if (fndemployeeData) {
-      const employeeAttendanceMap = fndemployeeData.reduce((acc, employee) => {
+    if (employeeData) {
+      const employeeAttendanceMap = employeeData.reduce((acc, employee) => {
         acc[employee.id] = {
           employee: employee.username,
           id: employee.id,
@@ -96,8 +96,8 @@ const AttendanceList = () => {
       }
 
      
-      if (fndattendancedata) {
-        fndattendancedata.forEach((attendance) => {
+      if (fnddat) {
+        fnddat.forEach((attendance) => {
           const attendanceDate = dayjs(attendance.date);
           if (attendanceDate.isSame(selectedMonth, 'month')) {
             const day = attendanceDate.date();
@@ -164,7 +164,7 @@ const AttendanceList = () => {
         // console.log(aggregatedData, "users");
       }
     }
-  }, [fndattendancedata, fndemployeeData, fndleavedata, selectedMonth]);
+  }, [fnddat, employeeData, fndleavedata, selectedMonth]);
 
 
 

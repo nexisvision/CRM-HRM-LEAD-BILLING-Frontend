@@ -75,7 +75,7 @@ const EmployeeList = () => {
 
   const branchDataa = useSelector((state) => state.Branch?.Branch?.data || []);
 
-  const branchData = branchDataa.filter(item => item.created_by === user);
+  // const branchData = branchDataa.filter(item => item.created_by === user);
 
   // console.log("branchData", branchData);
 
@@ -100,12 +100,12 @@ const EmployeeList = () => {
 
       if (datas) {
         // Filter employees by created_by matching the logged-in user's username
-        const filteredData = datas.filter(
-          (item) => item.created_by === user && item.employeeId
-        );
+        // const datas = datas.filter(
+        //   (item) => item.created_by === user && item.employeeId
+        // );
 
         // Map the data to include names instead of IDs
-        const mappedData = filteredData.map(employee => {
+        const mappedData = datas.map(employee => {
           // Find corresponding department
           const department = departmentData.find(
             dept => dept.id === employee.department
@@ -117,7 +117,7 @@ const EmployeeList = () => {
           );
 
           // Find corresponding branch
-          const branch = branchData.find(
+          const branch = branchDataa.find(
             br => br.id === employee.branch
           );
 
@@ -257,7 +257,7 @@ const EmployeeList = () => {
   //       //   (item) => item.role_name === "employee"
   //       // );
 
-  //       // const filteredData = datas.filter(
+  //       // const datas = datas.filter(
   //       //   (item) => item.role_id && item.role_name === "employee"
   //       // );
 
@@ -642,17 +642,17 @@ const EmployeeList = () => {
   const getFilteredEmployees = () => {
     if (!users) return [];
 
-    let filteredData = users;
+    let datas = users;
 
     // Filter by branch
     if (selectedBranch !== 'all') {
-      filteredData = filteredData.filter(employee => employee.branch === selectedBranch);
+      datas = datas.filter(employee => employee.branch === selectedBranch);
     }
 
     // Filter by search text
     if (searchText) {
       const searchLower = searchText.toLowerCase();
-      filteredData = filteredData.filter(employee => {
+      datas = datas.filter(employee => {
         return (
           employee.username?.toLowerCase().includes(searchLower) ||
           employee.firstName?.toLowerCase().includes(searchLower) ||
@@ -664,7 +664,7 @@ const EmployeeList = () => {
       });
     }
 
-    return filteredData;
+    return datas;
   };
 
   // Add this before the table component
@@ -677,7 +677,7 @@ const EmployeeList = () => {
         onChange={setSelectedBranch}
       >
         <Option value="all">All Branches</Option>
-        {branchData.map(branch => (
+        {branchDataa.map(branch => (
           <Option key={branch.id} value={branch.branchName}>
             {branch.branchName}
           </Option>

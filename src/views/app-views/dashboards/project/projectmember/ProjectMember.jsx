@@ -7,6 +7,7 @@ import { GetProject } from "../project-list/projectReducer/ProjectSlice";
 import Flex from "components/shared-components/Flex";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 const ProjectMember = () => {
   const dispatch = useDispatch();
@@ -14,10 +15,10 @@ const ProjectMember = () => {
     useState(false);
 
   const AllProject = useSelector((state) => state.Project);
-  const AllEmployee = useSelector((state) => state.employee);
+  const AllEmployee = useSelector((state) => state.Users);
 
   const projectData = AllProject?.Project?.data || [];
-  const employeeData = AllEmployee?.employee?.data || [];
+  const employeeData = AllEmployee?.Users?.data || [];
 
   const { id } = useParams();
 
@@ -53,15 +54,15 @@ const ProjectMember = () => {
     }
   };
 
-  console.log("tt", projectData);
+  // console.log("tt", projectData);
 
   const project = projectData[0]; // Accessing the first project as an example
 
-console.log("sdfsdfsdf",project);
+// console.log("sdfsdfsdf",project);
 
   const userField = fnddata?.project_members; // The 'user' field in the project
   let userArray = [];
-  console.log("popopop", userField);
+  // console.log("popopop", userField);
 
   try {
     const parsedUserField = JSON.parse(userField); // Parse the JSON string
@@ -80,7 +81,7 @@ console.log("sdfsdfsdf",project);
     })
     .filter((employee) => employee !== null); // Remove null values
 
-  console.log("Filtered Employee Data:", userEmployeeData);
+  // console.log("Filtered Employee Data:", userEmployeeData);
 
   const tableColumns = [
     {
@@ -135,6 +136,8 @@ console.log("sdfsdfsdf",project);
   };
 
   useEffect(() => {
+    dispatch(GetUsers());
+
     dispatch(GetProject());
   }, [dispatch]);
 

@@ -168,7 +168,7 @@ const VendorList = () => {
   const jobStatusList = ['active', 'blocked']
   const dropdownMenu = (record) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -180,8 +180,8 @@ const VendorList = () => {
             <span className="">View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
-      <Menu.Item>
+      </Menu.Item> */}
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -193,7 +193,7 @@ const VendorList = () => {
             <span className="">Send Mail</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item>
         <Flex alignItems="center">
           <Button

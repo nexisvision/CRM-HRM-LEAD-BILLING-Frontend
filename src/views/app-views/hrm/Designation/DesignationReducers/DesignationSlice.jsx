@@ -32,31 +32,6 @@ export const getDes = createAsyncThunk(
     }
 );
 
-// Async thunk for getting all users
-export const getAllUsers = createAsyncThunk(
-    "users/getAllUsers",
-    async (thunkAPI) => {
-        try {
-            const response = await UserService.getAllUsers();
-            return response;
-        } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data);
-        }
-    }
-);
-
-// Async thunk for getting user by id
-export const getUserById = createAsyncThunk(
-    "users/getUserById",
-    async (userId, thunkAPI) => {
-        try {
-            const response = await UserService.getUserById(userId);
-            return response;
-        } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data);
-        }
-    }
-);
 
 // Async thunk for deleting a user
 export const DeleteDes = createAsyncThunk(
@@ -144,11 +119,11 @@ const DesignationSlice = createSlice({
             })
             .addCase(AddDes.fulfilled, (state, action) => {
                 state.isLoading = false;
-                // message.success(action.payload?.message);
+                message.success(action.payload?.message);
             })
             .addCase(AddDes.rejected, (state, action) => {
                 state.isLoading = false;
-                // message.error(action.payload?.message);
+                message.error(action.payload?.message);
             })
 
 
@@ -170,13 +145,13 @@ const DesignationSlice = createSlice({
             .addCase(DeleteDes.pending, (state) => {
                 state.isLoading = true;
             })
-            .addCase(DeleteDes.fulfilled, (state, action) => {
+            .addCase(DeleteDes.fulfilled, (state, action) => {  
                 state.isLoading = false;
-                // message.success(action.payload?.message);
+                message.success(action.payload?.message);
             })
             .addCase(DeleteDes.rejected, (state, action) => {
                 state.isLoading = false;
-                // message.error(action.payload?.message);
+                message.error(action.payload?.message);
             })
             //update
 
@@ -187,13 +162,13 @@ const DesignationSlice = createSlice({
               .addCase(EditDes.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload;
-                // message.success(action.payload?.message);
+                message.success(action.payload?.message);
               })
 
               .addCase(EditDes.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-                // message.error(action.payload?.message);
+                message.error(action.payload?.message);
               });
     },
 });

@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { GetAllNotifications } from "views/app-views/pages/setting/NotificationReducer/NotificationSlice";
 import { UploadOutlined } from "@ant-design/icons";
+import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 const { Option } = Select;
 
@@ -22,21 +23,34 @@ const AddTask = ({ onClose }) => {
   // const { id } = useParams();
 
   useEffect(() => {
-    dispatch(empdata());
+    // dispatch(empdata());
+    dispatch(GetUsers());
   }, [dispatch]);
 
-  const allempdata = useSelector((state) => state.employee);
-  const empData = allempdata?.employee?.data || [];
+  const allempdata = useSelector((state) => state.Users);
+  const empData = allempdata?.Users?.data || [];
+  const loggedInUser = useSelector((state) => state.user.loggedInUser);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const userRole = roles?.find(role => role.id === loggedInUser.role_id);
+
+  const fndassine = empData.filter(emp => {
+    if (userRole?.role_name === 'client') {
+      return emp.client_id === loggedInUser.id;
+    } else {
+      return emp.client_id === loggedInUser.client_id;
+    }
+  });
+
 
   const allloggeduserdata = useSelector((state) => state.user);
   const loggedUserData = allloggeduserdata?.loggedInUser || {};
   const id = loggedUserData?.id;
 
-  const loggedusername = useSelector((state) => state.user?.loggedInUser?.username);
+  // const loggedusername = useSelector((state) => state.user?.loggedInUser?.username);
 
-  const fndassine = Array.isArray(empData) && loggedusername
-    ? empData.filter((item) => item?.created_by === loggedusername)
-    : [];
+  // const fndassine = Array.isArray(empData) && loggedusername
+  //   ? empData.filter((item) => item?.created_by === loggedusername)
+  //   : [];
 
 
 

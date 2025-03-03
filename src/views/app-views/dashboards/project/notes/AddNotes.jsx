@@ -8,6 +8,7 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { AddNote, GetNote } from "./NotesReducer/NotesSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 const { Option } = Select;
 
@@ -19,23 +20,40 @@ const AddNotes = ({ onClose }) => {
   //   (state.employee?.employee?.data || []).filter((employee) => employee.employeeId)
   // );
 
-  const user = useSelector((state) => state.user.loggedInUser.username);
 
-  const { data: employee } = useSelector((state) => state.employee.employee);
 
-  const employeeData = employee?.filter((item) => item.created_by === user) || [];
+  const allempdata = useSelector((state) => state.Users);
+  const empData = allempdata?.Users?.data || [];
+  const loggedInUser = useSelector((state) => state.user.loggedInUser);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const userRole = roles?.find(role => role.id === loggedInUser.role_id);
+
+  const employeeData = empData.filter(emp => {
+    if (userRole?.role_name === 'client') {
+      return emp.client_id === loggedInUser.id;
+    } else {
+      return emp.client_id === loggedInUser.client_id;
+    }
+  });
+
+
+  // const user = useSelector((state) => state.user.loggedInUser.username);
+
+  // const { data: employee } = useSelector((state) => state.employee.employee);
+
+  // const employeeData = employee?.filter((item) => item.created_by === user) || [];
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(empdata());
+    dispatch(GetUsers());
   }, []);
 
   // const { data: employee } = useSelector((state) => state.employee.employee);
 
-  const filterdata = useSelector((state)=>state.employee.employee.data)
+  // const filterdata = useSelector((state)=>state.employee.employee.data)
 
-  const loggeduesr = useSelector((state)=>state.user.loggedInUser.username)
+  // const loggeduesr = useSelector((state)=>state.user.loggedInUser.username)
 
   // const employee = filterdata.filter((item)=>item.created_by === loggeduesr)
 
@@ -77,7 +95,7 @@ const AddNotes = ({ onClose }) => {
 
       dispatch(AddNote({id,values}))
         .then(()=>{
-          message.success("Note added successfully!");
+          // message.success("Note added successfully!");
           dispatch(GetNote(id))
           resetForm();
           onClose();

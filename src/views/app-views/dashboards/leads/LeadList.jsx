@@ -159,10 +159,10 @@ const LeadList = () => {
 
   if (parsedPermissions["dashboards-lead"] && parsedPermissions["dashboards-lead"][0]?.permissions) {
     allpermisson = parsedPermissions["dashboards-lead"][0].permissions;
-    console.log('Parsed Permissions:', allpermisson);
+    // console.log('Parsed Permissions:', allpermisson);
 
   } else {
-    console.log('dashboards-lead is not available');
+    // console.log('dashboards-lead is not available');
   }
 
   const canCreateClient = allpermisson?.includes('create');
@@ -220,10 +220,11 @@ const LeadList = () => {
   useEffect(() => {
     if (tabledata && tabledata.Leads && tabledata.Leads.data) {
       // Filter leads by created_by matching the logged-in user's username
-      const filteredLeads = tabledata.Leads.data.filter(lead => lead.created_by === user);
+      // const filteredLeads = tabledata.Leads.data.filter(lead => lead.created_by === user);
+      const filteredLeads = tabledata.Leads.data;
       setUsers(filteredLeads);
     }
-  }, [tabledata, user]);
+  }, [tabledata]);
 
 
 

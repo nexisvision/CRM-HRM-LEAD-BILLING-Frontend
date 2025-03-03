@@ -31,31 +31,22 @@ const AddBranch = ({ onClose }) => {
   const [isAddUserModalVisible, setIsAddUserModalVisible] = useState(false);
   const [managers, setManagers] = useState([]);
 
-  const alldata = useSelector((state) => state.Users.Users);
+  const alldata = useSelector((state) => state.Users.Users?.data || []);
 
   useEffect(() => {
-    dispatch(GetUsers())
-      .then((response) => {
-        if (response.payload?.data) {
-          setManagers(response.payload.data);
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching users:', error);
-        message.error('Failed to fetch users');
-      });
+    dispatch(GetUsers());
   }, [dispatch]);
 
   const handleSubmit = (values, { resetForm }) => {
     dispatch(AddBranchs(values))
       .then(() => {
         dispatch(getBranch());
-        message.success('Branch added successfully!');
+        // message.success('Branch added successfully!');
         resetForm();
         onClose();
       })
       .catch((error) => {
-        message.error('Failed to add branch.');
+        // message.error('Failed to add branch.');
         console.error('Add API error:', error);
       });
   };
@@ -117,16 +108,20 @@ const AddBranch = ({ onClose }) => {
                         )}
                         onChange={(value) => {
                           setFieldValue("branchManager", value);
-                            setFieldValue("department", "");
-                            setFieldValue("designation", "");
+                          setFieldValue("department", "");
+                          setFieldValue("designation", "");
                           setSelectedBranch(value);
                         }}
                       >
-                        {managers.map((manager) => (
-                          <Option key={manager.id} value={manager.id}>
-                            {manager.username}
-                          </Option>
-                        ))}
+                        {Array.isArray(alldata) && alldata.length > 0 ? (
+                          alldata.map((manager) => (
+                            <Option key={manager.id} value={manager.id}>
+                              {manager.username}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option disabled>No managers available</Option>
+                        )}
                       </Select>
                     )}
                   </Field>
@@ -148,41 +143,6 @@ const AddBranch = ({ onClose }) => {
                   )}
                 </div>
               </Col>
-              {/* <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Branch Manager <span className="text-red-500">*</span></label>
-                  <Field name="branchManager">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-2"
-                        placeholder="Select Branch Manager"
-                        dropdownRender={(menu) => (
-                          <>
-                            {menu}
-                            <Button 
-                              type="link" 
-                              block
-                              icon={<PlusOutlined />}
-                              onClick={() => setIsAddUserModalVisible(true)}
-                            >
-                              Add New Branch Manager
-                            </Button>
-                          </>
-                        )}
-                        onChange={(value) => setFieldValue("branchManager", value)}
-                      >
-                        {managers.map((manager) => (
-                          <Option key={manager.id} value={manager.id}>
-                            {manager.username}
-                          </Option>
-                        ))}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage name="branchManager" component="div" className="text-red-500" />
-                </div>
-              </Col> */}
             </Row>
 
             <div className="text-right">

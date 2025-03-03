@@ -48,6 +48,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { DeleteTasks, GetTasks } from "./TaskReducer/TaskSlice";
 import { AnnualStatisticData } from "../../default/DefaultDashboardData";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 const { Column } = Table;
 
@@ -95,7 +96,7 @@ export const TaskList = () => {
 
   const alldatatask = useSelector((state) => state.Tasks);
   const fnddata = alldatatask.Tasks.data;
-  const employees = useSelector((state) => state.employee?.employee?.data || []);
+  const employees = useSelector((state) => state.Users?.Users?.data || []);
 
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -160,7 +161,7 @@ export const TaskList = () => {
     const loadInitialData = async () => {
       setLoading(true);
       try {
-        await dispatch(empdata());
+        await dispatch(GetUsers());
         await dispatch(GetTasks(id));
       } catch (error) {
         console.error('Error loading data:', error);
@@ -174,7 +175,7 @@ export const TaskList = () => {
 
   useEffect(() => {
     if (fnddata) {
-      console.log("fnddata",fnddata);
+      // console.log("fnddata",fnddata);
       setList(fnddata);
     }
   }, [fnddata]);

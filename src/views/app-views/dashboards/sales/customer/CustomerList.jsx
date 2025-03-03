@@ -62,14 +62,14 @@ const CustomerList = () => {
   const fnddata = alldata?.customers?.data || []; 
   const loggid = useSelector((state)=>state.user.loggedInUser);
 
-  const filterdata = fnddata.filter((item) => item?.created_by === loggid.username);
+  // const filterdata = fnddata.filter((item) => item?.created_by === loggid.username);
 
   // Update users state whenever customer data changes
   useEffect(() => {
     if (loggid && fnddata.length > 0) {
-      const filterdata = fnddata.filter((item) => item?.created_by === loggid.username);
-      setUsers(filterdata);
-      console.log("Filtered Customer Data:", filterdata);
+      // const filterdata = fnddata.filter((item) => item?.created_by === loggid.username);
+      setUsers(fnddata);
+      // console.log("Filtered Customer Data:", filterdata);
     }
   }, [fnddata]);
   
@@ -92,10 +92,10 @@ const CustomerList = () => {
     
         if (parsedPermissions["dashboards-sales-customer"] && parsedPermissions["dashboards-sales-customer"][0]?.permissions) {
           allpermisson = parsedPermissions["dashboards-sales-customer"][0].permissions;
-          console.log('Parsed Permissions:', allpermisson);
+          // console.log('Parsed Permissions:', allpermisson);
         
         } else {
-          console.log('dashboards-sales-customer is not available');
+          // console.log('dashboards-sales-customer is not available');
         }
         
         const canCreateClient = allpermisson?.includes('create');
@@ -139,13 +139,13 @@ const CustomerList = () => {
   const onSearch = (e) => {
     const value = e.currentTarget.value.toLowerCase();
     if (!value) {
-      setUsers(filterdata);
+      setUsers(fnddata); // Reset to original filtered data
       return;
     }
-    const filteredUsers = filterdata.filter(user => 
-      user.customerNumber?.toLowerCase().includes(value) ||
-      user.name?.toLowerCase().includes(value) ||
-      user.tax_number?.toLowerCase().includes(value)
+    const filteredUsers = fnddata.filter(user => 
+      Object.values(user).some(val => 
+        val && val.toString().toLowerCase().includes(value.toLowerCase())
+      )
     );
     setUsers(filteredUsers);
   };

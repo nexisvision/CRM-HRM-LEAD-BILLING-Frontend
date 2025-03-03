@@ -34,31 +34,6 @@ export const getAllTicket = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
-export const getAllUsers = createAsyncThunk(
-  "users/getAllUsers",
-  async (thunkAPI) => {
-    try {
-      const response = await UserService.getAllUsers();
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// Async thunk for getting user by id
-export const getUserById = createAsyncThunk(
-  "users/getUserById",
-  async (userId, thunkAPI) => {
-    try {
-      const response = await UserService.getUserById(userId);
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
 
 // Async thunk for deleting a user
 export const DeleteTicket = createAsyncThunk(

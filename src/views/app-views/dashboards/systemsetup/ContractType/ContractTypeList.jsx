@@ -72,10 +72,10 @@ const ContractTypeList = () => {
   
   const alltagdata = useSelector((state) => state.Lable);
 
-  const alltaggdata = alltagdata.Lable.data || [];
+  const fndddata = alltagdata.Lable.data || [];
 
 
-  const fndddata = alltaggdata.filter(item => item.created_by === user);
+  // const fndddata = alltaggdata.filter(item => item.created_by === user);
 
   // console.log("fndddata", fndddata);
 

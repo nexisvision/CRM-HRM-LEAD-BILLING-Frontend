@@ -133,9 +133,9 @@ const LeaveList = () => {
 
       setUsers(users.filter((item) => item.id !== userId));
 
-      message.success({ content: "Deleted leave successfully", duration: 2 });
+      // message.success({ content: "Deleted leave successfully", duration: 2 });
     } catch (error) {
-      message.error({ content: 'Failed to delete leave', duration: 2 });
+      // message.error({ content: 'Failed to delete leave', duration: 2 });
       console.error("Error deleting user:", error);
     }
   };
@@ -176,10 +176,11 @@ const LeaveList = () => {
 
   useEffect(() => {
     if (tabledata && tabledata.Leave && tabledata.Leave.data) {
-      const filteredData = tabledata.Leave.data.filter(item => item.created_by === user);
+      // const filteredData = tabledata.Leave.data.filter(item => item.created_by === user);
+      const filteredData = tabledata.Leave.data;  
       setUsers(filteredData);
     }
-  }, [tabledata, user]);
+  }, [tabledata]);
 
   const editleave = (id) => {
     openEditLeaveModal();

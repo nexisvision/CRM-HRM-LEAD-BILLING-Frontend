@@ -38,13 +38,13 @@ const AddDepartment = ({ onClose }) => {
       .then(() => {
         dispatch(getDept());
 
-        message.success("Department added successfully!");
+        // message.success("Department added successfully!");
         resetForm();
         onClose();
         // navigate("/app/hrm/department");
       })
       .catch((error) => {
-        message.error("Failed to add department.");
+        // message.error("Failed to add department.");
         console.error("Add API error:", error);
       });
   };

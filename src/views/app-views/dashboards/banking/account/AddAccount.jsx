@@ -33,15 +33,15 @@ const AddAccount = ({ onClose }) => {
   const onSubmit = async (values, { setSubmitting }) => {
     try {
       // Add your API call here
-      console.log('Form values:', values);
+      // console.log('Form values:', values);
       dispatch(addAccount(values)).then((result) => {
-        console.log('Result:', result);
+        // console.log('Result:', result);
         if (result.payload.success) {
-          message.success(result.payload.message);
+          // message.success(result.payload.message);
           dispatch(getAccounts());
           onClose();
         } else {
-          message.error(result.payload.message);
+          // message.error(result.payload.message);
         }
       });
     } catch (error) {

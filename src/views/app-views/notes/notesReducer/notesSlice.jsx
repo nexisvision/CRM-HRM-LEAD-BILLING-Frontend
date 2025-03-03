@@ -32,32 +32,6 @@ export const getnotess = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
-export const getAllUsers = createAsyncThunk(
-  "users/getAllUsers",
-  async (thunkAPI) => {
-    try {
-      const response = await UserService.getAllUsers();
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// Async thunk for getting user by id
-export const getUserById = createAsyncThunk(
-  "users/getUserById",
-  async (userId, thunkAPI) => {
-    try {
-      const response = await UserService.getUserById(userId);
-      return response;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
-
 // Async thunk for deleting a user
 export const delnotess = createAsyncThunk(
   "users/delnotess",
@@ -94,7 +68,7 @@ const initialIsAuth = () => {
   return item ? JSON.parse(item) : false;
 };
 
-const RoleAndPermissionSlice = createSlice({
+const NotesSlice = createSlice({
   name: "notes",
   initialState: {
     notes: [],
@@ -159,44 +133,18 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-      //getall
-      .addCase(getAllUsers.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getAllUsers.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.users = action.payload;
-        toast.success(`Users fetched successfully`);
-      })
-      .addCase(getAllUsers.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
-      })
-
-      //getuserbyid
-      .addCase(getUserById.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getUserById.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.detailItem = action.payload?.user;
-        toast.success(action.payload.message);
-      })
-      .addCase(getUserById.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
-      })
+     
       //delete
       .addCase(delnotess.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(delnotess.fulfilled, (state, action) => {
         state.isLoading = false;
-        toast.success(action.payload.message);
+        message.success(action.payload?.message);
       })
       .addCase(delnotess.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
+        message.error(action.payload?.response?.message);
       })
       //update
       .addCase(editnotess.pending, (state) => {
@@ -206,14 +154,16 @@ const RoleAndPermissionSlice = createSlice({
       .addCase(editnotess.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload; // Update the state with the updated employee data
+        message.success(action.payload?.message);
       })
       .addCase(editnotess.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || "Failed to update employee";
+        state.error = action.payload;
+        message.error(action.payload?.response?.message);
       });
   },
 });
 
 export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-  RoleAndPermissionSlice.actions;
-export default RoleAndPermissionSlice.reducer;
+  NotesSlice.actions;
+export default NotesSlice.reducer;
