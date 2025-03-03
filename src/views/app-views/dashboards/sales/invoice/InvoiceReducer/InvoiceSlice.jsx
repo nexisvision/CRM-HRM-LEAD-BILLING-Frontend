@@ -160,7 +160,8 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(getInvoice.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.salesInvoices = action.payload?.data || [];
+        state.salesInvoices = action.payload;
+        // message.success(action.payload?.message);
       })
       .addCase(getInvoice.rejected, (state, action) => {
         state.isLoading = false;

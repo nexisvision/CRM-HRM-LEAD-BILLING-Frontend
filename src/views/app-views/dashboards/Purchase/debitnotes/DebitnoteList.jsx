@@ -36,6 +36,7 @@ const DebitnoteList = () => {
     const lid = AllLoggeddtaa.loggedInUser.id;
 
     const [searchText, setSearchText] = useState('');
+    const [selectedDate, setSelectedDate] = useState(null);
     const [filteredList, setFilteredList] = useState([]);
 
     useEffect(() => {
@@ -58,7 +59,7 @@ const DebitnoteList = () => {
 
     useEffect(() => {
         applyFilters();
-    }, [list, searchText]);
+    }, [list, searchText, selectedDate]);
 
     const applyFilters = () => {
         let filtered = [...list];
@@ -71,11 +72,25 @@ const DebitnoteList = () => {
             );
         }
 
+        // Date filter
+        if (selectedDate) {
+            const selectedDay = dayjs(selectedDate).startOf('day');
+            filtered = filtered.filter(item => {
+                if (!item.date) return false;
+                const itemDate = dayjs(item.date).startOf('day');
+                return itemDate.isSame(selectedDay, 'day');
+            });
+        }
+
         setFilteredList(filtered);
     };
 
     const onSearch = (e) => {
         setSearchText(e.target.value);
+    };
+
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
     };
    
     const tableColumns = [
@@ -128,9 +143,16 @@ const DebitnoteList = () => {
                             value={searchText}
                         />
                     </div>
-                   
-                   
-                   
+                    <div className="mr-md-3 mb-3">
+                        <DatePicker
+                            onChange={handleDateChange}
+                            value={selectedDate}
+                            format="DD-MM-YYYY"
+                            placeholder="Select Date"
+                            allowClear
+                            style={{ width: '100%' }}
+                        />
+                    </div>
                 </Flex>
                 <Flex gap="7px">
                     <Button type="primary" onClick={openAddDebitnoteModal}>

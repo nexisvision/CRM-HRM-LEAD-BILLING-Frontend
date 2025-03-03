@@ -11,6 +11,7 @@ import {
   Tag,
   Modal,
   message,
+  DatePicker,
 } from "antd";
 import {
   EyeOutlined,
@@ -36,6 +37,7 @@ import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 const getRevenueStatus = (status) => {
   if (status === "Paid") {
@@ -73,8 +75,7 @@ const RevenueList = () => {
 
   const [idd, setIdd] = useState("");
   const [searchText, setSearchText] = useState('');
-  // const [selectedStatus, setSelectedStatus] = useState('All');
-  // const [statusOptions, setStatusOptions] = useState(['All']);
+  const [dateRange, setDateRange] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [categoryOptions, setCategoryOptions] = useState(['All']);
 
@@ -293,6 +294,16 @@ const RevenueList = () => {
       sorter: (a, b) => utils.antdTableSorter(a, b, "category"),
     },
     {
+      title: "Date",
+      dataIndex: "date",
+      render: (_, record) => (
+        <span>
+          {record.date ? dayjs(record.date).format('DD-MM-YYYY') : ''}
+        </span>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "date"),
+    },
+    {
         title: "Description",
         dataIndex: "description",
         render: (description) => (
@@ -339,53 +350,57 @@ const RevenueList = () => {
     },
   };
 
-  const onSearch = (e) => {
-    const value = e.target.value.toLowerCase();
-    setSearchText(value);
-    
-    if (!value) {
-        setList(fnddata);
-        return;
-    }
-    
-    const filtered = fnddata.filter(revenue => {
+  const filterRevenues = (text, date, category) => {
+    if (!fnddata) return;
+
+    let filtered = [...fnddata];
+
+    // Apply text search filter
+    if (text) {
+      filtered = filtered.filter(revenue => {
         const customerName = fnddataCustomers?.find(cust => 
-            cust.id === revenue.customer
+          cust.id === revenue.customer
         )?.name?.toLowerCase();
         const plainDescription = revenue.description?.replace(/<[^>]+>/g, '').toLowerCase() || '';
         
-        return customerName?.includes(value) || plainDescription.includes(value);
-    });
-    
+        return customerName?.includes(text.toLowerCase()) || plainDescription.includes(text.toLowerCase());
+      });
+    }
+
+    // Apply date filter
+    if (date) {
+      const selectedDate = dayjs(date).startOf('day');
+      filtered = filtered.filter(revenue => {
+        if (!revenue.date) return false;
+        const revenueDate = dayjs(revenue.date).startOf('day');
+        return revenueDate.isSame(selectedDate, 'day');
+      });
+    }
+
+    // Apply category filter
+    if (category !== 'All') {
+      filtered = filtered.filter(revenue => 
+        revenue.category === category
+      );
+    }
+
     setList(filtered);
   };
 
-  // const handleStatusChange = (value) => {
-  //   setSelectedStatus(value);
-    
-  //   if (value === 'All') {
-  //     setList(fnddata);
-  //     return;
-  //   }
+  const handleDateChange = (date) => {
+    setDateRange(date);
+    filterRevenues(searchText, date, selectedCategory);
+  };
 
-  //   const filtered = fnddata.filter(revenue => 
-  //     revenue.status === value
-  //   );
-  //   setList(filtered);
-  // };
+  const onSearch = (e) => {
+    const value = e.target.value;
+    setSearchText(value);
+    filterRevenues(value, dateRange, selectedCategory);
+  };
 
   const handleCategoryChange = (value) => {
     setSelectedCategory(value);
-    
-    if (value === 'All') {
-      setList(fnddata);
-      return;
-    }
-
-    const filtered = fnddata.filter(revenue => 
-      revenue.category === value
-    );
-    setList(filtered);
+    filterRevenues(searchText, dateRange, value);
   };
 
   const getFilteredRevenues = () => {
@@ -442,6 +457,16 @@ const RevenueList = () => {
               />
             </div>
             <div className="mb-3">
+              <DatePicker
+                onChange={handleDateChange}
+                format="DD-MM-YYYY"
+                placeholder="Select Date"
+                className="w-100"
+                style={{ minWidth: 200 }}
+                allowClear
+              />
+            </div>
+            <div className="mb-3">
               <Select
                 defaultValue="All"
                 value={selectedCategory}
@@ -456,21 +481,6 @@ const RevenueList = () => {
                   </Option>
                 ))}
               </Select>
-            </div>
-            <div className="mb-3">
-              {/* <Select
-                defaultValue="All"
-                value={selectedStatus}
-                onChange={handleStatusChange}
-                className="w-100"
-                style={{ minWidth: 180 }}
-              >
-                {statusOptions.map((status) => (
-                  <Option key={status} value={status}>
-                    {status === 'All' ? 'All Status' : status}
-                  </Option>
-                ))}
-              </Select> */}
             </div>
           </Flex>
           <Flex gap="7px" className="flex">

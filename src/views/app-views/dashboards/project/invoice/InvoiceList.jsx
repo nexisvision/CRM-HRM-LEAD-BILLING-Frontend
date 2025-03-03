@@ -50,6 +50,7 @@ import Invoice from "views/app-views/pages/invoice";
 // import AddInvoice from './AddInvoice';
 // import ViewInvoice from './ViewInvoice';
 import { ClientData } from 'views/app-views/Users/client-list/CompanyReducers/CompanySlice';
+import { DatePicker } from 'antd';
 const { Column } = Table;
 const { Option } = Select;
 const getPaymentStatus = (status) => {
@@ -100,6 +101,7 @@ export const InvoiceList = () => {
   const [searchText, setSearchText] = useState('');
   const clientsData = useSelector((state) => state.SubClient);
   const clients = clientsData.SubClient.data || [];
+  const [dateRange, setDateRange] = useState(null);
   // Fetch invoices when component mounts
   useEffect(() => {
     // console.log("Fetching invoices for ID:", id);
@@ -173,31 +175,58 @@ export const InvoiceList = () => {
     setViewInvoiceModalVisible(false);
   };
   const handleSearch = (e) => {
-    const value = e.target.value.toLowerCase();
+    const value = e.target.value?.toLowerCase() || '';
     setSearchText(value);
-    if (!value) {
-      setList(invoices);
-      return;
+    filterInvoices(value, dateRange);
+  };
+  const filterInvoices = (searchValue = searchText, dates = dateRange) => {
+    let filtered = [...invoices];
+
+    // Apply text search filter
+    if (searchValue) {
+        filtered = filtered.filter((invoice) => {
+            const clientName = clients.find(c => c.id === invoice.client)?.username || '';
+            
+            const searchableFields = [
+                invoice.invoiceNumber,
+                invoice.project,
+                clientName,
+                invoice.total?.toString(),
+                invoice.tax?.toString(),
+                dayjs(invoice.issueDate).format("DD/MM/YYYY"),
+                dayjs(invoice.dueDate).format("DD/MM/YYYY")
+            ];
+            return searchableFields.some(field => 
+                field?.toLowerCase().includes(searchValue)
+            );
+        });
     }
-    const filtered = invoices.filter((invoice) => {
-      const clientName = clients.find(c => c.id === invoice.client)?.username || '';
-      
-      const searchableFields = [
-        invoice.invoiceNumber,
-        invoice.project,
-        clientName,
-        invoice.total?.toString(),
-        invoice.tax?.toString(),
-        dayjs(invoice.issueDate).format("DD/MM/YYYY"),
-        dayjs(invoice.dueDate).format("DD/MM/YYYY")
-      ];
-      return searchableFields.some(field => 
-        field?.toLowerCase().includes(value)
-      );
-    });
-    
+
+    // Apply date range filter
+    if (dates && dates.length === 2) {
+        const startDate = dayjs(dates[0]).startOf('day');
+        const endDate = dayjs(dates[1]).endOf('day');
+
+        filtered = filtered.filter(invoice => {
+            const issueDate = dayjs(invoice.issueDate);
+            const dueDate = dayjs(invoice.dueDate);
+
+            // Check if either issueDate or dueDate falls within the selected range
+            return (
+                (issueDate.isAfter(startDate) || issueDate.isSame(startDate)) &&
+                (issueDate.isBefore(endDate) || issueDate.isSame(endDate))
+            ) || (
+                (dueDate.isAfter(startDate) || dueDate.isSame(startDate)) &&
+                (dueDate.isBefore(endDate) || dueDate.isSame(endDate))
+            );
+        });
+    }
+
     setList(filtered);
   };
+  useEffect(() => {
+    filterInvoices(searchText, dateRange);
+  }, [dateRange, invoices]);
   const dropdownMenu = (row) => (
     <Menu>
       <Menu.Item>
@@ -323,18 +352,15 @@ export const InvoiceList = () => {
                                 className="search-input"
                             />
                         </div>
-                        {/* <div className="mb-3">
-                            <Select
-                                defaultValue="All"
-                                className="w-100"
-                                style={{ minWidth: 180 }}
-                                // onChange={handleShowStatus}
-                                placeholder="Status"
-                            >
-                                <Option value="All">All payment </Option>
-                                {paymentStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
-                            </Select>
-                        </div> */}
+                        <div className="mr-0 md:mr-3 mb-3 md:mb-0">
+                            <DatePicker.RangePicker
+                                onChange={(dates) => setDateRange(dates)}
+                                format="DD-MM-YYYY"
+                                placeholder={['Issue Date', 'Due Date']}
+                                allowClear
+                                className="w-full md:w-auto"
+                            />
+                        </div>
                     </Flex>
                     <Flex gap="7px" className="flex">
                         <div className='flex gap-4'>

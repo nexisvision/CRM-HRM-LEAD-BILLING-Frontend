@@ -10,6 +10,7 @@ import {
   Modal,
   Select,
   Space,
+  DatePicker,
 } from "antd";
 import {
   EyeOutlined,
@@ -209,27 +210,38 @@ const ProposalList = () => {
   // Add new state for search value
   const [searchValue, setSearchValue] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
 
-  // Create debounced version of search
-  const debouncedSearch = debounce((value, data, setUsers) => {
+  // Modified debounced search function to include date filtering
+  const debouncedSearch = debounce((value, date, data, setUsers) => {
     setIsSearching(true);
     
     const searchValue = value.toLowerCase();
     
-    if (!searchValue) {
-      setUsers(fnddatas || []); // Reset to original data
+    if (!fnddatas) {
+      setUsers([]);
       setIsSearching(false);
       return;
     }
 
-    // Filter the data based on search value
-    const filteredData = fnddatas?.filter(proposal => {
+    // Filter the data based on search value and date
+    const filteredData = fnddatas.filter(proposal => {
       const lead = Leads?.find((l) => l.id === proposal.lead_title);
-      return (
+      const matchesSearch = !searchValue || (
         lead?.leadTitle?.toString().toLowerCase().includes(searchValue) ||
         proposal.deal_title?.toString().toLowerCase().includes(searchValue)
       );
-    }) || [];
+
+      // Add date filtering
+      let matchesDate = true;
+      if (date) {
+        const proposalDate = dayjs(proposal.valid_till).startOf('day');
+        const selectedDay = dayjs(date).startOf('day');
+        matchesDate = proposalDate.isSame(selectedDay, 'day');
+      }
+
+      return matchesSearch && matchesDate && proposal.created_by === user;
+    });
 
     // Enrich the filtered data with lead and deal titles
     const enrichedData = filteredData.map((proposal) => {
@@ -251,7 +263,13 @@ const ProposalList = () => {
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     setSearchValue(value);
-    debouncedSearch(value, fnddatas, setUsers);
+    debouncedSearch(value, selectedDate, fnddatas, setUsers);
+  };
+
+  // Add date change handler
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    debouncedSearch(searchValue, date, fnddatas, setUsers);
   };
 
   const deleteUser = (userId) => {
@@ -439,21 +457,22 @@ const ProposalList = () => {
 
 
     {
-      title: "tax",
+      title: "Tax",
       dataIndex: "tax",
       sorter: (a, b) => a.tax.length - b.tax.length,
     },
     {
-      title: "total",
+      title: "Total",
       dataIndex: "total",
       sorter: (a, b) => a.total.length - b.total.length,
     },
     {
-      title: "valid_till",
+      title: "Date",
       dataIndex: "valid_till",
       render: (date) => (date ? dayjs(date).format("DD-MM-YYYY") : "N/A"),
       sorter: (a, b) => a.valid_till.length - b.valid_till.length,
     },
+   
     // {
     //   title: "created_by ",
     //   dataIndex: "created_by",
@@ -488,6 +507,14 @@ const ProposalList = () => {
               allowClear
               style={{ width: '200px' }}
               loading={isSearching}
+            />
+            <DatePicker
+              onChange={handleDateChange}
+              value={selectedDate}
+              format="DD-MM-YYYY"
+              placeholder="Search Date"
+              allowClear
+              style={{ width: '200px' }}
             />
           </div>
         </Flex>

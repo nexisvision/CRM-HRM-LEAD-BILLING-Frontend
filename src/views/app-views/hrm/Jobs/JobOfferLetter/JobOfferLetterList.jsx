@@ -9,6 +9,7 @@ import {
   Button,
   Modal,
   Select,
+  DatePicker,
 } from "antd";
 import {
   EyeOutlined,
@@ -61,6 +62,9 @@ const JobOfferLetterList = () => {
   const [isAddEmployeeModalVisible, setIsAddEmployeeModalVisible] = useState(false);
   const [employeeData, setEmployeeData] = useState(null);
 
+  // Replace the two date state variables with a single dateRange
+  const [dateRange, setDateRange] = useState(null);
+
   useEffect(() => {
     dispatch(getjobofferss());
     dispatch(getjobapplication());
@@ -84,7 +88,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
 
   useEffect(() => {
     if (fnddata) {
-      setUsers(fnddtaa);
+      setUsers(fnddtaa);  
     }
   }, [fnddata]);
 
@@ -163,13 +167,31 @@ const user = useSelector((state) => state.user.loggedInUser.username);
   const getFilteredOffers = () => {
     if (!users) return [];
     
-    if (!searchText) return users;
+    let filtered = [...users];
 
-    return users.filter(offer => {
-      const offerSalary = offer.salary?.toString().toLowerCase();
-      const searchValue = searchText.toLowerCase();
-      return offerSalary?.includes(searchValue);
-    });
+    // Text search filter
+    if (searchText) {
+      filtered = filtered.filter(offer => {
+        const offerSalary = offer.salary?.toString().toLowerCase();
+        const searchValue = searchText.toLowerCase();
+        return offerSalary?.includes(searchValue);
+      });
+    }
+
+    // Date range filter
+    if (dateRange && dateRange[0] && dateRange[1]) {
+      const startDate = dayjs(dateRange[0]).format('YYYY-MM-DD');
+      const endDate = dayjs(dateRange[1]).format('YYYY-MM-DD');
+      
+      filtered = filtered.filter(offer => {
+        const offerExpiry = dayjs(offer.offer_expiry).format('YYYY-MM-DD');
+        const expectedJoining = dayjs(offer.expected_joining_date).format('YYYY-MM-DD');
+        
+        return offerExpiry >= startDate && expectedJoining <= endDate;
+      });
+    }
+
+    return filtered;
   };
 
   const handleSearch = () => {
@@ -416,6 +438,11 @@ const user = useSelector((state) => state.user.loggedInUser.username);
     },
   ];
 
+  // Replace the two date handlers with a single range handler
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates);
+  };
+
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
       <Flex
@@ -433,26 +460,20 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                 value={searchText}
                 className="search-input"
                 onPressEnter={handleSearch}
-                // type="number"
               />
             </Input.Group>
           </div>
-          {/* <div className="w-full md:w-48 ">
-            <Select
-              defaultValue="All"
+          <div className="mr-md-3 mb-3">
+            <DatePicker.RangePicker
+              value={dateRange}
+              onChange={handleDateRangeChange}
+              format="DD-MM-YYYY"
+              placeholder={['Offer Expiry', 'Expected Joining']}
               className="w-100"
-              style={{ minWidth: 180 }}
-              onChange={handleShowStatus}
-              placeholder="Status"
-            >
-              <Option value="All">All Job </Option>
-              {jobStatusList.map((elm) => (
-                <Option key={elm} value={elm}>
-                  {elm}
-                </Option>
-              ))}
-            </Select>
-          </div> */}
+              allowClear={true}
+              style={{ minWidth: '300px' }}
+            />
+          </div>
         </Flex>
         <Flex gap="7px">
          
@@ -597,6 +618,16 @@ const styles = `
 
   .table-responsive {
     overflow-x: auto;
+  }
+
+  .ant-picker {
+    min-width: 200px;
+  }
+
+  @media (max-width: 768px) {
+    .ant-picker {
+      width: 100%;
+    }
   }
 `;
 

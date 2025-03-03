@@ -16,6 +16,7 @@ import {
   Modal,
   Tag,
   message,
+  DatePicker,
 } from "antd";
 // import { invoiceData } from '../../../pages/invoice/invoiceData';
 // import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
@@ -106,6 +107,7 @@ export const BillingList = () => {
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [statusOptions, setStatusOptions] = useState(['All']);
   const [searchText, setSearchText] = useState('');
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const handleShowStatus = (value) => {
     if (value !== "All") {
@@ -360,59 +362,57 @@ export const BillingList = () => {
     },
   ];
 
+  const filterBillings = (text, date, status) => {
+    if (!fnddata) return;
+
+    let filtered = [...fnddata];
+
+    // Apply text search filter
+    if (text) {
+      filtered = filtered.filter(bill => 
+        bill.billNumber?.toLowerCase().includes(text.toLowerCase())
+      );
+    }
+
+    // Apply date filter
+    if (date) {
+      const selectedDate = dayjs(date).startOf('day');
+      filtered = filtered.filter(bill => {
+        if (!bill.billDate) return false;
+        const billDate = dayjs(bill.billDate).startOf('day');
+        return billDate.isSame(selectedDate, 'day');
+      });
+    }
+
+    // Apply status filter
+    if (status && status !== 'All') {
+      filtered = filtered.filter(bill => 
+        bill.status === status
+      );
+    }
+
+    setList(filtered);
+  };
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    filterBillings(searchText, date, selectedStatus);
+  };
+
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
-    
-    // If search value is empty, show all data
-    if (!value) {
-      setList(fnddata);
-      return;
-    }
-    
-    // Filter the data based on bill number
-    const filtered = fnddata.filter(bill => 
-      bill.billNumber?.toLowerCase().includes(value)
-    );
-    
-    setList(filtered);
+    filterBillings(value, selectedDate, selectedStatus);
+  };
+
+  const handleStatusChange = (value) => {
+    setSelectedStatus(value);
+    filterBillings(searchText, selectedDate, value);
   };
 
   const getFilteredBillings = () => {
     if (!list) return [];
-    
-    let filtered = list;
-
-    // Apply search filter
-    if (searchText) {
-      filtered = filtered.filter(bill => 
-        bill.billNumber?.toLowerCase().includes(searchText.toLowerCase())
-      );
-    }
-
-    // Apply status filter
-    if (selectedStatus && selectedStatus !== 'All') {
-      filtered = filtered.filter(bill => 
-        bill.status === selectedStatus
-      );
-    }
-
-    return filtered;
-  };
-
-  // Update status change handler
-  const handleStatusChange = (value) => {
-    setSelectedStatus(value);
-    
-    if (value === 'All') {
-      setList(fnddata);
-      return;
-    }
-
-    const filtered = fnddata.filter(bill => 
-      bill.status === value
-    );
-    setList(filtered);
+    return list;
   };
 
   return (
@@ -436,6 +436,17 @@ export const BillingList = () => {
                 value={searchText}
                 allowClear
                 className="search-input"
+              />
+            </div>
+            <div className="mb-3">
+              <DatePicker
+                onChange={handleDateChange}
+                format="DD-MM-YYYY"
+                placeholder="Select Date"
+                className="w-100"
+                style={{ minWidth: 200 }}
+                allowClear
+                value={selectedDate}
               />
             </div>
             <div className="mb-3">

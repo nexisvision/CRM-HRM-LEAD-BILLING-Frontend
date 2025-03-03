@@ -13,6 +13,7 @@ import {
   Menu,
   Modal,
   Tag,
+  DatePicker,
 } from "antd";
 // import { invoiceData } from '../../../pages/invoice/invoiceData';
 // import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
@@ -45,6 +46,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { deleteInvoice, getInvoice } from "./InvoiceReducer/InvoiceSlice";
 const { Column } = Table;
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 const getPaymentStatus = (status) => {
   if (status === "Paid") {
     return "success";
@@ -74,6 +76,7 @@ export const InvoiceList = () => {
   const fnddataCustomers = customerData.customers.data;
 
   const [searchText, setSearchText] = useState('');
+  const [dateRange, setDateRange] = useState(null);
 
   useEffect(() => {
     dispatch(getInvoice());
@@ -89,6 +92,54 @@ export const InvoiceList = () => {
   }, [fnddata]);
   const dispatch = useDispatch();
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
+  const filterInvoices = (text, dates) => {
+    if (!fnddata) return;
+
+    let filtered = [...fnddata];
+
+    // Apply text search filter
+    if (text) {
+      filtered = filtered.filter(invoice => 
+        invoice.salesInvoiceNumber?.toLowerCase().includes(text.toLowerCase())
+      );
+    }
+
+    // Apply date range filter
+    if (dates && dates[0] && dates[1]) {
+      const startDate = dayjs(dates[0]).startOf('day');
+      const endDate = dayjs(dates[1]).endOf('day');
+
+      filtered = filtered.filter(invoice => {
+        if (!invoice.issueDate) return false;
+        const issueDate = dayjs(invoice.issueDate);
+        return (
+          issueDate.isAfter(startDate) || issueDate.isSame(startDate, 'day')
+        ) && (
+          issueDate.isBefore(endDate) || issueDate.isSame(endDate, 'day')
+        );
+      });
+    }
+
+    setList(filtered);
+  };
+
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates);
+    if (dates === null) {
+      // If dates are cleared, reset to original list with only text filter
+      filterInvoices(searchText, null);
+    } else {
+      filterInvoices(searchText, dates);
+    }
+  };
+
+  const onSearch = (e) => {
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+    filterInvoices(value, dateRange);
+  };
+
   const handleShowStatus = (value) => {
     if (value !== "All") {
       const key = "paymentStatus";
@@ -216,6 +267,7 @@ export const InvoiceList = () => {
         <span
           className="cursor-pointer hover:underline"
           onClick={() => {
+            // Check if user has view permission
             if (whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) {
               Viewfunc(record.id);
             }
@@ -238,17 +290,6 @@ export const InvoiceList = () => {
         const customerA = fnddataCustomers?.find(cust => cust.id === a.customer)?.name || '';
         const customerB = fnddataCustomers?.find(cust => cust.id === b.customer)?.name || '';
         return customerA.localeCompare(customerB);
-      },
-    },
-    {
-      title: "Category",
-      dataIndex: "category",
-      render: (category) => <span>{category || 'N/A'}</span>,
-      sorter: (a, b) => {
-        if (a.category && b.category) {
-          return a.category.localeCompare(b.category);
-        }
-        return 0;
       },
     },
     {
@@ -327,39 +368,6 @@ export const InvoiceList = () => {
       setSelectedRowKeys(key);
     },
   };
-  const onSearch = (e) => {
-    const value = e.target.value.toLowerCase();
-    setSearchText(value);
-    
-    if (!value) {
-      setList(fnddata);
-      return;
-    }
-    
-    const filtered = fnddata.filter(invoice => 
-      invoice.salesInvoiceNumber?.toLowerCase().includes(value) ||
-      invoice.category?.toLowerCase().includes(value)
-    );
-    
-    setList(filtered);
-  };
-
-  // Update the filter function to include search
-  const getFilteredInvoices = () => {
-    if (!list) return [];
-    
-    let filtered = list;
-
-    // Apply search filter
-    if (searchText) {
-      filtered = filtered.filter(invoice => 
-        invoice.salesInvoiceNumber?.toLowerCase().includes(searchText.toLowerCase()) ||
-        invoice.category?.toLowerCase().includes(searchText.toLowerCase())
-      );
-    }
-
-    return filtered;
-  };
 
   // total() {
   //    let total = 0;
@@ -392,22 +400,15 @@ export const InvoiceList = () => {
                 className="search-input"
               />
             </div>
-            {/* <div className="mb-3">
-              <Select
-                defaultValue="All"
+            <div className="mb-3">
+              <RangePicker
+                onChange={handleDateRangeChange}
+                format="DD-MM-YYYY"
+                placeholder={['Start Date', 'End Date']}
                 className="w-100"
-                style={{ minWidth: 180 }}
-                onChange={handleShowStatus}
-                placeholder="Status"
-              >
-                <Option value="All">All payment </Option>
-                {paymentStatusList.map((elm) => (
-                  <Option key={elm} value={elm}>
-                    {elm}
-                  </Option>
-                ))}
-              </Select>
-            </div> */}
+                style={{ minWidth: 250 }}
+              />
+            </div>
           </Flex>
           <Flex gap="7px" className="flex">
                {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
@@ -430,7 +431,7 @@ export const InvoiceList = () => {
            {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                  <Table
                                  columns={tableColumns}
-                                 dataSource={getFilteredInvoices()}
+                                 dataSource={list}
                                  rowKey="id"
                                  scroll={{ x: 1200 }}
                                  rowSelection={{

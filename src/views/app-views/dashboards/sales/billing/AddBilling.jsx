@@ -31,6 +31,12 @@ const AddBilling = ({ onClose }) => {
   const [form] = Form.useForm();
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [newTag, setNewTag] = useState("");
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
+  const [newStatus, setNewStatus] = useState("");
+  const [statuses, setStatuses] = useState([]);
 
   const [tags, setTags] = useState([]);
   const AllLoggeddtaa = useSelector((state) => state.user);
@@ -379,6 +385,73 @@ const AddBilling = ({ onClose }) => {
     }
   };
 
+  const fetchLables = async (lableType, setter) => {
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const response = await dispatch(GetLable(lid));
+
+      if (response.payload && response.payload.data) {
+        const filteredLables = response.payload.data
+          .filter((lable) => lable.lableType === lableType)
+          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+        setter(filteredLables);
+      }
+    } catch (error) {
+      console.error(`Failed to fetch ${lableType}:`, error);
+      message.error(`Failed to load ${lableType}`);
+    }
+  };
+
+  useEffect(() => {
+    fetchLables("category", setCategories);
+    fetchLables("status", setStatuses);
+  }, []);
+
+  const handleAddNewLabel = async (labelType, newValue, setter, modalSetter) => {
+    if (!newValue.trim()) {
+      message.error(`Please enter a ${labelType} name`);
+      return;
+    }
+
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const payload = {
+        name: newValue.trim(),
+        lableType: labelType,
+      };
+
+      await dispatch(AddLable({ lid, payload }));
+      message.success(`${labelType} added successfully`);
+
+      // Fetch updated labels
+      const response = await dispatch(GetLable(lid));
+      if (response.payload && response.payload.data) {
+        const filteredLabels = response.payload.data
+          .filter(label => label.lableType === labelType)
+          .map(label => ({
+            id: label.id,
+            name: label.name.trim()
+          }));
+
+        // Update the appropriate state and form field
+        if (labelType === "category") {
+          setCategories(filteredLabels);
+          form.setFieldsValue({ category: newValue.trim() });
+        } else if (labelType === "status") {
+          setStatuses(filteredLabels);
+          form.setFieldsValue({ status: newValue.trim() });
+        }
+      }
+
+      // Reset input and close modal
+      setter("");
+      modalSetter(false);
+    } catch (error) {
+      console.error(`Failed to add ${labelType}:`, error);
+      message.error(`Failed to add ${labelType}`);
+    }
+  };
+
   return (
     <div>
       
@@ -437,24 +510,53 @@ const AddBilling = ({ onClose }) => {
 
             <Col span={12}>
               <Form.Item
-                label="Status"
+                label={<span className="">Category <span className="text-red-500">*</span></span>}
+                name="category"
+                rules={[{ required: true, message: "Please select or add a category" }]}
+              >
+                <Select
+                  placeholder="Select or add new category"
+                  dropdownRender={(menu) => (
+                    <div>
+                      {menu}
+                      <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                        <Button
+                          type="link"
+                          icon={<PlusOutlined />}
+                          onClick={() => setIsCategoryModalVisible(true)}
+                          block
+                        >
+                          Add New Category
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                >
+                  {categories.map((category) => (
+                    <Option key={category.id} value={category.name}>
+                      {category.name}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                label={<span className="">Status <span className="text-red-500">*</span></span>}
                 name="status"
-                rules={[{ required: true, message: "Please select status" }]}
+                rules={[{ required: true, message: "Please select or add a status" }]}
               >
                 <Select
                   placeholder="Select or add new status"
                   dropdownRender={(menu) => (
                     <div>
                       {menu}
-                      <div
-                        style={{
-                          padding: "8px",
-                          borderTop: "1px solid #e8e8e8",
-                        }}
-                      >
+                      <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
                         <Button
                           type="link"
-                          onClick={() => setIsTagModalVisible(true)}
+                          icon={<PlusOutlined />}
+                          onClick={() => setIsStatusModalVisible(true)}
                           block
                         >
                           Add New Status
@@ -463,37 +565,13 @@ const AddBilling = ({ onClose }) => {
                     </div>
                   )}
                 >
-                  {tags &&
-                    tags.map((tag) => (
-                      <Option key={tag.id} value={tag.name}>
-                        {tag.name}
-                      </Option>
-                    ))}
+                  {statuses.map((status) => (
+                    <Option key={status.id} value={status.name}>
+                      {status.name}
+                    </Option>
+                  ))}
                 </Select>
               </Form.Item>
-
-              <Modal
-                title="Add New Status"
-                visible={isTagModalVisible}
-                onOk={() => {
-                  if (newTag.trim()) {
-                    // Add new tag logic here
-                    setTags([...tags, { id: Date.now(), name: newTag.trim() }]);
-                    setNewTag("");
-                    setIsTagModalVisible(false);
-                  }
-                }}
-                onCancel={() => {
-                  setNewTag("");
-                  setIsTagModalVisible(false);
-                }}
-              >
-                <Input
-                  placeholder="Enter new status"
-                  value={newTag}
-                  onChange={(e) => setNewTag(e.target.value)}
-                />
-              </Modal>
             </Col>
 
             <Col span={12}>
@@ -778,6 +856,34 @@ const AddBilling = ({ onClose }) => {
         className='mt-[-70px]'
       >
         <AddVendor onClose={() => setIsAddVendorModalVisible(false)} />
+      </Modal>
+
+      <Modal
+        title="Add New Category"
+        open={isCategoryModalVisible}
+        onCancel={() => setIsCategoryModalVisible(false)}
+        onOk={() => handleAddNewLabel("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
+        okText="Add Category"
+      >
+        <Input
+          placeholder="Enter new category name"
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value)}
+        />
+      </Modal>
+
+      <Modal
+        title="Add New Status"
+        open={isStatusModalVisible}
+        onCancel={() => setIsStatusModalVisible(false)}
+        onOk={() => handleAddNewLabel("status", newStatus, setNewStatus, setIsStatusModalVisible)}
+        okText="Add Status"
+      >
+        <Input
+          placeholder="Enter new status name"
+          value={newStatus}
+          onChange={(e) => setNewStatus(e.target.value)}
+        />
       </Modal>
 
     </div>

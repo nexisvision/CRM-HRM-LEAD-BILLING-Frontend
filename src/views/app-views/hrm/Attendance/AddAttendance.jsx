@@ -180,7 +180,7 @@ const AddAttendance = ({ onClose }) => {
               </Col>
 
               {/* Late Field */}
-              <Col span={12}>
+              {/* <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">Late <span className="text-red-500">*</span></label>
                   <Field
@@ -199,7 +199,7 @@ const AddAttendance = ({ onClose }) => {
               </Col>
 
               {/* Half Day Dropdown */}
-              <Col span={12}>
+              {/* <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">Half Day <span className="text-red-500">*</span></label>
                   <Field
@@ -219,7 +219,7 @@ const AddAttendance = ({ onClose }) => {
                     </div>
                   )}
                 </div>
-              </Col>
+              </Col> */} 
 
               {/* Comment Field */}
               <Col span={24}>
@@ -238,7 +238,7 @@ const AddAttendance = ({ onClose }) => {
             </Row>
 
             {/* Submit Button */}
-            <div className="text-center">
+            <div className="text-right">
               <Button type="primary" htmlType="submit">
                 Add Attendance
               </Button>

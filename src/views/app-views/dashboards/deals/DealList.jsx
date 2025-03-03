@@ -11,6 +11,7 @@ import {
   Button,
   Modal,
   Radio,
+  DatePicker,
 } from "antd";
 import {
   EyeOutlined,
@@ -84,6 +85,7 @@ const DealList = () => {
 
   const [searchValue, setSearchValue] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   // Add console.log to debug data
   useEffect(() => {
@@ -100,8 +102,8 @@ const DealList = () => {
     }
   }, [tabledata, user]);
 
-  // Modified debounced search function
-  const debouncedSearch = debounce((value) => {
+  // Modified debounced search function to include date filtering
+  const debouncedSearch = debounce((value, date) => {
     setIsSearching(true);
     const searchValue = value.toLowerCase();
     
@@ -122,7 +124,15 @@ const DealList = () => {
           (deal.project?.toString().toLowerCase().includes(searchValue))
         );
         
-        return matchesUser && matchesSearch;
+        // Add date filtering
+        let matchesDate = true;
+        if (date) {
+          const dealDate = dayjs(deal.closedDate).startOf('day');
+          const selectedDay = dayjs(date).startOf('day');
+          matchesDate = dealDate.isSame(selectedDay, 'day');
+        }
+        
+        return matchesUser && matchesSearch && matchesDate;
       });
 
       setUsers(filteredData);
@@ -138,7 +148,13 @@ const DealList = () => {
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     setSearchValue(value);
-    debouncedSearch(value);
+    debouncedSearch(value, selectedDate);
+  };
+
+  // Add date change handler
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    debouncedSearch(searchValue, date);
   };
 
   useEffect(()=>{
@@ -411,7 +427,7 @@ const DealList = () => {
       },
     },
     {
-      title: "created_by",
+      title: "Created By",
       dataIndex: "created_by",
       sorter: {
         compare: (a, b) => a.created_by - b.created_by,
@@ -419,21 +435,31 @@ const DealList = () => {
     },
 
     {
-      title: "dealName",
+      title: "Deal Name",
       dataIndex: "dealName",
       sorter: {
         compare: (a, b) => a.dealName - b.dealName,
       },
     },
     {
-      title: "leadTitle",
+      title: "Lead Title",
       dataIndex: "leadTitle",
       sorter: {
         compare: (a, b) => a.leadTitle - b.leadTitle,
       },
     },
     {
-      title: "project",
+      title: "Closed Date",
+      dataIndex: "closedDate",
+      render: (_, record) => (
+        <span>
+          {record.closedDate ? dayjs(record.closedDate).format('DD-MM-YYYY') : ''}
+        </span>
+      ),
+      sorter: (a, b) => utils.antdTableSorter(a, b, "closedDate"),
+    },
+    {
+      title: "Project",
       dataIndex: "project",
       sorter: {
         compare: (a, b) => a.project - b.project,
@@ -532,6 +558,16 @@ const DealList = () => {
               allowClear
               style={{ width: '300px' }}
               loading={isSearching}
+            />
+          </div>
+          <div className="mr-md-3 mb-3">
+            <DatePicker
+              onChange={handleDateChange}
+              value={selectedDate}
+              format="DD-MM-YYYY"
+              placeholder="Search closed date"
+              allowClear
+              style={{ width: '200px' }}
             />
           </div>
         </Flex>

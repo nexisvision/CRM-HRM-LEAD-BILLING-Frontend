@@ -125,23 +125,41 @@ const currenciesState = useSelector((state) => state.currencies);
     }
   }, [loggedInUserId]);
 
-  const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
+  const handleAddNewLable = async (lableType, newValue, setter, modalSetter, setFieldValue) => {
     if (!newValue.trim()) {
       message.error(`Please enter a ${lableType} name.`);
       return;
     }
 
     try {
+      const lid = AllLoggedData.loggedInUser.id;
       const payload = {
         name: newValue.trim(),
         lableType,
-        userId: loggedInUserId,
       };
-      await dispatch(AddLable({ id: loggedInUserId, payload }));
+      await dispatch(AddLable({ lid, payload }));
       message.success(`${lableType} added successfully.`);
       setter("");
       modalSetter(false);
-      await fetchLables(lableType, lableType === "tag" ? setTags : lableType === "category" ? setCategories : setStatuses);
+
+      // Fetch updated labels and update the form field
+      const response = await dispatch(GetLable(lid));
+      if (response.payload && response.payload.data) {
+        const filteredLables = response.payload.data
+          .filter((lable) => lable.lableType === lableType)
+          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+        
+        if (lableType === "tag") {
+          setTags(filteredLables);
+          setFieldValue("tag", newValue.trim());
+        } else if (lableType === "category") {
+          setCategories(filteredLables);
+          setFieldValue("category", newValue.trim());
+        } else if (lableType === "status") {
+          setStatuses(filteredLables);
+          setFieldValue("status", newValue.trim());
+        }
+      }
     } catch (error) {
       console.error(`Failed to add ${lableType}:`, error);
       message.error(`Failed to add ${lableType}.`);
@@ -765,17 +783,17 @@ const currenciesState = useSelector((state) => state.currencies);
                       </div>
                     </Col>
                     <Col span={24}>
-                      <div className="form-item mt-3">
-                        <label className="font-semibold">Tags <span className="text-rose-500">*</span></label>
-                        <Field name="tags">
+                      <div className="form-item">
+                        <label className="font-semibold">Tag <span className="text-rose-500">*</span></label>
+                        <Field name="tag">
                           {({ field }) => (
                             <Select
-                              mode="multiple"
-                              style={{ width: "100%" }}
-                              className="mt-1"
-                              // placeholder="Select or add new tags"
-                              value={values.tags}
-                              onChange={(value) => setFieldValue("tags", value)}
+                              {...field}
+                              className="w-full mt-1"
+                              placeholder="Select or add new tag"
+                              onChange={(value) => setFieldValue("tag", value)}
+                              value={values.tag}
+                              onBlur={() => setFieldTouched("tag", true)}
                               dropdownRender={(menu) => (
                                 <div>
                                   {menu}
@@ -801,7 +819,7 @@ const currenciesState = useSelector((state) => state.currencies);
                           )}
                         </Field>
                         <ErrorMessage
-                          name="tags"
+                          name="tag"
                           component="div"
                           className="error-message text-red-500 my-1"
                         />
@@ -1017,7 +1035,7 @@ const currenciesState = useSelector((state) => state.currencies);
               title="Add New Tag"
               open={isTagModalVisible}
               onCancel={() => setIsTagModalVisible(false)}
-              onOk={() => handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible)}
+              onOk={() => handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible, setFieldValue)}
               okText="Add Tag"
             >
               <Input
@@ -1031,7 +1049,7 @@ const currenciesState = useSelector((state) => state.currencies);
               title="Add New Category"
               open={isCategoryModalVisible}
               onCancel={() => setIsCategoryModalVisible(false)}
-              onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
+              onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible, setFieldValue)}
               okText="Add Category"
             >
               <Input
@@ -1045,7 +1063,7 @@ const currenciesState = useSelector((state) => state.currencies);
               title="Add New Status"
               open={isStatusModalVisible}
               onCancel={() => setIsStatusModalVisible(false)}
-              onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible)}
+              onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible, setFieldValue)}
               okText="Add Status"
             >
               <Input

@@ -56,26 +56,34 @@ const AddJobOnBoarding = ({ onClose }) => {
     fetchLables("job-on-bording-status", setStatuses);
   }, []);
   
-  const handleAddNewStatus = async () => {
-    if (!newStatus.trim()) {
+  const handleAddNewStatus = async (newValue, setter, modalSetter, setFieldValue) => {
+    if (!newValue.trim()) {
       message.error("Please enter a Job On Boarding Status name");
       return;
     }
-  
+
     try {
       const lid = AllLoggedData.loggedInUser.id;
       const payload = {
-        name: newStatus.trim(),
+        name: newValue.trim(),
         lableType: "job-on-bording-status",
       };
-  
-      await dispatch(AddLable({ lid, payload }));
+
+      await dispatch(AddLable(lid, payload));
       message.success("Job On Boarding Status added successfully");
-      setNewStatus("");
-      setIsStatusModalVisible(false);
-  
-      // Fetch updated statuses
-      await fetchLables("job-on-bording-status", setStatuses);
+      setter(""); // Reset input field
+      modalSetter(false); // Close modal
+
+      // Fetch updated statuses and update the form field
+      const response = await dispatch(GetLable(lid));
+      if (response.payload && response.payload.data) {
+        const filteredStatuses = response.payload.data
+          .filter((label) => label.lableType === "job-on-bording-status")
+          .map((label) => ({ id: label.id, name: label.name.trim() }));
+        
+        setStatuses(filteredStatuses);
+        setFieldValue("status", newValue.trim()); // Set the newly created status in the form
+      }
     } catch (error) {
       console.error("Failed to add Job On Boarding Status:", error);
       message.error("Failed to add Job On Boarding Status");
@@ -151,238 +159,241 @@ const AddJobOnBoarding = ({ onClose }) => {
           setFieldTouched,
           resetForm,
         }) => (
-          <Form
-            layout="vertical"
-            name="add-job"
-            className="formik-form"
-            onSubmit={handleSubmit}
-          >
-            <Row gutter={16}>
-              {/* Interviewer */}
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Interviewer <span className="text-red-500">*</span></label>
-                  <Field name="interviewer">
-                    {({ field }) => (
-                      <Input
-                        {...field}
-                        className="w-full mt-1"
-                        placeholder="Enter Interviewer Name"
-                        onChange={(e) => setFieldValue("interviewer", e.target.value)}
-                        onBlur={() => setFieldTouched("interviewer", true)}
-                      />
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="interviewer"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+          <>
+            <Form
+              layout="vertical"
+              name="add-job"
+              className="formik-form"
+              onSubmit={handleSubmit}
+            >
+              <Row gutter={16}>
+                {/* Interviewer */}
+                <Col span={12}>
+                  <div className="form-item">
+                    <label className="font-semibold">Interviewer <span className="text-red-500">*</span></label>
+                    <Field name="interviewer">
+                      {({ field }) => (
+                        <Input
+                          {...field}
+                          className="w-full mt-1"
+                          placeholder="Enter Interviewer Name"
+                          onChange={(e) => setFieldValue("interviewer", e.target.value)}
+                          onBlur={() => setFieldTouched("interviewer", true)}
+                        />
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="interviewer"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
 
-              {/* Joining Date */}
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Joining Date <span className="text-red-500">*</span></label>
-                  <DatePicker
-                    className="w-full mt-1"
-                    format="DD-MM-YYYY"
-                    value={values.joiningDate}
-                    onChange={(joiningDate) =>
-                      setFieldValue("joiningDate", joiningDate)
-                    }
-                    onBlur={() => setFieldTouched("joiningDate", true)}
-                  />
-                  <ErrorMessage
-                    name="joiningDate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                {/* Joining Date */}
+                <Col span={12}>
+                  <div className="form-item">
+                    <label className="font-semibold">Joining Date <span className="text-red-500">*</span></label>
+                    <DatePicker
+                      className="w-full mt-1"
+                      format="DD-MM-YYYY"
+                      value={values.joiningDate}
+                      onChange={(joiningDate) =>
+                        setFieldValue("joiningDate", joiningDate)
+                      }
+                      onBlur={() => setFieldTouched("joiningDate", true)}
+                    />
+                    <ErrorMessage
+                      name="joiningDate"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
-              {/* Days of Week */}
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Days Of Week <span className="text-red-500">*</span></label>
-                  <Field
-                    name="daysOfWeek"
-                    as={Input}
-                    className="w-full mt-1"
-                    placeholder="Enter Days Of Week"
-                  />
-                  <ErrorMessage
-                    name="daysOfWeek"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                {/* Days of Week */}
+                <Col span={12} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold">Days Of Week <span className="text-red-500">*</span></label>
+                    <Field
+                      name="daysOfWeek"
+                      as={Input}
+                      className="w-full mt-1"
+                      placeholder="Enter Days Of Week"
+                    />
+                    <ErrorMessage
+                      name="daysOfWeek"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
-              {/* Salary */}
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Salary <span className="text-red-500">*</span></label>
-                  <Field name="salary" as={Input} placeholder="Enter Salary" className="w-full mt-1" />
-                  <ErrorMessage
-                    name="salary"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                {/* Salary */}
+                <Col span={12} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold">Salary <span className="text-red-500">*</span></label>
+                    <Field name="salary" as={Input} placeholder="Enter Salary" className="w-full mt-1" />
+                    <ErrorMessage
+                      name="salary"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
-              {/* Salary Type */}
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Salary Type <span className="text-red-500">*</span></label>
-                  <Field name="salaryType">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        placeholder="Select Salary Type"
-                        onChange={(value) => setFieldValue("salaryType", value)}
-                        value={values.salaryType}
-                        onBlur={() => setFieldTouched("salaryType", true)}
-                      >
-                        <Option value="hourly">Hourly Payslip</Option>
-                        <Option value="monthly">Monthly Payslip</Option>
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="salaryType"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                {/* Salary Type */}
+                <Col span={12} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold">Salary Type <span className="text-red-500">*</span></label>
+                    <Field name="salaryType">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-1"
+                          placeholder="Select Salary Type"
+                          onChange={(value) => setFieldValue("salaryType", value)}
+                          value={values.salaryType}
+                          onBlur={() => setFieldTouched("salaryType", true)}
+                        >
+                          <Option value="hourly">Hourly Payslip</Option>
+                          <Option value="monthly">Monthly Payslip</Option>
+                        </Select>
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="salaryType"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
-              {/* Salary Duration */}
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Salary Duration <span className="text-red-500">*</span></label>
-                  <Field name="salaryDuration">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        placeholder="Select Salary Duration"
-                        onChange={(value) =>
-                          setFieldValue("salaryDuration", value)
-                        }
-                        value={values.salaryDuration}
-                        onBlur={() => setFieldTouched("salaryDuration", true)}
-                      >
-                        <Option value="weekly">Weekly</Option>
-                        <Option value="biweekly">Biweekly</Option>
-                        <Option value="monthly">Monthly</Option>
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="salaryDuration"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                {/* Salary Duration */}
+                <Col span={12} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold">Salary Duration <span className="text-red-500">*</span></label>
+                    <Field name="salaryDuration">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-1"
+                          placeholder="Select Salary Duration"
+                          onChange={(value) =>
+                            setFieldValue("salaryDuration", value)
+                          }
+                          value={values.salaryDuration}
+                          onBlur={() => setFieldTouched("salaryDuration", true)}
+                        >
+                          <Option value="weekly">Weekly</Option>
+                          <Option value="biweekly">Biweekly</Option>
+                          <Option value="monthly">Monthly</Option>
+                        </Select>
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="salaryDuration"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
-              {/* Job Type */}
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Job Type <span className="text-red-500">*</span></label>
-                  <Field name="jobType">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        placeholder="Select Job Type"
-                        onChange={(value) => setFieldValue("jobType", value)}
-                        value={values.jobType}
-                        onBlur={() => setFieldTouched("jobType", true)}
-                      >
-                        <Option value="fulltime">Full Time</Option>
-                        <Option value="parttime">Part Time</Option>
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="jobType"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                {/* Job Type */}
+                <Col span={12} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold">Job Type <span className="text-red-500">*</span></label>
+                    <Field name="jobType">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-1"
+                          placeholder="Select Job Type"
+                          onChange={(value) => setFieldValue("jobType", value)}
+                          value={values.jobType}
+                          onBlur={() => setFieldTouched("jobType", true)}
+                        >
+                          <Option value="fulltime">Full Time</Option>
+                          <Option value="parttime">Part Time</Option>
+                        </Select>
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="jobType"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
 
-              {/* Status */}
-              <Col span={12}>
+                {/* Status */}
+                <Col span={12}>
                   <div className="form-item mt-3">
-                  <label className="font-semibold">Status <span className="text-red-500">*</span></label>
-                  <Select
-                    style={{ width: "100%" }}
-                    placeholder="Select or add new status"
-                    value={values.status}
-                    className="w-full mt-1"
-                    onChange={(value) => setFieldValue("status", value)}
-                    dropdownRender={(menu) => (
-                      <div>
-                        {menu}
-                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                          <Button
-                            type="link"
-                            icon={<PlusOutlined />}
-                            className="w-full mt-1"
-                            onClick={() => setIsStatusModalVisible(true)}
-                          >
-                            Add New Status
-                          </Button>
+                    <label className="font-semibold">Status <span className="text-red-500">*</span></label>
+                    <Select
+                      style={{ width: "100%" }}
+                      placeholder="Select or add new status"
+                      value={values.status}
+                      className="w-full mt-1"
+                      onChange={(value) => setFieldValue("status", value)}
+                      dropdownRender={(menu) => (
+                        <div>
+                          {menu}
+                          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                            <Button
+                              type="link"
+                              icon={<PlusOutlined />}
+                              className="w-full mt-1"
+                              onClick={() => setIsStatusModalVisible(true)}
+                            >
+                              Add New Status
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  >
-                    {statuses.map((status) => (
-                      <Option key={status.id} value={status.name}>
-                        {status.name}
-                      </Option>
-                    ))}
-                  </Select>
-                  <ErrorMessage
-                    name="status"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-            </Row>
+                      )}
+                    >
+                      {statuses.map((status) => (
+                        <Option key={status.id} value={status.name}>
+                          {status.name}
+                        </Option>
+                      ))}
+                    </Select>
+                    <ErrorMessage
+                      name="status"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+              </Row>
 
-            <div className="form-buttons text-right mt-2">
-              <Button type="default" className="mr-2" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="primary" htmlType="submit">
-                Create
-              </Button>
-            </div>
-          </Form>
+              <div className="form-buttons text-right mt-2">
+                <Button type="default" className="mr-2" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button type="primary" htmlType="submit">
+                  Create
+                </Button>
+              </div>
+            </Form>
+
+            <Modal
+              title="Add New Status"
+              open={isStatusModalVisible}
+              onCancel={() => setIsStatusModalVisible(false)}
+              onOk={() => handleAddNewStatus(newStatus, setNewStatus, setIsStatusModalVisible, setFieldValue)}
+              okText="Add Status"
+            >
+              <Input
+                placeholder="Enter new status name"
+                value={newStatus}
+                onChange={(e) => setNewStatus(e.target.value)}
+              />
+            </Modal>
+          </>
         )}
       </Formik>
-      <Modal
-        title="Add New Status"
-        open={isStatusModalVisible}
-        onCancel={() => setIsStatusModalVisible(false)}
-        onOk={() => handleAddNewStatus("status", newStatus, setNewStatus, setIsStatusModalVisible)}
-        okText="Add Status"
-      >
-        <Input
-          placeholder="Enter new status name"
-          value={newStatus}
-          onChange={(e) => setNewStatus(e.target.value)}
-        />
-      </Modal>
     </div>
   );
 };

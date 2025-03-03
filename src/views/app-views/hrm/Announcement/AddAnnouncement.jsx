@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getBranch } from '../Branch/BranchReducer/BranchSlice';
 import ReactQuill from 'react-quill';
 import AddBranch from '../Branch/AddBranch';
+import dayjs from 'dayjs';
 
 const { Option } = Select;
 
@@ -37,15 +38,31 @@ const AddAnnouncement = ({ onClose }) => {
   const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
 
   const handleSubmit = (values, { resetForm }) => {
+    // Ensure we have valid date and time values
+    if (!values.date || !values.time) {
+      message.error('Date and time are required');
+      return;
+    }
+
+    // Convert date to ISO string for proper date object handling on backend
+    const dateObj = values.date.toDate();
+    const formattedTime = values.time.format('HH:mm:ss');
+
     const payload = {
-      ...values,
+      title: values.title,
+      description: values.description,
+      date: dateObj,
+      time: formattedTime,
       branch: {
-        branch: values.branch,
-      },
+        branches: values.branch  // Changed from 'branch' to 'branches' to match backend schema
+      }
     };
+
+    console.log('Sending payload:', payload);
 
     dispatch(addAnnounce(payload))
       .then(() => {
+        message.success('Announcement added successfully');
         dispatch(GetAnn());
         resetForm();
         onClose();
@@ -53,6 +70,7 @@ const AddAnnouncement = ({ onClose }) => {
       })
       .catch((error) => {
         console.error('Add API error:', error);
+        message.error('Failed to add announcement: ' + error.message);
       });
   };
 
@@ -65,8 +83,8 @@ const AddAnnouncement = ({ onClose }) => {
         initialValues={{
           title: '',
           description: '',
-          date: '',
-          time: '',
+          date: null,
+          time: null,
           branch: [],
         }}
         validationSchema={validationSchema}
@@ -134,8 +152,8 @@ const AddAnnouncement = ({ onClose }) => {
                   <label className="font-semibold">Date <span className="text-red-500">*</span></label>
                   <DatePicker
                     className="w-full mt-1"
-                    format="DD-MM-YYYY"
-                    value={values.date}
+                    format="YYYY-MM-DD"
+                    value={values.date ? dayjs(values.date) : null}
                     onChange={(date) => setFieldValue("date", date)}
                     onBlur={() => setFieldTouched("date", true)}
                   />
@@ -151,11 +169,9 @@ const AddAnnouncement = ({ onClose }) => {
                   <label className="font-semibold">Time <span className="text-red-500">*</span></label>
                   <TimePicker
                     className="w-full mt-1"
-                    format="HH:mm"
-                    value={values.time}
-                    onChange={(time) =>
-                      setFieldValue("time", time)
-                    }
+                    format="HH:mm:ss"
+                    value={values.time ? dayjs(values.time, 'HH:mm:ss') : null}
+                    onChange={(time) => setFieldValue("time", time)}
                     onBlur={() => setFieldTouched("time", true)}
                   />
                   <ErrorMessage

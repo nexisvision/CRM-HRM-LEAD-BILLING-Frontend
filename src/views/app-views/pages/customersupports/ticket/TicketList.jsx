@@ -47,6 +47,8 @@ const { Column } = Table;
 
 const { Option } = Select;
 
+const priorityList = ["Low", "Medium", "High", "Critical"];
+
 const getPaymentStatus = (status) => {
   if (status === "Paid") {
     return "success";
@@ -77,6 +79,7 @@ export const TicketList = () => {
   const [pinnedTasks, setPinnedTasks] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedPriority, setSelectedPriority] = useState('All');
   const [isAddTicketModalVisible, setIsAddTicketModalVisible] = useState(false);
   const [isEditTicketModalVisible, setIsEditTicketModalVisible] =
     useState(false);
@@ -136,15 +139,45 @@ export const TicketList = () => {
     setIsViewTicketModalVisible(false);
   };
 
-  const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "priority";
-      const data = utils.filterArray(list, key, value);
-      setList(data);
-    } else {
-      setList(fnddata);
+  // Create a function to filter tickets based on both search and priority
+  const filterTickets = (searchText, priority) => {
+    let filteredData = fnddata || [];
+
+    // Apply search filter
+    if (searchText) {
+      filteredData = filteredData.filter(ticket =>
+        ticket.ticketSubject?.toLowerCase().includes(searchText.toLowerCase()) ||
+        ticket.description?.toLowerCase().includes(searchText.toLowerCase())
+      );
     }
+
+    // Apply priority filter
+    if (priority !== 'All') {
+      filteredData = filteredData.filter(ticket => ticket.priority === priority);
+    }
+
+    setList(filteredData);
   };
+
+  // Update the search handler to include priority
+  // const onSearch = (e) => {
+  //   const value = e.currentTarget.value;
+  //   setSearchValue(value);
+  //   filterTickets(value, selectedPriority);
+  // };
+
+  // Update the priority handler
+  const handleShowPriority = (value) => {
+    setSelectedPriority(value);
+    filterTickets(searchValue, value);
+  };
+
+  // Update useEffect to reset filters when data changes
+  // useEffect(() => {
+  //   if (finddata) {
+  //     filterTickets(searchValue, selectedPriority);
+  //   }
+  // }, [finddata]);
 
   useEffect(() => {
     dispatch(getAllTicket());
@@ -373,18 +406,16 @@ export const TicketList = () => {
                 style={{ width: '250px' }}
               />
             </div>
-            <div className="mb-3">
+            <div className="mr-md-3 mb-3">
               <Select
                 defaultValue="All"
-                className="w-100"
-                style={{ minWidth: 180 }}
-                onChange={handleShowStatus}
-                placeholder="Status"
+                style={{ width: 120 }}
+                onChange={handleShowPriority}
               >
-                <Option value="All">All Status</Option>
-                {paymentStatusList.map((elm) => (
-                  <Option key={elm} value={elm}>
-                    {elm}
+                <Option value="All">All Priority</Option>
+                {priorityList.map((priority) => (
+                  <Option key={priority} value={priority}>
+                    {priority}
                   </Option>
                 ))}
               </Select>

@@ -14,6 +14,7 @@ import {
   Modal,
   message,
   Space,
+  DatePicker,
 } from "antd";
 // import OrderListData from "../../../../assets/data/order-list.data.json";
 // import OrderListData from "assets/data/order-list.data.json"
@@ -48,6 +49,7 @@ import { DeleteTasks, GetTasks } from "../project/task/TaskReducer/TaskSlice";
 import { debounce } from 'lodash';
 
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 const getOrderStatus = (status) => {
   if (status === "Normal") {
@@ -82,6 +84,7 @@ const TaskList = () => {
   const [pinnedTasks, setPinnedTasks] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [dateRange, setDateRange] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -326,62 +329,28 @@ const TaskList = () => {
         compare: (a, b) => a.priority.length - b.priority.length,
       },
     },
-    // {
-    //   title: "Priority",
-    //   dataIndex: "priority",
-    //   sorter: {
-    //     compare: (a, b) => a.priority.length - b.priority.length,
-    //   },
-    // },
-    // {
-    //   title: "Date",
-    //   dataIndex: "date",
-    //   render: (_, record) => (
-    //     <span>{dayjs.unix(record.date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
-    //   ),
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "startdate"),
-    // },
-    // {
-    // 	title: 'Due Date',
-    // 	dataIndex: 'duedate',
-    // 	render: (_, record) => (
-    // 		<span>{dayjs.unix(record.date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
-    // 	),
-    // 	sorter: (a, b) => utils.antdTableSorter(a, b, 'startdate')
-    // },
-    // {
-    // 	title: 'Estimated Time',
-    // 	dataIndex: 'estimatedtime',
-    // 	sorter: {
-    // 		compare: (a, b) => a.description.length - b.description.length,
-    // 	},
-    // },
-    // {
-    // 	title: 'Hours Logged',
-    // 	dataIndex: 'hourslogged',
-    // 	sorter: {
-    // 		compare: (a, b) => a.description.length - b.description.length,
-    // 	},
-    // },
-    // {
-    //   title: "Assigned To",
-    //   dataIndex: "description",
-    //   render: (_, record) => (
-    //     <div className="d-flex">
-    //       <AvatarStatus size={30} src={record.image} />
-    //     </div>
-    //   ),
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "description"),
-    // },
+    
     {
       title: "Status",
-      dataIndex: "status",
+      dataIndex: "status", 
       render: (_, record) => (
         <>
           <Tag color={getOrderStatus(record.status)}>{record.status}</Tag>
         </>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "orderStatus"),
+    },
+    {
+      title: "Start Date",
+      dataIndex: "startDate",
+      render: (date) => (date ? dayjs(date).format("DD-MM-YYYY") : "N/A"),
+      sorter: (a, b) => new Date(a.startDate) - new Date(b.startDate),
+    },
+    {
+      title: "Due Date", 
+      dataIndex: "dueDate",
+      render: (date) => (date ? dayjs(date).format("DD-MM-YYYY") : "N/A"),
+      sorter: (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
     },
     {
       title: "Action",
@@ -401,35 +370,55 @@ const TaskList = () => {
     },
   };
 
-  // Create debounced version of search
-  const debouncedSearch = debounce((value, data, setList) => {
+  // Modified debounced search function to use date range
+  const debouncedSearch = debounce((value, dates, data, setList) => {
     setIsSearching(true);
     
     const searchValue = value.toLowerCase();
     
-    if (!searchValue) {
-      setList(fnddata || []); // Reset to original data
+    if (!fnddata) {
+      setList([]);
       setIsSearching(false);
       return;
     }
 
-    const filteredData = fnddata?.filter(task => {
-      return (
+    const filteredData = fnddata.filter(task => {
+      // Text search filter
+      const matchesSearch = !searchValue || (
         task.taskName?.toString().toLowerCase().includes(searchValue) ||
         stripHtmlTags(task.description)?.toLowerCase().includes(searchValue) ||
         task.priority?.toString().toLowerCase().includes(searchValue)
       );
-    }) || [];
+
+      // Date range filter
+      let matchesDateRange = true;
+      if (dates && dates[0] && dates[1]) {
+        const taskStartDate = dayjs(task.startDate);
+        const taskDueDate = dayjs(task.dueDate);
+        const rangeStart = dayjs(dates[0]).startOf('day');
+        const rangeEnd = dayjs(dates[1]).endOf('day');
+        
+        matchesDateRange = taskStartDate.isAfter(rangeStart) && taskDueDate.isBefore(rangeEnd);
+      }
+
+      return matchesSearch && matchesDateRange;
+    });
 
     setList(filteredData);
     setIsSearching(false);
-  }, 300); // 300ms delay
+  }, 300);
 
   // Modified onSearch function
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     setSearchValue(value);
-    debouncedSearch(value, fnddata, setList);
+    debouncedSearch(value, dateRange, fnddata, setList);
+  };
+
+  // Add date range change handler
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates);
+    debouncedSearch(searchValue, dates, fnddata, setList);
   };
 
   // const exportToExcel = () => {
@@ -480,9 +469,16 @@ const TaskList = () => {
                 prefix={<SearchOutlined />}
                 onChange={onSearch}
                 value={searchValue}
-                // allowClear
                 style={{ width: '250px' }}
                 loading={isSearching}
+              />
+              <RangePicker
+                onChange={handleDateRangeChange}
+                value={dateRange}
+                format="DD-MM-YYYY"
+                placeholder={['Start Date', 'Due Date']}
+                allowClear
+                style={{ width: '280px' }}
               />
             </div>
             <div className="mb-3">

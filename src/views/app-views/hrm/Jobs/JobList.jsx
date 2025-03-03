@@ -11,6 +11,7 @@ import {
   Button,
   Modal,
   Select,
+  DatePicker,
 } from "antd";
 import {
   EyeOutlined,
@@ -52,6 +53,7 @@ const JobList = () => {
   const [idd, setIdd] = useState("");
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState('');
+  const [dateRange, setDateRange] = useState([null, null]);
 
   const [annualStatisticData] = useState(AnnualStatisticData);
 
@@ -91,19 +93,42 @@ const JobList = () => {
     setSearchText(value);
   };
 
-  // Add this function to filter jobs
+  // Update the getFilteredJobs function to include date filtering
   const getFilteredJobs = () => {
     if (!filteredData) return [];
     
-    if (!searchText) return filteredData;
+    let filtered = [...filteredData]; // Create a copy of the array
 
-    return filteredData.filter(job => {
-      return (
-        job.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-        job.job_type?.toLowerCase().includes(searchText.toLowerCase()) ||
-        job.location?.toLowerCase().includes(searchText.toLowerCase())
-      );
-    });
+    // Text search filter
+    if (searchText) {
+      filtered = filtered.filter(job => {
+        return (
+          job.title?.toLowerCase().includes(searchText.toLowerCase()) ||
+          job.job_type?.toLowerCase().includes(searchText.toLowerCase()) ||
+          job.location?.toLowerCase().includes(searchText.toLowerCase())
+        );
+      });
+    }
+
+    // Date range filter
+    if (dateRange && dateRange[0] && dateRange[1]) {  // Check if dateRange exists and has both values
+      const startDate = dayjs(dateRange[0]).startOf('day');
+      const endDate = dayjs(dateRange[1]).endOf('day');
+
+      filtered = filtered.filter(job => {
+        if (!job.startDate || !job.endDate) return false; // Skip if job dates are missing
+        
+        const jobStartDate = dayjs(job.startDate);
+        const jobEndDate = dayjs(job.endDate);
+
+        return (
+          (jobStartDate.isSame(startDate, 'day') || jobStartDate.isAfter(startDate)) &&
+          (jobEndDate.isSame(endDate, 'day') || jobEndDate.isBefore(endDate))
+        );
+      });
+    }
+
+    return filtered;
   };
 
   // Add search button handler
@@ -338,6 +363,11 @@ const JobList = () => {
     },
   ];
 
+  // Update handler for date range changes
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates || [null, null]); // Ensure we set [null, null] when clearing
+  };
+
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
       {/* <Row gutter={16}>
@@ -370,22 +400,16 @@ const JobList = () => {
               />
             </Input.Group>
           </div>
-          {/* <div className="w-full md:w-48 ">
-            <Select
-              defaultValue="All"
+          <div className="mr-md-3 mb-3">
+            <DatePicker.RangePicker
+              value={dateRange}
+              onChange={handleDateRangeChange}
+              format="DD-MM-YYYY"
+              placeholder={['Start Date', 'End Date']}
               className="w-100"
-              style={{ minWidth: 180 }}
-              onChange={handleShowStatus}
-              placeholder="Status"
-            >
-              <Option value="All">All Job </Option>
-              {jobStatusList.map((elm) => (
-                <Option key={elm} value={elm}>
-                  {elm}
-                </Option>
-              ))}
-            </Select>
-          </div> */}
+              allowClear={true}
+            />
+          </div>
         </Flex>
         <Flex gap="7px">
         
@@ -509,6 +533,16 @@ const styles = `
 
   .table-responsive {
     overflow-x: auto;
+  }
+
+  .ant-picker-range {
+    min-width: 300px;
+  }
+
+  @media (max-width: 768px) {
+    .ant-picker-range {
+      width: 100%;
+    }
   }
 `;
 

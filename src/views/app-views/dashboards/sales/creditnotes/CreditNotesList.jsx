@@ -13,6 +13,7 @@ import {
   Tag,
   Modal,
   message,
+  DatePicker,
 } from "antd";
 // import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 // import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
@@ -84,6 +85,7 @@ const CreditNotesList = () => {
 
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
     dispatch(getcreditnote());
@@ -334,35 +336,46 @@ const CreditNotesList = () => {
     // },
   ];
 
-  const onSearch = (e) => {
-    const value = e.target.value.toLowerCase();
-    setSearchText(value);
-    
-    if (!value || !fnddata || !invoicesData) {
-      // Reset to original combined data
-      const combinedData = fnddata.map(creditNote => {
-        const matchingInvoice = invoicesData.find(invoice => invoice.id === creditNote.invoice);
-        return {
-          ...creditNote,
-          salesInvoiceNumber: matchingInvoice ? matchingInvoice.salesInvoiceNumber : 'N/A'
-        };
-      });
-      setFilteredData(combinedData);
-      return;
-    }
-    
-    // Filter based on invoice number
-    const filtered = fnddata.map(creditNote => {
+  const filterCreditNotes = (text, date) => {
+    if (!fnddata || !invoicesData) return;
+
+    let filtered = fnddata.map(creditNote => {
       const matchingInvoice = invoicesData.find(invoice => invoice.id === creditNote.invoice);
       return {
         ...creditNote,
         salesInvoiceNumber: matchingInvoice ? matchingInvoice.salesInvoiceNumber : 'N/A'
       };
-    }).filter(item => 
-      item.salesInvoiceNumber.toString().toLowerCase().includes(value)
-    );
-    
+    });
+
+    // Apply text search filter
+    if (text) {
+      filtered = filtered.filter(item => 
+        item.salesInvoiceNumber.toString().toLowerCase().includes(text.toLowerCase())
+      );
+    }
+
+    // Apply date filter
+    if (date) {
+      const selectedDate = dayjs(date).startOf('day');
+      filtered = filtered.filter(item => {
+        if (!item.date) return false;
+        const itemDate = dayjs(item.date).startOf('day');
+        return itemDate.isSame(selectedDate, 'day');
+      });
+    }
+
     setFilteredData(filtered);
+  };
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    filterCreditNotes(searchText, date);
+  };
+
+  const onSearch = (e) => {
+    const value = e.target.value.toLowerCase();
+    setSearchText(value);
+    filterCreditNotes(value, selectedDate);
   };
 
   const getFilteredCreditNotes = () => {
@@ -371,7 +384,7 @@ const CreditNotesList = () => {
 
   return (
     <>
-      <Card>
+      <Card className="">
         <Flex
           alignItems="center"
           justifyContent="space-between"
@@ -379,7 +392,7 @@ const CreditNotesList = () => {
           className="flex flex-wrap  gap-4"
         >
           <Flex
-            cclassName="flex flex-wrap gap-4 mb-4 md:mb-0"
+            className="flex flex-wrap gap-4 mb-4 md:mb-0"
             mobileFlex={false}
           >
             <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48 me-2">
@@ -390,6 +403,17 @@ const CreditNotesList = () => {
                 value={searchText}
                 allowClear
                 className="search-input"
+              />
+            </div>
+            <div className="mb-3">
+              <DatePicker
+                onChange={handleDateChange}
+                format="DD-MM-YYYY"
+                placeholder="Select Date"
+                className="w-100"
+                style={{ minWidth: 200 }}
+                allowClear
+                value={selectedDate}
               />
             </div>
           </Flex>

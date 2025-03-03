@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Menu, Tag, Input, message, Button, Modal } from "antd";
+import { Card, Table, Menu, Tag, Input, message, Button, Modal, DatePicker, Space } from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
@@ -28,6 +28,8 @@ import { useDispatch } from "react-redux";
 import { DeleteLea, GetLeave } from "./LeaveReducer/LeaveSlice";
 import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
 import axios from "axios";
+const { RangePicker } = DatePicker;
+
 const LeaveList = () => {
   const [userProfileVisible, setUserProfileVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -39,7 +41,8 @@ const LeaveList = () => {
   const [users, setUsers] = useState([]);  // Changed to empty array instead of userData
   const dispatch = useDispatch();
   const [searchText, setSearchText] = useState('');
-  // console.log("xiiiii", editid);
+  const [dateRange, setDateRange] = useState(null);
+  const [filteredData, setFilteredData] = useState([]);
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Leave);
@@ -77,16 +80,35 @@ const LeaveList = () => {
   const getFilteredLeaves = () => {
     if (!users) return [];
     
-    if (!searchText) return users;
+    let result = [...users];
 
-    return users.filter(leave => {
-      return (
-        leave.name?.toLowerCase().includes(searchText.toLowerCase()) ||
+    // Apply text search filter
+    if (searchText) {
+      result = result.filter(leave => 
         leave.leaveType?.toLowerCase().includes(searchText.toLowerCase()) ||
         leave.reason?.toLowerCase().includes(searchText.toLowerCase()) ||
         leave.status?.toLowerCase().includes(searchText.toLowerCase())
       );
-    });
+    }
+
+    // Apply date range filter
+    if (dateRange && dateRange[0] && dateRange[1]) {
+      const startDate = dayjs(dateRange[0]).startOf('day');
+      const endDate = dayjs(dateRange[1]).endOf('day');
+      
+      result = result.filter(leave => {
+        const leaveStartDate = dayjs(leave.startDate);
+        const leaveEndDate = dayjs(leave.endDate);
+        
+        // Check if leave dates fall within the selected range
+        return (
+          (leaveStartDate.isAfter(startDate) || leaveStartDate.isSame(startDate)) &&
+          (leaveEndDate.isBefore(endDate) || leaveEndDate.isSame(endDate))
+        );
+      });
+    }
+
+    return result;
   };
 
   const handleSearch = () => {
@@ -411,6 +433,12 @@ const LeaveList = () => {
       ),
     },
   ];
+
+  // Add date range change handler
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates);
+  };
+
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
       <Flex
@@ -422,21 +450,25 @@ const LeaveList = () => {
           <div className="mr-md-3 mb-3">
             <Input.Group compact>
               <Input
-                placeholder="Search employee"
+                placeholder="Search leave details..."
                 prefix={<SearchOutlined />}
                 onChange={onSearch}
                 value={searchText}
                 className="search-input"
-                onPressEnter={handleSearch}
+                allowClear
               />
-              {/* <Button 
-                type="primary" 
-                onClick={handleSearch}
-                icon={<SearchOutlined />}
-              >
-                Search
-              </Button> */}
             </Input.Group>
+          </div>
+          <div className="mr-md-3 mb-3">
+            <RangePicker
+              onChange={handleDateRangeChange}
+              value={dateRange}
+              format="DD-MM-YYYY"
+              placeholder={['Start Date', 'End Date']}
+              allowClear
+              style={{ width: '280px' }}
+             
+            />
           </div>
         </Flex>
         <Flex gap="7px">

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
+import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal, DatePicker } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from '../../Users/user-list/UserView';
@@ -26,6 +26,7 @@ const MeetingList = () => {
   const [meetid, setMeetid] = useState("");
   const [searchText, setSearchText] = useState('');
   const [isViewMeetingModalVisible, setIsViewMeetingModalVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -96,19 +97,32 @@ const MeetingList = () => {
     setSearchText(value);
   };
 
-  // Add this function to filter meetings
+  // Update getFilteredMeetings to include date filtering
   const getFilteredMeetings = () => {
     if (!filteredData) return [];
 
-    if (!searchText) return filteredData;
+    let result = [...filteredData];
 
-    return filteredData.filter(meeting => {
-      return (
-        meeting.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-        meeting.date?.toLowerCase().includes(searchText.toLowerCase()) ||
-        meeting.startTime?.toLowerCase().includes(searchText.toLowerCase())
-      );
-    });
+    // Apply text search filter
+    if (searchText) {
+      result = result.filter(meeting => {
+        return (
+          meeting.title?.toLowerCase().includes(searchText.toLowerCase()) ||
+          meeting.startTime?.toLowerCase().includes(searchText.toLowerCase())
+        );
+      });
+    }
+
+    // Apply date filter
+    if (selectedDate) {
+      const filterDate = dayjs(selectedDate).format('YYYY-MM-DD');
+      result = result.filter(meeting => {
+        const meetingDate = dayjs(meeting.date).format('YYYY-MM-DD');
+        return meetingDate === filterDate;
+      });
+    }
+
+    return result;
   };
 
   // Add search button handler
@@ -281,6 +295,11 @@ const MeetingList = () => {
     },
   ];
 
+  // Add date change handler
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+  };
+
   return (
     <Card bodyStyle={{ padding: '-3px' }}>
 
@@ -294,9 +313,19 @@ const MeetingList = () => {
                 onChange={onSearch}
                 value={searchText}
                 className="search-input"
-                onPressEnter={handleSearch}
+                allowClear
               />
             </Input.Group>
+          </div>
+          <div className="mr-md-3 mb-3">
+            <DatePicker
+              onChange={handleDateChange}
+              value={selectedDate}
+              format="DD-MM-YYYY"
+              placeholder="Filter by date"
+              allowClear
+              style={{ width: '200px' }}
+            />
           </div>
         </Flex>
         <Flex gap="7px">

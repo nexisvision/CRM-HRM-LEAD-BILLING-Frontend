@@ -186,7 +186,7 @@ const AddJob = ({ onClose }) => {
   }, []);
 
 
-  const handleAddNewLabel = async (lableType, newValue, setter, modalSetter) => {
+  const handleAddNewLabel = async (lableType, newValue, setter, modalSetter, setFieldValue) => {
     if (!newValue.trim()) {
       message.error(`Please enter a ${lableType} name.`);
       return;
@@ -196,7 +196,7 @@ const AddJob = ({ onClose }) => {
       const lid = AllLoggeddtaa.loggedInUser.id;
       const payload = {
         name: newValue.trim(),
-        lableType, // Send the correct label type
+        lableType,
       };
 
       await dispatch(AddLablee({ lid, payload }));
@@ -204,9 +204,24 @@ const AddJob = ({ onClose }) => {
       setter(""); // Reset input field
       modalSetter(false); // Close modal
 
-      // Re-fetch updated labels
-      await fetchLabels(lableType, lableType === "jobcategory" ? setJobCategories :
-        lableType === "jobskill" ? setJobSkills : setJobStatuses);
+      // Fetch updated labels and update the form field
+      const response = await dispatch(GetLablee(lid));
+      if (response.payload && response.payload.data) {
+        const filteredLabels = response.payload.data
+          .filter((label) => label.lableType === lableType)
+          .map((label) => ({ id: label.id, name: label.name.trim() }));
+        
+        if (lableType === "jobcategory") {
+          setJobCategories(filteredLabels);
+          setFieldValue("category", newValue.trim());
+        } else if (lableType === "jobskill") {
+          setJobSkills(filteredLabels);
+          setFieldValue("skillss", newValue.trim());
+        } else if (lableType === "jobstatus") {
+          setJobStatuses(filteredLabels);
+          setFieldValue("status", newValue.trim());
+        }
+      }
     } catch (error) {
       console.error(`Failed to add ${lableType}:`, error);
       message.error(`Failed to add ${lableType}`);
@@ -217,401 +232,407 @@ const AddJob = ({ onClose }) => {
       <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
-          <Form className="formik-form" onSubmit={handleSubmit}>
-            <Row gutter={16}>
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Job Title <span className="text-red-500">*</span>  </label>
-                  <Field
-                    className="mt-1"
-                    name="title"
-                    as={Input}
-                    placeholder="Enter title"
-                  />
-                  <ErrorMessage
-                    name="title"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Job Category <span className="text-red-500">*</span></label>
-                  <Select
-                    style={{ width: "100%" }}
-                    placeholder="Select or add new job category"
-                    className="w-full mt-1"
-                    value={values.category}
-                    onChange={(value) => setFieldValue("category", value)}
-                    dropdownRender={(menu) => (
-                      <div>
-                        {menu}
-                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                          <Button
-                            type="link"
-                            // icon={<PlusOutlined />}
-                            className="w-full"
-                            onClick={() => setIsJobCategoryModalVisible(true)}
-                          >
-                            + Add New Job Category
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  >
-                    {jobCategories.map((category) => (
-                      <Option key={category.id} value={category.name}>
-                        {category.name}
-                      </Option>
-                    ))}
-                  </Select>
-                  <ErrorMessage name="category" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-              <Col span={12}>
-                <div className="form-item mt-3">
-                  <label className="font-semibold">Job Skill <span className="text-red-500">*</span></label>
-                  <Select
-                    style={{ width: "100%" }}
-                    placeholder="Select or add new job skill"
-                    value={values.skillss}
-                    className="w-full mt-1"
-                    onChange={(value) => setFieldValue("skillss", value)}
-                    dropdownRender={(menu) => (
-                      <div>
-                        {menu}
-                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                          <Button
-                            type="link"
-                            // icon={<PlusOutlined />}
-                            className="w-full"
-                            onClick={() => setIsJobSkillModalVisible(true)}
-                          >
-                            + Add New Job Skill
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  >
-                    {jobSkills.map((skill) => (
-                      <Option key={skill.id} value={skill.name}>
-                        {skill.name}
-                      </Option>
-                    ))}
-                  </Select>
-                  <ErrorMessage name="skillss" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold mb-2">Location <span className="text-red-500">*</span></label>
-                  <Field
-                      className="mt-1"
-                    name="location"
-                    as={Input}
-                    placeholder="Enter location"
-                  />
-
-                  <ErrorMessage
-                    name="invoiceDate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold mb-2">Interview Rounds <span className="text-red-500">*</span></label>
-                  <Field name="interview rounds">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        mode="multiple"
-                        placeholder="Select InterviewRounds"
-                        className="w-full mt-1"
-                        onChange={(value) =>
-                          setFieldValue("interviewRounds", value)
-                        }
-                        value={values.interviewRounds}
-                        onBlur={() => setFieldTouched("interviewRounds", true)}
-                        allowClear={false}
-                      >
-                        <Option value="HR">HR</Option>
-                        <Option value="Technical">Technical</Option>
-                        <Option value="Prectical">Prectical</Option>
-                        <Option value="Communication">Communication</Option>
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="duedate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
-                  <DatePicker
-                    className="w-full mt-1"
-                    format="DD-MM-YYYY"
-                    value={values.startDate}
-                    onChange={(date) => setFieldValue("startDate", date)}
-                    onBlur={() => setFieldTouched("startDate", true)}
-                  />
-                  <ErrorMessage
-                    name="startDate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">End Date <span className="text-red-500">*</span></label>
-
-                  <DatePicker
-                    className="w-full mt-1"
-                    format="DD-MM-YYYY"
-                    value={values.endDate}
-                    onChange={(date) => setFieldValue("endDate", date)}
-                    onBlur={() => setFieldTouched("endDate", true)}
-                  />
-                  <ErrorMessage
-                    name="endDate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Recruiter <span className="text-red-500">*</span></label>
-                  <Field
-                    className="mt-1"
-                    name="recruiter"
-                    as={Input}
-                    placeholder="Enter recruiter"
-
-
-                  />
-                  <ErrorMessage
-                    name="recruiter"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Job Type <span className="text-red-500">*</span></label>
-                  <Field
-
-                    className="mt-1"
-                    name="jobType"
-                    as={Input}
-                    placeholder="Enter job type"
-
-                  />
-                  <ErrorMessage
-                    name="jobType"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-2">
-                <div className=" w-full">
+          <>
+            <Form className="formik-form" onSubmit={handleSubmit}>
+              <Row gutter={16}>
+                <Col span={12}>
                   <div className="form-item">
-                    <label className="font-semibold">Work Experence <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Job Title <span className="text-red-500">*</span>  </label>
                     <Field
                       className="mt-1"
-                      name="workExperience"
+                      name="title"
                       as={Input}
-                      placeholder="Enter work experence"
+                      placeholder="Enter title"
                     />
                     <ErrorMessage
-                      name="workExperience"
+                      name="title"
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
                   </div>
-                </div>
-              </Col>
+                </Col>
 
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold mb-2">Currency <span className="text-red-500">*</span></label>
-                  <div className="flex gap-2">
-                    <Field name="currency">
-                      {({ field, form }) => (
-                        <Select
-                          {...field}
-                          className="w-full mt-1"
-                          placeholder="Select Currency"
-                          onChange={(value) => {
-                            const selectedCurrency = currencies?.data?.find(
-                              (c) => c.id === value
-                            );
-                            form.setFieldValue(
-                              "currency",
-                              selectedCurrency?.currencyCode || ""
-                            );
-                          }}
-                        >
-                          {currencies?.data?.map((currency) => (
-                            <Option key={currency.id} value={currency.id}>
-                              {currency.currencyCode}
-                              ({currency.currencyIcon})
-                            </Option>
-                          ))}
-                        </Select>
-                      )}
-                    </Field>
-                  </div>
-                  <ErrorMessage
-                    name="currency"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-
-              <Col span={12}>
-                <div className="form-item mt-2">
-                  <label className="font-semibold">Job Status <span className="text-red-500">*</span></label>
-                  <Select
-                    style={{ width: "100%" }}
-                    placeholder="Select or add new job status"
-                    value={values.status}
-                    className="w-full mt-1"
-                    onChange={(value) => setFieldValue("status", value)}
-                    dropdownRender={(menu) => (
-                      <div>
-                        {menu}
-                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                          <Button
-                            type="link"
-                            className="w-full"
-                            onClick={() => setIsJobStatusModalVisible(true)}
-                          >
-                            + Add New Job Status
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  >
-                    {jobStatuses.map((status) => (
-                      <Option key={status.id} value={status.name}>
-                        {status.name}
-                      </Option>
-                    ))}
-                  </Select>
-                  <ErrorMessage name="status" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-
-
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Expect Salary <span className="text-red-500">*</span></label>
-                  <Field
-                    className="mt-1"
-                    name="expectedSalary"
-                    as={Input}
-                    placeholder="Enter expectedSalary"
-                  />
-                  <ErrorMessage
-                    name="expectedSalary"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              <div className="mt-2 w-full">
-                <Col span={24} className="mt-2">
+                <Col span={12}>
                   <div className="form-item">
-                    <label className="font-semibold">Description <span className="text-red-500">*</span></label>
-                    <ReactQuill
-                      value={values.description}
+                    <label className="font-semibold">Job Category <span className="text-red-500">*</span></label>
+                    <Select
+                      style={{ width: "100%" }}
+                      placeholder="Select or add new job category"
                       className="w-full mt-1"
-                      onChange={(value) => setFieldValue("description", value)}
-                      placeholder="Enter description"
-                      onBlur={() => setFieldTouched("description", true)}
+                      value={values.category}
+                      onChange={(value) => setFieldValue("category", value)}
+                      dropdownRender={(menu) => (
+                        <div>
+                          {menu}
+                          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                            <Button
+                              type="link"
+                              icon={<PlusOutlined />}
+                              onClick={() => setIsJobCategoryModalVisible(true)}
+                              block
+                            >
+                              Add New Job Category
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    >
+                      {jobCategories.map((category) => (
+                        <Option key={category.id} value={category.name}>
+                          {category.name}
+                        </Option>
+                      ))}
+                    </Select>
+                    <ErrorMessage name="category" component="div" className="error-message text-red-500 my-1" />
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div className="form-item mt-3">
+                    <label className="font-semibold">Job Skill <span className="text-red-500">*</span></label>
+                    <Select
+                      style={{ width: "100%" }}
+                      placeholder="Select or add new job skill"
+                      value={values.skillss}
+                      className="w-full mt-1"
+                      onChange={(value) => setFieldValue("skillss", value)}
+                      dropdownRender={(menu) => (
+                        <div>
+                          {menu}
+                          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                            <Button
+                              type="link"
+                              // icon={<PlusOutlined />}
+                              className="w-full"
+                              onClick={() => setIsJobSkillModalVisible(true)}
+                            >
+                              + Add New Job Skill
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    >
+                      {jobSkills.map((skill) => (
+                        <Option key={skill.id} value={skill.name}>
+                          {skill.name}
+                        </Option>
+                      ))}
+                    </Select>
+                    <ErrorMessage name="skillss" component="div" className="error-message text-red-500 my-1" />
+                  </div>
+                </Col>
+                <Col span={12} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold mb-2">Location <span className="text-red-500">*</span></label>
+                    <Field
+                        className="mt-1"
+                      name="location"
+                      as={Input}
+                      placeholder="Enter location"
                     />
+
                     <ErrorMessage
-                      name="description"
-                      component="div mt-2"
+                      name="invoiceDate"
+                      component="div"
                       className="error-message text-red-500 my-1"
                     />
                   </div>
                 </Col>
+                <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold mb-2">Interview Rounds <span className="text-red-500">*</span></label>
+                    <Field name="interview rounds">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          mode="multiple"
+                          placeholder="Select InterviewRounds"
+                          className="w-full mt-1"
+                          onChange={(value) =>
+                            setFieldValue("interviewRounds", value)
+                          }
+                          value={values.interviewRounds}
+                          onBlur={() => setFieldTouched("interviewRounds", true)}
+                          allowClear={false}
+                        >
+                          <Option value="HR">HR</Option>
+                          <Option value="Technical">Technical</Option>
+                          <Option value="Prectical">Prectical</Option>
+                          <Option value="Communication">Communication</Option>
+                        </Select>
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="duedate"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
+                    <DatePicker
+                      className="w-full mt-1"
+                      format="DD-MM-YYYY"
+                      value={values.startDate}
+                      onChange={(date) => setFieldValue("startDate", date)}
+                      onBlur={() => setFieldTouched("startDate", true)}
+                    />
+                    <ErrorMessage
+                      name="startDate"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">End Date <span className="text-red-500">*</span></label>
+
+                    <DatePicker
+                      className="w-full mt-1"
+                      format="DD-MM-YYYY"
+                      value={values.endDate}
+                      onChange={(date) => setFieldValue("endDate", date)}
+                      onBlur={() => setFieldTouched("endDate", true)}
+                    />
+                    <ErrorMessage
+                      name="endDate"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Recruiter <span className="text-red-500">*</span></label>
+                    <Field
+                      className="mt-1"
+                      name="recruiter"
+                      as={Input}
+                      placeholder="Enter recruiter"
+
+
+                    />
+                    <ErrorMessage
+                      name="recruiter"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+
+                    />
+                  </div>
+                </Col>
+
+                <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Job Type <span className="text-red-500">*</span></label>
+                    <Field
+
+                      className="mt-1"
+                      name="jobType"
+                      as={Input}
+                      placeholder="Enter job type"
+
+                    />
+                    <ErrorMessage
+                      name="jobType"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={12} className="mt-2">
+                  <div className=" w-full">
+                    <div className="form-item">
+                      <label className="font-semibold">Work Experence <span className="text-red-500">*</span></label>
+                      <Field
+                        className="mt-1"
+                        name="workExperience"
+                        as={Input}
+                        placeholder="Enter work experence"
+                      />
+                      <ErrorMessage
+                        name="workExperience"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </div>
+                </Col>
+
+                <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold mb-2">Currency <span className="text-red-500">*</span></label>
+                    <div className="flex gap-2">
+                      <Field name="currency">
+                        {({ field, form }) => (
+                          <Select
+                            {...field}
+                            className="w-full mt-1"
+                            placeholder="Select Currency"
+                            onChange={(value) => {
+                              const selectedCurrency = currencies?.data?.find(
+                                (c) => c.id === value
+                              );
+                              form.setFieldValue(
+                                "currency",
+                                selectedCurrency?.currencyCode || ""
+                              );
+                            }}
+                          >
+                            {currencies?.data?.map((currency) => (
+                              <Option key={currency.id} value={currency.id}>
+                                {currency.currencyCode}
+                                ({currency.currencyIcon})
+                              </Option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
+                    </div>
+                    <ErrorMessage
+                      name="currency"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+
+                <Col span={12}>
+                  <div className="form-item mt-2">
+                    <label className="font-semibold">Job Status <span className="text-red-500">*</span></label>
+                    <Select
+                      style={{ width: "100%" }}
+                      placeholder="Select or add new job status"
+                      value={values.status}
+                      className="w-full mt-1"
+                      onChange={(value) => setFieldValue("status", value)}
+                      dropdownRender={(menu) => (
+                        <div>
+                          {menu}
+                          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                            <Button
+                              type="link"
+                              className="w-full"
+                              onClick={() => setIsJobStatusModalVisible(true)}
+                            >
+                              + Add New Job Status
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    >
+                      {jobStatuses.map((status) => (
+                        <Option key={status.id} value={status.name}>
+                          {status.name}
+                        </Option>
+                      ))}
+                    </Select>
+                    <ErrorMessage name="status" component="div" className="error-message text-red-500 my-1" />
+                  </div>
+                </Col>
+
+
+                <Col span={12} className="mt-2">
+                  <div className="form-item">
+                    <label className="font-semibold">Expect Salary <span className="text-red-500">*</span></label>
+                    <Field
+                      className="mt-1"
+                      name="expectedSalary"
+                      as={Input}
+                      placeholder="Enter expectedSalary"
+                    />
+                    <ErrorMessage
+                      name="expectedSalary"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                <div className="mt-2 w-full">
+                  <Col span={24} className="mt-2">
+                    <div className="form-item">
+                      <label className="font-semibold">Description <span className="text-red-500">*</span></label>
+                      <ReactQuill
+                        value={values.description}
+                        className="w-full mt-1"
+                        onChange={(value) => setFieldValue("description", value)}
+                        placeholder="Enter description"
+                        onBlur={() => setFieldTouched("description", true)}
+                      />
+                      <ErrorMessage
+                        name="description"
+                        component="div mt-2"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+                </div>
+              </Row>
+              <div className="form-buttons text-right mt-4">
+                <Button type="default" className="mr-2" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button type="primary" htmlType="submit">
+                  Create
+                </Button>
               </div>
-            </Row>
-            <div className="form-buttons text-right mt-4">
-              <Button type="default" className="mr-2" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="primary" htmlType="submit">
-                Create
-              </Button>
-            </div>
-          </Form>
+            </Form>
+
+            {/* Modals */}
+            <Modal
+              title="Add New Job Category"
+              open={isJobCategoryModalVisible}
+              onCancel={() => setIsJobCategoryModalVisible(false)}
+              onOk={() => handleAddNewLabel("jobcategory", newJobCategory, setNewJobCategory, setIsJobCategoryModalVisible, setFieldValue)}
+              okText="Add Category"
+            >
+              <Input
+                placeholder="Enter new job category name"
+                value={newJobCategory}
+                onChange={(e) => setNewJobCategory(e.target.value)}
+              />
+            </Modal>
+
+            <Modal
+              title="Add New Job Skill"
+              open={isJobSkillModalVisible}
+              onCancel={() => setIsJobSkillModalVisible(false)}
+              onOk={() => handleAddNewLabel("jobskill", newJobSkill, setNewJobSkill, setIsJobSkillModalVisible, setFieldValue)}
+              okText="Add Skill"
+            >
+              <Input
+                placeholder="Enter new job skill name"
+                value={newJobSkill}
+                onChange={(e) => setNewJobSkill(e.target.value)}
+              />
+            </Modal>
+
+            <Modal
+              title="Add New Job Status"
+              open={isJobStatusModalVisible}
+              onCancel={() => setIsJobStatusModalVisible(false)}
+              onOk={() => handleAddNewLabel("jobstatus", newJobStatus, setNewJobStatus, setIsJobStatusModalVisible, setFieldValue)}
+              okText="Add Status"
+            >
+              <Input
+                placeholder="Enter new job status name"
+                value={newJobStatus}
+                onChange={(e) => setNewJobStatus(e.target.value)}
+              />
+            </Modal>
+          </>
         )}
       </Formik>
-      <Modal
-        title="Add New Job Category"
-        open={isJobCategoryModalVisible}
-        onCancel={() => setIsJobCategoryModalVisible(false)}
-        onOk={() => handleAddNewLabel("jobcategory", newJobCategory, setNewJobCategory, setIsJobCategoryModalVisible)}
-        okText="Add Category"
-      >
-        <Input
-          placeholder="Enter new job category name"
-          value={newJobCategory}
-          onChange={(e) => setNewJobCategory(e.target.value)}
-        />
-      </Modal>
-      <Modal
-        title="Add New Job Skill"
-        open={isJobSkillModalVisible}
-        onCancel={() => setIsJobSkillModalVisible(false)}
-        onOk={() => handleAddNewLabel("jobskill", newJobSkill, setNewJobSkill, setIsJobSkillModalVisible)}
-        okText="Add Skill"
-      >
-        <Input
-          placeholder="Enter new job skill name"
-          value={newJobSkill}
-          onChange={(e) => setNewJobSkill(e.target.value)}
-        />
-      </Modal>
-      <Modal
-        title="Add New Job Status"
-        open={isJobStatusModalVisible}
-        onCancel={() => setIsJobStatusModalVisible(false)}
-        onOk={() => handleAddNewLabel("jobstatus", newJobStatus, setNewJobStatus, setIsJobStatusModalVisible)}
-        okText="Add Status"
-      >
-        <Input
-          placeholder="Enter new job status name"
-          value={newJobStatus}
-          onChange={(e) => setNewJobStatus(e.target.value)}
-        />
-      </Modal>
     </div>
   );
 };

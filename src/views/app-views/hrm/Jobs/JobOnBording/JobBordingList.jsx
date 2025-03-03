@@ -11,6 +11,7 @@ import {
   Button,
   Modal,
   Select,
+  DatePicker,
 } from "antd";
 import {
   EyeOutlined,
@@ -55,6 +56,7 @@ const JobOnBordingList = () => {
     const [idd, setIdd] = useState("");
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState('');
+  const [selectedDate, setSelectedDate] = useState(null);
 
   const user = useSelector((state) => state.user.loggedInUser.username);
 
@@ -100,15 +102,33 @@ const JobOnBordingList = () => {
     setSearchText(value);
   };
 
-  // Add this function to filter onboarding entries by name
+  // Update the getFilteredOnboarding function to include date filtering
   const getFilteredOnboarding = () => {
     if (!filteredData) return [];
     
-    if (!searchText) return filteredData;
+    let filtered = [...filteredData];
 
-    return filteredData.filter(onboarding => {
-      return onboarding.Interviewer?.toLowerCase().includes(searchText.toLowerCase());
-    });
+    // Text search filter
+    if (searchText) {
+      filtered = filtered.filter(onboarding => {
+        return onboarding.Interviewer?.toLowerCase().includes(searchText.toLowerCase());
+      });
+    }
+
+    // Date filter
+    if (selectedDate) {
+      const filterDate = dayjs(selectedDate).format('YYYY-MM-DD');
+      filtered = filtered.filter(onboarding => {
+        return dayjs(onboarding.JoiningDate).format('YYYY-MM-DD') === filterDate;
+      });
+    }
+
+    return filtered;
+  };
+
+  // Add handler for date changes
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
   };
 
   // Add search button handler
@@ -364,22 +384,17 @@ const JobOnBordingList = () => {
               />
             </Input.Group>
           </div>
-          {/* <div className="w-full md:w-48 ">
-            <Select
-              defaultValue="All"
+          <div className="mr-md-3 mb-3">
+            <DatePicker
+              value={selectedDate}
+              onChange={handleDateChange}
+              format="DD-MM-YYYY"
+              placeholder="Filter by Joining Date"
               className="w-100"
-              style={{ minWidth: 180 }}
-              onChange={handleShowStatus}
-              placeholder="Status"
-            >
-              <Option value="All">All Job </Option>
-              {jobStatusList.map((elm) => (
-                <Option key={elm} value={elm}>
-                  {elm}
-                </Option>
-              ))}
-            </Select>
-          </div> */}
+              allowClear={true}
+              style={{ minWidth: '200px' }}
+            />
+          </div>
         </Flex>
         <Flex gap="7px">
         
@@ -497,6 +512,16 @@ const styles = `
 
   .table-responsive {
     overflow-x: auto;
+  }
+
+  .ant-picker {
+    min-width: 200px;
+  }
+
+  @media (max-width: 768px) {
+    .ant-picker {
+      width: 100%;
+    }
   }
 `;
 
