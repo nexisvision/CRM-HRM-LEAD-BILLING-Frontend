@@ -335,132 +335,139 @@ const ProjectList = () => {
 			</PageHeaderAlt>
 
 			<div className="my-4 container-fluid">
-				{view === VIEW_LIST  ? (
-					<Table
-						columns={tableColumns}
-						dataSource={list}
-						rowKey="id"
-						scroll={{ x: 1000 }}
-					/>
+				{list.length === 0 ? (
+					<div className="flex flex-col items-center justify-center h-64">
+						<h3 className="text-lg font-semibold text-gray-600">No Data Available</h3>
+						<p className="text-gray-500">Please check back later or add new projects.</p>
+					</div>
 				) : (
-					<Row gutter={[24, 24]} className="project-list-container">
-						{list?.map((item) => {
-							let statusColor = item.dayleft > 10 ? '#52c41a' : item.dayleft > 5 ? '#faad14' : '#f5222d';
-							
-							return (
-								<Col xs={24} sm={12} lg={8} xxl={6} key={item.id}>
-									<Card 
-										hoverable
-										className="project-card rounded-xl border-0"
-										style={{
-											background: 'linear-gradient(145deg, #ffffff 0%, #f8f9ff 100%)',
-											boxShadow: '0 3px 15px rgba(0,0,0,0.08)',
-											width: '100%'
-										}}
-										bodyStyle={{ padding: '0' }}
-									>
-										{/* Status Bar */}
-										<div 
-											className="h-1.5 rounded-t-xl"
-											style={{ backgroundColor: statusColor }}
-										/>
+					view === VIEW_LIST ? (
+						<Table
+							columns={tableColumns}
+							dataSource={list}
+							rowKey="id"
+							scroll={{ x: 1000 }}
+						/>
+					) : (
+						<Row gutter={[24, 24]} className="project-list-container">
+							{list.map((item) => {
+								let statusColor = item.dayleft > 10 ? '#52c41a' : item.dayleft > 5 ? '#faad14' : '#f5222d';
+								
+								return (
+									<Col xs={24} sm={12} lg={8} xxl={6} key={item.id}>
+										<Card 
+											hoverable
+											className="project-card rounded-xl border-0"
+											style={{
+												background: 'linear-gradient(145deg, #ffffff 0%, #f8f9ff 100%)',
+												boxShadow: '0 3px 15px rgba(0,0,0,0.08)',
+												width: '100%'
+											}}
+											bodyStyle={{ padding: '0' }}
+										>
+											{/* Status Bar */}
+											<div 
+												className="h-1.5 rounded-t-xl"
+												style={{ backgroundColor: statusColor }}
+											/>
 
-										<div className="p-3">
-											{/* Project Header */}
-											<div className="flex w-full items-start justify-between mb-4">
-												<div className="flex-1">
-													{/* <div className="flex items-center gap-2 mb-2">
-														{getStatusIcon(item.dayleft)}
-														<Tag color={item.tag ? 'blue' : 'default'} className="m-0 px-2 py-0.5">
-															{item.tag || 'No Tag'}
+											<div className="p-3">
+												{/* Project Header */}
+												<div className="flex w-full items-start justify-between mb-4">
+													<div className="flex-1">
+														{/* <div className="flex items-center gap-2 mb-2">
+															{getStatusIcon(item.dayleft)}
+															<Tag color={item.tag ? 'blue' : 'default'} className="m-0 px-2 py-0.5">
+																{item.tag || 'No Tag'}
+															</Tag>
+														</div> */}
+														<h4 
+															onClick={() => handleProjectClick(item.id)}
+															className="text-lg font-semibold hover:text-blue-600 cursor-pointer mb-1 line-clamp-2"
+															style={{ color: '#2c3e50' }}
+														>
+															{item.name}
+														</h4>
+														<p className="text-gray-500 text-sm mb-0">{item.category}</p>
+													</div>
+													<Dropdown overlay={dropdownMenu(item.id)} trigger={['click']}>
+														<Button 
+															type="text" 
+															icon={<EllipsisOutlined />}
+															className="hover:bg-gray-100"
+														/>
+													</Dropdown>
+												</div>
+
+												{/* Progress Section */}
+												
+
+												{/* Info Grid */}
+												<div className="grid grid-cols-2 gap-3 mb-4">
+													<div className="flex items-center p-2.5 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+														<DollarOutlined className="text-blue-500 mr-2" />
+														<div>
+															<p className="text-xs text-gray-500 m-0">Budget</p>
+															<p className="text-sm font-semibold m-0">₹{item.totalTask}</p>
+														</div>
+													</div>
+													<div className="flex items-center p-2.5 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+														<ClockCircleOutlined 
+															className="mr-2"
+															style={{ color: statusColor }}
+														/>
+														<div>
+															<p className="text-xs text-gray-500 m-0">Days Left</p>
+															<p className="text-sm font-semibold m-0" style={{ color: statusColor }}>
+																{item.dayleft} days
+															</p>
+														</div>
+													</div>
+												</div>
+
+												{/* Date Range */}
+												<div className="flex items-center gap-2 mb-4 text-sm text-gray-600 bg-gray-50 p-2 rounded-lg">
+													<CalendarOutlined className="text-blue-500" />
+													<span>{item.dateRange}</span>
+												</div>
+
+												{/* Team Members */}
+												<div className="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
+													<div className="flex items-center gap-2">
+														<TeamOutlined className="text-blue-500" />
+														<Avatar.Group 
+															maxCount={4}
+															size="small"
+															className="flex items-center"
+														>
+															{item.member?.map((member, index) => (
+																<Tooltip title={member.name} key={index}>
+																	<Avatar 
+																		src={member.img}
+																		style={{
+																			border: '2px solid #fff',
+																			backgroundColor: member.img ? 'transparent' : '#1890ff'
+																		}}
+																	>
+																		{member.name[0]}
+																	</Avatar>
+																</Tooltip>
+															))}
+														</Avatar.Group>
+													</div>
+													{item.member?.length > 4 && (
+														<Tag className="bg-blue-50 text-blue-600 border-0">
+															+{item.member.length - 4}
 														</Tag>
-													</div> */}
-													<h4 
-														onClick={() => handleProjectClick(item.id)}
-														className="text-lg font-semibold hover:text-blue-600 cursor-pointer mb-1 line-clamp-2"
-														style={{ color: '#2c3e50' }}
-													>
-														{item.name}
-													</h4>
-													<p className="text-gray-500 text-sm mb-0">{item.category}</p>
-												</div>
-												<Dropdown overlay={dropdownMenu(item.id)} trigger={['click']}>
-													<Button 
-														type="text" 
-														icon={<EllipsisOutlined />}
-														className="hover:bg-gray-100"
-													/>
-												</Dropdown>
-											</div>
-
-											{/* Progress Section */}
-											
-
-											{/* Info Grid */}
-											<div className="grid grid-cols-2 gap-3 mb-4">
-												<div className="flex items-center p-2.5 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-													<DollarOutlined className="text-blue-500 mr-2" />
-													<div>
-														<p className="text-xs text-gray-500 m-0">Budget</p>
-														<p className="text-sm font-semibold m-0">₹{item.totalTask}</p>
-													</div>
-												</div>
-												<div className="flex items-center p-2.5 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-													<ClockCircleOutlined 
-														className="mr-2"
-														style={{ color: statusColor }}
-													/>
-													<div>
-														<p className="text-xs text-gray-500 m-0">Days Left</p>
-														<p className="text-sm font-semibold m-0" style={{ color: statusColor }}>
-															{item.dayleft} days
-														</p>
-													</div>
+													)}
 												</div>
 											</div>
-
-											{/* Date Range */}
-											<div className="flex items-center gap-2 mb-4 text-sm text-gray-600 bg-gray-50 p-2 rounded-lg">
-												<CalendarOutlined className="text-blue-500" />
-												<span>{item.dateRange}</span>
-											</div>
-
-											{/* Team Members */}
-											<div className="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
-												<div className="flex items-center gap-2">
-													<TeamOutlined className="text-blue-500" />
-													<Avatar.Group 
-														maxCount={4}
-														size="small"
-														className="flex items-center"
-													>
-														{item.member?.map((member, index) => (
-															<Tooltip title={member.name} key={index}>
-																<Avatar 
-																	src={member.img}
-																	style={{
-																		border: '2px solid #fff',
-																		backgroundColor: member.img ? 'transparent' : '#1890ff'
-																	}}
-																>
-																	{member.name[0]}
-																</Avatar>
-															</Tooltip>
-														))}
-													</Avatar.Group>
-												</div>
-												{item.member?.length > 4 && (
-													<Tag className="bg-blue-50 text-blue-600 border-0">
-														+{item.member.length - 4}
-													</Tag>
-												)}
-											</div>
-										</div>
-									</Card>
-								</Col>
-							);
-						})}
-					</Row>
+										</Card>
+									</Col>
+								);
+							})}
+						</Row>
+					)
 				)}
 			</div>
 

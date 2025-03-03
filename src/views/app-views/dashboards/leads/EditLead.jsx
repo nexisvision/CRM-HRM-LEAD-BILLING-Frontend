@@ -290,10 +290,8 @@ const currenciesState = useSelector((state) => state.currencies);
   };
 
   const alldatas = useSelector((state)=>state.Leads.Leads.data);
-  console.log(alldatas,"alldatas");
 
   const fnddata = alldatas.filter((item)=>item.id === id);
-  console.log(fnddata,"fnddata");
 
   useEffect(()=>{
     setInitialValues({
@@ -311,7 +309,7 @@ const currenciesState = useSelector((state) => state.currencies);
       source: fnddata[0].source,
       category: fnddata[0].category,    
     })
-  },[])
+  },[fnddata])
 
  const LeadValueField = ({ field, form }) => (
   <div className="form-group">
@@ -424,6 +422,7 @@ const currenciesState = useSelector((state) => state.currencies);
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
+        enableReinitialize
       >
         {({
           values,

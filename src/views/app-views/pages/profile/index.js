@@ -29,6 +29,7 @@ import { getAllTicket } from "../customersupports/ticket/TicketReducer/TicketSli
 import { useDispatch } from "react-redux";
 import { GetDeals } from "views/app-views/dashboards/deals/DealReducers/DealSlice";
 import { ContaractData } from "views/app-views/dashboards/contract/ContractReducers/ContractSlice";
+import { ClientData } from "views/app-views/company/CompanyReducers/CompanySlice";
 ChartJS.register(ArcElement, Tooltip, Legend);
 const ProfileData = () => {
 
@@ -55,7 +56,10 @@ const ProfileData = () => {
         dispatch(getAllTicket())
         dispatch(GetDeals())
         dispatch(ContaractData())
+    dispatch(ClientData())
     }, [dispatch])
+
+
 
 
     const loggeddatass = useSelector((state) => state.user.loggedInUser.username)
@@ -99,6 +103,12 @@ const ProfileData = () => {
     const filterdtaa = allticketdata?.filter((item) => item?.created_by === loggeddatass)
 
     const taskfilter = taskdata?.filter((item) => item?.created_by === loggeddatass)
+
+    const filterdatas = useSelector((state) => state.user.loggedInUser);
+
+    const alldatas = useSelector((state)=>state.ClientData.ClientData.data);
+
+    const  loggedInUser = alldatas?.find((item)=>item?.id === filterdatas.id);
 
     const stripHtmlTags = (html) => {
         if (!html) return '';
@@ -151,8 +161,8 @@ const ProfileData = () => {
                                 <div className="relative">
                                     <div className="w-28 h-28 rounded-xl border-4 border-white shadow-lg overflow-hidden">
                                         <img
-                                            src={loggeddata.profilePic || "https://via.placeholder.com/100"}
-                                            alt={loggeddata.username}
+                                            src={loggedInUser?.profilePic || "https://via.placeholder.com/100"}
+                                            alt={loggedInUser?.username}
                                             className="w-full h-full object-cover"
                                         />
                                     </div>
@@ -162,12 +172,12 @@ const ProfileData = () => {
                                 {/* User Info */}
                                 <div className="flex flex-col justify-center">
                                     <h2 className="text-2xl font-semibold text-gray-800">
-                                        {`${loggeddata.firstName || ''} ${loggeddata.lastName || ''}`}
+                                        {`${loggedInUser?.firstName || ''} ${loggedInUser?.lastName || ''}`}
                                     </h2>
                                     <div className="flex items-center mt-2">
                                         <div className="flex items-center gap-2 bg-white/90 backdrop-blur-md rounded-full px-4 py-2 shadow-sm">
                                             <MailOutlined className="text-blue-500" />
-                                            <span className="text-sm text-gray-600">{loggeddata.email}</span>
+                                            <span className="text-sm text-gray-600">{loggedInUser?.email}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -188,7 +198,7 @@ const ProfileData = () => {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Username</p>
-                                            <p className="font-medium text-gray-800">{loggeddata.username || 'Not Set'}</p>
+                                            <p className="font-medium text-gray-800">{loggedInUser?.username || 'Not Set'}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -197,7 +207,7 @@ const ProfileData = () => {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Phone</p>
-                                            <p className="font-medium text-gray-800">{loggeddata.phone || 'Not Set'}</p>
+                                            <p className="font-medium text-gray-800">{loggedInUser?.phone || 'Not Set'}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -206,7 +216,7 @@ const ProfileData = () => {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">GST Number</p>
-                                            <p className="font-medium text-gray-800">{loggeddata.gstIn || 'Not Set'}</p>
+                                            <p className="font-medium text-gray-800">{loggedInUser?.gstIn || 'Not Set'}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -215,7 +225,7 @@ const ProfileData = () => {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Address</p>
-                                            <p className="font-medium text-gray-800">{loggeddata.address || 'Not Set'}</p>
+                                            <p className="font-medium text-gray-800">{loggedInUser?.address || 'Not Set'}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -224,7 +234,7 @@ const ProfileData = () => {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">State</p>
-                                            <p className="font-medium text-gray-800">{loggeddata.state || 'Not Set'}</p>
+                                            <p className="font-medium text-gray-800">{loggedInUser?.state || 'Not Set'}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -240,7 +250,7 @@ const ProfileData = () => {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Bank Name</p>
-                                            <p className="font-medium text-gray-800">{loggeddata.bankname || 'Not Set'}</p>
+                                            <p className="font-medium text-gray-800">{loggedInUser?.bankname || 'Not Set'}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -249,7 +259,7 @@ const ProfileData = () => {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Account Holder</p>
-                                            <p className="font-medium text-gray-800">{loggeddata.accountholder || 'Not Set'}</p>
+                                            <p className="font-medium text-gray-800">{loggedInUser?.accountholder || 'Not Set'}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -258,7 +268,7 @@ const ProfileData = () => {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Account Number</p>
-                                            <p className="font-medium text-gray-800">{loggeddata.accountnumber || 'Not Set'}</p>
+                                            <p className="font-medium text-gray-800">{loggedInUser?.accountnumber || 'Not Set'}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -267,7 +277,7 @@ const ProfileData = () => {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Account Type</p>
-                                            <p className="font-medium text-gray-800">{loggeddata.accounttype || 'Not Set'}</p>
+                                            <p className="font-medium text-gray-800">{loggedInUser?.accounttype || 'Not Set'}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -276,7 +286,7 @@ const ProfileData = () => {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">IFSC Code</p>
-                                            <p className="font-medium text-gray-800">{loggeddata.ifsc || 'Not Set'}</p>
+                                            <p className="font-medium text-gray-800">{loggedInUser?.ifsc || 'Not Set'}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3">
@@ -285,7 +295,7 @@ const ProfileData = () => {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Bank Location</p>
-                                            <p className="font-medium text-gray-800">{loggeddata.banklocation || 'Not Set'}</p>
+                                            <p className="font-medium text-gray-800">{loggedInUser?.banklocation || 'Not Set'}</p>
                                         </div>
                                     </div>
                                 </div>

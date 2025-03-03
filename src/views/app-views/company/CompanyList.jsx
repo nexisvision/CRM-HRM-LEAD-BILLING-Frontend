@@ -117,8 +117,11 @@ const CompanyList = () => {
   };
 
   const deleteUser = (userId) => {
-    dispatch(deleteClient(userId));
-    message.success(`Deleted Company successfully`);
+    dispatch(deleteClient(userId))
+      .then(()=>{
+        dispatch(ClientData());
+        message.success(`Deleted Company successfully`);
+      })
   };
 
   const dropdownMenu = (user) => (
@@ -361,7 +364,12 @@ const CompanyList = () => {
       </div>
 
       {/* Conditional rendering of grid or list view */}
-      {view === VIEW_LIST ? (
+      {users.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-64">
+          <h3 className="text-lg font-semibold text-gray-600">No Data Available</h3>
+          <p className="text-gray-500">Please add new companies to see them listed here.</p>
+        </div>
+      ) : view === VIEW_LIST ? (
         <div className="overflow-x-auto">
           <Table
             columns={tableColumns}
