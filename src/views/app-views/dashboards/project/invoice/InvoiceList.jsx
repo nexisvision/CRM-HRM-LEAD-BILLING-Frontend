@@ -91,7 +91,6 @@ export const InvoiceList = () => {
   const [isViewInvoiceModalVisible, setIsViewInvoiceModalVisible] =
     useState(false);
   const { invoices, loading } = useSelector((state) => state.invoice);
-  
   const [filteredData, setFilteredData] = useState(invoices);
   const dispatch = useDispatch();
   const { id } = useParams();
@@ -104,13 +103,13 @@ export const InvoiceList = () => {
   const [dateRange, setDateRange] = useState(null);
   // Fetch invoices when component mounts
   useEffect(() => {
-    // console.log("Fetching invoices for ID:", id);
+    console.log("Fetching invoices for ID:", id);
     dispatch(getAllInvoices(id));
     dispatch(ClientData());
   }, [dispatch]);
   // Update list when invoices change
   useEffect(() => {
-    // console.log("Invoices updated:", invoices);
+    console.log("Invoices updated:", invoices);
     if (invoices) {
       setList(invoices);
     }

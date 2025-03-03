@@ -333,7 +333,7 @@ const BranchList = () => {
       <div className="table-responsive mt-2">
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
           <Table 
-            loading={loading}
+            // loading={loading}
             columns={tableColumns} 
             dataSource={getFilteredBranches()} 
             rowKey="id"

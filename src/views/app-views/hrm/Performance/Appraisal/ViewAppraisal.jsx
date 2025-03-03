@@ -1,9 +1,20 @@
 import React from "react";
+import { Row, Col, Divider, Badge, Card } from "antd";
+import { 
+  StarFilled, 
+  StarOutlined, 
+  UserOutlined, 
+  BankOutlined, 
+  CalendarOutlined,
+  TrophyOutlined 
+} from '@ant-design/icons';
 
 const ViewAppraisal = () => {
     const data = [
         {
             category: "Behavioural Competencies",
+            icon: "🎯",
+            color: "#6366F1", // Indigo
             items: [
                 { name: "Business Process", indicator: 4, appraisal: 4 },
                 { name: "Oral Communication", indicator: 3, appraisal: 4 },
@@ -11,6 +22,8 @@ const ViewAppraisal = () => {
         },
         {
             category: "Organizational Competencies",
+            icon: "🏢",
+            color: "#0EA5E9", // Sky blue
             items: [
                 { name: "Leadership", indicator: 4, appraisal: 4 },
                 { name: "Project Management", indicator: 5, appraisal: 5 },
@@ -18,6 +31,8 @@ const ViewAppraisal = () => {
         },
         {
             category: "Technical Competencies",
+            icon: "⚡",
+            color: "#10B981", // Emerald
             items: [
                 { name: "Allocating Resources", indicator: 2, appraisal: 2 },
             ],
@@ -26,94 +41,153 @@ const ViewAppraisal = () => {
 
     const renderStars = (count) => {
         return (
-            <div className="flex">
+            <div className="flex gap-1.5">
                 {[...Array(5)].map((_, index) => (
-                    <span
-                        key={index}
-                        className={`text-2xl ${index < count ? "text-yellow-300" : "text-gray-300"}`}
-                    >
-                        ★
-                    </span>
+                    index < count ? (
+                        <StarFilled key={index} className="text-amber-400 text-sm sm:text-base lg:text-lg transition-all" />
+                    ) : (
+                        <StarOutlined key={index} className="text-gray-200 text-sm sm:text-base lg:text-lg transition-all" />
+                    )
                 ))}
             </div>
         );
     };
 
     return (
-        <div>
-            <div className="bg-gray-50 mx-[-24px] mb-[-22px] mt-[-55px] p-4 rounded-t-lg rounded-b-lg">
-                <hr style={{ marginTop: "35px", border: '1px solid #e8e8e8' }} />
-                <div className="mt-10">
-                    <div className="">
-                        <div className="container p-2">
-                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0  w-96">
-                                {/* Left Section */}
-                                <div className="flex flex-col space-y-2">
-                                    <p className="text-gray-700">
-                                        <span className="font-semibold">Branch</span>: China
-                                    </p>
-                                    <p className="text-gray-700">
-                                        <span className="font-semibold">Employee</span>: Sonya Sims
-                                    </p>
-                                </div>
-                                {/* Right Section */}
-                                <div className="sm:text-right">
-                                <p className="text-gray-700 sm:hidden">
-                                    </p>
-                                    <p className="text-gray-700">
-                                        <span className="font-semibold">Appraisal Date</span>: 2022-10
-                                    </p>
-                                </div>
-                            </div>
+        <div className="rounded-2xl">
+            {/* Header Banner */}
+            <Card className="mb-6 overflow-hidden">
+                <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600/90 to-indigo-600/90 rounded-t-xl" />
+                    <div className="relative px-6 py-8">
+                        <div className="flex items-center gap-3 mb-8">
+                            <TrophyOutlined className="text-2xl text-yellow-400" />
+                            <h1 className="text-xl md:text-2xl font-semibold text-white m-0">
+                                Performance Appraisal Review
+                            </h1>
                         </div>
-                        {/* <div className="flex justify-between text-sm text-gray-600">
-                            <p><span className="font-medium">Branch:</span> China</p>
-                            <p><span className="font-medium">Employee:</span> Sonya Sims</p>
-                            <p><span className="font-medium">Appraisal Date:</span> 2022-10</p>
-                        </div> */}
-                    </div>
-
-                    <div className="flex justify-center items-center mb-4">
-                    <p className="text-base text-gray-700 w-1/3"></p>
-                        <div className="flex-1 text-base flex justify-between font-semibold">
-                            <div className="flex items-center gap-2 w-1/2">
-                                <h1>Indicator</h1>
-                            </div>
-                            <div className="flex items-center gap-2 w-1/2">
-                                <h1>Appraisal</h1>
-                            </div>
-                        </div>
-                    </div>
-                    {data.map((section, index) => (
-                        <div key={index} className="mb-6">
-                            <h3 className="sm:text-base md:text-lg font-semibold mb-3 border-b pb-2">
-                                {section.category}
-                            </h3>
-                            {section.items.length > 0 ? (
-                                section.items.map((item, idx) => (
-                                    <div key={idx} className="flex justify-between items-start md:items-center mb-3">
-                                        <p className="text-sm text-gray-700 w-1/3">{item.name}</p>
-                                        <div className="flex-1 flex justify-between">
-                                            <div className="flex items-center gap-2 w-1/2">
-                                                {renderStars(item.indicator)}
-                                            </div>
-                                            <div className="flex items-center gap-2 w-1/2">
-                                                {renderStars(item.appraisal)}
-                                            </div>
+                        
+                        <Row gutter={[24, 24]} className="items-start">
+                            <Col xs={24} sm={12} lg={8}>
+                                <div className="bg-white rounded-xl p-4 border border-gray-100 hover:shadow-md transition-all duration-300">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-blue-50 rounded-lg">
+                                            <BankOutlined className="text-blue-600 text-lg" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-gray-500 text-sm">Branch</span>
+                                            <span className="text-gray-800 font-medium">China</span>
                                         </div>
                                     </div>
-                                ))
-                            ) : (
-                                <p className="text-sm text-gray-500">No data available</p>
-                            )}
-                        </div>
-                    ))}
-                    <div className="border-t pt-4 ">
-                            <h1 className="font-semibold  text-base">Remark</h1>
-                            <p className="text-gray-700 mt-4">It is the process of evaluating individual job performance as a basis for making objective personnel decisions.</p>
+                                </div>
+                            </Col>
+                            <Col xs={24} sm={12} lg={8}>
+                                <div className="bg-white rounded-xl p-4 border border-gray-100 hover:shadow-md transition-all duration-300">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-blue-50 rounded-lg">
+                                            <UserOutlined className="text-blue-600 text-lg" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-gray-500 text-sm">Employee</span>
+                                            <span className="text-gray-800 font-medium">Sonya Sims</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Col>
+                            <Col xs={24} sm={12} lg={8}>
+                                <div className="bg-white rounded-xl p-4 border border-gray-100 hover:shadow-md transition-all duration-300">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-blue-50 rounded-lg">
+                                            <CalendarOutlined className="text-blue-600 text-lg" />
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-gray-500 text-sm">Appraisal Date</span>
+                                            <span className="text-gray-800 font-medium">2022-10</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Col>
+                        </Row>
                     </div>
                 </div>
-            </div>
+
+                {/* Rating Headers */}
+                <div className="mt-6 grid grid-cols-12 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <div className="col-span-12 md:col-span-4">
+                        <h3 className="text-gray-600 font-medium m-0">Competency</h3>
+                    </div>
+                    <div className="col-span-12 md:col-span-8">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="text-center">
+                                <h3 className="text-gray-600 font-medium m-0">Indicator</h3>
+                            </div>
+                            <div className="text-center">
+                                <h3 className="text-gray-600 font-medium m-0">Appraisal</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Competencies Sections */}
+                <div className="space-y-6 mt-6">
+                    {data.map((section, index) => (
+                        <Card 
+                            key={index} 
+                            className="overflow-hidden hover:shadow-md transition-shadow duration-300"
+                            bodyStyle={{ padding: 0 }}
+                        >
+                            <div className="p-4 border-b" style={{ backgroundColor: `${section.color}08` }}>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-xl">{section.icon}</span>
+                                    <h2 className="text-lg font-semibold text-gray-800 m-0">
+                                        {section.category}
+                                    </h2>
+                                </div>
+                            </div>
+                            <div className="p-4">
+                                <div className="space-y-4">
+                                    {section.items.map((item, idx) => (
+                                        <div 
+                                            key={idx} 
+                                            className="grid grid-cols-12 gap-6 items-center p-3 hover:bg-gray-50 rounded-xl transition-all duration-200"
+                                        >
+                                            <div className="col-span-12 md:col-span-4">
+                                                <span className="text-gray-700 font-medium">{item.name}</span>
+                                            </div>
+                                            <div className="col-span-12 md:col-span-8">
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="flex justify-center">
+                                                        {renderStars(item.indicator)}
+                                                    </div>
+                                                    <div className="flex justify-center">
+                                                        {renderStars(item.appraisal)}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </Card>
+                    ))}
+                </div>
+
+                {/* Remark Section */}
+                <Divider className="my-6" />
+                <div className="bg-gray-50 rounded-xl p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                        <Badge color="#4F46E5" />
+                        <h2 className="text-lg font-semibold text-gray-800 m-0">
+                            Remark
+                        </h2>
+                    </div>
+                    <div className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm">
+                        <p className="text-gray-700 leading-relaxed m-0">
+                            It is the process of evaluating individual job performance as a basis for making objective personnel decisions.
+                        </p>
+                    </div>
+                </div>
+            </Card>
         </div>
     );
 };
