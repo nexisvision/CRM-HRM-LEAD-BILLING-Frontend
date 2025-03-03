@@ -90,7 +90,6 @@ export const InvoiceList = () => {
   const [isViewInvoiceModalVisible, setIsViewInvoiceModalVisible] =
     useState(false);
   const { invoices, loading } = useSelector((state) => state.invoice);
-  
   const [filteredData, setFilteredData] = useState(invoices);
   const dispatch = useDispatch();
   const { id } = useParams();
@@ -102,13 +101,13 @@ export const InvoiceList = () => {
   const clients = clientsData.SubClient.data || [];
   // Fetch invoices when component mounts
   useEffect(() => {
-    // console.log("Fetching invoices for ID:", id);
+    console.log("Fetching invoices for ID:", id);
     dispatch(getAllInvoices(id));
     dispatch(ClientData());
   }, [dispatch]);
   // Update list when invoices change
   useEffect(() => {
-    // console.log("Invoices updated:", invoices);
+    console.log("Invoices updated:", invoices);
     if (invoices) {
       setList(invoices);
     }
@@ -175,10 +174,12 @@ export const InvoiceList = () => {
   const handleSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
+
     if (!value) {
       setList(invoices);
       return;
     }
+
     const filtered = invoices.filter((invoice) => {
       const clientName = clients.find(c => c.id === invoice.client)?.username || '';
       
@@ -191,6 +192,7 @@ export const InvoiceList = () => {
         dayjs(invoice.issueDate).format("DD/MM/YYYY"),
         dayjs(invoice.dueDate).format("DD/MM/YYYY")
       ];
+
       return searchableFields.some(field => 
         field?.toLowerCase().includes(value)
       );

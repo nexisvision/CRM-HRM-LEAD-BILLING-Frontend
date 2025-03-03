@@ -301,7 +301,7 @@ const AddDealCards = ({ onClose }) => {
                         {Array.isArray(countries) && countries.length > 0 ? (
                           countries.map((country) => (
                             <Option key={country.id} value={country.phoneCode}>
-                              +{country.phoneCode}
+                              {country.phoneCode}
                             </Option>
                           ))
                         ) : (
