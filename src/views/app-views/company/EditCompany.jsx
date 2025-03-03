@@ -11,15 +11,15 @@ import {
   Upload,
   Form as AntForm,
 } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
-import CompanyService from "./CompanyReducers/CompanyService";
 import axios from "axios";
 import { Editclients, ClientData } from "./CompanyReducers/CompanySlice";
 import { UploadOutlined } from '@ant-design/icons';
+import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
 
 const { Option } = Select;
 
@@ -27,12 +27,15 @@ const EditCompany = ({ comnyid, initialData, onClose }) => {
   const [form] = AntForm.useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const auth = useSelector((state) => state.auth);
   const loggedInUser = useSelector((state) => state.user.loggedInUser);
-  const clientData = useSelector((state) => state.ClientData?.data?.find(item => item.id === comnyid));
+  const countries = useSelector((state) => state.countries.countries);
 
-  // Setup axios interceptor for token
+  useEffect(() => {
+    dispatch(getallcountries());
+  }, [dispatch]);
+
   useEffect(() => {
     const interceptor = axios.interceptors.request.use(
       config => {
@@ -50,34 +53,6 @@ const EditCompany = ({ comnyid, initialData, onClose }) => {
       axios.interceptors.request.eject(interceptor);
     };
   }, [auth.token]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (!auth.token) {
-          message.error("Please login to continue");
-          navigate('/auth/login');
-          return;
-        }
-
-        const result = await dispatch(ClientData()).unwrap();
-        if (!result?.success) {
-          throw new Error(result?.message || 'Failed to fetch client data');
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching client data:", error);
-        if (error.message === "Unauthorized access" || error.response?.status === 401) {
-          message.error("Session expired. Please login again");
-          navigate('/auth/login');
-        } else {
-          message.error(error.message || "Failed to fetch client data");
-        }
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [dispatch, comnyid, auth.token, navigate]);
 
   const [initialValues, setInitialValues] = useState({
     firstName: "",
@@ -100,34 +75,48 @@ const EditCompany = ({ comnyid, initialData, onClose }) => {
   });
 
   useEffect(() => {
-    if (clientData || initialData || loggedInUser) {
+    if (initialData || loggedInUser) {
       setInitialValues(prev => ({
-        firstName: initialData?.firstName || clientData?.firstName || loggedInUser?.firstName || "",
-        lastName: initialData?.lastName || clientData?.lastName || loggedInUser?.lastName || "",
-        bankname: initialData?.bankname || clientData?.bankname || loggedInUser?.bankname || "",
-        phone: initialData?.phone || clientData?.phone || loggedInUser?.phone || "",
-        ifsc: initialData?.ifsc || clientData?.ifsc || loggedInUser?.ifsc || "",
-        banklocation: initialData?.banklocation || clientData?.banklocation || loggedInUser?.banklocation || "",
-        accountholder: initialData?.accountholder || clientData?.accountholder || loggedInUser?.accountholder || "",
-        accountnumber: initialData?.accountnumber || clientData?.accountnumber || loggedInUser?.accountnumber || "",
-        gstIn: initialData?.gstIn || clientData?.gstIn || loggedInUser?.gstIn || "",
-        city: initialData?.city || clientData?.city || loggedInUser?.city || "",
-        state: initialData?.state || clientData?.state || loggedInUser?.state || "",
-        country: initialData?.country || clientData?.country || loggedInUser?.country || "",
-        zipcode: initialData?.zipcode || clientData?.zipcode || loggedInUser?.zipcode || "",
-        profilePic: initialData?.profilePic || clientData?.profilePic || loggedInUser?.profilePic || "",
-        address: initialData?.address || clientData?.address || loggedInUser?.address || "",
-        website: initialData?.website || clientData?.website || loggedInUser?.website || "",
-        accountType: initialData?.accountType || clientData?.accountType || loggedInUser?.accountType || ""
+        firstName: initialData?.firstName || loggedInUser?.firstName || "",
+        lastName: initialData?.lastName || loggedInUser?.lastName || "",
+        bankname: initialData?.bankname || loggedInUser?.bankname || "",
+        phone: initialData?.phone || loggedInUser?.phone || "",
+        ifsc: initialData?.ifsc || loggedInUser?.ifsc || "",
+        banklocation: initialData?.banklocation || loggedInUser?.banklocation || "",
+        accountholder: initialData?.accountholder || loggedInUser?.accountholder || "",
+        accountnumber: initialData?.accountnumber || loggedInUser?.accountnumber || "",
+        gstIn: initialData?.gstIn || loggedInUser?.gstIn || "",
+        city: initialData?.city || loggedInUser?.city || "",
+        state: initialData?.state || loggedInUser?.state || "",
+        country: initialData?.country || loggedInUser?.country || "",
+        zipcode: initialData?.zipcode || loggedInUser?.zipcode || "",
+        profilePic: initialData?.profilePic || loggedInUser?.profilePic || "",
+        address: initialData?.address || loggedInUser?.address || "",
+        website: initialData?.website || loggedInUser?.website || "",
+        accountType: initialData?.accountType || loggedInUser?.accountType || ""
       }));
 
-      // Update AntD form values
       form.setFieldsValue({
-        firstName: initialData?.firstName || clientData?.firstName || loggedInUser?.firstName || "",
-        // ... set other fields similarly
+        firstName: initialData?.firstName || loggedInUser?.firstName || "",
+        lastName: initialData?.lastName || loggedInUser?.lastName || "",
+        bankname: initialData?.bankname || loggedInUser?.bankname || "",
+        phone: initialData?.phone || loggedInUser?.phone || "",
+        ifsc: initialData?.ifsc || loggedInUser?.ifsc || "",
+        banklocation: initialData?.banklocation || loggedInUser?.banklocation || "",
+        accountholder: initialData?.accountholder || loggedInUser?.accountholder || "",
+        accountnumber: initialData?.accountnumber || loggedInUser?.accountnumber || "",
+        gstIn: initialData?.gstIn || loggedInUser?.gstIn || "",
+        city: initialData?.city || loggedInUser?.city || "",
+        state: initialData?.state || loggedInUser?.state || "",
+        country: initialData?.country || loggedInUser?.country || "",
+        zipcode: initialData?.zipcode || loggedInUser?.zipcode || "",
+        profilePic: initialData?.profilePic || loggedInUser?.profilePic || "",
+        address: initialData?.address || loggedInUser?.address || "",
+        website: initialData?.website || loggedInUser?.website || "",
+        accountType: initialData?.accountType || loggedInUser?.accountType || ""
       });
     }
-  }, [clientData, initialData, loggedInUser, form]);
+  }, [initialData, loggedInUser, form]);
 
   const validationSchema = Yup.object({
     firstName: Yup.string().required("Please enter a First Name."),
@@ -146,7 +135,6 @@ const EditCompany = ({ comnyid, initialData, onClose }) => {
     try {
       if (!auth.token) {
         message.error("Please login to continue");
-        navigate('/auth/login');
         return;
       }
 
@@ -172,7 +160,6 @@ const EditCompany = ({ comnyid, initialData, onClose }) => {
     } catch (error) {
       if (error.message === "Unauthorized access" || error.response?.status === 401) {
         message.error("Session expired. Please login again");
-        navigate('/auth/login');
       } else {
         message.error(error.message || "Failed to update company");
       }
@@ -184,237 +171,516 @@ const EditCompany = ({ comnyid, initialData, onClose }) => {
   }
 
   return (
-    <div className="add-job-form">
-      <AntForm form={form}>
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-          enableReinitialize={true}
-        >
-          {({ values, handleSubmit }) => (
-            <Form onSubmit={handleSubmit}>
-              <hr style={{ marginBottom: "10px", border: "1px solid #e8e8e8" }} />
-              <Row gutter={16}>
-                <Col span={12} className="">
-                  <div className="form-item ">
-                    <label className="font-semibold ">First Name <span className="text-red-500">*</span></label>
-                    <Field name="firstName" as={Input} placeholder="Enter First Name" className="mt-1" />
-                    <ErrorMessage
-                      name="firstName"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
+    <div className="edit-company-modal">
+      <div className="modal-body">
+        <AntForm form={form}>
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+            enableReinitialize={true}
+          >
+            {({ values, handleSubmit }) => (
+              <Form onSubmit={handleSubmit}>
+                {/* Personal Information Section */}
+                <div className="form-section">
+                  <div className="section-title">
+                    <h2>Personal Information</h2>
                   </div>
-                </Col>
-                <Col span={12} className="">
-                  <div className="form-item">
-                    <label className="font-semibold">Last Name <span className="text-red-500">*</span></label>
-                    <Field name="lastName" as={Input} placeholder="Enter Last Name" className="mt-1" />
-                    <ErrorMessage
-                      name="lastName"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
+
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          First Name <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="firstName">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter First Name"
+                              className="w-full rounded-lg border-gray-200 hover:border-indigo-400 focus:border-indigo-500 transition-all"
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="firstName" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                    <Col span={12}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Last Name <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="lastName">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter Last Name"
+                              className="w-full rounded-lg border-gray-200 hover:border-indigo-400 focus:border-indigo-500 transition-all"
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="lastName" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                  </Row>
+
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Phone <span className="text-red-500">*</span>
+                        </label>
+                        <div className="flex gap-2">
+                          <Select
+                            style={{ width: '30%' }}
+                            placeholder="Code"
+                            className="rounded-lg hover:border-indigo-400 focus:border-indigo-500"
+                          >
+                            {countries.map((country) => (
+                              <Option key={country.id} value={country.phoneCode}>
+                                (+{country.phoneCode})
+                              </Option>
+                            ))}
+                          </Select>
+                          <Field name="phone">
+                            {({ field }) => (
+                              <Input
+                                {...field}
+                                style={{ width: '70%' }}
+                                placeholder="Enter phone number"
+                                className="rounded-lg hover:border-indigo-400 focus:border-indigo-500"
+                              />
+                            )}
+                          </Field>
+                        </div>
+                        <ErrorMessage name="phone" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                    <Col span={12}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Website <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="website">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter Website"
+                              className="w-full rounded-lg border-gray-200 hover:border-indigo-400 focus:border-indigo-500"
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="website" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                  </Row>
+
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Address <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="address">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter Address"
+                              className="w-full rounded-lg border-gray-200 hover:border-indigo-400 focus:border-indigo-500"
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="address" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                    <Col span={12}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          GST Number <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="gstIn">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter GST Number"
+                              className="w-full rounded-lg border-gray-200 hover:border-indigo-400 focus:border-indigo-500"
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="gstIn" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                  </Row>
+
+                  <Row gutter={16}>
+                    <Col span={6}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          City <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="city">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter City"
+                              className="w-full rounded-lg border-gray-200 hover:border-indigo-400 focus:border-indigo-500"
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="city" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                    <Col span={6}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          State <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="state">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter State"
+                              className="w-full rounded-lg border-gray-200 hover:border-indigo-400 focus:border-indigo-500"
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="state" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                    <Col span={6}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Country <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="country">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter Country"
+                              className="w-full rounded-lg border-gray-200 hover:border-indigo-400 focus:border-indigo-500"
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="country" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                    <Col span={6}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Zipcode <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="zipcode">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter Zipcode"
+                              className="w-full rounded-lg border-gray-200 hover:border-indigo-400 focus:border-indigo-500"
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="zipcode" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
+
+                {/* Bank Details Section */}
+                <div className="form-section">
+                  <div className="section-title">
+                    <h2>Bank Details</h2>
                   </div>
-                </Col>
-                <Col span={12} className="mt-3">
-                  <div className="form-item">
-                    <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
-                    <Field name="phone" as={Input} placeholder="Enter Phone" className="mt-1" />
-                    <ErrorMessage
-                      name="phone"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-3">
-                  <div className="form-item">
-                    <label className="font-semibold">Bank Name <span className="text-red-500">*</span></label>
-                    <Field name="bankname" as={Input} placeholder="Enter  Bank Name" className="mt-1" />
-                    <ErrorMessage
-                      name="bankname"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-3">
-                  <div className="form-item">
-                    <label className="font-semibold">Ifsc <span className="text-red-500">*</span></label>
-                    <Field name="ifsc" as={Input} placeholder="Enter  Ifsc" type="string" className="mt-1" />
-                    <ErrorMessage
-                      name="ifsc"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-3">
-                  <div className="form-item">
-                    <label className="font-semibold">Bank Location <span className="text-red-500">*</span></label>
-                    <Field name="banklocation" as={Input} placeholder="Enter  Bank Location" className="mt-1" />
-                    <ErrorMessage
-                      name="banklocation"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-3">
-                  <div className="form-item">
-                    <label className="font-semibold">Account Holder <span className="text-red-500">*</span></label>
-                    <Field name="accountholder" as={Input} placeholder="Enter  Account Holder" className="mt-1" />
-                    <ErrorMessage
-                      name="accountholder"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-3">
-                  <div className="form-item">
-                    <label className="font-semibold">Account Number <span className="text-red-500">*</span></label>
-                    <Field name="accountnumber" as={Input} placeholder="Enter  Account Number" type="number" className="mt-1" />
-                    <ErrorMessage
-                      name="accountnumber"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-3">
-                  <div className="form-item">
-                    <label className="font-semibold">GstIn <span className="text-red-500">*</span></label>
-                    <Field name="gstIn" as={Input} placeholder="Enter  GstIn" className="mt-1" />
-                    <ErrorMessage
-                      name="gstIn"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-3">
-                  <div className="form-item">
-                    <label className="font-semibold">City <span className="text-red-500">*</span></label>
-                    <Field name="city" as={Input} placeholder="Enter  City" className="mt-1" />
-                    <ErrorMessage
-                      name="city"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-3">
-                  <div className="form-item">
-                    <label className="font-semibold">State <span className="text-red-500">*</span></label>
-                    <Field name="state" as={Input} placeholder="Enter  State" className="mt-1" />
-                    <ErrorMessage
-                      name="state"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-3">
-                  <div className="form-item">
-                    <label className="font-semibold">Country <span className="text-red-500">*</span></label>
-                    <Field name="country" as={Input} placeholder="Enter  Country" className="mt-1" />
-                    <ErrorMessage
-                      name="country"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-3">
-                  <div className="form-item">
-                    <label className="font-semibold">Zipcode <span className="text-red-500">*</span></label>
-                    <Field name="zipcode" as={Input} placeholder="Enter  Zipcode" type="string" className="mt-1" />
-                    <ErrorMessage
-                      name="zipcode"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-3">
-                  <div className="form-item">
-                    <label className="font-semibold">Address <span className="text-red-500">*</span></label>
-                    <Field name="address" as={Input} placeholder="Enter  address" className="mt-1" />
-                    <ErrorMessage
-                      name="address"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-3">
-                  <div className="form-item">
-                    <label className="font-semibold ">Website <span className="text-red-500">*</span></label>
-                    <Field name="website" as={Input} placeholder="Enter  Website" className="mt-2" />
-                    <ErrorMessage
-                      name="website"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-3">
-                  <div className="flex flex-col space-y-2">
-                    <label className="text-sm font-semibold text-gray-700">Account Type <span className="text-red-500">*</span></label>
-                    <Field name="accountType" as={Select} placeholder="Select Account Type" className="w-full rounded-md border-gray-300  focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                      <Option value="current">Current</Option>
-                      <Option value="saving">Saving</Option>
-                      <Option value="business">Business</Option>
-                    </Field>
-                    <ErrorMessage
-                      name="accountType"
-                      component="div"
-                      className="text-sm text-red-500"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-3">
-                  <div className="flex flex-col gap-3">
-                    <label className="font-semibold text-gray-700">Profile Picture <span className="text-red-500">*</span></label>
-                    <Field name="profilePic">
-                      {({ field, form }) => (
-                        <Upload
-                          accept="image/*"
-                          beforeUpload={(file) => {
-                            form.setFieldValue('profilePic', file);
-                            return false;
-                          }}
-                          showUploadList={true}
-                        >
-                          <Button icon={<UploadOutlined />} className="flex items-center gap-2">
-                            Upload Profile Picture
-                          </Button>
-                        </Upload>
-                      )}
-                    </Field>
-                    <ErrorMessage
-                      name="profilePic"
-                      component="div"
-                      className="text-red-500 text-sm"
-                    />
-                  </div>
-                </Col>
-              </Row>
-              <div className="form-buttons text-right mt-2">
-                <Button type="default" className="mr-2" onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button type="primary" htmlType="submit">
-                  Update
-                </Button>
-              </div>
-            </Form>
-          )}
-        </Formik>
-      </AntForm>
+
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Account Holder Name <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="accountholder">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter Account Holder Name"
+                              className="w-full rounded-lg border-gray-200 hover:border-indigo-400 focus:border-indigo-500"
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="accountholder" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                    <Col span={12}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Account Number <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="accountnumber">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter Account Number"
+                              className="w-full rounded-lg border-gray-200 hover:border-indigo-400 focus:border-indigo-500"
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="accountnumber" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                  </Row>
+
+                  <Row gutter={16}>
+                    <Col span={8}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Bank Name <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="bankname">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter Bank Name"
+                              className="w-full rounded-lg border-gray-200 hover:border-indigo-400 focus:border-indigo-500"
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="bankname" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                    <Col span={8}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          IFSC Code <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="ifsc">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter IFSC Code"
+                              className="w-full rounded-lg border-gray-200 hover:border-indigo-400 focus:border-indigo-500"
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="ifsc" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                    <Col span={8}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Bank Location <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="banklocation">
+                          {({ field }) => (
+                            <Input
+                              {...field}
+                              placeholder="Enter Bank Location"
+                              className="w-full rounded-lg border-gray-200 hover:border-indigo-400 focus:border-indigo-500"
+                            />
+                          )}
+                        </Field>
+                        <ErrorMessage name="banklocation" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                  </Row>
+
+                  <Row gutter={16}>
+                    <Col span={12}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Account Type <span className="text-red-500">*</span>
+                        </label>
+                        <Field name="accountType">
+                          {({ field }) => (
+                            <Select
+                              {...field}
+                              className="w-full rounded-lg hover:border-indigo-400 focus:border-indigo-500"
+                            >
+                              <Option value="current">Current</Option>
+                              <Option value="saving">Saving</Option>
+                              <Option value="business">Business</Option>
+                            </Select>
+                          )}
+                        </Field>
+                        <ErrorMessage name="accountType" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                    <Col span={12}>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Profile Picture
+                        </label>
+                        <Field name="profilePic">
+                          {({ field, form }) => (
+                            <Upload
+                              accept="image/*"
+                              beforeUpload={(file) => {
+                                form.setFieldValue('profilePic', file);
+                                return false;
+                              }}
+                              showUploadList={true}
+                              className="mt-1"
+                            >
+                              <Button icon={<UploadOutlined />} className="mt-1">
+                                Upload Profile Picture
+                              </Button>
+                            </Upload>
+                          )}
+                        </Field>
+                        <ErrorMessage name="profilePic" component="div" className="mt-1 text-sm text-red-500" />
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
+
+                <div className="modal-footer">
+                  <Button onClick={onClose} className="btn-cancel">
+                    Cancel
+                  </Button>
+                  <Button type="primary" htmlType="submit" className="btn-submit">
+                    Update
+                  </Button>
+                </div>
+              </Form>
+            )}
+          </Formik>
+        </AntForm>
+      </div>
+
+      <style jsx="true">{`
+        .edit-company-modal {
+          background: white;
+          border-radius: 8px;
+          overflow: hidden;
+        }
+
+        .modal-body {
+          padding: 16px;
+          background: white;
+        }
+
+        .form-section {
+          margin-bottom: 24px;
+          background: white;
+        }
+
+        .form-section:last-child {
+          margin-bottom: 0;
+        }
+
+        .section-title {
+          margin-bottom: 20px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid #e5e7eb;
+        }
+
+        .section-title h2 {
+          font-size: 1rem;
+          font-weight: 600;
+          color: #374151;
+          margin: 0;
+        }
+
+        .modal-footer {
+          display: flex;
+          justify-content: flex-end;
+          gap: 8px;
+          padding: 16px;
+          background: #f8fafc;
+          border-top: 1px solid #e5e7eb;
+        }
+
+        .btn-cancel {
+          padding: 0 16px;
+          height: 36px;
+          border-radius: 4px;
+          border: 1px solid #e5e7eb;
+          background: white;
+          color: #4b5563;
+          transition: all 0.2s ease;
+        }
+
+        .btn-cancel:hover {
+          background: #f9fafb;
+          border-color: #d1d5db;
+        }
+
+        .btn-submit {
+          padding: 0 16px;
+          height: 36px;
+          border-radius: 4px;
+          background: #3b82f6;
+          border: none;
+          color: white;
+          transition: all 0.2s ease;
+        }
+
+        .btn-submit:hover {
+          background: #2563eb;
+        }
+
+        /* Form field styles */
+        .ant-input,
+        .ant-select-selector {
+          border-radius: 4px !important;
+          border: 1px solid #e5e7eb !important;
+          transition: all 0.2s ease !important;
+          box-shadow: none !important;
+        }
+
+        .ant-input:hover,
+        .ant-select-selector:hover {
+          border-color: #3b82f6 !important;
+        }
+
+        .ant-input:focus,
+        .ant-select-selector:focus,
+        .ant-select-focused .ant-select-selector {
+          border-color: #3b82f6 !important;
+          box-shadow: none !important;
+        }
+
+        /* Label styles */
+        label {
+          color: #374151;
+          font-weight: 500;
+          font-size: 0.875rem;
+          margin-bottom: 0.25rem;
+          display: block;
+        }
+
+        /* Error message styles */
+        .error-message {
+          color: #ef4444;
+          font-size: 0.75rem;
+          margin-top: 2px;
+        }
+
+        /* Upload button styles */
+        .ant-upload-select {
+          width: 100%;
+        }
+
+        .ant-upload-select .ant-btn {
+          width: 100%;
+          border: 1px dashed #d1d5db;
+          background: #f9fafb;
+          border-radius: 4px;
+          height: 36px;
+        }
+
+        .ant-upload-select .ant-btn:hover {
+          border-color: #3b82f6;
+          color: #3b82f6;
+        }
+
+        /* Row spacing */
+        .ant-row {
+          margin-bottom: 12px;
+        }
+
+        .mb-4 {
+          margin-bottom: 12px;
+        }
+      `}</style>
     </div>
   );
 };

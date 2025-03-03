@@ -63,7 +63,7 @@ const EditEmployee = ({ onClose, setSub }) => {
     const length = 8;
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let password = "";
-    
+
     // Generate 6 characters
     for (let i = 0; i < length; i++) {
       password += charset[Math.floor(Math.random() * charset.length)];
@@ -72,7 +72,7 @@ const EditEmployee = ({ onClose, setSub }) => {
     // Ensure at least one number
     const randomNum = Math.floor(Math.random() * 10).toString();
     password = password.slice(0, 7) + randomNum;
-    
+
     return password;
   };
   useEffect(() => {
@@ -297,7 +297,7 @@ const EditEmployee = ({ onClose, setSub }) => {
               </Col>
               <Col span={12}>
                 <div className="form-item mt-2">
-                <label className="font-semibold">Password <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Password <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <Field
                       name="password"
@@ -309,7 +309,7 @@ const EditEmployee = ({ onClose, setSub }) => {
                       className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
                       onClick={() => setFieldValue("password", generatePassword())}
                     >
-                     <ToTopOutlined/>
+                      <ToTopOutlined />
                     </Button>
                   </div>
                   <ErrorMessage
@@ -406,8 +406,8 @@ const EditEmployee = ({ onClose, setSub }) => {
                         dropdownRender={(menu) => (
                           <>
                             {menu}
-                            <Button 
-                              type="link" 
+                            <Button
+                              type="link"
                               block
                               onClick={() => {
                                 openAddBranchModal();
@@ -451,7 +451,7 @@ const EditEmployee = ({ onClose, setSub }) => {
                         dropdownRender={(menu) => (
                           <>
                             {menu}
-                            <Button 
+                            <Button
                               type="link"
                               block
                               onClick={openAddDepartmentModal}
@@ -487,7 +487,7 @@ const EditEmployee = ({ onClose, setSub }) => {
                         dropdownRender={(menu) => (
                           <>
                             {menu}
-                            <Button 
+                            <Button
                               type="link"
                               block
                               onClick={openAddDesignationModal}
@@ -561,17 +561,17 @@ const EditEmployee = ({ onClose, setSub }) => {
             </Row>
 
             <Col span={24} className="mt-4 "><div className="flex justify-between items-center">
-                  <label className="text-lg font-bold mb-3 mt-4">Salary</label>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={salary}
-                      onChange={(e) => setSalary(e.target.checked)}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
-                  </label>
-                </div>
+              <label className="text-lg font-bold mb-3 mt-4">Salary</label>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={salary}
+                  onChange={(e) => setSalary(e.target.checked)}
+                />
+                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full peer-checked:after:border-white"></div>
+              </label>
+            </div>
             </Col>
             {salary && (
               <>
@@ -674,7 +674,7 @@ const EditEmployee = ({ onClose, setSub }) => {
                     </div>
                   </Col>
 
-                  
+
                   <Col span={12}>
                     <div className="form-item mt-3">
                       <label className="">Bank Account</label>
@@ -692,7 +692,7 @@ const EditEmployee = ({ onClose, setSub }) => {
                       />
                     </div>
                   </Col>
-                  
+
                 </Row>
               </>
             )}

@@ -16,7 +16,7 @@ import { getDept } from "views/app-views/hrm/Department/DepartmentReducers/Depar
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import Upload from "antd/es/upload/Upload";
 import { UploadOutlined } from '@ant-design/icons';
-import {  QuestionCircleOutlined } from "@ant-design/icons";
+import { QuestionCircleOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -90,7 +90,7 @@ const EditClient = ({ comnyid, onClose }) => {
       });
   };
 
-  const [initialValues,setInitialValues] =  useState({
+  const [initialValues, setInitialValues] = useState({
     firstName: "",
     lastName: "",
     bankname: "",
@@ -405,7 +405,7 @@ const EditClient = ({ comnyid, onClose }) => {
                     </Field>
                     <ErrorMessage
                       name="accountType"
-                      component="div" 
+                      component="div"
                       className="text-red-500 text-sm mt-1"
                     />
                   </div>
@@ -434,7 +434,7 @@ const EditClient = ({ comnyid, onClose }) => {
                     <label className="font-semibold">Address <span className="text-red-500">*</span>    </label>
                     <Field
                       name="address"
-                        as={Input}
+                      as={Input}
                       className="w-full mt-2"
                       placeholder="Enter Address"
                     />

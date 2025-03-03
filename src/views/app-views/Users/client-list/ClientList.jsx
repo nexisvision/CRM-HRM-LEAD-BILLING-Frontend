@@ -422,7 +422,7 @@ const ClientList = () => {
   ];
 
   return (
-    <Card bodyStyle={{ padding: "0" }} className="shadow-lg rounded-xl overflow-hidden">
+    <Card bodyStyle={{ padding: "0" }} className="rounded-xl overflow-hidden">
       <div className="bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 p-6 border-b border-gray-100">
         <Flex
           alignItems="center"
