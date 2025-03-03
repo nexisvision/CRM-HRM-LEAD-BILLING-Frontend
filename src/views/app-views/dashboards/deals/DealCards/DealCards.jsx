@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Row, Col, Modal, Select } from "antd";
+import { Card, Row, Col, Modal, Select, Avatar } from "antd";
 import { DndContext, useDroppable, useDraggable, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,6 +9,7 @@ import AddDealCards from "./AdddealCards";
 import { GetPip } from "../../systemsetup/Pipeline/PiplineReducer/piplineSlice";
 import { Option } from "antd/es/mentions";
 import { EditDeals, GetDeals } from "../DealReducers/DealSlice";
+import { CalendarOutlined, CommentOutlined } from "@ant-design/icons";
 
 const DraggableItem = ({ lead, id }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useDraggable({ id });
@@ -20,13 +21,71 @@ const DraggableItem = ({ lead, id }) => {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <Card>
-        <h4>{lead.leadTitle}</h4>
-        <p>Deal Name: {lead.dealName}</p>
-        <p>Pipeline: {lead.pipeline}</p>
-        <p>Price: {lead.currency} {lead.price}</p>
-        <p>Closed Date: {new Date(lead.closedDate).toLocaleDateString()}</p>
-        <p>Project: {lead.project}</p>
+      <Card 
+        className="cursor-pointer hover:shadow-md transition-all"
+        bodyStyle={{ padding: '16px', paddingLeft: '20px', position: 'relative' }}
+      >
+        {/* Left border line */}
+        <div 
+          style={{ 
+            position: 'absolute',
+            left: "16px",
+            right: 0,
+            top: '15px',
+            height: '3px',
+            width: '50px',
+            backgroundColor: '#1677ff',
+            borderTopLeftRadius: '3px',
+            borderTopRightRadius: '3px'
+          }} 
+        />
+        
+        <div>
+          <h4 style={{ 
+            fontSize: '16px', 
+            fontWeight: '500',
+            color: '#1a1a1a',
+            marginBottom: '8px'
+          }}>
+            {lead.dealName}
+          </h4>
+          
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            marginBottom: '8px',
+            color: '#8c8c8c',
+            fontSize: '13px'
+          }}>
+            <CalendarOutlined style={{ marginRight: '4px' }} />
+            {new Date(lead.closedDate).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric'
+            })}
+            <div style={{ margin: '0 8px' }}>•</div>
+            <CommentOutlined style={{ marginRight: '4px' }} />
+            1
+          </div>
+
+          <div style={{ 
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginTop: '12px'
+          }}>
+            <div style={{ 
+              fontSize: '13px',
+              color: '#595959'
+            }}>
+              {/* {lead.currency} {lead.price} */}
+            </div>
+            <Avatar.Group>
+              <Avatar size="small" style={{ backgroundColor: '#f56a00' }}>K</Avatar>
+              <Avatar size="small" style={{ backgroundColor: '#87d068' }}>U</Avatar>
+              <Avatar size="small" style={{ backgroundColor: '#1677ff' }}>O</Avatar>
+            </Avatar.Group>
+          </div>
+        </div>
       </Card>
     </div>
   );

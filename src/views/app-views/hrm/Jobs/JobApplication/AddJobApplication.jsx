@@ -130,7 +130,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                     )}
                   </Field>
                   <ErrorMessage
-                    name="customer"
+                    name="job"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />

@@ -30,7 +30,7 @@ const AddNotes = ({ onClose }) => {
   const initialValues = {
     title: "",
     description: "",
-    type: "Personal",
+    type: "",
     assignto: [],
   };
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {

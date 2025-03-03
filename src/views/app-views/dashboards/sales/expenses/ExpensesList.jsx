@@ -16,7 +16,7 @@ import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils'
 import AddExpenses from "./AddExpenses";
-import EditExpenses from "./EditExpenses"
+import EditExpenses from "./EditExpenses";
 import ViewExpenses from './ViewExpenses';
 import { debounce } from 'lodash';
 

@@ -28,6 +28,7 @@ import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlic
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
 import AddLeadStages from "../systemsetup/LeadStages/AddLeadStages";
+import moment from 'moment';
 
 const { Option } = Select;
 
@@ -190,13 +191,13 @@ const currenciesState = useSelector((state) => state.currencies);
     telephone: Yup.string()
       .required("Please enter a valid number")
       .nullable(),
-    email: Yup.string().required("Please enter a valid email address").nullable(),
+    email: Yup.string().optional("Please enter a valid email address").nullable(),
     leadStage: Yup.string().required("Lead Stage is required"),
-    leadValue: Yup.number().typeError("Lead Value must be a number").nullable(),
+    leadValue: Yup.number().optional("Lead Value must be a number").nullable(),
     currencyIcon: Yup.string().nullable(),
     employee: Yup.string().required("Employee is required"),
     category: Yup.string().required("Category is required"),
-    assigned: Yup.string().required("Assigned is required"),
+    assigned: Yup.string().optional("Assigned is required"),
     status: Yup.string().required("Status is required"),
 
     // Details section
@@ -229,20 +230,43 @@ const currenciesState = useSelector((state) => state.currencies);
   });
 
   const onSubmit = (values, { resetForm }) => {
+    // Check if all required fields are filled
+    const requiredFields = [
+      'leadTitle',
+      'firstName', 
+      'lastName',
+      'telephone',
+      'leadStage',
+      'employee',
+      'category',
+      'status'
+    ];
+
+    const missingFields = requiredFields.filter(field => !values[field]);
+
+    if (missingFields.length > 0) {
+      message.error('Please fill in all required fields');
+      return;
+    }
+
     const formData = {
       ...values,
       leadValue: values.leadValue ? String(values.leadValue) : null,
       currencyIcon: values.currencyIcon || null,
+      lastContacted: values.lastContacted ? moment(values.lastContacted).format('YYYY-MM-DD') : null,
+      targetDate: values.targetDate ? moment(values.targetDate).format('YYYY-MM-DD') : null
     };
-    dispatch(LeadsEdit({id,formData}))
+
+    dispatch(LeadsEdit({id, formData}))
       .then(() => {
-        dispatch(GetLeads()); // Refresh leave data
+        dispatch(GetLeads()); // Refresh leads data
+        message.success("Lead updated successfully!");
         resetForm();
         onClose(); // Close modal
       })
       .catch((error) => {
-        // message.error("Failed to add Leads.");
-        console.error("Add API error:", error);
+        message.error("Failed to update Lead. Please try again.");
+        console.error("Edit API error:", error);
       });
   };
 
@@ -338,7 +362,7 @@ const currenciesState = useSelector((state) => state.currencies);
     <div className="add-job-form">
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({
@@ -514,7 +538,7 @@ const currenciesState = useSelector((state) => state.currencies);
 
               <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Email Address <span className="text-rose-500">*</span></label>
+                  <label className="font-semibold">Email Address </label>
                   <Field
                     name="email"
                     as={Input}
@@ -531,7 +555,7 @@ const currenciesState = useSelector((state) => state.currencies);
 
               <Col span={12} className="mt-3">
                               <div className="form-item ">
-                                <label className="font-semibold">Lead Value <span className="text-rose-500">*</span></label>
+                                <label className="font-semibold">Lead Value </label>
                                 <Field name="leadValue" component={LeadValueField}  className="mt-1"/>
                                 <ErrorMessage
                                   name="leadValue.amount"
@@ -548,7 +572,7 @@ const currenciesState = useSelector((state) => state.currencies);
 
               <Col span={24} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold mb-2">Assigned <span className="text-rose-500">*</span></label>
+                  <label className="font-semibold mb-2">Assigned </label>
                   <div className="flex gap-2">
                     <Field name="employee">
                       {({ field, form }) => (

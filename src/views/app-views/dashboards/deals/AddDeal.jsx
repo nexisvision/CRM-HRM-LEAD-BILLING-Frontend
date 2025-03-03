@@ -347,7 +347,7 @@ const AddDeal = ({ onClose }) => {
 
               <Col span={12} className="mt-3">
                     <div className="form-item">
-                      <label className="font-semibold">Category <span className="text-rose-500">*</span></label>
+                      <label className="font-semibold">Category </label>
                       <Select
                         name="category"
                         style={{ width: "100%" }}

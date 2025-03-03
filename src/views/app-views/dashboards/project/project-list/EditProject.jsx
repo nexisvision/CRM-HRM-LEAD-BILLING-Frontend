@@ -538,6 +538,7 @@ const EditProject = ({ id, onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Description</label>
                   <ReactQuill
+                    name="project_description"
                     className="mt-1"
                     value={values.project_description}
                     onChange={(value) =>
@@ -556,7 +557,7 @@ const EditProject = ({ id, onClose }) => {
 
               <Col span={24} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Tag</label>
+                  <label className="font-semibold">Tag </label>
                   <Select
                     style={{ width: "100%" }}
                     className="mt-1"

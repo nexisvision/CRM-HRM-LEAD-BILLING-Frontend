@@ -15,6 +15,8 @@ const validationSchema = Yup.object().shape({
     .required("Department Name is required")
     .min(2, "Department name must be at least 2 characters")
     .max(50, "Department name cannot exceed 50 characters"),
+  branch: Yup.string()
+    .required("Branch is required")
 });
 
 const AddDepartment = ({ onClose }) => {
@@ -62,6 +64,7 @@ const AddDepartment = ({ onClose }) => {
       <Formik
         initialValues={{
           department_name: "",
+          branch: "",
         }}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}

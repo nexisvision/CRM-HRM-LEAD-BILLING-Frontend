@@ -559,6 +559,9 @@ const AddInvoice = ({ onClose }) => {
               <Form.Item
                 label="Reference Number"
                 name="refnumber"
+                rules={[
+                  { required: true, message: "Please enter reference number" },
+                ]}
                
               >
                 <Input placeholder="Enter Reference Number" />

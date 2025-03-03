@@ -227,7 +227,7 @@ const curren = currencies?.data || [];
                 </Col>
                 <Col span={12}>
                   <div className="form-item">
-                    <label className="font-semibold">Invoice <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Invoice </label>
                     <Field name="invoice">
                       {({ field }) => (
                         <Select
@@ -257,7 +257,7 @@ const curren = currencies?.data || [];
                 </Col>
                 <Col span={12} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold">Estimate <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Estimate </label>
                     <Field name="estimate">
                       {({ field }) => (
                         <Select
@@ -290,7 +290,7 @@ const curren = currencies?.data || [];
                 </Col>
                 <Col span={12} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold">Expense <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Expense </label>
                     <Field name="expense">
                       {({ field }) => (
                         <Select

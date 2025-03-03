@@ -547,7 +547,7 @@ const TaskList = () => {
         </div>
       </Card>
 
-      <Card>
+      
         <Modal
           title="Add Task"
           visible={isAddTaskModalVisible}
@@ -582,7 +582,7 @@ const TaskList = () => {
 				>
 					<ViewTask onClose={closeViewTaskModal} />
 				</Modal> */}
-      </Card>
+      
     </>
   );
 };

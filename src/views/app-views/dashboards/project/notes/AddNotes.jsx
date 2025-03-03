@@ -53,6 +53,7 @@ const AddNotes = ({ onClose }) => {
     note_title: Yup.string().required("Please enter Note Title."),
     notetype: Yup.string().required("Please select Note Type."),
     description: Yup.string().optional("Please enter Description."),
+    // employees: Yup.string().required("Please select Employee."),
   });
 
   const onSubmit = async (values, { resetForm }) => {

@@ -67,8 +67,10 @@ const AddBranch = ({ onClose }) => {
       <Formik
         initialValues={{
           branchName: '',
+          branchManager: '',
+          branchAddress: ''
         }}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({ errors, touched, setFieldValue, resetForm }) => (

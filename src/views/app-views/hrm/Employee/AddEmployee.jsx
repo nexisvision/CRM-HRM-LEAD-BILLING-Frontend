@@ -148,7 +148,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
     try {
       console.log("Form Values:", values);
       setFormValues2(values);
-      // Store employeeId in formValues
+      // Store employeeId in formValues  
       const updatedFormValues = { ...values };
 
       const response = await dispatch(addEmp(updatedFormValues));
@@ -161,10 +161,14 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
       if (response.payload?.data?.employeeId) {
         updatedFormValues.employeeId = response.payload.data.employeeId;
         setFormValues(updatedFormValues); // Set formValues here
+        
+        // Only reset form and close modal after successful employee creation
+        if (!response.payload?.data?.sessionToken) {
+          resetForm();
+          onClose();
+        }
       }
 
-      resetForm();
-      onClose();
     } catch (error) {
       console.error("Error submitting form:", error);
       message.error("Failed to add employee. Please try again.");
@@ -279,6 +283,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
     <div className="add-employee p-6">
       <Formik
         initialValues={initialValues}
+        validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({

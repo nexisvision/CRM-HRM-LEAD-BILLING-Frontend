@@ -15,6 +15,8 @@ import {
   Menu,
   Modal,
   Tag,
+  DatePicker,
+  Space,
 } from "antd";
 // import { invoiceData } from '../../../pages/invoice/invoiceData';
 // import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
@@ -52,6 +54,7 @@ import { useParams } from "react-router-dom";
 const { Column } = Table;
 
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 const getMilestoneStatus = (status) => {
   if (status === "Paid") {
@@ -102,6 +105,7 @@ export const MilestoneList = () => {
 
   const [searchText, setSearchText] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
+  const [dateRange, setDateRange] = useState(null);
 
   // Get unique statuses from milestone data
   const getUniqueStatuses = () => {
@@ -236,15 +240,16 @@ export const MilestoneList = () => {
       },
     },
     {
-      title: "Summary",
-      dataIndex: "milestone_summary",
-      render: (summary) => (
-        <div 
-          dangerouslySetInnerHTML={{ __html: summary }} 
-          className="max-w-md truncate"
-          title={summary?.replace(/<[^>]*>/g, '')} // Show full text on hover
-        />
-      ),
+      title: "Start Date",
+      dataIndex: "milestone_start_date",
+      render: (date) => dayjs(date).format('YYYY-MM-DD'),
+      sorter: (a, b) => dayjs(a.milestone_start_date).unix() - dayjs(b.milestone_start_date).unix(),
+    },
+    {
+      title: "End Date",
+      dataIndex: "milestone_end_date",
+      render: (date) => dayjs(date).format('YYYY-MM-DD'),
+      sorter: (a, b) => dayjs(a.milestone_end_date).unix() - dayjs(b.milestone_end_date).unix(),
     },
     {
       title: "Status",
@@ -290,7 +295,12 @@ export const MilestoneList = () => {
     setList(filtered);
   };
 
-  // Update the filter function to include status
+  // Handle date range change
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates);
+  };
+
+  // Update the filter function to include date range
   const getFilteredMilestones = () => {
     if (!filtermin) return [];
     
@@ -308,6 +318,18 @@ export const MilestoneList = () => {
       filtered = filtered.filter(milestone => 
         milestone.milestone_status === selectedStatus
       );
+    }
+
+    // Apply date range filter
+    if (dateRange && dateRange[0] && dateRange[1]) {
+      const startRange = dayjs(dateRange[0]).startOf('day');
+      const endRange = dayjs(dateRange[1]).endOf('day');
+      
+      filtered = filtered.filter(milestone => {
+        const milestoneStartDate = dayjs(milestone.milestone_start_date);
+        return (milestoneStartDate.isAfter(startRange) || milestoneStartDate.isSame(startRange)) && 
+               (milestoneStartDate.isBefore(endRange) || milestoneStartDate.isSame(endRange));
+      });
     }
 
     return filtered;
@@ -355,6 +377,14 @@ export const MilestoneList = () => {
                   </Option>
                 ))}
               </Select>
+            </div>
+            <div className="mr-0 md:mr-3 mb-3 md:mb-0">
+              <RangePicker
+                onChange={handleDateRangeChange}
+                format="YYYY-MM-DD"
+                placeholder={['Start Date', 'End Date']}
+                className="date-range-picker"
+              />
             </div>
           </Flex>
           <Flex gap="7px" className="flex">
@@ -414,14 +444,17 @@ export const MilestoneList = () => {
 
 const styles = `
   .search-input,
-  .status-select {
+  .status-select,
+  .date-range-picker {
     transition: all 0.3s;
   }
 
   .search-input:hover,
   .search-input:focus,
   .status-select:hover,
-  .status-select:focus {
+  .status-select:focus,
+  .date-range-picker:hover,
+  .date-range-picker:focus {
     border-color: #40a9ff;
     box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
   }
@@ -429,6 +462,7 @@ const styles = `
   @media (max-width: 768px) {
     .search-input,
     .status-select,
+    .date-range-picker,
     .ant-input-group {
       width: 100%;
     }

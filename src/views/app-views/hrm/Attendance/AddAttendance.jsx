@@ -88,8 +88,8 @@ const AddAttendance = ({ onClose }) => {
         initialValues={{
           employee: "",
           date: "",
-          startTime: moment("9:00", "HH:mm"), // Default start time
-          endTime: moment("18:00", "HH:mm"), // Default end time
+          startTime: "", // Default start time
+          endTime: "", // Default end time
           late: "",
           halfDay: "",
           comment: "",

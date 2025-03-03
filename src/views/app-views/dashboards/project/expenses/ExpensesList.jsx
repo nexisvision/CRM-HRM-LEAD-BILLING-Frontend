@@ -12,6 +12,7 @@ import {
     Tag,
     Modal,
     message,
+    DatePicker,
 } from "antd";
 import {
     EyeOutlined,
@@ -40,6 +41,7 @@ import ViewExpenss from "./ViewExpenss";
 import { GetProject } from '../project-list/projectReducer/ProjectSlice';
 
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 const getShippingStatus = (orderStatus) => {
     if (orderStatus === "Ready") {
         return "blue";
@@ -74,6 +76,7 @@ const ExpensesList = () => {
     const [searchText, setSearchText] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('all');
     const [loading, setLoading] = useState(false);
+    const [dateRange, setDateRange] = useState(null);
 
     const projectData = useSelector((state) => state.Project);
     const projects = projectData.Project.data || [];
@@ -145,6 +148,15 @@ const ExpensesList = () => {
                 });
             }
 
+            // Apply date range filter
+            if (dateRange && dateRange.length === 2) {
+                filtered = filtered.filter(item => {
+                    const purchaseDate = dayjs(item.purchase_date);
+                    return purchaseDate.isAfter(dateRange[0].startOf('day')) && 
+                           purchaseDate.isBefore(dateRange[1].endOf('day'));
+                });
+            }
+
             setFilteredData(filtered);
         } catch (error) {
             console.error('Error filtering data:', error);
@@ -155,7 +167,7 @@ const ExpensesList = () => {
 
     useEffect(() => {
         handleFilters();
-    }, [searchText, selectedStatus, list]);
+    }, [searchText, selectedStatus, list, dateRange]);
 
     const onSearch = (e) => {
         const value = e.currentTarget.value.toLowerCase();
@@ -388,20 +400,15 @@ const ExpensesList = () => {
                             allowClear
                         />
                     </div>
-                    {/* <div className="w-full md:w-48">
-                        <Select
-                            placeholder="Filter by status"
-                            onChange={handleStatusChange}
-                            value={selectedStatus}
-                            style={{ width: '100%' }}
-                        >
-                            {statusOptions.map(status => (
-                                <Option key={status.value} value={status.value}>
-                                    {status.label}
-                                </Option>
-                            ))}
-                        </Select>
-                    </div> */}
+                    <div className="mr-0 md:mr-3 mb-3 md:mb-0">
+                        <RangePicker
+                            onChange={(dates) => setDateRange(dates)}
+                            format="DD-MM-YYYY"
+                            allowClear
+                            placeholder={['Start Date', 'End Date']}
+                            className="w-full md:w-auto"
+                        />
+                    </div>
                 </Flex>
                 <Flex gap="7px" className="flex">
                     <Button
@@ -439,7 +446,7 @@ const ExpensesList = () => {
                     />
                 </div>
             </Card>
-            <Card>
+    
                 <Modal
                     title="Add Expenses"
                     visible={isAddExpensesModalVisible}
@@ -473,7 +480,7 @@ const ExpensesList = () => {
                 >
                     <ViewExpenss data={selectedExpense} onClose={closeViewExpensesModal} />
                 </Modal>
-            </Card>
+        
         </>
     );
 };

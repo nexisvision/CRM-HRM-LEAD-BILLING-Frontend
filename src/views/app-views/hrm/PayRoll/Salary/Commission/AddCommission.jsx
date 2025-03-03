@@ -7,7 +7,29 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { addcommi, getcommi } from "./commistionReducer/commitionSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import * as Yup from "yup";
+
 const { Option } = Select;
+
+// Add validation schema
+const validationSchema = Yup.object().shape({
+  employeeId: Yup.string()
+    .required("Please select an employee"),
+  title: Yup.string()
+    .required("Title is required")
+    .min(2, "Title must be at least 2 characters")
+    .max(50, "Title must not exceed 50 characters"),
+  type: Yup.string()
+    .required("Type is required")
+    .min(2, "Type must be at least 2 characters")
+    .max(50, "Type must not exceed 50 characters"),
+  currency: Yup.string()
+    .required("Please select a currency"),
+  amount: Yup.number()
+    .required("Amount is required")
+    .positive("Amount must be positive")
+    .typeError("Amount must be a number")
+});
 
 const AddCommission = ({ id, onClose }) => {
   const dispatch = useDispatch();
@@ -38,19 +60,26 @@ const AddCommission = ({ id, onClose }) => {
     <div className="employee-salary">
       <hr className="my-2 border-gray-300" />
       <Formik
-        initialValues={{ title: "", type: "", currency: "", amount: "" }}
+        initialValues={{ 
+          employeeId: "",
+          title: "", 
+          type: "", 
+          currency: "", 
+          amount: "" 
+        }}
+        validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ handleSubmit, setFieldValue, values, resetForm }) => (
+        {({ handleSubmit, setFieldValue, values, resetForm, touched, errors }) => (
           <form onSubmit={handleSubmit} className="space-y-4">
             <Col span={24} className="mt-4">
               <div className="form-item">
-                <label className="font-semibold">employee <span className="text-red-500">*</span></label>
+                <label className="font-semibold">Employee <span className="text-red-500">*</span></label>
                 <Field name="employeeId">
                   {({ field }) => (
                     <Select
                       {...field}
-                      className="w-full mt-2"
+                      className={`w-full mt-2 ${touched.employeeId && errors.employeeId ? 'border-red-500' : ''}`}
                       placeholder="Select Employee"
                       onChange={(value) => setFieldValue("employeeId", value)}
                       value={values.employeeId}
@@ -74,42 +103,52 @@ const AddCommission = ({ id, onClose }) => {
                 <ErrorMessage
                   name="employeeId"
                   component="div"
-                  className="error-message text-red-500 my-1"
+                  className="error-message text-red-500 text-sm mt-1"
                 />
               </div>
             </Col>
             <div>
               <label className="font-semibold">Title <span className="text-red-500">*</span></label>
               <Field name="title">
-                {({ field }) => <Input {...field} placeholder="Enter Title" />}
+                {({ field }) => (
+                  <Input 
+                    {...field} 
+                    placeholder="Enter Title" 
+                    className={`${touched.title && errors.title ? 'border-red-500' : ''}`}
+                  />
+                )}
               </Field>
               <ErrorMessage
                 name="title"
                 component="div"
-                className="text-red-500"
+                className="text-red-500 text-sm mt-1"
               />
             </div>
-            {/* Type */}
             <div>
               <label className="font-semibold">Type <span className="text-red-500">*</span></label>
               <Field name="type">
-                {({ field }) => <Input {...field} placeholder="Enter Type" />}
+                {({ field }) => (
+                  <Input 
+                    {...field} 
+                    placeholder="Enter Type" 
+                    className={`${touched.type && errors.type ? 'border-red-500' : ''}`}
+                  />
+                )}
               </Field>
               <ErrorMessage
                 name="type"
                 component="div"
-                className="text-red-500"
+                className="text-red-500 text-sm mt-1"
               />
             </div>
-            {/* Deduction Option */}
             <Col span={24} className="mt-4">
               <div className="form-item">
-                <label className="font-semibold">currency <span className="text-red-500">*</span></label>
+                <label className="font-semibold">Currency <span className="text-red-500">*</span></label>
                 <Field name="currency">
                   {({ field }) => (
                     <Select
                       {...field}
-                      className="w-full mt-2"
+                      className={`w-full mt-2 ${touched.currency && errors.currency ? 'border-red-500' : ''}`}
                       placeholder="Select Currency"
                       onChange={(value) => setFieldValue("currency", value)}
                       value={values.currency}
@@ -123,7 +162,7 @@ const AddCommission = ({ id, onClose }) => {
                         ))
                       ) : (
                         <Option value="" disabled>
-                          {/* No Clients Available */}
+                          No Currency Available
                         </Option>
                       )}
                     </Select>
@@ -132,25 +171,33 @@ const AddCommission = ({ id, onClose }) => {
                 <ErrorMessage
                   name="currency"
                   component="div"
-                  className="error-message text-red-500 my-1"
+                  className="error-message text-red-500 text-sm mt-1"
                 />
               </div>
             </Col>
-            {/* Currency */}
             <div>
               <label className="font-semibold">Amount <span className="text-red-500">*</span></label>
               <Field name="amount">
-                {({ field }) => <Input {...field} placeholder="Enter Amount" type="number" />}
+                {({ field }) => (
+                  <Input 
+                    {...field} 
+                    placeholder="Enter Amount" 
+                    type="number"
+                    className={`${touched.amount && errors.amount ? 'border-red-500' : ''}`}
+                  />
+                )}
               </Field>
               <ErrorMessage
                 name="amount"
                 component="div"
-                className="text-red-500"
+                className="text-red-500 text-sm mt-1"
               />
             </div>
 
-            {/* Submit Button */}
             <div className="text-right">
+              <Button type="default" className="mr-2" onClick={onClose}>
+                Cancel
+              </Button>
               <Button type="primary" htmlType="submit">
                 Submit
               </Button>

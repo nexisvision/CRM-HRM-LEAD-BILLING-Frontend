@@ -499,6 +499,7 @@ const AddBilling = ({ onClose }) => {
             <Col span={12}>
               <Form.Item label="Note" name="note">
                 <Input placeholder="Enter Note (Optional)" />
+                
               </Form.Item>
             </Col>
 
@@ -759,11 +760,11 @@ const AddBilling = ({ onClose }) => {
         </Card>
 
         <div className="mt-3 flex justify-end">
+        <Button type="default" onClick={onClose} style={{ marginRight: 8 }}>
+              Cancel
+            </Button>
           <Button type="primary" onClick={handleSubmit}>
             Submit Bill
-          </Button>
-          <Button type="ghost" onClick={onClose}>
-            Cancel
           </Button>
         </div>
       </Form>

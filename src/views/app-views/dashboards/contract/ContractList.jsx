@@ -10,6 +10,8 @@ import {
   message,
   Button,
   Modal,
+  DatePicker,
+  Select,
 } from "antd";
 import {
   EyeOutlined,
@@ -41,6 +43,9 @@ import { GetProject } from "../project/project-list/projectReducer/ProjectSlice"
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ContaractData, DeleteCon } from "./ContractReducers/ContractSlice";
+
+const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 const ContractList = () => {
   const [users, setUsers] = useState(userData);
@@ -120,6 +125,7 @@ const ContractList = () => {
   };
   // Search functionality
   const [searchText, setSearchText] = useState('');
+  const [dateRange, setDateRange] = useState(null);
 
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
@@ -153,6 +159,22 @@ const ContractList = () => {
         )?.username?.toLowerCase();
         
         return clientName?.includes(searchText.toLowerCase());
+      });
+    }
+
+    // Apply date range filter
+    if (dateRange && dateRange.length === 2) {
+      filtered = filtered.filter(contract => {
+        const contractStartDate = dayjs(contract.startDate);
+        const contractEndDate = dayjs(contract.endDate);
+        const filterStartDate = dayjs(dateRange[0]);
+        const filterEndDate = dayjs(dateRange[1]);
+
+        // Contract's date range should overlap with the selected date range
+        return (
+          (contractStartDate.isAfter(filterStartDate) || contractStartDate.isSame(filterStartDate)) &&
+          (contractEndDate.isBefore(filterEndDate) || contractEndDate.isSame(filterEndDate))
+        );
       });
     }
 
@@ -493,6 +515,15 @@ const ContractList = () => {
               className="search-input"
             />
           </div>
+          <div className="mr-md-3 mb-3">
+            <RangePicker
+              placeholder={['Contract Start Date', 'Contract End Date']}
+              onChange={(dates) => setDateRange(dates)}
+              format="DD-MM-YYYY"
+              allowClear
+              className="date-range-picker"
+            />
+          </div>
         </Flex>
         <Flex gap="7px">
           
@@ -587,8 +618,13 @@ const styles = `
     box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
   }
 
+  .date-range-picker {
+    min-width: 280px;
+  }
+
   @media (max-width: 768px) {
-    .search-input {
+    .search-input,
+    .date-range-picker {
       width: 100%;
       margin-bottom: 1rem;
     }

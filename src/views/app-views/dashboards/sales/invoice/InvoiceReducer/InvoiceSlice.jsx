@@ -102,6 +102,8 @@ const RoleAndPermissionSlice = createSlice({
     isLoading: false,
     addModel: false,
     editModal: false,
+    error: null,
+    success: false
   },
   reducers: {
     toggleAddModal: (state, action) => {
@@ -136,15 +138,21 @@ const RoleAndPermissionSlice = createSlice({
       //add
       .addCase(AddInvoices.pending, (state) => {
         state.isLoading = true;
+        state.error = null;
       })
       .addCase(AddInvoices.fulfilled, (state, action) => {
         state.isLoading = false;
-        // toast.success(action.payload?.data?.message);
+        if (action.payload?.data) {
+          state.salesInvoices = state.salesInvoices || [];
+          state.salesInvoices.push(action.payload.data);
+        }
+        state.success = true;
         message.success(action.payload?.message);
       })
       .addCase(AddInvoices.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.message);
+        state.error = action.payload;
+        message.error(action.payload?.message || "Failed to add invoice");
       })
 
       .addCase(getInvoice.pending, (state) => {
@@ -152,12 +160,12 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(getInvoice.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.salesInvoices = action?.payload;
-        // toast.success(action.payload?.data?.message);
+        state.salesInvoices = action.payload?.data || [];
       })
       .addCase(getInvoice.rejected, (state, action) => {
         state.isLoading = false;
-        toast.error(action.payload?.message);
+        state.error = action.payload;
+        message.error(action.payload?.message);
       })
 
       //getall

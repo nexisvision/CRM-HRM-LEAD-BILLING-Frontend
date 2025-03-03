@@ -419,7 +419,7 @@ const AddRevenue = ({ onClose }) => {
                         ))}
                       </Select>
                       <ErrorMessage
-                        name="project_category"
+                        name="category"
                         component="div"
                         className="error-message text-red-500 my-1"
                       />

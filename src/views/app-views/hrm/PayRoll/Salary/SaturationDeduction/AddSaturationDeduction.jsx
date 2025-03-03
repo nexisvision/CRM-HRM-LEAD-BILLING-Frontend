@@ -1,12 +1,34 @@
 import React, { useEffect } from "react";
 import { Input, Button, Col, message, Select } from "antd";
 import { ErrorMessage, Field, Formik } from "formik";
+import * as Yup from 'yup';
 import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 // import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 import { Option } from "antd/es/mentions";
 import { adddeducati, getdeducati } from "./deducationReducer/deducationSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+
+const validationSchema = Yup.object().shape({
+  employeeId: Yup.string()
+    .required('Employee is required'),
+  title: Yup.string()
+    .required('Title is required')
+    .min(2, 'Title must be at least 2 characters')
+    .max(50, 'Title must not exceed 50 characters'),
+  type: Yup.string()
+    .required('Type is required')
+    .min(2, 'Type must be at least 2 characters'),
+  deductionOption: Yup.string()
+    .required('Deduction Option is required'),
+  currency: Yup.string()
+    .required('Currency is required'),
+  amount: Yup.number()
+    .required('Amount is required')
+    .positive('Amount must be positive')
+    .typeError('Amount must be a number'),
+});
+
 const AddSaturationDeduction = ({ id, onClose }) => {
   const dispatch = useDispatch();
 
@@ -52,6 +74,7 @@ const AddSaturationDeduction = ({ id, onClose }) => {
           currency: "",
           amount: "",
         }}
+        validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({ handleSubmit, resetForm, setFieldValue, values }) => (

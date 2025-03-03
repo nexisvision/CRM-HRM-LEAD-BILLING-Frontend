@@ -10,6 +10,26 @@ import {
   getotherpay,
 } from "./otherpaymentReducer/otherpaymentSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import * as Yup from 'yup';
+
+const validationSchema = Yup.object().shape({
+  employeeId: Yup.string()
+    .required('Employee is required'),
+  title: Yup.string()
+    .required('Title is required')
+    .min(2, 'Title must be at least 2 characters')
+    .max(50, 'Title must not exceed 50 characters'),
+  type: Yup.string()
+    .required('Type is required')
+    .min(2, 'Type must be at least 2 characters')
+    .max(50, 'Type must not exceed 50 characters'),
+  currency: Yup.string()
+    .required('Currency is required'),
+  amount: Yup.number()
+    .required('Amount is required')
+    .positive('Amount must be positive')
+    .typeError('Amount must be a number'),
+});
 
 const AddOtherPayment = ({ id, onClose }) => {
   const dispatch = useDispatch();
@@ -49,7 +69,8 @@ const AddOtherPayment = ({ id, onClose }) => {
     <div className="employee-salary">
       <hr className="my-2 border-gray-300" />
       <Formik
-        initialValues={{ title: "", type: "", currency: "", amount: "" }}
+        initialValues={{ title: "", type: "", currency: "", amount: "", employeeId: "" }}
+        validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({ handleSubmit, values, setFieldValue, isSubmitting, resetForm }) => (

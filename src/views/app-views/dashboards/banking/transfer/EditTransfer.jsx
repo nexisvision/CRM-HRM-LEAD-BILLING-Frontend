@@ -102,20 +102,27 @@ const EditTransfer = ({ onClose, initialData, idd }) => {
                 {({ handleSubmit, isSubmitting, setFieldValue, values, setFieldTouched }) => (
                     <FormikForm onSubmit={handleSubmit}>
                         <Row gutter={16}>
-                            <Col span={12} className="">
-                                <div className="form-item">
-                                    <label className="font-semibold">Date <span className="text-red-500">*</span></label>
-                                    <input
-                                        type="date"
-                                        className="w-full mt-2 p-2 border rounded "
-                                    />
-                                    <ErrorMessage
-                                        name="date"
-                                        component="div"
-                                        className="error-message text-red-500 my-1"
-                                    />
-                                </div>
-                            </Col>
+                        <Col span={12} className="">
+                        <div className="form-item">
+                      <label className="font-semibold">Date <span className="text-red-500">*</span></label>
+                      <Field name="date">
+                        {({ field }) => (
+                          <input
+                            {...field}
+                            type="date"
+                            className="w-full mt-2 p-2 border rounded"
+                            value={values.date ? moment(values.date).format('YYYY-MM-DD') : ''}
+                            onChange={(e) => setFieldValue('date', e.target.value)}
+                          />
+                        )}
+                      </Field>
+                      <ErrorMessage
+                        name="date"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
 
                             <Col span={12}>
                                 <div className="form-group">
@@ -124,7 +131,10 @@ const EditTransfer = ({ onClose, initialData, idd }) => {
                                         {({ field }) => (
                                             <Select
                                                 {...field}
-                                                onChange={(value) => setFieldValue('fromAccount', value)}
+                                                onChange={(value) => {
+                                                    setFieldValue('fromAccount', value);
+                                                    setFieldValue('toAccount', value);
+                                                }}
                                                 placeholder="Select from account"
                                                 className="w-full mt-1"
                                                 dropdownRender={menu => (
@@ -165,7 +175,7 @@ const EditTransfer = ({ onClose, initialData, idd }) => {
                                         {({ field }) => (
                                             <Select
                                                 {...field}
-                                                onChange={(value) => setFieldValue('toAccount', value)}
+                                                disabled={true}
                                                 placeholder="Select to account"
                                                 className="w-full mt-1"
                                                 dropdownRender={menu => (

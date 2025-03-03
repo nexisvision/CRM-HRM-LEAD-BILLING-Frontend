@@ -69,24 +69,26 @@ const AddDocument = ({ onClose }) => {
   // };
 
   const onSubmit = async (values, { resetForm }) => {
-    // dispatch(AddDocu(values)).then(() => {
-    //   dispatch(getDocu());
-     
-    // });
+    // Validate that all required fields are filled
+    if (!values.name || !values.role || !values.description) {
+      message.error("Please fill in all required fields");
+      return;
+    }
 
     const formData = new FormData();
     for (const key in values) {
-        formData.append(key, values[key]);
+      formData.append(key, values[key]);
     }
 
-    
-    dispatch(AddDocu(formData)).then((res)=>{
-     
-      dispatch(getDocu());
+    try {
+      await dispatch(AddDocu(formData)).unwrap();
+      await dispatch(getDocu());
       message.success("Document added successfully!");
       resetForm();
-      onClose();
-    })
+      onClose(); // Close modal after successful submission
+    } catch (error) {
+      message.error(error?.message || "Failed to add document");
+    }
   };
 
   return (
@@ -94,7 +96,7 @@ const AddDocument = ({ onClose }) => {
       <hr className="mt-3 border border-gray-300" />
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({ handleSubmit, setFieldValue, setFieldTouched, values }) => (

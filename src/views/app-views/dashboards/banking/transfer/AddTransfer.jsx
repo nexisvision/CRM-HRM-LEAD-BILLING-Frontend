@@ -26,12 +26,13 @@ const AddTransfer = ({ onClose }) => {
     };
 
     const validationSchema = Yup.object({
-        date: Yup.string().required('Please enter a date.'),
+        date: Yup.date()
+            .required('Please enter a date.')
+            .typeError('Please enter a valid date.'),
         fromAccount: Yup.string().required('Please enter a from account.'),
         toAccount: Yup.string().required('Please enter a to account.'),
         amount: Yup.string().required('Please enter a amount.'),
         description: Yup.string().required('Please enter a description.'),
-        // bankaddress: Yup.string().required('Please enter a bank address.'),
     });
 
     useEffect(()=>{
@@ -80,11 +81,18 @@ const AddTransfer = ({ onClose }) => {
                         <Col span={12} className="">
                     <div className="form-item">
                       <label className="font-semibold">Date <span className="text-red-500">*</span></label>
-                      <input
-                        type="date"
-                        className="w-full mt-1 p-2 border rounded "
-                        // value={values.date || ''}
-                      />
+                      <Field name="date">
+                        {({ field }) => (
+                          <input
+                            {...field}
+                            type="date"
+                            className="w-full mt-1 p-2 border rounded"
+                            onChange={(e) => {
+                              setFieldValue('date', e.target.value);
+                            }}
+                          />
+                        )}
+                      </Field>
                       <ErrorMessage
                         name="date"
                         component="div"
@@ -99,7 +107,11 @@ const AddTransfer = ({ onClose }) => {
                                         {({ field }) => (
                                             <Select
                                                 {...field}
-                                                onChange={(value) => setFieldValue('fromAccount', value)}
+                                                onChange={(value) => {
+                                                    setFieldValue('fromAccount', value);
+                                                    // When fromAccount is selected, set toAccount to the same value
+                                                    setFieldValue('toAccount', value);
+                                                }}
                                                 placeholder="Select from account"
                                                 className="w-full mt-1"
                                                 dropdownRender={menu => (
@@ -156,7 +168,8 @@ const AddTransfer = ({ onClose }) => {
                                         {({ field }) => (
                                             <Select
                                                 {...field}
-                                                onChange={(value) => setFieldValue('toAccount', value)}
+                                                disabled={true}
+                                                value={values.toAccount}
                                                 placeholder="Select to account"
                                                 className="w-full mt-1"
                                                 dropdownRender={menu => (

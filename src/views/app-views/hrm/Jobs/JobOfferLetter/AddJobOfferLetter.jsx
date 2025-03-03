@@ -56,6 +56,7 @@ const AddJobOfferLetter = ({ onClose }) => {
   const validationSchema = Yup.object({
     job: Yup.string().required("Please select a job"),
     job_applicant: Yup.string().required("Please select a job application"),
+    rate: Yup.string().required("Please enter a rate"),
     offer_expiry: Yup.date().required("Please select an offer expiry date"),
     expected_joining_date: Yup.date().required("Please select an expected joining date"),
     salary: Yup.string().required("Please enter a salary"),

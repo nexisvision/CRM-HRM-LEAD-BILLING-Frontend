@@ -40,101 +40,57 @@ const DraggableItem = ({ lead, id }) => {
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <Card 
-        className="lead-card cursor-pointer"
-        bodyStyle={{ padding: '16px' }}
-        bordered={false}
-        style={{
-          background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)',
-          borderRadius: '12px',
-          boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
-          border: '1px solid #e6ebf5',
-          position: 'relative',
-          overflow: 'hidden'
-        }}
+        className="cursor-pointer hover:shadow-md transition-all"
+        bodyStyle={{ padding: '12px', paddingLeft: '16px', position: 'relative' }}
       >
-        {/* Status Bar */}
+        {/* Left border line */}
         <div 
-          className="absolute top-0 left-0 right-0 h-1"
           style={{ 
-            background: lead.status === 'Won' ? '#52c41a' : '#1890ff',
+            position: 'absolute',
+            left: "16px",
+            right: 0,
+            top: '15px',
+            height: '3px',
+            width: '50px',
+            backgroundColor: '#1677ff',
+            borderTopLeftRadius: '3px',
+            borderTopRightRadius: '3px'
           }} 
         />
-
-        {/* Lead Header */}
-        <div className="flex justify-between items-start mb-4 pt-2">
-          <div className="flex-1">
-            <h4 className="text-lg font-medium text-gray-800 mb-1 line-clamp-1">
-              {lead.leadTitle}
-            </h4>
-            <div className="flex items-center gap-2">
-              <Tag 
-                color={lead.status === 'Won' ? 'success' : 'processing'} 
-                className="rounded-full text-xs font-medium"
-              >
-                {lead.status || 'New Lead'}
-              </Tag>
+        <div>
+          <div className="flex justify-between items-start">
+            <div>
+              <h4 className="text-lg font-medium mb-2 mt-2">{lead.leadTitle}</h4>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center text-gray-500 text-sm">
+                  <CalendarOutlined className="mr-1" />
+                  {new Date(lead.createdAt).toLocaleDateString('en-US', {
+                    day: 'numeric',
+                    month: 'short'
+                  })}
+                </div>
+                <div className="flex items-center text-gray-500 text-sm">
+                  <CommentOutlined className="mr-1" />
+                  {lead.commentCount || 1}
+                </div>
+              </div>
             </div>
           </div>
-          <Avatar
-            size={40}
-            className="bg-blue-50 border-2 border-white shadow-sm"
-            style={{ color: '#1890ff' }}
-          >
-            {lead.firstName?.[0] || lead.lastName?.[0] || '?'}
-          </Avatar>
-        </div>
-
-        {/* Contact Info */}
-        <div className="space-y-2.5 mb-4">
-          <div className="flex items-center text-gray-600">
-            <UserOutlined className="text-blue-400 mr-2" />
-            <span className="text-sm font-medium">
-              {`${lead.firstName || ''} ${lead.lastName || ''}`}
-            </span>
-          </div>
-          {lead.telephone && (
-            <div className="flex items-center text-gray-500">
-              <PhoneOutlined className="text-green-400 mr-2" />
-              <span className="text-sm">{lead.telephone}</span>
-            </div>
-          )}
-          {lead.email && (
-            <div className="flex items-center text-gray-500">
-              <MailOutlined className="text-orange-400 mr-2" />
-              <span className="text-sm truncate">{lead.email}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <div className="flex items-center gap-2">
-            <CalendarOutlined className="text-gray-400" />
-            <span className="text-xs text-gray-500">
-              {new Date(lead.createdAt).toLocaleDateString('en-US', {
-                month: 'short',
-                day: 'numeric'
-              })}
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Tooltip title="Comments">
-              <Badge 
-                count={1} 
-                size="small"
-                className="cursor-pointer"
-                offset={[-5, 5]}
-              >
-                <MessageOutlined className="text-gray-400 text-lg" />
-              </Badge>
-            </Tooltip>
-            <div 
-              className="w-2 h-2 rounded-full"
-              style={{ 
-                backgroundColor: lead.status === 'Won' ? '#52c41a' : '#1890ff',
-                boxShadow: `0 0 0 3px ${lead.status === 'Won' ? 'rgba(82, 196, 26, 0.1)' : 'rgba(24, 144, 255, 0.1)'}` 
-              }} 
-            />
+          <div className="mt-2 flex justify-end">
+            <Avatar.Group size={35}>
+              <Avatar 
+                src={lead.assigned?.profilePicture || "https://www.gravatar.com/avatar/?d=mp"}
+                alt={lead.assigned?.name || "User Avatar"}
+              />
+              <Avatar
+                src="https://www.gravatar.com/avatar/?d=mp"
+                alt="Team Member"
+              />
+              <Avatar
+                src="https://www.gravatar.com/avatar/?d=mp"
+                alt="Team Member"
+              />
+            </Avatar.Group>
           </div>
         </div>
       </Card>

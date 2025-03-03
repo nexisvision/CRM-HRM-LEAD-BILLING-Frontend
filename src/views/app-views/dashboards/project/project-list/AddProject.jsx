@@ -149,7 +149,7 @@ const AddProject = ({ onClose }) => {
     budget: Yup.number()
       .required("Please enter a Project Budget.")
       .positive("Budget must be positive."),
-    estimatedmonths: Yup.string()
+      estimatedmonths: Yup.string()
       .required("Please enter Estimated Months."),
       // .positive("Months must be positive.")
       // .integer("Months must be a whole number"),
@@ -168,7 +168,7 @@ const AddProject = ({ onClose }) => {
     // Convert estimatedmonths to number before sending
     const payload = {
       ...values,
-      estimatedmonths: parseInt(values.estimatedmonths, 10)
+      // estimatedmonths: parseInt(values.estimatedmonths, 10)
     };
 
     dispatch(AddPro(payload))
@@ -399,11 +399,12 @@ const AddProject = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">Estimated Duration <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Estimated Months <span className="text-red-500">*</span></label>
                   <Field
                     name="estimatedmonths"
                     as={Input}
                     className="mt-1"
+                    // type="string"
                     placeholder="Duration will be calculated automatically"
                     disabled={values.startDate && values.endDate}
                   />
@@ -569,7 +570,7 @@ const AddProject = ({ onClose }) => {
                                 </div>
                             </Col>
 
-              <Col span={12} className="mt-4">
+              {/* <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Estimated Months <span className="text-red-500">*</span></label>
                   <Field
@@ -587,7 +588,7 @@ const AddProject = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
 
               <Col span={12} className="mt-4">
                 <div className="form-item">

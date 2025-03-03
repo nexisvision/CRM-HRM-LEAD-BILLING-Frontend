@@ -99,6 +99,31 @@ const AddJob = ({ onClose }) => {
   });
 
   const onSubmit = (values, { resetForm }) => {
+    // Check if all required fields are filled
+    const requiredFields = [
+      'title',
+      'category', 
+      'skillss',
+      'location',
+      'interviewRounds',
+      'startDate',
+      'endDate',
+      'recruiter',
+      'jobType',
+      'workExperience',
+      'currency',
+      'description',
+      'status',
+      'expectedSalary'
+    ];
+
+    const missingFields = requiredFields.filter(field => !values[field]);
+    
+    if (missingFields.length > 0) {
+      message.error('Please fill in all required fields');
+      return;
+    }
+
     // Transforming skills and interviewRounds into the desired object structure
     const transformedValues = {
       ...values,
@@ -111,13 +136,10 @@ const AddJob = ({ onClose }) => {
     // Remove the skillss field as we've transformed it to skills
     delete transformedValues.skillss;
 
-    // Log the transformed values to verify the structure
-    console.log('Transformed Values:', transformedValues);
-
     dispatch(AddJobs(transformedValues)).then(() => {
       dispatch(GetJobdata());
       message.success("Job added successfully!");
-      onClose();
+      onClose(); // Close modal after successful submission
       resetForm();
     }).catch((error) => {
       console.error('Error adding job:', error);
@@ -233,10 +255,11 @@ const AddJob = ({ onClose }) => {
                         <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
                           <Button
                             type="link"
-                            icon={<PlusOutlined />}
+                            // icon={<PlusOutlined />}
+                            className="w-full"
                             onClick={() => setIsJobCategoryModalVisible(true)}
                           >
-                            Add New Job Category
+                            + Add New Job Category
                           </Button>
                         </div>
                       </div>
@@ -266,10 +289,11 @@ const AddJob = ({ onClose }) => {
                         <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
                           <Button
                             type="link"
-                            icon={<PlusOutlined />}
+                            // icon={<PlusOutlined />}
+                            className="w-full"
                             onClick={() => setIsJobSkillModalVisible(true)}
                           >
-                            Add New Job Skill
+                            + Add New Job Skill
                           </Button>
                         </div>
                       </div>
@@ -482,10 +506,10 @@ const AddJob = ({ onClose }) => {
                         <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
                           <Button
                             type="link"
-                            icon={<PlusOutlined />}
+                            className="w-full"
                             onClick={() => setIsJobStatusModalVisible(true)}
                           >
-                            Add New Job Status
+                            + Add New Job Status
                           </Button>
                         </div>
                       </div>

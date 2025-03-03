@@ -15,6 +15,7 @@ import {
   Modal,
   Tag,
   message,
+  DatePicker,
 } from "antd";
 // import { invoiceData } from '../../../pages/invoice/invoiceData';
 // import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
@@ -106,6 +107,9 @@ export const TaskList = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Add new state for date range
+  const [dateRange, setDateRange] = useState(null);
+
   // Open Add Job Modal
   const openAddTaskModal = () => {
     setIsAddTaskModalVisible(true);
@@ -181,14 +185,34 @@ export const TaskList = () => {
         const formattedTasks = fnddata.map(task => {
           let assignToNames = 'Not Assigned';
           try {
-            const assignToIds = JSON.parse(task.assignTo || "[]");
-            const employeeNames = assignToIds.map(empId => {
-              const employee = employees.find(emp => emp.id === empId);
-              return employee?.firstName || 'Unknown';
-            });
-            assignToNames = employeeNames.join(', ');
+            let assignToIds = [];
+            
+            // Handle different possible formats of assignTo data
+            if (typeof task.assignTo === 'string') {
+              try {
+                const parsed = JSON.parse(task.assignTo);
+                assignToIds = Array.isArray(parsed) ? parsed : [parsed];
+              } catch {
+                assignToIds = [task.assignTo];
+              }
+            } else if (Array.isArray(task.assignTo)) {
+              assignToIds = task.assignTo;
+            } else if (task.assignTo) {
+              assignToIds = [task.assignTo];
+            }
+
+            if (assignToIds.length > 0) {
+              const employeeNames = assignToIds
+                .map(empId => {
+                  const employee = employees.find(emp => emp.id === empId);
+                  return employee?.firstName || 'Unknown';
+                })
+                .filter(name => name); // Remove any undefined/null values
+              
+              assignToNames = employeeNames.length > 0 ? employeeNames.join(', ') : 'Not Assigned';
+            }
           } catch (error) {
-            console.error('Error parsing assignTo:', error);
+            console.error('Error processing assignTo:', error);
           }
 
           return {
@@ -385,11 +409,16 @@ export const TaskList = () => {
     },
   };
 
-  // Update the filter function to handle API data
-  const handleFilters = async () => {
+  // Handle date range change
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates);
+    handleFilters(dates); // Pass the dates directly to handleFilters
+  };
+
+  // Update the filter function to handle API data and date range
+  const handleFilters = async (dates = dateRange) => {
     setLoading(true);
     try {
-      // First, ensure we have the base data
       let filtered = [...fnddata];
 
       // Apply search text filter
@@ -406,8 +435,25 @@ export const TaskList = () => {
         filtered = filtered.filter(item => item.status === selectedStatus);
       }
 
-      // Update the filtered data
+      // Apply date range filter
+      if (dates && dates[0] && dates[1]) {
+        const startRange = dayjs(dates[0]).startOf('day');
+        const endRange = dayjs(dates[1]).endOf('day');
+        
+        filtered = filtered.filter(task => {
+          const taskStartDate = dayjs(task.startDate);
+          const taskEndDate = dayjs(task.dueDate);
+          
+          // Check if task's date range overlaps with selected date range
+          return taskStartDate.isSame(startRange, 'day') || 
+                 taskEndDate.isSame(endRange, 'day') || 
+                 (taskStartDate.isAfter(startRange) && taskStartDate.isBefore(endRange)) ||
+                 (taskEndDate.isAfter(startRange) && taskEndDate.isBefore(endRange));
+        });
+      }
+
       setFilteredData(filtered);
+      setList(filtered);
     } catch (error) {
       console.error('Error filtering data:', error);
       message.error('Failed to filter data');
@@ -415,9 +461,11 @@ export const TaskList = () => {
     setLoading(false);
   };
 
-  // Add useEffect to trigger filtering when search or status changes
+  // Add useEffect to trigger filtering when filters change
   useEffect(() => {
-    handleFilters();
+    if (fnddata) {
+      handleFilters();
+    }
   }, [searchText, selectedStatus, fnddata]);
 
   // Update the getFilteredTasks function
@@ -498,6 +546,25 @@ export const TaskList = () => {
                 ))}
               </Select>
             </div>
+            <div className="mr-0 md:mr-3 mt-7 md:mb-0">
+              <DatePicker.RangePicker
+                onChange={handleDateRangeChange}
+                format="YYYY-MM-DD"
+                placeholder={['Start Date', 'End Date']}
+                className="date-range-picker"
+                allowClear={true}
+                value={dateRange}
+              />
+            </div>
+            {/* <div className="mr-0 md:mr-3 mt-7 md:mb-0">
+              <Button 
+                type="primary" 
+                onClick={handleFilters}
+                icon={<SearchOutlined />}
+              >
+                Search
+              </Button>
+            </div> */}
           </Flex>
           <Flex gap="7px" className="flex">
             <Button
@@ -509,13 +576,13 @@ export const TaskList = () => {
               <span className="ml-2">New</span>
             </Button>
             <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
-                block
-              >
-                Export All
-              </Button>
+              type="primary"
+              icon={<FileExcelOutlined />}
+              onClick={exportToExcel}
+              block
+            >
+              Export All
+            </Button>
           </Flex>
         </Flex>
         <div className="table-responsive">

@@ -154,7 +154,7 @@ const EditDeal = ({ onClose, id }) => {
                   <label className="font-semibold">Deal Name <span className="text-rose-500">*</span></label>
                   <Field
                     name="dealName"
-                    className="mt-2"
+                    className="mt-1"
                     as={Input}
                     placeholder="Enter Deal Name"
                     rules={[{ required: true }]}
@@ -166,7 +166,7 @@ const EditDeal = ({ onClose, id }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-3">
+              <Col span={12} className="">
                 <div className="form-item">
                   <label className="font-semibold">Phone <span className="text-rose-500">*</span></label>
                   <div className="flex">

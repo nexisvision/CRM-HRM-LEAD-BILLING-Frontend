@@ -106,12 +106,12 @@ const TransferList = () => {
 
   const alltransferdata = useSelector((state)=>state?.transfer?.transfer?.data);
 
-  const fnsadadata = alltransferdata?.filter((item)=>item?.created_by === loggeddata)
+  // const fnsadadata = alltransferdata?.filter((item)=>item?.created_by === loggeddata)
 
 
   useEffect(()=>{
-    if(fnsadadata){
-      setList(fnsadadata)
+    if(alltransferdata){
+      setList(alltransferdata)
     }
 },[alltransferdata])
 
@@ -219,14 +219,14 @@ const TransferList = () => {
     },
     {
       title: 'From Account',
-      dataIndex: 'fromaccount',
+      dataIndex: 'fromAccount',
       sorter: {
         compare: (a, b) => a.fromaccount.length - b.fromaccount.length,
       },
     },
     {
       title: 'To Account',
-      dataIndex: 'toaccount',
+      dataIndex: 'toAccount',
       sorter: {
         compare: (a, b) => a.toaccount.length - b.toaccount.length,
       },

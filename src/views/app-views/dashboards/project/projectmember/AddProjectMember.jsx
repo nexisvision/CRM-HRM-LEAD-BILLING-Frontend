@@ -78,17 +78,21 @@ const AddProjectMember = ({ onClose }) => {
 
   const onSubmit = async (values, { resetForm }) => {
     try {
+      if (!values.project_members || values.project_members.length === 0) {
+        message.error("Please select project members!");
+        return;
+      }
+
       const payload = {
         project_members: values,
       };
 
       await Addmember(payload);
-
       await dispatch(GetProject()).unwrap();
-
+      
       message.success("Project added successfully!");
       resetForm();
-      onClose();
+      onClose(); // Close modal after successful submission
     } catch (error) {
       message.error("Failed to add project or fetch data!");
       console.error("Error in onSubmit:", error);
@@ -119,7 +123,7 @@ const loggeduserdata = useSelector((state)=>state.user.loggedInUser.username)
       <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (

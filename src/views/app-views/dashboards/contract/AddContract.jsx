@@ -229,7 +229,7 @@ const AddContract = ({ onClose }) => {
 
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({ handleSubmit, setFieldValue, values,setFieldTouched }) => (
@@ -557,7 +557,7 @@ const AddContract = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-3">
+              <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold ">StartDate <span className="text-rose-500">*</span></label>
                   <DatePicker

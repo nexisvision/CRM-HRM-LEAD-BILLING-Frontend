@@ -323,15 +323,15 @@ const CreditNotesList = () => {
         },
       },
     },
-    {
-      title: "Action",
-      dataIndex: "actions",
-      render: (_, elm) => (
-        <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
-        </div>
-      ),
-    },
+    // {
+    //   title: "Action",
+    //   dataIndex: "actions",
+    //   render: (_, elm) => (
+    //     <div className="text-center">
+    //       <EllipsisDropdown menu={dropdownMenu(elm)} />
+    //     </div>
+    //   ),
+    // },
   ];
 
   const onSearch = (e) => {

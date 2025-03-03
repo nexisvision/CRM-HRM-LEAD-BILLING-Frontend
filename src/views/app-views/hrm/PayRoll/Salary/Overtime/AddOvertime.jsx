@@ -2,9 +2,31 @@ import React, { useEffect } from "react";
 import { Form, Input, Select, Row, Col, Button, message } from "antd";
 import { ErrorMessage, Field, Formik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
+import * as Yup from 'yup';
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { addovertimess, getovertimess } from "./overtimeReducer/overtimeSlice";
 const { Option } = Select;
+
+const validationSchema = Yup.object().shape({
+  employeeId: Yup.string()
+    .required('Employee is required'),
+  title: Yup.string()
+    .required('Title is required')
+    .min(2, 'Title must be at least 2 characters')
+    .max(50, 'Title must not exceed 50 characters'),
+  days: Yup.number()
+    .required('Days is required')
+    .positive('Days must be a positive number')
+    .max(31, 'Days cannot exceed 31'),
+  Hours: Yup.number()
+    .required('Hours is required')
+    .positive('Hours must be a positive number')
+    .max(24, 'Hours cannot exceed 24 per day'),
+  rate: Yup.number()
+    .required('Rate is required')
+    .positive('Rate must be a positive number'),
+});
+
 const AddOvertime = ({ id, onClose }) => {
   const dispatch = useDispatch();
 
@@ -35,7 +57,14 @@ const AddOvertime = ({ id, onClose }) => {
     <div className="employee-salary">
       <hr className="my-2 border-gray-300" />
       <Formik
-        initialValues={{ title: "", days: "", Hours: "", rate: "" }}
+        initialValues={{ 
+          employeeId: "",
+          title: "", 
+          days: "", 
+          Hours: "", 
+          rate: "" 
+        }}
+        validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({ handleSubmit, resetForm, setFieldValue, values }) => (

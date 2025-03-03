@@ -135,9 +135,11 @@ const AddClient = ({ visible, onClose, onCreate }) => {
                       />
                     )}
                   </Field>
-                  {errors.username && touched.username && (
-                    <div className="error-message">{errors.username}</div>
-                  )}
+                  <ErrorMessage
+                    name="username"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 
@@ -154,9 +156,11 @@ const AddClient = ({ visible, onClose, onCreate }) => {
                       />
                     )}
                   </Field>
-                  {errors.email && touched.email && (
-                    <div className="error-message">{errors.email}</div>
-                  )}
+                  <ErrorMessage
+                    name="email"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                 </div>
               </Col>
 

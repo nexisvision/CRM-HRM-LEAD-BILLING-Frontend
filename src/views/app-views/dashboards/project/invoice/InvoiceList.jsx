@@ -15,6 +15,8 @@ import {
   Menu,
   Modal,
   Tag,
+  DatePicker,
+  Space,
 } from "antd";
 // import { invoiceData } from '../../../pages/invoice/invoiceData';
 // import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
@@ -98,10 +100,9 @@ export const InvoiceList = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedInvoiceData, setSelectedInvoiceData] = useState(null);
   const [searchText, setSearchText] = useState('');
-  const clientsData = useSelector((state) => state.SubClient);
-  const clients = clientsData.SubClient.data || [];
-  const projectsData = useSelector((state) => state.Project);
-  const projects = projectsData.Project.data || [];
+  const [dateRange, setDateRange] = useState(null);
+  const { RangePicker } = DatePicker;
+
   // Fetch invoices when component mounts
   useEffect(() => {
     console.log("Fetching invoices for ID:", id);
@@ -109,12 +110,14 @@ export const InvoiceList = () => {
     dispatch(ClientData());
     dispatch(GetProject());
   }, [dispatch]);
+
   // Update list when invoices change
   useEffect(() => {
     if (invoices) {
       setList(invoices);
     }
   }, [invoices]);
+
   const Editfunc = (id) => {
     openEditInvoiceModal();
     setIdd(id);
@@ -126,7 +129,6 @@ export const InvoiceList = () => {
     setIdd(id);
     openViewInvoiceModal();
   };
-  //   console.log(idd, "idddd");
     
     const handleDelete = async (id) => {
         try {
@@ -177,31 +179,64 @@ export const InvoiceList = () => {
   const handleSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
-
+    
     if (!value) {
       setList(invoices);
       return;
     }
-
-    const filtered = invoices.filter((invoice) => {
-      const clientName = clients.find(c => c.id === invoice.client)?.username || '';
-      
-      const searchableFields = [
-        invoice.invoiceNumber,
-        invoice.project,
-        clientName,
-        invoice.total?.toString(),
-        invoice.tax?.toString(),
-        dayjs(invoice.issueDate).format("DD/MM/YYYY"),
-        dayjs(invoice.dueDate).format("DD/MM/YYYY")
-      ];
-
-      return searchableFields.some(field => 
-        field?.toLowerCase().includes(value)
-      );
-    });
     
+    const filtered = getFilteredInvoices();
     setList(filtered);
+  };
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates);
+    const filtered = getFilteredInvoices(dates);
+    setList(filtered);
+  };
+  const handleClearFilters = () => {
+    setSearchText('');
+    setDateRange(null);
+    setList(invoices);
+  };
+  const getFilteredInvoices = (dates = dateRange) => {
+    if (!invoices) return [];
+    
+    let filtered = [...invoices];
+
+    if (searchText) {
+      filtered = filtered.filter(invoice => {
+        const searchFields = [
+          invoice.invoiceNumber,
+          invoice.client,
+          invoice.total?.toString(),
+          invoice.tax?.toString(),
+          dayjs(invoice.issueDate).format('DD/MM/YYYY'),
+          dayjs(invoice.dueDate).format('DD/MM/YYYY')
+        ];
+        return searchFields.some(field => 
+          field?.toLowerCase().includes(searchText.toLowerCase())
+        );
+      });
+    }
+
+    if (dates && dates[0] && dates[1]) {
+      const startRange = dayjs(dates[0]).startOf('day');
+      const endRange = dayjs(dates[1]).endOf('day');
+      
+      filtered = filtered.filter(invoice => {
+        const issueDate = dayjs(invoice.issueDate);
+        const dueDate = dayjs(invoice.dueDate);
+        
+        return (
+          (issueDate.isAfter(startRange) || issueDate.isSame(startRange)) && 
+          (issueDate.isBefore(endRange) || issueDate.isSame(endRange)) ||
+          (dueDate.isAfter(startRange) || dueDate.isSame(startRange)) && 
+          (dueDate.isBefore(endRange) || dueDate.isSame(endRange))
+        );
+      });
+    }
+
+    return filtered;
   };
   const dropdownMenu = (row) => (
     <Menu>
@@ -326,25 +361,32 @@ export const InvoiceList = () => {
                     <Flex className="flex flex-wrap gap-4 mb-4 md:mb-0" mobileFlex={false}>
                         <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
                             <Input 
-                                placeholder="Search by invoice #, client, amount, date..." 
+                                placeholder="Search by invoice #, client, amount..." 
                                 prefix={<SearchOutlined />} 
                                 onChange={handleSearch}
                                 value={searchText}
+                                allowClear
                                 className="search-input"
                             />
                         </div>
-                        {/* <div className="mb-3">
-                            <Select
-                                defaultValue="All"
-                                className="w-100"
-                                style={{ minWidth: 180 }}
-                                // onChange={handleShowStatus}
-                                placeholder="Status"
+                        <div className="mr-0 md:mr-3 mb-3 md:mb-0">
+                            <RangePicker
+                                onChange={handleDateRangeChange}
+                                format="DD/MM/YYYY"
+                                value={dateRange}
+                                placeholder={['Start Date', 'End Date']}
+                                className="date-range-picker"
+                                allowClear={true}
+                                style={{ width: '280px' }}
+                            />
+                            {/* <Button 
+                                onClick={handleClearFilters}
+                                type="default"
+                                className="ml-2"
                             >
-                                <Option value="All">All payment </Option>
-                                {paymentStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
-                            </Select>
-                        </div> */}
+                                Clear Filters
+                            </Button> */}
+                        </div>
                     </Flex>
                     <Flex gap="7px" className="flex">
                         <div className='flex gap-4'>
@@ -368,10 +410,10 @@ export const InvoiceList = () => {
                             rowKey="id"
                             scroll={{ x: 1200 }}
                             locale={{
-                                emptyText: searchText ? (
+                                emptyText: searchText || dateRange ? (
                                     <div className="text-center my-4">
                                         <SearchOutlined style={{ fontSize: '24px' }} />
-                                        <p>No results found for "{searchText}"</p>
+                                        <p>No results found for the selected criteria</p>
                                     </div>
                                 ) : (
                                     <div className="text-center my-4">No data available</div>

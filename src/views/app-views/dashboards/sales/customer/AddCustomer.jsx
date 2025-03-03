@@ -191,7 +191,7 @@ const AddCustomer = ({ onClose }) => {
                       
                     </div>
                     <ErrorMessage
-                      name="country_code"
+                      name="contact"
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
@@ -213,7 +213,8 @@ const AddCustomer = ({ onClose }) => {
 
                   <Col span={8} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Tax Number <span className="text-red-500">*</span> </label>
+                    <label className="font-semibold">Tax Number 
+                       </label>
                     <Field
                       name="taxnumber"
                       as={Input}
@@ -278,7 +279,7 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Name <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Name</label>
                     <Field
                       name="billing_name"
                       as={Input}
@@ -295,7 +296,7 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Phone  </label>
                     <div className="flex">
                       <Select
                         className="mt-1"
@@ -337,7 +338,7 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={24} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Address <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Address  </label>
                     <Field name="billing_address" as={Input} placeholder="Enter Address" className="mt-1" />
                     <ErrorMessage
                       name="billing_address"
@@ -349,7 +350,7 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">City <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">City   </label>
                     <Field
                       name="billing_city"
                       as={Input}
@@ -366,7 +367,7 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">State <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">State  </label>
                     <Field
                       name="billing_state"
                       as={Input}
@@ -384,7 +385,7 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Country <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Country  </label>
                     <Select
                       className="mt-1 w-full"
                       placeholder="Select Country"
@@ -408,7 +409,7 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={12} className="mt-3 mb-4">
                   <div className="form-item">
-                    <label className="font-semibold">Zip Code <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Zip Code   </label>
                     <Field
                       name="billing_zipcode"
                       as={Input}
@@ -425,14 +426,37 @@ const AddCustomer = ({ onClose }) => {
                 </Col>
 
                 <Col span={24}>
-                  <h1 className="font-semibold mb-2 text-lg">
-                    Shipping Address
-                  </h1>
+                  <div className="flex justify-between items-center">
+                    <h1 className="font-semibold mb-2 text-lg">
+                      Shipping Address
+                    </h1>
+                    <Button 
+                      style={{ 
+                        backgroundColor: 'rgb(107 114 128)', 
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px'
+                      }}
+                      className="mb-3 "
+                      onClick={() => {
+                        setFieldValue('shipping_name', values.billing_name);
+                        setFieldValue('shipping_country_code', values.billing_country_code);
+                        setFieldValue('shipping_phone', values.billing_phone);
+                        setFieldValue('shipping_address', values.billing_address);
+                        setFieldValue('shipping_city', values.billing_city);
+                        setFieldValue('shipping_state', values.billing_state);
+                        setFieldValue('shipping_country', values.billing_country);
+                        setFieldValue('shipping_zipcode', values.billing_zipcode);
+                      }}
+                    >
+                      Shipping Same As Billing
+                    </Button>
+                  </div>
                 </Col>
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Name <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Name   </label>
                     <Field
                       name="shipping_name"
                       as={Input}
@@ -449,7 +473,7 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Phone  </label>
                     <div className="flex">
                         <Select
                         className="mt-1"
@@ -497,7 +521,7 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={24} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Address <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Address  </label>
                     <Field name="shipping_address" as={Input} placeholder="Enter Address" className="mt-1" />
                     <ErrorMessage
                       name="shipping_address"
@@ -511,7 +535,7 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">City <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">City   </label>
                     <Field
                       name="shipping_city"
                       as={Input}
@@ -529,7 +553,7 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">State <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">State  </label>
                     <Field
                       name="shipping_state"
                       as={Input}
@@ -547,7 +571,7 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Country <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Country  </label>
                     <Select
                       className="mt-1 w-full"
                       placeholder="Select Country"
@@ -571,7 +595,7 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Zip Code <span className="text-red-500">*</span>   </label>
+                    <label className="font-semibold">Zip Code      </label>
                     <Field
                       name="shipping_zipcode"
                       as={Input}
@@ -588,7 +612,7 @@ const AddCustomer = ({ onClose }) => {
                 </Col>
               </Row>
 
-              <div className="form-buttons text-right mt-2">
+              <div className="form-buttons text-right mt-4">
                 <Button type="default" className="mr-2" onClick={onClose}>
                   Cancel
                 </Button>

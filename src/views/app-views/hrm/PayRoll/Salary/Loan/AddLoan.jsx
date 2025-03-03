@@ -7,7 +7,33 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { addloans, getloans } from "./loanReducer/loanSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import * as Yup from 'yup';
+
 const { Option } = Select;
+
+const validationSchema = Yup.object().shape({
+  employeeId: Yup.string()
+    .required('Employee is required'),
+  title: Yup.string()
+    .required('Title is required')
+    .min(2, 'Title must be at least 2 characters')
+    .max(50, 'Title must not exceed 50 characters'),
+  loanOption: Yup.string()
+    .required('Loan option is required'),
+  type: Yup.string()
+    .required('Type is required'),
+  currency: Yup.string()
+    .required('Currency is required'),
+  amount: Yup.number()
+    .required('Amount is required')
+    .positive('Amount must be positive')
+    .min(1, 'Amount must be greater than 0'),
+  reason: Yup.string()
+    .required('Reason is required')
+    .min(10, 'Reason must be at least 10 characters')
+    .max(500, 'Reason must not exceed 500 characters'),
+});
+
 const AddLoan = ({ id, onClose }) => {
   const dispatch = useDispatch();
   useEffect(() => {
@@ -43,8 +69,10 @@ const AddLoan = ({ id, onClose }) => {
           currency: "",
           amount: "",
           reason: "",
+          employeeId: id || "",
         }}
-        onSubmit={handleSubmit}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit} 
       >
         {({ values, setFieldValue, resetForm }) => (
           <Form className="space-y-4">

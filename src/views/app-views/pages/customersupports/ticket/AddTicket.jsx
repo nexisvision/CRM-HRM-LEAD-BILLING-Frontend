@@ -41,8 +41,8 @@ const AddTicket = ({ onClose }) => {
   const initialValues = {
     ticketSubject: "",
     requestor: "",
-    priority: "Low",
-    status: "Open",
+    priority: "",
+    status: "",
     endDate: null,
     description: "",
     file: null,
@@ -279,9 +279,9 @@ const AddTicket = ({ onClose }) => {
                     <Button icon={<UploadOutlined />} className="bg-white">
                       Select File
                     </Button>
-                    <span className="ml-2 text-gray-500 text-sm">
+                    {/* <span className="ml-2 text-gray-500 text-sm">
                       Supports: JPG, PNG, PDF (Max: 5MB)
-                    </span>
+                    </span> */}
                   </Upload>
                 </div>
               </Col>
