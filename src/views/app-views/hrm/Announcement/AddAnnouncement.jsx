@@ -204,7 +204,7 @@ const AddAnnouncement = ({ onClose }) => {
               </Col> */}
             </Row>
 
-            <div className="text-right">
+            <div className="text-right mt-3">
               <Button
                 type="default"
                 className="mr-2"

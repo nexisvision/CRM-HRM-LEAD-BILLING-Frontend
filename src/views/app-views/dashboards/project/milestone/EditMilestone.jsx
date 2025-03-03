@@ -12,6 +12,7 @@ import {
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
+import { PlusOutlined } from "@ant-design/icons";
 import "react-quill/dist/quill.snow.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -20,6 +21,8 @@ import moment from "moment";
 import { Editmins, Getmins } from "./minestoneReducer/minestoneSlice";
 import { AddLable, GetLable } from "./LableReducer/LableSlice";
 import dayjs from "dayjs";
+import AddCurrencies from '../../../setting/currencies/AddCurrencies';
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 const { Option } = Select;
 const EditMilestone = ({ idd, onClose }) => {
@@ -31,10 +34,27 @@ const EditMilestone = ({ idd, onClose }) => {
   const [tags, setTags] = useState([]);
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [newTag, setNewTag] = useState("");
+
+  const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
+  const allempdatass = useSelector((state) => state.currencies);
+const fnddatass = allempdatass?.currencies?.data;
+
+// const curren = curr?.filter((item) => item.created_by === user);
+  
+  // console.log("Milestone ID:", id);
+
+  const getInitialCurrency = () => {
+    if (fnddatass?.length > 0) {
+      const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
+      return usdCurrency?.id || fnddatass[0]?.id;
+    }
+    return '';
+  };
   const [initialValues, setInitialValues] = useState({
     milestone_title: "",
     milestone_cost: "",
     milestone_status: "",
+    currency: getInitialCurrency(),
     add_cost_to_project_budget: false,
     milestone_summary: "",
     milestone_start_date: null,
@@ -136,7 +156,7 @@ const EditMilestone = ({ idd, onClose }) => {
         .required("Please enter milestone cost."),
     milestone_status: Yup.string().required("Please select status."),
     add_cost_to_project_budget: Yup.string()
-        .oneOf(['yes', 'no'], 'Please select yes or no')
+        // .oneOf(['yes', 'no'], 'Please select yes or no')
         .required("Please select add cost to project budget option."),
     milestone_summary: Yup.string().required("Please enter milestone summary."),
     milestone_start_date: Yup.date()
@@ -179,24 +199,103 @@ const EditMilestone = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-2">
-                    <div className="form-item">
-                      <label className="font-semibold mb-2">
-                        Milestone Cost <span className="text-red-500">*</span>
-                      </label>
-                      <Field
-                        name="milestone_cost"
-                        as={Input}
-                        placeholder="Enter Milestone Cost"
-                        className="rounded-e-lg rounded-s-none mt-1"
-                      />
-                      <ErrorMessage
-                        name="milestone_cost"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
-                    </div>
-                  </Col>
+                  <Col span={12}>
+                      <div className="form-group">
+                        <label className="text-gray-600 mb-2 font-semibold block">Milestone Cost & Currency <span className="text-red-500">*</span></label>
+                        <div className="flex gap-0">
+                          <Field name="currency">
+                            {({ field }) => (
+                              <Select
+                                {...field}
+                                className="currency-select"
+                                style={{
+                                  width: '60px',
+                                  borderTopRightRadius: 0,
+                                  borderBottomRightRadius: 0,
+                                  borderRight: 0,
+                                  backgroundColor: '#f8fafc',
+                                }}
+                                placeholder={<span className="text-gray-400">$</span>}
+                                onChange={(value) => {
+                                  if (value === 'add_new') {
+                                    setIsAddCurrencyModalVisible(true);
+                                  } else {
+                                    setFieldValue("currency", value);
+                                  }
+                                }}
+                                value={values.currency}
+                                dropdownStyle={{ minWidth: '180px' }}
+                                suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                                loading={!fnddatass}
+                                dropdownRender={menu => (
+                                  <div>
+                                    <div
+                                      className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                      onClick={() => setIsAddCurrencyModalVisible(true)}
+                                    >
+                                      <PlusOutlined className="mr-2" />
+                                      <span className="text-sm">Add New</span>
+                                    </div>
+                                    {menu}
+                                  </div>
+                                )}
+                              >
+                                {fnddatass?.map((currency) => (
+                                  <Option key={currency.id} value={currency.id}>
+                                    <div className="flex items-center w-full px-1">
+                                      <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                      <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                      <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                                    </div>
+                                  </Option>
+                                ))}
+                              </Select>
+                            )}
+                          </Field>
+                          <Field name="milestone_cost">
+                            {({ field, form }) => (
+                              <Input
+                                {...field}
+                                className="price-input"
+                                style={{
+                                  borderTopLeftRadius: 0,
+                                  borderBottomLeftRadius: 0,
+                                  borderLeft: '1px solid #d9d9d9',
+                                  width: 'calc(100% - 100px)'
+                                }}
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder="0.00"
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                    form.setFieldValue('milestone_cost', value);
+                                  }
+                                }}
+                                onKeyPress={(e) => {
+                                  const charCode = e.which ? e.which : e.keyCode;
+                                  if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                    e.preventDefault();
+                                  }
+                                  if (charCode === 46 && field.value.includes('.')) {
+                                    e.preventDefault();
+                                  }
+                                }}
+                                prefix={
+                                  values.currency && (
+                                    <span className="text-gray-600 font-medium mr-1">
+                                      {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                                    </span>
+                                  )
+                                }
+                              />
+                            )}
+                          </Field>
+                        </div>
+                        <ErrorMessage name="milestone_cost" component="div" className="text-red-500 mt-1 text-sm" />
+                      </div>
+                    </Col>
                     <Col span={24} className="mt-4">
                                       <div className="form-item">
                                         <label className="font-semibold">Status <span className="text-red-500">*</span></label>
@@ -382,6 +481,50 @@ const EditMilestone = ({ idd, onClose }) => {
                         onChange={(e) => setNewTag(e.target.value)}
                       />
                     </Modal>
+
+                     {/* Add Currency Modal */}
+      <Modal
+        title="Add New Currency"
+        visible={isAddCurrencyModalVisible}
+        onCancel={() => setIsAddCurrencyModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <AddCurrencies
+          onClose={() => {
+            setIsAddCurrencyModalVisible(false);
+            dispatch(getcurren()); // Refresh currency list after adding
+          }}
+        />
+      </Modal>
+      <style jsx>{`
+        .currency-select .ant-select-selection-item {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 16px !important;
+        }
+
+        .currency-select .ant-select-selection-item > div {
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .currency-select .ant-select-selection-item span:not(:first-child) {
+          display: none !important;
+        }
+
+        .ant-select-dropdown .ant-select-item {
+          padding: 8px 12px !important;
+        }
+
+        .ant-select-dropdown .ant-select-item-option-content > div {
+          display: flex !important;
+          align-items: center !important;
+          width: 100% !important;
+        }
+      `}</style>
+                    
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Card, Row, Col, Button, Modal, Input, Form, Select, Avatar, Tag, Badge, Tooltip } from "antd";
-import { PlusOutlined, CalendarOutlined, MessageOutlined, CommentOutlined, UserOutlined, PhoneOutlined, MailOutlined } from "@ant-design/icons";
+import { Card, Row, Col, Button, Modal, Input, Form, Select, Avatar, Tag, Badge, Tooltip, Progress } from "antd";
+import { PlusOutlined, CalendarOutlined, MessageOutlined, CommentOutlined, UserOutlined, PhoneOutlined, MailOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import {
   DndContext,
   useDroppable,
@@ -35,13 +35,39 @@ const DraggableItem = ({ lead, id }) => {
       : undefined,
     transition,
     marginBottom: "12px",
+    cursor: "move",
+  };
+
+  // Calculate days since creation
+  const daysSinceCreation = () => {
+    const createdDate = new Date(lead.createdAt);
+    const today = new Date();
+    const diffTime = today - createdDate;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  // Get progress color based on days
+  const getProgressColor = (days) => {
+    if (days <= 7) return "#52c41a";
+    if (days <= 14) return "#faad14";
+    return "#ff4d4f";
   };
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
       <Card 
-        className="cursor-pointer hover:shadow-md transition-all"
-        bodyStyle={{ padding: '12px', paddingLeft: '16px', position: 'relative' }}
+        className="lead-card cursor-pointer"
+        bodyStyle={{ padding: '12px' }}
+        bordered={false}
+        style={{
+          background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)',
+          borderRadius: '12px',
+          boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+          border: '1px solid #e6ebf5',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
       >
         {/* Left border line */}
         <div 
@@ -283,78 +309,125 @@ const LeadCards = () => {
   
 
   return (
-    <div className="p-4">
-      {/* Add Lead Button */}
-      <div className="mb-4">
-              <Select
-                placeholder="Select Pipeline"
-                style={{ width: 200 }}
-                onChange={handlePipelineChange}
-                value={selectedPipeline}
-              >
-                <Option value="all">All Pipelines</Option>
-                {fnddatss.map((pipeline) => (
-                  <Option key={pipeline.id} value={pipeline.id}>
-                    {pipeline.pipeline_name}
-                  </Option>
-                ))}
-              </Select>
-            </div>
-      {/* <Button
-        type="primary"
-        icon={<PlusOutlined />}
-        onClick={handleAddLeadCardsClick}
-        style={{ marginBottom: "16px" }}
-      >
-        Add Lead
-      </Button> */}
+    <div className="lead-board" style={{ padding: "24px" }}>
+      <div className="lead-board-header" style={{ marginBottom: "24px" }}>
+        <Select
+          placeholder="Select Pipeline"
+          style={{ 
+            width: '100%',
+            maxWidth: '300px',
+            marginBottom: '16px'
+          }}
+          onChange={handlePipelineChange}
+          value={selectedPipeline}
+          suffixIcon={<ArrowRightOutlined />}
+        >
+          <Option value="all">All Pipelines</Option>
+          {fnddatss.map((pipeline) => (
+            <Option key={pipeline.id} value={pipeline.id}>
+              {pipeline.pipeline_name}
+            </Option>
+          ))}
+        </Select>
+      </div>
 
-      {/* <Select
-        placeholder="Select a pipeline"
-        onChange={(value) => setSelectedPipeline(value)}
-        style={{ marginBottom: "16px", width: "100%" }}
-      >
-        {[...new Set(fndata.map((stage) => stage.pipelineId))].map((pipelineId) => (
-          <Select.Option key={pipelineId} value={pipelineId}>
-            {fndata.find((stage) => stage.pipelineId === pipelineId)?.pipelineName || `Pipeline ${pipelineId}`}
-          </Select.Option>
-        ))}
-      </Select> */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <Row gutter={16}>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <Row 
+          gutter={[16, 16]}
+          style={{
+            margin: 0,
+            overflowX: 'auto',
+            flexWrap: 'nowrap',
+            padding: '8px 4px'
+          }}
+        >
           {leadData?.length > 0 ? (
             leadData.map((leadGroup) => (
-              <Col xs={24} sm={12} md={8} lg={6} key={leadGroup?.stageId}>
-                <Card title={leadGroup?.status} className="mb-4">
-                  <DroppableColumn
-                    status={leadGroup?.status}
-                    leads={leadGroup?.leads || []}
-                  />
+              <Col 
+                key={leadGroup?.stageId}
+                style={{
+                  minWidth: '300px',
+                  maxWidth: '350px'
+                }}
+              >
+                <Card 
+                  title={
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span>{leadGroup?.status}</span>
+                      <Tag color="blue">{leadGroup?.leads?.length || 0}</Tag>
+                    </div>
+                  }
+                  className="stage-card"
+                  headStyle={{ 
+                    backgroundColor: '#fafafa',
+                    borderBottom: '1px solid #f0f0f0',
+                    padding: '12px 16px'
+                  }}
+                  bodyStyle={{ 
+                    padding: '16px',
+                    backgroundColor: 'rgba(0,0,0,0.02)'
+                  }}
+                  style={{
+                    borderRadius: '12px',
+                    border: '1px solid #f0f0f0'
+                  }}
+                >
+                  <DroppableColumn status={leadGroup?.status} leads={leadGroup?.leads || []} />
                 </Card>
               </Col>
             ))
           ) : (
-            <p>No stages or leads available</p>
+            <Col span={24}>
+              <Card>
+                <div style={{ textAlign: 'center', padding: '24px' }}>
+                  <p style={{ color: '#8c8c8c' }}>No stages or leads available</p>
+                </div>
+              </Card>
+            </Col>
           )}
         </Row>
-
-        {/* Add Lead Modal */}
-        <Modal
-          title="Add Lead"          visible={isAddLeadCardsVisible}
-          onCancel={() => setIsAddLeadCardsVisible(false)}
-          footer={null} // Remove the footer since AddLeadCards will have its own buttons
-        >
-          <AddLeadCards
-            visible={isAddLeadCardsVisible}
-            onClose={() => setIsAddLeadCardsVisible(false)}
-          />
-        </Modal>
-         
       </DndContext>
+
+      <Modal
+        title="Add Lead"
+        visible={isAddLeadCardsVisible}
+        onCancel={() => setIsAddLeadCardsVisible(false)}
+        footer={null}
+        width={720}
+      >
+        <AddLeadCards visible={isAddLeadCardsVisible} onClose={() => setIsAddLeadCardsVisible(false)} />
+      </Modal>
+
+      <style jsx>{`
+        .lead-board {
+          background: #fff;
+          min-height: calc(100vh - 64px);
+        }
+        
+        .stage-card {
+          height: 100%;
+          background: #fff;
+        }
+
+        .lead-card:hover {
+          box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+          transform: translateY(-2px);
+          transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+          .lead-board {
+            padding: 16px;
+          }
+        }
+
+        .truncate {
+          max-width: 200px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      `}</style>
     </div>
   );
 };

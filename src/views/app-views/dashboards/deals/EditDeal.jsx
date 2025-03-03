@@ -16,6 +16,7 @@ import {getallcountries} from "../../setting/countries/countriesreducer/countrie
 import AddDealStages from "../systemsetup/DealStages/AddDealStages";
 import { PlusOutlined } from "@ant-design/icons";
 import AddPipeLine from "../systemsetup/Pipeline/AddPipeLine";
+import AddCurrencies from '../../setting/currencies/AddCurrencies';
 
 import dayjs from "dayjs";
 const { Option } = Select;
@@ -29,21 +30,27 @@ const EditDeal = ({ onClose, id }) => {
   const { data: Project } = useSelector((state) => state.Project.Project);
   const countries = useSelector((state) => state.countries.countries);
 
-  useEffect(() => {
-    dispatch(getallcountries());
-  }, [dispatch]);
+  const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
-  useEffect(() => {
-    dispatch(getcurren());
-  }, [dispatch]);
+  const allempdatass = useSelector((state) => state.currencies);
+  const fnddatass = allempdatass?.currencies?.data;
+
+  const getInitialCurrency = () => {
+    if (fnddatass?.length > 0) {
+      const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
+      return usdCurrency?.id || fnddatass[0]?.id;
+    }
+    return '';
+  };
 
   const [initialValues, setInitialValues] = useState({
     dealName: "",
     phoneNumber: "",
+    phoneCode: "",
     price: "",
     clients: "",
     leadTitle: "",
-    currency: "",
+    currency: getInitialCurrency(),
     pipeline: "",
     stage: "",
     closedDate: null,
@@ -60,6 +67,7 @@ const EditDeal = ({ onClose, id }) => {
       setInitialValues({
         dealName: dealData.dealName || "",
         phoneNumber: dealData.phoneNumber || "",
+        phoneCode: dealData.phoneCode || "",
         price: dealData.price || "",
         clients: dealData.clients || "",
         leadTitle: dealData.leadTitle || "",
@@ -179,7 +187,7 @@ const EditDeal = ({ onClose, id }) => {
                     >
                       {countries.map((country) => (
                         <Option key={country.id} value={country.phoneCode}>
-                          (+{country.phoneCode})
+                          ({country.phoneCode})
                         </Option>
                       ))}
                     </Select>
@@ -208,20 +216,100 @@ const EditDeal = ({ onClose, id }) => {
                 </div>
               </Col>
               <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Price <span className="text-rose-500">*</span></label>
-                  <Field
-                    name="price"
-                    as={Input}
-                    className="mt-1"
-                    placeholder="Enter Price"
-                    rules={[{ required: true }]}
-                  />
-                  <ErrorMessage
-                    name="price"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                <div className="form-group">
+                  <label className="text-gray-600 font-semibold mb-2 block">Currency <span className="text-red-500">*</span></label>
+                  <div className="flex gap-0">
+                    <Field name="currency">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="currency-select"
+                          style={{
+                            width: '60px',
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRight: 0,
+                            backgroundColor: '#f8fafc',
+                          }}
+                          placeholder={<span className="text-gray-400">$</span>}
+                          onChange={(value) => {
+                            if (value === 'add_new') {
+                              setIsAddCurrencyModalVisible(true);
+                            } else {
+                              setFieldValue("currency", value);
+                            }
+                          }}
+                          value={values.currency}
+                          dropdownStyle={{ minWidth: '180px' }}
+                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                          loading={!fnddatass}
+                          dropdownRender={menu => (
+                            <div>
+                              <div
+                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                onClick={() => setIsAddCurrencyModalVisible(true)}
+                              >
+                                <PlusOutlined className="mr-2" />
+                                <span className="text-sm">Add New</span>
+                              </div>
+                              {menu}
+                            </div>
+                          )}
+                        >
+                          {fnddatass?.map((currency) => (
+                            <Option key={currency.id} value={currency.id}>
+                              <div className="flex items-center w-full px-1">
+                                <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                              </div>
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
+                    <Field name="price">
+                      {({ field, form }) => (
+                        <Input
+                          {...field}
+                          className="price-input"
+                          style={{
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderLeft: '1px solid #d9d9d9',
+                            width: 'calc(100% - 100px)'
+                          }}
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="0.00"
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                              form.setFieldValue('price', value);
+                            }
+                          }}
+                          onKeyPress={(e) => {
+                            const charCode = e.which ? e.which : e.keyCode;
+                            if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                              e.preventDefault();
+                            }
+                            if (charCode === 46 && field.value.includes('.')) {
+                              e.preventDefault();
+                            }
+                          }}
+                          prefix={
+                            values.currency && (
+                              <span className="text-gray-600 font-medium mr-1">
+                                {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                              </span>
+                            )
+                          }
+                        />
+                      )}
+                    </Field>
+                  </div>
+                  <ErrorMessage name="price" component="div" className="text-red-500 mt-1 text-sm" />
                 </div>
               </Col>
               <Col span={12} className="mt-3">
@@ -508,211 +596,52 @@ const EditDeal = ({ onClose, id }) => {
       >
         <AddPipeLine onClose={closeAddPipeLineModal} />
       </Modal>
+
+      {/* Add Currency Modal */}
+      <Modal
+        title="Add New Currency"
+        visible={isAddCurrencyModalVisible}
+        onCancel={() => setIsAddCurrencyModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <AddCurrencies
+          onClose={() => {
+            setIsAddCurrencyModalVisible(false);
+            dispatch(getcurren()); // Refresh currency list after adding
+          }}
+        />
+      </Modal>
     </div>
   );
 };
+
 export default EditDeal;
 
+<style jsx>{`
+  .currency-select .ant-select-selection-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 16px !important;
+  }
 
+  .currency-select .ant-select-selection-item > div {
+    display: flex !important;
+    align-items: center !important;
+  }
 
+  .currency-select .ant-select-selection-item span:not(:first-child) {
+    display: none !important;
+  }
 
+  .ant-select-dropdown .ant-select-item {
+    padding: 8px 12px !important;
+  }
 
-
-
-
-
-
-
-
-
-// import React, { useEffect, useState } from "react";
-// import { Input, Button, Select, message, Row, Col } from "antd";
-// import { useNavigate } from "react-router-dom";
-// import ReactQuill from "react-quill";
-// import { Formik, Form, Field, ErrorMessage } from "formik";
-// import * as Yup from "yup";
-// import { useSelector } from "react-redux";
-// import { useDispatch } from "react-redux";
-// import { EditDeals, GetDeals } from "./DealReducers/DealSlice";
-
-// const { Option } = Select;
-
-// const EditDeal = ({ onClose, id }) => {
-//   const navigate = useNavigate();
-
-//   const dispatch = useDispatch();
-
-//   const [initialValues, setInitialValues] = useState({
-//     dealName: "",
-//     phoneNumber: "",
-//     price: "",
-//     clients: "",
-//   });
-
-//   const allempdata = useSelector((state) => state.Deals);
-//   const datac = allempdata.Deals.data;
-
-//   const tabledata = useSelector((state) => state?.SubClient);
-//   const clientdata = tabledata?.SubClient?.data;
-
-//   useEffect(() => {
-//     // Check if the deal data exists for the given `id`
-//     const dealData = datac.find((item) => item.id === id);
-//     if (dealData) {
-//       setInitialValues({
-//         dealName: dealData.dealName || "",
-//         phoneNumber: dealData.phoneNumber || "",
-//         price: dealData.price || "",
-//         clients: dealData.clients || "",
-//       });
-//     }
-//   }, [id, datac]);
-
-//   const validationSchema = Yup.object({
-//     dealName: Yup.string().optional("Please enter a Deal Name."),
-//     phoneNumber: Yup.string()
-//       .matches(/^\d{10}$/, "telephone number must be exactly 10 digits")
-//       .nullable(),
-//     price: Yup.string().optional("Please enter a Price."),
-//     clients: Yup.string().required("Please select clients."),
-//   });
-
-//   const onSubmit = (values) => {
-//     dispatch(EditDeals({ id, values }))
-//       .then(() => {
-//         dispatch(GetDeals());
-//         message.success("Deal updated successfully!");
-//         onClose();
-//       })
-//       .catch((error) => {
-//         message.error("Failed to update Employee.");
-//         console.error("Edit API error:", error);
-//       });
-//   };
-
-//   return (
-//     <div className="add-job-form">
-//       <Formik
-//         initialValues={initialValues}
-//         validationSchema={validationSchema}
-//         enableReinitialize={true} // Allow Formik to reset the initialValues when they change
-//         onSubmit={onSubmit}
-//       >
-//         {({
-//           values,
-//           setFieldValue,
-//           handleSubmit,
-//           handleChange,
-//           setFieldTouched,
-//         }) => (
-//           <Form className="formik-form" onSubmit={handleSubmit}>
-//             <h2 className="mb-4 border-b pb-2 font-medium"></h2>
-
-//             <Row gutter={16}>
-//               <Col span={12}>
-//                 <div className="form-item">
-//                   <label className="font-semibold">Deal Name</label>
-//                   <Field
-//                     name="dealName"
-//                     as={Input}
-//                     placeholder="Enter Deal Name"
-//                     rules={[{ required: true }]}
-//                   />
-//                   <ErrorMessage
-//                     name="dealName"
-//                     component="div"
-//                     className="error-message text-red-500 my-1"
-//                   />
-//                 </div>
-//               </Col>
-
-//               <Col span={12}>
-//                 <div className="form-item">
-//                   <label className="font-semibold">Phone</label>
-//                   <Field
-//                     name="phoneNumber"
-//                     as={Input}
-//                     placeholder="Enter Phone Number"
-//                   />
-
-//                   <ErrorMessage
-//                     name="phoneNumber"
-//                     component="div"
-//                     className="error-message text-red-500 my-1"
-//                   />
-//                 </div>
-//               </Col>
-
-//               <Col span={12} className="mt-4">
-//                 <div className="form-item">
-//                   <label className="font-semibold">Price</label>
-//                   <Field
-//                     name="price"
-//                     as={Input}
-//                     placeholder="Enter Price"
-//                     rules={[{ required: true }]}
-//                   />
-//                   <ErrorMessage
-//                     name="price"
-//                     component="div"
-//                     className="error-message text-red-500 my-1"
-//                   />
-//                 </div>
-//               </Col>
-
-//               <Col span={12} className="mt-4">
-//                 <div className="form-item">
-//                   <label className="font-semibold">Clients</label>
-//                   <Field name="clients">
-//                     {({ field }) => (
-//                       <Select
-//                         {...field}
-//                         style={{ width: "100%" }}
-//                         placeholder="Select User"
-//                         loading={!clientdata}
-//                         value={values.clients} // Ensure this matches the `clients` field
-//                         onChange={(value) => setFieldValue("clients", value)} // Update `clients` in Formik
-//                         onBlur={() => setFieldTouched("clients", true)}
-//                       >
-//                         {clientdata && clientdata.length > 0 ? (
-//                           clientdata.map((employee) => (
-//                             <Option key={employee.id} value={employee.id}>
-//                               {employee.firstName ||
-//                                 employee.username ||
-//                                 "Unnamed User"}
-//                             </Option>
-//                           ))
-//                         ) : (
-//                           <Option value="" disabled>
-//                             No Users Available
-//                           </Option>
-//                         )}
-//                       </Select>
-//                     )}
-//                   </Field>
-
-//                   <ErrorMessage
-//                     name="user"
-//                     component="div"
-//                     className="error-message text-red-500 my-1"
-//                   />
-//                 </div>
-//               </Col>
-//             </Row>
-
-//             <div className="form-buttons text-right mt-4">
-//               <Button type="default" className="mr-2" onClick={onClose}>
-//                 Cancel
-//               </Button>
-//               <Button type="primary" htmlType="submit">
-//                 Update
-//               </Button>
-//             </div>
-//           </Form>
-//         )}
-//       </Formik>
-//     </div>
-//   );
-// };
-
-// export default EditDeal;
+  .ant-select-dropdown .ant-select-item-option-content > div {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+`}</style>

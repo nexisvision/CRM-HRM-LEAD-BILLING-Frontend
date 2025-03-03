@@ -24,7 +24,7 @@ import OrderListData from "assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteBranch, getBranch } from "./BranchReducer/BranchSlice";
-import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
+import { GetUsers } from '../../Users/UserReducers/UserSlice';
 // import { DeleteDept, getDept } from './DepartmentReducers/DepartmentSlice';
 
 const BranchList = () => {
@@ -48,6 +48,7 @@ const BranchList = () => {
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Branch);
+  const [managers, setManagers] = useState([]);
  
 
   useEffect(() => {
@@ -67,6 +68,17 @@ const BranchList = () => {
     }
   }, [tabledata]);
 
+  useEffect(() => {
+    dispatch(GetUsers())
+      .then((response) => {
+        if (response.payload?.data) {
+          setManagers(response.payload.data);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching users:', error);
+      });
+  }, [dispatch]);
 
    //// permission
                             
@@ -258,7 +270,7 @@ const BranchList = () => {
       },
       sorter: (a, b) => {
         const nameA = alluserdata?.find((item) => item?.id === a?.branchManager)?.username || '';
-        const nameB = alluserdata?.find((item) => item?.id === b?.branchManager)?.username || '';
+        const nameB = alluserdata?.find((item) => item?.id === b?.branchManager)?.username ||  '';
         return nameA?.length - nameB?.length;
       },
     },

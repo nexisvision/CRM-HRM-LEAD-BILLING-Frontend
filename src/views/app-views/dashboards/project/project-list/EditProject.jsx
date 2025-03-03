@@ -26,7 +26,7 @@ import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/cu
 import { AddUserss, GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 import { addClient } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 // import { AllLoggedData } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
-
+import AddCurrencies from '../../../setting/currencies/AddCurrencies';
 const { Option } = Select;
 
 const EditProject = ({ id, onClose }) => {
@@ -43,6 +43,7 @@ const EditProject = ({ id, onClose }) => {
   const { currencies } = useSelector((state) => state.currencies);
 
   const curr = currencies?.data || [];
+  const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
   const curren = curr?.filter((item) => item.created_by === allloggeduser);
 
@@ -78,6 +79,16 @@ const EditProject = ({ id, onClose }) => {
 
   const Tagsdetail = useSelector((state) => state.Tags);
   const AllTags = Tagsdetail?.Tags?.data;
+  const allempdatass = useSelector((state) => state.currencies);
+  const fnddatass = allempdatass?.currencies?.data;
+
+  const getInitialCurrency = () => {
+    if (fnddatass?.length > 0) {
+      const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
+      return usdCurrency?.id || fnddatass[0]?.id;
+    }
+    return '';
+  };
 
     // const alluserdatas = useSelector((state) => state.Users);
     // const fnadat = alluserdatas?.Users?.data;
@@ -210,6 +221,7 @@ const EditProject = ({ id, onClose }) => {
     project_description: "",
     tag: "",
     status: "",
+    currency: getInitialCurrency(),
   };
 
   const validationSchema = Yup.object({
@@ -234,6 +246,7 @@ const EditProject = ({ id, onClose }) => {
     project_description: Yup.string().required("Please enter a Project Description."),
     tag: Yup.string().required("Please enter a Tag."),
     status: Yup.string().required("Please select Status."),
+
   });
 
   const [isAddUserModalVisible, setIsAddUserModalVisible] = useState(false);
@@ -438,7 +451,7 @@ const EditProject = ({ id, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              {/* <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Budget <span className="text-red-500">*</span></label>
                   <Field
@@ -454,49 +467,105 @@ const EditProject = ({ id, onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
 
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Currency</label>
-                  <Field name="currency">
-
-                    {({ field, form }) => (
-                      <Select
-                        {...field}
-                        placeholder="Select Currency"
-                        className="w-full mt-1"
-                        onChange={(value) => {
-                          const selectedCurrency = curren.find(
-                            (c) => c.id === value
-                          );
-                          form.setFieldValue(
-                            "currency",
-                            selectedCurrency?.currencyCode || ""
-                          );
-                        }}
-                        value={form.values.currency}
-                        onBlur={() => form.setFieldTouched("currency", true)}
-                        allowClear={false}
-                      >
-                        {Array.isArray(curren) && curren.map((currency) => (
-                          <Option
-                            key={currency.id}
-                            value={currency.id}
-                          >
-                            {currency.currencyCode}
-                          </Option>
-                        ))}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="currency"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+               <Col span={12} className="mt-4">
+                      <div className="form-group">
+                        <label className="text-gray-600 font-semibold mb-2 block"> Price & Currency <span className="text-red-500">*</span></label>
+                        <div className="flex gap-0">
+                          <Field name="currency">
+                            {({ field }) => (
+                              <Select
+                                {...field}
+                                className="currency-select"
+                                style={{
+                                  width: '60px',
+                                  borderTopRightRadius: 0,
+                                  borderBottomRightRadius: 0,
+                                  borderRight: 0,
+                                  backgroundColor: '#f8fafc',
+                                }}
+                                placeholder={<span className="text-gray-400">$</span>}
+                                onChange={(value) => {
+                                  if (value === 'add_new') {
+                                    setIsAddCurrencyModalVisible(true);
+                                  } else {
+                                    setFieldValue("currency", value);
+                                  }
+                                }}
+                                value={values.currency}
+                                dropdownStyle={{ minWidth: '180px' }}
+                                suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                                loading={!fnddatass}
+                                dropdownRender={menu => (
+                                  <div>
+                                    <div
+                                      className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                      onClick={() => setIsAddCurrencyModalVisible(true)}
+                                    >
+                                      <PlusOutlined className="mr-2" />
+                                      <span className="text-sm">Add New</span>
+                                    </div>
+                                    {menu}
+                                  </div>
+                                )}
+                              >
+                                {fnddatass?.map((currency) => (
+                                  <Option key={currency.id} value={currency.id}>
+                                    <div className="flex items-center w-full px-1">
+                                      <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                      <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                      <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                                    </div>
+                                  </Option>
+                                ))}
+                              </Select>
+                            )}
+                          </Field>
+                          <Field name="budget">
+                            {({ field, form }) => (
+                              <Input
+                                {...field}
+                                className="price-input"
+                                style={{
+                                  borderTopLeftRadius: 0,
+                                  borderBottomLeftRadius: 0,
+                                  borderLeft: '1px solid #d9d9d9',
+                                  width: 'calc(100% - 100px)'
+                                }}
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder="0.00"
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                    form.setFieldValue('budget', value);
+                                  }
+                                }}
+                                onKeyPress={(e) => {
+                                  const charCode = e.which ? e.which : e.keyCode;
+                                  if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                    e.preventDefault();
+                                  }
+                                  if (charCode === 46 && field.value.includes('.')) {
+                                    e.preventDefault();
+                                  }
+                                }}
+                                prefix={
+                                  values.currency && (
+                                    <span className="text-gray-600 font-medium mr-1">
+                                      {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                                    </span>
+                                  )
+                                }
+                              />
+                            )}
+                          </Field>
+                        </div>
+                        <ErrorMessage name="budget" component="div" className="text-red-500 mt-1 text-sm" />
+                      </div>
+                    </Col>
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
@@ -705,6 +774,50 @@ const EditProject = ({ id, onClose }) => {
       >
         <addClient onClose={() => setIsAddClientModalVisible(false)} />
       </Modal>
+      {/* Add Currency Modal */}
+      <Modal
+        title="Add New Currency"
+        visible={isAddCurrencyModalVisible}
+        onCancel={() => setIsAddCurrencyModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <AddCurrencies
+          onClose={() => {
+            setIsAddCurrencyModalVisible(false);
+            dispatch(getcurren()); // Refresh currency list after adding
+          }}
+        />
+      </Modal>
+
+      {/* Custom render for selected value */}
+      <style jsx>{`
+        .currency-select .ant-select-selection-item {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 16px !important;
+        }
+
+        .currency-select .ant-select-selection-item > div {
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .currency-select .ant-select-selection-item span:not(:first-child) {
+          display: none !important;
+        }
+
+        .ant-select-dropdown .ant-select-item {
+          padding: 8px 12px !important;
+        }
+
+        .ant-select-dropdown .ant-select-item-option-content > div {
+          display: flex !important;
+          align-items: center !important;
+          width: 100% !important;
+        }
+      `}</style>
     </div>
   );
 };

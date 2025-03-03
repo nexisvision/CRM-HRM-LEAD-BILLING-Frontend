@@ -293,7 +293,12 @@ const JobOnBordingList = () => {
     {
       title: "JoiningDate",
       dataIndex: "JoiningDate",
-      sorter: (a, b) => dayjs(a.createdat).unix() - dayjs(b.createdat).unix(),
+      render: (text) => (
+        <span>
+          {text ? dayjs(text).format('DD-MM-YYYY') : '-'}
+        </span>
+      ),
+      sorter: (a, b) => dayjs(a.JoiningDate).unix() - dayjs(b.JoiningDate).unix(),
     },
 
     {

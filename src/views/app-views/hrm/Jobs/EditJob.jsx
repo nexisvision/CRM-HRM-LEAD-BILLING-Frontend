@@ -102,18 +102,16 @@ const EditJob = ({ idd, onClose }) => {
   });
 
   const onSubmit = (values, { resetForm }) => {
-    // Transforming skills and interviewRounds into the desired object structure
+    // Transform the skills and interviewRounds into the correct format
     const transformedValues = {
       ...values,
-      skills: { Skills: values.skills },
-      interviewRounds: { InterviewRounds: values.interviewRounds },
+      skills: { Skills: values.skillss }, // Changed to plain object instead of JSON string
+      interviewRounds: { InterviewRounds: values.interviewRounds } // Changed to plain object instead of JSON string
     };
 
     dispatch(EditJobs({ idd, transformedValues }));
     dispatch(GetJobdata());
     onClose();
-    // console.log("Submitted values:", transformedValues);
-    // message.success("Job added successfully!");
     resetForm();
   };
 
@@ -185,12 +183,14 @@ const EditJob = ({ idd, onClose }) => {
     const empData = alldept?.Jobs?.data || [];
     const data = empData.find((item) => item.id === idd);
     if (data) {
-      // Set form values using setFieldValue
       const formik = formikRef.current;
       if (formik) {
         formik.setFieldValue('title', data.title || '');
         formik.setFieldValue('category', data.category || '');
-        formik.setFieldValue('skillss', data.skills === "{}" ? "" : JSON.parse(data.skills)?.Skills || "");
+        formik.setFieldValue('skillss', 
+          data.skills && data.skills !== "{}" 
+            ? JSON.parse(data.skills)?.Skills || ""
+            : "");
         formik.setFieldValue('location', data.location || '');
         formik.setFieldValue('interviewRounds', 
           data.interviewRounds ? JSON.parse(data.interviewRounds)?.InterviewRounds || [] : []);

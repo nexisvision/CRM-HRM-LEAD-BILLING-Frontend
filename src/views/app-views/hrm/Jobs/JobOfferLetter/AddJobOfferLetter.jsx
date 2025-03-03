@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Input,
   Button,
@@ -63,6 +63,12 @@ const AddJobOfferLetter = ({ onClose }) => {
     description: Yup.string().required("Please enter a description"),
   });
 
+  const [fileList, setFileList] = useState([]);
+
+  const handleFileChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+  };
+
   const onSubmit = async (values, { resetForm }) => {
     try {
       const formData = new FormData();
@@ -77,7 +83,19 @@ const AddJobOfferLetter = ({ onClose }) => {
       // Append all form values to FormData
       Object.keys(formattedValues).forEach(key => {
         if (key === 'file' && formattedValues[key]) {
-          formData.append('file', formattedValues[key]);
+          // Validate file type and size before appending
+          const file = formattedValues[key];
+          const isValidFileType = ['image/jpeg', 'image/png', 'application/pdf'].includes(file.type);
+          const isValidFileSize = file.size / 1024 / 1024 < 5;
+
+          if (!isValidFileType) {
+            throw new Error('Invalid file type. Only JPG, PNG, and PDF files are allowed.');
+          }
+          if (!isValidFileSize) {
+            throw new Error('File size must be less than 5MB.');
+          }
+
+          formData.append('file', file);
         } else if (formattedValues[key] !== null && formattedValues[key] !== undefined) {
           formData.append(key, formattedValues[key]);
         }
@@ -105,13 +123,13 @@ const AddJobOfferLetter = ({ onClose }) => {
           <Form
             onSubmit={handleSubmit}
             style={{
-              padding: "20px",
+              // padding: "20px",
               background: "#fff",
               borderRadius: "8px",
             }}
           >
             <Row gutter={16}>
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">Job Application <span className="text-red-500">*</span></label>
                   <Field name="job">
@@ -146,7 +164,7 @@ const AddJobOfferLetter = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">Job <span className="text-red-500">*</span></label>
                   <Field name="job_applicant">
@@ -199,7 +217,7 @@ const AddJobOfferLetter = ({ onClose }) => {
                 </div>
               </Col> */}
 
-              <Col span={12} className='mt-2'>
+              <Col span={12} className='mt-3'>
                 <div className="form-item">
                   <label className='font-semibold'>Offer Expire On <span className="text-red-500">*</span></label>
                   <DatePicker
@@ -213,7 +231,7 @@ const AddJobOfferLetter = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className='mt-2'>
+              <Col span={12} className='mt-3'>
                 <div className="form-item">
                   <label className='font-semibold'>Expected Joining Date <span className="text-red-500">*</span></label>
                   <DatePicker
@@ -246,7 +264,7 @@ const AddJobOfferLetter = ({ onClose }) => {
               </Col> */}
 
               <Col span={12}>
-                <div className="form-item mt-2">
+                <div className="form-item mt-3">
                   <label className="font-semibold">Salary <span className="text-red-500">*</span></label>
                   <Field
                     name="salary"
@@ -263,7 +281,7 @@ const AddJobOfferLetter = ({ onClose }) => {
               </Col>
 
               <Col span={12}>
-                <div className="form-item mt-2">
+                <div className="form-item mt-3">
                   <label className="font-semibold">Rate <span className="text-red-500">*</span></label>
                   <Field
                     name="rate"
@@ -280,7 +298,7 @@ const AddJobOfferLetter = ({ onClose }) => {
               </Col>
 
               <Col span={24}>
-                <div className="form-item mt-2">
+                <div className="form-item mt-3">
                   <label className="font-semibold">Description <span className="text-red-500">*</span></label>
                   <ReactQuill
                     theme="snow"
@@ -288,7 +306,7 @@ const AddJobOfferLetter = ({ onClose }) => {
                     value={values.description}
                     onChange={(value) => setFieldValue("description", value)}
                     onBlur={() => setFieldTouched("description", true)}
-                    placeholder="Enter Description"
+                      placeholder="Enter Description"
                   />
                   <ErrorMessage
                     name="description"
@@ -298,25 +316,35 @@ const AddJobOfferLetter = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24} className="mt-4">
-                <span className="block font-semibold p-2">
-                  Add <QuestionCircleOutlined />
-                </span>
-                <Field name="file">
-                  {({ field }) => (
-                    <div>
-                      <Upload
-                        beforeUpload={(file) => {
-                          setFieldValue("file", file); // Set file in Formik state
-                          return false; // Prevent auto upload
-                        }}
-                        showUploadList={false}
-                      >
-                        <Button icon={<UploadOutlined />}>Choose File</Button>
-                      </Upload>
-                    </div>
-                  )}
-                </Field>
+              <Col span={24}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Attachment 
+                  </label>
+                  <Upload
+                    beforeUpload={(file) => {
+                      const isValidFileType = ['image/jpeg', 'image/png', 'application/pdf'].includes(file.type);
+                      const isValidFileSize = file.size / 1024 / 1024 < 5;
+
+                      if (!isValidFileType) {
+                        message.error('You can only upload JPG/PNG/PDF files!');
+                        return Upload.LIST_IGNORE;
+                      }
+                      if (!isValidFileSize) {
+                        message.error('File must be smaller than 5MB!');
+                        return Upload.LIST_IGNORE;
+                      }
+
+                      setFieldValue("file", file);
+                      return false;
+                    }}
+                    maxCount={1}
+                  >
+                    <Button icon={<UploadOutlined />} className="bg-white">
+                      Select File
+                    </Button>
+                  </Upload>
+                </div>
               </Col>
             </Row>
 

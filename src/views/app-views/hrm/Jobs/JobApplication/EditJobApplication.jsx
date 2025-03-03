@@ -110,7 +110,7 @@ const EditJobApplication = ({ idd, onClose }) => {
   });
   return (
     <div>
-  
+      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8",marginTop:"20px" }} />
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -127,7 +127,7 @@ const EditJobApplication = ({ idd, onClose }) => {
             <Form
               onSubmit={handleSubmit}
               style={{
-                padding: "20px",
+                // padding: "20px",
                 background: "#fff",
                 borderRadius: "8px",
               }}
@@ -182,7 +182,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                   </div>
                 </Col>
                 {/* Email */}
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Email <span className="text-red-500">*</span></label>
                     <Field name="email" as={Input} placeholder="Enter Email"  className="w-full mt-1"/>
@@ -194,7 +194,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                   </div>
                 </Col>
                 {/* Phone */}
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
                     <div className="flex">
@@ -207,7 +207,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                       >
                         {countries.map((country) => (
                           <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
+                            ({country.phoneCode})
                           </Option>
                         ))}
                       </Select>
@@ -227,7 +227,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                   </div>
                 </Col>
                 {/* Location */}
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Location <span className="text-red-500">*</span></label>
                     <Field
@@ -244,7 +244,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                   </div>
                 </Col>
                 {/* Total Experience */}
-                <Col span={12}  className="mt-2">
+                <Col span={12}  className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Total Experience <span className="text-red-500">*</span></label>
                     <Select
@@ -268,7 +268,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                   </div>
                 </Col>
                 {/* Current Location */}
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Current Location <span className="text-red-500">*</span></label>
                     <Field
@@ -285,7 +285,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                   </div>
                 </Col>
                 {/* Notice Period */}
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Notice Period <span className="text-red-500">*</span></label>
                     <Select
@@ -307,7 +307,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                   </div>
                 </Col>
                 {/* Status */}
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Status <span className="text-red-500">*</span></label><br/>
                     <Radio.Group
@@ -325,7 +325,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                   </div>
                 </Col>
                 {/* Applied Source */}
-                <Col span={12} className="mt-2">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Applied Sources <span className="text-red-500">*</span></label>
                     <Field
@@ -342,7 +342,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                   </div>
                 </Col>
                  {/* CV Upload */}
-                 <Col span={12} className="mt-2">
+                 <Col span={12} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Upload CV</label><br/>
                     <Field name="cv">
@@ -380,7 +380,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                 
 
                 {/* Cover Letter */}
-                <Col span={24} className="mt-2">
+                <Col span={24} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Cover Letter <span className="text-red-500">*</span></label>
                     <ReactQuill

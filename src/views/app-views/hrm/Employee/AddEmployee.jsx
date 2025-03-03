@@ -370,7 +370,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                     >
                       {countries.map((country) => (
                         <Option key={country.id} value={country.phoneCode}>
-                          (+{country.phoneCode})
+                          ({country.phoneCode})
                         </Option>
                       ))}
                     </Select>

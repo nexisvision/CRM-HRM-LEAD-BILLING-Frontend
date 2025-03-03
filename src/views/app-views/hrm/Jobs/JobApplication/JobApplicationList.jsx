@@ -214,14 +214,14 @@ const JobApplicationList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      <Menu.Item>
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button type="" className="" icon={<EyeOutlined />} size="small">
             <span>View Details</span>
           </Button>
         </Flex>
-      </Menu.Item>
-      <Menu.Item>
+      </Menu.Item> */}
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -233,8 +233,8 @@ const JobApplicationList = () => {
             <span>Send Mail</span>
           </Button>
         </Flex>
-      </Menu.Item>
-      <Menu.Item>
+      </Menu.Item> */}
+      {/* <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
@@ -246,7 +246,7 @@ const JobApplicationList = () => {
             <span className="ml-2">Add to Job OnBoard</span>
           </Button>
         </Flex>
-      </Menu.Item>
+      </Menu.Item> */}
      
       
 

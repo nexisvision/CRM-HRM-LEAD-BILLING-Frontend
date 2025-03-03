@@ -15,6 +15,7 @@ import moment from "moment";
 import { getcurren } from "../../setting/currencies/currenciesSlice/currenciesSlice";
 import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
 import { GetLable, AddLable } from "../sales/LableReducer/LableSlice";
+import AddCurrencies from '../../setting/currencies/AddCurrencies';
 
 const { Option } = Select;
 
@@ -29,11 +30,23 @@ const EditContract = ({ id, onClose }) => {
   const countries = useSelector((state) => state.countries.countries);
   const { currencies } = useSelector((state) => state.currencies);
 
+  const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
+
   const [isContracttypeModalVisible, setIsContracttypeModalVisible] = useState(false);
   const [newContracttype, setNewContracttype] = useState("");
   const [contracttypes, setContracttypes] = useState([]);
 
   const [filteredProjects, setFilteredProjects] = useState([]);
+  const allempdatass = useSelector((state) => state.currencies);
+  const fnddatass = allempdatass?.currencies?.data;
+
+  const getInitialCurrency = () => {
+    if (fnddatass?.length > 0) {
+      const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
+      return usdCurrency?.id || fnddatass[0]?.id;
+    }
+    return '';
+  };
 
   useEffect(() => {
     dispatch(getallcountries());
@@ -61,7 +74,7 @@ const EditContract = ({ id, onClose }) => {
     phone: "",
     phoneCode: "",
     // contract_number: "",
-    currency: "",
+    currency: getInitialCurrency(),
     address: "",
     city: "",
     country: "",
@@ -282,10 +295,21 @@ const EditContract = ({ id, onClose }) => {
                           style={{ width: '70%' }}
                           placeholder="Enter phone"
                           onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
+                          onKeyPress={(e) => {
+                            // Allow only numeric input
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          }}
                         />
                       )}
                     </Field>
                   </div>
+                  <ErrorMessage
+                    name="phoneCode"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
                   <ErrorMessage
                     name="phone"
                     component="div"
@@ -418,46 +442,102 @@ const EditContract = ({ id, onClose }) => {
               </Col>
 
               <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Currency <span className="text-rose-500">*</span></label>
-                  <div className="flex gap-2">
-                    <Field name="currency">
-                      {({ field, form }) => (
-                        <Select
-                          {...field}
-                          className="w-full mt-1"
-                          placeholder="Select Currency"
-
-                          onChange={(value) => {
-                            const selectedCurrency = Array.isArray(currencies?.data) && 
-                              currencies?.data?.find((c) => c.id === value);
-                            form.setFieldValue(
-                              "currency",
-                              selectedCurrency?.currencyCode || ""
-                            );
-                          }}
-                        >
-                          {Array.isArray(currencies?.data) && currencies?.data?.length > 0 ? (
-                            currencies.data.map((currency) => (
-                              <Option key={currency.id} value={currency.id}>
-                                {currency.currencyCode}
-                                ({currency.currencyIcon})
-                              </Option>
-                            ))
-                          ) : (
-                            <Option value="" disabled>No Currencies Available</Option>
-                          )}
-                        </Select>
-                      )}
-                    </Field>
-                  </div>
-                  <ErrorMessage
-                    name="currency"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                      <div className="form-group">
+                        <label className="text-gray-600 font-semibold mb-2 block"> Currency <span className="text-red-500">*</span></label>
+                        <div className="flex gap-0">
+                          <Field name="currency">
+                            {({ field }) => (
+                              <Select
+                                {...field}
+                                className="currency-select"
+                                style={{
+                                  width: '60px',
+                                  borderTopRightRadius: 0,
+                                  borderBottomRightRadius: 0,
+                                  borderRight: 0,
+                                  backgroundColor: '#f8fafc',
+                                }}
+                                placeholder={<span className="text-gray-400">$</span>}
+                                onChange={(value) => {
+                                  if (value === 'add_new') {
+                                    setIsAddCurrencyModalVisible(true);
+                                  } else {
+                                    setFieldValue("currency", value);
+                                  }
+                                }}
+                                value={values.currency}
+                                dropdownStyle={{ minWidth: '180px' }}
+                                suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                                loading={!fnddatass}
+                                dropdownRender={menu => (
+                                  <div>
+                                    <div
+                                      className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                      onClick={() => setIsAddCurrencyModalVisible(true)}
+                                    >
+                                      <PlusOutlined className="mr-2" />
+                                      <span className="text-sm">Add New</span>
+                                    </div>
+                                    {menu}
+                                  </div>
+                                )}
+                              >
+                                {fnddatass?.map((currency) => (
+                                  <Option key={currency.id} value={currency.id}>
+                                    <div className="flex items-center w-full px-1">
+                                      <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                      <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                      <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                                    </div>
+                                  </Option>
+                                ))}
+                              </Select>
+                            )}
+                          </Field>
+                          <Field name="value">
+                            {({ field, form }) => (
+                              <Input
+                                {...field}
+                                className="price-input"
+                                style={{
+                                  borderTopLeftRadius: 0,
+                                  borderBottomLeftRadius: 0,
+                                  borderLeft: '1px solid #d9d9d9',
+                                  width: 'calc(100% - 100px)'
+                                }}
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder="0.00"
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                    form.setFieldValue('value', value);
+                                  }
+                                }}
+                                onKeyPress={(e) => {
+                                  const charCode = e.which ? e.which : e.keyCode;
+                                  if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                    e.preventDefault();
+                                  }
+                                  if (charCode === 46 && field.value.includes('.')) {
+                                    e.preventDefault();
+                                  }
+                                }}
+                                prefix={
+                                  values.currency && (
+                                    <span className="text-gray-600 font-medium mr-1">
+                                      {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                                    </span>
+                                  )
+                                }
+                              />
+                            )}
+                          </Field>
+                        </div>
+                        <ErrorMessage name="value" component="div" className="text-red-500 mt-1 text-sm" />
+                      </div>
+                    </Col>
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
@@ -536,7 +616,7 @@ const EditContract = ({ id, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-4">
+              {/* <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Contract Value <span className="text-rose-500">*</span></label>
                   <Field
@@ -552,7 +632,7 @@ const EditContract = ({ id, onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col>
+              </Col> */}
 
               <Col span={12} className="mt-3">
                 <div className="form-item">
@@ -660,6 +740,51 @@ const EditContract = ({ id, onClose }) => {
           onChange={(e) => setNewContracttype(e.target.value)}
         />
       </Modal>
+
+      {/* Add Currency Modal */}
+      <Modal
+        title="Add New Currency"
+        visible={isAddCurrencyModalVisible}
+        onCancel={() => setIsAddCurrencyModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <AddCurrencies
+          onClose={() => {
+            setIsAddCurrencyModalVisible(false);
+            dispatch(getcurren()); // Refresh currency list after adding
+          }}
+        />
+      </Modal>
+
+      {/* Custom render for selected value */}
+      <style jsx>{`
+        .currency-select .ant-select-selection-item {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 16px !important;
+        }
+
+        .currency-select .ant-select-selection-item > div {
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .currency-select .ant-select-selection-item span:not(:first-child) {
+          display: none !important;
+        }
+
+        .ant-select-dropdown .ant-select-item {
+          padding: 8px 12px !important;
+        }
+
+        .ant-select-dropdown .ant-select-item-option-content > div {
+          display: flex !important;
+          align-items: center !important;
+          width: 100% !important;
+        }
+      `}</style>
 
     </div>
   );

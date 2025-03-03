@@ -61,77 +61,16 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
         setInitialValues({
           job: findofferdatas.job,
           job_applicant: findofferdatas.job_applicant,
-            offer_expiry: moment(findofferdatas.offer_expiry, "YYYY-MM-DD"),
-            expected_joining_date: moment(
-              findofferdatas.expected_joining_date,
-              "YYYY-MM-DD"
-            ), // Ensure moment conversion
+          offer_expiry: findofferdatas.offer_expiry ? dayjs(findofferdatas.offer_expiry) : null,
+          expected_joining_date: findofferdatas.expected_joining_date ? dayjs(findofferdatas.expected_joining_date) : null,
           salary: findofferdatas.salary,
+          rate: findofferdatas.rate,
           description: findofferdatas.description,
           file: null,
         });
       }
     }
-  }, [fnddatassss]);
-
-  // const onSubmit = async (values, { resetForm }) => {
-  //   try {
-  //     // Check for file and convert to base64 if present
-  //     let fileBase64 = null;
-  //     if (values.file) {
-  //       const reader = new FileReader();
-  //       reader.readAsDataURL(values.file.file);
-  //       reader.onloadend = async () => {
-  //         fileBase64 = reader.result;
-
-  //         // Prepare the payload object
-  //         const payload = {
-  //           job: values.job,
-  //           job_applicant: values.job_applicant,
-  //           offer_expiry: values.offer_expiry,
-  //           expected_joining_date: values.expected_joining_date,
-  //           salary: values.salary,
-  //           description: values.description,
-  //           file: fileBase64,
-  //         };
-
-  //         const response = await dispatch(editjobofferss({ idd, payload }));
-
-  //         if (response && response.payload) {
-  //           dispatch(getjobofferss());
-  //           onClose();
-  //           resetForm();
-  //           // message.success("Job offer letter added successfully!");
-  //         } else {
-  //           // message.error("Failed to add the job offer letter.");
-  //         }
-  //       };
-  //     } else {
-  //       const payload = {
-  //         job: values.job,
-  //         job_applicant: values.job_applicant,  
-  //         offer_expiry: values.offer_expiry,
-  //         expected_joining_date: values.expected_joining_date,
-  //         salary: values.salary,
-  //         description: values.description,
-  //       };
-
-  //       const response = await dispatch(editjobofferss({ idd, payload }));
-
-  //       if (response && response.payload) {
-  //         dispatch(getjobofferss());
-  //         onClose();
-  //         resetForm();
-  //         // message.success("Job offer letter added successfully!");
-  //       } else {
-  //         // message.error("Failed to add the job offer letter.");
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Submission error:", error);
-  //     message.error("An error occurred while submitting the job offer letter.");
-  //   }
-  // };
+  }, [fnddatassss, idd]);
 
   const onSubmit = async (values, { resetForm }) => {
     try {
@@ -140,14 +79,26 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
       // Format dates
       const formattedValues = {
         ...values,
-        offer_expiry: values.offer_expiry ? moment(values.offer_expiry).format('YYYY-MM-DD') : null,
-        expected_joining_date: values.expected_joining_date ? moment(values.expected_joining_date).format('YYYY-MM-DD') : null,
+        offer_expiry: values.offer_expiry ? dayjs(values.offer_expiry).format('YYYY-MM-DD') : null,
+        expected_joining_date: values.expected_joining_date ? dayjs(values.expected_joining_date).format('YYYY-MM-DD') : null,
       };
 
       // Append all form values to FormData
       Object.keys(formattedValues).forEach(key => {
         if (key === 'file' && formattedValues[key]) {
-          formData.append('file', formattedValues[key]);
+          // Validate file type and size before appending
+          const file = formattedValues[key];
+          const isValidFileType = ['image/jpeg', 'image/png', 'application/pdf'].includes(file.type);
+          const isValidFileSize = file.size / 1024 / 1024 < 5;
+
+          if (!isValidFileType) {
+            throw new Error('Invalid file type. Only JPG, PNG, and PDF files are allowed.');
+          }
+          if (!isValidFileSize) {
+            throw new Error('File size must be less than 5MB.');
+          }
+
+          formData.append('file', file);
         } else if (formattedValues[key] !== null && formattedValues[key] !== undefined) {
           formData.append(key, formattedValues[key]);
         }
@@ -155,11 +106,11 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
 
       await dispatch(editjobofferss({ idd, formData })).unwrap();
       await dispatch(getjobofferss());
-      message.success('Job offer letter added successfully');
+      message.success('Job offer letter updated successfully');
       onClose();
       resetForm();
     } catch (error) {
-      message.error(error?.message || 'Failed to add job offer letter');
+      message.error(error?.message || 'Failed to update job offer letter');
     }
   };
 
@@ -169,6 +120,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
     offer_expiry: "",
     expected_joining_date: "",
     salary: "",
+    rate: "",
     description: "",
     file: null,
   });
@@ -186,7 +138,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
 
   return (
     <div>
-      <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+      <hr style={{  border: "1px solid #E8E8E8"}} />
 
       <Formik
         initialValues={initialValues}
@@ -204,13 +156,13 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
           <Form
             onSubmit={handleSubmit}
             style={{
-              padding: "20px",
+              // padding: "20px",
               background: "#fff",
               borderRadius: "8px",
             }}
           >
             <Row gutter={16}>
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">Job Application <span className="text-red-500">*</span></label>
                   <Field name="job">
@@ -246,7 +198,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">Job <span className="text-red-500">*</span></label>
                   <Field name="job_applicant">
@@ -301,7 +253,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                   />
                 </div>
               </Col> */}
-              <Col span={12} className='mt-2'>
+              <Col span={12} className='mt-3'>
                 <div className="form-item">
                   <label className='font-semibold'>Offer Expire On <span className="text-red-500">*</span></label>
                   <DatePicker
@@ -346,7 +298,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                 </div>
               </Col> */}
 
-              <Col span={12} className="mt-2">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">Expected Joining Date <span className="text-red-500">*</span></label>
                   <DatePicker
@@ -377,7 +329,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
               </Col>
 
               <Col span={12}>
-                <div className="form-item mt-2">
+                  <div className="form-item mt-3">
                   <label className="font-semibold">Salary <span className="text-red-500">*</span></label>
                   <Field
                     className="mt-1 w-full"
@@ -394,7 +346,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
               </Col>
 
               <Col span={12}>
-                <div className="form-item mt-2">
+                <div className="form-item mt-3">
                   <label className="font-semibold">Rate <span className="text-red-500">*</span></label>
                   <Field
                     className="mt-1 w-full"
@@ -411,7 +363,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
               </Col>
 
               <Col span={24}>
-                <div className="form-item mt-2">
+                <div className="form-item mt-3">
                   <label className="font-semibold">Description <span className="text-red-500">*</span></label>
                   <ReactQuill
                     className="mt-1 w-full"
@@ -429,25 +381,38 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              <Col span={24} className="mt-4">
-                <span className="block font-semibold p-2">
-                  Add <QuestionCircleOutlined />
-                </span>
-                <Field name="file">
-                  {({ field }) => (
-                    <div>
-                      <Upload
-                        beforeUpload={(file) => {
-                          setFieldValue("file", file); // Set file in Formik state
-                          return false; // Prevent auto upload
-                        }}
-                        showUploadList={false}
-                      >
-                        <Button icon={<UploadOutlined />}>Choose File</Button>
-                      </Upload>
-                    </div>
-                  )}
-                </Field>
+              <Col span={24} className="mt-3">
+                  <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Attachment 
+                  </label>
+                  <Upload
+                    beforeUpload={(file) => {
+                      const isValidFileType = ['image/jpeg', 'image/png', 'application/pdf'].includes(file.type);
+                      const isValidFileSize = file.size / 1024 / 1024 < 5;
+
+                      if (!isValidFileType) {
+                        message.error('You can only upload JPG/PNG/PDF files!');
+                        return Upload.LIST_IGNORE;
+                      }
+                      if (!isValidFileSize) {
+                        message.error('File must be smaller than 5MB!');
+                        return Upload.LIST_IGNORE;
+                      }
+
+                      setFieldValue("file", file);
+                      return false;
+                    }}
+                    maxCount={1}
+                  >
+                    <Button icon={<UploadOutlined />} className="bg-white">
+                      Select File
+                    </Button>
+                    {/* <span className="ml-2 text-gray-500 text-sm">
+                      Supports: JPG, PNG, PDF (Max: 5MB)
+                    </span> */}
+                  </Upload>
+                </div>
               </Col>
             </Row>
             <div style={{ textAlign: "right", marginTop: "16px" }}>

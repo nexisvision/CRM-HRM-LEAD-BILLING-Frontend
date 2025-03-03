@@ -471,7 +471,7 @@ const DealList = () => {
                 <div className="text-gray-600 mb-2">
                   <div>Price: ${deal.price}</div>
                   <div>Stage: {getStageName(deal.stage)}</div>
-                  <div>Created by: {deal.created_by}</div>
+                  {/* <div>Created by: {deal.created_by}</div> */}
                 </div>
                 <div className="text-gray-500">
                   <div>Lead: {deal.leadTitle}</div>

@@ -8,6 +8,7 @@ import { Formik, Field, ErrorMessage } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
 import { AddDocu, editDocu, getDocu } from "./DocumentReducers/documentSlice";
+import { getRoles } from '../RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice';
 // import { AddTrainng, GetallTrainng } from "./TrainingReducer/TrainingSlice";
 const { Option } = Select;
 const EditDocument = ({ idd, onClose }) => {
@@ -22,17 +23,25 @@ const EditDocument = ({ idd, onClose }) => {
   const alladatas = useSelector((state) => state.Documents);
   const fnddtaas = alladatas.Documents.data;
 
+  const { role } = useSelector((state) => state.role);
+
+  useEffect(() => {
+    dispatch(getRoles());
+  }, [dispatch]);
+
   useEffect(() => {
     if (fnddtaas) {
       const fdd = fnddtaas.find((item) => item.id === idd);
-
-      setinitialValues({
-        name: fdd.name,
-        role: fdd.role,
-        description: fdd.description,
-      });
+      if (fdd) {
+        setinitialValues({
+          name: fdd.name,
+          role: fdd.role,
+          description: fdd.description,
+          file: null,
+        });
+      }
     }
-  }, [fnddtaas]);
+  }, [fnddtaas, idd]);
 
   const [rows, setRows] = useState([
     {
@@ -45,6 +54,7 @@ const EditDocument = ({ idd, onClose }) => {
     name: "",
     role: "",
     description: "",
+    file: null,
   });
   const validationSchema = Yup.object({
     name: Yup.string().required("Please enter Name"),
@@ -88,22 +98,29 @@ const EditDocument = ({ idd, onClose }) => {
   //   }
   // };
 
-  const onSubmit = async (values, { resetForm }) => {
-   
+  const onSubmit = async (values, { setSubmitting, resetForm }) => {
+    try {
       const formData = new FormData();
-        for (const key in values) {
+      Object.keys(values).forEach(key => {
+        if (values[key] !== null) {
+          if (key === 'file' && values[key]) {
             formData.append(key, values[key]);
+          } else {
+            formData.append(key, values[key]);
+          }
         }
-    
-        
-        dispatch(editDocu({ idd,formData})).then((res)=>{
-         
-          dispatch(getDocu());
-          message.success("Document added successfully!");
-          resetForm();
-          onClose();
-        })
-    
+      });
+
+      await dispatch(editDocu({ idd, formData }));
+      message.success('Document updated successfully!');
+      dispatch(getDocu());
+      onClose();
+      resetForm();
+    } catch (error) {
+      message.error(error?.message || 'Failed to update document');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -137,7 +154,7 @@ const EditDocument = ({ idd, onClose }) => {
                   />
            
               </Col>
-              <Col span={8} className="">
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Role <span className="text-red-500">*</span></label>
                   <Field name="role">
@@ -145,17 +162,19 @@ const EditDocument = ({ idd, onClose }) => {
                       <Select
                         {...field}
                         placeholder="Select role"
-                        className="w-full mt-2"
-                        onChange={(value) => setFieldValue("role", value)}
+                        className="w-full mt-1"
+                        onChange={(value, option) => {
+                          setFieldValue("role", option.children);
+                        }}
                         value={values.role}
                         onBlur={() => setFieldTouched("role", true)}
                         allowClear={false}
                       >
-                        <Option value="cilent">Cilent</Option>
-                        <Option value="sub client">Sub Client</Option>
-                        <Option value="user">User</Option>
-                        <Option value="employee">Employee</Option>
-                        <Option value="super admin">Super Admin</Option>
+                        {role?.data?.map((item) => (
+                          <Option key={item.id} value={item.id}>
+                            {item.role_name}
+                          </Option>
+                        ))}
                       </Select>
                     )}
                   </Field>
@@ -184,22 +203,35 @@ const EditDocument = ({ idd, onClose }) => {
                   </div>
                 </Col>
               </div>
-              <Col span={24} className="mt-2">
-              <Field name="file">
-                       {({ field }) => (
-                           <Form.Item label="Attachment" className="mt-3 font-semibold">
-                               <Upload
-                                   beforeUpload={(file) => {
-                                       setFieldValue("file", file); // Set the uploaded file in Formik state
-                                       return false; // Prevent automatic upload
-                                   }}
-                                   showUploadList={false} // Hide the default upload list
-                               >
-                                   <Button icon={<UploadOutlined />}>Choose File</Button>
-                               </Upload>
-                           </Form.Item>
-                       )}
-                   </Field>
+              <Col span={24} className="mt-3">
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Attachment
+                  </label>
+                  <Upload
+                    beforeUpload={(file) => {
+                      const isValidFileType = ['image/jpeg', 'image/png', 'application/pdf'].includes(file.type);
+                      const isValidFileSize = file.size / 1024 / 1024 < 5;
+
+                      if (!isValidFileType) {
+                        message.error('You can only upload JPG/PNG/PDF files!');
+                        return Upload.LIST_IGNORE;
+                      }
+                      if (!isValidFileSize) {
+                        message.error('File must be smaller than 5MB!');
+                        return Upload.LIST_IGNORE;
+                      }
+
+                      setFieldValue("file", file);
+                      return false;
+                    }}
+                    maxCount={1}
+                  >
+                    <Button icon={<UploadOutlined />} className="bg-white">
+                      Select File
+                    </Button>
+                  </Upload>
+                </div>
               </Col>
             </Row>
             <Form.Item>

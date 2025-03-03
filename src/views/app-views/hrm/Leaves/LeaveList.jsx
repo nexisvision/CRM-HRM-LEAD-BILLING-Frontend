@@ -291,11 +291,11 @@ const LeaveList = () => {
       dataIndex: "leaveType",
       sorter: (a, b) => a.leavetype.length - b.leavetype.length,
     },
-    {
-      title: "Applied On",
-      dataIndex: "appliedon",
-      sorter: (a, b) => dayjs(a.appliedon).unix() - dayjs(b.appliedon).unix(),
-    },
+    // {
+    //   title: "Applied On",
+    //   dataIndex: "appliedon",
+    //   sorter: (a, b) => dayjs(a.appliedon).unix() - dayjs(b.appliedon).unix(),
+    // },
     {
       title: "Start Date",
       dataIndex: "startDate",
@@ -319,11 +319,11 @@ const LeaveList = () => {
       sorter: (a, b) => utils.antdTableSorter(a, b, "endDate"),
     },
 
-    {
-      title: "Total Days",
-      dataIndex: "totaldays",
-      sorter: (a, b) => a.totaldays - b.totaldays,
-    },
+    // {
+    //   title: "Total Days",
+    //   dataIndex: "totaldays",
+    //   sorter: (a, b) => a.totaldays - b.totaldays,
+    // },
     {
       title: "Leave Reason",
       dataIndex: "reason",

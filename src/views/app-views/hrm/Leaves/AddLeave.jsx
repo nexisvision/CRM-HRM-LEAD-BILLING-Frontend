@@ -26,7 +26,7 @@ const validationSchema = Yup.object().shape({
     .required("End date is required")
     .min(Yup.ref('startDate'), "End date must be after start date"),
   reason: Yup.string().required("Leave reason is required"),
-  remark: Yup.string().required("Remark is required"),
+  remark: Yup.string().optional("Remark is required"),
 });
 
 const AddLeave = ({ onClose }) => {

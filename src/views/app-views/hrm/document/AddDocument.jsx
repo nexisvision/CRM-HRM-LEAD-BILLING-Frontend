@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Input, Button, Row, Col, message, Upload, Select } from "antd";
 import { useNavigate } from "react-router-dom";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { RxCross2 } from "react-icons/rx";
 import * as Yup from "yup";
 import { Formik, Field, ErrorMessage } from "formik";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
 import { AddDocu, getDocu } from "./DocumentReducers/documentSlice";
+import { getRoles } from '../RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice';
 // import { AddTrainng, GetallTrainng } from "./TrainingReducer/TrainingSlice";
 const { Option } = Select;
 const AddDocument = ({ onClose }) => {
@@ -25,12 +26,19 @@ const AddDocument = ({ onClose }) => {
     name: "",
     role: null,
     description: "",
+    file: null,
   };
   const validationSchema = Yup.object({
     name: Yup.string().required("Please enter Name"),
     role: Yup.string().required("Please enter Role"),
     description: Yup.string().required("Please enter Description"),
   });
+  const { role } = useSelector((state) => state.role);
+
+  useEffect(() => {
+    dispatch(getRoles());
+  }, [dispatch]);
+
   const handleAddRow = () => {
     setRows([
       ...rows,
@@ -68,26 +76,36 @@ const AddDocument = ({ onClose }) => {
   //   }
   // };
 
-  const onSubmit = async (values, { resetForm }) => {
-    // Validate that all required fields are filled
-    if (!values.name || !values.role || !values.description) {
-      message.error("Please fill in all required fields");
-      return;
-    }
-
-    const formData = new FormData();
-    for (const key in values) {
-      formData.append(key, values[key]);
-    }
-
+  const onSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      await dispatch(AddDocu(formData)).unwrap();
-      await dispatch(getDocu());
-      message.success("Document added successfully!");
+      const formData = new FormData();
+
+      // Only append non-null values
+      Object.keys(values).forEach(key => {
+        if (key === 'file') {
+          // Only append file if it exists
+          if (values[key]) {
+            formData.append(key, values[key]);
+          }
+        } else if (values[key] !== null && values[key] !== undefined) {
+          formData.append(key, values[key]);
+        }
+      });
+
+      // Add required fields validation
+      if (!values.name || !values.role || !values.description) {
+        throw new Error('Please fill in all required fields');
+      }
+
+      await dispatch(AddDocu(formData));
+      message.success('Document created successfully!');
+      dispatch(getDocu());
+      onClose();
       resetForm();
-      onClose(); // Close modal after successful submission
     } catch (error) {
-      message.error(error?.message || "Failed to add document");
+      message.error(error?.message || 'Failed to create document');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -109,7 +127,7 @@ const AddDocument = ({ onClose }) => {
             <Row gutter={16}>
               <Col span={12} className="mt-3">
               <label className="font-semibold">Name <span className="text-red-500">*</span></label>
-                  <Field name="name" className="w-full mt-2">
+                  <Field name="name" className="w-full mt-1">
                     {({ field }) => (
                       <Input placeholder="Enter Name" {...field} />
                     )}
@@ -121,25 +139,27 @@ const AddDocument = ({ onClose }) => {
                   />
              
               </Col>
-              {/* <Col span={8} className="">
+              <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="">Role</label>
+                  <label className="font-semibold">Role <span className="text-red-500">*</span></label>
                   <Field name="role">
                     {({ field }) => (
                       <Select
                         {...field}
                         placeholder="Select role"
-                        className="w-full mt-2"
-                        onChange={(value) => setFieldValue("role", value)}
+                        className="w-full mt-1"
+                        onChange={(value, option) => {
+                          setFieldValue("role", option.children);
+                        }}
                         value={values.role}
                         onBlur={() => setFieldTouched("role", true)}
                         allowClear={false}
                       >
-                        <Option value="cilent">Cilent</Option>
-                        <Option value="sub client">Sub Client</Option>
-                        <Option value="user">User</Option>
-                        <Option value="employee">Employee</Option>
-                        <Option value="super admin">Super Admin</Option>
+                        {role?.data?.map((item) => (
+                          <Option key={item.id} value={item.id}>
+                            {item.role_name}
+                          </Option>
+                        ))}
                       </Select>
                     )}
                   </Field>
@@ -149,7 +169,7 @@ const AddDocument = ({ onClose }) => {
                     className="error-message text-red-500 my-1"
                   />
                 </div>
-              </Col> */}
+              </Col>
               <div className=" w-full">
                 <Col span={24} className="mt-3">
                   <div className="form-item">
@@ -158,7 +178,7 @@ const AddDocument = ({ onClose }) => {
                       value={values.description}
                       onChange={(value) => setFieldValue("description", value)}
                       placeholder="Enter description"
-                      className="mt-2"
+                      className="mt-1"
                       onBlur={() => setFieldTouched("description", true)}
                     />
                     <ErrorMessage
@@ -169,22 +189,38 @@ const AddDocument = ({ onClose }) => {
                   </div>
                 </Col>
               </div>
-              <Col span={24}>
-                <Field name="file">
-                       {({ field }) => (
-                           <Form.Item label="Attachment" className="mt-3 font-semibold">
-                               <Upload
-                                   beforeUpload={(file) => {
-                                       setFieldValue("file", file); // Set the uploaded file in Formik state
-                                       return false; // Prevent automatic upload
-                                   }}
-                                   showUploadList={false} // Hide the default upload list
-                               >
-                                   <Button icon={<UploadOutlined />}>Choose File</Button>
-                               </Upload>
-                           </Form.Item>
-                       )}
-                   </Field>
+              <Col span={24} className="mt-3">
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Attachment
+                  </label>
+                  <Upload
+                    beforeUpload={(file) => {
+                      const isValidFileType = ['image/jpeg', 'image/png', 'application/pdf'].includes(file.type);
+                      const isValidFileSize = file.size / 1024 / 1024 < 5;
+
+                      if (!isValidFileType) {
+                        message.error('You can only upload JPG/PNG/PDF files!');
+                        return Upload.LIST_IGNORE;
+                      }
+                      if (!isValidFileSize) {
+                        message.error('File must be smaller than 5MB!');
+                        return Upload.LIST_IGNORE;
+                      }
+
+                      setFieldValue("file", file);
+                      return false;
+                    }}
+                    maxCount={1}
+                    onRemove={() => {
+                      setFieldValue("file", null);
+                    }}
+                  >
+                    <Button icon={<UploadOutlined />} className="bg-white">
+                      Select File
+                    </Button>
+                  </Upload>
+                </div>
               </Col>
             </Row>
             <Form.Item>

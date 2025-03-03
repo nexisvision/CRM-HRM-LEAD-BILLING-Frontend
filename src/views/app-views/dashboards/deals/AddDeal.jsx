@@ -17,6 +17,7 @@ import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/cu
 import {getallcountries} from "../../setting/countries/countriesreducer/countriesSlice";
 import AddDealStages from "../systemsetup/DealStages/AddDealStages";
 import AddPipeLine from "../systemsetup/Pipeline/AddPipeLine";
+import AddCurrencies from "views/app-views/setting/currencies/AddCurrencies";
 const { Option } = Select;
 const AddDeal = ({ onClose }) => {
   const navigate = useNavigate();
@@ -133,13 +134,26 @@ const AddDeal = ({ onClose }) => {
  
    // category end
 
+  const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
+
+  const allempdatass = useSelector((state) => state.currencies);
+  const fnddatass = allempdatass?.currencies?.data;
+
+  const getInitialCurrency = () => {
+    if (fnddatass?.length > 0) {
+      const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
+      return usdCurrency?.id || fnddatass[0]?.id;
+    }
+    return '';
+  };
+
   const initialValues = {
     dealName: "",
     phoneNumber: "",
     phoneCode: "",
     price: "",
     leadTitle: "",
-    currency: "",
+    currency: getInitialCurrency(),
     category: "",
     pipeline: "",
     stage: "",
@@ -254,7 +268,7 @@ const AddDeal = ({ onClose }) => {
                     >
                       {countries.map((country) => (
                         <Option key={country.id} value={country.phoneCode}>
-                          (+{country.phoneCode})
+                          ({country.phoneCode})
                         </Option>
                       ))}
                     </Select>
@@ -287,61 +301,101 @@ const AddDeal = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-3 mb-3">
-                <div className="form-item">
-                  <label className="font-semibold">Price <span className="text-rose-500">*</span></label>
-                  <Field
-                    name="price"
-                    as={Input}
-                    className="mt-1"
-                    placeholder="Enter Price"
-                  />
-                  <ErrorMessage
-                    name="price"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
               <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold mb-2">Currency <span className="text-rose-500">*</span></label>
-                  <div className="flex gap-2">
+                <div className="form-group">
+                  <label className="text-gray-600 font-semibold mb-2 block">Currency <span className="text-red-500">*</span></label>
+                  <div className="flex gap-0">
                     <Field name="currency">
-                      {({ field, form }) => (
+                      {({ field }) => (
                         <Select
                           {...field}
-                          className="w-full mt-1"
-                          placeholder="Select Currency"
-                          onChange={(value) => {
-                            const selectedCurrency = Array.isArray(currencies?.data) && 
-                              currencies?.data?.find((c) => c.id === value);
-                            form.setFieldValue(
-                              "currency",
-                              selectedCurrency?.currencyCode || ""
-                              
-                            );
+                          className="currency-select"
+                          style={{
+                            width: '60px',
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRight: 0,
+                            backgroundColor: '#f8fafc',
                           }}
-                        >
-                          {Array.isArray(currencies?.data) && currencies?.data?.length > 0 ? (
-                            currencies.data.map((currency) => (
-                              <Option key={currency.id} value={currency.id}>
-                                {currency.currencyCode}
-                                ({currency.currencyIcon})
-                              </Option>
-                            ))
-                          ) : (
-                            <Option value="" disabled>No Currencies Available</Option>
+                          placeholder={<span className="text-gray-400">$</span>}
+                          onChange={(value) => {
+                            if (value === 'add_new') {
+                              setIsAddCurrencyModalVisible(true);
+                            } else {
+                              setFieldValue("currency", value);
+                            }
+                          }}
+                          value={values.currency}
+                          dropdownStyle={{ minWidth: '180px' }}
+                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                          loading={!fnddatass}
+                          dropdownRender={menu => (
+                            <div>
+                              <div
+                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                onClick={() => setIsAddCurrencyModalVisible(true)}
+                              >
+                                <PlusOutlined className="mr-2" />
+                                <span className="text-sm">Add New</span>
+                              </div>
+                              {menu}
+                            </div>
                           )}
+                        >
+                          {fnddatass?.map((currency) => (
+                            <Option key={currency.id} value={currency.id}>
+                              <div className="flex items-center w-full px-1">
+                                <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                              </div>
+                            </Option>
+                          ))}
                         </Select>
                       )}
                     </Field>
+                    <Field name="price">
+                      {({ field, form }) => (
+                        <Input
+                          {...field}
+                          className="price-input"
+                          style={{
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderLeft: '1px solid #d9d9d9',
+                            width: 'calc(100% - 100px)'
+                          }}
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="0.00"
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                              form.setFieldValue('price', value);
+                            }
+                          }}
+                          onKeyPress={(e) => {
+                            const charCode = e.which ? e.which : e.keyCode;
+                            if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                              e.preventDefault();
+                            }
+                            if (charCode === 46 && field.value.includes('.')) {
+                              e.preventDefault();
+                            }
+                          }}
+                          prefix={
+                            values.currency && (
+                              <span className="text-gray-600 font-medium mr-1">
+                                {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                              </span>
+                            )
+                          }
+                        />
+                      )}
+                    </Field>
                   </div>
-                  <ErrorMessage
-                    name="currency"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <ErrorMessage name="price" component="div" className="text-red-500 mt-1 text-sm" />
                 </div>
               </Col>
 
@@ -638,6 +692,22 @@ const AddDeal = ({ onClose }) => {
         width={700}
       >
         <AddPipeLine onClose={closeAddPipeLineModal} />
+      </Modal>
+
+      {/* Add Currency Modal */}
+      <Modal
+        title="Add New Currency"
+        visible={isAddCurrencyModalVisible}
+        onCancel={() => setIsAddCurrencyModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <AddCurrencies
+          onClose={() => {
+            setIsAddCurrencyModalVisible(false);
+            dispatch(getcurren()); // Refresh currency list after adding
+          }}
+        />
       </Modal>
     </div>
   );

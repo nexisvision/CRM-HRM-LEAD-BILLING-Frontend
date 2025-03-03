@@ -353,6 +353,7 @@ const EditJobOnBording = ({ idd, onClose }) => {
                   <label className="font-semibold">Status <span className="text-red-500">*</span></label>
                   <Select
                     style={{ width: "100%" }}
+                    className="w-full mt-1"
                     placeholder="Select or add new status"
                     value={values.status}
                     onChange={(value) => setFieldValue("status", value)}
@@ -392,7 +393,7 @@ const EditJobOnBording = ({ idd, onClose }) => {
                 Cancel
               </Button>
               <Button type="primary" htmlType="submit">
-                Create
+                Update
               </Button>
             </div>
           </Form>

@@ -30,6 +30,7 @@ import { getallcountries } from "views/app-views/setting/countries/countriesredu
 import useSelection from "antd/es/table/hooks/useSelection";
 import AddLeadStages from "../systemsetup/LeadStages/AddLeadStages";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
+import AddCurrencies from "views/app-views/setting/currencies/AddCurrencies";
 
 const { Option } = Select;
 
@@ -99,6 +100,7 @@ const currenciesState = useSelector((state) => state.currencies);
   const countries = useSelector((state) => state.countries.countries || []);
 
   const [isAddLeadStageModalVisible, setIsAddLeadStageModalVisible] = useState(false);
+  const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
   const fetchLables = async (lableType, setter) => {
     try {
@@ -177,7 +179,7 @@ const currenciesState = useSelector((state) => state.currencies);
     email: "",
     leadStage: "",
     leadValue: "",
-    currencyIcon: "",
+    currency: "",
     assigned: "",
     status: "",
     notes: "",
@@ -214,7 +216,7 @@ const currenciesState = useSelector((state) => state.currencies);
     email: Yup.string().optional("Please enter a valid email address").nullable(),
     leadStage: Yup.string().required("Lead Stage is required"),
     leadValue: Yup.number().optional("Lead Value must be a number").nullable(),
-    currencyIcon: Yup.string().nullable(),
+    currency: Yup.string().required("Currency is required"),
     employee: Yup.string().required("Employee is required"),
     category: Yup.string().required("Category is required"),
     assigned: Yup.string().optional("Assigned is required"),
@@ -272,7 +274,7 @@ const currenciesState = useSelector((state) => state.currencies);
     const formData = {
       ...values,
       leadValue: values.leadValue ? String(values.leadValue) : null,
-      currencyIcon: values.currencyIcon || null,
+      currency: values.currency || null,
     };
 
     dispatch(LeadsAdd(formData))
@@ -289,60 +291,101 @@ const currenciesState = useSelector((state) => state.currencies);
   };
 
  const LeadValueField = ({ field, form }) => (
-     <Col span={24} className="mt-2">
-       <div className="form-item">
-         <div className="flex gap-2">
-           <Field
-             name="leadValue"
-             type="number"
-             as={Input}
-             placeholder="Enter Lead Value"
-             className="w-full"
-           />
-           <Field name="currencyId">
-             {({ field, form }) => (
-               <Select
-                 {...field}
-                 className="w-full"
-                 placeholder="Currency"
-                 onChange={(value) => {
-                   form.setFieldValue("currencyId", value);
-                   const selected = currencies.find(c => c.id === value);
-                   setSelectedCurrency(selected);
-                 }}
-                 value={field.value}
-               >
-                 {Array.isArray(currencies) && currencies.length > 0 ? (
-                   currencies.map((currency) => (
-                     <Option
-                       key={currency.id}
-                       value={currency.id}
-                     >
-                       {currency.currencyCode} ({currency.currencyIcon})
-                     </Option>
-                   ))
-                 ) : (
-                   <Option value="" disabled>
-                     Loading currencies...
-                   </Option>
-                 )}
-               </Select>
-             )}
-           </Field>
-         </div>
-         <ErrorMessage
-           name="leadValue"
-           component="div"
-           className="error-message text-red-500 my-1"
-         />
-         <ErrorMessage
-           name="currencyId"
-           component="div"
-           className="error-message text-red-500 my-1"
-         />
-       </div>
-     </Col>
-   );
+  <div className="form-group">
+    <div className="flex gap-0">
+      <Field name="currency">
+        {({ field }) => (
+          <Select
+            {...field}
+            className="currency-select"
+            style={{
+              width: '60px',
+              borderTopRightRadius: 0,
+              borderBottomRightRadius: 0,
+              borderRight: 0,
+              backgroundColor: '#f8fafc',
+            }}
+            placeholder={<span className="text-gray-400">$</span>}
+            onChange={(value) => {
+              if (value === 'add_new') {
+                setIsAddCurrencyModalVisible(true);
+              } else {
+                form.setFieldValue("currency", value);
+              }
+            }}
+            value={form.values.currency}
+            dropdownStyle={{ minWidth: '180px' }}
+            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+            loading={!fndcurr}
+            dropdownRender={menu => (
+              <div>
+                <div
+                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                  onClick={() => setIsAddCurrencyModalVisible(true)}
+                >
+                  <PlusOutlined className="mr-2" />
+                  <span className="text-sm">Add New</span>
+                </div>
+                {menu}
+              </div>
+            )}
+          >
+            {fndcurr?.map((currency) => (
+              <Option key={currency.id} value={currency.id}>
+                <div className="flex items-center w-full px-1">
+                  <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                  <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                  <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                </div>
+              </Option>
+            ))}
+          </Select>
+        )}
+      </Field>
+      <Field name="leadValue">
+        {({ field, form }) => (
+          <Input
+            {...field}
+            className="price-input"
+            style={{
+              borderTopLeftRadius: 0,
+              borderBottomLeftRadius: 0,
+              borderLeft: '1px solid #d9d9d9',
+              width: 'calc(100% - 100px)'
+            }}
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                form.setFieldValue('leadValue', value);
+              }
+            }}
+            onKeyPress={(e) => {
+              const charCode = e.which ? e.which : e.keyCode;
+              if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                e.preventDefault();
+              }
+              if (charCode === 46 && field.value.includes('.')) {
+                e.preventDefault();
+              }
+            }}
+            prefix={
+              form.values.currency && (
+                <span className="text-gray-600 font-medium mr-1">
+                  {fndcurr?.find(c => c.id === form.values.currency)?.currencyIcon}
+                </span>
+              )
+            }
+          />
+        )}
+      </Field>
+    </div>
+    <ErrorMessage name="leadValue" component="div" className="text-red-500 mt-1 text-sm" />
+  </div>
+);
 
   const openAddLeadStageModal = () => {
     setIsAddLeadStageModalVisible(true);
@@ -440,7 +483,7 @@ const currenciesState = useSelector((state) => state.currencies);
                       {Array.isArray(countries) && countries.length > 0 ? (
                         countries.map((country) => (
                           <Option key={country.id} value={country.phoneCode}>
-                            (+{country.phoneCode})
+                            ({country.phoneCode})
                           </Option>
                         ))
                       ) : (
@@ -557,7 +600,7 @@ const currenciesState = useSelector((state) => state.currencies);
                                   className="error-message text-red-500 my-1"
                                 />
                                 <ErrorMessage
-                                  name="leadValue.currencyId"
+                                  name="leadValue.currency"
                                   component="div"
                                   className="error-message text-red-500 my-1"
                                 />
@@ -1022,6 +1065,21 @@ const currenciesState = useSelector((state) => state.currencies);
               <AddLeadStages onClose={closeAddLeadStageModal} />
             </Modal>
 
+            <Modal
+              title="Add New Currency"
+              visible={isAddCurrencyModalVisible}
+              onCancel={() => setIsAddCurrencyModalVisible(false)}
+              footer={null}
+              width={600}
+            >
+              <AddCurrencies
+                onClose={() => {
+                  setIsAddCurrencyModalVisible(false);
+                  dispatch(getcurren()); // Refresh currency list after adding
+                }}
+              />
+            </Modal>
+
           </Form>
         )}
       </Formik>
@@ -1030,4 +1088,32 @@ const currenciesState = useSelector((state) => state.currencies);
 };
 
 export default AddLead;
+
+<style jsx>{`
+  .currency-select .ant-select-selection-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 16px !important;
+  }
+
+  .currency-select .ant-select-selection-item > div {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .currency-select .ant-select-selection-item span:not(:first-child) {
+    display: none !important;
+  }
+
+  .ant-select-dropdown .ant-select-item {
+    padding: 8px 12px !important;
+  }
+
+  .ant-select-dropdown .ant-select-item-option-content > div {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+`}</style>
 

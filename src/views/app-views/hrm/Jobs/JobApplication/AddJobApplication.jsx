@@ -83,6 +83,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
   });
   return (
     <div>
+      <hr style={{ marginBottom: "-10px", border: "1px solid #e8e8e8",marginTop:"20px" }} />
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -100,7 +101,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
             <Row gutter={16}>
               {/* Job */}
 
-              <Col span={12} className="">
+              <Col span={12}>
                 <div className="form-item">
                {/* <hr className="border-b-2 border-gray-300"></hr> */}
                   <label className="font-semibold">job <span className="text-red-500">*</span></label>
@@ -174,7 +175,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                     >
                       {countries.map((country) => (
                         <Option key={country.id} value={country.phoneCode}>
-                          (+{country.phoneCode})
+                          ({country.phoneCode})
                         </Option>
                       ))}
                     </Select>
