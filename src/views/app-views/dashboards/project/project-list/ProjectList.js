@@ -6,7 +6,7 @@ import ProjectListData from './ProjectListData';
 import AddProject from './AddProject';
 import EditProject from './EditProject';
 import utils from 'utils';
-import { useLocation, useNavigate,useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import PageHeaderAlt from 'components/layout-components/PageHeaderAlt';
 import Flex from 'components/shared-components/Flex';
 import { empdata } from 'views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice';
@@ -18,111 +18,135 @@ const VIEW_LIST = 'LIST';
 const VIEW_GRID = 'GRID';
 
 const ProjectList = () => {
-
 	const [view, setView] = useState(VIEW_GRID);
 	const [list, setList] = useState([]);
 	const [isAddProjectModalVisible, setIsAddProjectModalVisible] = useState(false);
 	const [isEditProjectModalVisible, setIsEditProjectModalVisible] = useState(false);
-	const [clientid,setClientId] = useState("");
-
-	const [idd,setIdd]= useState("");
-
-	  const AllProject = useSelector((state) => state.Project);
-	  const properdata = AllProject.Project.data;
-	//   console.log("opopopopop",properdata)
-
-	  const loggedInUser = useSelector((state) => state.user.loggedInUser);
-	  const username = loggedInUser ? loggedInUser.client_id : "";
-
-	  const {state} = useLocation();
- 
-	  useEffect(() => {
-		if (state?.idd) {
-		  setClientId(state.idd);
-		}
-	  }, [state]);
-
-	  const matchingClients = properdata?.filter(client => client?.client === clientid);
+	const [clientid, setClientId] = useState("");
+	const [idd, setIdd] = useState("");
 
 	const dispatch = useDispatch();
-
-	const Allclientdata = useSelector((state) => state.SubClient);
-
-	const dataclient = Allclientdata.SubClient.data;
-
 	const navigate = useNavigate();
+	const { state } = useLocation();
 
-	const handleProjectClick = (id) => {
-        navigate(`/app/dashboards/project/view/${id}`);
-    };
+	// Move all selectors to the top
+	const AllProject = useSelector((state) => state.Project);
+	const properdata = AllProject.Project.data;
+	const currencies = useSelector((state) => state.currencies?.currencies?.data);
+	const loggedInUser = useSelector((state) => state.user.loggedInUser);
+	const username = loggedInUser ? loggedInUser.client_id : "";
+	const Allclientdata = useSelector((state) => state.SubClient);
+	const dataclient = Allclientdata.SubClient.data;
+	// Get employee data from Redux store - moved here from bottom
+	const allEmployeeData = useSelector((state) => state.employee);
+	const empData = allEmployeeData?.employee?.data || [];
 
-	  useEffect(() => {
+	useEffect(() => {
+		if (state?.idd) {
+			setClientId(state.idd);
+		}
+	}, [state]);
+
+	const matchingClients = properdata?.filter(client => client?.client === clientid);
+
+	useEffect(() => {
 		dispatch(empdata());
 		dispatch(ClientData());
 		dispatch(GetProject());
-	  }, [dispatch]);
+	}, [dispatch]);
 
-	  useEffect(() => {
+	useEffect(() => {
 		if (!properdata) return;
 
-		// let filteredProjects = [];
-		
-		// if (clientid && properdata.length > 0) {
-		//   filteredProjects = properdata.filter(item => item.client === clientid);
-		// } else {
-		//   filteredProjects = properdata;
-		// }
-
-		// filteredProjects = filteredProjects.filter(item => item.client_id === username);
-
 		const formattedData = properdata.map((item) => {
-			// Parse project_members and files for each project individually
 			let projectMembers = [];
 			let filesArray = [];
-			
+
 			try {
 				// Parse project members
-				const parsedMembers = JSON.parse(item.project_members);
-				projectMembers = parsedMembers.project_members || [];
-				
+				const parsedMembers = typeof item.project_members === 'string'
+					? JSON.parse(item.project_members)
+					: item.project_members;
+
+				projectMembers = parsedMembers?.project_members || [];
+
 				// Parse files for this specific project
-				filesArray = JSON.parse(item.files) || [];
+				filesArray = item.files ? JSON.parse(item.files) : [];
 			} catch (error) {
 				console.error("Error parsing data:", error);
 			}
 
-			// Get file URLs for this specific project
-			const fileUrls = filesArray.map(file => file.url);
+			// Get employee details for project members
+			const memberDetails = projectMembers.map(memberId => {
+				const employee = empData.find(emp => emp.id === memberId);
+				return employee ? {
+					id: employee.id,
+					name: employee.username || 'User',
+					img: employee.profilePic,
+					initials: (employee.username || 'U')[0].toUpperCase()
+				} : null;
+			}).filter(Boolean);
 
-			// Map members to their avatars, cycling through available files
-			const memberWithAvatars = projectMembers.map((memberId, index) => ({
-				id: memberId,
-				name: "Member",
-				// Use modulo to cycle through available files if there are more members than files
-				img: fileUrls[index % fileUrls.length] || "https://xsgames.co/randomusers/avatar.php?g=pixel"
-			}));
+			// Find currency details
+			const currencyDetails = currencies?.find(c => c.currencyCode === item.currency) || {};
+			const currencyIcon = currencyDetails.currencyIcon || '$';
+
+			// Format dates
+			const startDate = item.startDate ? new Date(item.startDate) : null;
+			const endDate = item.endDate ? new Date(item.endDate) : null;
+			const formattedStartDate = startDate ? startDate.toLocaleDateString('en-GB', {
+				day: '2-digit',
+				month: 'short',
+				year: 'numeric'
+			}) : 'N/A';
+			const formattedEndDate = endDate ? endDate.toLocaleDateString('en-GB', {
+				day: '2-digit',
+				month: 'short',
+				year: 'numeric'
+			}) : 'N/A';
 
 			return {
 				...item,
-				dateRange: `${new Date(item.startDate).toLocaleDateString('en-GB')}/${new Date(item.endDate).toLocaleDateString('en-GB')}`,
+				dateRange: `${formattedStartDate} - ${formattedEndDate}`,
 				id: item.id,
 				name: item.project_name || item.name,
 				category: item.project_category,
 				attachmentCount: item.attachmentCount,
-				totalTask: item.budget,
-				completedTask: `${Math.round((new Date() - new Date(item.startDate)) / (new Date(item.endDate) - new Date(item.startDate)) * 100)}%`,
-				progressPercent: Math.round((new Date() - new Date(item.startDate)) / (new Date(item.endDate) - new Date(item.startDate)) * 100),
-				dayleft: Math.max(0, Math.ceil((new Date(item.endDate) - new Date()) / (1000 * 3600 * 24))),
+				totalTask: `${currencyIcon}${Number(item.budget).toLocaleString()}`,
+				completedTask: `${Math.round((new Date() - startDate) / (endDate - startDate) * 100)}%`,
+				progressPercent: Math.round((new Date() - startDate) / (endDate - startDate) * 100),
+				dayleft: endDate ? Math.max(0, Math.ceil((endDate - new Date()) / (1000 * 3600 * 24))) : 0,
 				statusColor: item.status,
-				member: memberWithAvatars,
+				member: memberDetails,
 				tag: item.tag_name || item.tag,
+				formattedStartDate,
+				formattedEndDate
 			};
 		});
 		setList(formattedData);
-	}, [properdata, clientid, username]);
+	}, [properdata, clientid, username, currencies, empData]);
 
+	const handleProjectClick = (id) => {
+		navigate(`/app/dashboards/project/view/${id}`);
+	};
 
-	  
+	// Delete Project
+	const deleteItem = (id) => {
+		dispatch(DeletePro(id));
+		const updatedList = list.filter((item) => item.id !== id);
+		setList(updatedList);
+	};
+
+	const editp = (id) => {
+		openEditProjectModal(id);
+		setIdd(id);
+	};
+
+	// Change Project View
+	const onChangeProjectView = (e) => {
+		setView(e.target.value);
+	};
+
 	// Open Add Project Modal
 	const openAddProjectModal = () => setIsAddProjectModalVisible(true);
 	const closeAddProjectModal = () => setIsAddProjectModalVisible(false);
@@ -131,70 +155,39 @@ const ProjectList = () => {
 	const openEditProjectModal = () => setIsEditProjectModalVisible(true);
 	const closeEditProjectModal = () => setIsEditProjectModalVisible(false);
 
-	// Delete Project
-	const deleteItem = (id) => {
-		dispatch(DeletePro(id)); // Assuming DeletePro is a redux action
-		const updatedList = list.filter((item) => item.id !== id); // Update the list after deletion
-		setList(updatedList); // Set the updated list in the state
-	};
-	
-
-	const editp = (id) => {
-		openEditProjectModal(id)
-		setIdd(id)
-	};
-
-	// Change Project View
-	const onChangeProjectView = (e) => {
-		setView(e.target.value);
-	};
-
-
-
 	// Generate Action Menu for Dropdown
 	const dropdownMenu = (id) => (
 		<Menu>
-		
-
-
-								<Menu.Item key="edit"  onClick={() => editp(id)}>
-								<EditOutlined /> Edit
-							</Menu.Item>
-
-
-								<Menu.Item key="delete" onClick={() => deleteItem(id)}>
-								<DeleteOutlined /> Delete
-							</Menu.Item>
-
+			<Menu.Item key="edit" onClick={() => editp(id)}>
+				<EditOutlined /> Edit
+			</Menu.Item>
+			<Menu.Item key="delete" onClick={() => deleteItem(id)}>
+				<DeleteOutlined /> Delete
+			</Menu.Item>
 		</Menu>
 	);
 
-	// Get employee data from Redux store
-	const allEmployeeData = useSelector((state) => state.employee);
-	const empData = allEmployeeData?.employee?.data || [];
-
 	const tableColumns = [
-		
 		{
-            title: 'Project',
-            dataIndex: 'name',
-            key: 'name',
-            render: (name, record) => (
-                <div 
-                    onClick={() => handleProjectClick(record.id)}
-                    className="cursor-pointer hover:text-blue-600"
-                >
-                    <h4 className="mb-0">{name}</h4>
-                    {/* <span className="text-gray-500">{record.project_category}</span> */}
-                </div>
-            ),
-        },
+			title: 'Project',
+			dataIndex: 'name',
+			key: 'name',
+			render: (name, record) => (
+				<div
+					onClick={() => handleProjectClick(record.id)}
+					className="cursor-pointer hover:text-blue-600"
+				>
+					<h4 className="mb-0">{name}</h4>
+					{/* <span className="text-gray-500">{record.project_category}</span> */}
+				</div>
+			),
+		},
 		{
 			title: 'Budget',
 			dataIndex: 'totalTask',
 			key: 'totalTask',
 			render: (totalTask) => (
-				<div>
+				<div className="font-semibold">
 					<span>{totalTask}</span>
 				</div>
 			),
@@ -210,53 +203,45 @@ const ProjectList = () => {
 		},
 		{
 			title: 'Project Members',
-			dataIndex: 'project_members',
-			key: 'project_members',
+			dataIndex: 'member',
+			key: 'member',
 			render: (members) => {
-				if (!members) return <span>No members</span>;
-				
-				try {
-					// Parse the project_members string to get array of member IDs
-					const parsedMembers = typeof members === 'string' 
-						? JSON.parse(members).project_members 
-						: members.project_members;
+				if (!members || members.length === 0) return <span>No members</span>;
 
-					if (!parsedMembers || !Array.isArray(parsedMembers)) {
-						return <span>No members</span>;
-					}
-
-					// Find employee details for each member ID
-					const memberDetails = parsedMembers.map(memberId => {
-						const employee = empData.find(emp => emp.id === memberId);
-						return employee;
-					}).filter(Boolean); // Remove any undefined values
-
-					return (
-						<Avatar.Group maxCount={3}>
-							{memberDetails.map((employee, index) => (
-								<Tooltip 
-									key={employee.id} 
-									title={`${employee.firstName} ${employee.lastName || ''}`}
+				return (
+					<div className="flex items-center">
+						<Avatar.Group
+							maxCount={3}
+							size="small"
+							className="flex items-center"
+						>
+							{members.map((member, index) => (
+								<Tooltip
+									key={member.id}
+									title={member.name}
+									placement="top"
 								>
-									<Avatar 
-										src={employee.profilePic}
-										className="rounded-full"
+									<Avatar
+										src={member.img}
+										style={{
+											backgroundColor: !member.img ? `hsl(${index * 50 % 360}, 70%, 50%)` : 'transparent',
+											border: '2px solid #fff',
+											cursor: 'pointer'
+										}}
+										className="shadow-sm hover:opacity-80 transition-opacity"
 									>
-										{employee.firstName?.[0] || 'U'}
+										{!member.img && member.initials}
 									</Avatar>
 								</Tooltip>
 							))}
-							{memberDetails.length > 3 && (
-								<div className="ml-2">
-									+{memberDetails.length - 3} more
-								</div>
-							)}
 						</Avatar.Group>
-					);
-				} catch (error) {
-					console.error('Error parsing project members:', error);
-					return <span>Error displaying members</span>;
-				}
+						{members.length > 3 && (
+							<span className="ml-2 text-gray-500 text-sm">
+								+{members.length - 3}
+							</span>
+						)}
+					</div>
+				);
 			}
 		},
 		{
@@ -277,15 +262,13 @@ const ProjectList = () => {
 		},
 		{
 			title: 'Start Date',
-			dataIndex: 'startDate',
+			dataIndex: 'formattedStartDate',
 			key: 'startDate',
-			render: (date) => date ? new Date(date).toLocaleDateString('en-GB') : 'N/A'
 		},
 		{
 			title: 'End Date',
-			dataIndex: 'endDate',
+			dataIndex: 'formattedEndDate',
 			key: 'endDate',
-			render: (date) => date ? new Date(date).toLocaleDateString('en-GB') : 'N/A'
 		},
 		{
 			title: 'Action',
@@ -314,28 +297,28 @@ const ProjectList = () => {
 				<div className="container-fluid">
 					<div className='flex justify-between items-center '>
 						<h2 className='text-xl font-medium font-family-Roboto'>Projects</h2>
-					<Flex className="p-2 flex justify-end">
-						<div className='flex gap-3 justify-end'>
-							<Radio.Group defaultValue={VIEW_GRID} onChange={onChangeProjectView}>
-								<Radio.Button value={VIEW_GRID}>
-									<AppstoreOutlined />
-								</Radio.Button>
-								<Radio.Button value={VIEW_LIST}>
-									<UnorderedListOutlined />
-								</Radio.Button>
-							</Radio.Group>
+						<Flex className="p-2 flex justify-end">
+							<div className='flex gap-3 justify-end'>
+								<Radio.Group defaultValue={VIEW_GRID} onChange={onChangeProjectView}>
+									<Radio.Button value={VIEW_GRID}>
+										<AppstoreOutlined />
+									</Radio.Button>
+									<Radio.Button value={VIEW_LIST}>
+										<UnorderedListOutlined />
+									</Radio.Button>
+								</Radio.Group>
 								<Button type="primary" icon={<PlusOutlined />} onClick={openAddProjectModal} className="flex items-center">
 									New Project
 								</Button>
-						</div>
-					</Flex>
+							</div>
+						</Flex>
 
 					</div>
 				</div>
 			</PageHeaderAlt>
 
 			<div className="my-4 container-fluid">
-				{view === VIEW_LIST  ? (
+				{view === VIEW_LIST ? (
 					<Table
 						columns={tableColumns}
 						dataSource={list}
@@ -346,10 +329,10 @@ const ProjectList = () => {
 					<Row gutter={[24, 24]} className="project-list-container">
 						{list?.map((item) => {
 							let statusColor = item.dayleft > 10 ? '#52c41a' : item.dayleft > 5 ? '#faad14' : '#f5222d';
-							
+
 							return (
 								<Col xs={24} sm={12} lg={8} xxl={6} key={item.id}>
-									<Card 
+									<Card
 										hoverable
 										className="project-card rounded-xl border-0"
 										style={{
@@ -360,7 +343,7 @@ const ProjectList = () => {
 										bodyStyle={{ padding: '0' }}
 									>
 										{/* Status Bar */}
-										<div 
+										<div
 											className="h-1.5 rounded-t-xl"
 											style={{ backgroundColor: statusColor }}
 										/>
@@ -375,7 +358,7 @@ const ProjectList = () => {
 															{item.tag || 'No Tag'}
 														</Tag>
 													</div> */}
-													<h4 
+													<h4
 														onClick={() => handleProjectClick(item.id)}
 														className="text-lg font-semibold hover:text-blue-600 cursor-pointer mb-1 line-clamp-2"
 														style={{ color: '#2c3e50' }}
@@ -385,8 +368,8 @@ const ProjectList = () => {
 													<p className="text-gray-500 text-sm mb-0">{item.category}</p>
 												</div>
 												<Dropdown overlay={dropdownMenu(item.id)} trigger={['click']}>
-													<Button 
-														type="text" 
+													<Button
+														type="text"
 														icon={<EllipsisOutlined />}
 														className="hover:bg-gray-100"
 													/>
@@ -394,7 +377,7 @@ const ProjectList = () => {
 											</div>
 
 											{/* Progress Section */}
-											
+
 
 											{/* Info Grid */}
 											<div className="grid grid-cols-2 gap-3 mb-4">
@@ -402,11 +385,11 @@ const ProjectList = () => {
 													<DollarOutlined className="text-blue-500 mr-2" />
 													<div>
 														<p className="text-xs text-gray-500 m-0">Budget</p>
-														<p className="text-sm font-semibold m-0">₹{item.totalTask}</p>
+														<p className="text-sm font-semibold m-0">{item.totalTask}</p>
 													</div>
 												</div>
 												<div className="flex items-center p-2.5 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-													<ClockCircleOutlined 
+													<ClockCircleOutlined
 														className="mr-2"
 														style={{ color: statusColor }}
 													/>
@@ -429,29 +412,35 @@ const ProjectList = () => {
 											<div className="flex items-center justify-between bg-gray-50 p-2 rounded-lg">
 												<div className="flex items-center gap-2">
 													<TeamOutlined className="text-blue-500" />
-													<Avatar.Group 
+													<Avatar.Group
 														maxCount={4}
 														size="small"
 														className="flex items-center"
 													>
 														{item.member?.map((member, index) => (
-															<Tooltip title={member.name} key={index}>
-																<Avatar 
+															<Tooltip
+																key={member.id}
+																title={member.name}
+																placement="top"
+															>
+																<Avatar
 																	src={member.img}
 																	style={{
+																		backgroundColor: !member.img ? `hsl(${index * 50 % 360}, 70%, 50%)` : 'transparent',
 																		border: '2px solid #fff',
-																		backgroundColor: member.img ? 'transparent' : '#1890ff'
+																		cursor: 'pointer'
 																	}}
+																	className="shadow-sm hover:opacity-80 transition-opacity"
 																>
-																	{member.name[0]}
+																	{!member.img && member.initials}
 																</Avatar>
 															</Tooltip>
 														))}
 													</Avatar.Group>
 												</div>
 												{item.member?.length > 4 && (
-													<Tag className="bg-blue-50 text-blue-600 border-0">
-														+{item.member.length - 4}
+													<Tag className="bg-blue-50 text-blue-600 border-0 flex items-center">
+														<span className="text-sm">+{item.member.length - 4}</span>
 													</Tag>
 												)}
 											</div>

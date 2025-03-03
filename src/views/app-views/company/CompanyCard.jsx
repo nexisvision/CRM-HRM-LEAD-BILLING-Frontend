@@ -211,28 +211,28 @@ const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) =>
   return (
     <>
       <Card
-        className="transform transition-all duration-300 hover:shadow-xl rounded-lg border border-gray-200 overflow-hidden"
+        className="transform transition-all duration-300 hover:shadow-xl rounded-lg border border-gray-200 overflow-hidden w-full"
         bodyStyle={{ padding: 0 }}
       >
         {/* Company Header */}
         <div className="relative">
           {/* Background Pattern - Professional Gradient */}
           <div
-            className="h-28 relative overflow-hidden"
+            className="h-24 sm:h-28 relative overflow-hidden"
             style={{
               background: 'linear-gradient(135deg, #F0F7FF 0%, #E6F0FF 100%)',
             }}
           >
             {/* Decorative Elements */}
             <div
-              className="absolute top-0 right-0 w-32 h-32 transform rotate-45 translate-x-16 -translate-y-16"
+              className="absolute top-0 right-0 w-24 sm:w-32 h-24 sm:h-32 transform rotate-45 translate-x-16 -translate-y-16"
               style={{
                 background: 'linear-gradient(135deg, rgba(24, 144, 255, 0.1) 0%, rgba(24, 144, 255, 0.05) 100%)',
                 borderRadius: '50%'
               }}
             />
             <div
-              className="absolute bottom-0 left-0 w-24 h-24 transform -translate-x-8 translate-y-8"
+              className="absolute bottom-0 left-0 w-20 sm:w-24 h-20 sm:h-24 transform -translate-x-8 translate-y-8"
               style={{
                 background: 'linear-gradient(135deg, rgba(24, 144, 255, 0.08) 0%, rgba(24, 144, 255, 0.03) 100%)',
                 borderRadius: '50%'
@@ -241,10 +241,10 @@ const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) =>
           </div>
 
           {/* Company Avatar with Enhanced Styling */}
-          <div className="absolute -bottom-6 left-6">
+          <div className="absolute -bottom-4 sm:-bottom-6 left-4 sm:left-6">
             <div className="ring-4 ring-white rounded-full shadow-lg">
               <Avatar
-                size={68}
+                size={{ xs: 56, sm: 68, md: 68, lg: 68, xl: 68, xxl: 68 }}
                 src={company.profilePic}
                 icon={!company.profilePic && <UserOutlined />}
                 className="shadow-sm"
@@ -265,33 +265,33 @@ const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) =>
             >
               <Button
                 type="default"
-                className="border-0 shadow-sm flex items-center justify-center w-9 h-9 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
+                className="border-0 shadow-sm flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 bg-white/90 hover:bg-white hover:shadow-md transition-all duration-200"
                 style={{
                   borderRadius: '10px',
                   padding: 0
                 }}
               >
-                <MoreOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
+                <MoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
               </Button>
             </Dropdown>
           </div>
 
           {/* Enhanced Status Badge */}
-          <div className="absolute top-4 right-14">
+          <div className="absolute top-4 right-12 sm:right-14">
             {(() => {
               const statusStyle = getStatusStyles(hasActiveSubscription);
               return (
                 <Tag
-                  className="rounded-full px-3.5 py-1.5 flex items-center gap-1.5 transition-all duration-300 cursor-default"
+                  className="rounded-full px-2.5 sm:px-3.5 py-1 sm:py-1.5 flex items-center gap-1.5 transition-all duration-300 cursor-default"
                   style={{
                     background: statusStyle.background,
                     color: statusStyle.color,
                     border: statusStyle.border,
                     boxShadow: statusStyle.boxShadow,
-                    fontSize: '11px',
+                    fontSize: '10px',
                     fontWeight: 700,
                     lineHeight: '1',
-                    minHeight: '24px',
+                    minHeight: '20px',
                     textTransform: 'uppercase',
                     letterSpacing: '0.04em',
                     backdropFilter: 'blur(8px)',
@@ -308,7 +308,7 @@ const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) =>
                     e.currentTarget.style.transform = 'translateY(1px)';
                   }}
                 >
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1">
                     {statusStyle.icon}
                     <span style={{
                       position: 'relative',
@@ -325,97 +325,78 @@ const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) =>
         </div>
 
         {/* Company Info Section */}
-        <div className="pt-10 px-6 pb-4">
+        <div className="pt-8 sm:pt-10 px-4 sm:px-6 pb-4">
           {/* Company Name and Basic Info */}
           <div className="mb-4">
-            <h3 className="text-lg font-semibold text-gray-800 mb-1">
-              {company.name}
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-1 truncate">
+              {company.username}
             </h3>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <MailOutlined className="text-blue-500" />
-                <span className="text-sm text-gray-600">{company.email}</span>
+            <div className="flex flex-col gap-1.5 sm:gap-2">
+              <div className="flex items-center gap-2 overflow-hidden">
+                <MailOutlined className="text-blue-500 flex-shrink-0" />
+                <span className="text-sm text-gray-600 truncate">{company.email}</span>
               </div>
-              {company.phone && (
-                <div className="flex items-center gap-2">
-                  <PhoneOutlined className="text-green-500" />
-                  <span className="text-sm text-gray-600">{company.phone}</span>
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                <PhoneOutlined className="text-green-500 flex-shrink-0" />
+                <span className="text-sm text-gray-600 truncate">{company.phone || 'Not Available'}</span>
+              </div>
             </div>
           </div>
 
           {/* Company Details */}
-          <div className="border-t border-gray-100 pt-4 mb-4">
-            <h4 className="text-sm font-medium text-gray-700 mb-3">Company Details</h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-gray-500">Registration No.</p>
-                <p className="text-sm font-medium text-gray-800">
-                  {company.registrationNumber || 'Not Available'}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500">Tax ID</p>
-                <p className="text-sm font-medium text-gray-800">
-                  {company.taxId || 'Not Available'}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500">Website</p>
-                <p className="text-sm font-medium text-gray-800">
-                  {company.website || 'Not Available'}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500">Industry</p>
-                <p className="text-sm font-medium text-gray-800">
-                  {company.industry || 'Not Available'}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Banking Information */}
           <div className="border-t border-gray-100 pt-4">
-            <h4 className="text-sm font-medium text-gray-700 mb-3">Banking Information</h4>
-            <div className="space-y-3">
+            <h4 className="text-sm font-medium text-gray-700 mb-3">Company Details</h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <p className="text-xs text-gray-500">Bank Name</p>
-                <p className="text-sm font-medium text-gray-800">
-                  {company.bankName || 'Not Available'}
-                </p>
+                <p className="text-xs text-gray-500">Employee ID</p>
+                <Tooltip title={company.employeeId || 'Not Available'}>
+                  <p className="text-sm font-medium text-gray-800 truncate">
+                    {company.employeeId || 'Not Available'}
+                  </p>
+                </Tooltip>
               </div>
               <div>
-                <p className="text-xs text-gray-500">Account Number</p>
-                <p className="text-sm font-medium text-gray-800">
-                  {company.accountNumber || 'Not Available'}
-                </p>
+                <p className="text-xs text-gray-500">GST Number</p>
+                <Tooltip title={company.gstIn || 'Not Available'}>
+                  <p className="text-sm font-medium text-gray-800 truncate">
+                    {company.gstIn || 'Not Available'}
+                  </p>
+                </Tooltip>
               </div>
               <div>
-                <p className="text-xs text-gray-500">IFSC Code</p>
-                <p className="text-sm font-medium text-gray-800">
-                  {company.ifscCode || 'Not Available'}
-                </p>
+                <p className="text-xs text-gray-500">Address</p>
+                <Tooltip title={company.address || 'Not Available'}>
+                  <p className="text-sm font-medium text-gray-800 truncate">
+                    {company.address || 'Not Available'}
+                  </p>
+                </Tooltip>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">State</p>
+                <Tooltip title={company.state || 'Not Available'}>
+                  <p className="text-sm font-medium text-gray-800 truncate">
+                    {company.state || 'Not Available'}
+                  </p>
+                </Tooltip>
               </div>
             </div>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="px-6 pb-6 space-y-3">
+        <div className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-2 sm:space-y-3">
           {hasActiveSubscription ? (
             <Button
               type="default"
               icon={<RocketOutlined />}
               block
-              className="h-10 flex items-center justify-center border-green-400 text-green-600 bg-green-50 hover:bg-green-100 transition-colors duration-200"
+              className="h-9 sm:h-10 flex items-center justify-center border-green-400 text-green-600 bg-green-50 hover:bg-green-100 transition-colors duration-200"
               style={{
                 borderWidth: '1px',
                 borderRadius: '8px'
               }}
             >
-              <span className="font-medium">Subscribed Plan Active</span>
+              <span className="font-medium text-sm sm:text-base">Subscribed Plan Active</span>
             </Button>
           ) : (
             <Button
@@ -423,25 +404,25 @@ const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) =>
               icon={<RocketOutlined />}
               block
               onClick={() => onUpgrade(company.id)}
-              className="h-10 text-blue-600 border-blue-600 hover:bg-blue-50 flex items-center justify-center transition-all duration-200"
+              className="h-9 sm:h-10 text-blue-600 border-blue-600 hover:bg-blue-50 flex items-center justify-center transition-all duration-200"
               style={{ borderRadius: '8px' }}
             >
-              <span className="font-medium">Upgrade to Premium</span>
+              <span className="font-medium text-sm sm:text-base">Upgrade to Premium</span>
             </Button>
           )}
         </div>
 
         {/* Login Button with Enhanced Styling */}
-        <div className="px-6 pb-6">
+        <div className="px-4 sm:px-6 pb-4 sm:pb-6">
           <Button
             type="primary"
             icon={<LoginOutlined />}
             block
             onClick={() => handleLoginAsCompany(company)}
-            className="bg-blue-600 hover:bg-blue-700 h-10 flex items-center justify-center shadow-sm transition-all duration-200"
+            className="bg-blue-600 hover:bg-blue-700 h-9 sm:h-10 flex items-center justify-center shadow-sm transition-all duration-200"
             style={{ borderRadius: '8px' }}
           >
-            <span className="font-medium">Login as Company</span>
+            <span className="font-medium text-sm sm:text-base">Login as Company</span>
           </Button>
         </div>
       </Card>

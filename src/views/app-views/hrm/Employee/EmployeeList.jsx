@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Menu, Input, message, Button, Modal, Select, Switch, Badge } from "antd";
+import { Card, Table, Menu, Input, message, Button, Modal, Select, Switch, Badge, Avatar, Tag } from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
@@ -446,31 +446,49 @@ const EmployeeList = () => {
   // Update your tableColumns to include salary status
   const tableColumns = [
     {
-      title: "profilePic",
+      title: "Employee",
       dataIndex: 'profilePic',
       render: (_, record) => (
-        <AvatarStatus
-          src={record.profilePic}
-          name={record.username || record.firstName}
-          size={40}
-        />
+        <div className="flex items-center">
+          <div className="mr-3">
+            {record.profilePic ? (
+              <Avatar
+                src={record.profilePic}
+                size={40}
+                className="border-2 border-white shadow-md"
+              />
+            ) : (
+              <Avatar
+                size={40}
+                className="bg-indigo-600 border-2 border-white shadow-md flex items-center justify-center"
+              >
+                {record.firstName?.charAt(0)?.toUpperCase() || record.username?.charAt(0)?.toUpperCase() || 'U'}
+              </Avatar>
+            )}
+          </div>
+          <div>
+            <div className="font-medium text-gray-900">
+              {record.firstName && record.lastName
+                ? `${record.firstName} ${record.lastName}`
+                : record.username || 'N/A'
+              }
+            </div>
+            <div className="text-gray-500 text-sm">
+              {record.email || 'No email'}
+            </div>
+          </div>
+        </div>
       ),
-    },
-    {
-      title: "User",
-      dataIndex: "username",
-      sorter: {
-        compare: (a, b) => {
-          if (a.username && b.username) {
-            return a.username.localeCompare(b.username);
-          }
-          return 0;
-        },
-      },
     },
     {
       title: "Branch",
       dataIndex: "branch",
+      render: (branch) => (
+        <div className="flex items-center">
+          <span className={`w-2 h-2 rounded-full mr-2 ${branch ? 'bg-green-500' : 'bg-gray-400'}`}></span>
+          <span className="text-gray-700">{branch || 'N/A'}</span>
+        </div>
+      ),
       sorter: {
         compare: (a, b) => {
           if (a.branch && b.branch) {
@@ -483,6 +501,11 @@ const EmployeeList = () => {
     {
       title: "Department",
       dataIndex: "department",
+      render: (department) => (
+        <Tag color="blue" className="text-sm px-3 py-1 rounded-full font-medium">
+          {department || 'N/A'}
+        </Tag>
+      ),
       sorter: {
         compare: (a, b) => {
           if (a.department && b.department) {
@@ -495,6 +518,11 @@ const EmployeeList = () => {
     {
       title: "Designation",
       dataIndex: "designation",
+      render: (designation) => (
+        <Tag color="purple" className="text-sm px-3 py-1 rounded-full font-medium">
+          {designation || 'N/A'}
+        </Tag>
+      ),
       sorter: {
         compare: (a, b) => {
           if (a.designation && b.designation) {
@@ -507,9 +535,11 @@ const EmployeeList = () => {
     {
       title: "Date OF Joining",
       dataIndex: "joiningDate",
-      render: (text) => {
-        return text ? moment(text).format('DD-MM-YYYY') : 'N/A';
-      },
+      render: (text) => (
+        <div className="text-gray-600">
+          {text ? moment(text).format('DD MMM YYYY') : 'N/A'}
+        </div>
+      ),
       sorter: {
         compare: (a, b) => moment(a.joiningDate) - moment(b.joiningDate),
       },
@@ -517,9 +547,11 @@ const EmployeeList = () => {
     {
       title: "Leave Date",
       dataIndex: "leaveDate",
-      render: (text) => {
-        return text ? moment(text).format('DD-MM-YYYY') : 'N/A';
-      },
+      render: (text) => (
+        <div className="text-gray-600">
+          {text ? moment(text).format('DD MMM YYYY') : 'N/A'}
+        </div>
+      ),
       sorter: {
         compare: (a, b) => moment(a.leaveDate) - moment(b.leaveDate),
       },
@@ -538,12 +570,17 @@ const EmployeeList = () => {
               checkedChildren="Paid"
               unCheckedChildren="Unpaid"
               disabled={!(whorole === "super-admin" || whorole === "client" || canEditClient)}
+              className={`${salaryRecord?.status === 'paid' ? 'bg-green-500' : 'bg-gray-400'} shadow-sm`}
             />
             <Badge
               status={salaryRecord?.status === 'paid' ? 'success' : 'error'}
-              text={salaryRecord?.status
-                ? salaryRecord.status.charAt(0).toUpperCase() + salaryRecord.status.slice(1)
-                : 'No Salary'}
+              text={
+                <span className="text-sm font-medium">
+                  {salaryRecord?.status
+                    ? salaryRecord.status.charAt(0).toUpperCase() + salaryRecord.status.slice(1)
+                    : 'No Salary'}
+                </span>
+              }
             />
           </div>
         );
@@ -690,172 +727,157 @@ const EmployeeList = () => {
   };
 
   return (
-    <Card bodyStyle={{ padding: "-3px" }}>
-      <Flex
-        alignItems="center"
-        justifyContent="space-between"
-        mobileFlex={false}
-      >
-        <Flex className="mb-1" mobileFlex={false}>
-          <div className="mr-md-3 mb-3">
-            <Input
-              placeholder="Search by name, department, designation..."
-              prefix={<SearchOutlined />}
-              onChange={onSearch}
-              value={searchText}
-              allowClear
-            />
-          </div>
-          <div className="mr-md-3 mb-3">
-            <BranchFilter />
-          </div>
-        </Flex>
-        <Flex gap="7px">
-
-
-
-          {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
+    <Card bodyStyle={{ padding: "0" }} className="shadow-lg rounded-xl overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 p-6 border-b border-gray-100">
+        <Flex
+          alignItems="center"
+          justifyContent="space-between"
+          mobileFlex={false}
+        >
+          <Flex className="mb-1" mobileFlex={false}>
+            <div className="mr-md-3 mb-3">
+              <Input
+                placeholder="Search employees..."
+                prefix={<SearchOutlined className="text-gray-400" />}
+                onChange={onSearch}
+                allowClear
+                className="min-w-[250px] hover:border-indigo-400 focus:border-indigo-500"
+                style={{ borderRadius: '8px' }}
+              />
+            </div>
+            <div className="mb-3 ml-2">
+              <BranchFilter />
+            </div>
+          </Flex>
+          <Flex gap="7px">
+            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) && (
+              <Button
+                type="primary"
+                className="rounded-lg flex items-center shadow-md hover:shadow-lg transition-all"
+                onClick={openAddEmployeeModal}
+              >
+                <PlusOutlined />
+                Add Employee
+              </Button>
+            )}
             <Button
               type="primary"
-              className="ml-2 mb-5"
-              onClick={openAddEmployeeModal}
+              icon={<FileExcelOutlined />}
+              onClick={exportToExcel}
+              className="rounded-lg shadow-md hover:shadow-lg transition-all"
             >
-              <PlusOutlined />
-              <span>New</span>
+              Export
             </Button>
-
-          ) : null}
-
-
-          <Button
-            type="primary"
-            icon={<FileExcelOutlined />}
-            onClick={exportToExcel} // Call export function when the button is clicked
-            block
-          >
-            Export All
-          </Button>
+          </Flex>
         </Flex>
-      </Flex>
-      <div className="table-responsive mt-2">
-
-        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-          <Table columns={tableColumns} dataSource={getFilteredEmployees()} rowKey="id" />
-
-        ) : null}
-
-
       </div>
-      <UserView
-        data={selectedUser}
-        visible={userProfileVisible}
-        close={closeUserProfile}
-      />
+      <div className="overflow-hidden">
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
+          <Table
+            columns={tableColumns}
+            dataSource={getFilteredEmployees()}
+            rowKey="id"
+            className="ant-table-striped"
+            rowClassName={(record, index) =>
+              index % 2 === 0 ? 'bg-gray-50 hover:bg-gray-100 transition-colors' : 'bg-white hover:bg-gray-50 transition-colors'
+            }
+          />
+        )}
+      </div>
 
       <Modal
-        title={<span className="ms-5">Add Employee</span>}
+        title={
+          <div className="flex items-center gap-2 text-indigo-600">
+            <PlusOutlined className="text-xl" />
+            <span>Add New Employee</span>
+          </div>
+        }
         visible={isAddEmployeeModalVisible}
         onCancel={closeAddEmployeeModal}
         footer={null}
-        width={1000}
-        className="mt-[-70px]"
+        width={800}
+        className="custom-modal"
       >
-        <AddEmployee onClose={closeAddEmployeeModal} setSub={setSub} />
+        <AddEmployee onClose={closeAddEmployeeModal} />
       </Modal>
+
       <Modal
-        title="Edit Employee"
+        title={
+          <div className="flex items-center gap-2 text-indigo-600">
+            <EditOutlined className="text-xl" />
+            <span>Edit Employee</span>
+          </div>
+        }
         visible={isEditEmployeeModalVisible}
         onCancel={closeEditEmployeeModal}
         footer={null}
-        width={1000}
-        className="mt-[-70px]"
+        width={800}
+        className="custom-modal"
       >
-        <EditEmployee
-          onClose={closeEditEmployeeModal}
-          employeeIdd={selectedEmployeeId}
-        />
+        <EditEmployee onClose={closeEditEmployeeModal} idd={selectedEmployeeId} />
       </Modal>
 
       <Modal
-        title={<span className="text-2xl font-bold">Employee Details</span>}
         visible={isViewEmployeeModalVisible}
         onCancel={closeViewEmployeeModal}
         footer={null}
-        width={1000}
-        className="mt-[-80px]"
+        width={800}
+        className="custom-modal"
       >
-        <ViewEmployee onClose={closeViewEmployeeModal} employeeIdd={selectedEmployeeId} />
+        <ViewEmployee employeeIdd={selectedEmployeeId} visible={isViewEmployeeModalVisible} close={closeViewEmployeeModal} />
       </Modal>
-
-      {/* <Modal
-        title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <MailOutlined />
-            <span>Email Verification</span>
-          </div>
-        }
-        visible={isEmailVerificationModalVisible}
-        onCancel={() => setIsEmailVerificationModalVisible(false)}
-        footer={[
-          <Button key="cancel" onClick={() => setIsEmailVerificationModalVisible(false)}>
-            Cancel
-          </Button>,
-          <Button key="submit" type="primary" onClick={handleSendOTP}>
-            Send OTP
-          </Button>
-        ]}
-        width={400}
-      >
-        <div>
-          <div style={{ marginBottom: '8px' }}>
-          Email Address <span style={{ color: '#ff4d4f' }}>*</span> 
-          </div>
-          <Input 
-            placeholder="Enter your email"
-            value={initialValues.email}
-            onChange={(e) => setInitialValues({ email: e.target.value })}
-          />
-        </div>
-      </Modal>
-
-      <Modal
-        title={
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <MailOutlined />
-            <span>Verify OTP</span>
-          </div>
-        }
-        visible={isOtpModalVisible}
-        onCancel={() => setIsOtpModalVisible(false)}
-        footer={[
-          <Button key="cancel" onClick={() => setIsOtpModalVisible(false)}>
-            Cancel
-          </Button>,
-          <Button key="submit" type="primary" onClick={handleVerifyOTP}>
-            Verify OTP
-          </Button>
-        ]}
-        width={400}
-      >
-        <div>
-          <div>{emailForOtp}</div>
-          <div style={{ marginBottom: '8px', marginTop: '16px' }}>
-            <span style={{ color: '#ff4d4f' }}>*</span> Enter OTP
-          </div>
-          <Input 
-            placeholder="Enter 6-digit OTP"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-          />
-        </div>
-      </Modal> */}
 
       <EmailVerification
         visible={isEmailVerificationModalVisible}
         onCancel={() => setIsEmailVerificationModalVisible(false)}
-        initialEmail={initialValues.email}
+        initialEmail={users.find(user => user.id === comnyid)?.email}
         idd={comnyid}
       />
+
+      <style jsx global>{`
+        .custom-modal .ant-modal-content {
+          border-radius: 16px;
+          overflow: hidden;
+        }
+        .custom-modal .ant-modal-header {
+          padding: 16px 24px;
+          background: #f8fafc;
+          border-bottom: 1px solid #e2e8f0;
+        }
+        .custom-modal .ant-modal-body {
+          padding: 24px;
+        }
+        .custom-modal .ant-modal-close {
+          top: 16px;
+          right: 16px;
+        }
+        .ant-table-striped .ant-table-row:nth-child(odd) > td {
+          background-color: #f8fafc;
+        }
+        .ant-table-row:hover > td {
+          background-color: #f1f5f9 !important;
+        }
+        .ant-table-tbody > tr > td {
+          padding: 16px 24px;
+          transition: all 0.2s;
+        }
+        .ant-input-affix-wrapper:hover {
+          border-color: #818cf8;
+        }
+        .ant-input-affix-wrapper-focused {
+          border-color: #6366f1;
+          box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+        }
+        .ant-btn-primary {
+          background: linear-gradient(to right, #4f46e5, #6366f1);
+          border: none;
+          box-shadow: 0 2px 4px rgba(99, 102, 241, 0.1);
+        }
+        .ant-btn-primary:hover {
+          background: linear-gradient(to right, #4338ca, #4f46e5);
+          transform: translateY(-1px);
+        }
+      `}</style>
     </Card>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Dropdown, Avatar, Modal, Form, Input, Upload, Button, message } from 'antd';
+import { Dropdown, Avatar, Modal, Form, Input, Upload, Button, message, Select } from 'antd';
 import { useDispatch, useSelector } from 'react-redux'
 import {
 	EditOutlined,
@@ -13,6 +13,7 @@ import {
 import NavItem from './NavItem';
 import Flex from 'components/shared-components/Flex';
 import { signOut } from 'store/slices/authSlice';
+import { updateUser, getUserById } from 'views/auth-views/auth-reducers/UserSlice';
 import styled from '@emotion/styled';
 import { FONT_WEIGHT, MEDIA_QUERIES, SPACER, FONT_SIZES } from 'constants/ThemeConstant';
 import EditCompany from 'views/app-views/company/EditCompany';
@@ -129,16 +130,25 @@ export const NavProfile = ({ mode }) => {
 		setRoleu(userRole?.role_name || "");
 		setCurrent(currentuser?.loggedInUser?.username || "");
 
-		// Set initial form values for superadmin
-		if (roleu === "superadmin") {
+		// Set initial form values with all available user data
+		if (currentuser?.loggedInUser) {
 			form.setFieldsValue({
 				email: currentuser?.loggedInUser?.email,
 				firstName: currentuser?.loggedInUser?.firstName,
 				lastName: currentuser?.loggedInUser?.lastName,
 				phone: currentuser?.loggedInUser?.phone,
+				address: currentuser?.loggedInUser?.address,
+				state: currentuser?.loggedInUser?.state,
+				gstIn: currentuser?.loggedInUser?.gstIn,
+				accountholder: currentuser?.loggedInUser?.accountholder,
+				accountnumber: currentuser?.loggedInUser?.accountnumber,
+				bankname: currentuser?.loggedInUser?.bankname,
+				ifsc: currentuser?.loggedInUser?.ifsc,
+				banklocation: currentuser?.loggedInUser?.banklocation,
+				accounttype: currentuser?.loggedInUser?.accounttype,
 			});
 		}
-	}, [roles, currentuser, roleu]);
+	}, [roles, currentuser, roleu, form]);
 
 	const handleProfileClick = () => {
 		if (profileRef.current) {
@@ -151,96 +161,254 @@ export const NavProfile = ({ mode }) => {
 		}
 	};
 
-	const handleSuperAdminSubmit = async (values) => {
-		try {
-			// Handle superadmin profile update
-			const formData = new FormData();
-			formData.append('email', values.email);
-			formData.append('firstName', values.firstName);
-			formData.append('lastName', values.lastName);
-			formData.append('phone', values.phone);
-			if (values.password) {
-				formData.append('password', values.password);
+	// Function to refresh user data after profile update
+	const refreshUserData = async () => {
+		if (currentuser?.loggedInUser?.id) {
+			try {
+				await dispatch(getUserById(currentuser.loggedInUser.id));
+			} catch (error) {
+				console.error('Error refreshing user data:', error);
 			}
-			if (values.profilePic) {
-				formData.append('profilePic', values.profilePic);
-			}
-
-			// Dispatch your update action here
-			// await dispatch(updateSuperAdminProfile(formData));
-			message.success('Profile updated successfully');
-			setIsEditModalVisible(false);
-		} catch (error) {
-			message.error('Failed to update profile');
 		}
 	};
 
-	const SuperAdminEditForm = () => (
-		<Form
-			form={form}
-			layout="vertical"
-			onFinish={handleSuperAdminSubmit}
-		>
-			<Form.Item
-				label="Email"
-				name="email"
-				rules={[{ required: true, type: 'email', message: 'Please enter a valid email' }]}
-			>
-				<Input />
-			</Form.Item>
+	const handleSuperAdminSubmit = async (values) => {
+		try {
+			// Create form data for user update
+			const formData = new FormData();
 
-			<Form.Item
-				label="First Name"
-				name="firstName"
-				rules={[{ required: true, message: 'Please enter your first name' }]}
-			>
-				<Input />
-			</Form.Item>
+			// Add user ID to formData
+			formData.append('id', currentuser?.loggedInUser?.id);
 
-			<Form.Item
-				label="Last Name"
-				name="lastName"
-				rules={[{ required: true, message: 'Please enter your last name' }]}
-			>
-				<Input />
-			</Form.Item>
+			// Loop through all values and append to formData
+			Object.keys(values).forEach(key => {
+				// For all fields except profilePic
+				if (key !== 'profilePic') {
+					// Skip empty values, except for fields that can be legitimately empty like password
+					if (values[key] !== undefined && values[key] !== null && (values[key] !== '' || key === 'password')) {
+						formData.append(key, values[key]);
+					}
+				}
+			});
 
-			<Form.Item
-				label="Phone"
-				name="phone"
-				rules={[{ required: true, message: 'Please enter your phone number' }]}
-			>
-				<Input />
-			</Form.Item>
+			// Special handling for profile pic
+			if (values.profilePic && values.profilePic.length > 0) {
+				// Check if it's a new file being uploaded
+				const fileItem = values.profilePic[0];
+				if (fileItem.originFileObj) {
+					formData.append('profilePic', fileItem.originFileObj);
+				}
+			}
 
-			<Form.Item
-				label="New Password"
-				name="password"
-				rules={[{ min: 6, message: 'Password must be at least 6 characters' }]}
-			>
-				<Input.Password />
-			</Form.Item>
+			// For debugging - log the form data (except file contents)
+			console.log('Form data keys being sent:', [...formData.entries()]
+				.map(entry => entry[0] === 'profilePic' ? ['profilePic', '[File object]'] : entry));
 
-			<Form.Item
-				label="Profile Picture"
-				name="profilePic"
+			// Dispatch the update user action
+			const response = await dispatch(updateUser(formData)).unwrap();
+
+			if (response && (response.status === 200 || response.success)) {
+				message.success('Profile updated successfully');
+
+				// Refresh user data after successful update
+				await refreshUserData();
+
+				// Close the modal
+				setIsEditModalVisible(false);
+			} else {
+				throw new Error(response?.message || 'Failed to update profile');
+			}
+		} catch (error) {
+			console.error('Profile update error:', error);
+			message.error(error.message || 'Failed to update profile');
+		}
+	};
+
+	const SuperAdminEditForm = () => {
+		// Get the default file list for the Upload component
+		const getDefaultFileList = () => {
+			if (currentuser?.loggedInUser?.profilePic) {
+				return [
+					{
+						uid: '-1',
+						name: 'Profile Picture',
+						status: 'done',
+						url: currentuser.loggedInUser.profilePic,
+					}
+				];
+			}
+			return [];
+		};
+
+		// Custom normalization for file upload
+		const normFile = (e) => {
+			if (Array.isArray(e)) {
+				return e;
+			}
+			return e?.fileList;
+		};
+
+		return (
+			<Form
+				form={form}
+				layout="vertical"
+				onFinish={handleSuperAdminSubmit}
+				className="grid grid-cols-1 md:grid-cols-2 gap-4"
+				initialValues={{
+					...currentuser?.loggedInUser,
+					password: '' // Initialize password as empty
+				}}
 			>
-				<Upload
-					maxCount={1}
-					beforeUpload={() => false}
-					accept="image/*"
+				<div className="col-span-2">
+					<h3 className="text-lg font-semibold mb-4">Personal Information</h3>
+				</div>
+
+				<Form.Item
+					label="Email"
+					name="email"
+					rules={[{ required: true, type: 'email', message: 'Please enter a valid email' }]}
 				>
-					<Button icon={<UploadOutlined />}>Upload Photo</Button>
-				</Upload>
-			</Form.Item>
+					<Input />
+				</Form.Item>
 
-			<Form.Item>
-				<Button type="primary" htmlType="submit">
-					Update Profile
-				</Button>
-			</Form.Item>
-		</Form>
-	);
+				<Form.Item
+					label="First Name"
+					name="firstName"
+					rules={[{ required: true, message: 'Please enter your first name' }]}
+				>
+					<Input />
+				</Form.Item>
+
+				<Form.Item
+					label="Last Name"
+					name="lastName"
+					rules={[{ required: true, message: 'Please enter your last name' }]}
+				>
+					<Input />
+				</Form.Item>
+
+				<Form.Item
+					label="Phone"
+					name="phone"
+					rules={[{ required: true, message: 'Please enter your phone number' }]}
+				>
+					<Input />
+				</Form.Item>
+
+				<Form.Item
+					label="Address"
+					name="address"
+					className="col-span-2"
+				>
+					<Input.TextArea rows={2} />
+				</Form.Item>
+
+				<Form.Item
+					label="State"
+					name="state"
+				>
+					<Input />
+				</Form.Item>
+
+				<Form.Item
+					label="GST Number"
+					name="gstIn"
+				>
+					<Input />
+				</Form.Item>
+
+				<div className="col-span-2">
+					<h3 className="text-lg font-semibold mb-4 mt-4">Banking Information</h3>
+				</div>
+
+				<Form.Item
+					label="Bank Name"
+					name="bankname"
+				>
+					<Input />
+				</Form.Item>
+
+				<Form.Item
+					label="Account Holder"
+					name="accountholder"
+				>
+					<Input />
+				</Form.Item>
+
+				<Form.Item
+					label="Account Number"
+					name="accountnumber"
+				>
+					<Input />
+				</Form.Item>
+
+				<Form.Item
+					label="IFSC Code"
+					name="ifsc"
+				>
+					<Input />
+				</Form.Item>
+
+				<Form.Item
+					label="Bank Location"
+					name="banklocation"
+				>
+					<Input />
+				</Form.Item>
+
+				<Form.Item
+					label="Account Type"
+					name="accounttype"
+				>
+					<Select>
+						<Select.Option value="saving">Saving</Select.Option>
+						<Select.Option value="current">Current</Select.Option>
+					</Select>
+				</Form.Item>
+
+				<div className="col-span-2">
+					<h3 className="text-lg font-semibold mb-4 mt-4">Security</h3>
+				</div>
+
+				<Form.Item
+					label="New Password"
+					name="password"
+					rules={[{ min: 6, message: 'Password must be at least 6 characters' }]}
+					className="col-span-2"
+				>
+					<Input.Password />
+				</Form.Item>
+
+				<Form.Item
+					label="Profile Picture"
+					name="profilePic"
+					className="col-span-2"
+					valuePropName="fileList"
+					getValueFromEvent={normFile}
+					initialValue={getDefaultFileList()}
+				>
+					<Upload
+						name="profilePic"
+						listType="picture-card"
+						maxCount={1}
+						beforeUpload={() => false}
+						accept="image/*"
+					>
+						<div>
+							<UploadOutlined />
+							<div style={{ marginTop: 8 }}>Upload</div>
+						</div>
+					</Upload>
+				</Form.Item>
+
+				<Form.Item className="col-span-2">
+					<Button type="primary" htmlType="submit" block>
+						Update Profile
+					</Button>
+				</Form.Item>
+			</Form>
+		);
+	};
 
 	const ProfileMenu = () => (
 		<div
@@ -268,8 +436,8 @@ export const NavProfile = ({ mode }) => {
 						alignItems: 'center',
 						gap: '8px'
 					}}
-					className="ant-dropdown-menu-item mt-[12px]" 
-					
+					className="ant-dropdown-menu-item mt-[12px]"
+
 					onClick={() => {
 						setShowProfileMenu(false);
 						if (item.key === 'Edit Profile') {

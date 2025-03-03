@@ -1,48 +1,30 @@
-import React, { useEffect, useState } from "react";
-import { CircularProgressbar } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    ResponsiveContainer,
-} from "recharts";
-import { Button, Modal, Avatar, Tag, Row, Col, Typography, Divider } from "antd";
-import { FaCoins, FaFileInvoiceDollar } from "react-icons/fa";
-import { HiOutlineDotsHorizontal } from "react-icons/hi";
-import { IoLayers } from "react-icons/io5";
-import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { TbClockHour3Filled } from "react-icons/tb";
-import { useDispatch, useSelector } from "react-redux";
-import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
+import React from 'react';
+import { Modal, Avatar, Card, Tag, Row, Col, Typography, Divider } from 'antd';
 import {
     UserOutlined,
     BankOutlined,
     IdcardOutlined,
     MailOutlined,
     PhoneOutlined,
+    TeamOutlined,
+    CalendarOutlined,
+    DollarOutlined,
+    SafetyCertificateOutlined,
+    NumberOutlined,
     GlobalOutlined,
+    ApartmentOutlined,
     CreditCardOutlined,
     BranchesOutlined,
-    NumberOutlined,
+    SolutionOutlined,
     ClockCircleOutlined,
     CheckCircleOutlined,
     CloseOutlined,
-    EnvironmentOutlined,
-    DollarOutlined,
-    TeamOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
-// Register the chart components
-ChartJS.register(ArcElement, Tooltip, Legend);
-
 const { Text, Title } = Typography;
 
-const ViewClient = ({ data, visible, close }) => {
+const UserView = ({ data, visible, close }) => {
     if (!data) return null;
 
     const InfoItem = ({ icon, label, value, color = "text-blue-500" }) => (
@@ -63,13 +45,13 @@ const ViewClient = ({ data, visible, close }) => {
             onCancel={close}
             footer={null}
             width={900}
-            className="client-profile-modal"
+            className="user-profile-modal"
             title={null}
             closeIcon={<CloseOutlined className="text-lg" />}
             bodyStyle={{ padding: 0 }}
         >
             {/* Header Section */}
-            <div className="relative bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 p-8 text-white">
+            <div className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 p-8 text-white">
                 <div className="absolute inset-0 bg-black opacity-5"></div>
                 <div className="absolute inset-0" style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M54.627 0l.83.828-1.415 1.415L51.8 0h2.827zM5.373 0l-.83.828L5.96 2.243 8.2 0H5.374zM48.97 0l3.657 3.657-1.414 1.414L46.143 0h2.828zM11.03 0L7.372 3.657 8.787 5.07 13.857 0H11.03zm32.284 0L49.8 6.485 48.384 7.9l-7.9-7.9h2.83zM16.686 0L10.2 6.485 11.616 7.9l7.9-7.9h-2.83zM22.343 0L13.857 8.485 15.272 9.9l9.9-9.9h-2.83zM32 0l-3.486 3.485-1.414-1.414L30.587 0H32zM0 0c0 3.373 2.73 6.103 6.103 6.103S12.207 3.373 12.207 0H0zm0 10.93c0 3.374 2.73 6.105 6.103 6.105S12.207 14.304 12.207 10.93H0zm0 10.93c0 3.373 2.73 6.104 6.103 6.104S12.207 24.604 12.207 21.23H0zm0 10.93c0 3.373 2.73 6.103 6.103 6.103S12.207 34.977 12.207 31.604H0zm0 10.93c0 3.374 2.73 6.104 6.103 6.104S12.207 45.907 12.207 42.534H0zm0 10.93c0 3.373 2.73 6.103 6.103 6.103S12.207 56.836 12.207 53.463H0z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E")`,
@@ -108,35 +90,35 @@ const ViewClient = ({ data, visible, close }) => {
             {/* Content Section */}
             <div className="p-8 bg-gradient-to-b from-gray-50 to-white">
                 <Row gutter={[48, 24]}>
-                    {/* Personal Details */}
+                    {/* Employment Details */}
                     <Col span={12}>
                         <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-                            <Title level={5} className="mb-6 flex items-center text-purple-700">
-                                <UserOutlined className="mr-2" />
-                                Personal Information
+                            <Title level={5} className="mb-6 flex items-center text-indigo-700">
+                                <SolutionOutlined className="mr-2" />
+                                Employment Information
                             </Title>
                             <InfoItem
-                                icon={<IdcardOutlined />}
-                                label="First Name"
-                                value={data.firstName}
+                                icon={<SafetyCertificateOutlined />}
+                                label="Role"
+                                value={data.role_name}
                                 color="text-green-500"
                             />
                             <InfoItem
                                 icon={<IdcardOutlined />}
-                                label="Last Name"
-                                value={data.lastName}
+                                label="Employee ID"
+                                value={data.employeeId}
                                 color="text-purple-500"
                             />
                             <InfoItem
-                                icon={<TeamOutlined />}
-                                label="Company"
-                                value={data.company}
+                                icon={<ApartmentOutlined />}
+                                label="Department"
+                                value={data.department}
                                 color="text-indigo-500"
                             />
                             <InfoItem
-                                icon={<EnvironmentOutlined />}
-                                label="Location"
-                                value={data.location}
+                                icon={<DollarOutlined />}
+                                label="Salary"
+                                value={data.salary}
                                 color="text-emerald-500"
                             />
                         </div>
@@ -145,14 +127,14 @@ const ViewClient = ({ data, visible, close }) => {
                     {/* Bank Details */}
                     <Col span={12}>
                         <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300">
-                            <Title level={5} className="mb-6 flex items-center text-purple-700">
+                            <Title level={5} className="mb-6 flex items-center text-indigo-700">
                                 <BankOutlined className="mr-2" />
                                 Banking Details
                             </Title>
                             <InfoItem
-                                icon={<UserOutlined />}
-                                label="Account Holder"
-                                value={data.accountholder}
+                                icon={<BankOutlined />}
+                                label="Bank Name"
+                                value={data.bankname}
                                 color="text-blue-500"
                             />
                             <InfoItem
@@ -170,7 +152,7 @@ const ViewClient = ({ data, visible, close }) => {
                             <InfoItem
                                 icon={<BranchesOutlined />}
                                 label="Branch"
-                                value={data.branchname}
+                                value={data.branch}
                                 color="text-red-500"
                             />
                         </div>
@@ -183,31 +165,31 @@ const ViewClient = ({ data, visible, close }) => {
                 <div className="bg-gray-50 rounded-xl p-6">
                     <div className="grid grid-cols-3 gap-4 text-sm">
                         <div className="flex items-center text-gray-600 bg-white rounded-lg p-4 shadow-sm">
-                            <DollarOutlined className="mr-2 text-purple-500" />
-                            <span className="font-medium">Total Earnings:</span>
-                            <span className="ml-2">{data.totalEarnings || '0'}</span>
+                            <UserOutlined className="mr-2 text-indigo-500" />
+                            <span className="font-medium">Created By:</span>
+                            <span className="ml-2">{data.created_by}</span>
                         </div>
                         <div className="flex items-center text-gray-600 bg-white rounded-lg p-4 shadow-sm">
-                            <TeamOutlined className="mr-2 text-indigo-500" />
-                            <span className="font-medium">Total Projects:</span>
-                            <span className="ml-2">{data.totalProjects || '0'}</span>
+                            <CalendarOutlined className="mr-2 text-blue-500" />
+                            <span className="font-medium">Joined:</span>
+                            <span className="ml-2">{dayjs(data.joiningDate).format('DD MMM YYYY')}</span>
                         </div>
                         <div className="flex items-center text-gray-600 bg-white rounded-lg p-4 shadow-sm">
-                            <ClockCircleOutlined className="mr-2 text-blue-500" />
-                            <span className="font-medium">Last Login:</span>
-                            <span className="ml-2">{data.lastLogin ? dayjs(data.lastLogin).format('DD MMM YYYY') : 'Never'}</span>
+                            <ClockCircleOutlined className="mr-2 text-purple-500" />
+                            <span className="font-medium">Updated:</span>
+                            <span className="ml-2">{dayjs(data.updatedAt).format('DD MMM YYYY')}</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <style jsx global>{`
-                .client-profile-modal .ant-modal-content {
+                .user-profile-modal .ant-modal-content {
                     overflow: hidden;
                     border-radius: 16px;
                     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
                 }
-                .client-profile-modal .ant-modal-close {
+                .user-profile-modal .ant-modal-close {
                     position: absolute;
                     top: 20px;
                     right: 20px;
@@ -223,12 +205,12 @@ const ViewClient = ({ data, visible, close }) => {
                     transition: all 0.2s ease;
                     z-index: 1000;
                 }
-                .client-profile-modal .ant-modal-close:hover {
+                .user-profile-modal .ant-modal-close:hover {
                     background: rgba(255, 255, 255, 0.25);
                     transform: scale(1.05);
                     border-color: rgba(255, 255, 255, 0.3);
                 }
-                .client-profile-modal .ant-modal-close-x {
+                .user-profile-modal .ant-modal-close-x {
                     width: 36px;
                     height: 36px;
                     font-size: 18px;
@@ -238,14 +220,14 @@ const ViewClient = ({ data, visible, close }) => {
                     justify-content: center;
                     color: white;
                 }
-                .client-profile-modal .ant-modal-close-x .anticon {
+                .user-profile-modal .ant-modal-close-x .anticon {
                     vertical-align: 0;
                 }
-                .client-profile-modal .ant-tag {
+                .user-profile-modal .ant-tag {
                     font-weight: 500;
                     border-radius: 6px;
                 }
-                .client-profile-modal .ant-divider {
+                .user-profile-modal .ant-divider {
                     border-color: rgba(0,0,0,0.06);
                 }
             `}</style>
@@ -253,4 +235,4 @@ const ViewClient = ({ data, visible, close }) => {
     );
 };
 
-export default ViewClient;
+export default UserView; 

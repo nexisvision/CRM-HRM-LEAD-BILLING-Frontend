@@ -157,7 +157,7 @@ export const SubscribedUserPlansList = () => {
           <span className="ml-2">Edit</span>
         </Flex>
       </Menu.Item>
-     
+
       <Menu.Item>
         <Flex alignItems="center">
           <DeleteOutlined />
@@ -174,18 +174,18 @@ export const SubscribedUserPlansList = () => {
         Modal.confirm({
           title: 'Deactivate Plan',
           content: 'Are you sure you want to deactivate this plan? This action cannot be undone.',
-          okText: 'Yes', 
+          okText: 'Yes',
           cancelText: 'No',
           onOk: async () => {
             try {
               const token = localStorage.getItem('auth_token');
-              
+
               const response = await axios.delete(`http://localhost:5353/api/v1/subscriptions/remove/${id}`, {
                 headers: {
                   'Authorization': `Bearer ${token}`
                 }
               });
-              
+
               if (response.data.success) {
                 message.success('Plan removed successfully');
                 dispatch(getsubplandata());
@@ -209,7 +209,7 @@ export const SubscribedUserPlansList = () => {
       return false;
     }
   };
-  
+
 
   const tableColumns = [
     // {
@@ -367,12 +367,12 @@ export const SubscribedUserPlansList = () => {
             dataSource={users}
             rowKey="id"
             scroll={{ x: 1200 }}
-            // rowSelection={{
-            // 	selectedRowKeys: selectedRowKeys,
-            // 	type: 'checkbox',
-            // 	preserveSelectedRowKeys: false,
-            // 	...rowSelection,
-            // }}
+          // rowSelection={{
+          // 	selectedRowKeys: selectedRowKeys,
+          // 	type: 'checkbox',
+          // 	preserveSelectedRowKeys: false,
+          // 	...rowSelection,
+          // }}
           />
         </div>
 

@@ -9,6 +9,7 @@ import {
   Select,
   Modal,
   message,
+  Avatar,
 } from "antd";
 import {
   EyeOutlined,
@@ -20,10 +21,11 @@ import {
   EditOutlined,
   PlusOutlined,
   FileExcelOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 // import { useNavigate } from 'react-router-dom';
-import UserView from "../client-list/UserView";
+import UserView from "./ViewClient";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
@@ -60,7 +62,7 @@ const ClientList = () => {
     useState(false);
   const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
   const [comnyid, setCompnyid] = useState("");
-  const [clientid,setClientId] = useState("");
+  const [clientid, setClientId] = useState("");
 
   const tabledata = useSelector((state) => state.ClientData);
 
@@ -71,40 +73,40 @@ const ClientList = () => {
 
   const dispatch = useDispatch();
 
- //// permission
-               
-    const roleId = useSelector((state) => state.user.loggedInUser.role_id);
-    const roles = useSelector((state) => state.role?.role?.data);
-    const roleData = roles?.find(role => role.id === roleId);
- 
-    const whorole = roleData.role_name;
- 
-    const parsedPermissions = Array.isArray(roleData?.permissions)
+  //// permission
+
+  const roleId = useSelector((state) => state.user.loggedInUser.role_id);
+  const roles = useSelector((state) => state.role?.role?.data);
+  const roleData = roles?.find(role => role.id === roleId);
+
+  const whorole = roleData.role_name;
+
+  const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
     : typeof roleData?.permissions === 'string'
-    ? JSON.parse(roleData.permissions)
-    : [];
-  
-  
-    let allpermisson;  
- 
-    if (parsedPermissions["extra-users-client-list"] && parsedPermissions["extra-users-client-list"][0]?.permissions) {
-      allpermisson = parsedPermissions["extra-users-client-list"][0].permissions;
-      // console.log('Parsed Permissions:', allpermisson);
-    
-    } else {
-      // console.log('extra-users-client-list is not available');
-    }
-    
-    const canCreateClient = allpermisson?.includes('create');
-    const canEditClient = allpermisson?.includes('edit');
-    const canDeleteClient = allpermisson?.includes('delete');
-    const canViewClient = allpermisson?.includes('view');
- 
-    ///endpermission
+      ? JSON.parse(roleData.permissions)
+      : [];
+
+
+  let allpermisson;
+
+  if (parsedPermissions["extra-users-client-list"] && parsedPermissions["extra-users-client-list"][0]?.permissions) {
+    allpermisson = parsedPermissions["extra-users-client-list"][0].permissions;
+    // console.log('Parsed Permissions:', allpermisson);
+
+  } else {
+    // console.log('extra-users-client-list is not available');
+  }
+
+  const canCreateClient = allpermisson?.includes('create');
+  const canEditClient = allpermisson?.includes('edit');
+  const canDeleteClient = allpermisson?.includes('delete');
+  const canViewClient = allpermisson?.includes('view');
+
+  ///endpermission
 
   const deleteUser = (userId) => {
-   
+
     dispatch(deleteClient(userId));
     setUsers(users.filter((user) => user.id !== userId));
     dispatch(ClientData());
@@ -128,23 +130,23 @@ const ClientList = () => {
     dispatch(ClientData());
   }, [dispatch]);
 
-   const {state} = useLocation();
+  const { state } = useLocation();
 
-   const allddata = useSelector((state)=>state.SubClient.SubClient.data);
-   
-      useEffect(()=>{
-      setClientId(state?.idd) 
-      },[])
-  
-      const matchingClients = allddata?.filter(client => client?.created_by === clientid);
+  const allddata = useSelector((state) => state.SubClient.SubClient.data);
+
+  useEffect(() => {
+    setClientId(state?.idd)
+  }, [])
+
+  const matchingClients = allddata?.filter(client => client?.created_by === clientid);
 
 
   useEffect(() => {
-    if(loggedInUser.username == "superadmin" && !state){
+    if (loggedInUser.username == "superadmin" && !state) {
       setUsers(tabledata.ClientData.data);
-    }else if(state && matchingClients){
+    } else if (state && matchingClients) {
       setUsers(matchingClients)
-    }else{
+    } else {
       if (tabledata && tabledata.ClientData && tabledata.ClientData.data) {
         const filteredUsers = tabledata.ClientData.data.filter(
           (client) => client.created_by === loggedInUser?.username
@@ -170,12 +172,12 @@ const ClientList = () => {
 
   const onSearch = (e) => {
     const searchValue = e.currentTarget.value.toLowerCase();
-    
+
     // First, get the base data according to user role
     let baseData;
-    if(loggedInUser.username === "superadmin" && !state){
+    if (loggedInUser.username === "superadmin" && !state) {
       baseData = tabledata.ClientData.data;
-    } else if(state && matchingClients){
+    } else if (state && matchingClients) {
       baseData = matchingClients;
     } else {
       baseData = tabledata.ClientData.data.filter(
@@ -185,7 +187,7 @@ const ClientList = () => {
 
     // Then apply the search filter on the already filtered data
     if (searchValue) {
-      const filteredData = baseData.filter(user => 
+      const filteredData = baseData.filter(user =>
         user.username.toLowerCase().includes(searchValue)
       );
       setUsers(filteredData);
@@ -216,7 +218,7 @@ const ClientList = () => {
   };
 
   const openEditCompanyModal = (userId) => {
-  
+
     setCompnyid(userId);
     setIsEditCompanyModalVisible(true);
   };
@@ -273,96 +275,70 @@ const ClientList = () => {
 
   const dropdownMenu = (user) => (
     <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            icon={<EyeOutlined />}
-            onClick={() => openViewCompanyModal()}
-            size="small"
-            style={{ display: "block", marginBottom: "8px" }}
-          >
-            View Details
-          </Button>
-        </Flex>
-      </Menu.Item>
-     
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            icon={<PushpinOutlined />}
-            onClick={openResetPasswordModal}
-            size="small"
-            style={{ display: "block", marginBottom: "8px" }}
-          >
-            Reset Password
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            icon={<RocketOutlined />}
-            onClick={openUpgradePlanModal}
-            size="small"
-            style={{ display: "block", marginBottom: "8px" }}
-          >
-            Upgrade Plan
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-     
+      {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              icon={<EyeOutlined />}
+              onClick={() => showUserProfile(user)}
+              size="small"
+              style={{ display: "block", marginBottom: "8px" }}
+            >
+              View Details
+            </Button>
+          </Flex>
+        </Menu.Item>
+      )}
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                             <Menu.Item>
-                             <Flex alignItems="center">
-                               <Button
-                                 type=""
-                                 icon={<EditOutlined />}
-                                 onClick={() => openEditCompanyModal(user.id)}
-                                 size="small"
-                                 style={{ display: "block", marginBottom: "8px" }}
-                               >
-                                 Edit
-                               </Button>
-                             </Flex>
-                           </Menu.Item>
-                    ) : null}
-      
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              icon={<EditOutlined />}
+              onClick={() => openEditCompanyModal(user.id)}
+              size="small"
+              style={{ display: "block", marginBottom: "8px" }}
+            >
+              Edit
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
+
       <Menu.Item>
         <Flex alignItems="center">
           <Button
             type=""
             className="flex items-center gap-2"
-            icon={<MdOutlineEmail/>}
+            icon={<MdOutlineEmail />}
             onClick={() => {
               setIsEmailVerificationModalVisible(true);
               setCompnyid(user.id);
             }}
             size="small"
-            // style={{ display: "block", marginBottom: "8px" }}
+          // style={{ display: "block", marginBottom: "8px" }}
           >
             <span>Update Email</span>
           </Button>
         </Flex>
       </Menu.Item>
-      
+
       {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                       <Menu.Item>
-                       <Flex alignItems="center">
-                         <Button
-                           type=""
-                           icon={<DeleteOutlined />}
-                           onClick={() => deleteUser(user.id)}
-                           size="small"
-                         >
-                           Delete
-                         </Button>
-                       </Flex>
-                     </Menu.Item>
-                    ) : null}
+        <Menu.Item>
+          <Flex alignItems="center">
+            <Button
+              type=""
+              icon={<DeleteOutlined />}
+              onClick={() => deleteUser(user.id)}
+              size="small"
+            >
+              Delete
+            </Button>
+          </Flex>
+        </Menu.Item>
+      ) : null}
 
 
     </Menu>
@@ -370,54 +346,70 @@ const ClientList = () => {
 
   const tableColumns = [
     {
-      title: "profilePic",
-      dataIndex: 'profilePic',
+      title: "Client",
+      dataIndex: "profilePic",
       render: (_, record) => (
-        <AvatarStatus
-          src={record.profilePic}
-          name={record.username || record.firstName}
-          size={40}
-        />
+        <div className="flex items-center">
+          <div className="mr-3">
+            {record.profilePic ? (
+              <Avatar
+                src={record.profilePic}
+                size={40}
+                className="border-2 border-white shadow-md"
+              />
+            ) : (
+              <Avatar
+                size={40}
+                className="bg-indigo-600 border-2 border-white shadow-md flex items-center justify-center"
+              >
+                {record.username?.[0]?.toUpperCase() || 'U'}
+              </Avatar>
+            )}
+          </div>
+          <div>
+            <div className="font-medium text-gray-900">
+              {record.username || 'N/A'}
+            </div>
+            <div className="text-gray-500 text-sm">
+              {record.email || 'No email'}
+            </div>
+          </div>
+        </div>
       ),
     },
     {
-      title: "username",
-      dataIndex: "username",
-      sorter: (a, b) => a.username.length - b.username.length,
-    },
-
-    {
-      title: "Client",
-      dataIndex: "email",
-      sorter: (a, b) => a.email.length - b.email.length,
-    },
-    // {
-    //   title: "Client",
-    //   dataIndex: "name",
-    //   render: (_, record) => (
-    //     <div className="d-flex" onClick={() => ClickFun(record.id)}>
-    //       <AvatarStatus
-    //         src={record.img}
-    //         name={record.name}
-    //         subTitle={record.email}
-    //       />
-    //     </div>
-    //   ),
-    //   sorter: (a, b) => a.name.localeCompare(b.name),
-    // },
-    {
-      title: "created_by",
+      title: "Created By",
       dataIndex: "created_by",
-      sorter: (a, b) => a.created_by.length - b.created_by.length,
+      render: (created_by) => (
+        <Tag color="purple" className="text-sm px-3 py-1 rounded-full font-medium">
+          {created_by || 'N/A'}
+        </Tag>
+      ),
+      sorter: (a, b) => (a.created_by || '').localeCompare(b.created_by || ''),
     },
     {
-      title: "createdAt",
+      title: "Status",
+      dataIndex: "status",
+      render: (status) => (
+        <Tag
+          className="text-sm px-3 py-1 rounded-full font-medium"
+          color={getCompanyStatus(status)}
+        >
+          {status}
+        </Tag>
+      ),
+      sorter: (a, b) => (a.status || '').localeCompare(b.status || ''),
+    },
+    {
+      title: "Created",
       dataIndex: "createdAt",
-      render: (date) => dayjs(date).format("DD/MM/YYYY"),
+      render: (date) => (
+        <div className="text-gray-600">
+          {date ? dayjs(date).format('DD MMM YYYY') : 'N/A'}
+        </div>
+      ),
       sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
     },
-
-  
     {
       title: "Action",
       dataIndex: "actions",
@@ -430,63 +422,75 @@ const ClientList = () => {
   ];
 
   return (
-    <Card bodyStyle={{ padding: "-3px" }}>
-      <Flex
-        alignItems="center"
-        justifyContent="space-between"
-        mobileFlex={false}
-      >
-        <Flex className="mb-1" mobileFlex={false}>
-          <div className="mr-md-3 mb-3">
-            <Input
-              placeholder="Search"
-              prefix={<SearchOutlined />}
-              onChange={(e) => onSearch(e)}
-            />
-          </div>
-          <div className="mb-3">
-            <Select
-              defaultValue="All"
-              className="w-100"
-              style={{ minWidth: 180 }}
-              onChange={handleShowStatus}
-              placeholder="Status"
-            >
-              <Select.Option value="All">All Status</Select.Option>
-              {companyStatusList.map((elm) => (
-                <Select.Option key={elm} value={elm}>
-                  {elm}
-                </Select.Option>
-              ))}
-            </Select>
-          </div>
-        </Flex>
-        <Flex gap="7px">
-      
-
-           {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                                                     <Button type="primary" icon={<PlusOutlined />} onClick={openAddCompanyModal} className="flex items-center">
-                                                                                                                                                     New Client
-                                                                                                                                                 </Button>
-                                                                                                                                    
-                                                                                                                                        ) : null}
-
-
-          <Button
-                type="primary"
-                icon={<FileExcelOutlined />}
-                onClick={exportToExcel}
-                block
+    <Card bodyStyle={{ padding: "0" }} className="shadow-lg rounded-xl overflow-hidden">
+      <div className="bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 p-6 border-b border-gray-100">
+        <Flex
+          alignItems="center"
+          justifyContent="space-between"
+          mobileFlex={false}
+        >
+          <Flex className="mb-1" mobileFlex={false}>
+            <div className="mr-md-3 mb-3">
+              <Input
+                placeholder="Search clients..."
+                prefix={<SearchOutlined className="text-gray-400" />}
+                onChange={(e) => onSearch(e)}
+                allowClear
+                className="min-w-[250px] hover:border-indigo-400 focus:border-indigo-500"
+                style={{ borderRadius: '8px' }}
+              />
+            </div>
+            <div className="mb-3">
+              <Select
+                defaultValue="All"
+                className="min-w-[180px]"
+                onChange={handleShowStatus}
+                placeholder="Status"
+                style={{ borderRadius: '8px' }}
               >
-                Export All
+                <Select.Option value="All">All Status</Select.Option>
+                {companyStatusList.map((elm) => (
+                  <Select.Option key={elm} value={elm}>
+                    {elm}
+                  </Select.Option>
+                ))}
+              </Select>
+            </div>
+          </Flex>
+          <Flex gap="7px">
+            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) && (
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={openAddCompanyModal}
+                className="rounded-lg flex items-center shadow-md hover:shadow-lg transition-all"
+              >
+                New Client
               </Button>
+            )}
+            <Button
+              type="primary"
+              icon={<FileExcelOutlined />}
+              onClick={exportToExcel}
+              className="rounded-lg shadow-md hover:shadow-lg transition-all"
+            >
+              Export All
+            </Button>
+          </Flex>
         </Flex>
-      </Flex>
-      <div className="table-responsive">
-     
-         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                                                                                                  <Table columns={tableColumns} dataSource={users} rowKey="id" />
-                                                                                                                  ) : null}
+      </div>
+      <div className="overflow-hidden">
+        {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
+          <Table
+            columns={tableColumns}
+            dataSource={users}
+            rowKey="id"
+            className="ant-table-striped"
+            rowClassName={(record, index) =>
+              index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+            }
+          />
+        )}
       </div>
       {userProfileVisible && (
         <UserView
