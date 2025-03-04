@@ -1,3 +1,812 @@
+// import React, { useEffect, useState } from "react";
+// import {
+//   Modal,
+//   Input,
+//   Button,
+//   DatePicker,
+//   Select,
+//   Upload,
+//   message,
+//   Row,
+//   Col,
+//   Form,
+// } from "antd";
+// import { useNavigate } from "react-router-dom";
+// import { ToTopOutlined, UploadOutlined, QuestionCircleOutlined } from "@ant-design/icons";
+// import moment from "moment";
+// import { useDispatch, useSelector } from "react-redux";
+// import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
+// import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
+// import { getallcountries } from "../../setting/countries/countriesreducer/countriesSlice";
+// import { getBranch } from "../Branch/BranchReducer/BranchSlice";
+// import { empdata, updateEmp } from "./EmployeeReducers/EmployeeSlice";
+// import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+// import TextArea from "antd/es/input/TextArea";
+// import ReactQuill from "react-quill";
+// import { Formik, Field, ErrorMessage } from "formik";
+// import * as Yup from "yup";
+// import axios from "axios";
+// import AddBranch from '../../hrm/Branch/AddBranch';
+// import { PlusOutlined } from '@ant-design/icons';
+// import AddDepartment from '../Department/AddDepartment';
+// import AddDesignation from '../Designation/AddDesignation';
+
+// const { Option } = Select;
+
+// const EditEmployee = ({ employeeIdd, onClose }) => {
+//   const [form] = Form.useForm();
+//   const navigate = useNavigate();
+//   const dispatch = useDispatch();
+
+//   // States
+//   const [fileList, setFileList] = useState([]);
+//   const [cvFileList, setCvFileList] = useState([]);
+//   const [selectedBranch, setSelectedBranch] = useState(null);
+//   const [salary, setSalary] = useState(false);
+
+//   // Selectors
+//   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
+//   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
+//   const loggedusername = useSelector((state) => state.user.loggedInUser.username);
+//   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
+//   const countries = useSelector((state) => state.countries.countries);
+//   const { currencies } = useSelector((state) => state.currencies);
+//   const allempdata = useSelector((state) => state.employee);
+
+//   // Filtered data
+//   const fndbranchdata = branchData.filter((item) => item.created_by === loggedusername);
+//   const fnddepart = departmentData.filter((item) => item.created_by === loggedusername);
+//   const fnddesi = designationData.filter((item) => item.created_by === loggedusername);
+//   const filteredDepartments = fnddepart.filter((dept) => dept.branch === selectedBranch);
+//   const filteredDesignations = fnddesi.filter((des) => des.branch === selectedBranch);
+
+//   useEffect(() => {
+//     dispatch(empdata());
+//     dispatch(getallcountries());
+//     dispatch(getDept());
+//     dispatch(getDes());
+//     dispatch(getBranch());
+//     dispatch(getcurren());
+//   }, [dispatch]);
+
+//   useEffect(() => {
+//     const empData = allempdata?.employee?.data || [];
+//     const data = empData.find((item) => item.id === employeeIdd);
+
+//     if (data) {
+//       setSelectedBranch(data.branch);
+//       form.setFieldsValue({
+//         firstName: data.firstName,
+//         lastName: data.lastName,
+//         email: data.email,
+//         phone: data.phone,
+//         address: data.address,
+//         branch: data.branch,
+//         joiningDate: data.joiningDate ? moment(data.joiningDate) : null,
+//         leaveDate: data.leaveDate ? moment(data.leaveDate) : null,
+//         department: data.department,
+//         designation: data.designation,
+//         salary: data.salary,
+//         accountholder: data.accountholder,
+//         accountnumber: data.accountnumber,
+//         bankname: data.bankname,
+//         banklocation: data.banklocation,
+//         status: data.status,
+//         currency: data.currency,
+//         payroll: data.payroll,
+//         netSalary: data.netSalary
+//       });
+//     }
+//   }, [allempdata, employeeIdd, form]);
+
+//   const onFinish = async (values) => {
+//     try {
+//       const formData = new FormData();
+
+//       if (fileList.length > 0 && fileList[0].originFileObj) {
+//         formData.append('profilePic', fileList[0].originFileObj);
+//       }
+
+//       if (cvFileList.length > 0 && cvFileList[0].originFileObj) {
+//         formData.append('cv', cvFileList[0].originFileObj);
+//       }
+
+//       // Convert dates to ISO strings
+//       if (values.joiningDate) {
+//         formData.append('joiningDate', values.joiningDate.toISOString());
+//       }
+//       if (values.leaveDate) {
+//         formData.append('leaveDate', values.leaveDate.toISOString());
+//       }
+
+//       // Append other form values
+//       Object.keys(values).forEach(key => {
+//         if (key !== 'profilePic' && 
+//             key !== 'cv' && 
+//             key !== 'joiningDate' && 
+//             key !== 'leaveDate' && 
+//             values[key] !== undefined && 
+//             values[key] !== null) {
+//           formData.append(key, values[key]);
+//         }
+//       });
+
+//       const response = await dispatch(updateEmp({ employeeIdd, formData })).unwrap();
+      
+//       if (response) {
+//         message.success('Employee updated successfully!');
+//         dispatch(empdata());
+//         onClose();
+//       }
+//     } catch (error) {
+//       console.error("Update error:", error);
+//       message.error(error?.message || "Failed to update employee");
+//     }
+//   };
+
+//   const handleFileChange = ({ file }) => {
+//     if (file.status !== 'removed') {
+//       setFileList([{
+//         uid: '-1',
+//         name: file.name,
+//         status: 'done',
+//         originFileObj: file
+//       }]);
+//     } else {
+//       setFileList([]);
+//     }
+//   };
+
+//   const handleCVChange = ({ file }) => {
+//     const isValidType = file.type === 'application/pdf' || 
+//                        file.type === 'application/msword' || 
+//                        file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    
+//     if (!isValidType && file.status !== 'removed') {
+//       message.error('You can only upload PDF or Word documents!');
+//       return;
+//     }
+
+//     if (file.status !== 'removed') {
+//       setCvFileList([{
+//         uid: '-1',
+//         name: file.name,
+//         status: 'done',
+//         originFileObj: file
+//       }]);
+//     } else {
+//       setCvFileList([]);
+//     }
+//   };
+
+//   const [showOtpModal, setShowOtpModal] = useState(false);
+//   const [otpToken, setOtpToken] = useState(null);
+//   const [otp, setOtp] = useState("");
+
+//   const generatePassword = () => {
+//     const length = 8;
+//     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+//     let password = "";
+
+//     // Generate 6 characters
+//     for (let i = 0; i < length; i++) {
+//       password += charset[Math.floor(Math.random() * charset.length)];
+//     }
+
+//     // Ensure at least one number
+//     const randomNum = Math.floor(Math.random() * 10).toString();
+//     password = password.slice(0, 7) + randomNum;
+
+//     return password;
+//   };
+
+//   const otpapi = async (otp) => {
+//     try {
+//       const res = await axios.post(
+//         "http://localhost:5353/api/v1/auth/verify-signup",
+//         { otp },
+//         {
+//           headers: {
+//             Authorization: `Bearer ${otpToken}`,
+//           },
+//         }
+//       );
+//       return res.data;
+//     } catch (error) {
+//       console.error("Error verifying OTP:", error);
+//       throw error;
+//     }
+//   };
+//   const handleOtpVerify = async () => {
+//     if (!otp || otp.length !== 6) {
+//       message.error("Please enter a valid 6-digit OTP.");
+//       return;
+//     }
+
+//     try {
+//       const response = await otpapi(otp);
+//       if (response.success) {
+//         message.success("OTP Verified Successfully");
+//         setShowOtpModal(false);
+//         dispatch(empdata());
+//       } else {
+//         message.error("Invalid OTP. Please try again.");
+//       }
+//     } catch (error) {
+//       message.error("Failed to verify OTP. Please try again.");
+//     }
+//   };
+
+//   const onFinishFailed = (errorInfo) => {
+//     console.error("Form submission failed:", errorInfo);
+//   };
+
+//   const onOpenOtpModal = () => {
+//     setShowOtpModal(true);
+//   };
+//   const onCloseOtpModal = () => {
+//     setShowOtpModal(false);
+//   };
+
+//   const initialValues = {
+//     firstName: "",
+//     lastName: "",
+//     username: "",
+//     password: "",
+//     email: "",
+//     phone: "",
+//     address: "",
+//     branch: "",
+//     joiningDate: null,
+//     leaveDate: null,
+//     department: "",
+//     designation: "",
+//     salary: "",
+//     accountholder: "",
+//     accountnumber: "",
+//     bankname: "",
+//     banklocation: "",
+//     payroll: "",
+//     bankaccount: "",
+//     netSalary: "",
+//     status: "",
+//     currency: "",
+//   };
+
+//   const validationSchema = Yup.object({
+//     firstName: Yup.string().required("Please enter a first name."),
+//     lastName: Yup.string().required("Please enter a last name."),
+//     username: Yup.string().required("Please enter a username."),
+//     password: Yup.string()
+//       .min(8, "Password must be at least 8 characters")
+//       .matches(/\d/, "Password must have at least one number")
+//       .required("Password is required"),
+//     email: Yup.string()
+//       .email("Please enter a valid email address.")
+//       .required("Please enter an email"),
+//     phone: Yup.string()
+//       .matches(/^\d{10}$/, "Phone number must be 10 digits.")
+//       .required("Please enter a phone number."),
+//     address: Yup.string().required("Please enter an address."),
+//     branch: Yup.string().required("Please select a branch."),
+//     joiningDate: Yup.date().nullable().required("Joining date is required."),
+//     leaveDate: Yup.date().nullable().required("Leave date is required."),
+//     department: Yup.string().required("Please select a department."),
+//     designation: Yup.string().required("Please select a designation."),
+//     salary: Yup.string().required("Please enter a salary."),
+//     accountholder: Yup.string().optional(),
+//     accountnumber: Yup.string().optional(),
+//     bankname: Yup.string().optional(),
+//     ifsc: Yup.string().optional(),
+//     banklocation: Yup.string().optional(),
+//     payroll: Yup.string().optional(),
+//     bankaccount: Yup.string().optional(),
+//     netSalary: Yup.string().optional(),
+//     status: Yup.string().optional(),
+//     currency: Yup.string().optional(),
+//   });
+
+//   const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
+
+//   const openAddBranchModal = () => {
+//     setIsAddBranchModalVisible(true);
+//   };
+
+//   const closeAddBranchModal = () => {
+//     setIsAddBranchModalVisible(false);
+//     dispatch(getBranch());
+//   };
+
+//   const [isAddDepartmentModalVisible, setIsAddDepartmentModalVisible] = useState(false);
+
+//   const openAddDepartmentModal = () => {
+//     setIsAddDepartmentModalVisible(true);
+//   };
+
+//   const closeAddDepartmentModal = () => {
+//     setIsAddDepartmentModalVisible(false);
+//     dispatch(getDept());
+//   };
+
+//   const [isAddDesignationModalVisible, setIsAddDesignationModalVisible] = useState(false);
+
+//   const openAddDesignationModal = () => {
+//     setIsAddDesignationModalVisible(true);
+//   };
+
+//   const closeAddDesignationModal = () => {
+//     setIsAddDesignationModalVisible(false);
+//     dispatch(getDes());
+//   };
+
+//   return (
+//     <div className="add-employee p-6">
+//       <Formik
+//         initialValues={initialValues}
+//         onSubmit={onFinish}
+//         enableReinitialize={true}
+//       >
+//         {({
+//           isSubmitting,
+//           resetForm,
+//           values,
+//           setFieldValue,
+//           handleSubmit,
+//           setFieldTouched,
+//         }) => (
+//           <Form
+//             className="space-y-4"
+//             onSubmit={handleSubmit}
+//             onFinishFailed={onFinishFailed}
+//           >
+//             <h1 className="border-b-2 border-gray-300 pb-4 mt-[-35px] "></h1>
+//             <h1 className="text-lg font-bold mb-4">Personal Details</h1>
+//             <Row gutter={16}>
+//               <Col span={12}>
+//                 <div className="form-item">
+//                   <label className="">First Name <span className="text-red-500">*</span></label>
+//                   <Field name="firstName" as={Input} placeholder="John" className="mt-1" />
+//                   <ErrorMessage name="firstName" component="div" className="text-red-500" />
+//                 </div>
+//               </Col>
+//               <Col span={12}>
+//                 <div className="form-item">
+//                   <label className="">Last Name <span className="text-red-500">*</span></label>
+//                   <Field name="lastName" as={Input} placeholder="Doe" className="mt-1" />
+//                   <ErrorMessage name="lastName" component="div" className="text-red-500" />
+//                 </div>
+//               </Col>
+//             </Row>
+//             <Row gutter={16}>
+//               <Col span={12}>
+//                 <div className="form-item">
+//                   <label className="">Username <span className="text-red-500">*</span></label>
+//                   <Field name="username" as={Input} placeholder="john_doe" className="mt-1" />
+//                   <ErrorMessage name="username" component="div" className="text-red-500" />
+//                 </div>
+//               </Col>
+//               <Col span={12}>
+//                 <div className="form-item mt-2">
+//                   <label className="font-semibold">Password <span className="text-red-500">*</span></label>
+//                   <div className="relative">
+//                     <Field
+//                       name="password"
+//                       as={Input.Password}
+//                       placeholder="Password"
+//                       className="mt-1 w-full"
+//                     />
+//                     <Button
+//                       className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
+//                       onClick={() => setFieldValue("password", generatePassword())}
+//                     >
+//                       <ToTopOutlined />
+//                     </Button>
+//                   </div>
+//                   <ErrorMessage
+//                     name="password"
+//                     component="div"
+//                     className="text-red-500"
+//                   />
+//                 </div>
+//               </Col>
+//             </Row>
+//             <Row gutter={16}>
+//               <Col span={12}>
+//                 <div className="form-item">
+//                   <label className="">Email <span className="text-red-500">*</span></label>
+//                   <Field name="email" as={Input} placeholder="johndoe@example.com" className="mt-1" />
+//                   <ErrorMessage name="email" component="div" className="text-red-500" />
+//                 </div>
+//               </Col>
+//               <Col span={12} className="mt-2">
+//                 <div className="form-item">
+//                   <label className="">Phone <span className="text-red-500">*</span></label>
+//                   <div className="flex">
+//                     <Select
+//                       style={{ width: '30%', marginRight: '8px' }}
+//                       placeholder="Code"
+//                       name="phoneCode"
+//                       onChange={(value) => setFieldValue('phoneCode', value)}
+//                     >
+//                       {countries.map((country) => (
+//                         <Option key={country.id} value={country.phoneCode}>
+//                           (+{country.phoneCode})
+//                         </Option>
+//                       ))}
+//                     </Select>
+//                     <Field name="phone">
+//                       {({ field }) => (
+//                         <Input
+//                           {...field}
+//                           type="string"
+//                           style={{ width: '70%' }}
+//                           placeholder="Enter phone number"
+//                           onKeyPress={(e) => {
+//                             if (!/[0-9]/.test(e.key)) {
+//                               e.preventDefault();
+//                             }
+//                           }}
+//                           className="hide-number-spinner"
+//                         />
+//                       )}
+//                     </Field>
+//                   </div>
+//                   <ErrorMessage
+//                     name="phoneNumber"
+//                     component="div"
+//                     className="error-message text-red-500 my-1"
+//                   />
+//                 </div>
+//               </Col>
+//             </Row>
+//             <Row gutter={16}>
+//               <Col span={12}>
+//                 <div className="form-item">
+//                   <label className="">Address <span className="text-red-500">*</span></label>
+//                   <Field name="address" as={Input} placeholder="Enter Address" className="mt-1" />
+//                   <ErrorMessage name="address" component="div" className="text-red-500" />
+//                 </div>
+//               </Col>
+//               <Col span={12}>
+//                 <div className="form-item">
+//                   <label className="">Joining Date <span className="text-red-500">*</span></label>
+//                   <Field name="joiningDate">
+//                     {({ field }) => (
+//                       <DatePicker
+//                         className="w-full mt-1"
+//                         format="DD-MM-YYYY"
+//                         onChange={(date) => setFieldValue("joiningDate", date)}
+//                       />
+//                     )}
+//                   </Field>
+//                   <ErrorMessage name="joiningDate" component="div" className="text-red-500" />
+//                 </div>
+//               </Col>
+//             </Row>
+//             <Row gutter={16}>
+//               <Col span={12}>
+//                 <div className="form-item">
+//                   <label className="">Branch <span className="text-red-500">*</span></label>
+//                   <Field name="branch">
+//                     {({ field }) => (
+//                       <Select
+//                         {...field}
+//                         className="w-full mt-2"
+//                         placeholder="Select Branch"
+//                         dropdownRender={(menu) => (
+//                           <>
+//                             {menu}
+//                             <Button
+//                               type="link"
+//                               block
+//                               onClick={() => {
+//                                 openAddBranchModal();
+//                                 dispatch(getBranch());
+//                               }}
+//                             >
+//                               + Add New Branch
+//                             </Button>
+//                           </>
+//                         )}
+//                         onChange={(value) => {
+//                           setFieldValue("branch", value);
+//                           setFieldValue("department", "");
+//                           setFieldValue("designation", "");
+//                           setSelectedBranch(value);
+//                         }}
+//                       >
+//                         {fndbranchdata.map((branch) => (
+//                           <Option key={branch.id} value={branch.id}>
+//                             {branch.branchName}
+//                           </Option>
+//                         ))}
+//                       </Select>
+//                     )}
+//                   </Field>
+//                   <ErrorMessage name="branch" component="div" className="text-red-500" />
+//                 </div>
+//               </Col>
+
+//               <Col span={12}>
+//                 <div className="form-item mt-1">
+//                   <label className="">Department <span className="text-red-500">*</span></label>
+//                   <Field name="department">
+//                     {({ field }) => (
+//                       <Select
+//                         {...field}
+//                         className="w-full mt-1"
+//                         placeholder="Select Department"
+//                         disabled={!selectedBranch}
+//                         onChange={(value) => setFieldValue("department", value)}
+//                         dropdownRender={(menu) => (
+//                           <>
+//                             {menu}
+//                             <Button
+//                               type="link"
+//                               block
+//                               onClick={openAddDepartmentModal}
+//                             >
+//                               + Add New Department
+//                             </Button>
+//                           </>
+//                         )}
+//                       >
+//                         {filteredDepartments.map((dept) => (
+//                           <Option key={dept.id} value={dept.id}>
+//                             {dept.department_name}
+//                           </Option>
+//                         ))}
+//                       </Select>
+//                     )}
+//                   </Field>
+//                   <ErrorMessage name="department" component="div" className="text-red-500" />
+//                 </div>
+//               </Col>
+
+//               <Col span={12}>
+//                 <div className="form-item mt-2">
+//                   <label className="">Designation <span className="text-red-500">*</span></label>
+//                   <Field name="designation">
+//                     {({ field }) => (
+//                       <Select
+//                         {...field}
+//                         className="w-full mt-1"
+//                         placeholder="Select Designation"
+//                         disabled={!selectedBranch}
+//                         onChange={(value) => setFieldValue("designation", value)}
+//                         dropdownRender={(menu) => (
+//                           <>
+//                             {menu}
+//                             <Button
+//                               type="link"
+//                               block
+//                               onClick={openAddDesignationModal}
+//                             >
+//                               + Add New Designation
+//                             </Button>
+//                           </>
+//                         )}
+//                       >
+//                         {filteredDesignations.map((des) => (
+//                           <Option key={des.id} value={des.id}>
+//                             {des.designation_name}
+//                           </Option>
+//                         ))}
+//                       </Select>
+//                     )}
+//                   </Field>
+//                   <ErrorMessage name="designation" component="div" className="text-red-500" />
+//                 </div>
+//               </Col>
+
+              
+//             </Row>
+            
+
+//             <Col span={24} className="mt-4 "><div className="flex justify-between items-center">
+              
+//             </div>
+//             </Col>
+//             {salary && (
+//               <>
+//                 <Row gutter={16}>
+//                   <Col span={12}>
+//                     <div className="form-item">
+//                       <label className="">Payroll Type </label>
+//                       <Field name="payslipType">
+//                         {({ field }) => (
+//                           <Select
+//                             {...field}
+//                             className="w-full mt-1"
+//                             placeholder="Select Payroll Type"
+//                             onChange={(value) => setFieldValue("payslipType", value)}
+//                             onBlur={() => setFieldTouched("payslipType", true)}
+//                           >
+//                             <Option value="monthly">Monthly</Option>
+//                             <Option value="hourly">Hourly</Option>
+//                             <Option value="weekly">Weekly</Option>
+//                           </Select>
+//                         )}
+//                       </Field>
+//                       <ErrorMessage
+//                         name="payslipType"
+//                         component="div"
+//                         className="error-message text-red-500 my-1"
+//                       />
+//                     </div>
+//                   </Col>
+
+//                   <Col span={12}>
+//                     <div className="form-item">
+//                       <label className="">Currency </label>
+//                       <Field name="currency">
+//                         {({ field }) => (
+//                           <Select
+//                             {...field}
+//                             className="w-full mt-1"
+//                             placeholder="Select Currency"
+//                             onChange={(value) => setFieldValue("currency", value)}
+//                           >
+//                             {currencies?.data?.map((currency) => (
+//                               <Option key={currency.id} value={currency.id}>
+//                                 {currency.currencyCode} ({currency.currencyIcon})
+//                               </Option>
+//                             ))}
+//                           </Select>
+//                         )}
+//                       </Field>
+//                       <ErrorMessage
+//                         name="currency"
+//                         component="div"
+//                         className="error-message text-red-500 my-1"
+//                       />
+//                     </div>
+//                   </Col>
+//                 </Row>
+
+//                 <Row gutter={16}>
+//                   <Col span={12}>
+//                     <div className="form-item">
+//                       <label className="">Net Salary </label>
+//                       <Field
+//                         name="netSalary"
+//                         as={Input}
+//                         type="string"
+//                         className="w-full mt-1"
+//                         placeholder="Enter Net Salary Amount"
+//                       />
+//                       <ErrorMessage
+//                         name="netSalary"
+//                         component="div"
+//                         className="error-message text-red-500 my-1"
+//                       />
+//                     </div>
+//                   </Col>
+
+//                   <Col span={12}>
+//                     <div className="form-item">
+//                       <label className="">Status </label>
+//                       <Field name="status">
+//                         {({ field }) => (
+//                           <Select
+//                             {...field}
+//                             className="w-full mt-1"
+//                             placeholder="Select Status"
+//                             onChange={(value) => setFieldValue("status", value)}
+//                           >
+//                             <Option value="active">Active</Option>
+//                             <Option value="inactive">Inactive</Option>
+//                             <Option value="pending">Pending</Option>
+//                           </Select>
+//                         )}
+//                       </Field>
+//                       <ErrorMessage
+//                         name="status"
+//                         component="div"
+//                         className="error-message text-red-500 my-1"
+//                       />
+//                     </div>
+//                   </Col>
+
+
+//                   <Col span={12}>
+//                     <div className="form-item mt-3">
+//                       <label className="">Bank Account</label>
+//                       <Field
+//                         name="bankaccount"
+//                         as={Input}
+//                         type="string"
+//                         className="w-full mt-1"
+//                         placeholder="Enter Bank Account"
+//                       />
+//                       <ErrorMessage
+//                         name="bankaccount"
+//                         component="div"
+//                         className="error-message text-red-500 my-1"
+//                       />
+//                     </div>
+//                   </Col>
+
+//                 </Row>
+//               </>
+//             )}
+//             <div className="text-right mt-4">
+//               <Button type="default" className="mr-2" onClick={() => onClose()}>
+//                 Cancel
+//               </Button>
+//               <Button
+//                 type="primary"
+//                 htmlType="submit"
+//                 loading={isSubmitting}
+//               >
+//                 {isSubmitting ? "Submitting..." : "Submit"}
+//               </Button>
+//             </div>
+//           </Form>
+//         )}
+//       </Formik>
+//       <Modal
+//         title="Verify OTP"
+//         visible={showOtpModal}
+//         onCancel={onCloseOtpModal}
+//         footer={null}
+//         centered
+//       >
+//         <div className="p-4 rounded-lg bg-white">
+//           <h2 className="text-xl  mb-4">OTP Page</h2>
+//           <p>
+//             An OTP has been sent to your registered email. Please enter the OTP
+//             below to verify your account.
+//           </p>
+//           <Input
+//             type="number"
+//             placeholder="Enter OTP"
+//             className="mt-4 p-3 border border-gray-300 rounded-md"
+//             style={{ width: "100%" }}
+//             onChange={(e) => setOtp(e.target.value)}
+//           />
+//           <div className="mt-4">
+//             <Button type="primary" className="w-full" onClick={handleOtpVerify}>
+//               Verify OTP
+//             </Button>
+//           </div>
+//         </div>
+//       </Modal>
+//       <Modal
+//         title="Add Branch"
+//         visible={isAddBranchModalVisible}
+//         onCancel={closeAddBranchModal}
+//         footer={null}
+//         width={800}
+//       >
+//         <AddBranch onClose={closeAddBranchModal} />
+//       </Modal>
+//       <Modal
+//         title="Add Department"
+//         visible={isAddDepartmentModalVisible}
+//         onCancel={closeAddDepartmentModal}
+//         footer={null}
+//         width={800}
+//       >
+//         <AddDepartment onClose={closeAddDepartmentModal} />
+//       </Modal>
+//       <Modal
+//         title="Add Designation"
+//         visible={isAddDesignationModalVisible}
+//         onCancel={closeAddDesignationModal}
+//         footer={null}
+//         width={800}
+//       >
+//         <AddDesignation onClose={closeAddDesignationModal} />
+//       </Modal>
+//     </div>
+//   );
+// };
+
+// export default EditEmployee;
+
+
+
 import React, { useEffect, useState } from "react";
 import {
   Modal,
@@ -16,7 +825,7 @@ import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-import { addEmp, empdata } from "./EmployeeReducers/EmployeeSlice";
+import { addEmp, empdata, updateEmp } from "./EmployeeReducers/EmployeeSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
@@ -27,10 +836,11 @@ import { PlusOutlined } from '@ant-design/icons';
 import AddDepartment from '../Department/AddDepartment';
 import AddDesignation from '../Designation/AddDesignation';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import { AddSalaryss, getSalaryss } from "../PayRoll/Salary/SalaryReducers/SalarySlice";
 
 const { Option } = Select;
 
-const EditEmployee = ({ onClose, setSub }) => {
+const EditEmployee = ({idd, onClose, setSub, initialData = {} }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -38,6 +848,8 @@ const EditEmployee = ({ onClose, setSub }) => {
   const [otpToken, setOtpToken] = useState(null);
   const [otp, setOtp] = useState("");
   const [salary, setSalary] = useState(false);
+  const [formValues, setFormValues] = useState({});
+  const [formValues2, setFormValues2] = useState({});
 
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
@@ -118,10 +930,21 @@ const EditEmployee = ({ onClose, setSub }) => {
 
     try {
       const response = await otpapi(otp);
+      console.log("Response:", response);
       if (response.success) {
         message.success("OTP Verified Successfully");
         setShowOtpModal(false);
         dispatch(empdata());
+
+        // Debugging: Log formValues to ensure it's populated
+        console.log("Form Values:", formValues);
+
+        const payloadss = {
+          ...formValues2,
+          employeeId: response.data.user.id,
+        }
+
+        await dispatch(AddSalaryss(payloadss));
       } else {
         message.error("Invalid OTP. Please try again.");
       }
@@ -132,14 +955,29 @@ const EditEmployee = ({ onClose, setSub }) => {
 
   const onSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
-      const response = await dispatch(addEmp(values));
+      console.log("Form Values:", values);
+      setFormValues2(values);
+      // Store employeeId in formValues  
+      const updatedFormValues = { ...values };
+
+      const response = await dispatch(updateEmp({idd, updatedFormValues}));
 
       if (response.payload?.data?.sessionToken) {
         setOtpToken(response.payload?.data?.sessionToken);
         setShowOtpModal(true);
       }
-      resetForm();
-      onClose();
+
+      if (response.payload?.data?.employeeId) {
+        updatedFormValues.employeeId = response.payload.data.employeeId;
+        setFormValues(updatedFormValues); // Set formValues here
+        
+        // Only reset form and close modal after successful employee creation
+        if (!response.payload?.data?.sessionToken) {
+          resetForm();
+          onClose();
+        }
+      }
+
     } catch (error) {
       console.error("Error submitting form:", error);
       message.error("Failed to add employee. Please try again.");
@@ -160,11 +998,11 @@ const EditEmployee = ({ onClose, setSub }) => {
   };
 
   const initialValues = {
-    firstName: "",
-    lastName: "",
+    firstName: initialData.firstName || "",
+    lastName: initialData.lastName || "",
     username: "",
     password: "",
-    email: "",
+    email: initialData.email || "",
     phone: "",
     address: "",
     branch: "",
@@ -178,7 +1016,7 @@ const EditEmployee = ({ onClose, setSub }) => {
     bankname: "",
     banklocation: "",
     payroll: "",
-    bankaccount: "",
+    bankAccount: "",
     netSalary: "",
     status: "",
     currency: "",
@@ -211,7 +1049,7 @@ const EditEmployee = ({ onClose, setSub }) => {
     ifsc: Yup.string().optional(),
     banklocation: Yup.string().optional(),
     payroll: Yup.string().optional(),
-    bankaccount: Yup.string().optional(),
+    bankAccount: Yup.string().optional(),
     netSalary: Yup.string().optional(),
     status: Yup.string().optional(),
     currency: Yup.string().optional(),
@@ -254,6 +1092,7 @@ const EditEmployee = ({ onClose, setSub }) => {
     <div className="add-employee p-6">
       <Formik
         initialValues={initialValues}
+        // validationSchema={validationSchema}  
         onSubmit={onSubmit}
       >
         {({
@@ -679,14 +1518,14 @@ const EditEmployee = ({ onClose, setSub }) => {
                     <div className="form-item mt-3">
                       <label className="">Bank Account</label>
                       <Field
-                        name="bankaccount"
+                        name="bankAccount"
                         as={Input}
                         type="string"
                         className="w-full mt-1"
                         placeholder="Enter Bank Account"
                       />
                       <ErrorMessage
-                        name="bankaccount"
+                        name="bankAccount"
                         component="div"
                         className="error-message text-red-500 my-1"
                       />
@@ -770,4 +1609,3 @@ const EditEmployee = ({ onClose, setSub }) => {
 };
 
 export default EditEmployee;
-

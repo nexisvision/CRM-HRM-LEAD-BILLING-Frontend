@@ -24,7 +24,7 @@ const EditCompany = ({ comnyid, onClose }) => {
 
   const alldatas = useSelector((state)=>state.ClientData.ClientData.data);
 
-  const  loggedInUser = alldatas.find((item)=>item.id === comnyid);
+  const  loggedInUser = alldatas?.find((item)=>item?.id === comnyid);
 
 
   const formik = useFormik({

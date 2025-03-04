@@ -63,12 +63,12 @@ const Empdelete = async (id) => {
   }
 };
 
-const EditEmp = async (employeeIdd, formData) => {
+const EditEmp = async (employeeIdd, updatedFormValues) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
       `http://localhost:5353/api/v1/employees/${employeeIdd}`,
-      formData,
+      updatedFormValues,
       {
         headers: {
           Authorization: `Bearer ${token}`,

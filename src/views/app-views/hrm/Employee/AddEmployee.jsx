@@ -283,7 +283,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
     <div className="add-employee p-6">
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}  
         onSubmit={onSubmit}
       >
         {({
