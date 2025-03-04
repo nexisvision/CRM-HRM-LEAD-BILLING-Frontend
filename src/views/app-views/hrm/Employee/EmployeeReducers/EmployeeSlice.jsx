@@ -72,9 +72,9 @@ export const deleteEmp = createAsyncThunk(
 );
 export const updateEmp = createAsyncThunk(
     "users/updateEmployee",
-    async ({ employeeIdd, updatedFormValues }, thunkAPI) => {
+    async ({ idd, updatedFormValues }, thunkAPI) => {
       try {
-        const response = await UserService.EditEmp(employeeIdd, updatedFormValues);
+        const response = await UserService.EditEmp(idd, updatedFormValues);
         return response; // Return the updated data
       } catch (error) {
         return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");

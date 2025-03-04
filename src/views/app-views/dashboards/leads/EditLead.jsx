@@ -279,7 +279,6 @@ const currenciesState = useSelector((state) => state.currencies);
     dispatch(LeadsEdit({id, formData}))
       .then(() => {
         dispatch(GetLeads()); // Refresh leads data
-        message.success("Lead updated successfully!");
         resetForm();
         onClose(); // Close modal
       })

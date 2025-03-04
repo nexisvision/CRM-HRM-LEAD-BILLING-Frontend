@@ -230,7 +230,7 @@ const AddDeal = ({ onClose }) => {
     <div className="add-job-form">
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
