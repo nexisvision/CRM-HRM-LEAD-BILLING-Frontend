@@ -1,13 +1,16 @@
-import React, { useEffect } from "react";
-import { Input, Button, message, Row, Col, Select } from "antd";
+import React, { useEffect, useState } from "react";
+import { Input, Button, message, Row, Col, Select, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
+import { PlusOutlined } from "@ant-design/icons";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { addcus, Getcus } from "./CustomerReducer/CustomerSlice";
 import { getallcountries } from "../../../setting/countries/countriesreducer/countriesSlice";
+import AddCountries from "views/app-views/setting/countries/AddCountries";
+
 
 const { Option } = Select;
 
@@ -16,20 +19,34 @@ const AddCustomer = ({ onClose }) => {
   const dispatch = useDispatch();
 
   const countries = useSelector((state) => state.countries.countries);
+  const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
 
   useEffect(() => {
     dispatch(getallcountries());
   }, [dispatch]);
+
+  const getInitialCountry = () => {
+    if (countries?.length > 0) {
+      const indiaCode = countries.find(c => c.countryCode === 'IN');
+      return indiaCode?.phoneCode || "+91";
+    }
+    return "+91";
+  };
 
   const initialValues = {
     name: "",
     contact: "",
     email: "",
     taxnumber: "",
+    country_code: getInitialCountry(),
+    alternate_country_code: getInitialCountry(),
+    billing_country_code: getInitialCountry(),
+    shipping_country_code: getInitialCountry(),
     alternatemobilenumber: "",
     billing_name: "",
     billing_phone: "",
     billing_address: "",
+    
     billing_city: "",
     billing_state: "",
     billing_country: "",
@@ -42,15 +59,18 @@ const AddCustomer = ({ onClose }) => {
     shipping_country: "",
     shipping_zipcode: "",
     country_code: "",
-    billing_country_code: "",
-    shipping_country_code: "",
+    // billing_country_code: "",
+    // shipping_country_code: "",
   };
 
   const validationSchema = Yup.object({
     name: Yup.string().required("Please enter a Name."),
     country_code: Yup.string().optional("Country code is required"),
     contact: Yup.string()
-      .required("Please enter a Contact Number"),
+      .required("Please enter a Contact Number")
+      .matches(/^\d+$/, "Phone number must contain only digits")
+      .min(10, "Phone number must be 10 digits")
+      .max(10, "Phone number must be 10 digits"),
     email: Yup.string()
       .email("Please enter a valid email address with @.")
       .required("please enter a email"),
@@ -80,8 +100,11 @@ const AddCustomer = ({ onClose }) => {
   });
 
   const handlePhoneNumberChange = (e, setFieldValue, fieldName) => {
-    const value = e.target.value.replace(/\D/g, '');
-    setFieldValue(fieldName, value);
+    const value = e.target.value;
+    // Only allow numbers and limit length to 10 digits
+    if (/^\d*$/.test(value) && value.length <= 10) {
+      setFieldValue(fieldName, value);
+    }
   };
 
   const onSubmit = (values, { resetForm }) => {
@@ -156,46 +179,84 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                      <label className="font-semibold">Contact <span className="text-red-500">*</span></label>
-                    <div className="flex">
-                      <Select
-                        className="mt-1"
-                        style={{ width: '30%', marginRight: '8px' }}
-                        placeholder="Code"
-                        name="country_code"
-                        onChange={(value) => setFieldValue('country_code', value)}
-                        value={values.country_code}
-                      >
-                        {countries.map((country) => (
-                          <Option key={country.id} value={country.phoneCode}>
-                            {country.phoneCode}
-                          </Option>
-                        ))}
-                      </Select>
-                      <Field
-                        name="contact"
-                        as={Input}
-                        type="number"
-                        className="mt-1"
-                        maxLength={10}
-                        style={{ width: '70%' }}
-                        placeholder="Enter Contact"
-                        onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'contact')}
-
-                        onKeyPress={(e) => {
-                          if (!/[0-9]/.test(e.key)) {
-                            e.preventDefault();
-                          }
-                        }}
-                      />
-                      
+                    <label className="font-semibold">Contact <span className="text-red-500">*</span></label>
+                    <div className="flex gap-0">
+                      <Field name="country_code">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            className="phone-code-select"
+                            style={{
+                              width: '80px',
+                              borderTopRightRadius: 0,
+                              borderBottomRightRadius: 0,
+                              borderRight: 0,
+                              backgroundColor: '#f8fafc',
+                            }}
+                            placeholder={<span className="text-gray-400">+91</span>}
+                            onChange={(value) => {
+                              if (value === 'add_new') {
+                                setIsAddPhoneCodeModalVisible(true);
+                              } else {
+                                setFieldValue('country_code', value);
+                              }
+                            }}
+                            value={values.country_code || getInitialCountry()}
+                            dropdownStyle={{ minWidth: '180px' }}
+                            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                            dropdownRender={menu => (
+                              <div>
+                                <div
+                                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                  onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                                >
+                                  <PlusOutlined className="mr-2" />
+                                  <span className="text-sm">Add New</span>
+                                </div>
+                                {menu}
+                              </div>
+                            )}
+                          >
+                            {countries?.map((country) => (
+                              <Option key={country.id} value={country.phoneCode}>
+                                <div className="flex items-center w-full px-1">
+                                  <span className="text-base min-w-[40px]">{country.phoneCode}</span>
+                                  <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+                                  <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                                </div>
+                              </Option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
+                      <Field name="contact">
+                        {({ field, form }) => (
+                          <Input
+                            {...field}
+                            className="phone-input"
+                            style={{
+                              borderTopLeftRadius: 0,
+                              borderBottomLeftRadius: 0,
+                              borderLeft: '1px solid #d9d9d9',
+                              width: 'calc(100% - 80px)'
+                            }}
+                            type="tel"
+                            maxLength={10}
+                            placeholder="Enter phone number"
+                            onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'contact')}
+                            onKeyPress={(e) => {
+                              // Allow only number keys
+                              const charCode = e.which ? e.which : e.keyCode;
+                              if (charCode < 48 || charCode > 57) {
+                                e.preventDefault();
+                              }
+                            }}
+                            value={values.contact}
+                          />
+                        )}
+                      </Field>
                     </div>
-                    <ErrorMessage
-                      name="contact"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                   
+                    <ErrorMessage name="contact" component="div" className="text-red-500 mt-1 text-sm" />
                   </div>
                 </Col>
 
@@ -211,10 +272,10 @@ const AddCustomer = ({ onClose }) => {
                   </div>
                 </Col>
 
-                  <Col span={8} className="mt-3">
+                <Col span={8} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Tax Number 
-                       </label>
+                    <label className="font-semibold">Tax Number
+                    </label>
                     <Field
                       name="taxnumber"
                       as={Input}
@@ -232,44 +293,56 @@ const AddCustomer = ({ onClose }) => {
                 <Col span={8} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Alternate Mobile Number</label>
-                    <div className="flex">
-                      <Select
-                        className="mt-1"
-                        style={{ width: '30%', marginRight: '8px' }}
-                        placeholder="Code"
-                        name="alternate_country_code"
-                        onChange={(value) => setFieldValue('alternate_country_code', value)}
-                      >
-                        {countries.map((country) => (
-                          <Option key={country.id} value={country.phoneCode}>
-                            {country.phoneCode}
-                          </Option>
-                        ))}
-                      </Select>
+                    <div className="flex gap-0">
+                      <Field name="alternate_country_code">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            className="phone-code-select"
+                            style={{
+                              width: '80px',
+                              borderTopRightRadius: 0,
+                              borderBottomRightRadius: 0,
+                              borderRight: 0,
+                              backgroundColor: '#f8fafc',
+                            }}
+                            placeholder={<span className="text-gray-400">+91</span>}
+                            onChange={(value) => setFieldValue('alternate_country_code', value)}
+                            value={values.alternate_country_code}
+                            dropdownStyle={{ minWidth: '180px' }}
+                            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                          >
+                            {countries?.map((country) => (
+                              <Option key={country.id} value={country.phoneCode}>
+                                <div className="flex items-center w-full px-1">
+                                  <span className="text-base min-w-[40px]">{country.phoneCode}</span>
+                                  <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+                                  <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                                </div>
+                              </Option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
                       <Field name="alternatemobilenumber">
                         {({ field }) => (
                           <Input
                             {...field}
-                            type="number"
-                            className="mt-1"
-                            style={{ width: '70%' }}
-                            placeholder="Enter Alternate Mobile Number"
-                            maxLength={10}
-                            onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'alternatemobilenumber')}
-                            onKeyPress={(e) => {
-                              if (!/[0-9]/.test(e.key)) {
-                                e.preventDefault();
-                              }
+                            className="phone-input"
+                            style={{
+                              borderTopLeftRadius: 0,
+                              borderBottomLeftRadius: 0,
+                              borderLeft: '1px solid #d9d9d9',
+                              width: 'calc(100% - 80px)'
                             }}
+                            type="number"
+                            placeholder="Enter alternate number"
+                            onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'alternatemobilenumber')}
                           />
                         )}
                       </Field>
                     </div>
-                    <ErrorMessage
-                      name="alternatemobilenumber"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
+                    <ErrorMessage name="alternatemobilenumber" component="div" className="text-red-500 mt-1 text-sm" />
                   </div>
                 </Col>
 
@@ -294,7 +367,7 @@ const AddCustomer = ({ onClose }) => {
                   </div>
                 </Col>
 
-                <Col span={12} className="mt-3">
+                {/* <Col span={12} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Phone  </label>
                     <div className="flex">
@@ -333,6 +406,88 @@ const AddCustomer = ({ onClose }) => {
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
+                  </div>
+                </Col> */}
+
+                <Col span={12} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
+                    <div className="flex gap-0">
+                      <Field name="billing_country_code">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            className="phone-code-select"
+                            style={{
+                              width: '80px',
+                              borderTopRightRadius: 0,
+                              borderBottomRightRadius: 0,
+                              borderRight: 0,
+                              backgroundColor: '#f8fafc',
+                            }}
+                            placeholder={<span className="text-gray-400">+91</span>}
+                            onChange={(value) => {
+                              if (value === 'add_new') {
+                                setIsAddPhoneCodeModalVisible(true);
+                              } else {
+                                setFieldValue('country_code', value);
+                              }
+                            }}
+                            value={values.billing_country_code}
+                            dropdownStyle={{ minWidth: '180px' }}
+                            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                            dropdownRender={menu => (
+                              <div>
+                                <div
+                                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                  onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                                >
+                                  <PlusOutlined className="mr-2" />
+                                  <span className="text-sm">Add New</span>
+                                </div>
+                                {menu}
+                              </div>
+                            )}
+                          >
+                            {countries?.map((country) => (
+                              <Option key={country.id} value={country.phoneCode}>
+                                <div className="flex items-center w-full px-1">
+                                  <span className="text-base min-w-[40px]">{country.phoneCode}</span>
+                                  <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+                                  <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                                </div>
+                              </Option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
+                      <Field name="billing_phone">
+                        {({ field, form }) => (
+                          <Input
+                            {...field}
+                            className="phone-input"
+                            style={{
+                              borderTopLeftRadius: 0,
+                              borderBottomLeftRadius: 0,
+                              borderLeft: '1px solid #d9d9d9',
+                              width: 'calc(100% - 80px)'
+                            }}
+                            type="tel"
+                            maxLength={10}
+                            placeholder="Enter phone number"
+                            onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'billing_phone')}
+                            onKeyPress={(e) => {
+                              const charCode = e.which ? e.which : e.keyCode;
+                              if (charCode < 48 || charCode > 57) {
+                                e.preventDefault();
+                              }
+                            }}
+                            value={values.billing_phone}
+                          />
+                        )}
+                      </Field>
+                    </div>
+                    <ErrorMessage name="billing_phone" component="div" className="text-red-500 mt-1 text-sm" />
                   </div>
                 </Col>
 
@@ -430,9 +585,9 @@ const AddCustomer = ({ onClose }) => {
                     <h1 className="font-semibold mb-2 text-lg">
                       Shipping Address
                     </h1>
-                    <Button 
-                      style={{ 
-                        backgroundColor: 'rgb(107 114 128)', 
+                    <Button
+                      style={{
+                        backgroundColor: 'rgb(107 114 128)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '4px'
@@ -473,49 +628,83 @@ const AddCustomer = ({ onClose }) => {
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Phone  </label>
-                    <div className="flex">
-                        <Select
-                        className="mt-1"
-                        style={{ width: '30%', marginRight: '8px' }}
-                        placeholder="Code"
-                        name="shipping_country_code"
-                        onChange={(value) => setFieldValue('shipping_country_code', value)}
-                        value={values.shipping_country_code}
-                      >
-                        {countries.map((country) => (
-                          <Option key={country.id} value={country.phoneCode}>
-                            {country.phoneCode}
-                          </Option>
-                        ))}
-                      </Select>
-                      <Field
-                        name="shipping_phone"
-                        as={Input}
-                        type="number"
-                        className="mt-1"
-                        maxLength={10}
-                        style={{ width: '70%' }}
-                        placeholder="Enter phone"
-                        onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'shipping_phone')}
-
-                        onKeyPress={(e) => {
-                          if (!/[0-9]/.test(e.key)) {
-                            e.preventDefault();
-                          }
-                        }}
-                      />
+                    <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
+                    <div className="flex gap-0">
+                      <Field name="shipping_country_code">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            className="phone-code-select"
+                            style={{
+                              width: '80px',
+                              borderTopRightRadius: 0,
+                              borderBottomRightRadius: 0,
+                              borderRight: 0,
+                              backgroundColor: '#f8fafc',
+                            }}
+                            placeholder={<span className="text-gray-400">+91</span>}
+                            onChange={(value) => {
+                              if (value === 'add_new') {
+                                setIsAddPhoneCodeModalVisible(true);
+                              } else {
+                                setFieldValue('country_code', value);
+                              }
+                            }}
+                            value={values.shipping_country_code}
+                            dropdownStyle={{ minWidth: '180px' }}
+                            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                            dropdownRender={menu => (
+                              <div>
+                                <div
+                                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                  onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                                >
+                                  <PlusOutlined className="mr-2" />
+                                  <span className="text-sm">Add New</span>
+                                </div>
+                                {menu}
+                              </div>
+                            )}
+                          >
+                            {countries?.map((country) => (
+                              <Option key={country.id} value={country.phoneCode}>
+                                <div className="flex items-center w-full px-1">
+                                  <span className="text-base min-w-[40px]">{country.phoneCode}</span>
+                                  <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+                                  <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                                </div>
+                              </Option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
+                      <Field name="shipping_phone">
+                        {({ field, form }) => (
+                          <Input
+                            {...field}
+                            className="phone-input"
+                            style={{
+                              borderTopLeftRadius: 0,
+                              borderBottomLeftRadius: 0,
+                              borderLeft: '1px solid #d9d9d9',
+                              width: 'calc(100% - 80px)'
+                            }}
+                            type="tel"
+                            maxLength={10}
+                            placeholder="Enter phone number"
+                            onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'shipping_phone')}
+                            onKeyPress={(e) => {
+                              const charCode = e.which ? e.which : e.keyCode;
+                              if (charCode < 48 || charCode > 57) {
+                                e.preventDefault();
+                              }
+                            }}
+                            value={values.shipping_phone}
+                          />
+                        )}
+                      </Field>
                     </div>
-                    <ErrorMessage
-                      name="shipping_country_code"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                    {/* <ErrorMessage
-                      name="shipping_phone"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    /> */}
+                    <ErrorMessage name="shipping_phone" component="div" className="text-red-500 mt-1 text-sm" />
                   </div>
                 </Col>
 
@@ -525,8 +714,6 @@ const AddCustomer = ({ onClose }) => {
                     <Field name="shipping_address" as={Input} placeholder="Enter Address" className="mt-1" />
                     <ErrorMessage
                       name="shipping_address"
-
-
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
@@ -599,7 +786,7 @@ const AddCustomer = ({ onClose }) => {
                     <Field
                       name="shipping_zipcode"
                       as={Input}
-                        placeholder="Enter Zip Code"
+                      placeholder="Enter Zip Code"
                       className="mt-1"
                     />
 
@@ -611,8 +798,7 @@ const AddCustomer = ({ onClose }) => {
                   </div>
                 </Col>
               </Row>
-
-              <div className="form-buttons text-right mt-4">
+              <div className="form-buttons text-right mt-4 mb-4">
                 <Button type="default" className="mr-2" onClick={onClose}>
                   Cancel
                 </Button>
@@ -623,9 +809,83 @@ const AddCustomer = ({ onClose }) => {
             </Form>
           )}
         </Formik>
+
+        <Modal
+          title="Add New Country"
+          visible={isAddPhoneCodeModalVisible}
+          onCancel={() => setIsAddPhoneCodeModalVisible(false)}
+          footer={null}
+          width={600}
+        >
+          <AddCountries
+            onClose={() => {
+              setIsAddPhoneCodeModalVisible(false);
+              dispatch(getallcountries());
+            }}
+          />
+        </Modal>
+
+        <style jsx>{`
+        .phone-code-select .ant-select-selector {
+          background-color: #f8fafc !important;
+          border-top-right-radius: 0 !important;
+          border-bottom-right-radius: 0 !important;
+          border-right: 0 !important;
+        }
+
+        .phone-code-select .ant-select-selection-item {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 14px !important;
+          font-weight: 500 !important;
+          color: rgba(0, 0, 0, 0.88) !important;
+        }
+
+        .phone-code-select .ant-select-selection-item > div {
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .phone-code-select .ant-select-selection-item span:not(:first-child) {
+          display: none !important;
+        }
+
+        .phone-code-select .ant-select-arrow {
+          color: rgba(0, 0, 0, 0.25) !important;
+          font-size: 10px !important;
+          right: 8px !important;
+        }
+
+        .phone-code-select:hover .ant-select-selector {
+          border-color: #d9d9d9 !important;
+        }
+
+        .phone-code-select.ant-select-focused .ant-select-selector {
+          border-color: #4096ff !important;
+          box-shadow: 0 0 0 2px rgba(5, 145, 255, 0.1) !important;
+        }
+
+        .phone-input::-webkit-inner-spin-button,
+        .phone-input::-webkit-outer-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+        }
+
+        .phone-input {
+          -moz-appearance: textfield;
+        }
+
+        .phone-input:focus {
+          outline: none;
+          border-color: #4096ff;
+          box-shadow: 0 0 0 2px rgba(5, 145, 255, 0.1);
+        }
+      `}</style>
       </div>
     </div>
   );
 };
 
 export default AddCustomer;
+

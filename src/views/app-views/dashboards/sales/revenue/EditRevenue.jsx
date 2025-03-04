@@ -239,17 +239,19 @@ const EditRevenue = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12}>
+                  <Col span={12} className="mt-3">
                       <div className="form-group">
-                        <label className="text-gray-600 font-semibold mb-2 block"> Currency <span className="text-red-500">*</span></label>
-                        <div className="flex gap-0">
+                        <label className="text-gray-600 font-semibold mb-1 block">Currency & Amount <span className="text-red-500">*</span></label>
+                        <div className="flex gap-0" style={{ display: 'flex' }}>
                           <Field name="currency">
                             {({ field }) => (
                               <Select
                                 {...field}
                                 className="currency-select"
                                 style={{
-                                  width: '60px',
+                                  width: '80px',
+                                  minWidth: '80px',
+                                  flex: '0 0 80px',
                                   borderTopRightRadius: 0,
                                   borderBottomRightRadius: 0,
                                   borderRight: 0,
@@ -265,20 +267,6 @@ const EditRevenue = ({ idd, onClose }) => {
                                 }}
                                 value={values.currency}
                                 dropdownStyle={{ minWidth: '180px' }}
-                                suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-                                loading={!fnddatass}
-                                dropdownRender={menu => (
-                                  <div>
-                                    <div
-                                      className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                                      onClick={() => setIsAddCurrencyModalVisible(true)}
-                                    >
-                                      <PlusOutlined className="mr-2" />
-                                      <span className="text-sm">Add New</span>
-                                    </div>
-                                    {menu}
-                                  </div>
-                                )}
                               >
                                 {fnddatass?.map((currency) => (
                                   <Option key={currency.id} value={currency.id}>
@@ -298,10 +286,10 @@ const EditRevenue = ({ idd, onClose }) => {
                                 {...field}
                                 className="price-input"
                                 style={{
+                                  flex: 1,
                                   borderTopLeftRadius: 0,
                                   borderBottomLeftRadius: 0,
                                   borderLeft: '1px solid #d9d9d9',
-                                  width: 'calc(100% - 100px)'
                                 }}
                                 type="number"
                                 min="0"
@@ -310,30 +298,16 @@ const EditRevenue = ({ idd, onClose }) => {
                                 onChange={(e) => {
                                   const value = e.target.value;
                                   if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
-                                    form.setFieldValue('amount', value);
+                                    setFieldValue('amount', value);
                                   }
                                 }}
-                                onKeyPress={(e) => {
-                                  const charCode = e.which ? e.which : e.keyCode;
-                                  if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
-                                    e.preventDefault();
-                                  }
-                                  if (charCode === 46 && field.value.includes('.')) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                                prefix={
-                                  values.currency && (
-                                    <span className="text-gray-600 font-medium mr-1">
-                                      {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
-                                    </span>
-                                  )
-                                }
+                                onBlur={() => setFieldTouched("amount", true)}
                               />
                             )}
                           </Field>
                         </div>
                         <ErrorMessage name="amount" component="div" className="text-red-500 mt-1 text-sm" />
+                        <ErrorMessage name="currency" component="div" className="text-red-500 mt-1 text-sm" />
                       </div>
                     </Col>
                   <Col span={12} className="mt-3">

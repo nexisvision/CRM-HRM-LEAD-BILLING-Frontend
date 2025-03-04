@@ -61,8 +61,8 @@ const AddProject = ({ onClose }) => {
 
   const getInitialCurrency = () => {
     if (fnddatass?.length > 0) {
-      const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
-      return usdCurrency?.id || fnddatass[0]?.id;
+      const inrCurrency = fnddatass.find(c => c.currencyCode === 'INR');
+      return inrCurrency?.id || fnddatass[0]?.id;
     }
     return '';
   };

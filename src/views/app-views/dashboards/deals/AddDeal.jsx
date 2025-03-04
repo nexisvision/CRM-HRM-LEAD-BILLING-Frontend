@@ -18,6 +18,7 @@ import {getallcountries} from "../../setting/countries/countriesreducer/countrie
 import AddDealStages from "../systemsetup/DealStages/AddDealStages";
 import AddPipeLine from "../systemsetup/Pipeline/AddPipeLine";
 import AddCurrencies from "views/app-views/setting/currencies/AddCurrencies";
+import AddCountries from "views/app-views/setting/countries/AddCountries";
 const { Option } = Select;
 const AddDeal = ({ onClose }) => {
   const navigate = useNavigate();
@@ -141,16 +142,24 @@ const AddDeal = ({ onClose }) => {
 
   const getInitialCurrency = () => {
     if (fnddatass?.length > 0) {
-      const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
-      return usdCurrency?.id || fnddatass[0]?.id;
+      const inrCurrency = fnddatass.find(c => c.currencyCode === 'INR');
+      return inrCurrency?.id || fnddatass[0]?.id;
     }
     return '';
+  };
+
+  const getInitialCountry = () => {
+    if (countries?.length > 0) {
+      const indiaCode = countries.find(c => c.countryCode === 'IN');
+      return indiaCode?.phoneCode || "+91";
+    }
+    return "+91";
   };
 
   const initialValues = {
     dealName: "",
     phoneNumber: "",
-    phoneCode: "",
+    phoneCode: getInitialCountry(),
     price: "",
     leadTitle: "",
     currency: getInitialCurrency(),
@@ -226,6 +235,15 @@ const AddDeal = ({ onClose }) => {
     setIsAddPipeLineModalVisible(false);
   };
 
+  const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
+
+  const handlePhoneNumberChange = (e, setFieldValue) => {
+    const value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 15) {
+      setFieldValue('phoneNumber', value);
+    }
+  };
+
   return (
     <div className="add-job-form">
       <Formik
@@ -256,49 +274,79 @@ const AddDeal = ({ onClose }) => {
               </Col>
               <Col span={12} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Phone <span className="text-rose-500">*</span></label>
-                  <div className="flex">
-                    <Select
-                      style={{ width: '30%', marginRight: '8px' }}
-                      placeholder="Code"
-                      name="phoneCode"
-                      className="mt-1"
-                      value={values.phoneCode}
-                      onChange={(value) => setFieldValue('phoneCode', value)}
-                    >
-                      {countries.map((country) => (
-                        <Option key={country.id} value={country.phoneCode}>
-                          ({country.phoneCode})
-                        </Option>
-                      ))}
-                    </Select>
+                  <label className="font-semibold">Phone
+                    <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="flex gap-0">
+                    <Field name="phoneCode">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="phone-code-select"
+                          style={{
+                            width: '80px',
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRight: 0,
+                            backgroundColor: '#f8fafc',
+                          }}
+                          placeholder={<span className="text-gray-400">+91</span>}
+                          onChange={(value) => {
+                            if (value === 'add_new') {
+                              setIsAddPhoneCodeModalVisible(true);
+                            } else {
+                              setFieldValue('phoneCode', value);
+                            }
+                          }}
+                          value={values.phoneCode || getInitialCountry()}
+                          dropdownStyle={{ minWidth: '180px' }}
+                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                          loading={!countries}
+                          dropdownRender={menu => (
+                            <div>
+                              <div
+                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                              >
+                                <PlusOutlined className="mr-2" />
+                                <span className="text-sm">Add New</span>
+                              </div>
+                              {menu}
+                            </div>
+                          )}
+                        >
+                          {countries?.map((country) => (
+                            <Option key={country.id} value={country.phoneCode}>
+                              <div className="flex items-center w-full px-1">
+                                <span className="text-base min-w-[40px]">{country.phoneCode}</span>
+                                <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+                                <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                              </div>
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
                     <Field name="phoneNumber">
                       {({ field }) => (
                         <Input
                           {...field}
-                          type="number"
-                          style={{ width: '70%' }}
-                          placeholder="Enter phone number"
-                          onKeyPress={(e) => {
-                            // Allow only numbers
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                          className="phone-input"
+                          style={{
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderLeft: 0,
+                            width: 'calc(100% - 80px)'
                           }}
+                          type="tel"
+                          placeholder="Enter 10-digit number"
+                          onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
+                          maxLength={15}
                         />
                       )}
                     </Field>
                   </div>
-                  {/* <ErrorMessage
-                    name="phoneCode"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  /> */}
-                  <ErrorMessage
-                    name="phoneNumber"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <ErrorMessage name="phoneNumber" component="div" className="text-red-500 mt-1 text-sm" />
                 </div>
               </Col>
               <Col span={12} className="mt-3">
@@ -311,13 +359,13 @@ const AddDeal = ({ onClose }) => {
                           {...field}
                           className="currency-select"
                           style={{
-                            width: '60px',
+                            width: '80px',
                             borderTopRightRadius: 0,
                             borderBottomRightRadius: 0,
                             borderRight: 0,
                             backgroundColor: '#f8fafc',
                           }}
-                          placeholder={<span className="text-gray-400">$</span>}
+                          placeholder={<span className="text-gray-400">₹</span>}
                           onChange={(value) => {
                             if (value === 'add_new') {
                               setIsAddCurrencyModalVisible(true);
@@ -325,6 +373,7 @@ const AddDeal = ({ onClose }) => {
                               setFieldValue("currency", value);
                             }
                           }}
+                          defaultValue={getInitialCurrency()}
                           value={values.currency}
                           dropdownStyle={{ minWidth: '180px' }}
                           suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
@@ -709,6 +758,62 @@ const AddDeal = ({ onClose }) => {
           }}
         />
       </Modal>
+
+      {/* Add Phone Code Modal */}
+      <Modal
+        title="Add New Country"
+        visible={isAddPhoneCodeModalVisible}
+        onCancel={() => setIsAddPhoneCodeModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <AddCountries
+          onClose={() => {
+            setIsAddPhoneCodeModalVisible(false);
+            dispatch(getallcountries());
+          }}
+        />
+      </Modal>
+
+      {/* Add these styles */}
+      <style jsx>{`
+        .phone-code-select .ant-select-selector {
+          background-color: #f8fafc !important;
+          border-top-right-radius: 0 !important;
+          border-bottom-right-radius: 0 !important;
+          border-right: 0 !important;
+        }
+
+        .phone-code-select .ant-select-selection-item {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 16px !important;
+        }
+
+        .phone-code-select .ant-select-selection-item > div {
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .phone-code-select .ant-select-selection-item span:not(:first-child) {
+          display: none !important;
+        }
+
+        .phone-input {
+          border-top-left-radius: 0 !important;
+          border-bottom-left-radius: 0 !important;
+        }
+
+        .phone-input:focus {
+          border-color: #d9d9d9 !important;
+          box-shadow: none !important;
+        }
+
+        .phone-input:hover {
+          border-color: #d9d9d9 !important;
+        }
+      `}</style>
     </div>
   );
 };

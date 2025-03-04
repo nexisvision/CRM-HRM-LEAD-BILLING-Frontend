@@ -25,6 +25,7 @@ import { getallcountries } from "views/app-views/setting/countries/countriesredu
 import AddLeadStages from "../systemsetup/LeadStages/AddLeadStages";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 import AddCurrencies from "views/app-views/setting/currencies/AddCurrencies";
+import AddCountries from "views/app-views/setting/countries/AddCountries";
 
 const { Option } = Select;
 
@@ -95,6 +96,7 @@ const AddLead = ({ onClose }) => {
 
   const [isAddLeadStageModalVisible, setIsAddLeadStageModalVisible] = useState(false);
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
+  const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
 
   const fetchLables = async (lableType, setter) => {
     try {
@@ -183,6 +185,23 @@ const AddLead = ({ onClose }) => {
   const allcountry = useSelector((state) => state.countries);
   const fndcountry = allcountry?.countries?.data || [];
 
+  // Define the function first
+  const getInitialCountry = () => {
+    if (countries?.length > 0) {
+      const indiaCode = countries.find(c => c.countryCode === 'IN');
+      return indiaCode?.phoneCode || "+91";
+    }
+    return "+91";
+  };
+
+  const handlePhoneNumberChange = (e, setFieldValue) => {
+    const value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 15) {
+      setFieldValue('telephone', value);
+    }
+  };
+
+  // Then use it in initialValues
   const initialValues = {
     leadTitle: "",
     firstName: "",
@@ -203,6 +222,7 @@ const AddLead = ({ onClose }) => {
     contentType: "",
     brandName: "",
     tags: [],
+    phoneCode: getInitialCountry(),
   };
 
   useEffect(() => {
@@ -222,9 +242,8 @@ const AddLead = ({ onClose }) => {
     firstName: Yup.string().required("First name is required"),
     lastName: Yup.string().required("Last Name is required"),
     telephone: Yup.string()
-      .required("Please enter a valid number")
-      .matches(/^\d+$/, "Please enter only numbers")
-      .nullable(),
+      .matches(/^\d{10}$/, 'Phone number must be exactly 10 digits')
+      .required('Please enter a valid number'),
     email: Yup.string().optional("Please enter a valid email address").nullable(),
     leadStage: Yup.string().required("Lead Stage is required"),
     leadValue: Yup.number().optional("Lead Value must be a number").nullable(),
@@ -261,6 +280,7 @@ const AddLead = ({ onClose }) => {
       then: Yup.string().required("Brand name is required"),
     }),
     tags: Yup.array().min(1, "At least one tag is required"),
+    phoneCode: Yup.string().required('Country code is required'),
   });
 
   const onSubmit = (values, { resetForm }) => {
@@ -479,45 +499,85 @@ const AddLead = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Telephone
-                    <span className="text-rose-500"> *</span>
-                  </label>
-                  <div className="flex">
-                    <Select
-                      style={{ width: '30%', marginRight: '8px' }}
-                      placeholder="Code"
-                      name="phoneCode"
-                      className="mt-1"
-                      onChange={(value) => setFieldValue('phoneCode', value)}
-                    >
-                      {Array.isArray(countries) && countries.length > 0 ? (
-                        countries.map((country) => (
-                          <Option key={country.id} value={country.phoneCode}>
-                            ({country.phoneCode})
-                          </Option>
-                        ))
-                      ) : (
-                        <Option value="" disabled>Loading country codes...</Option>
+              <Col span={12}>
+                <div className="form-group">
+                  <label className="text-gray-600 font-semibold mb-2 block">Telephone <span className="text-red-500">*</span></label>
+                  <div className="flex gap-0">
+                    <Field name="phoneCode">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="phone-code-select"
+                          style={{
+                            width: '80px',
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRight: 0,
+                            backgroundColor: '#f8fafc',
+                          }}
+                          placeholder={<span className="text-gray-400">+91</span>}
+                          // defaultValue={getInitialPhoneCode()}
+                          onChange={(value) => {
+                            if (value === 'add_new') {
+                              setIsAddPhoneCodeModalVisible(true);
+                            } else {
+                              setFieldValue('phoneCode', value);
+                            }
+                          }}
+                          value={values.phoneCode}
+                          dropdownStyle={{ minWidth: '180px' }}
+                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                          dropdownRender={menu => (
+                            <div>
+                              <div
+                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                              >
+                                <PlusOutlined className="mr-2" />
+                                <span className="text-sm">Add New</span>
+                              </div>
+                              {menu}
+                            </div>
+                          )}
+                        >
+                          {countries?.map((country) => (
+                            <Option key={country.id} value={country.phoneCode}>
+                              <div className="flex items-center w-full px-1">
+                                <span className="text-base min-w-[40px]">{country.phoneCode}</span>
+                                <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+                                <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                              </div>
+                            </Option>
+                          ))}
+                        </Select>
                       )}
-                    </Select>
-                    <Field
-                      name="telephone"
-                      as={Input}
-                      style={{ width: '70%' }}
-                      placeholder="Enter Telephone"
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '');
-                        setFieldValue('telephone', value.toString());
-                      }}
-                    />
+                    </Field>
+                    <Field name="telephone">
+                      {({ field }) => (
+                        <Input
+                          {...field}
+                          className="phone-input"
+                          style={{
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderLeft: '1px solid #d9d9d9',
+                            width: 'calc(100% - 80px)'
+                          }}
+                          type="number"
+                          placeholder="Enter telephone number"
+                          onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
+                          // prefix={
+                          //   values.phoneCode && (
+                          //     <span className="text-gray-600 font-medium mr-1">
+                          //       {values.phoneCode}
+                          //     </span>
+                          //   )
+                          // }
+                        />
+                      )}
+                    </Field>
                   </div>
-                  <ErrorMessage
-                    name="telephone"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <ErrorMessage name="telephone" component="div" className="text-red-500 mt-1 text-sm" />
                 </div>
               </Col>
 
@@ -1092,6 +1152,21 @@ const AddLead = ({ onClose }) => {
               />
             </Modal>
 
+            <Modal
+              title="Add New Country"
+              visible={isAddPhoneCodeModalVisible}
+              onCancel={() => setIsAddPhoneCodeModalVisible(false)}
+              footer={null}
+              width={600}
+            >
+              <AddCountries
+                onClose={() => {
+                  setIsAddPhoneCodeModalVisible(false);
+                  dispatch(getallcountries());
+                }}
+              />
+            </Modal>
+
           </Form>
         )}
       </Formik>
@@ -1118,14 +1193,65 @@ export default AddLead;
     display: none !important;
   }
 
-  .ant-select-dropdown .ant-select-item {
-    padding: 8px 12px !important;
-  }
+ .ant-select-dropdown .ant-select-item {
+          padding: 8px 12px !important;
+        }
 
-  .ant-select-dropdown .ant-select-item-option-content > div {
-    display: flex !important;
-    align-items: center !important;
-    width: 100% !important;
-  }
+        .ant-select-dropdown .ant-select-item-option-content > div {
+          display: flex !important;
+          align-items: center !important;
+          width: 100% !important;
+        }
+
+        //    .contract-select .ant-select-selection-item {
+        //   display: flex !important;
+        //   align-items: center !important;
+        //   justify-content: center !important;
+        //   font-size: 16px !important;
+        // }
+
+        // .contract-select .ant-select-selection-item > div {
+        //   display: flex !important;
+        //   align-items: center !important;
+        // }
+
+        // .contract-select .ant-select-selection-item span:not(:first-child) {
+        //   display: none !important;
+        // }
+
+        .phone-code-select .ant-select-selector {
+          // height: 32px !important;
+          // padding: 0 8px !important;
+          background-color: #f8fafc !important;
+          border-top-right-radius: 0 !important;
+          border-bottom-right-radius: 0 !important;
+          border-right: 0 !important;
+        }
+
+        .phone-code-select .ant-select-selection-item {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 16px !important;
+        }
+
+        .phone-code-select .ant-select-selection-item > div {
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .phone-code-select .ant-select-selection-item span:not(:first-child) {
+          display: none !important;
+        }
+
+        // .phone-input::-webkit-inner-spin-button,
+        // .phone-input::-webkit-outer-spin-button {
+        //   -webkit-appearance: none;
+        //   margin: 0;
+        // }
+
+        // .phone-input {
+        //   -moz-appearance: textfield;
+        // }
 `}</style>
 

@@ -23,6 +23,7 @@ import moment from "moment";
 import { PlusOutlined } from "@ant-design/icons";
 import { GetLable, AddLable } from "../sales/LableReducer/LableSlice";
 import AddCurrencies from '../../setting/currencies/AddCurrencies';
+import AddCountries from "views/app-views/setting/countries/AddCountries";
 
 const { Option } = Select;
 
@@ -47,17 +48,25 @@ const AddContract = ({ onClose }) => {
   const allempdatass = useSelector((state) => state.currencies);
   const fnddatass = allempdatass?.currencies?.data;
 
+  const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
+
   const getInitialCurrency = () => {
     if (fnddatass?.length > 0) {
-      const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
-      return usdCurrency?.id || fnddatass[0]?.id;
+      const inrCurrency = fnddatass.find(c => c.currencyCode === 'INR');
+      return inrCurrency?.id || fnddatass[0]?.id;
     }
     return '';
   };
 
-  useEffect(() => {
-    dispatch(getallcountries());
-  }, [dispatch]);
+  const getInitialCountry = () => {
+    if (countries?.length > 0) {
+      const indiaCode = countries.find(c => c.countryCode === 'IN');
+      return indiaCode?.phoneCode || "+91";
+    }
+    return "+91";
+  };
+
+ 
 
   useEffect(() => {
     dispatch(getcurren());
@@ -73,13 +82,21 @@ const AddContract = ({ onClose }) => {
     fetchLables("contracttype", setContracttypes);
   }, []);
 
+  // const getInitialCountry = () => {
+  //   if (countries?.length > 0) {
+  //     const country = countries.find(c => c.countryCode === 'IN');
+  //     return country?.id || countries[0]?.id;
+  //   }
+  //   return '';
+  // };
+
   const initialValues = {
     subject: "",
     client: "",
     project: "",
     type: "",
-    currency: getInitialCurrency(),
-    phoneCode: "",
+      currency: getInitialCurrency(),
+    phoneCode: getInitialCountry(),
     phone: "",
     address: "",
     city: "",
@@ -142,74 +159,6 @@ const AddContract = ({ onClose }) => {
       .min(10, "Description must be at least 10 characters long"),
   });
 
-
-
-
-  // ... existing code ...
-
-// const validationSchema = Yup.object().shape({
-//   subject: Yup.string().required("Please enter a Subject Name."),
-//   client: Yup.string().required("Please select a Client."),
-//   project: Yup.string().required("Please select a Project."),
-//   type: Yup.string().required("Please enter Contract Type."),
-//   address: Yup.string().required("Please enter a Address."),
-//   phoneCode: Yup.string().required("Please select a Country Code."),
-//   phone: Yup.string()
-//     .required("Please enter a Phone Number.")
-//     .matches(/^\d+$/, "Phone number must contain only digits")
-//     .min(6, "Phone number must be at least 6 digits")
-//     .max(15, "Phone number must not exceed 15 digits"),
-//   city: Yup.string().required("Please enter a City."),
-//   notes: Yup.string().required("Please enter Notes."),
-//   country: Yup.string().required("Please select a Country."),
-//   state: Yup.string().required("Please enter a State."),
-//   currency: Yup.string().required("Please select Contract currency."),
-//   startDate: Yup.date()
-//     .required("Start date is required.")
-//     .nullable()
-//     .test("startDate", "Start date cannot be in the past", function(value) {
-//       if (!value) return true;
-//       const today = new Date();
-//       today.setHours(0, 0, 0, 0);
-//       return value >= today;
-//     }),
-//   endDate: Yup.date()
-//     .required("End date is required.")
-//     .nullable()
-//     .test("endDate", "End date must be after start date", function(value) {
-//       const { startDate } = this.parent;
-//       if (!startDate || !value) return true;
-//       return value > startDate;
-//     }),
-//   zipcode: Yup.string()
-//     .required("Please enter a Zip Code.")
-//     .matches(/^\d+$/, "Zip code must contain only digits")
-//     .min(5, "Zip code must be at least 5 digits")
-//     .max(10, "Zip code must not exceed 10 digits"),
-//   value: Yup.number()
-//     .required("Please enter a Contract Value.")
-//     .positive("Contract Value must be positive.")
-//     .min(0.01, "Contract Value must be greater than 0")
-//     .typeError("Contract Value must be a number"),
-//   description: Yup.string()
-//     .required("Please enter a Description.")
-//     .min(10, "Description must be at least 10 characters long"),
-// });
-
-// ... existing code ...
-
-// Update the handlePhoneNumberChange function
-
-
-
-// const handlePhoneNumberChange = (e, setFieldValue) => {
-//   const value = e.target.value.replace(/\D/g, '');
-//   if (value.length <= 15) { // Limit phone number length
-//     setFieldValue('phone', value);
-//   }
-// };
-
-// ... existing code ...
   const onSubmit = (values, { resetForm }) => {
     const formattedValues = {
       ...values,
@@ -219,8 +168,6 @@ const AddContract = ({ onClose }) => {
       value: values.value ? parseFloat(values.value) : 0
     };
 
-    // console.log("Submitting values:", formattedValues);
-    
     dispatch(AddCon(formattedValues))
       .unwrap()
       .then(() => {
@@ -239,14 +186,10 @@ const AddContract = ({ onClose }) => {
 
   const clientdata = filtersubclient?.filter((item) => item.created_by === allloggeduser);
 
-
-
   const Projectdtaa = useSelector((state) => state.Project);
   const filterprojectdata = Projectdtaa.Project.data || [];
 
-
   const projectdata = filterprojectdata?.filter((item) => item.created_by === allloggeduser);
-
 
   const fetchLables = async (lableType, setter) => {
     try {
@@ -309,7 +252,7 @@ const AddContract = ({ onClose }) => {
 
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({ handleSubmit, setFieldValue, values,setFieldTouched }) => (
@@ -333,40 +276,84 @@ const AddContract = ({ onClose }) => {
               </Col>
 
               <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
-                  <div className="flex">
-                    <Select
-                      style={{ width: '30%', marginRight: '8px' }}
-                      placeholder="Code"
-                      className="mt-1"
-                      name="phoneCode"
-                      onChange={(value) => setFieldValue('phoneCode', value)}
-                    >
-                      {countries.map((country) => (
-                        <Option key={country.id} value={country.phoneCode}>
-                          ({country.phoneCode})
-                        </Option>
-                      ))}
-                    </Select>
+                <div className="form-group">
+                  <label className="text-gray-600 font-semibold mb-2 block">Phone <span className="text-red-500">*</span></label>
+                  <div className="flex gap-0">
+                    <Field name="phoneCode">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="phone-code-select"
+                          style={{
+                            width: '80px',
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRight: 0,
+                            backgroundColor: '#f8fafc',
+                          }}
+                          placeholder={<span className="text-gray-400">+91</span>}
+                          // defaultValue={getInitialPhoneCode()}
+                          onChange={(value) => {
+                            if (value === 'add_new') {
+                              setIsAddPhoneCodeModalVisible(true);
+                            } else {
+                              setFieldValue('phoneCode', value);
+                            }
+                          }}
+                          value={values.phoneCode}
+                          dropdownStyle={{ minWidth: '180px' }}
+                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                          dropdownRender={menu => (
+                            <div>
+                              <div
+                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                              >
+                                <PlusOutlined className="mr-2" />
+                                <span className="text-sm">Add New</span>
+                              </div>
+                              {menu}
+                            </div>
+                          )}
+                        >
+                          {countries?.map((country) => (
+                            <Option key={country.id} value={country.phoneCode}>
+                              <div className="flex items-center w-full px-1">
+                                <span className="text-base min-w-[40px]">{country.phoneCode}</span>
+                                <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+                                <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                              </div>
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
                     <Field name="phone">
                       {({ field }) => (
                         <Input
                           {...field}
+                          className="phone-input"
+                          style={{
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderLeft: '1px solid #d9d9d9',
+                            width: 'calc(100% - 80px)'
+                          }}
                           type="number"
-                          className="mt-1"
-                          style={{ width: '70%' }}
-                          placeholder="Enter phone"
+                          placeholder="Enter phone number"
                           onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
+                          // prefix={
+                          //   values.phoneCode && (
+                          //     <span className="text-gray-600 font-medium mr-1">
+                          //       {values.phoneCode}
+                          //     </span>
+                          //   )
+                          // }
                         />
                       )}
                     </Field>
                   </div>
-                  <ErrorMessage
-                    name="phone"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <ErrorMessage name="phone" component="div" className="text-red-500 mt-1 text-sm" />
                 </div>
               </Col>
 
@@ -403,6 +390,7 @@ const AddContract = ({ onClose }) => {
                 <div className="form-item">
                   <label className="font-semibold">Country <span className="text-red-500">*</span></label>
                   <Select
+                   
                     className="w-full mt-1"
                     placeholder="Select Country"
                     name="country"
@@ -492,7 +480,43 @@ const AddContract = ({ onClose }) => {
                 </div>
               </Col>
 
+             
+
               <Col span={12} className="mt-4">
+                <div className="form-item">
+                  <label className="font-semibold">Projects <span className="text-red-500">*</span></label>
+                  <Field name="project">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-1"
+                        placeholder="Select Projects"
+                        onChange={(value) => setFieldValue("project", value)}
+                        value={values.project}
+                      >
+                        {filteredProjects && filteredProjects.length > 0 ? (
+                          filteredProjects.map((project) => (
+                            <Option key={project.id} value={project.id}>
+                              {project.project_name || "Unnamed Project"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Projects Available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="project"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+               <Col span={12} className="mt-4">
                       <div className="form-group">
                         <label className="text-gray-600 font-semibold mb-2 block"> Currency <span className="text-red-500">*</span></label>
                         <div className="flex gap-0">
@@ -502,7 +526,7 @@ const AddContract = ({ onClose }) => {
                                 {...field}
                                 className="currency-select"
                                 style={{
-                                  width: '60px',
+                                  width: '80px',
                                   borderTopRightRadius: 0,
                                   borderBottomRightRadius: 0,
                                   borderRight: 0,
@@ -589,110 +613,6 @@ const AddContract = ({ onClose }) => {
                         <ErrorMessage name="value" component="div" className="text-red-500 mt-1 text-sm" />
                       </div>
                     </Col>
-
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Projects <span className="text-red-500">*</span></label>
-                  <Field name="project">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        placeholder="Select Projects"
-                        onChange={(value) => setFieldValue("project", value)}
-                        value={values.project}
-                      >
-                        {filteredProjects && filteredProjects.length > 0 ? (
-                          filteredProjects.map((project) => (
-                            <Option key={project.id} value={project.id}>
-                              {project.project_name || "Unnamed Project"}
-                            </Option>
-                          ))
-                        ) : (
-                          <Option value="" disabled>
-                            No Projects Available
-                          </Option>
-                        )}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="project"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Contract Type <span className="text-red-500">*</span></label>
-                  <Field name="type">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        placeholder="Select Contract Type"
-                        onChange={(value) => setFieldValue("type", value)}
-                        value={values.type}
-                        dropdownRender={(menu) => (
-                          <div>
-                            {menu}
-                            <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                              <Button
-                                type="link"
-                                icon={<PlusOutlined /> }
-                                onClick={() => setIsContracttypeModalVisible(true)}
-                                className="w-full items-center flex"
-                              >
-                                Add New Type
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                      >
-                        {contracttypes.map((contracttype) => (
-                          <Option key={contracttype.id} value={contracttype.name}>
-                            {contracttype.name}
-                          </Option>
-                        ))}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="type"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              {/* <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Contract Value <span className="text-red-500">*</span></label>
-                  <Field name="value">
-                    {({ field }) => (
-                      <Input
-                        {...field}
-                        type="number"
-                        className="mt-1"
-                        step="0.01"
-                        min="0"
-                        placeholder="Enter Contract Value"
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          setFieldValue('value', value ? parseFloat(value) : '');
-                        }}
-                      />
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="value"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
@@ -803,7 +723,6 @@ const AddContract = ({ onClose }) => {
         />
       </Modal>
 
-      {/* Add Currency Modal */}
       <Modal
         title="Add New Currency"
         visible={isAddCurrencyModalVisible}
@@ -814,12 +733,26 @@ const AddContract = ({ onClose }) => {
         <AddCurrencies
           onClose={() => {
             setIsAddCurrencyModalVisible(false);
-            dispatch(getcurren()); // Refresh currency list after adding
+            dispatch(getcurren());
           }}
         />
       </Modal>
 
-      {/* Custom render for selected value */}
+      <Modal
+        title="Add New Country"
+        visible={isAddPhoneCodeModalVisible}
+        onCancel={() => setIsAddPhoneCodeModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <AddCountries
+          onClose={() => {
+            setIsAddPhoneCodeModalVisible(false);
+            dispatch(getallcountries());
+          }}
+        />
+      </Modal>
+
       <style jsx>{`
         .currency-select .ant-select-selection-item {
           display: flex !important;
@@ -846,6 +779,57 @@ const AddContract = ({ onClose }) => {
           align-items: center !important;
           width: 100% !important;
         }
+
+        //    .contract-select .ant-select-selection-item {
+        //   display: flex !important;
+        //   align-items: center !important;
+        //   justify-content: center !important;
+        //   font-size: 16px !important;
+        // }
+
+        // .contract-select .ant-select-selection-item > div {
+        //   display: flex !important;
+        //   align-items: center !important;
+        // }
+
+        // .contract-select .ant-select-selection-item span:not(:first-child) {
+        //   display: none !important;
+        // }
+
+        .phone-code-select .ant-select-selector {
+          // height: 32px !important;
+          // padding: 0 8px !important;
+          background-color: #f8fafc !important;
+          border-top-right-radius: 0 !important;
+          border-bottom-right-radius: 0 !important;
+          border-right: 0 !important;
+        }
+
+        .phone-code-select .ant-select-selection-item {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 16px !important;
+        }
+
+        .phone-code-select .ant-select-selection-item > div {
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .phone-code-select .ant-select-selection-item span:not(:first-child) {
+          display: none !important;
+        }
+
+        // .phone-input::-webkit-inner-spin-button,
+        // .phone-input::-webkit-outer-spin-button {
+        //   -webkit-appearance: none;
+        //   margin: 0;
+        // }
+
+        // .phone-input {
+        //   -moz-appearance: textfield;
+        // }
       `}</style>
     </div>
   );

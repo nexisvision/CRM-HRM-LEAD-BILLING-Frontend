@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
-import { Button, Row, Col, Input, Checkbox, message } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Button, Row, Col, Input, Checkbox, message, Modal, Select } from 'antd';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { vendordataedata, vendordataeditt } from './vendorReducers/vendorSlice';
+import { PlusOutlined } from '@ant-design/icons';
+import AddCountries from "views/app-views/setting/countries/AddCountries";
+import { getallcountries } from 'views/app-views/setting/countries/countriesreducer/countriesSlice';
 // Import your vendor actions here
+
+const { Option } = Select;
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
-  contact: Yup.string().required('Contact is required'),
+  contact: Yup.string()
+    .matches(/^\d{10}$/, 'Phone number must be exactly 10 digits')
+    .required('Contact is required'),
   email: Yup.string().email('Invalid email').required('Email is required'),
   taxNumber: Yup.string().required('Tax Number is required'),
   address: Yup.string().required('Address is required'),
@@ -16,12 +23,25 @@ const validationSchema = Yup.object().shape({
   state: Yup.string().required('State is required'),
   country: Yup.string().required('Country is required'),
   zipcode: Yup.string().required('Zip code is required'),
+  phoneCode: Yup.string().required('Country code is required'),
 });
 
 const EditVendor = ({ onClose, vendorData, idd }) => {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  console.log("vendorData", vendorData);
+  const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
+  const countries = useSelector((state) => state.countries?.countries);
+
+  useEffect(() => {
+    dispatch(getallcountries());
+  }, [dispatch]);
+
+  const handlePhoneNumberChange = (e, setFieldValue) => {
+    const value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 15) {
+      setFieldValue('contact', value);
+    }
+  };
 
   const initialValues = {
     name: vendorData?.name || '',
@@ -33,6 +53,7 @@ const EditVendor = ({ onClose, vendorData, idd }) => {
     state: vendorData?.state || '',
     country: vendorData?.country || '',
     zipcode: vendorData?.zipcode || '',
+    phoneCode: vendorData?.phoneCode || '+91',
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -62,7 +83,7 @@ const EditVendor = ({ onClose, vendorData, idd }) => {
       onSubmit={handleSubmit}
       enableReinitialize={true}
     >
-      {({ values, errors, touched }) => (
+      {({ values, errors, touched, setFieldValue }) => (
         <Form className="edit-vendor-form">
           <h1 className='border-b-2 border-gray-300'></h1>
           <h2 className='text-2xl font-bold mt-2'>Basic Info</h2>
@@ -85,15 +106,75 @@ const EditVendor = ({ onClose, vendorData, idd }) => {
             </Col>
             <Col span={8}>
               <div className="form-group mt-3">
-                <label className='font-semibold'>
-                  Contact <span className="text-red-500">*</span>
-                </label>
-                <Field
-                  name="contact"
-                  as={Input}
-                  placeholder="Enter Contact"
-                  className={errors.contact && touched.contact ? 'is-invalid' : 'mt-1'}
-                />
+                <label className="font-semibold">Contact <span className="text-red-500">*</span></label>
+                <div className="flex gap-0">
+                  <Field name="phoneCode">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="phone-code-select"
+                        style={{
+                          width: '80px',
+                          borderTopRightRadius: 0,
+                          borderBottomRightRadius: 0,
+                          borderRight: 0,
+                          backgroundColor: '#f8fafc',
+                        }}
+                        placeholder={<span className="text-gray-400">+91</span>}
+                        onChange={(value) => {
+                          if (value === 'add_new') {
+                            setIsAddPhoneCodeModalVisible(true);
+                          } else {
+                            setFieldValue('phoneCode', value);
+                          }
+                        }}
+                        value={values.phoneCode}
+                        dropdownStyle={{ minWidth: '180px' }}
+                        suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                        dropdownRender={menu => (
+                          <div>
+                            <div
+                              className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                              onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                            >
+                              <PlusOutlined className="mr-2" />
+                              <span className="text-sm">Add New</span>
+                            </div>
+                            {menu}
+                          </div>
+                        )}
+                      >
+                        {countries?.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            <div className="flex items-center w-full px-1">
+                              <span className="text-base min-w-[40px]">{country.phoneCode}</span>
+                              <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+                              <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                            </div>
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <Field name="contact">
+                    {({ field }) => (
+                      <Input
+                        {...field}
+                        className="phone-input"
+                        style={{
+                          borderTopLeftRadius: 0,
+                          borderBottomLeftRadius: 0,
+                          borderLeft: '1px solid #d9d9d9',
+                          width: 'calc(100% - 80px)'
+                        }}
+                        type="tel"
+                        placeholder="Enter 10-digit number"
+                        onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
+                        maxLength={15}
+                      />
+                    )}
+                  </Field>
+                </div>
                 {errors.contact && touched.contact && (
                   <div className="text-red-500">{errors.contact}</div>
                 )}
@@ -212,6 +293,46 @@ const EditVendor = ({ onClose, vendorData, idd }) => {
               Update
             </Button>
           </div>
+
+          <Modal
+            title="Add New Country"
+            visible={isAddPhoneCodeModalVisible}
+            onCancel={() => setIsAddPhoneCodeModalVisible(false)}
+            footer={null}
+            width={600}
+          >
+            <AddCountries
+              onClose={() => {
+                setIsAddPhoneCodeModalVisible(false);
+                dispatch(getallcountries());
+              }}
+            />
+          </Modal>
+
+          <style jsx>{`
+            .phone-code-select .ant-select-selector {
+              background-color: #f8fafc !important;
+              border-top-right-radius: 0 !important;
+              border-bottom-right-radius: 0 !important;
+              border-right: 0 !important;
+            }
+
+            .phone-code-select .ant-select-selection-item {
+              display: flex !important;
+              align-items: center !important;
+              justify-content: center !important;
+              font-size: 16px !important;
+            }
+
+            .phone-code-select .ant-select-selection-item > div {
+              display: flex !important;
+              align-items: center !important;
+            }
+
+            .phone-code-select .ant-select-selection-item span:not(:first-child) {
+              display: none !important;
+            }
+          `}</style>
         </Form>
       )}
     </Formik>
