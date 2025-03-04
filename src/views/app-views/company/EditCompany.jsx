@@ -11,21 +11,22 @@ import { UploadOutlined } from '@ant-design/icons';
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData, Editclients } from "./CompanyReducers/CompanySlice";
+import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
 
 const { Option } = Select;
 
 const EditCompany = ({ comnyid, onClose }) => {
   const dispatch = useDispatch();
-  const filterdatas = useSelector((state) => state.user.loggedInUser);
+  const countries = useSelector((state) => state.countries.countries);
 
-  useEffect(()=>{
-    dispatch(ClientData())
-  },[dispatch])
+  useEffect(() => {
+    dispatch(ClientData());
+    dispatch(getallcountries());
+  }, [dispatch]);
 
-  const alldatas = useSelector((state)=>state.ClientData.ClientData.data);
+  const alldatas = useSelector((state) => state.ClientData.ClientData.data);
 
-  const  loggedInUser = alldatas?.find((item)=>item?.id === comnyid);
-
+  const loggedInUser = alldatas?.find((item) => item?.id === comnyid);
 
   const formik = useFormik({
     initialValues: {
@@ -56,15 +57,15 @@ const EditCompany = ({ comnyid, onClose }) => {
       });
 
       dispatch(Editclients({ comnyid, formData }))
-        .then(()=>{
-            dispatch(ClientData());
-            onClose()
+        .then(() => {
+          dispatch(ClientData());
+          onClose()
         })
     },
   });
 
   useEffect(() => {
-    if (loggedInUser) {
+    if (loggedInUser && formik) {
       formik.setValues({
         firstName: loggedInUser.firstName || '',
         lastName: loggedInUser.lastName || '',
@@ -86,7 +87,7 @@ const EditCompany = ({ comnyid, onClose }) => {
         profilePic: loggedInUser.profilePic || null,
       });
     }
-  }, [loggedInUser]);
+  }, [loggedInUser, formik]);
 
   return (
     <div className="edit-company-modal">
@@ -153,9 +154,15 @@ const EditCompany = ({ comnyid, onClose }) => {
                       onBlur={() => formik.setFieldTouched('phoneCode', true)}
                       value={formik.values.phoneCode}
                     >
-                      <Option value="1">(+1)</Option>
-                      <Option value="91">(+91)</Option>
-                      {/* Add more options as needed */}
+                      {countries && countries.length > 0 ? (
+                        countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            ({country.phoneCode})
+                          </Option>
+                        ))
+                      ) : (
+                        <Option value="" disabled>Loading country codes...</Option>
+                      )}
                     </Select>
                     <Input
                       name="phone"
@@ -165,6 +172,11 @@ const EditCompany = ({ comnyid, onClose }) => {
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       value={formik.values.phone}
+                      onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                   </div>
                   {formik.touched.phone && formik.errors.phone ? (

@@ -7,17 +7,12 @@ import {
   message,
   Row,
   Col,
-  Switch,
-  Upload,
-  Card,
   Modal,
 } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
-import { ExclamationCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
-import utils from "utils";
-import OrderListData from "assets/data/order-list.data.json";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,7 +22,6 @@ import { GetLable, AddLable } from "../project/milestone/LableReducer/LableSlice
 import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { getallcountries } from "views/app-views/setting/countries/countriesreducer/countriesSlice";
-import useSelection from "antd/es/table/hooks/useSelection";
 import AddLeadStages from "../systemsetup/LeadStages/AddLeadStages";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 import AddCurrencies from "views/app-views/setting/currencies/AddCurrencies";
@@ -36,25 +30,25 @@ const { Option } = Select;
 
 const AddLead = ({ onClose }) => {
   const navigate = useNavigate();
-  const { id } = useParams();
+
   const [details, setDetails] = useState(false);
   const [info, setInfo] = useState(false);
   const [organisation, setorganisation] = useState(false);
   const dispatch = useDispatch();
- 
-//  const { currencies } = useSelector((state) => state.currencies);
-const currenciesState = useSelector((state) => state.currencies);
+
+  //  const { currencies } = useSelector((state) => state.currencies);
+  const currenciesState = useSelector((state) => state.currencies);
   const currencies = currenciesState?.currencies?.data || [];
   // 
   // const { data: employee } = useSelector((state) => state.employee.employee);
-  
-  useEffect(()=>{
+
+  useEffect(() => {
     dispatch(empdata())
-  },[dispatch])
+  }, [dispatch])
 
 
 
-  
+
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
   const loggedInUser = useSelector((state) => state.user.loggedInUser);
@@ -148,7 +142,7 @@ const currenciesState = useSelector((state) => state.currencies);
         const filteredLables = response.payload.data
           .filter((lable) => lable.lableType === lableType)
           .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
-        
+
         if (lableType === "tag") {
           setTags(filteredLables);
           setFieldValue("tag", newValue.trim());
@@ -176,8 +170,8 @@ const currenciesState = useSelector((state) => state.currencies);
     dispatch(getallcountries());
   }, []);
 
-  const alllogeddata =  useSelector((state)=>state.user.loggedInUser.username)
-  
+  const alllogeddata = useSelector((state) => state.user.loggedInUser.username)
+
   const allstagedata = useSelector((state) => state.StagesLeadsDeals);
   const filterdatas = allstagedata?.StagesLeadsDeals?.data?.filter(item => item.stageType === "lead") || [];
 
@@ -273,7 +267,7 @@ const currenciesState = useSelector((state) => state.currencies);
     // Check if all required fields are filled
     const requiredFields = [
       'leadTitle',
-      'firstName', 
+      'firstName',
       'lastName',
       'telephone',
       'leadStage',
@@ -308,102 +302,102 @@ const currenciesState = useSelector((state) => state.currencies);
       });
   };
 
- const LeadValueField = ({ field, form }) => (
-  <div className="form-group">
-    <div className="flex gap-0">
-      <Field name="currency">
-        {({ field }) => (
-          <Select
-            {...field}
-            className="currency-select"
-            style={{
-              width: '60px',
-              borderTopRightRadius: 0,
-              borderBottomRightRadius: 0,
-              borderRight: 0,
-              backgroundColor: '#f8fafc',
-            }}
-            placeholder={<span className="text-gray-400">$</span>}
-            onChange={(value) => {
-              if (value === 'add_new') {
-                setIsAddCurrencyModalVisible(true);
-              } else {
-                form.setFieldValue("currency", value);
-              }
-            }}
-            value={form.values.currency}
-            dropdownStyle={{ minWidth: '180px' }}
-            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-            loading={!fndcurr}
-            dropdownRender={menu => (
-              <div>
-                <div
-                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                  onClick={() => setIsAddCurrencyModalVisible(true)}
-                >
-                  <PlusOutlined className="mr-2" />
-                  <span className="text-sm">Add New</span>
+  const LeadValueField = ({ field, form }) => (
+    <div className="form-group">
+      <div className="flex gap-0">
+        <Field name="currency">
+          {({ field }) => (
+            <Select
+              {...field}
+              className="currency-select"
+              style={{
+                width: '60px',
+                borderTopRightRadius: 0,
+                borderBottomRightRadius: 0,
+                borderRight: 0,
+                backgroundColor: '#f8fafc',
+              }}
+              placeholder={<span className="text-gray-400">$</span>}
+              onChange={(value) => {
+                if (value === 'add_new') {
+                  setIsAddCurrencyModalVisible(true);
+                } else {
+                  form.setFieldValue("currency", value);
+                }
+              }}
+              value={form.values.currency}
+              dropdownStyle={{ minWidth: '180px' }}
+              suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+              loading={!fndcurr}
+              dropdownRender={menu => (
+                <div>
+                  <div
+                    className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                    onClick={() => setIsAddCurrencyModalVisible(true)}
+                  >
+                    <PlusOutlined className="mr-2" />
+                    <span className="text-sm">Add New</span>
+                  </div>
+                  {menu}
                 </div>
-                {menu}
-              </div>
-            )}
-          >
-            {fndcurr?.map((currency) => (
-              <Option key={currency.id} value={currency.id}>
-                <div className="flex items-center w-full px-1">
-                  <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
-                  <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
-                  <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
-                </div>
-              </Option>
-            ))}
-          </Select>
-        )}
-      </Field>
-      <Field name="leadValue">
-        {({ field, form }) => (
-          <Input
-            {...field}
-            className="price-input"
-            style={{
-              borderTopLeftRadius: 0,
-              borderBottomLeftRadius: 0,
-              borderLeft: '1px solid #d9d9d9',
-              width: 'calc(100% - 100px)'
-            }}
-            type="number"
-            min="0"
-            step="0.01"
-            placeholder="0.00"
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
-                form.setFieldValue('leadValue', value);
+              )}
+            >
+              {fndcurr?.map((currency) => (
+                <Option key={currency.id} value={currency.id}>
+                  <div className="flex items-center w-full px-1">
+                    <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                    <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                    <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                  </div>
+                </Option>
+              ))}
+            </Select>
+          )}
+        </Field>
+        <Field name="leadValue">
+          {({ field, form }) => (
+            <Input
+              {...field}
+              className="price-input"
+              style={{
+                borderTopLeftRadius: 0,
+                borderBottomLeftRadius: 0,
+                borderLeft: '1px solid #d9d9d9',
+                width: 'calc(100% - 100px)'
+              }}
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                  form.setFieldValue('leadValue', value);
+                }
+              }}
+              onKeyPress={(e) => {
+                const charCode = e.which ? e.which : e.keyCode;
+                if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                  e.preventDefault();
+                }
+                if (charCode === 46 && field.value.includes('.')) {
+                  e.preventDefault();
+                }
+              }}
+              prefix={
+                form.values.currency && (
+                  <span className="text-gray-600 font-medium mr-1">
+                    {fndcurr?.find(c => c.id === form.values.currency)?.currencyIcon}
+                  </span>
+                )
               }
-            }}
-            onKeyPress={(e) => {
-              const charCode = e.which ? e.which : e.keyCode;
-              if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
-                e.preventDefault();
-              }
-              if (charCode === 46 && field.value.includes('.')) {
-                e.preventDefault();
-              }
-            }}
-            prefix={
-              form.values.currency && (
-                <span className="text-gray-600 font-medium mr-1">
-                  {fndcurr?.find(c => c.id === form.values.currency)?.currencyIcon}
-                </span>
-              )
-            }
-          />
-        )}
-      </Field>
+            />
+          )}
+        </Field>
+      </div>
+      <ErrorMessage name="leadValue" component="div" className="text-red-500 mt-1 text-sm" />
     </div>
-    <ErrorMessage name="leadValue" component="div" className="text-red-500 mt-1 text-sm" />
-  </div>
-);
+  );
 
   const openAddLeadStageModal = () => {
     setIsAddLeadStageModalVisible(true);
@@ -513,12 +507,12 @@ const currenciesState = useSelector((state) => state.currencies);
                       as={Input}
                       style={{ width: '70%' }}
                       placeholder="Enter Telephone"
-                     onChange={(e) => {
-              const value = e.target.value.replace(/\D/g, '');
-              setFieldValue('telephone', value.toString());
-            }}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '');
+                        setFieldValue('telephone', value.toString());
+                      }}
                     />
-                  </div> 
+                  </div>
                   <ErrorMessage
                     name="telephone"
                     component="div"
@@ -609,21 +603,21 @@ const currenciesState = useSelector((state) => state.currencies);
               </Col>
 
               <Col span={12} className="mt-3">
-                              <div className="form-item ">
-                                <label className="font-semibold">Lead Value </label>
-                                <Field name="leadValue" component={LeadValueField}  className="mt-1"/>
-                                <ErrorMessage
-                                  name="leadValue.amount"
-                                  component="div"
-                                  className="error-message text-red-500 my-1"
-                                />
-                                <ErrorMessage
-                                  name="leadValue.currency"
-                                  component="div"
-                                  className="error-message text-red-500 my-1"
-                                />
-                              </div>
-                            </Col>
+                <div className="form-item ">
+                  <label className="font-semibold">Lead Value </label>
+                  <Field name="leadValue" component={LeadValueField} className="mt-1" />
+                  <ErrorMessage
+                    name="leadValue.amount"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                  <ErrorMessage
+                    name="leadValue.currency"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
 
               <Col span={24} className="mt-3">
                 <div className="form-item">
@@ -738,93 +732,93 @@ const currenciesState = useSelector((state) => state.currencies);
                 </div>
               </Col>
               <Col span={24}>
-                      <div className="form-item mt-3">
-                        <label className="font-semibold">Category <span className="text-rose-500">*</span></label>
-                        <Field name="category">
-                          {({ field }) => (
-                            <Select
-                              {...field}
-                              className="w-full mt-1"
-                              placeholder="Select or add new category"
-                              onChange={(value) =>
-                                setFieldValue("category", value)
-                              }
-                              value={values.category}
-                              onBlur={() => setFieldTouched("category", true)}
-                              dropdownRender={(menu) => (
-                                <div>
-                                  {menu}
-                                  <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                                    <Button
-                                      type="link"
-                                      icon={<PlusOutlined />}
-                                      className="w-full mt-2"
-                                      onClick={() => setIsCategoryModalVisible(true)}
-                                    >
-                                      Add New Category
-                                    </Button>
-                                  </div>
-                                </div>
-                              )}
-                            >
-                              {categories.map((category) => (
-                                <Option key={category.id} value={category.id}>
-                                  {category.name}
-                                </Option>
-                              ))}
-                            </Select>
-                          )}
-                        </Field>
-                        <ErrorMessage
-                          name="category"
-                          component="div"
-                          className="error-message text-red-500 my-1"
-                        />
-                      </div>
-                    </Col>
-                    <Col span={24}>
-                      <div className="form-item">
-                        <label className="font-semibold">Tag <span className="text-rose-500">*</span></label>
-                        <Field name="tag">
-                          {({ field }) => (
-                            <Select
-                              {...field}
-                              className="w-full mt-1"
-                              placeholder="Select or add new tag"
-                              onChange={(value) => setFieldValue("tag", value)}
-                              value={values.tag}
-                              onBlur={() => setFieldTouched("tag", true)}
-                              dropdownRender={(menu) => (
-                                <div>
-                                  {menu}
-                                  <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                                    <Button
-                                      type="link"
-                                      icon={<PlusOutlined />}
-                                      className="w-full mt-2"
-                                      onClick={() => setIsTagModalVisible(true)}
-                                    >
-                                      Add New Tag
-                                    </Button>
-                                  </div>
-                                </div>
-                              )}
-                            >
-                              {tags.map((tag) => (
-                                <Option key={tag.id} value={tag.name}>
-                                  {tag.name}
-                                </Option>
-                              ))}
-                            </Select>
-                          )}
-                        </Field>
-                        <ErrorMessage
-                          name="tag"
-                          component="div"
-                          className="error-message text-red-500 my-1"
-                        />
-                      </div>
-                    </Col>
+                <div className="form-item mt-3">
+                  <label className="font-semibold">Category <span className="text-rose-500">*</span></label>
+                  <Field name="category">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-1"
+                        placeholder="Select or add new category"
+                        onChange={(value) =>
+                          setFieldValue("category", value)
+                        }
+                        value={values.category}
+                        onBlur={() => setFieldTouched("category", true)}
+                        dropdownRender={(menu) => (
+                          <div>
+                            {menu}
+                            <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                              <Button
+                                type="link"
+                                icon={<PlusOutlined />}
+                                className="w-full mt-2"
+                                onClick={() => setIsCategoryModalVisible(true)}
+                              >
+                                Add New Category
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      >
+                        {categories.map((category) => (
+                          <Option key={category.id} value={category.id}>
+                            {category.name}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="category"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+              <Col span={24}>
+                <div className="form-item">
+                  <label className="font-semibold">Tag <span className="text-rose-500">*</span></label>
+                  <Field name="tag">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-1"
+                        placeholder="Select or add new tag"
+                        onChange={(value) => setFieldValue("tag", value)}
+                        value={values.tag}
+                        onBlur={() => setFieldTouched("tag", true)}
+                        dropdownRender={(menu) => (
+                          <div>
+                            {menu}
+                            <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                              <Button
+                                type="link"
+                                icon={<PlusOutlined />}
+                                className="w-full mt-2"
+                                onClick={() => setIsTagModalVisible(true)}
+                              >
+                                Add New Tag
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      >
+                        {tags.map((tag) => (
+                          <Option key={tag.id} value={tag.name}>
+                            {tag.name}
+                          </Option>
+                        ))}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="tag"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
               <Col span={24} className="mt-4 ">
                 <div className="flex justify-between items-center">
                   <label className="font-semibold">Details</label>
@@ -873,7 +867,7 @@ const currenciesState = useSelector((state) => state.currencies);
                         ))}
                       </Select>
                     </Col>
-                    
+
                     <Col span={24}>
                       <div className="form-item  mt-3 border-b pb-3">
                         <label className="font-semibold">
@@ -923,7 +917,7 @@ const currenciesState = useSelector((state) => state.currencies);
                           <Field
                             name="totalBudget"
                             as={Input}
-                                placeholder="Enter Total Budget"
+                            placeholder="Enter Total Budget"
                             className="mt-1"
                           />
                           <ErrorMessage

@@ -264,13 +264,13 @@ const LeadList = () => {
           <Button
             type=""
             className=""
-            icon={<RetweetOutlined/>}
+            icon={<RetweetOutlined />}
             onClick={() => openConvertDealModal(elm)}
             size="small"
           >
             <span className="">Convert to Deal</span>
 
-            
+
           </Button>
         </Flex>
       </Menu.Item>
@@ -360,7 +360,7 @@ const LeadList = () => {
       title: "Task",
       dataIndex: "status",
       render: (status) => (
-      
+
         <Tag
           className="text-capitalize"
           color={status === "active" ? "cyan" : "red"}
@@ -551,8 +551,8 @@ const LeadList = () => {
           width={800}
           className="mt-[-70px]"
         >
-          <ConvertDeal 
-            onClose={closeConvertDealModal} 
+          <ConvertDeal
+            onClose={closeConvertDealModal}
             leadData={selectedLead}
           />
         </Modal>

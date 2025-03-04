@@ -23,24 +23,24 @@ const AddClient = ({ visible, onClose, onCreate }) => {
       .required('Please enter the client password')
   });
 
-  const 
-  
-  generatePassword = () => {
-    const length = 8;
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let password = "";
-    
-    // Generate 6 characters
-    for (let i = 0; i < length; i++) {
-      password += charset[Math.floor(Math.random() * charset.length)];
-    }
+  const
 
-    // Ensure at least one number
-    const randomNum = Math.floor(Math.random() * 10).toString();
-    password = password.slice(0, 7) + randomNum;
-    
-    return password;
-  };
+    generatePassword = () => {
+      const length = 8;
+      const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      let password = "";
+
+      // Generate 6 characters
+      for (let i = 0; i < length; i++) {
+        password += charset[Math.floor(Math.random() * charset.length)];
+      }
+
+      // Ensure at least one number
+      const randomNum = Math.floor(Math.random() * 10).toString();
+      password = password.slice(0, 7) + randomNum;
+
+      return password;
+    };
 
   const otpapi = async (otp) => {
     try {
@@ -120,15 +120,15 @@ const AddClient = ({ visible, onClose, onCreate }) => {
         {({ errors, touched, setFieldValue }) => (
           <Form>
             <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
-            
+
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-group">
                   <label htmlFor="username" className="font-semibold">Name <span className="text-red-500">*</span></label>
                   <Field name="username">
                     {({ field }) => (
-                      <Input 
-                        {...field} 
+                      <Input
+                        {...field}
                         placeholder="Enter client Name"
                         className="mt-1"
                         status={errors.username && touched.username ? "error" : ""}
@@ -148,8 +148,8 @@ const AddClient = ({ visible, onClose, onCreate }) => {
                   <label htmlFor="email" className="font-semibold">Email Address <span className="text-red-500">*</span></label>
                   <Field name="email">
                     {({ field }) => (
-                      <Input 
-                        {...field} 
+                      <Input
+                        {...field}
                         placeholder="Enter Client Email"
                         className="mt-1"
                         status={errors.email && touched.email ? "error" : ""}
@@ -166,7 +166,7 @@ const AddClient = ({ visible, onClose, onCreate }) => {
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                <label className="font-semibold">Password <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Password <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <Field
                       name="password"
@@ -178,7 +178,7 @@ const AddClient = ({ visible, onClose, onCreate }) => {
                       className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
                       onClick={() => setFieldValue("password", generatePassword())}
                     >
-                     <ToTopOutlined/>
+                      <ToTopOutlined />
                     </Button>
                   </div>
                   <ErrorMessage

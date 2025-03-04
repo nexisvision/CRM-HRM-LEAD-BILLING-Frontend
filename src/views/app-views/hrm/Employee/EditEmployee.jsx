@@ -132,7 +132,7 @@
 //       });
 
 //       const response = await dispatch(updateEmp({ employeeIdd, formData })).unwrap();
-      
+
 //       if (response) {
 //         message.success('Employee updated successfully!');
 //         dispatch(empdata());
@@ -161,7 +161,7 @@
 //     const isValidType = file.type === 'application/pdf' || 
 //                        file.type === 'application/msword' || 
 //                        file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-    
+
 //     if (!isValidType && file.status !== 'removed') {
 //       message.error('You can only upload PDF or Word documents!');
 //       return;
@@ -599,12 +599,12 @@
 //                 </div>
 //               </Col>
 
-              
+
 //             </Row>
-            
+
 
 //             <Col span={24} className="mt-4 "><div className="flex justify-between items-center">
-              
+
 //             </div>
 //             </Col>
 //             {salary && (
@@ -814,16 +814,12 @@ import {
   Button,
   DatePicker,
   Select,
-  Upload,
   message,
   Row,
   Col,
 } from "antd";
-import { useNavigate } from "react-router-dom";
-import { ToTopOutlined, UploadOutlined } from "@ant-design/icons";
-import ReactQuill from "react-quill";
+import { ToTopOutlined } from "@ant-design/icons";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import axios from "axios";
 import { addEmp, empdata, updateEmp } from "./EmployeeReducers/EmployeeSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -832,7 +828,6 @@ import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
 import { getallcountries } from "../../setting/countries/countriesreducer/countriesSlice";
 import { getBranch } from "../Branch/BranchReducer/BranchSlice";
 import AddBranch from '../../hrm/Branch/AddBranch';
-import { PlusOutlined } from '@ant-design/icons';
 import AddDepartment from '../Department/AddDepartment';
 import AddDesignation from '../Designation/AddDesignation';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
@@ -840,7 +835,7 @@ import { AddSalaryss, getSalaryss } from "../PayRoll/Salary/SalaryReducers/Salar
 
 const { Option } = Select;
 
-const EditEmployee = ({idd, onClose, setSub, initialData = {} }) => {
+const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -960,7 +955,7 @@ const EditEmployee = ({idd, onClose, setSub, initialData = {} }) => {
       // Store employeeId in formValues  
       const updatedFormValues = { ...values };
 
-      const response = await dispatch(updateEmp({idd, updatedFormValues}));
+      const response = await dispatch(updateEmp({ idd, updatedFormValues }));
 
       if (response.payload?.data?.sessionToken) {
         setOtpToken(response.payload?.data?.sessionToken);
@@ -970,7 +965,7 @@ const EditEmployee = ({idd, onClose, setSub, initialData = {} }) => {
       if (response.payload?.data?.employeeId) {
         updatedFormValues.employeeId = response.payload.data.employeeId;
         setFormValues(updatedFormValues); // Set formValues here
-        
+
         // Only reset form and close modal after successful employee creation
         if (!response.payload?.data?.sessionToken) {
           resetForm();
@@ -990,9 +985,6 @@ const EditEmployee = ({idd, onClose, setSub, initialData = {} }) => {
     console.error("Form submission failed:", errorInfo);
   };
 
-  const onOpenOtpModal = () => {
-    setShowOtpModal(true);
-  };
   const onCloseOtpModal = () => {
     setShowOtpModal(false);
   };
@@ -1021,39 +1013,6 @@ const EditEmployee = ({idd, onClose, setSub, initialData = {} }) => {
     status: "",
     currency: "",
   };
-
-  const validationSchema = Yup.object({
-    firstName: Yup.string().required("Please enter a first name."),
-    lastName: Yup.string().required("Please enter a last name."),
-    username: Yup.string().required("Please enter a username."),
-    password: Yup.string()
-      .min(8, "Password must be at least 8 characters")
-      .matches(/\d/, "Password must have at least one number")
-      .required("Password is required"),
-    email: Yup.string()
-      .email("Please enter a valid email address.")
-      .required("Please enter an email"),
-    phone: Yup.string()
-      .matches(/^\d{10}$/, "Phone number must be 10 digits.")
-      .required("Please enter a phone number."),
-    address: Yup.string().required("Please enter an address."),
-    branch: Yup.string().required("Please select a branch."),
-    joiningDate: Yup.date().nullable().required("Joining date is required."),
-    leaveDate: Yup.date().nullable().required("Leave date is required."),
-    department: Yup.string().required("Please select a department."),
-    designation: Yup.string().required("Please select a designation."),
-    salary: Yup.string().required("Please enter a salary."),
-    accountholder: Yup.string().optional(),
-    accountnumber: Yup.string().optional(),
-    bankname: Yup.string().optional(),
-    ifsc: Yup.string().optional(),
-    banklocation: Yup.string().optional(),
-    payroll: Yup.string().optional(),
-    bankAccount: Yup.string().optional(),
-    netSalary: Yup.string().optional(),
-    status: Yup.string().optional(),
-    currency: Yup.string().optional(),
-  });
 
   const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
 
@@ -1108,7 +1067,7 @@ const EditEmployee = ({idd, onClose, setSub, initialData = {} }) => {
             onSubmit={handleSubmit}
             onFinishFailed={onFinishFailed}
           >
-            <h1 className="border-b-2 border-gray-300 pb-4 mt-[-35px] "></h1>
+            <div className="border-b-2 border-gray-300 pb-4 mt-[-35px]"></div>
             <h1 className="text-lg font-bold mb-4">Personal Details</h1>
             <Row gutter={16}>
               <Col span={12}>
