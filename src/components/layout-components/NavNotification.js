@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Avatar, List, Popover, Tabs } from 'antd';
+import { Badge, Avatar, List, Popover, Tabs, Modal } from 'antd';
 import {
   MailOutlined,
   WarningOutlined,
@@ -23,6 +23,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { GetAllNotifications } from 'views/app-views/pages/setting/NotificationReducer/NotificationSlice';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import ViewTask from 'views/app-views/dashboards/task/ViewTask';
 
 dayjs.extend(relativeTime);
 
@@ -285,6 +286,9 @@ const getNotificationBody = (notifications, handleNotificationClick, getNotifica
 const NavNotification = ({ mode }) => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [list, setList] = useState([]);
+  const [isViewTaskModalVisible, setIsViewTaskModalVisible] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [noti, setNoti] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -360,11 +364,39 @@ const NavNotification = ({ mode }) => {
   // Handle notification click
   const handleNotificationClick = (notification) => {
     setIsPopupVisible(false);
-    if (notification.title?.toLowerCase().includes('plan')) {
-      navigate('/app/pages/plans');
-    } else if (notification.related_id) {
-      navigate(`/app/details/${notification.related_id}`);
+    console.log('Clicked notification:', notification);
+    setNoti(notification);
+
+    // Parse assignTo to include only user data
+    let assignToObject = {
+      assignedUsers: []
+    };
+
+    try {
+      if (notification.users) {
+        assignToObject.assignedUsers = notification.users;
+      } else if (typeof notification.assignTo === 'string') {
+        const parsed = JSON.parse(notification.assignTo);
+        assignToObject.assignedUsers = parsed.assignedUsers || [];
+      } else if (notification.assignTo?.assignedUsers) {
+        assignToObject.assignedUsers = notification.assignTo.assignedUsers;
+      }
+    } catch (error) {
+      console.error("Error parsing assignTo:", error);
     }
+
+    const taskData = {
+      notification: notification
+    };
+
+    console.log('Setting task data:', taskData);
+    setSelectedTask(taskData);
+    setIsViewTaskModalVisible(true);
+  };
+
+  const handleTaskModalClose = () => {
+    setIsViewTaskModalVisible(false);
+    setSelectedTask(null);
   };
 
   // Update the EmptyState component
@@ -555,21 +587,40 @@ const NavNotification = ({ mode }) => {
   }, []);
 
   return (
-    <Popover
-      placement="bottomRight"
-      content={notificationList}
-      trigger="click"
-      overlayClassName="nav-notification"
-      overlayInnerStyle={{ padding: 0 }}
-      visible={isPopupVisible}
-      onVisibleChange={(visible) => setIsPopupVisible(visible)}
-    >
-      <NavItem mode={mode}>
-        <Badge count={list.length}>
-          <BellOutlined className="nav-icon mx-auto" type="bell" />
-        </Badge>
-      </NavItem>
-    </Popover>
+    <>
+      <Popover
+        placement="bottomRight"
+        content={notificationList}
+        trigger="click"
+        overlayClassName="nav-notification"
+        overlayInnerStyle={{ padding: 0 }}
+        visible={isPopupVisible}
+        onVisibleChange={(visible) => setIsPopupVisible(visible)}
+      >
+        <NavItem mode={mode}>
+          <Badge count={list.length}>
+            <BellOutlined className="nav-icon mx-auto" type="bell" />
+          </Badge>
+        </NavItem>
+      </Popover>
+
+      <Modal
+        title={selectedTask?.title || "Task Details"}
+        visible={isViewTaskModalVisible}
+        onCancel={handleTaskModalClose}
+        footer={null}
+        width={1200}
+        className="mt-[-70px]"
+      >
+        {selectedTask && (
+          <ViewTask 
+            filterdatass={noti} 
+            notificationData={selectedTask.notificationData} 
+            onClose={handleTaskModalClose} 
+          />
+        )}
+      </Modal>
+    </>
   );
 };
 

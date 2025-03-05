@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Card,
   Row,
@@ -29,11 +29,24 @@ import {
   HistoryOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { GetTasks } from '../project/task/TaskReducer/TaskSlice';
 
 const { Title, Text, Paragraph } = Typography;
 
-const ViewTask = ({ task, onClose }) => {
+const ViewTask = ({ filterdatass, onClose }) => {
+  const dispatch = useDispatch()
+
+  const alllogedata = useSelector((state)=>state.user.loggedInUser.id)
+
+  useEffect(()=>{
+    dispatch(GetTasks(alllogedata))
+  },[dispatch])
+
+  const alldatas = useSelector((state)=>state.Tasks.Tasks.data)
+
+  const task = alldatas?.find((item)=>item?.id === filterdatass?.related_id)
+  
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
 

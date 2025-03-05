@@ -114,7 +114,6 @@ const AddHoliday = ({ onClose }) => {
                     placeholder="Select start date"
                     value={values.start_date}
                     onChange={(date) => setFieldValue("start_date", date)}
-                    format="YYYY-MM-DD"
                   />
                   {errors.start_date && touched.start_date && (
                     <div style={{ color: "red", fontSize: "12px" }}>
@@ -133,7 +132,6 @@ const AddHoliday = ({ onClose }) => {
                     placeholder="Select end date"
                     value={values.end_date}
                     onChange={(date) => setFieldValue("end_date", date)}
-                    format="YYYY-MM-DD"
                   />
                   {errors.end_date && touched.end_date && (
                     <div style={{ color: "red", fontSize: "12px" }}>

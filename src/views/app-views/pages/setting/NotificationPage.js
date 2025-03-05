@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { GetAllNotifications } from './NotificationReducer/NotificationSlice';
-import { Badge, Tabs, Timeline, Card, Avatar, Tooltip, Button } from 'antd';
+import { Badge, Tabs, Timeline, Card, Avatar, Tooltip, Button, Modal } from 'antd';
 import {
   BellOutlined,
   ClockCircleOutlined,
@@ -14,6 +14,8 @@ import {
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import calendar from 'dayjs/plugin/calendar';
+import NotificationDetailModal from './NotificationDetailModal';
+import ViewTask from '../../dashboards/task/ViewTask';
 
 dayjs.extend(relativeTime);
 dayjs.extend(calendar);
@@ -74,6 +76,11 @@ const NotificationPage = () => {
   const fnddata = allnoidata?.Notifications?.data || [];
   const [list, setList] = useState([]);
   const [pinnedNotifications, setPinnedNotifications] = useState([]);
+  const [selectedNotification, setSelectedNotification] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isViewTaskModalVisible, setIsViewTaskModalVisible] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [noti, setNoti] = useState(null);
 
   useEffect(() => {
     dispatch(GetAllNotifications());
@@ -150,6 +157,47 @@ const NotificationPage = () => {
     }
   };
 
+  const handleNotificationClick = (notification) => {
+    console.log('Clicked notification:', notification); // Debug log
+    setNoti(notification);
+
+    // Parse assignTo to include only user data
+    let assignToObject = {
+      assignedUsers: []
+    };
+
+    try {
+      if (notification.users) {
+        assignToObject.assignedUsers = notification.users;
+      } else if (typeof notification.assignTo === 'string') {
+        const parsed = JSON.parse(notification.assignTo);
+        assignToObject.assignedUsers = parsed.assignedUsers || [];
+      } else if (notification.assignTo?.assignedUsers) {
+        assignToObject.assignedUsers = notification.assignTo.assignedUsers;
+      }
+    } catch (error) {
+      console.error("Error parsing assignTo:", error);
+    }
+
+    const taskData = {
+      notification: notification
+    };
+
+    console.log('Setting task data:', taskData); // Debug log
+    setSelectedTask(taskData);
+    setIsViewTaskModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    setSelectedNotification(null);
+  };
+
+  const handleTaskModalClose = () => {
+    setIsViewTaskModalVisible(false);
+    setSelectedTask(null);
+  };
+
   const NotificationCard = ({ notification }) => {
     const iconConfig = getTypeIcon(notification.notification_type);
     const isPinned = pinnedNotifications.find(p => p.id === notification.id);
@@ -157,7 +205,8 @@ const NotificationPage = () => {
     return (
       <Card
         className={`mb-3 hover:shadow-md transition-all duration-300 border-l-4 ${isPinned ? 'bg-blue-50/30' : ''
-          }`}
+          } cursor-pointer`}
+        onClick={() => handleNotificationClick(notification)}
         style={{
           borderLeftColor: notification.notification_type === 'reminder'
             ? '#faad14'
@@ -219,7 +268,10 @@ const NotificationPage = () => {
                 <Button
                   type="text"
                   size="small"
-                  onClick={() => handlePinNotification(notification)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handlePinNotification(notification);
+                  }}
                   className={`flex items-center justify-center w-8 h-8 rounded-full 
                     ${isPinned
                       ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
@@ -333,6 +385,29 @@ const NotificationPage = () => {
           }}
         />
       </Card>
+
+      <NotificationDetailModal
+        visible={isModalVisible}
+        notification={selectedNotification}
+        onClose={handleModalClose}
+      />
+
+      <Modal
+        title={selectedTask?.title || "Task Details"}
+        visible={isViewTaskModalVisible}
+        onCancel={handleTaskModalClose}
+        footer={null}
+        width={1200}
+        className="mt-[-70px]"
+      >
+        {selectedTask && (
+          <ViewTask 
+          filterdatass={noti} 
+            notificationData={selectedTask.notificationData} 
+            onClose={handleTaskModalClose} 
+          />
+        )}
+      </Modal>
     </div>
   );
 };
