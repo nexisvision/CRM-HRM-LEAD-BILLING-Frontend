@@ -433,6 +433,78 @@ const AddInvoice = ({ onClose }) => {
 
   const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] = useState(false);
 
+  // Update category related states
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [categories, setCategories] = useState([]);
+
+  const AllLoggedData = useSelector((state) => state.user);
+
+  // Add fetchLables function
+  const fetchLables = async (lableType, setter) => {
+    try {
+      const lid = AllLoggedData.loggedInUser.id;
+      const response = await dispatch(GetLable(lid));
+      if (response.payload && response.payload.data) {
+        const filteredLables = response.payload.data
+          .filter((lable) => lable.lableType === lableType)
+          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+        setter(filteredLables);
+      }
+    } catch (error) {
+      console.error(`Failed to fetch ${lableType}:`, error);
+      message.error(`Failed to load ${lableType}`);
+    }
+  };
+
+  // Add useEffect to fetch categories
+  useEffect(() => {
+    fetchLables("category", setCategories);
+  }, []);
+
+  // Update handleAddNewLable function
+  const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
+    if (!newValue.trim()) {
+      message.error(`Please enter a ${lableType} name.`);
+      return;
+    }
+
+    try {
+      const lid = AllLoggedData.loggedInUser.id;
+      const payload = {
+        name: newValue.trim(),
+        lableType,
+      };
+      
+      const response = await dispatch(AddLable({ lid, payload }));
+      
+      if (response.payload && response.payload.success) {
+        message.success(`${lableType} added successfully.`);
+        
+        // Refresh the labels immediately after adding
+        const labelsResponse = await dispatch(GetLable(lid));
+        if (labelsResponse.payload && labelsResponse.payload.data) {
+          const filteredLables = labelsResponse.payload.data
+            .filter((lable) => lable.lableType === lableType)
+            .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+          
+          setCategories(filteredLables);
+          // Update form field value
+          form.setFieldValue("category", newValue.trim());
+        }
+        
+        // Reset input and close modal
+        setter("");
+        modalSetter(false);
+      } else {
+        throw new Error('Failed to add label');
+      }
+    } catch (error) {
+      console.error(`Failed to add ${lableType}:`, error);
+      message.error(`Failed to add ${lableType}. Please try again.`);
+    }
+  };
+
   return (
     <div>
       <Form form={form} layout="vertical">
@@ -496,9 +568,19 @@ const AddInvoice = ({ onClose }) => {
                 rules={[
                   { required: true, message: "Please select issue date" },
                 ]}
-
               >
-                <DatePicker className="w-full" format="DD-MM-YYYY" />
+                <DatePicker 
+                  className="w-full" 
+                  format="DD-MM-YYYY" 
+                  onChange={(date) => {
+                    form.setFieldsValue({ issueDate: date });
+                    // Clear due date if it's before the new issue date
+                    const dueDate = form.getFieldValue('dueDate');
+                    if (dueDate && date && dueDate.isBefore(date)) {
+                      form.setFieldsValue({ dueDate: null });
+                    }
+                  }}
+                />
               </Form.Item>
             </Col>
 
@@ -508,8 +590,18 @@ const AddInvoice = ({ onClose }) => {
                 name="dueDate"
                 rules={[{ required: true, message: "Please select due date" }]}
               >
+                <DatePicker 
+                  className="w-full" 
+                  format="DD-MM-YYYY"
+                  disabledDate={(current) => {
+                    // Get the issue date from form
+                    const issueDate = form.getFieldValue('issueDate');
+                    // Disable dates before issue date
+                    return issueDate ? current && current < issueDate.startOf('day') : false;
+                  }}
+                />
 
-                <DatePicker className="w-full" format="DD-MM-YYYY" />
+            
               </Form.Item>
             </Col>
 
@@ -517,27 +609,18 @@ const AddInvoice = ({ onClose }) => {
               <Form.Item
                 label="Category"
                 name="category"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please select or add a category",
-                  },
-                ]}
+                rules={[{ required: true, message: "Please select or add a category" }]}
               >
                 <Select
                   placeholder="Select or add new category"
                   dropdownRender={(menu) => (
                     <div>
                       {menu}
-                      <div
-                        style={{
-                          padding: "8px",
-                          borderTop: "1px solid #e8e8e8",
-                        }}
-                      >
+                      <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
                         <Button
                           type="link"
-                          onClick={() => setIsTagModalVisible(true)}
+                          icon={<PlusOutlined />}
+                          onClick={() => setIsCategoryModalVisible(true)}
                           block
                         >
                           Add New Category
@@ -546,12 +629,11 @@ const AddInvoice = ({ onClose }) => {
                     </div>
                   )}
                 >
-                  {tags &&
-                    tags.map((tag) => (
-                      <Option key={tag.id} value={tag.name}>
-                        {tag.name}
-                      </Option>
-                    ))}
+                  {categories.map((category) => (
+                    <Option key={category.id} value={category.name}>
+                      {category.name}
+                    </Option>
+                  ))}
                 </Select>
               </Form.Item>
             </Col>
@@ -855,15 +937,15 @@ const AddInvoice = ({ onClose }) => {
       </Form>
       <Modal
         title="Add New Category"
-        open={isTagModalVisible}
-        onCancel={() => setIsTagModalVisible(false)}
-        onOk={handleAddNewTag}
+        open={isCategoryModalVisible}
+        onCancel={() => setIsCategoryModalVisible(false)}
+        onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
         okText="Add Category"
       >
         <Input
-          placeholder="Enter new Category"
-          value={newTag}
-          onChange={(e) => setNewTag(e.target.value)}
+          placeholder="Enter new category name"
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value)}
         />
       </Modal>
       <Modal

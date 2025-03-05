@@ -127,26 +127,53 @@ const currenciesState = useSelector((state) => state.currencies);
     }
   }, [loggedInUserId]);
 
-  const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
+  const handleAddNewLable = async (lableType, newValue, setter, modalSetter, setFieldValue) => {
     if (!newValue.trim()) {
       message.error(`Please enter a ${lableType} name.`);
       return;
     }
 
     try {
+      const lid = AllLoggedData.loggedInUser.id;
       const payload = {
         name: newValue.trim(),
         lableType,
-        userId: loggedInUserId,
       };
-      await dispatch(AddLable({ id: loggedInUserId, payload }));
-      message.success(`${lableType} added successfully.`);
-      setter("");
-      modalSetter(false);
-      await fetchLables(lableType, lableType === "tag" ? setTags : lableType === "category" ? setCategories : setStatuses);
+      
+      const response = await dispatch(AddLable({ lid, payload }));
+      
+      if (response.payload && response.payload.success) {
+        message.success(`${lableType} added successfully.`);
+        
+        // Refresh the labels immediately after adding
+        const labelsResponse = await dispatch(GetLable(lid));
+        if (labelsResponse.payload && labelsResponse.payload.data) {
+          const filteredLables = labelsResponse.payload.data
+            .filter((lable) => lable.lableType === lableType)
+            .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+          
+          if (lableType === "category") {
+            setCategories(filteredLables);
+            // Update form field value with the new category
+            setFieldValue("category", newValue.trim());
+          } else if (lableType === "tag") {
+            setTags(filteredLables);
+            setFieldValue("tag", newValue.trim());
+          } else if (lableType === "status") {
+            setStatuses(filteredLables);
+            setFieldValue("status", newValue.trim());
+          }
+        }
+        
+        // Reset input and close modal
+        setter("");
+        modalSetter(false);
+      } else {
+        throw new Error('Failed to add label');
+      }
     } catch (error) {
       console.error(`Failed to add ${lableType}:`, error);
-      message.error(`Failed to add ${lableType}.`);
+      message.error(`Failed to add ${lableType}. Please try again.`);
     }
   };
 
@@ -1074,7 +1101,7 @@ const currenciesState = useSelector((state) => state.currencies);
               title="Add New Tag"
               open={isTagModalVisible}
               onCancel={() => setIsTagModalVisible(false)}
-              onOk={() => handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible)}
+              onOk={() => handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible, setFieldValue)}
               okText="Add Tag"
             >
               <Input
@@ -1088,7 +1115,7 @@ const currenciesState = useSelector((state) => state.currencies);
               title="Add New Category"
               open={isCategoryModalVisible}
               onCancel={() => setIsCategoryModalVisible(false)}
-              onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
+              onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible, setFieldValue)}
               okText="Add Category"
             >
               <Input
@@ -1102,7 +1129,7 @@ const currenciesState = useSelector((state) => state.currencies);
               title="Add New Status"
               open={isStatusModalVisible}
               onCancel={() => setIsStatusModalVisible(false)}
-              onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible)}
+              onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible, setFieldValue)}
               okText="Add Status"
             >
               <Input

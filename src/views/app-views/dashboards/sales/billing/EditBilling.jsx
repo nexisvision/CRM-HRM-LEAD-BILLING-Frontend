@@ -33,6 +33,9 @@ const EditBilling = ({ idd, onClose }) => {
   const [form] = Form.useForm();
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [newTag, setNewTag] = useState("");
+  const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
+  const [newStatus, setNewStatus] = useState("");
+  const [statuses, setStatuses] = useState([]);
 
   const { taxes } = useSelector((state) => state.tax);
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
@@ -83,6 +86,7 @@ const EditBilling = ({ idd, onClose }) => {
     dispatch(getAllTaxes());
     dispatch(vendordataedata());
     fetchTags();
+    fetchLables("status", setStatuses);
   }, []);
 
  useEffect(() => {
@@ -440,23 +444,51 @@ const EditBilling = ({ idd, onClose }) => {
     }
   };
 
-  const handleAddNewTag = async () => {
-    if (!newTag.trim()) {
+  const fetchLables = async (lableType, setter) => {
+    try {
+      const response = await dispatch(GetLable(lid));
+      if (response.payload && response.payload.data) {
+        const filteredLables = response.payload.data
+          .filter((lable) => lable.lableType === lableType)
+          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+        setter(filteredLables);
+      }
+    } catch (error) {
+      console.error(`Failed to fetch ${lableType}:`, error);
+      message.error(`Failed to load ${lableType}`);
+    }
+  };
+
+  const handleAddNewStatus = async () => {
+    if (!newStatus.trim()) {
       message.error("Please enter a status name");
       return;
     }
 
     try {
       const payload = {
-        name: newTag.trim(),
+        name: newStatus.trim(),
         labelType: "status",
       };
 
       await dispatch(AddLable({ lid, payload }));
       message.success("Status added successfully");
-      setNewTag("");
-      setIsTagModalVisible(false);
-      await fetchTags();
+      setNewStatus("");
+      setIsStatusModalVisible(false);
+      
+      // Fetch updated statuses
+      const response = await dispatch(GetLable(lid));
+      if (response.payload && response.payload.data) {
+        const filteredStatuses = response.payload.data
+          .filter((label) => label.lableType === "status")
+          .map((label) => ({
+            id: label.id,
+            name: label.name.trim(),
+          }));
+        setStatuses(filteredStatuses);
+        // Update form field with new status
+        form.setFieldsValue({ status: newStatus.trim() });
+      }
     } catch (error) {
       console.error("Failed to add status:", error);
       message.error("Failed to add status");
@@ -551,24 +583,20 @@ const EditBilling = ({ idd, onClose }) => {
 
             <Col span={12}>
               <Form.Item
-                label="Status"
+                label={<span className="">Status <span className="text-red-500">*</span></span>}
                 name="status"
-                rules={[{ required: true, message: "Please select status" }]}
+                rules={[{ required: true, message: "Please select or add a status" }]}
               >
                 <Select
                   placeholder="Select or add new status"
                   dropdownRender={(menu) => (
                     <div>
                       {menu}
-                      <div
-                        style={{
-                          padding: "8px",
-                          borderTop: "1px solid #e8e8e8",
-                        }}
-                      >
+                      <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
                         <Button
                           type="link"
-                          onClick={() => setIsTagModalVisible(true)}
+                          icon={<PlusOutlined />}
+                          onClick={() => setIsStatusModalVisible(true)}
                           block
                         >
                           Add New Status
@@ -577,12 +605,11 @@ const EditBilling = ({ idd, onClose }) => {
                     </div>
                   )}
                 >
-                  {tags &&
-                    tags.map((tag) => (
-                      <Option key={tag.id} value={tag.name}>
-                        {tag.name}
-                      </Option>
-                    ))}
+                  {statuses.map((status) => (
+                    <Option key={status.id} value={status.name}>
+                      {status.name}
+                    </Option>
+                  ))}
                 </Select>
               </Form.Item>
             </Col>
@@ -842,15 +869,15 @@ const EditBilling = ({ idd, onClose }) => {
 
       <Modal
         title="Add New Status"
-        visible={isTagModalVisible}
-        onOk={handleAddNewTag}
-        onCancel={() => setIsTagModalVisible(false)}
-        okText="Add"
+        open={isStatusModalVisible}
+        onOk={handleAddNewStatus}
+        onCancel={() => setIsStatusModalVisible(false)}
+        okText="Add Status"
       >
         <Input
-          value={newTag}
-          onChange={(e) => setNewTag(e.target.value)}
           placeholder="Enter new status name"
+          value={newStatus}
+          onChange={(e) => setNewStatus(e.target.value)}
         />
       </Modal>
 

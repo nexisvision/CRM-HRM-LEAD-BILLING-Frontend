@@ -244,32 +244,45 @@ const AddProject = ({ onClose }) => {
         name: newValue.trim(),
         lableType,
       };
-      await dispatch(AddLablee({ lid, payload }));
-      message.success(`${lableType} added successfully.`);
-      setter(""); // Reset input field
-      modalSetter(false); // Close modal
-
-      // Fetch updated labels and update the form field
-      const response = await dispatch(GetLablee(lid));
-      if (response.payload && response.payload.data) {
-        const filteredLables = response.payload.data
-          .filter((lable) => lable.lableType === lableType)
-          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+      
+      const response = await dispatch(AddLablee({ lid, payload }));
+      
+      if (response.payload && response.payload.success) {
+        message.success(`${lableType} added successfully.`);
         
-        if (lableType === "tag") {
-          setTags(filteredLables);
-          setFieldValue("tag", newValue.trim());
-        } else if (lableType === "category") {
-          setCategories(filteredLables);
-          setFieldValue("project_category", newValue.trim());
-        } else if (lableType === "status") {
-          setStatuses(filteredLables);
-          setFieldValue("status", newValue.trim());
+        // Refresh the labels immediately after adding
+        const labelsResponse = await dispatch(GetLablee(lid));
+        if (labelsResponse.payload && labelsResponse.payload.data) {
+          const filteredLables = labelsResponse.payload.data
+            .filter((lable) => lable.lableType === lableType)
+            .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+          
+          // Update the appropriate state based on label type
+          switch (lableType) {
+            case "tag":
+              setTags(filteredLables);
+              if (setFieldValue) setFieldValue("tag", newValue.trim());
+              break;
+            case "category":
+              setCategories(filteredLables);
+              if (setFieldValue) setFieldValue("project_category", newValue.trim());
+              break;
+            case "status":
+              setStatuses(filteredLables);
+              if (setFieldValue) setFieldValue("status", newValue.trim());
+              break;
+          }
         }
+        
+        // Reset input and close modal
+        setter("");
+        modalSetter(false);
+      } else {
+        throw new Error('Failed to add label');
       }
     } catch (error) {
       console.error(`Failed to add ${lableType}:`, error);
-      message.error(`Failed to add ${lableType}.`);
+      message.error(`Failed to add ${lableType}. Please try again.`);
     }
   };
 
@@ -364,6 +377,10 @@ const AddProject = ({ onClose }) => {
                     value={values.startDate}
                     onChange={(date) => {
                       setFieldValue("startDate", date);
+                      // If end date is before new start date, clear it
+                      if (values.endDate && date && values.endDate.isBefore(date)) {
+                        setFieldValue("endDate", null);
+                      }
                       // Calculate duration if both dates are set
                       if (date && values.endDate) {
                         const startDate = date;
@@ -399,6 +416,10 @@ const AddProject = ({ onClose }) => {
                     className="w-full mt-1"
                     format="DD-MM-YYYY"
                     value={values.endDate}
+                    disabledDate={(current) => {
+                      // Disable dates before start date
+                      return values.startDate ? current && current < values.startDate.startOf('day') : false;
+                    }}
                     onChange={(date) => {
                       setFieldValue("endDate", date);
                       // Calculate duration if both dates are set
@@ -798,7 +819,7 @@ const AddProject = ({ onClose }) => {
               </Button>
             </div>
 
-            {/* Add Tag Modal */}
+            {/* Keep only one set of modals at the bottom of the form */}
             <Modal
               title="Add New Tag"
               open={isTagModalVisible}
@@ -813,7 +834,6 @@ const AddProject = ({ onClose }) => {
               />
             </Modal>
 
-            {/* Add Category Modal */}
             <Modal
               title="Add New Category"
               open={isCategoryModalVisible}
@@ -828,7 +848,6 @@ const AddProject = ({ onClose }) => {
               />
             </Modal>
 
-            {/* Add Status Modal */}
             <Modal
               title="Add New Status"
               open={isStatusModalVisible}
@@ -843,7 +862,6 @@ const AddProject = ({ onClose }) => {
               />
             </Modal>
 
-            {/* Add User Modal */}
             <Modal
               title="Add User"
               visible={isAddUserModalVisible}
@@ -854,7 +872,6 @@ const AddProject = ({ onClose }) => {
               <AddUser onClose={() => setIsAddUserModalVisible(false)} />
             </Modal>
 
-            {/* Add Client Modal */}
             <Modal
               title="Add Client"
               visible={isAddClientModalVisible}
@@ -864,121 +881,24 @@ const AddProject = ({ onClose }) => {
             >
               <AddClient onClose={() => setIsAddClientModalVisible(false)} />
             </Modal>
+
+            <Modal
+              title="Add New Currency"
+              visible={isAddCurrencyModalVisible}
+              onCancel={() => setIsAddCurrencyModalVisible(false)}
+              footer={null}
+              width={600}
+            >
+              <AddCurrencies
+                onClose={() => {
+                  setIsAddCurrencyModalVisible(false);
+                  dispatch(getcurren());
+                }}
+              />
+            </Modal>
           </Form>
         )}
       </Formik>
-
-      {/* Add Tag Modal */}
-      <Modal
-        title="Add New Tag"
-        open={isTagModalVisible}
-        onCancel={() => setIsTagModalVisible(false)}
-        onOk={() => handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible)}
-        okText="Add Tag"
-      >
-        <Input
-          placeholder="Enter new tag name"
-          value={newTag}
-          onChange={(e) => setNewTag(e.target.value)}
-        />
-      </Modal>
-
-      {/* Add Category Modal */}
-      <Modal
-        title="Add New Category"
-        open={isCategoryModalVisible}
-        onCancel={() => setIsCategoryModalVisible(false)}
-        onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
-        okText="Add Category"
-      >
-        <Input
-          placeholder="Enter new category name"
-          value={newCategory}
-          onChange={(e) => setNewCategory(e.target.value)}
-        />
-      </Modal>
-
-      {/* Add Status Modal */}
-      <Modal
-        title="Add New Status"
-        open={isStatusModalVisible}
-        onCancel={() => setIsStatusModalVisible(false)}
-        onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible)}
-        okText="Add Status"
-      >
-        <Input
-          placeholder="Enter new status name"
-          value={newStatus}
-          onChange={(e) => setNewStatus(e.target.value)}
-        />
-      </Modal>
-
-      {/* Add User Modal */}
-      <Modal
-        title="Add User"
-        visible={isAddUserModalVisible}
-        onCancel={() => setIsAddUserModalVisible(false)}
-        footer={null}
-        width={1000}
-      >
-        <AddUser onClose={() => setIsAddUserModalVisible(false)} />
-      </Modal>
-
-      {/* Add Client Modal */}
-      <Modal
-        title="Add Client"
-        visible={isAddClientModalVisible}
-        onCancel={() => setIsAddClientModalVisible(false)}
-        footer={null}
-        width={800}
-      >
-        <AddClient onClose={() => setIsAddClientModalVisible(false)} />
-      </Modal>
-
-      {/* Add Currency Modal */}
-      <Modal
-        title="Add New Currency"
-        visible={isAddCurrencyModalVisible}
-        onCancel={() => setIsAddCurrencyModalVisible(false)}
-        footer={null}
-        width={600}
-      >
-        <AddCurrencies
-          onClose={() => {
-            setIsAddCurrencyModalVisible(false);
-            dispatch(getcurren()); // Refresh currency list after adding
-          }}
-        />
-      </Modal>
-
-      {/* Custom render for selected value */}
-      <style jsx>{`
-        .currency-select .ant-select-selection-item {
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          font-size: 16px !important;
-        }
-
-        .currency-select .ant-select-selection-item > div {
-          display: flex !important;
-          align-items: center !important;
-        }
-
-        .currency-select .ant-select-selection-item span:not(:first-child) {
-          display: none !important;
-        }
-
-        .ant-select-dropdown .ant-select-item {
-          padding: 8px 12px !important;
-        }
-
-        .ant-select-dropdown .ant-select-item-option-content > div {
-          display: flex !important;
-          align-items: center !important;
-          width: 100% !important;
-        }
-      `}</style>
     </div>
   );
 };

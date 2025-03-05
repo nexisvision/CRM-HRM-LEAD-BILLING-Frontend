@@ -68,7 +68,11 @@ const AddAttendance = ({ onClose }) => {
 
 
     dispatch(addAttendance(formattedValues))
-      .then(() => {
+
+
+    .then(() => {
+      console.log("formattedValues", formattedValues);
+
         dispatch(getAttendances());
         message.success("Attendance added successfully!");
         onClose();
@@ -94,7 +98,7 @@ const AddAttendance = ({ onClose }) => {
           halfDay: "",
           comment: "",
         }}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({ errors, touched, setFieldValue, resetForm }) => (

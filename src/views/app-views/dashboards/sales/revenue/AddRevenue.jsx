@@ -59,7 +59,6 @@ const AddRevenue = ({ onClose }) => {
     try {
       const lid = AllLoggedData.loggedInUser.id;
       const response = await dispatch(GetLable(lid));
-
       if (response.payload && response.payload.data) {
         const filteredLables = response.payload.data
           .filter((lable) => lable.lableType === lableType)
@@ -76,9 +75,9 @@ const AddRevenue = ({ onClose }) => {
     fetchLables("category", setCategories);
   }, []);
 
-  const handleAddNewCategory = async (lableType, newValue, setter, modalSetter, setFieldValue) => {
+  const handleAddNewLable = async (lableType, newValue, setter, modalSetter, setFieldValue) => {
     if (!newValue.trim()) {
-      message.error("Please enter a category name");
+      message.error(`Please enter a ${lableType} name.`);
       return;
     }
 
@@ -86,26 +85,36 @@ const AddRevenue = ({ onClose }) => {
       const lid = AllLoggedData.loggedInUser.id;
       const payload = {
         name: newValue.trim(),
-        lableType: "category"
+        lableType,
       };
-
-      await dispatch(AddLable({ lid, payload }));
-      message.success("Category added successfully");
-      setNewCategory("");
-      setIsCategoryModalVisible(false);
-
-      // Fetch updated categories and update form field
-      const response = await dispatch(GetLable(lid));
-      if (response.payload && response.payload.data) {
-        const filteredCategories = response.payload.data
-          .filter((lable) => lable.lableType === "category")
-          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
-        setCategories(filteredCategories);
-        setFieldValue("category", newValue.trim());
+      
+      const response = await dispatch(AddLable({ lid, payload }));
+      
+      if (response.payload && response.payload.success) {
+        message.success(`${lableType} added successfully.`);
+        
+        // Refresh the labels immediately after adding
+        const labelsResponse = await dispatch(GetLable(lid));
+        if (labelsResponse.payload && labelsResponse.payload.data) {
+          const filteredLables = labelsResponse.payload.data
+            .filter((lable) => lable.lableType === lableType)
+            .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+          
+          setCategories(filteredLables);
+          if (setFieldValue) {
+            setFieldValue("category", newValue.trim());
+          }
+        }
+        
+        // Reset input and close modal
+        setter("");
+        modalSetter(false);
+      } else {
+        throw new Error('Failed to add label');
       }
     } catch (error) {
-      console.error("Failed to add Category:", error);
-      message.error("Failed to add Category");
+      console.error(`Failed to add ${lableType}:`, error);
+      message.error(`Failed to add ${lableType}. Please try again.`);
     }
   };
 
@@ -561,7 +570,7 @@ const AddRevenue = ({ onClose }) => {
                   title="Add New Category"
                   open={isCategoryModalVisible}
                   onCancel={() => setIsCategoryModalVisible(false)}
-                  onOk={() => handleAddNewCategory("category", newCategory, setNewCategory, setIsCategoryModalVisible, setFieldValue)}
+                  onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible, setFieldValue)}
                   okText="Add Category"
                 >
                   <Input
@@ -587,34 +596,8 @@ const AddRevenue = ({ onClose }) => {
         </div>
       </div>
 
-      {/* Add Category Modal */}
+      {/* Add Currency Modal */}
       <Modal
-        title="Add New Category"
-        open={isCategoryModalVisible}
-        onCancel={() => setIsCategoryModalVisible(false)}
-        onOk={() => handleAddNewCategory("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
-        okText="Add Category"
-      >
-        <Input
-          placeholder="Enter new category name"
-          value={newCategory}
-          onChange={(e) => setNewCategory(e.target.value)}
-        />
-      </Modal>
-
-      {/* AddCustomer Modal */}
-      <Modal
-        title="Add Customer"
-        visible={isAddCustomerModalVisible}
-        onCancel={closeAddCustomerModal}
-        footer={null}
-        width={1000}
-      >
-        <AddCustomer onClose={closeAddCustomerModal} />
-      </Modal>
-
-       {/* Add Currency Modal */}
-       <Modal
         title="Add New Currency"
         visible={isAddCurrencyModalVisible}
         onCancel={() => setIsAddCurrencyModalVisible(false)}

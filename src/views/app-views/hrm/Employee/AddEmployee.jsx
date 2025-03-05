@@ -11,7 +11,7 @@ import {
   Col,
 } from "antd";
 import { useNavigate } from "react-router-dom";
-import { ToTopOutlined, UploadOutlined } from "@ant-design/icons";
+import { ReloadOutlined } from "@ant-design/icons";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -339,7 +339,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                       className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
                       onClick={() => setFieldValue("password", generatePassword())}
                     >
-                      <ToTopOutlined />
+                     <ReloadOutlined/>
                     </Button>
                   </div>
                   <ErrorMessage

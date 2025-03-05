@@ -13,7 +13,7 @@ import { addClient, ClientData } from "./CompanyReducers/CompanySlice"; // Adjus
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
-import { KeyOutlined, ToTopOutlined } from "@ant-design/icons";
+import { ReloadOutlined } from "@ant-design/icons";
 
 const AddCompany = ({ onClose }) => {
   const navigate = useNavigate();
@@ -163,7 +163,7 @@ const AddCompany = ({ onClose }) => {
                       className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
                       onClick={() => setFieldValue("password", generatePassword())}
                     >
-                     <ToTopOutlined/>
+                      <ReloadOutlined />
                     </Button>
                   </div>
                   <ErrorMessage

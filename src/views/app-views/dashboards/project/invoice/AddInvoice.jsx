@@ -708,7 +708,18 @@ const sub = subClientsss?.SubClient?.data;
                                             label="Issue Date"
                                             rules={[{ required: true, message: "Please select the issue date" }]}
                                         >
-                                            <DatePicker className="w-full" format="DD-MM-YYYY" />
+                                            <DatePicker 
+                                                className="w-full" 
+                                                format="DD-MM-YYYY"
+                                                onChange={(date) => {
+                                                    form.setFieldsValue({ issueDate: date });
+                                                    // Clear due date if it's before the new issue date
+                                                    const dueDate = form.getFieldValue('dueDate');
+                                                    if (dueDate && date && dueDate.isBefore(date)) {
+                                                        form.setFieldsValue({ dueDate: null });
+                                                    }
+                                                }}
+                                            />
                                         </Form.Item>
                                     </Col>
 
@@ -718,7 +729,16 @@ const sub = subClientsss?.SubClient?.data;
                                             label="Due Date"
                                             rules={[{ required: true, message: "Please select the due date" }]}
                                         >
-                                            <DatePicker className="w-full" format="DD-MM-YYYY" />
+                                            <DatePicker 
+                                                className="w-full" 
+                                                format="DD-MM-YYYY"
+                                                disabledDate={(current) => {
+                                                    // Get the issue date from form
+                                                    const issueDate = form.getFieldValue('issueDate');
+                                                    // Disable dates before issue date
+                                                    return issueDate ? current && current < issueDate.startOf('day') : false;
+                                                }}
+                                            />
                                         </Form.Item>
                                     </Col>
 

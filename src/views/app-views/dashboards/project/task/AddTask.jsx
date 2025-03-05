@@ -108,15 +108,28 @@ const AddTask = ({ onClose }) => {
   };
 
   const validationSchema = Yup.object({
-    taskName: Yup.string().required("Please enter TaskName."),
-    category: Yup.string().required("Please enter TaskCategory."),
-    project: Yup.string().required("Please enter Project."),
-    startDate: Yup.date().nullable().required("Date is required."),
-    lead : Yup.string().required("lead required"),
-    dueDate: Yup.date().nullable().required("Date is required."),
-    assignTo: Yup.array().min(1, "Please select at least one AssignTo."),
-    description: Yup.string().required("Please enter a Description."),
-    
+    taskName: Yup.string().required("Task Name is required"),
+    category: Yup.string().required("Category is required"),
+    project: Yup.string().required("Project is required"),
+    startDate: Yup.date()
+      .nullable()
+      .required("Start Date is required"),
+    dueDate: Yup.date()
+      .nullable()
+      .required("Due Date is required")
+      .min(
+        Yup.ref('startDate'),
+        'Due Date must be after Start Date'
+      ),
+    assignTo: Yup.array()
+      .min(1, "Please select at least one assignee")
+      .required("Please assign the task to someone"),
+    description: Yup.string()
+      .required("Description is required"),
+    priority: Yup.string()
+      .required("Priority is required"),
+    status: Yup.string()
+      .required("Status is required")
   });
 
     useEffect(() => {
@@ -359,7 +372,13 @@ const AddTask = ({ onClose }) => {
                       name="startDate"
                       className="w-full mt-1"
                       placeholder="Select startDate"
-                      onChange={(value) => setFieldValue("startDate", value)}
+                      onChange={(date) => {
+                        setFieldValue("startDate", date);
+                        // Clear end date if it's before the new start date
+                        if (values.dueDate && date && values.dueDate.isBefore(date)) {
+                          setFieldValue("dueDate", null);
+                        }
+                      }}
                       value={values.startDate}
                       onBlur={() => setFieldTouched("startDate", true)}
                     />
@@ -381,6 +400,10 @@ const AddTask = ({ onClose }) => {
                       onChange={(value) => setFieldValue("dueDate", value)}
                       value={values.dueDate}
                       onBlur={() => setFieldTouched("dueDate", true)}
+                      disabledDate={(current) => {
+                        // Disable dates before start date
+                        return values.startDate ? current && current < values.startDate.startOf('day') : false;
+                      }}
                     />
                     <ErrorMessage
                       name="dueDate"

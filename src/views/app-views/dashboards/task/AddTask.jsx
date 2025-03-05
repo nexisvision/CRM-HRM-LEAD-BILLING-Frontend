@@ -192,7 +192,13 @@ const AddTask = ({ onClose }) => {
                     name="startDate"
                     className="w-full mt-1"
                     placeholder="Select startDate"
-                    onChange={(value) => setFieldValue("startDate", value)}
+                    onChange={(date) => {
+                      setFieldValue("startDate", date);
+                      // Clear end date if it's before the new start date
+                      if (values.dueDate && date && values.dueDate.isBefore(date)) {
+                        setFieldValue("dueDate", null);
+                      }
+                    }}
                     value={values.startDate}
                     onBlur={() => setFieldTouched("startDate", true)}
                   />
@@ -214,6 +220,10 @@ const AddTask = ({ onClose }) => {
                     onChange={(value) => setFieldValue("dueDate", value)}
                     value={values.dueDate}
                     onBlur={() => setFieldTouched("dueDate", true)}
+                    disabledDate={(current) => {
+                      // Disable dates before start date
+                      return values.startDate ? current && current < values.startDate.startOf('day') : false;
+                    }}
                   />
                   <ErrorMessage
                     name="dueDate"

@@ -107,8 +107,8 @@ const AddDeal = ({ onClose }) => {
      fetchLables("category", setCategories);
    }, []);
  
-   const handleAddNewCategory = async () => {
-     if (!newCategory.trim()) {
+   const handleAddNewCategory = async (newValue, setter, modalSetter, setFieldValue) => {
+     if (!newValue.trim()) {
        message.error("Please enter a category name");
        return;
      }
@@ -116,17 +116,25 @@ const AddDeal = ({ onClose }) => {
      try {
        const lid = AllLoggedData.loggedInUser.id;
        const payload = {
-         name: newCategory.trim(),
-         labelType: "status",
+         name: newValue.trim(),
+         lableType: "category",
        };
  
        await dispatch(AddLable({ lid, payload }));
        message.success("Category added successfully");
-       setNewCategory("");
-       setIsCategoryModalVisible(false);
+       setter(""); // Reset input field
+       modalSetter(false); // Close modal
  
-       // Fetch updated categories
-       await fetchLables();
+       // Fetch updated categories and update the form field
+       const response = await dispatch(GetLable(lid));
+       if (response.payload && response.payload.data) {
+         const filteredCategories = response.payload.data
+           .filter((label) => label.lableType === "category")
+           .map((label) => ({ id: label.id, name: label.name.trim() }));
+         
+         setCategories(filteredCategories);
+         setFieldValue("category", newValue.trim()); // Set the newly created category in the form
+       }
      } catch (error) {
        console.error("Failed to add Category:", error);
        message.error("Failed to add Category");
@@ -251,303 +259,189 @@ const AddDeal = ({ onClose }) => {
         // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
-        {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
-          <Form className="formik-form" onSubmit={handleSubmit}>
-            <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
-            {/* <h2 className="mb-4 border-b pb-2 font-medium">Add Deal</h2> */}
-            <Row gutter={16}>
-              <Col span={12}>
-                <div className="form-item mt-3">
-                  <label className="font-semibold">Deal Name <span className="text-rose-500">*</span></label>
-                  <Field
-                    className="mt-1"
-                    name="dealName"
-                    as={Input}
-                    placeholder="Enter Deal Name"
-                  />
-                  <ErrorMessage
-                    name="dealName"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Phone
-                    <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="flex gap-0">
-                    <Field name="phoneCode">
-                      {({ field }) => (
-                        <Select
-                          {...field}
-                          className="phone-code-select"
-                          style={{
-                            width: '80px',
-                            borderTopRightRadius: 0,
-                            borderBottomRightRadius: 0,
-                            borderRight: 0,
-                            backgroundColor: '#f8fafc',
-                          }}
-                          placeholder={<span className="text-gray-400">+91</span>}
-                          onChange={(value) => {
-                            if (value === 'add_new') {
-                              setIsAddPhoneCodeModalVisible(true);
-                            } else {
-                              setFieldValue('phoneCode', value);
-                            }
-                          }}
-                          value={values.phoneCode || getInitialCountry()}
-                          dropdownStyle={{ minWidth: '180px' }}
-                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-                          loading={!countries}
-                          dropdownRender={menu => (
-                            <div>
-                              <div
-                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                                onClick={() => setIsAddPhoneCodeModalVisible(true)}
-                              >
-                                <PlusOutlined className="mr-2" />
-                                <span className="text-sm">Add New</span>
-                              </div>
-                              {menu}
-                            </div>
-                          )}
-                        >
-                          {countries?.map((country) => (
-                            <Option key={country.id} value={country.phoneCode}>
-                              <div className="flex items-center w-full px-1">
-                                <span className="text-base min-w-[40px]">{country.phoneCode}</span>
-                                <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
-                                <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
-                              </div>
-                            </Option>
-                          ))}
-                        </Select>
-                      )}
-                    </Field>
-                    <Field name="phoneNumber">
-                      {({ field }) => (
-                        <Input
-                          {...field}
-                          className="phone-input"
-                          style={{
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0,
-                            borderLeft: 0,
-                            width: 'calc(100% - 80px)'
-                          }}
-                          type="tel"
-                          placeholder="Enter 10-digit number"
-                          onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                          maxLength={15}
-                        />
-                      )}
-                    </Field>
+        {({
+          values,
+          setFieldValue,
+          handleSubmit,
+          setFieldTouched,
+          resetForm,
+        }) => (
+          <>
+            <Form className="formik-form" onSubmit={handleSubmit}>
+              <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+              {/* <h2 className="mb-4 border-b pb-2 font-medium">Add Deal</h2> */}
+              <Row gutter={16}>
+                <Col span={12}>
+                  <div className="form-item mt-3">
+                    <label className="font-semibold">Deal Name <span className="text-rose-500">*</span></label>
+                    <Field
+                      className="mt-1"
+                      name="dealName"
+                      as={Input}
+                      placeholder="Enter Deal Name"
+                    />
+                    <ErrorMessage
+                      name="dealName"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
                   </div>
-                  <ErrorMessage name="phoneNumber" component="div" className="text-red-500 mt-1 text-sm" />
-                </div>
-              </Col>
-              <Col span={12} className="mt-3">
-                <div className="form-group">
-                  <label className="text-gray-600 font-semibold mb-2 block">Currency <span className="text-red-500">*</span></label>
-                  <div className="flex gap-0">
-                    <Field name="currency">
-                      {({ field }) => (
-                        <Select
-                          {...field}
-                          className="currency-select"
-                          style={{
-                            width: '80px',
-                            borderTopRightRadius: 0,
-                            borderBottomRightRadius: 0,
-                            borderRight: 0,
-                            backgroundColor: '#f8fafc',
-                          }}
-                          placeholder={<span className="text-gray-400">₹</span>}
-                          onChange={(value) => {
-                            if (value === 'add_new') {
-                              setIsAddCurrencyModalVisible(true);
-                            } else {
-                              setFieldValue("currency", value);
-                            }
-                          }}
-                          defaultValue={getInitialCurrency()}
-                          value={values.currency}
-                          dropdownStyle={{ minWidth: '180px' }}
-                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-                          loading={!fnddatass}
-                          dropdownRender={menu => (
-                            <div>
-                              <div
-                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                                onClick={() => setIsAddCurrencyModalVisible(true)}
-                              >
-                                <PlusOutlined className="mr-2" />
-                                <span className="text-sm">Add New</span>
-                              </div>
-                              {menu}
-                            </div>
-                          )}
-                        >
-                          {fnddatass?.map((currency) => (
-                            <Option key={currency.id} value={currency.id}>
-                              <div className="flex items-center w-full px-1">
-                                <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
-                                <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
-                                <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
-                              </div>
-                            </Option>
-                          ))}
-                        </Select>
-                      )}
-                    </Field>
-                    <Field name="price">
-                      {({ field, form }) => (
-                        <Input
-                          {...field}
-                          className="price-input"
-                          style={{
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0,
-                            borderLeft: '1px solid #d9d9d9',
-                            width: 'calc(100% - 100px)'
-                          }}
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          placeholder="0.00"
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
-                              form.setFieldValue('price', value);
-                            }
-                          }}
-                          onKeyPress={(e) => {
-                            const charCode = e.which ? e.which : e.keyCode;
-                            if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
-                              e.preventDefault();
-                            }
-                            if (charCode === 46 && field.value.includes('.')) {
-                              e.preventDefault();
-                            }
-                          }}
-                          prefix={
-                            values.currency && (
-                              <span className="text-gray-600 font-medium mr-1">
-                                {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
-                              </span>
-                            )
-                          }
-                        />
-                      )}
-                    </Field>
-                  </div>
-                  <ErrorMessage name="price" component="div" className="text-red-500 mt-1 text-sm" />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-3">
-                    <div className="form-item">
-                      <label className="font-semibold">Category </label>
+                </Col>
+                <Col span={12} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold">Phone <span className="text-rose-500">*</span></label>
+                    <div className="flex">
                       <Select
-                        name="category"
-                        style={{ width: "100%" }}
-                        className="w-full mt-1"
-                        placeholder="Select or add new category"
-                        value={values.category}
-                        onChange={(value) => setFieldValue("category", value)}
-                        dropdownRender={(menu) => (
-                          <div>
-                            {menu}
-                            <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                              <Button
-                                type="link"
-                                icon={<PlusOutlined />}
-                                className="w-full mt-1"
-                                onClick={() => setIsCategoryModalVisible(true)}
-                              >
-                                Add New Category
-                              </Button>
-                            </div>
-                          </div>
-                        )}
+                        style={{ width: '30%', marginRight: '8px' }}
+                        placeholder="Code"
+                        name="phoneCode"
+                        className="mt-1"
+                        value={values.phoneCode}
+                        onChange={(value) => setFieldValue('phoneCode', value)}
                       >
-                        {categories.map((category) => (
-                          <Option key={category.id} value={category.name}>
-                            {category.name}
+                        {countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            ({country.phoneCode})
                           </Option>
                         ))}
                       </Select>
-                      <ErrorMessage
-                        name="project_category"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
+                      <Field name="phoneNumber">
+                        {({ field }) => (
+                          <Input
+                            {...field}
+                            type="number"
+                            style={{ width: '70%' }}
+                            placeholder="Enter phone number"
+                            onKeyPress={(e) => {
+                              // Allow only numbers
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          />
+                        )}
+                      </Field>
                     </div>
-                  </Col>
-              
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Lead Title <span className="text-rose-500">*</span></label>
-                  <div className="flex gap-2">
-                    <Field name="leadTitle">
-                      {({ field, form }) => (
-                        <Select
-                          {...field} // Spread Formik field props to manage the value
-                          className="w-full mt-1"
-                          placeholder="Select Lead Title"
-                          value={field.value || ""} // Ensure the select value is controlled by Formik
-                          onChange={(value) => {
-                            // Find the selected lead from the Leads array
-                            const selectedLead =
-                              Array.isArray(Leads) &&
-                              Leads.find((e) => e.id === value);
-                            // Update Formik's field value with the selected lead's title
-                            form.setFieldValue(
-                              "leadTitle",
-                              selectedLead?.leadTitle || ""
-                            );
-                          }}
-                        >
-                          {Array.isArray(Leads) &&
-                            Leads.map((lead) => (
-                              <Option key={lead.id} value={lead.id}>
-                                {lead.leadTitle}
+                    {/* <ErrorMessage
+                      name="phoneCode"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    /> */}
+                    <ErrorMessage
+                      name="phoneNumber"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                <Col span={12} className="mt-3">
+                  <div className="form-group">
+                    <label className="text-gray-600 font-semibold mb-2 block">Currency <span className="text-red-500">*</span></label>
+                    <div className="flex gap-0">
+                      <Field name="currency">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            className="currency-select"
+                            style={{
+                              width: '60px',
+                              borderTopRightRadius: 0,
+                              borderBottomRightRadius: 0,
+                              borderRight: 0,
+                              backgroundColor: '#f8fafc',
+                            }}
+                            placeholder={<span className="text-gray-400">$</span>}
+                            onChange={(value) => {
+                              if (value === 'add_new') {
+                                setIsAddCurrencyModalVisible(true);
+                              } else {
+                                setFieldValue("currency", value);
+                              }
+                            }}
+                            value={values.currency}
+                            dropdownStyle={{ minWidth: '180px' }}
+                            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                            loading={!fnddatass}
+                            dropdownRender={menu => (
+                              <div>
+                                <div
+                                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                  onClick={() => setIsAddCurrencyModalVisible(true)}
+                                >
+                                  <PlusOutlined className="mr-2" />
+                                  <span className="text-sm">Add New</span>
+                                </div>
+                                {menu}
+                              </div>
+                            )}
+                          >
+                            {fnddatass?.map((currency) => (
+                              <Option key={currency.id} value={currency.id}>
+                                <div className="flex items-center w-full px-1">
+                                  <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                  <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                  <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                                </div>
                               </Option>
                             ))}
-                        </Select>
-                      )}
-                    </Field>
+                          </Select>
+                        )}
+                      </Field>
+                      <Field name="price">
+                        {({ field, form }) => (
+                          <Input
+                            {...field}
+                            className="price-input"
+                            style={{
+                              borderTopLeftRadius: 0,
+                              borderBottomLeftRadius: 0,
+                              borderLeft: '1px solid #d9d9d9',
+                              width: 'calc(100% - 100px)'
+                            }}
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                form.setFieldValue('price', value);
+                              }
+                            }}
+                            onKeyPress={(e) => {
+                              const charCode = e.which ? e.which : e.keyCode;
+                              if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                e.preventDefault();
+                              }
+                              if (charCode === 46 && field.value.includes('.')) {
+                                e.preventDefault();
+                              }
+                            }}
+                            prefix={
+                              values.currency && (
+                                <span className="text-gray-600 font-medium mr-1">
+                                  {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                                </span>
+                              )
+                            }
+                          />
+                        )}
+                      </Field>
+                    </div>
+                    <ErrorMessage name="price" component="div" className="text-red-500 mt-1 text-sm" />
                   </div>
-                  <ErrorMessage
-                    name="leadTitle"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                </Col>
 
                 <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Pipeline <span className="text-rose-500">*</span></label>
-                  <div className="flex gap-2">
-                    <Field name="pipeline">
-                      {({ field, form }) => (
+                      <div className="form-item">
+                        <label className="font-semibold">Category </label>
                         <Select
-                          {...field}
+                          name="category"
+                          style={{ width: "100%" }}
                           className="w-full mt-1"
-                          placeholder="Select Pipeline"
-                          onChange={(value) => {
-                            const selectedPipeline =
-                              Array.isArray(fnddatas) &&
-                              fnddatas.find((e) => e.id === value);
-                            form.setFieldValue(
-                              "pipeline",
-                              selectedPipeline?.pipeline_name || ""
-                            );
-                          }}
+                          placeholder="Select or add new category"
+                          value={values.category}
+                          onChange={(value) => setFieldValue("category", value)}
                           dropdownRender={(menu) => (
                             <div>
                               {menu}
@@ -556,169 +450,260 @@ const AddDeal = ({ onClose }) => {
                                   type="link"
                                   icon={<PlusOutlined />}
                                   className="w-full mt-1"
-                                  onClick={openAddPipeLineModal}
+                                  onClick={() => setIsCategoryModalVisible(true)}
                                 >
-                                  Add New Pipeline
+                                  Add New Category
                                 </Button>
                               </div>
                             </div>
                           )}
                         >
-                          {Array.isArray(fnddatas) &&
-                            fnddatas.map((pipeline) => (
-                              <Option key={pipeline.id} value={pipeline.id}>
-                                {pipeline.pipeline_name}
-                              </Option>
-                            ))}
+                          {categories.map((category) => (
+                            <Option key={category.id} value={category.name}>
+                              {category.name}
+                            </Option>
+                          ))}
                         </Select>
-                      )}
-                    </Field>
+                        <ErrorMessage
+                          name="project_category"
+                          component="div"
+                          className="error-message text-red-500 my-1"
+                        />
+                      </div>
+                    </Col>
+                
+                <Col span={12} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold">Lead Title <span className="text-rose-500">*</span></label>
+                    <div className="flex gap-2">
+                      <Field name="leadTitle">
+                        {({ field, form }) => (
+                          <Select
+                            {...field} // Spread Formik field props to manage the value
+                            className="w-full mt-1"
+                            placeholder="Select Lead Title"
+                            value={field.value || ""} // Ensure the select value is controlled by Formik
+                            onChange={(value) => {
+                              // Find the selected lead from the Leads array
+                              const selectedLead =
+                                Array.isArray(Leads) &&
+                                Leads.find((e) => e.id === value);
+                              // Update Formik's field value with the selected lead's title
+                              form.setFieldValue(
+                                "leadTitle",
+                                selectedLead?.leadTitle || ""
+                              );
+                            }}
+                          >
+                            {Array.isArray(Leads) &&
+                              Leads.map((lead) => (
+                                <Option key={lead.id} value={lead.id}>
+                                  {lead.leadTitle}
+                                </Option>
+                              ))}
+                          </Select>
+                        )}
+                      </Field>
+                    </div>
+                    <ErrorMessage
+                      name="leadTitle"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
                   </div>
-                  <ErrorMessage
-                    name="pipeline"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Stage <span className="text-rose-500">*</span></label>
-                  <div className="flex gap-2">
-                    <Field name="stage">
-                      {({ field, form }) => (
-                        <Select
-                          {...field}
-                          className="w-full mt-1"
-                          placeholder="Select Stage"
-                          value={field.value} // Ensure the select value is controlled
-                          onChange={(value) => {
-                            const selectedStage =
-                              Array.isArray(StagesLeadsDeals) &&
-                              StagesLeadsDeals.find((e) => e.id === value);
-                            form.setFieldValue(
-                              "stage",
-                              selectedStage?.id || ""
-                            );
-                          }}
-                          dropdownRender={(menu) => (
-                            <div>
-                              {menu}
-                              <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                                <Button
-                                  type="link"
-                                  icon={<PlusOutlined />}
-                                  className="w-full mt-1"
-                                  onClick={openAddDealStagesModal}
-                                >
-                                  Add New Deal Stage
-                                </Button>
-                              </div>
-                            </div>
-                          )}
-                        >
-                          {Array.isArray(StagesLeadsDeals) &&
-                            StagesLeadsDeals.map((stage) => (
-                              <Option key={stage.id} value={stage.id}>
-                                {stage.stageName}
-                              </Option>
-                            ))}
-                        </Select>
-                      )}
-                    </Field>
-                  </div>
-                  <ErrorMessage
-                    name="stage"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Closed Date <span className="text-rose-500">*</span></label>
-                  <Field name="closedDate">
-                    {({ field }) => (
-                      <DatePicker
-                        {...field}
-                        className="mt-1"
-                        style={{ width: "100%" }}
-                        onChange={(date) => setFieldValue("closedDate", date)}
-                      />
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="closedDate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                </Col>
 
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Project <span className="text-rose-500">*</span> </label>
-                  <div className="flex gap-2">
-                    <Field name="project">
-                      {({ field, form }) => (
-                        <Select
+                  <Col span={12} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold">Pipeline <span className="text-rose-500">*</span></label>
+                    <div className="flex gap-2">
+                      <Field name="pipeline">
+                        {({ field, form }) => (
+                          <Select
+                            {...field}
+                            className="w-full mt-1"
+                            placeholder="Select Pipeline"
+                            onChange={(value) => {
+                              const selectedPipeline =
+                                Array.isArray(fnddatas) &&
+                                fnddatas.find((e) => e.id === value);
+                              form.setFieldValue(
+                                "pipeline",
+                                selectedPipeline?.pipeline_name || ""
+                              );
+                            }}
+                            dropdownRender={(menu) => (
+                              <div>
+                                {menu}
+                                <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                  <Button
+                                    type="link"
+                                    icon={<PlusOutlined />}
+                                    className="w-full mt-1"
+                                    onClick={openAddPipeLineModal}
+                                  >
+                                    Add New Pipeline
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
+                          >
+                            {Array.isArray(fnddatas) &&
+                              fnddatas.map((pipeline) => (
+                                <Option key={pipeline.id} value={pipeline.id}>
+                                  {pipeline.pipeline_name}
+                                </Option>
+                              ))}
+                          </Select>
+                        )}
+                      </Field>
+                    </div>
+                    <ErrorMessage
+                      name="pipeline"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                <Col span={12} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold">Stage <span className="text-rose-500">*</span></label>
+                    <div className="flex gap-2">
+                      <Field name="stage">
+                        {({ field, form }) => (
+                          <Select
+                            {...field}
+                            className="w-full mt-1"
+                            placeholder="Select Stage"
+                            value={field.value} // Ensure the select value is controlled
+                            onChange={(value) => {
+                              const selectedStage =
+                                Array.isArray(StagesLeadsDeals) &&
+                                StagesLeadsDeals.find((e) => e.id === value);
+                              form.setFieldValue(
+                                "stage",
+                                selectedStage?.id || ""
+                              );
+                            }}
+                            dropdownRender={(menu) => (
+                              <div>
+                                {menu}
+                                <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                  <Button
+                                    type="link"
+                                    icon={<PlusOutlined />}
+                                    className="w-full mt-1"
+                                    onClick={openAddDealStagesModal}
+                                  >
+                                    Add New Deal Stage
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
+                          >
+                            {Array.isArray(StagesLeadsDeals) &&
+                              StagesLeadsDeals.map((stage) => (
+                                <Option key={stage.id} value={stage.id}>
+                                  {stage.stageName}
+                                </Option>
+                              ))}
+                          </Select>
+                        )}
+                      </Field>
+                    </div>
+                    <ErrorMessage
+                      name="stage"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                <Col span={12} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold">Closed Date <span className="text-rose-500">*</span></label>
+                    <Field name="closedDate">
+                      {({ field }) => (
+                        <DatePicker
                           {...field}
-                          className="w-full mt-1"
-                          placeholder="Select Project"
-                          onChange={(value) => {
-                            const selectedProject =
-                              Array.isArray(Project) &&
-                              Project.find((e) => e.id === value);
-                            form.setFieldValue(
-                              "project",
-                              selectedProject?.project_name || ""
-                            );
-                          }}
-                        >
-                          {Array.isArray(Project) &&
-                            Project.map((project) => (
-                              <Option key={project.id} value={project.id}>
-                                {project.project_name}
-                              </Option>
-                            ))}
-                        </Select>
+                          className="mt-1"
+                          style={{ width: "100%" }}
+                          onChange={(date) => setFieldValue("closedDate", date)}
+                        />
                       )}
                     </Field>
+                    <ErrorMessage
+                      name="closedDate"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
                   </div>
-                  <ErrorMessage
-                    name="project"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-            </Row>
-            <div className="form-buttons text-right mt-4">
-              <Button type="default" className="mr-2" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="primary" htmlType="submit">
-                Create
-              </Button>
-            </div>
-          </Form>
+                </Col>
+
+                <Col span={12} className="mt-3">
+                  <div className="form-item">
+                    <label className="font-semibold">Project <span className="text-rose-500">*</span> </label>
+                    <div className="flex gap-2">
+                      <Field name="project">
+                        {({ field, form }) => (
+                          <Select
+                            {...field}
+                            className="w-full mt-1"
+                            placeholder="Select Project"
+                            onChange={(value) => {
+                              const selectedProject =
+                                Array.isArray(Project) &&
+                                Project.find((e) => e.id === value);
+                              form.setFieldValue(
+                                "project",
+                                selectedProject?.project_name || ""
+                              );
+                            }}
+                          >
+                            {Array.isArray(Project) &&
+                              Project.map((project) => (
+                                <Option key={project.id} value={project.id}>
+                                  {project.project_name}
+                                </Option>
+                              ))}
+                          </Select>
+                        )}
+                      </Field>
+                    </div>
+                    <ErrorMessage
+                      name="project"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+              </Row>
+              <div className="form-buttons text-right mt-4">
+                <Button type="default" className="mr-2" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button type="primary" htmlType="submit">
+                  Create
+                </Button>
+              </div>
+            </Form>
+
+            {/* Category Modal - Moved inside Formik */}
+            <Modal
+              title="Add New Category"
+              open={isCategoryModalVisible}
+              onCancel={() => setIsCategoryModalVisible(false)}
+              onOk={() => handleAddNewCategory(newCategory, setNewCategory, setIsCategoryModalVisible, setFieldValue)}
+              okText="Add Category"
+            >
+              <Input
+                placeholder="Enter new category name"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+              />
+            </Modal>
+          </>
         )}
       </Formik>
-
-       {/* Add Category Modal */}
-       <Modal
-        title="Add New Category"
-        open={isCategoryModalVisible}
-        onCancel={() => setIsCategoryModalVisible(false)}
-        onOk={() => handleAddNewCategory("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
-        okText="Add Category"
-      >
-        <Input
-          placeholder="Enter new category name"
-          value={newCategory}
-          onChange={(e) => setNewCategory(e.target.value)}
-        />
-      </Modal>
 
       {/* Add Deal Stages Modal */}
       <Modal

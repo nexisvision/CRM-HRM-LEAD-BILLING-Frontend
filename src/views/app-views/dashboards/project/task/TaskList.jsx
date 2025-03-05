@@ -101,6 +101,7 @@ export const TaskList = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState('all');
+  const [selectedPriority, setSelectedPriority] = useState('all');
   const [searchText, setSearchText] = useState('');
   // const [statusFilter, setStatusFilter] = useState('all');
 
@@ -416,7 +417,32 @@ export const TaskList = () => {
     handleFilters(dates); // Pass the dates directly to handleFilters
   };
 
-  // Update the filter function to handle API data and date range
+  // Get unique priorities from task data
+  const getUniquePriorities = () => {
+    if (!fnddata) return [];
+    
+    // Get all unique priorities from the data
+    const priorities = [...new Set(fnddata.map(item => item.priority))];
+    
+    // Create priority options array with 'All Priority' as first option
+    return [
+      { value: 'all', label: 'All Priority' },
+      ...priorities.map(priority => ({
+        value: priority,
+        label: priority
+      }))
+    ];
+  };
+
+  // Get priority options
+  const priorityOptions = getUniquePriorities();
+
+  // Handle priority change
+  const handlePriorityChange = (value) => {
+    setSelectedPriority(value);
+  };
+
+  // Update the filter function to handle priority
   const handleFilters = async (dates = dateRange) => {
     setLoading(true);
     try {
@@ -426,14 +452,18 @@ export const TaskList = () => {
       if (searchText) {
         filtered = filtered.filter(item => 
           item.taskName?.toLowerCase().includes(searchText.toLowerCase()) ||
-          item.assignToName?.toLowerCase().includes(searchText.toLowerCase()) ||
-          item.priority?.toLowerCase().includes(searchText.toLowerCase())
+          item.assignToName?.toLowerCase().includes(searchText.toLowerCase())
         );
       }
 
       // Apply status filter
       if (selectedStatus && selectedStatus !== 'all') {
         filtered = filtered.filter(item => item.status === selectedStatus);
+      }
+
+      // Apply priority filter
+      if (selectedPriority && selectedPriority !== 'all') {
+        filtered = filtered.filter(item => item.priority === selectedPriority);
       }
 
       // Apply date range filter
@@ -445,7 +475,6 @@ export const TaskList = () => {
           const taskStartDate = dayjs(task.startDate);
           const taskEndDate = dayjs(task.dueDate);
           
-          // Check if task's date range overlaps with selected date range
           return taskStartDate.isSame(startRange, 'day') || 
                  taskEndDate.isSame(endRange, 'day') || 
                  (taskStartDate.isAfter(startRange) && taskStartDate.isBefore(endRange)) ||
@@ -462,12 +491,12 @@ export const TaskList = () => {
     setLoading(false);
   };
 
-  // Add useEffect to trigger filtering when filters change
+  // Update useEffect to include selectedPriority
   useEffect(() => {
     if (fnddata) {
       handleFilters();
     }
-  }, [searchText, selectedStatus, fnddata]);
+  }, [searchText, selectedStatus, selectedPriority, fnddata]);
 
   // Update the getFilteredTasks function
   const getFilteredTasks = () => {
@@ -543,6 +572,21 @@ export const TaskList = () => {
                 {statusOptions.map(status => (
                   <Option key={status.value} value={status.value}>
                     {status.label}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+            <div className="mr-0 md:mr-3 mt-7 md:mb-0 w-full md:w-40">
+              <Select
+                placeholder="Filter by priority"
+                onChange={handlePriorityChange}
+                value={selectedPriority}
+                style={{ width: '100%' }}
+                className="priority-select"
+              >
+                {priorityOptions.map(priority => (
+                  <Option key={priority.value} value={priority.value}>
+                    {priority.label}
                   </Option>
                 ))}
               </Select>

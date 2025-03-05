@@ -20,6 +20,7 @@ import { Deletepip, GetPip } from "./PiplineReducer/piplineSlice";
 const PipelineList = () => {
   //   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [isAddPipeLineModalVisible, setIsAddPipeLineModalVisible] =
     useState(false);
   const [isEditPipeLineModalVisible, setIsEditPipeLineModalVisible] =
@@ -128,15 +129,28 @@ const PipelineList = () => {
   ];
 
   const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? fnddatas : fnddatas;
-    const data = utils.wildCardSearch(searchArray, value);
+    const value = e.currentTarget.value.toLowerCase();
+    
+    if (!value) {
+      setFilteredData(fnddatas); // Reset to original data when search is empty
+      return;
+    }
+
+    const filtered = fnddatas.filter((item) => 
+      item.pipeline_name?.toString().toLowerCase().includes(value)
+    );
+    
+    setFilteredData(filtered);
     setSelectedRowKeys([]);
   };
 
   useEffect(() => {
     dispatch(GetPip());
   }, [dispatch]);
+
+  useEffect(() => {
+    setFilteredData(fnddatas);
+  }, [fnddatas]);
 
   return (
     <>
@@ -167,7 +181,7 @@ const PipelineList = () => {
         >
           <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
             <Input
-              placeholder="Search"
+              placeholder="Search pipeline..."
               prefix={<SearchOutlined />}
               onChange={(e) => onSearch(e)}
             />
@@ -176,7 +190,7 @@ const PipelineList = () => {
         <div className="table-responsive">
           <Table
             columns={tableColumns}
-            dataSource={fnddatas} 
+            dataSource={filteredData} 
             rowKey="id"
           />
         </div>

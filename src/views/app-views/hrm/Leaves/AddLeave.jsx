@@ -166,7 +166,13 @@ const AddLeave = ({ onClose }) => {
                         id="startDate"
                         className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         format="DD-MM-YYYY"
-                        onChange={(date) => setFieldValue("startDate", date)}
+                        onChange={(date) => {
+                          setFieldValue("startDate", date);
+                          // Clear end date if it's before the new start date
+                          if (values.endDate && date && values.endDate.isBefore(date)) {
+                            setFieldValue("endDate", null);
+                          }
+                        }}
                       />
                     )}
                   </Field>
@@ -194,6 +200,10 @@ const AddLeave = ({ onClose }) => {
                         className="w-full rounded-md border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         format="DD-MM-YYYY"
                         onChange={(date) => setFieldValue("endDate", date)}
+                        disabledDate={(current) => {
+                          // Disable dates before start date
+                          return values.startDate ? current && current < values.startDate.startOf('day') : false;
+                        }}
                       />
                     )}
                   </Field>

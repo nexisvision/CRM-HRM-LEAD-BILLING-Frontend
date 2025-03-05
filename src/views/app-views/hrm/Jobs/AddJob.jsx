@@ -380,7 +380,13 @@ const AddJob = ({ onClose }) => {
                       className="w-full mt-1"
                       format="DD-MM-YYYY"
                       value={values.startDate}
-                      onChange={(date) => setFieldValue("startDate", date)}
+                      onChange={(date) => {
+                        setFieldValue("startDate", date);
+                        // Clear end date if it's before the new start date
+                        if (values.endDate && date && values.endDate.isBefore(date)) {
+                          setFieldValue("endDate", null);
+                        }
+                      }}
                       onBlur={() => setFieldTouched("startDate", true)}
                     />
                     <ErrorMessage
@@ -401,6 +407,10 @@ const AddJob = ({ onClose }) => {
                       value={values.endDate}
                       onChange={(date) => setFieldValue("endDate", date)}
                       onBlur={() => setFieldTouched("endDate", true)}
+                      disabledDate={(current) => {
+                        // Disable dates before start date
+                        return values.startDate ? current && current < values.startDate.startOf('day') : false;
+                      }}
                     />
                     <ErrorMessage
                       name="endDate"

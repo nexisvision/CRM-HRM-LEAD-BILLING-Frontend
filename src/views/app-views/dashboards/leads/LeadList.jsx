@@ -11,6 +11,7 @@ import {
   Button,
   Modal,
   Radio,
+  Select,
 } from "antd";
 import {
   EyeOutlined,
@@ -61,6 +62,7 @@ const LeadList = () => {
   const [id, setId] = useState("null");
   const [searchText, setSearchText] = useState('');
   const [filteredData, setFilteredData] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState('all');
 
   // Ref for file input
   const fileInputRef = useRef(null);
@@ -113,6 +115,37 @@ const LeadList = () => {
     }
   }, [tabledata]);
 
+  // Get unique statuses from leads data
+  const getUniqueStatuses = () => {
+    if (!tabledata?.Leads?.data) return [];
+    
+    const statuses = [...new Set(tabledata.Leads.data.map(item => item.status))];
+    return [
+      { value: 'all', label: 'All Status' },
+      ...statuses.map(status => ({
+        value: status,
+        label: status
+      }))
+    ];
+  };
+
+  // Handle status change
+  const handleStatusChange = (value) => {
+    setSelectedStatus(value);
+    
+    if (!tabledata?.Leads?.data) return;
+
+    if (value === 'all') {
+      setFilteredData(tabledata.Leads.data);
+      return;
+    }
+
+    const filtered = tabledata.Leads.data.filter(lead => 
+      lead.status === value
+    );
+    setFilteredData(filtered);
+  };
+
   // Search function
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
@@ -123,9 +156,11 @@ const LeadList = () => {
       return;
     }
 
-    // Filter based on lead title
+    // Filter based on lead title and status
     const filtered = tabledata.Leads.data.filter(lead =>
-      lead.leadTitle?.toString().toLowerCase().includes(value)
+      (lead.leadTitle?.toString().toLowerCase().includes(value) ||
+      lead.status?.toString().toLowerCase().includes(value)) &&
+      (selectedStatus === 'all' || lead.status === selectedStatus)
     );
 
     setFilteredData(filtered);
@@ -357,7 +392,7 @@ const LeadList = () => {
     //   sorter: (a, b) => dayjs(a.leadTitle).unix() - dayjs(b.startdate).unix(),
     // },
     {
-      title: "Task",
+      title: "Status",
       dataIndex: "status",
       render: (status) => (
 
@@ -433,13 +468,28 @@ const LeadList = () => {
           <Flex className="mb-1" mobileFlex={false}>
             <div className="mr-md-3 mb-3">
               <Input
-                placeholder="Search by lead title..."
+                placeholder="Search by lead title or status..."
                 prefix={<SearchOutlined />}
                 onChange={onSearch}
                 value={searchText}
                 allowClear
                 className="search-input"
               />
+            </div>
+            <div className="mr-md-3 mb-3">
+              <Select
+                placeholder="Filter by status"
+                onChange={handleStatusChange}
+                value={selectedStatus}
+                style={{ width: '200px' }}
+                className="status-select"
+              >
+                {getUniqueStatuses().map(status => (
+                  <Select.Option key={status.value} value={status.value}>
+                    {status.label}
+                  </Select.Option>
+                ))}
+              </Select>
             </div>
           </Flex>
 

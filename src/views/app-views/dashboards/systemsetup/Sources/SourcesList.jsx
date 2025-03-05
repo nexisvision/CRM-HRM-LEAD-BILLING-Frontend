@@ -112,13 +112,13 @@ const SourcesList = () => {
 
   useEffect(() => {
     dispatch(GetLable(lid));
-  }, []);
+  }, [dispatch, lid]);
 
   useEffect(() => {
-    if (datas) {
+    if (datas && datas.length > 0) {
       setList(datas);
     }
-  }, []);
+  }, [datas]);
 
   const deletefun = async (userId) => {
     try {

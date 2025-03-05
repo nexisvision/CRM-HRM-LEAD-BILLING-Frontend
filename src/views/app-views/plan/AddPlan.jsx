@@ -196,7 +196,7 @@ const AddPlan = ({ onClose }) => {
                   <Row gutter={16}>
                     <Col span={12}>
                       <div className="form-group mb-4">
-                        <label className="text-gray-600 mb-2 block">Plan Name <span className="text-blue-600">*</span></label>
+                        <label className="text-gray-600 mb-2 block">Plan Name <span className="text-red-500">*</span></label>
                         <Field name="name">
                           {({ field }) => (
                             <Input

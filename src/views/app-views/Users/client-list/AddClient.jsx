@@ -5,7 +5,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { addClient, ClientData } from "./CompanyReducers/CompanySlice";
 import axios from "axios";
-import { ToTopOutlined } from "@ant-design/icons";
+import { ReloadOutlined } from "@ant-design/icons";
 
 const AddClient = ({ visible, onClose, onCreate }) => {
   const dispatch = useDispatch();
@@ -114,7 +114,7 @@ const AddClient = ({ visible, onClose, onCreate }) => {
           password: '',
           loginEnabled: true
         }}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={handleFinish}
       >
         {({ errors, touched, setFieldValue }) => (
@@ -178,7 +178,7 @@ const AddClient = ({ visible, onClose, onCreate }) => {
                       className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
                       onClick={() => setFieldValue("password", generatePassword())}
                     >
-                      <ToTopOutlined />
+                      <ReloadOutlined/>
                     </Button>
                   </div>
                   <ErrorMessage

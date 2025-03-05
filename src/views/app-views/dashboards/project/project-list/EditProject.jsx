@@ -184,26 +184,57 @@ const EditProject = ({ id, onClose }) => {
     fetchLables("status", setStatuses);
   }, []);
 
-  const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
+  const handleAddNewLable = async (lableType, newValue, setter, modalSetter, setFieldValue) => {
     if (!newValue.trim()) {
       message.error(`Please enter a ${lableType} name.`);
       return;
     }
+
     try {
       const lid = AllLoggedData.loggedInUser.id;
       const payload = {
         name: newValue.trim(),
         lableType,
       };
-      await dispatch(AddLable({ lid, payload }));
+      
+      const response = await dispatch(AddLable({ lid, payload }));
+      
+      if (response.payload && response.payload.success) {
       message.success(`${lableType} added successfully.`);
+        
+        // Refresh the labels immediately after adding
+        const labelsResponse = await dispatch(GetLable(lid));
+        if (labelsResponse.payload && labelsResponse.payload.data) {
+          const filteredLables = labelsResponse.payload.data
+            .filter((lable) => lable.lableType === lableType)
+            .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+          
+          // Update the appropriate state based on label type
+          switch (lableType) {
+            case "tag":
+              setTags(filteredLables);
+              if (setFieldValue) setFieldValue("tag", newValue.trim());
+              break;
+            case "category":
+              setCategories(filteredLables);
+              if (setFieldValue) setFieldValue("project_category", newValue.trim());
+              break;
+            case "status":
+              setStatuses(filteredLables);
+              if (setFieldValue) setFieldValue("status", newValue.trim());
+              break;
+          }
+        }
+        
+        // Reset input and close modal
       setter("");
       modalSetter(false);
-
-      await fetchLables(lableType, lableType === "tag" ? setTags : lableType === "category" ? setCategories : setStatuses);
+      } else {
+        throw new Error('Failed to add label');
+      }
     } catch (error) {
       console.error(`Failed to add ${lableType}:`, error);
-      message.error(`Failed to add ${lableType}.`);
+      message.error(`Failed to add ${lableType}. Please try again.`);
     }
   };
 
@@ -261,6 +292,7 @@ const EditProject = ({ id, onClose }) => {
         onSubmit={onSubmit}
       >
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
+          <>
           <Form className="formik-form" onSubmit={handleSubmit}>
             <h2 className="mb-4 border-b pb-2 font-medium"></h2>
 
@@ -706,15 +738,13 @@ const EditProject = ({ id, onClose }) => {
               </Button>
             </div>
           </Form>
-        )}
-      </Formik>
 
       {/* Add Tag Modal */}
       <Modal
         title="Add New Tag"
         open={isTagModalVisible}
         onCancel={() => setIsTagModalVisible(false)}
-        onOk={() => handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible)}
+              onOk={() => handleAddNewLable("tag", newTag, setNewTag, setIsTagModalVisible, setFieldValue)}
         okText="Add Tag"
       >
         <Input
@@ -728,7 +758,7 @@ const EditProject = ({ id, onClose }) => {
         title="Add New Category"
         open={isCategoryModalVisible}
         onCancel={() => setIsCategoryModalVisible(false)}
-        onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
+              onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible, setFieldValue)}
         okText="Add Category"
       >
         <Input
@@ -743,7 +773,7 @@ const EditProject = ({ id, onClose }) => {
         title="Add New Status"
         open={isStatusModalVisible}
         onCancel={() => setIsStatusModalVisible(false)}
-        onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible)}
+              onOk={() => handleAddNewLable("status", newStatus, setNewStatus, setIsStatusModalVisible, setFieldValue)}
         okText="Add Status"
       >
         <Input
@@ -774,6 +804,7 @@ const EditProject = ({ id, onClose }) => {
       >
         <addClient onClose={() => setIsAddClientModalVisible(false)} />
       </Modal>
+
       {/* Add Currency Modal */}
       <Modal
         title="Add New Currency"
@@ -785,10 +816,13 @@ const EditProject = ({ id, onClose }) => {
         <AddCurrencies
           onClose={() => {
             setIsAddCurrencyModalVisible(false);
-            dispatch(getcurren()); // Refresh currency list after adding
+                  dispatch(getcurren());
           }}
         />
       </Modal>
+          </>
+        )}
+      </Formik>
 
       {/* Custom render for selected value */}
       <style jsx>{`

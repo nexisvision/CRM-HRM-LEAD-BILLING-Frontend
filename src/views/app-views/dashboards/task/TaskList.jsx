@@ -54,16 +54,6 @@ import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-const getOrderStatus = (status) => {
-  if (status === "Normal") {
-    return "success";
-  }
-  if (status === "Shipped") {
-    return "warning";
-  }
-  return "";
-};
-
 const orderStatusList = ["Normal", "Expired"];
 
 const stripHtmlTags = (html) => {
@@ -162,6 +152,8 @@ const TaskList = () => {
   const [searchValue, setSearchValue] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [dateRange, setDateRange] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [selectedPriority, setSelectedPriority] = useState('All');
 
   const dispatch = useDispatch();
   const allempdata = useSelector((state) => state.Users);
@@ -264,14 +256,76 @@ const TaskList = () => {
     setIsEditTaskModalVisible(false);
   };
 
+  const openviewTaskModal = () => {
+    navigate("/app/dashboards/project/task/viewtask");
+  };
+
+  // Get unique statuses from task data
+  const getUniqueStatuses = () => {
+    if (!fnddata) return ['All'];
+    
+    const statuses = [...new Set(fnddata.map(item => item.status))];
+    return ['All', ...statuses];
+  };
+
+  // Add function to get unique priorities
+  const getUniquePriorities = () => {
+    if (!fnddata) return ['All'];
+    
+    const priorities = [...new Set(fnddata.map(item => item.priority))];
+    return ['All', ...priorities];
+  };
+
+  // Modify handleShowStatus to handle both status and priority
   const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "status";
-      const data = utils.filterArray(list, key, value);
-      setList(data);
-    } else {
-      dispatch(GetTasks(id));
+    setSelectedStatus(value);
+    applyFilters(value, selectedPriority);
+  };
+
+  // Add priority change handler
+  // const handlePriorityChange = (value) => {
+  //   setSelectedPriority(value);
+  //   applyFilters(selectedStatus, value);
+  // };
+
+  // Add combined filter function
+  const applyFilters = (status, priority) => {
+    if (!fnddata) return;
+
+    let filteredData = [...fnddata];
+
+    // Apply search filter
+    if (searchValue) {
+      filteredData = filteredData.filter(task => 
+        task.taskName?.toString().toLowerCase().includes(searchValue.toLowerCase()) ||
+        stripHtmlTags(task.description)?.toLowerCase().includes(searchValue.toLowerCase()) ||
+        task.priority?.toString().toLowerCase().includes(searchValue.toLowerCase())
+      );
     }
+
+    // Apply status filter
+    if (status !== 'All') {
+      filteredData = filteredData.filter(task => task.status === status);
+    }
+
+    // Apply priority filter
+    if (priority !== 'All') {
+      filteredData = filteredData.filter(task => task.priority === priority);
+    }
+
+    // Apply date range filter
+    if (dateRange && dateRange[0] && dateRange[1]) {
+      const rangeStart = dayjs(dateRange[0]).startOf('day');
+      const rangeEnd = dayjs(dateRange[1]).endOf('day');
+      
+      filteredData = filteredData.filter(task => {
+        const taskStartDate = dayjs(task.startDate);
+        const taskDueDate = dayjs(task.dueDate);
+        return taskStartDate.isAfter(rangeStart) && taskDueDate.isBefore(rangeEnd);
+      });
+    }
+
+    setList(filteredData);
   };
 
   const deleytfun = (userId) => {
@@ -385,30 +439,30 @@ const TaskList = () => {
     {
       title: "Title",
       dataIndex: "taskName",
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <Input
-            placeholder="Search title"
-            value={selectedKeys[0]}
-            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-            onPressEnter={() => confirm()}
-            style={{ width: 188, marginBottom: 8, display: 'block' }}
-          />
-          <Space>
-            <Button
-              type="primary"
-              onClick={() => confirm()}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Search
-            </Button>
-            <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
-              Reset
-            </Button>
-          </Space>
-        </div>
-      ),
+      // filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      //   <div style={{ padding: 8 }}>
+      //     <Input
+      //       placeholder="Search title"
+      //       value={selectedKeys[0]}
+      //       onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+      //       onPressEnter={() => confirm()}
+      //       style={{ width: 188, marginBottom: 8, display: 'block' }}
+      //     />
+      //     <Space>
+      //       <Button
+      //         type="primary"
+      //         onClick={() => confirm()}
+      //         size="small"
+      //         style={{ width: 90 }}
+      //       >
+      //         Search
+      //       </Button>
+      //       <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
+      //         Reset
+      //       </Button>
+      //     </Space>
+      //   </div>
+      // ),
       filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
       onFilter: (value, record) =>
         record.taskName
@@ -681,8 +735,8 @@ const TaskList = () => {
     },
   };
 
-  // Modified debounced search function to use date range
-  const debouncedSearch = debounce((value, dates, data, setList) => {
+  // Modify debouncedSearch to include priority
+  const debouncedSearch = debounce((value, dates, status, priority, data, setList) => {
     setIsSearching(true);
 
     const searchValue = value.toLowerCase();
@@ -722,7 +776,13 @@ const TaskList = () => {
         })())
       );
 
-      // Date range filter with proper validation
+      // Status filter
+      const matchesStatus = status === 'All' || task.status === status;
+
+      // Priority filter
+      const matchesPriority = priority === 'All' || task.priority === priority;
+
+      // Date range filter
       let matchesDateRange = true;
       if (dates && dates[0] && dates[1]) {
         const taskStartDate = task.startDate ? dayjs(task.startDate) : null;
@@ -734,24 +794,24 @@ const TaskList = () => {
           (!taskDueDate || taskDueDate.isBefore(rangeEnd) || taskDueDate.isSame(rangeEnd));
       }
 
-      return matchesSearch && matchesDateRange;
+      return matchesSearch && matchesStatus && matchesPriority && matchesDateRange;
     });
 
     setList(filteredData);
     setIsSearching(false);
   }, 300);
 
-  // Modified onSearch function
+  // Modify onSearch to include priority
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     setSearchValue(value);
-    debouncedSearch(value, dateRange, fnddata, setList);
+    debouncedSearch(value, dateRange, selectedStatus, selectedPriority, fnddata, setList);
   };
 
-  // Add date range change handler
+  // Modify handleDateRangeChange to include priority
   const handleDateRangeChange = (dates) => {
     setDateRange(dates);
-    debouncedSearch(searchValue, dates, fnddata, setList);
+    debouncedSearch(searchValue, dates, selectedStatus, selectedPriority, fnddata, setList);
   };
 
   // const exportToExcel = () => {
@@ -914,18 +974,30 @@ const TaskList = () => {
                 {showPinnedOnly ? "Show All" : "Show Pinned"}
               </Button>
             </div>
-            <div className="mb-3">
+            <div className="mb-3" style={{ display: 'flex', gap: '8px' }}>
               <Select
-                defaultValue="All"
+                value={selectedStatus}
                 className="w-100"
                 style={{ minWidth: 180 }}
                 onChange={handleShowStatus}
                 placeholder="Status"
               >
-                <Option value="All">All Status</Option>
-                {orderStatusList.map((elm) => (
-                  <Option key={elm} value={elm}>
-                    {elm}
+                {getUniqueStatuses().map((status) => (
+                  <Option key={status} value={status}>
+                    {status}
+                  </Option>
+                ))}
+              </Select>
+              <Select
+                value={selectedPriority}
+                className="w-100"
+                style={{ minWidth: 180 }}
+                onChange={handlePriorityChange}
+                placeholder="Priority"
+              >
+                {getUniquePriorities().map((priority) => (
+                  <Option key={priority} value={priority}>
+                    {priority}
                   </Option>
                 ))}
               </Select>

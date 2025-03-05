@@ -41,6 +41,8 @@ const ForgotPasswordForm = ({ visible, onCancel }) => {
 		}
 	};
 
+	
+
 	const renderStepContent = () => {
 		switch (step) {
 			case 1:

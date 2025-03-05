@@ -38,6 +38,9 @@ const EditInvoice = ({ idd, onClose }) => {
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] = useState(false);
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [categories, setCategories] = useState([]);
 
   const alladatas = useSelector((state) => state?.salesInvoices);
   const fnddata = alladatas?.salesInvoices?.data;
@@ -489,6 +492,70 @@ const handleProductChange = (productId) => {
     }
   }, [tableData, globalDiscountValue, globalDiscountType]);
 
+  const fetchLables = async (lableType, setter) => {
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const response = await dispatch(GetLable(lid));
+      if (response.payload && response.payload.data) {
+        const filteredLables = response.payload.data
+          .filter((lable) => lable.lableType === lableType)
+          .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+        setter(filteredLables);
+      }
+    } catch (error) {
+      console.error(`Failed to fetch ${lableType}:`, error);
+      message.error(`Failed to load ${lableType}`);
+    }
+  };
+
+  useEffect(() => {
+    fetchLables("category", setCategories);
+  }, []);
+
+  const handleAddNewLable = async (lableType, newValue, setter, modalSetter, setFieldValue) => {
+    if (!newValue.trim()) {
+      message.error(`Please enter a ${lableType} name.`);
+      return;
+    }
+
+    try {
+      const lid = AllLoggeddtaa.loggedInUser.id;
+      const payload = {
+        name: newValue.trim(),
+        lableType,
+      };
+      
+      const response = await dispatch(AddLable({ lid, payload }));
+      
+      if (response.payload && response.payload.success) {
+        message.success(`${lableType} added successfully.`);
+        
+        // Refresh the labels immediately after adding
+        const labelsResponse = await dispatch(GetLable(lid));
+        if (labelsResponse.payload && labelsResponse.payload.data) {
+          const filteredLables = labelsResponse.payload.data
+            .filter((lable) => lable.lableType === lableType)
+            .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
+          
+          setCategories(filteredLables);
+          // Update form field value using Formik's setFieldValue
+          if (setFieldValue) {
+            setFieldValue("category", newValue.trim());
+          }
+        }
+        
+        // Reset input and close modal
+        setter("");
+        modalSetter(false);
+      } else {
+        throw new Error('Failed to add label');
+      }
+    } catch (error) {
+      console.error(`Failed to add ${lableType}:`, error);
+      message.error(`Failed to add ${lableType}. Please try again.`);
+    }
+  };
+
   return (
     <div>
       <Card className="border-0">
@@ -505,426 +572,429 @@ const handleProductChange = (productId) => {
             handleSubmit,
             setFieldTouched,
             isSubmitting,
+            form,
           }) => (
-            <Form onSubmit={handleSubmit}>
-              <Row gutter={16}>
-                <Col span={12}>
-                  <div className="form-item">
-                    <label className="font-semibold">Customer <span className="text-red-500">*</span></label>
-                    <Select
-                      style={{ width: "100%" }}
-                      placeholder="Select Customer"
-                      className="mt-2"
-                      name="customer"
-                      value={values.customer}
-                      onChange={(value) => setFieldValue("customer", value)}
-                      loading={!fnddatas}
-                      dropdownRender={(menu) => (
-                        <div>
-                          {menu}
-                          <div
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              padding: '8px',
-                              borderTop: '1px solid #e8e8e8',
-                            }}
-                          >
-                            <Button
-                              type="link"
-                              icon={<PlusOutlined />}
-                              onClick={() => setIsAddCustomerModalVisible(true)}
+            <>
+              <Form onSubmit={handleSubmit}>
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <div className="form-item">
+                      <label className="font-semibold">Customer <span className="text-red-500">*</span></label>
+                      <Select
+                        style={{ width: "100%" }}
+                        placeholder="Select Customer"
+                        className="mt-2"
+                        name="customer"
+                        value={values.customer}
+                        onChange={(value) => setFieldValue("customer", value)}
+                        loading={!fnddatas}
+                        dropdownRender={(menu) => (
+                          <div>
+                            {menu}
+                            <div
+                              style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                padding: '8px',
+                                borderTop: '1px solid #e8e8e8',
+                              }}
                             >
-                              Add Customer
-                            </Button>
+                              <Button
+                                type="link"
+                                icon={<PlusOutlined />}
+                                onClick={() => setIsAddCustomerModalVisible(true)}
+                              >
+                                Add Customer
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    >
-                      {fnddatas && fnddatas.length > 0 ? (
-                        fnddatas.map((customer) => (
-                          <Option key={customer.id} value={customer.id}>
-                            {customer.name || "Unnamed Customer"}
+                        )}
+                      >
+                        {fnddatas && fnddatas.length > 0 ? (
+                          fnddatas.map((customer) => (
+                            <Option key={customer.id} value={customer.id}>
+                              {customer.name || "Unnamed Customer"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No customers available
                           </Option>
-                        ))
-                      ) : (
-                        <Option value="" disabled>
-                          No customers available
-                        </Option>
-                      )}
-                    </Select>
+                        )}
+                      </Select>
+                      <ErrorMessage
+                        name="customer"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+
+                  <Col span={12}>
+                    <label className="font-semibold">Issue Date <span className="text-red-500">*</span></label>
+                    <DatePicker
+                      className="w-full mt-2"
+                      format="DD-MM-YYYY"
+
+                      value={values.issueDate ? dayjs(values.issueDate) : null}
+                      onChange={(issueDate) =>
+                        setFieldValue("issueDate", issueDate)
+                      }
+                      onBlur={() => setFieldTouched("issueDate", true)}
+                    />
                     <ErrorMessage
-                      name="customer"
+                      name="issueDate"
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
-                  </div>
-                </Col>
+                  </Col>
 
-                <Col span={12}>
-                  <label className="font-semibold">Issue Date <span className="text-red-500">*</span></label>
-                  <DatePicker
-                    className="w-full mt-2"
-                    format="DD-MM-YYYY"
+                  <Col span={12} className="mt-4">
+                    <label className="font-semibold">Due Date <span className="text-red-500">*</span></label>
+                    <DatePicker
+                      className="w-full mt-2"
+                      format="DD-MM-YYYY"
+                      value={values.dueDate ? dayjs(values.dueDate) : null}
+                      onChange={(dueDate) => setFieldValue("dueDate", dueDate)}
+                      onBlur={() => setFieldTouched("dueDate", true)}
+                    />
+                    <ErrorMessage
+                      name="dueDate"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </Col>
 
-                    value={values.issueDate ? dayjs(values.issueDate) : null}
-                    onChange={(issueDate) =>
-                      setFieldValue("issueDate", issueDate)
-                    }
-                    onBlur={() => setFieldTouched("issueDate", true)}
-                  />
-                  <ErrorMessage
-                    name="issueDate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </Col>
+                  {/* <Col span={12} className="mt-2">
+                    <label className="font-semibold">Invoice Number</label>
+                    <Field
+                      name="invoicenub"
+                      as={Input}
+                      placeholder="Enter Invoice Number"
+                    />
+                    <ErrorMessage
+                      name="invoicenub"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </Col> */}
 
-                <Col span={12} className="mt-4">
-                  <label className="font-semibold">Due Date <span className="text-red-500">*</span></label>
-                  <DatePicker
-                    className="w-full mt-2"
-                    format="DD-MM-YYYY"
-                    value={values.dueDate ? dayjs(values.dueDate) : null}
-                    onChange={(dueDate) => setFieldValue("dueDate", dueDate)}
-                    onBlur={() => setFieldTouched("dueDate", true)}
-                  />
-                  <ErrorMessage
-                    name="dueDate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </Col>
-
-                {/* <Col span={12} className="mt-2">
-                  <label className="font-semibold">Invoice Number</label>
-                  <Field
-                    name="invoicenub"
-                    as={Input}
-                    placeholder="Enter Invoice Number"
-                  />
-                  <ErrorMessage
-                    name="invoicenub"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </Col> */}
-
-                <Col span={12} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">Category <span className="text-red-500">*</span></label>
-                    <Select
-                      style={{ width: "100%" }}
-                      className="mt-2"
-                      placeholder="Select or add new category"
-                      name="category"
-                      value={values.category}
-                      onChange={(value) => setFieldValue("category", value)}
-                      dropdownRender={(menu) => (
-                        <div>
-                          {menu}
-                          <div
-                            style={{
-                              padding: "8px",
-                              borderTop: "1px solid #e8e8e8",
-                            }}
-                          >
-                            <Button
-                              type="link"
-                              onClick={() => setIsTagModalVisible(true)}
-                              block
+                  <Col span={12} className="mt-4">
+                    <div className="form-item">
+                      <label className="font-semibold">Category <span className="text-red-500">*</span></label>
+                      <Select
+                        style={{ width: "100%" }}
+                        className="mt-2"
+                        placeholder="Select or add new category"
+                        name="category"
+                        value={values.category}
+                        onChange={(value) => setFieldValue("category", value)}
+                        dropdownRender={(menu) => (
+                          <div>
+                            {menu}
+                            <div
+                              style={{
+                                padding: "8px",
+                                borderTop: "1px solid #e8e8e8",
+                              }}
                             >
-                              Add New Category
-                            </Button>
+                              <Button
+                                type="link"
+                                icon={<PlusOutlined />}
+                                onClick={() => setIsCategoryModalVisible(true)}
+                                block
+                              >
+                                Add New Category
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                      )}
-                    >
-                      {tags && tags.map((tag) => (
-                        <Option key={tag.id} value={tag.name}>
-                          {tag.name}
-                        </Option>
-                      ))}
-                    </Select>
-                    <ErrorMessage
-                      name="category"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">Currency <span className="text-red-500">*</span></label>
-                    <Select
-                      style={{ width: "100%" }}
-                      placeholder="Select Currency"
-                      className="mt-2"
-                      name="currency"
-                      value={values.currency}
-                      onChange={(value) => {
-                        const selected = currencies?.find(c => c.currencyCode === value);
-                        setSelectedCurrencyIcon(selected?.currencyIcon || '₹');
-                        setFieldValue("currency", value);
-                      }}
-                    >
-                      {currencies?.map((currency) => (
-                        <Option
-                          key={currency.id}
-                          value={currency.currencyCode}
-                        >
-                          {currency.currencyCode}
-                          ({currency.currencyIcon})
-                        </Option>
-                      ))}
-                    </Select>
-                    <ErrorMessage
-                      name="currency"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-              </Row>
-
-              <h4 className="font-semibold text-lg mb-3 mt-4">Product & Services</h4>
-              <Flex alignItems="center" mobileFlex={false} className='flex mb-4 gap-4 mt-4'>
-              <Flex className="flex" mobileFlex={false}>
-                <div className="w-full flex gap-4">
-                  <div>
-                    <Select
-                      value={selectedProduct}
-                      onChange={handleProductChange}
-                      className="w-full !rounded-none"
-                      placeholder="Select Product"
-                      rootClassName="!rounded-none"
-                      allowClear
-                      loading={!products.length}
-                    >
-                      {products && products.length > 0 ? (
-                        products.map((product) => (
-                          <Option key={product.id} value={product.id}>
-                            {product.name}
+                        )}
+                      >
+                        {categories.map((category) => (
+                          <Option key={category.id} value={category.name}>
+                            {category.name}
                           </Option>
-                        ))
-                      ) : (
-                        <Option disabled>No products available</Option>
-                      )}
-                    </Select>
-                  </div>
-                </div>
+                        ))}
+                      </Select>
+                      <ErrorMessage
+                        name="category"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+                  <Col span={12} className="mt-4">
+                    <div className="form-item">
+                      <label className="font-semibold">Currency <span className="text-red-500">*</span></label>
+                      <Select
+                        style={{ width: "100%" }}
+                        placeholder="Select Currency"
+                        className="mt-2"
+                        name="currency"
+                        value={values.currency}
+                        onChange={(value) => {
+                          const selected = currencies?.find(c => c.currencyCode === value);
+                          setSelectedCurrencyIcon(selected?.currencyIcon || '₹');
+                          setFieldValue("currency", value);
+                        }}
+                      >
+                        {currencies?.map((currency) => (
+                          <Option
+                            key={currency.id}
+                            value={currency.currencyCode}
+                          >
+                            {currency.currencyCode}
+                            ({currency.currencyIcon})
+                          </Option>
+                        ))}
+                      </Select>
+                      <ErrorMessage
+                        name="currency"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+                </Row>
 
+                <h4 className="font-semibold text-lg mb-3 mt-4">Product & Services</h4>
+                <Flex alignItems="center" mobileFlex={false} className='flex mb-4 gap-4 mt-4'>
+                <Flex className="flex" mobileFlex={false}>
+                  <div className="w-full flex gap-4">
+                    <div>
+                      <Select
+                        value={selectedProduct}
+                        onChange={handleProductChange}
+                        className="w-full !rounded-none"
+                        placeholder="Select Product"
+                        rootClassName="!rounded-none"
+                        allowClear
+                        loading={!products.length}
+                      >
+                        {products && products.length > 0 ? (
+                          products.map((product) => (
+                            <Option key={product.id} value={product.id}>
+                              {product.name}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option disabled>No products available</Option>
+                        )}
+                      </Select>
+                    </div>
+                  </div>
+
+                </Flex>
               </Flex>
-            </Flex>
-          <div className="mt-4">
-           
-            <div className="overflow-x-auto">
-              <table className="w-full border border-gray-200 bg-white">
-                <thead className="bg-gray-100">
-                  <tr>
-                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                    Item<span className="text-red-500">*</span>
-                    </th>
-                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                      Quantity<span className="text-red-500">*</span>
-                    </th>
-                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                      Unit Price<span className="text-red-500">*</span>
-                    </th>
-                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                      HSN/SAC
-                    </th>
-                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                      Discount (%)
-                    </th>
-                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                      TAX (%)
-                    </th>
-                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                      Amount
-                    </th>
-                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tableData.map((row) => (
-                    <React.Fragment key={row.id}>
-                      <tr>
-                        <td className="px-2 py-2 border-b">
-                          <input
-                            type="text"
-                            value={row.item}
-                            onChange={(e) => handleTableDataChange(row.id, "item", e.target.value)}
-                            placeholder="Item Name"
-                            className="w-full p-2 border rounded-s"
-                          />
-                        </td>
-                        <td className="px-2 py-2 border-b">
-                          <input
-                            type="number"
-                            min="1"
-                            value={row.quantity}
-                            onChange={(e) => handleTableDataChange(row.id, "quantity", e.target.value)}
-                            placeholder="Qty"
-                            className="w-full p-2 border rounded"
-                          />
-                        </td>
-                        <td className="px-2 py-2 border-b">
-                          <input
-                           prefix={selectedCurrencyIcon}
-                            type="number"
-                            min="0"
-                            value={row.price}
-                            onChange={(e) => handleTableDataChange(row.id, "price", e.target.value)}
-                            placeholder="Price"
-                            className="w-full p-2 border rounded-s"
-                          />
-                        </td>
-                        <td className="px-2 py-2 border-b">
-                          <input
-                            type="text"
-                            value={row.hsn_sac}
-                            onChange={(e) => handleTableDataChange(row.id, "hsn_sac", e.target.value)}
-                            placeholder="HSN/SAC"
-                            className="w-full p-2 border rounded"
-                            readOnly
-                          />
-                        </td>
-                        <td className="px-2 py-2 border-b">
-                          <div className="flex space-x-2">
-                            <Select
-                              value={row.discountType}
-                              onChange={(value) => handleTableDataChange(row.id, "discountType", value)}
-                              style={{ width: '100px' }}
-                            >
-                              <Option value="percentage">Percentage</Option>
-                              <Option value="fixed">Fixed</Option>
-                            </Select>
-                            <Input
+            <div className="mt-4">
+             
+              <div className="overflow-x-auto">
+                <table className="w-full border border-gray-200 bg-white">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Item<span className="text-red-500">*</span>
+                      </th>
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Quantity<span className="text-red-500">*</span>
+                      </th>
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Unit Price<span className="text-red-500">*</span>
+                      </th>
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        HSN/SAC
+                      </th>
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Discount (%)
+                      </th>
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        TAX (%)
+                      </th>
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Amount
+                      </th>
+                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tableData.map((row) => (
+                      <React.Fragment key={row.id}>
+                        <tr>
+                          <td className="px-2 py-2 border-b">
+                            <input
+                              type="text"
+                              value={row.item}
+                              onChange={(e) => handleTableDataChange(row.id, "item", e.target.value)}
+                              placeholder="Item Name"
+                              className="w-full p-2 border rounded-s"
+                            />
+                          </td>
+                          <td className="px-2 py-2 border-b">
+                            <input
+                              type="number"
+                              min="1"
+                              value={row.quantity}
+                              onChange={(e) => handleTableDataChange(row.id, "quantity", e.target.value)}
+                              placeholder="Qty"
+                              className="w-full p-2 border rounded"
+                            />
+                          </td>
+                          <td className="px-2 py-2 border-b">
+                            <input
+                             prefix={selectedCurrencyIcon}
                               type="number"
                               min="0"
-                              value={row.discountValue}
-                              onChange={(e) => handleTableDataChange(row.id, "discountValue", e.target.value)}
-                              placeholder="0"
+                              value={row.price}
+                              onChange={(e) => handleTableDataChange(row.id, "price", e.target.value)}
+                              placeholder="Price"
+                              className="w-full p-2 border rounded-s"
                             />
-                          </div>
-                        </td>
-                        <td className="px-2 py-2 border-b">
+                          </td>
+                          <td className="px-2 py-2 border-b">
+                            <input
+                              type="text"
+                              value={row.hsn_sac}
+                              onChange={(e) => handleTableDataChange(row.id, "hsn_sac", e.target.value)}
+                              placeholder="HSN/SAC"
+                              className="w-full p-2 border rounded"
+                              readOnly
+                            />
+                          </td>
+                          <td className="px-2 py-2 border-b">
+                            <div className="flex space-x-2">
+                              <Select
+                                value={row.discountType}
+                                onChange={(value) => handleTableDataChange(row.id, "discountType", value)}
+                                style={{ width: '100px' }}
+                              >
+                                <Option value="percentage">Percentage</Option>
+                                <Option value="fixed">Fixed</Option>
+                              </Select>
+                              <Input
+                                type="number"
+                                min="0"
+                                value={row.discountValue}
+                                onChange={(e) => handleTableDataChange(row.id, "discountValue", e.target.value)}
+                                placeholder="0"
+                              />
+                            </div>
+                          </td>
+                          <td className="px-2 py-2 border-b">
+                            <Select
+                              value={row.tax?.gstPercentage ? `${row.tax.gstName}|${row.tax.gstPercentage}` : '0'}
+                              onChange={(value) => {
+                                  if (!value || value === '0') {
+                                      handleTableDataChange(row.id, "tax", null);
+                                      return;
+                                  }
+                                  const [gstName, gstPercentage] = value.split('|');
+                                  handleTableDataChange(row.id, "tax", {
+                                      gstName,
+                                      gstPercentage: parseFloat(gstPercentage) || 0
+                                  });
+                              }}
+                              placeholder="Select Tax"
+                              className="w-[100px]"
+                              allowClear
+                          >
+                              {taxes && taxes.data && taxes.data.map(tax => (
+                                  <Option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
+                                      {tax.gstName} ({tax.gstPercentage}%)
+                                  </Option>
+                              ))}
+                          </Select>
+                          </td>
+                          <td className="px-2 py-2 border-b">
+                          <span>{selectedCurrencyIcon} {parseFloat(row.amount || 0).toFixed(2)}</span>
+                          </td>
+                          <td className="px-2 py-1 border-b text-center">
+                            <Button danger onClick={() => handleDeleteRow(row.id)}>
+                              <DeleteOutlined />
+                            </Button>
+                          </td>
+                        </tr>
+                        <tr>
+                        <td colSpan={8} className="px-2 py-2 border-b">
+                          <textarea
+                              rows={2}
+                              value={row.description ? row.description.replace(/<[^>]*>/g, '') : ''} // Remove HTML tags
+                              onChange={(e) => handleTableDataChange(row.id, "description", e.target.value)}
+                              placeholder="Description"
+                              className="w-[70%] p-2 border"
+                          />
+                      </td>
+                        </tr>
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
+                <div className="form-buttons text-left mb-2">
+                <Button type="primary" onClick={handleAddRow}>
+                  <PlusOutlined /> Add Items
+                </Button>
+              </div>
+              </div>
+            </div>
+
+            <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
+              <table className="w-full lg:w-[50%] p-2">
+                <tbody>
+                  <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
+                    <td className="font-medium">Sub Total</td>
+                    <td className="font-medium px-4 py-2">{selectedCurrencyIcon} {totals.subtotal}</td>
+                  </tr>
+
+                  <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
+                        <td className="font-medium">Item Discount</td>
+                        <td className="flex items-center space-x-2">
                           <Select
-                            value={row.tax?.gstPercentage ? `${row.tax.gstName}|${row.tax.gstPercentage}` : '0'}
+                            value={globalDiscountType}
                             onChange={(value) => {
-                                if (!value || value === '0') {
-                                    handleTableDataChange(row.id, "tax", null);
-                                    return;
-                                }
-                                const [gstName, gstPercentage] = value.split('|');
-                                handleTableDataChange(row.id, "tax", {
-                                    gstName,
-                                    gstPercentage: parseFloat(gstPercentage) || 0
-                                });
+                              setGlobalDiscountType(value);
+                              calculateTotal(tableData, globalDiscountValue);
                             }}
-                            placeholder="Select Tax"
-                            className="w-[100px]"
-                            allowClear
-                        >
-                            {taxes && taxes.data && taxes.data.map(tax => (
-                                <Option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
-                                    {tax.gstName} ({tax.gstPercentage}%)
-                                </Option>
-                            ))}
-                        </Select>
-                        </td>
-                        <td className="px-2 py-2 border-b">
-                        <span>{selectedCurrencyIcon} {parseFloat(row.amount || 0).toFixed(2)}</span>
-                        </td>
-                        <td className="px-2 py-1 border-b text-center">
-                          <Button danger onClick={() => handleDeleteRow(row.id)}>
-                            <DeleteOutlined />
-                          </Button>
+                            style={{ width: '100px' }}
+                          >
+                            <Option value="percentage">Percentage</Option>
+                            <Option value="fixed">Fixed</Option>
+                          </Select>
+                          <Input
+                            type="number"
+                            min="0"
+                            value={globalDiscountValue}
+                            onChange={(e) => {
+                              setGlobalDiscountValue(e.target.value);
+                              calculateTotal(tableData, e.target.value);
+                            }}
+                            placeholder="0"
+                          />
                         </td>
                       </tr>
-                      <tr>
-                      <td colSpan={8} className="px-2 py-2 border-b">
-                        <textarea
-                            rows={2}
-                            value={row.description ? row.description.replace(/<[^>]*>/g, '') : ''} // Remove HTML tags
-                            onChange={(e) => handleTableDataChange(row.id, "description", e.target.value)}
-                            placeholder="Description"
-                            className="w-[70%] p-2 border"
-                        />
-                    </td>
-                      </tr>
-                    </React.Fragment>
-                  ))}
+
+
+                  {parseFloat(totals.itemDiscount) > 0 && (
+                    <tr className="flex justify-between px-2 py-2 border-x-2">
+                      <td className="font-medium">Total Item Discount Amount</td>
+                      <td className="font-medium px-4 py-2 text-red-500">-₹{totals.itemDiscount}</td>
+                    </tr>
+                  )}
+
+                      
+                      <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
+                    <td className="font-medium">Total Tax</td>
+                    <td className="font-medium px-4 py-2">{selectedCurrencyIcon} {totals.totalTax}</td>
+                  </tr>
+
+                  <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
+                    <td className="font-bold text-lg">Total Amount</td>
+                    <td className="font-bold text-lg px-4">{selectedCurrencyIcon} {totals.finalTotal}</td>
+                  </tr>
                 </tbody>
               </table>
-              <div className="form-buttons text-left mb-2">
-              <Button type="primary" onClick={handleAddRow}>
-                <PlusOutlined /> Add Items
-              </Button>
             </div>
-            </div>
-          </div>
-
-          <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
-            <table className="w-full lg:w-[50%] p-2">
-              <tbody>
-                <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
-                  <td className="font-medium">Sub Total</td>
-                  <td className="font-medium px-4 py-2">{selectedCurrencyIcon} {totals.subtotal}</td>
-                </tr>
-
-                <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
-                      <td className="font-medium">Item Discount</td>
-                      <td className="flex items-center space-x-2">
-                        <Select
-                          value={globalDiscountType}
-                          onChange={(value) => {
-                            setGlobalDiscountType(value);
-                            calculateTotal(tableData, globalDiscountValue);
-                          }}
-                          style={{ width: '100px' }}
-                        >
-                          <Option value="percentage">Percentage</Option>
-                          <Option value="fixed">Fixed</Option>
-                        </Select>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={globalDiscountValue}
-                          onChange={(e) => {
-                            setGlobalDiscountValue(e.target.value);
-                            calculateTotal(tableData, e.target.value);
-                          }}
-                          placeholder="0"
-                        />
-                      </td>
-                    </tr>
-
-
-                {parseFloat(totals.itemDiscount) > 0 && (
-                  <tr className="flex justify-between px-2 py-2 border-x-2">
-                    <td className="font-medium">Total Item Discount Amount</td>
-                    <td className="font-medium px-4 py-2 text-red-500">-₹{totals.itemDiscount}</td>
-                  </tr>
-                )}
-
-                    
-                    <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
-                  <td className="font-medium">Total Tax</td>
-                  <td className="font-medium px-4 py-2">{selectedCurrencyIcon} {totals.totalTax}</td>
-                </tr>
-
-                <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
-                  <td className="font-bold text-lg">Total Amount</td>
-                  <td className="font-bold text-lg px-4">{selectedCurrencyIcon} {totals.finalTotal}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-       
+         
 
               <div className="form-buttons text-right mt-4">
                 <Button type="default" onClick={onClose} className="mr-2">
@@ -935,36 +1005,51 @@ const handleProductChange = (productId) => {
                 </Button>
               </div>
             </Form>
-          )}
-        </Formik>
 
-        <Modal
-          title="Add New Category"
-          open={isTagModalVisible}
-          onCancel={() => setIsTagModalVisible(false)}
-          onOk={handleAddNewTag}
-          okText="Add Category"
-        >
-          <Input
-            placeholder="Enter new Category"
-            value={newTag}
-            onChange={(e) => setNewTag(e.target.value)}
-          />
-        </Modal>
+            <Modal
+              title="Add New Category"
+              open={isCategoryModalVisible}
+              onCancel={() => setIsCategoryModalVisible(false)}
+              onOk={() => handleAddNewLable("category", newCategory, setNewCategory, setIsCategoryModalVisible, setFieldValue)}
+              okText="Add Category"
+            >
+              <Input
+                placeholder="Enter new category name"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+              />
+            </Modal>
+          </>
+        )}
+      </Formik>
 
-        <Modal
-          title="Add Customer"
-          visible={isAddCustomerModalVisible}
-          onCancel={() => setIsAddCustomerModalVisible(false)}
-          footer={null}
-          width={1000}
-          className="mt-[-70px]"
-        >
-          <AddCustomer onClose={() => setIsAddCustomerModalVisible(false)} />
-        </Modal>
-      </Card>
-    </div>
-  );
+      <Modal
+        title="Add New Category"
+        open={isTagModalVisible}
+        onCancel={() => setIsTagModalVisible(false)}
+        onOk={handleAddNewTag}
+        okText="Add Category"
+      >
+        <Input
+          placeholder="Enter new Category"
+          value={newTag}
+          onChange={(e) => setNewTag(e.target.value)}
+        />
+      </Modal>
+
+      <Modal
+        title="Add Customer"
+        visible={isAddCustomerModalVisible}
+        onCancel={() => setIsAddCustomerModalVisible(false)}
+        footer={null}
+        width={1000}
+        className="mt-[-70px]"
+      >
+        <AddCustomer onClose={() => setIsAddCustomerModalVisible(false)} />
+      </Modal>
+    </Card>
+  </div>
+);
 };
 
 

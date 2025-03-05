@@ -792,93 +792,93 @@ const AddLead = ({ onClose }) => {
                 </div>
               </Col>
               <Col span={24}>
-                <div className="form-item mt-3">
-                  <label className="font-semibold">Category <span className="text-rose-500">*</span></label>
-                  <Field name="category">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        placeholder="Select or add new category"
-                        onChange={(value) =>
-                          setFieldValue("category", value)
-                        }
-                        value={values.category}
-                        onBlur={() => setFieldTouched("category", true)}
-                        dropdownRender={(menu) => (
-                          <div>
-                            {menu}
-                            <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                              <Button
-                                type="link"
-                                icon={<PlusOutlined />}
-                                className="w-full mt-2"
-                                onClick={() => setIsCategoryModalVisible(true)}
-                              >
-                                Add New Category
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                      >
-                        {categories.map((category) => (
-                          <Option key={category.id} value={category.id}>
-                            {category.name}
-                          </Option>
-                        ))}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="category"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              <Col span={24}>
-                <div className="form-item">
-                  <label className="font-semibold">Tag <span className="text-rose-500">*</span></label>
-                  <Field name="tag">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        placeholder="Select or add new tag"
-                        onChange={(value) => setFieldValue("tag", value)}
-                        value={values.tag}
-                        onBlur={() => setFieldTouched("tag", true)}
-                        dropdownRender={(menu) => (
-                          <div>
-                            {menu}
-                            <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                              <Button
-                                type="link"
-                                icon={<PlusOutlined />}
-                                className="w-full mt-2"
-                                onClick={() => setIsTagModalVisible(true)}
-                              >
-                                Add New Tag
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                      >
-                        {tags.map((tag) => (
-                          <Option key={tag.id} value={tag.name}>
-                            {tag.name}
-                          </Option>
-                        ))}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="tag"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                      <div className="form-item mt-3">
+                        <label className="font-semibold">Category <span className="text-rose-500">*</span></label>
+                        <Field name="category">
+                          {({ field }) => (
+                            <Select
+                              {...field}
+                              className="w-full mt-1"
+                              placeholder="Select or add new category"
+                              onChange={(value) =>
+                                setFieldValue("category", value)
+                              }
+                              value={values.category}
+                              onBlur={() => setFieldTouched("category", true)}
+                              dropdownRender={(menu) => (
+                                <div>
+                                  {menu}
+                                  <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                    <Button
+                                      type="link"
+                                      icon={<PlusOutlined />}
+                                      className="w-full mt-2"
+                                      onClick={() => setIsCategoryModalVisible(true)}
+                                    >
+                                      Add New Category
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                            >
+                              {categories.map((category) => (
+                                <Option key={category.id} value={category.id}>
+                                  {category.name}
+                                </Option>
+                              ))}
+                            </Select>
+                          )}
+                        </Field>
+                        <ErrorMessage
+                          name="category"
+                          component="div"
+                          className="error-message text-red-500 my-1"
+                        />
+                      </div>
+                    </Col>
+                    <Col span={24}>
+                      <div className="form-item mt-3">
+                        <label className="font-semibold">Tag <span className="text-rose-500">*</span></label>
+                        <Field name="tag">
+                          {({ field }) => (
+                            <Select
+                              {...field}
+                              className="w-full mt-1"
+                              placeholder="Select or add new tag"
+                              onChange={(value) => setFieldValue("tag", value)}
+                              value={values.tag}
+                              onBlur={() => setFieldTouched("tag", true)}
+                              dropdownRender={(menu) => (
+                                <div>
+                                  {menu}
+                                  <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                                    <Button
+                                      type="link"
+                                      icon={<PlusOutlined />}
+                                      className="w-full mt-2"
+                                      onClick={() => setIsTagModalVisible(true)}
+                                    >
+                                      Add New Tag
+                                    </Button>
+                                  </div>
+                                </div>
+                              )}
+                            >
+                              {tags.map((tag) => (
+                                <Option key={tag.id} value={tag.name}>
+                                  {tag.name}
+                                </Option>
+                              ))}
+                            </Select>
+                          )}
+                        </Field>
+                        <ErrorMessage
+                          name="tag"
+                          component="div"
+                          className="error-message text-red-500 my-1"
+                        />
+                      </div>
+                    </Col>
               <Col span={24} className="mt-4 ">
                 <div className="flex justify-between items-center">
                   <label className="font-semibold">Details</label>

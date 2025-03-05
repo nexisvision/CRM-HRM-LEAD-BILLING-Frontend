@@ -53,7 +53,7 @@ const AddProduct = ({ idd, onClose }) => {
     }
   };
 
-  const handleAddNewCategory = async () => {
+  const handleAddNewCategory = async (setFieldValue) => {
     if (!newCategory.trim()) {
       message.error("Please enter a category name");
       return;
@@ -61,11 +61,37 @@ const AddProduct = ({ idd, onClose }) => {
 
     try {
       const payload = { name: newCategory.trim(), labelType: "status" };
-      await dispatch(AddLable({ lid, payload }));
-      message.success("Category added successfully");
-      setNewCategory("");
-      setIsCategoryModalVisible(false);
-      fetchLables();
+      const response = await dispatch(AddLable({ lid, payload }));
+      
+      if (response.payload && response.payload.success) {
+        message.success("Category added successfully");
+        
+        // Fetch updated categories immediately
+        const labelsResponse = await dispatch(GetLable(lid));
+        if (labelsResponse.payload && labelsResponse.payload.data) {
+          const filteredLabels = labelsResponse.payload.data
+            .filter((label) => label && label?.name)
+            .map((label) => ({
+              id: label?.id,
+              name: label?.name.trim(),
+            }))
+            .filter(
+              (label, index, self) =>
+                index === self.findIndex((t) => t?.name === label?.name)
+            );
+          
+          setCategories(filteredLabels);
+          // Set the newly created category as the selected value
+          if (setFieldValue) {
+            setFieldValue("category", newCategory.trim());
+          }
+        }
+        
+        setNewCategory("");
+        setIsCategoryModalVisible(false);
+      } else {
+        throw new Error('Failed to add category');
+      }
     } catch (error) {
       console.error("Failed to add category:", error);
       message.error("Failed to add category");
@@ -140,206 +166,184 @@ const AddProduct = ({ idd, onClose }) => {
       validationSchema={validationSchema}
        onSubmit={onSubmit}>
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
-          <Form className="formik-form" onSubmit={handleSubmit}>
-            <Row gutter={16}>
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Name <span className="text-red-500">*</span> </label>
-                  <Field
-                    className="mt-1"
-                    name="name"
-                    as={Input}
-                    placeholder="Enter Name"
-                  />
-                  <ErrorMessage
-                    name="name"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Price <span className="text-red-500">*</span></label>
-                  <Field
-                    className="mt-1"
-                    type="number"
-                    name="price"
-                    as={Input}
-                    placeholder="Enter Price"
-                  />
-                  <ErrorMessage
-                    name="price"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-              <Col span={12} className="mt-4">
-                <div className="form-item mt-2">
-                  <label className="font-semibold">Category <span className="text-red-500">*</span></label>
-                  <Select
-                    style={{ width: "100%" }}
-                    className="mt-1"
-                    placeholder="Select or add new category"
-                    value={values.category}
-                    onChange={(value) => setFieldValue("category", value)}
-                    dropdownRender={(menu) => (
-                      <div>
-                        {menu}
-                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                          <Button
-                            type="link"
-                            icon={<PlusOutlined />}
-                            className="w-full mt-2"
-                            onClick={() => setIsCategoryModalVisible(true)}
-                          >
-                            Add New Category
-                          </Button>
+          <>
+            <Form className="formik-form" onSubmit={handleSubmit}>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <div className="form-item">
+                    <label className="font-semibold">Name <span className="text-red-500">*</span> </label>
+                    <Field
+                      className="mt-1"
+                      name="name"
+                      as={Input}
+                      placeholder="Enter Name"
+                    />
+                    <ErrorMessage
+                      name="name"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                <Col span={12}>
+                  <div className="form-item">
+                    <label className="font-semibold">Price <span className="text-red-500">*</span></label>
+                    <Field
+                      className="mt-1"
+                      type="number"
+                      name="price"
+                      as={Input}
+                      placeholder="Enter Price"
+                    />
+                    <ErrorMessage
+                      name="price"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                <Col span={12} className="mt-4">
+                  <div className="form-item mt-2">
+                    <label className="font-semibold">Category <span className="text-red-500">*</span></label>
+                    <Select
+                      style={{ width: "100%" }}
+                      className="mt-1"
+                      placeholder="Select or add new category"
+                      value={values.category}
+                      onChange={(value) => setFieldValue("category", value)}
+                      dropdownRender={(menu) => (
+                        <div>
+                          {menu}
+                          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                            <Button
+                              type="link"
+                              icon={<PlusOutlined />}
+                              className="w-full mt-2"
+                              onClick={() => setIsCategoryModalVisible(true)}
+                            >
+                              Add New Category
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  >
-                    {categories.map((category) => (
-                      <Option key={category.id} value={category.name}>
-                        {category.name}
-                      </Option>
-                    ))}
-                  </Select>
-                  <ErrorMessage name="category" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">SKU <span className="text-red-500">*</span></label>
-                  <Field 
-                    className="mt-2" 
-                    name="sku" 
-                    as={CustomInput} 
-                    placeholder="Enter SKU"
-                    validate={(value) => {
-                      if (!value) {
-                        return 'SKU is required';
-                      }
-                      if (!/^\d{6,8}$/.test(value)) {
-                        return 'SKU must be between 6 to 8 digits';
-                      }
-                    }}
-                  />
-                  <ErrorMessage name="sku" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">HSN/SAC <span className="text-red-500">*</span></label>
-                  <Field 
-                    className="mt-2" 
-                    name="hsn_sac" 
-                    as={CustomInput} 
-                    placeholder="Enter HSN/SAC"
-                    validate={(value) => {
-                      if (!value) {
-                        return 'HSN/SAC is required';
-                      }
-                      if (!/^\d{6,8}$/.test(value)) {
-                        return 'HSN/SAC must be between 6 to 8 digits';
-                      }
-                    }}
-                  />
-                  <ErrorMessage name="hsn_sac" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-              <Col span={24} className="mt-4">
-                <div className="form-item">
-                    <label className="font-semibold">Description <span className="text-red-500">*</span></label>
-                  <ReactQuill
-                    className="mt-1"
-                    value={values.description}
-                    onChange={(value) => setFieldValue("description", value)}
-                    placeholder="Enter Description"
-                    onBlur={() => setFieldTouched("description", true)}
-                  />
-                  <ErrorMessage name="description" component="div" className="error-message text-red-500 my-1" />
-                </div>
-              </Col>
-{/* 
-              <Col span={24} className="mt-4">
-                <span className="block font-semibold p-2">
-                  Product Image <QuestionCircleOutlined />
-                </span>
-                <Field name="image">
-                  {({ field, form }) => (
-                    <div>
-                      <Upload
-                        beforeUpload={(file) => {
-                          setFieldValue("image", file);
-                          return false;
-                        }}
-                        showUploadList={true}
-                        fileList={form.values.image ? [
-                          {
-                            uid: '-1',
-                            name: form.values.image.name,
-                            status: 'done',
-                          }
-                        ] : []}
-                      >
-                        <Button icon={<UploadOutlined />}>Choose File</Button>
-                      </Upload>
-                    </div>
-                  )}
-                </Field>
-              </Col> */}
+                      )}
+                    >
+                      {categories.map((category) => (
+                        <Option key={category.id} value={category.name}>
+                          {category.name}
+                        </Option>
+                      ))}
+                    </Select>
+                    <ErrorMessage
+                      name="category"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">SKU <span className="text-red-500">*</span></label>
+                    <Field 
+                      className="mt-2" 
+                      name="sku" 
+                      as={CustomInput} 
+                      placeholder="Enter SKU"
+                      validate={(value) => {
+                        if (!value) {
+                          return 'SKU is required';
+                        }
+                        if (!/^\d{6,8}$/.test(value)) {
+                          return 'SKU must be between 6 to 8 digits';
+                        }
+                      }}
+                    />
+                    <ErrorMessage name="sku" component="div" className="error-message text-red-500 my-1" />
+                  </div>
+                </Col>
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">HSN/SAC <span className="text-red-500">*</span></label>
+                    <Field 
+                      className="mt-2" 
+                      name="hsn_sac" 
+                      as={CustomInput} 
+                      placeholder="Enter HSN/SAC"
+                      validate={(value) => {
+                        if (!value) {
+                          return 'HSN/SAC is required';
+                        }
+                        if (!/^\d{6,8}$/.test(value)) {
+                          return 'HSN/SAC must be between 6 to 8 digits';
+                        }
+                      }}
+                    />
+                    <ErrorMessage name="hsn_sac" component="div" className="error-message text-red-500 my-1" />
+                  </div>
+                </Col>
+                <Col span={24} className="mt-4">
+                  <div className="form-item">
+                      <label className="font-semibold">Description <span className="text-red-500">*</span></label>
+                    <ReactQuill
+                      className="mt-1"
+                      value={values.description}
+                      onChange={(value) => setFieldValue("description", value)}
+                      placeholder="Enter Description"
+                      onBlur={() => setFieldTouched("description", true)}
+                    />
+                    <ErrorMessage name="description" component="div" className="error-message text-red-500 my-1" />
+                  </div>
+                </Col>
 
 <div className="mt-4 w-full">
-                <span className="block font-semibold p-2">Product Image</span>
-                <Col span={24}>
-                  <Upload
-                    beforeUpload={() => false} // Prevent auto upload
-                    listType="picture"
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    maxCount={1}
-                    fileList={fileList}
-                    onChange={handleFileChange}
-                    showUploadList={{ 
-                      showRemoveIcon: true,
-                      showPreviewIcon: true,
-                      className: "upload-list-inline"
-                    }}
-                    className="border-2 flex flex-col justify-center items-center p-10"
-                  >
-                    <Button icon={<UploadOutlined />}>Choose File</Button>
-                  </Upload>
-                </Col>
-              </div>
-            </Row>
+                  <span className="block font-semibold p-2">Product Image</span>
+                  <Col span={24}>
+                    <Upload
+                      beforeUpload={() => false} // Prevent auto upload
+                      listType="picture"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      maxCount={1}
+                      fileList={fileList}
+                      onChange={handleFileChange}
+                      showUploadList={{ 
+                        showRemoveIcon: true,
+                        showPreviewIcon: true,
+                        className: "upload-list-inline"
+                      }}
+                      className="border-2 flex flex-col justify-center items-center p-10"
+                    >
+                      <Button icon={<UploadOutlined />}>Choose File</Button>
+                    </Upload>
+                  </Col>
+                </div>
+              </Row>
 
-            <div className="form-buttons text-right mt-4">
-              <Button type="default" className="mr-2" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="primary" htmlType="submit">
-                Create
-              </Button>
-            </div>
-          </Form>
+              <div className="form-buttons text-right mt-4">
+                <Button type="default" className="mr-2" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button type="primary" htmlType="submit">
+                  Create
+                </Button>
+              </div>
+            </Form>
+
+            {/* Add Category Modal */}
+            <Modal
+              title="Add New Category"
+              open={isCategoryModalVisible}
+              onCancel={() => setIsCategoryModalVisible(false)}
+              onOk={() => handleAddNewCategory(setFieldValue)}
+              okText="Add Category"
+            >
+              <Input
+                placeholder="Enter new category name"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+              />
+            </Modal>
+          </>
         )}
       </Formik>
-
-      {/* Add Category Modal */}
-      <Modal
-        title="Add New Category"
-        open={isCategoryModalVisible}
-        onCancel={() => setIsCategoryModalVisible(false)}
-        onOk={handleAddNewCategory}
-        okText="Add Category"
-      >
-        <Input
-          placeholder="Enter new category name"
-          value={newCategory}
-          onChange={(e) => setNewCategory(e.target.value)}
-        />
-      </Modal>
     </div>
   );
 };
