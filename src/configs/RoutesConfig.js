@@ -1049,6 +1049,11 @@ export const protectedRoutes = [
         component: React.lazy(() => import('views/app-views/hrm/Attendance')),
     },
     {
+        key: 'hrm.holiday.holidaylist',
+        path: `${APP_PREFIX_PATH}/hrm/holiday/holidaylist`,
+        component: React.lazy(() => import('views/app-views/hrm/holiday/HolidayList')),
+    },
+    {
         key: 'hrm.leave',
         path: `${APP_PREFIX_PATH}/hrm/leave`,
         component: React.lazy(() => import('views/app-views/hrm/Leaves')),

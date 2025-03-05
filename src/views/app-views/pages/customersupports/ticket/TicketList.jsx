@@ -321,7 +321,7 @@ export const TicketList = () => {
       },
     },
     {
-      title: "Start Date", 
+      title: "Start Date ", 
       dataIndex: "createdAt",
       render: (_, record) => (
         <span>{dayjs(record.createdAt).format(DATE_FORMAT_DD_MM_YYYY)}</span>

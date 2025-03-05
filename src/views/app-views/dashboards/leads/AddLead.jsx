@@ -223,6 +223,7 @@ const AddLead = ({ onClose }) => {
     brandName: "",
     tags: [],
     phoneCode: getInitialCountry(),
+    company_name: "",
   };
 
   useEffect(() => {
@@ -252,6 +253,7 @@ const AddLead = ({ onClose }) => {
     category: Yup.string().required("Category is required"),
     assigned: Yup.string().optional("Assigned is required"),
     status: Yup.string().required("Status is required"),
+    company_name: Yup.string().required("Company name is required"),
 
     // Details section
     notes: Yup.string().when("details", {

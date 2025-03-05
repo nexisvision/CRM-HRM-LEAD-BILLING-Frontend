@@ -1,21 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Row, Col, Button, Select, Input } from "antd";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from "react-redux";
 import { Edituser, GetUsers } from "../UserReducers/UserSlice";
 import { roledata } from "views/app-views/hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice";
+import { ReloadOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
 const validationSchema = Yup.object().shape({
   username: Yup.string()
     .required('Username is required'),
-  email: Yup.string()
-    .email('Invalid email')
-    .required('Email is required'),
   role_id: Yup.string()
-    .required('Role is required')
+    .required('Role is required'),
+  password: Yup.string()
+    .min(6, 'Password must be at least 6 characters')
 });
 
 const EditUser = ({ idd, visible, onClose, onUpdate }) => {
@@ -36,31 +36,48 @@ const EditUser = ({ idd, visible, onClose, onUpdate }) => {
   const finddata = fnduset.find((item) => item.id === idd);
   const fndroleee = fnddata.find((item) => item.id === finddata?.role_id);
 
+  const generatePassword = () => {
+    const length = 8;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let password = "";
+
+    // Generate 6 characters
+    for (let i = 0; i < length; i++) {
+      password += charset[Math.floor(Math.random() * charset.length)];
+    }
+
+    // Ensure at least one number
+    const randomNum = Math.floor(Math.random() * 10).toString();
+    password = password.slice(0, 7) + randomNum;
+
+    return password;
+  };
+
   const initialValues = {
     username: finddata?.username || '',
-    email: finddata?.email || '',
-    role_id: fndroleee?.id || ''
+    role_id: fndroleee?.id || '',
+    password: ''
   };
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const updateData = {
         username: values.username,
-        email: values.email,
-        role_id: values.role_id
+        role_id: values.role_id,
+        ...(values.password && { password: values.password })
       };
 
       await dispatch(Edituser({ idd, values: updateData }));
       dispatch(GetUsers());
       onClose();
       onUpdate(updateData);
+      dispatch(GetUsers());
     } catch (error) {
       console.error('Error updating user:', error);
     } finally {
       setSubmitting(false);
     }
   };
-
 
   return (
     <div className="">
@@ -100,7 +117,7 @@ const EditUser = ({ idd, visible, onClose, onUpdate }) => {
                     User Role <span className="text-red-500">*</span>
                   </label>
                   <Select
-                    className="w-full mt-2"
+                    className="w-full"
                     placeholder="Select Role"
                     value={values.role_id}
                     onChange={(value) => setFieldValue('role_id', value)}
@@ -118,6 +135,34 @@ const EditUser = ({ idd, visible, onClose, onUpdate }) => {
                 </div>
               </Col>
             </Row>
+
+            <Row gutter={[16, 16]} className="mt-4">
+              <Col span={24}>
+                <div className="form-item">
+                  <label className="font-semibold">Password</label>
+                  <div className="relative">
+                    <Field
+                      name="password"
+                      as={Input.Password}
+                      placeholder="Leave blank to keep current password"
+                      className="mt-1 w-full"
+                    />
+                    <Button
+                      className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
+                      onClick={() => setFieldValue("password", generatePassword())}
+                    >
+                      <ReloadOutlined />
+                    </Button>
+                  </div>
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="text-red-500"
+                  />
+                </div>
+              </Col>
+            </Row>
+
             <div className="flex justify-end gap-2 mt-6">
               <Button
                 onClick={onClose}

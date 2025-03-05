@@ -379,6 +379,13 @@ const LeadList = () => {
         compare: (a, b) => a.email.length - b.email.length,
       },
     },
+    {
+      title: "company name",
+      dataIndex: "company_name",
+      sorter: {
+        compare: (a, b) => a.company_name.length - b.company_name.length,
+      },
+    },
     // {
     //   title: "leadTitle",
     //   dataIndex: "leadTitle",

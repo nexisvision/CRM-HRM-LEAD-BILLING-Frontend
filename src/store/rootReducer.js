@@ -76,6 +76,7 @@ import vendors from "../views/app-views/dashboards/Purchase/vendor/vendorReducer
 import debitNotes from "../views/app-views/dashboards/Purchase/debitnotes/debitReducer/DebitSlice"
 import payment from "../views/app-views/dashboards/sales/billing/paymentReducer/PaymentSlice"
 import mail from "../views/app-views/dashboards/mail/mailReducer/mailSlice"
+import holidays from "../views/app-views/hrm/holiday/AttendanceReducer/holidaySlice"
 
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
@@ -156,6 +157,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
         debitNotes,
         payment,
         mail,
+        holidays,
         // employee,
         // department,
         ...asyncReducers,

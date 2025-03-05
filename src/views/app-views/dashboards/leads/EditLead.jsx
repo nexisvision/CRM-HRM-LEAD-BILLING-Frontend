@@ -219,6 +219,7 @@ const currenciesState = useSelector((state) => state.currencies);
     contentType: "",
     brandName: "",
     tags: [],
+    company_name: "",
   });
 
   useEffect(() => {
@@ -336,7 +337,8 @@ const currenciesState = useSelector((state) => state.currencies);
       status: fnddata[0].status,
       notes: fnddata[0].notes,
       source: fnddata[0].source,
-      category: fnddata[0].category,    
+      category: fnddata[0].category,
+      company_name: fnddata[0].company_name,
     })
   },[fnddata])
 
@@ -866,6 +868,22 @@ const currenciesState = useSelector((state) => state.currencies);
                         </Field>
                         <ErrorMessage
                           name="tags"
+                          component="div"
+                          className="error-message text-red-500 my-1"
+                        />
+                      </div>
+                    </Col>
+                    <Col span={24}>
+                      <div className="form-item mt-3">
+                        <label className="font-semibold">Company Name <span className="text-rose-500">*</span></label>
+                        <Field
+                          name="company_name"
+                          as={Input}
+                          placeholder="Enter Company Name"
+                          className="mt-1"
+                        />
+                        <ErrorMessage
+                          name="company_name"
                           component="div"
                           className="error-message text-red-500 my-1"
                         />
