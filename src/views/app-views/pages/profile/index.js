@@ -56,7 +56,7 @@ const ProfileData = () => {
         dispatch(getAllTicket())
         dispatch(GetDeals())
         dispatch(ContaractData())
-    dispatch(ClientData())
+        dispatch(ClientData())
     }, [dispatch])
 
 
@@ -106,9 +106,9 @@ const ProfileData = () => {
 
     const filterdatas = useSelector((state) => state.user.loggedInUser);
 
-    const alldatas = useSelector((state)=>state.ClientData.ClientData.data);
+    const alldatas = useSelector((state) => state.ClientData.ClientData.data);
 
-    const  loggedInUser = alldatas?.find((item)=>item?.id === filterdatas.id);
+    const loggedInUser = alldatas?.find((item) => item?.id === filterdatas.id);
 
     const stripHtmlTags = (html) => {
         if (!html) return '';

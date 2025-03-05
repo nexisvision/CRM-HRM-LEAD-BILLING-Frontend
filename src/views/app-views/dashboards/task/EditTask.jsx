@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, DatePicker, Select, message, Row, Col, Upload } from "antd";
+import { Input, Button, DatePicker, Select, message, Row, Col, Upload, Tag } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -83,13 +83,13 @@ const EditTask = ({ onClose, idd, projectId }) => {
         try {
           if (taskData.assignTo) {
             if (typeof taskData.assignTo === 'string') {
-              // Parse JSON string to array
-              assignToArray = JSON.parse(taskData.assignTo);
+              const parsed = JSON.parse(taskData.assignTo);
+              assignToArray = parsed.assignedUsers || [];
+            } else if (taskData.assignTo?.assignedUsers) {
+              assignToArray = taskData.assignTo.assignedUsers;
             } else if (Array.isArray(taskData.assignTo)) {
-              // Already an array, use as is
               assignToArray = taskData.assignTo;
             } else {
-              // Single value, convert to array
               assignToArray = [taskData.assignTo];
             }
           }
@@ -97,6 +97,8 @@ const EditTask = ({ onClose, idd, projectId }) => {
           console.error("Error parsing assignTo:", error);
           assignToArray = [];
         }
+
+        console.log("Parsed assignTo array:", assignToArray);
 
         setInitialValues({
           taskName: taskData.taskName || "",
@@ -162,50 +164,21 @@ const EditTask = ({ onClose, idd, projectId }) => {
         return;
       }
 
-      // Create FormData object
-      const formData = new FormData();
+      // Convert assignTo array to object with array values
+      const assignToObject = {
+        assignedUsers: Array.isArray(values.assignTo)
+          ? values.assignTo.filter(id => id && id.trim() !== '')
+          : []
+      };
 
-      // Directly append all required fields to FormData
-      formData.append('taskName', values.taskName);
-      formData.append('description', values.description);
-      formData.append('status', values.status);
-      formData.append('priority', values.priority);
-      formData.append('task_reporter', values.task_reporter);
-      formData.append('task_id', idd);
+      // Create payload with assignTo as object
+      const payload = {
+        ...values,
+        assignTo: assignToObject
+      };
 
-      // Handle dates
-      if (values.startDate) {
-        formData.append('startDate', values.startDate.toISOString());
-      }
-      if (values.dueDate) {
-        formData.append('dueDate', values.dueDate.toISOString());
-      }
 
-      // Handle assignTo array
-      const assignToArray = Array.isArray(values.assignTo) ? values.assignTo : [values.assignTo];
-      formData.append('assignTo', JSON.stringify(assignToArray));
-
-      // Handle file uploads
-      if (fileList.length > 0) {
-        fileList.forEach((file) => {
-          if (file.originFileObj) {
-            formData.append('task_file', file.originFileObj);
-          } else if (file instanceof File) {
-            formData.append('task_file', file);
-          } else if (file.url) {
-            // If it's an existing file with URL, pass the URL
-            formData.append('existing_task_file', file.url);
-          }
-        });
-      }
-
-      // Log the FormData contents for debugging
-      console.log("Form values:", values);
-      for (let pair of formData.entries()) {
-        console.log(pair[0], pair[1]);
-      }
-
-      const response = await dispatch(EditTaskss({ idd, values }));
+      const response = await dispatch(EditTaskss({ idd, values: payload }));
 
       if (response.error) {
         throw new Error(response.error.message || 'Failed to update task');
@@ -338,13 +311,22 @@ const EditTask = ({ onClose, idd, projectId }) => {
                         }}
                         value={values.assignTo}
                         onBlur={() => setFieldTouched("assignTo", true)}
+                        showSearch
+                        optionFilterProp="children"
+                        filterOption={(input, option) => {
+                          if (!option?.children) return false;
+                          return option.children.toLowerCase().includes(input.toLowerCase());
+                        }}
                       >
                         {Array.isArray(fndassine) && fndassine.length > 0 ? (
-                          fndassine.map((client) => (
-                            <Option key={client.id} value={client.id}>
-                              {client.firstName || client.username || "Unnamed Client"}
-                            </Option>
-                          ))
+                          fndassine.map((client) => {
+                            const displayName = client.firstName || client.username || "Unnamed Client";
+                            return (
+                              <Option key={client.id} value={client.id}>
+                                {displayName}
+                              </Option>
+                            );
+                          })
                         ) : (
                           <Option value="" disabled>
                             No Members Available
@@ -353,6 +335,21 @@ const EditTask = ({ onClose, idd, projectId }) => {
                       </Select>
                     )}
                   </Field>
+                  {/* Display selected users as tags */}
+                  <div className="mt-2">
+                    {Array.isArray(values.assignTo) && values.assignTo.length > 0 && (
+                      <div className="selected-users">
+                        {values.assignTo.map((userId) => {
+                          const user = fndassine.find(u => u.id === userId);
+                          return user && (
+                            <Tag key={userId} className="mb-1 mr-1" color="blue">
+                              {user.firstName || user.username || "Unnamed Client"}
+                            </Tag>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                   <ErrorMessage
                     name="assignTo"
                     component="div"

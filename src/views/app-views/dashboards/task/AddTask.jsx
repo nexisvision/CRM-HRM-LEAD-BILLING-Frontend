@@ -128,51 +128,33 @@ const AddTask = ({ onClose }) => {
   };
 
   const onSubmit = async (values, { resetForm }) => {
-    const formData = new FormData();
+    try {
+      // Convert assignTo array to object with array values
+      const assignToObject = {
+        assignedUsers: Array.isArray(values.assignTo)
+          ? values.assignTo.filter(id => id && id.trim() !== '')
+          : []
+      };
 
-    // Ensure assignTo is an array before adding to formData
-    const assignToArray = Array.isArray(values.assignTo) ? values.assignTo : [values.assignTo];
+      // Create payload with assignTo as object
+      const payload = {
+        ...values,
+        assignTo: assignToObject
+      };
 
-    // Append all form fields
-    Object.keys(values).forEach(key => {
-      if (key === 'assignTo') {
-        formData.append(key, JSON.stringify(assignToArray));
-      } else if (key !== 'files') {
-        formData.append(key, values[key]);
+
+      const response = await dispatch(AddTasks({ id, payload }));
+      if (response.error) {
+        throw new Error(response.error.message);
       }
-    });
-
-    // Append files
-    fileList.forEach((file) => {
-      formData.append('task_file', file);
-    });
-
-    dispatch(AddTasks({ id, values: formData }))
-      .then(() => {
-        message.success("Task added successfully!");
-        dispatch(GetTasks(id))
-          .then(() => {
-            resetForm();
-            setFileList([]); // Reset file list
-            onClose();
-          })
-          .catch((error) => {
-            message.error("Failed to fetch the latest Task data.");
-            console.error("Task API error:", error);
-          });
-      })
-      .catch((error) => {
-        message.error("Failed to add Task.");
-        console.error("AddTask API error:", error);
-      });
-  };
-
-  const handleCheckboxChange = () => {
-    setIsWithoutDueDate(!isWithoutDueDate);
-  };
-
-  const toggleOtherDetails = () => {
-    setIsOtherDetailsVisible(!isOtherDetailsVisible);
+      await dispatch(GetTasks(id));
+      resetForm();
+      setFileList([]);
+      onClose();
+    } catch (error) {
+      console.error("Error adding task:", error);
+      message.error(error.message || "Failed to add Task.");
+    }
   };
 
   return (
@@ -478,152 +460,3 @@ const AddTask = ({ onClose }) => {
 };
 
 export default AddTask;
-
-// import React, { useState } from 'react';
-// import { Input, Button, DatePicker, Select, message, Row, Col, Switch, Upload, Card } from 'antd';
-// import { useNavigate } from 'react-router-dom';
-// import { ExclamationCircleOutlined } from '@ant-design/icons';
-// import 'react-quill/dist/quill.snow.css';
-// import ReactQuill from 'react-quill';
-// import utils from 'utils';
-// import OrderListData from "assets/data/order-list.data.json"
-// import { Formik, Form, Field, ErrorMessage } from 'formik';
-// import * as Yup from 'yup';
-
-// const { Option } = Select;
-
-// const AddTask = () => {
-//     const navigate = useNavigate();
-//     const [description, setDescription] = useState(false);
-//     const [info, setInfo] = useState(false);
-//     const [option, setOption] = useState(false);
-
-//     const initialValues = {
-
-//         title: '',
-//         status: '',
-//         priority: '',
-
-//         description: '',
-
-//     };
-
-//     const validationSchema = Yup.object({
-
-//         title: Yup.string().required('Please enter a Title.'),
-//         status: Yup.string().required('Please select status.'),
-//         priority: Yup.string().required('please select a Priority'),
-
-//         description: description ? Yup.string().required("Description are required") : Yup.string(),
-
-//     });
-
-//     const onSubmit = (values) => {
-//         console.log('Submitted values:', values);
-//         message.success('Project added successfully!');
-//         navigate('/app/apps/project');
-//     };
-//     // console.log("object",Option)
-
-//     return (
-//         <div className="add-job-form">
-//             <Formik
-//                 initialValues={initialValues}
-//                 validationSchema={validationSchema}
-//                 onSubmit={onSubmit}
-//             >
-//                 {({ values, setFieldValue, handleSubmit, handleChange, }) => (
-//                     <Form className="formik-form" onSubmit={handleSubmit}>
-//                         <h2 className="mb-4 border-b pb-2 font-medium"></h2>
-
-//                         <Row gutter={16}>
-
-//                             <Col span={12} className='mt-2'>
-//                                 <div className="form-item">
-//                                     <label className='font-semibold flex'>Title<h1 className='text-rose-500'>*</h1></label>
-//                                     <Field name="title" as={Input} placeholder="Enter Title Name" />
-//                                     <ErrorMessage name="title" component="div" className="error-message text-red-500 my-1" />
-//                                 </div>
-//                             </Col>
-//                             <Col span={12} className='mt-2'>
-//                                 <div className="form-item">
-//                                     <label className='font-semibold flex'>Status <h1 className='text-rose-500'>*</h1></label>
-//                                     <Field name="status">
-//                                         {({ field }) => (
-//                                             <Select
-//                                                 {...field}
-//                                                 className="w-full"
-//                                                 placeholder="Select Status"
-//                                                 onChange={(value) => setFieldValue('status', value)}
-//                                                 value={values.status}
-//                                             >
-//                                                 <Option value="new">New</Option>
-//                                                 <Option value="converted">Converted</Option>
-//                                                 <Option value="qualified">Qualified</Option>
-//                                                 <Option value="proposalsent">Proposal Sent</Option>
-//                                             </Select>
-//                                         )}
-//                                     </Field>
-//                                     <ErrorMessage name="status" component="div" className="error-message text-red-500 my-1" />
-//                                 </div>
-//                             </Col>
-
-//                             <Col span={12} className='mt-2'>
-//                                 <div className="form-item">
-//                                     <label className='font-semibold flex'>Priority <h1 className='text-rose-500'>*</h1></label>
-//                                     <Field name="priority">
-//                                         {({ field }) => (
-//                                             <Select
-//                                                 {...field}
-//                                                 className="w-full"
-//                                                 placeholder="Select Priority"
-//                                                 onChange={(value) => setFieldValue('priority', value)}
-//                                                 value={values.priority}
-//                                             >
-//                                                 <Option value="new">New</Option>
-//                                                 <Option value="converted">Converted</Option>
-//                                                 <Option value="qualified">Qualified</Option>
-//                                                 <Option value="proposalsent">Proposal Sent</Option>
-//                                             </Select>
-//                                         )}
-//                                     </Field>
-//                                     <ErrorMessage name="priority" component="div" className="error-message text-red-500 my-1" />
-//                                 </div>
-//                             </Col>
-
-//                             <Col span={24} className="mt-4 border-t pt-4">
-//                                 <div className="flex justify-between items-center">
-//                                     <label className="font-semibold">Description</label>
-//                                 </div>
-
-//                                 {/* Always show the description field */}
-//                                 <Col span={24}>
-//                                     <div className="mt-2">
-//                                         <ReactQuill
-//                                             value={values.notes}
-//                                             onChange={(value) => setFieldValue("description", value)}
-//                                             placeholder="Enter Description"
-//                                             className="mt-2 bg-white rounded-md"
-//                                         />
-//                                         <ErrorMessage
-//                                             name="description"
-//                                             component="div"
-//                                             className="error-message text-red-500 my-1"
-//                                         />
-//                                     </div>
-//                                 </Col>
-//                             </Col>
-//                         </Row>
-
-//                         <div className="form-buttons text-right mt-4">
-//                             <Button type="default" htmlType='submit' className="mr-2" onClick={() => navigate('/app/apps/project/lead')}>Cancel</Button>
-//                             <Button type="primary" htmlType="submit">Create</Button>
-//                         </div>
-//                     </Form>
-//                 )}
-//             </Formik>
-//         </div>
-//     );
-// };
-
-// export default AddTask;

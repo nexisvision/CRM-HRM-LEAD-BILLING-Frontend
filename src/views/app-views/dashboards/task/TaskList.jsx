@@ -15,6 +15,8 @@ import {
   message,
   Space,
   DatePicker,
+  Avatar,
+  Tooltip,
 } from "antd";
 // import OrderListData from "../../../../assets/data/order-list.data.json";
 // import OrderListData from "assets/data/order-list.data.json"
@@ -76,6 +78,79 @@ const stripHtmlTags = (html) => {
   return temp.textContent || temp.innerText || '';
 };
 
+const UserAvatarGroup = ({ users, maxCount = 3 }) => {
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  // Professional color palette with lighter shades
+  const colors = [
+    { bg: '#E3F2FD', text: '#1976D2' }, // Light Blue
+    { bg: '#F3E5F5', text: '#7B1FA2' }, // Light Purple
+    { bg: '#E8F5E9', text: '#388E3C' }, // Light Green
+    { bg: '#FFF3E0', text: '#F57C00' }, // Light Orange
+    { bg: '#E1F5FE', text: '#0288D1' }, // Light Sky Blue
+    { bg: '#FCE4EC', text: '#C2185B' }, // Light Pink
+  ];
+
+  const displayUsers = users.slice(0, maxCount);
+  const remainingCount = users.length - maxCount;
+
+  return (
+    <Avatar.Group
+      maxCount={maxCount}
+      maxStyle={{
+        color: '#5A5A5A',
+        backgroundColor: '#F5F5F5',
+        border: '2px solid #FFFFFF',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        fontSize: '12px',
+        fontWeight: '600'
+      }}
+    >
+      {displayUsers.map((user, index) => {
+        const name = user.firstName || user.username || "Unnamed";
+        const color = colors[index % colors.length];
+        return (
+          <Tooltip key={user.id} title={name}>
+            <Avatar
+              style={{
+                backgroundColor: color.bg,
+                color: color.text,
+                border: '2px solid #FFFFFF',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                fontSize: '12px',
+                fontWeight: '600'
+              }}
+            >
+              {getInitials(name)}
+            </Avatar>
+          </Tooltip>
+        );
+      })}
+      {remainingCount > 0 && (
+        <Avatar
+          style={{
+            backgroundColor: '#F5F5F5',
+            color: '#5A5A5A',
+            border: '2px solid #FFFFFF',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            fontSize: '12px',
+            fontWeight: '600'
+          }}
+        >
+          +{remainingCount}
+        </Avatar>
+      )}
+    </Avatar.Group>
+  );
+};
+
 const TaskList = () => {
   // const [annualStatisticData] = useState(AnnualStatisticData);
 
@@ -109,7 +184,6 @@ const TaskList = () => {
 
   const [isAddTaskModalVisible, setIsAddTaskModalVisible] = useState(false);
   const [isEditTaskModalVisible, setIsEditTaskModalVisible] = useState(false);
-  const [isViewTaskModalVisible, setIsViewTaskModalVisible] = useState(false);
   const [idd, setIdd] = useState("");
 
   const allloggeddata = useSelector((state) => state.user);
@@ -119,6 +193,8 @@ const TaskList = () => {
 
   const alldatas = useSelector((state) => state.Tasks);
   const fnddata = alldatas.Tasks.data;
+
+  console.log("sn", fnddata)
 
   const navigate = useNavigate();
 
@@ -188,10 +264,6 @@ const TaskList = () => {
     setIsEditTaskModalVisible(false);
   };
 
-  const openviewTaskModal = () => {
-    navigate("/app/dashboards/project/task/viewtask");
-  };
-
   const handleShowStatus = (value) => {
     if (value !== "All") {
       const key = "status";
@@ -236,26 +308,35 @@ const TaskList = () => {
   const getPinnedTasks = () => list.filter((task) => pinnedTasks.includes(task.id));
   const getUnpinnedTasks = () => list.filter((task) => !pinnedTasks.includes(task.id));
 
+  const [isViewTaskModalVisible, setIsViewTaskModalVisible] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+
+  // Open View Task Modal
+  const openViewTaskModal = (task) => {
+    setSelectedTask(task);
+    setIsViewTaskModalVisible(true);
+  };
+
+  // Close View Task Modal
+  const closeViewTaskModal = () => {
+    setSelectedTask(null);
+    setIsViewTaskModalVisible(false);
+  };
+
   const dropdownMenu = (row) => (
-    <Menu>
+    <Menu onClick={(e) => e.domEvent.stopPropagation()}>
+      <Menu.Item>
+        <Flex alignItems="center" onClick={() => openViewTaskModal(row)}>
+          <EyeOutlined />
+          <span className="ml-2">View Details</span>
+        </Flex>
+      </Menu.Item>
       <Menu.Item>
         <Flex alignItems="center" onClick={() => togglePinTask(row.id)}>
           <PushpinOutlined style={{ color: pinnedTasks.includes(row.id) ? "#1890ff" : undefined }} />
           <span className="ml-2">{pinnedTasks.includes(row.id) ? "Unpin" : "Pin"}</span>
         </Flex>
       </Menu.Item>
-      {/* <Menu.Item>
-        <Flex alignItems="center" onClick={openviewTaskModal}>
-          <EyeOutlined />
-          <span className="ml-2">View Details</span>
-        </Flex>
-      </Menu.Item> */}
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <PlusCircleOutlined />
-          <span className="ml-2">Add to remark</span>
-        </Flex>
-      </Menu.Item> */}
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
         <Menu.Item>
@@ -266,7 +347,6 @@ const TaskList = () => {
         </Menu.Item>
       ) : null}
 
-
       {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
         <Menu.Item>
           <Flex alignItems="center" onClick={() => deleytfun(row.id)}>
@@ -275,7 +355,6 @@ const TaskList = () => {
           </Flex>
         </Menu.Item>
       ) : null}
-
     </Menu>
   );
 
@@ -284,16 +363,22 @@ const TaskList = () => {
       title: "",
       width: 50,
       render: (_, record) => (
-        <Button
-          type="text"
-          icon={<PushpinOutlined style={{
-            color: pinnedTasks.includes(record.id) ? "#1890ff" : "#999",
-            transform: pinnedTasks.includes(record.id) ? "rotate(-45deg)" : "none",
-            transition: "all 0.3s"
-          }} />}
-          onClick={() => togglePinTask(record.id)}
-          className="pin-button"
-        />
+        <div className="interactive-cell" onClick={e => e.stopPropagation()}>
+          <Button
+            type="text"
+            icon={<PushpinOutlined style={{
+              color: pinnedTasks.includes(record.id) ? "#1890ff" : "#999",
+              transform: pinnedTasks.includes(record.id) ? "rotate(-45deg)" : "none",
+              transition: "all 0.3s"
+            }} />}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              togglePinTask(record.id);
+            }}
+            className="pin-button"
+          />
+        </div>
       ),
       fixed: 'left'
     },
@@ -343,12 +428,21 @@ const TaskList = () => {
             value={selectedKeys}
             onChange={values => setSelectedKeys(values)}
             allowClear
+            showSearch
+            optionFilterProp="children"
+            filterOption={(input, option) => {
+              if (!option?.children) return false;
+              return option.children.toLowerCase().includes(input.toLowerCase());
+            }}
           >
-            {fndassine.map(user => (
-              <Option key={user.id} value={user.id}>
-                {user.firstName || user.username || "Unnamed User"}
-              </Option>
-            ))}
+            {fndassine.map(user => {
+              const displayName = user.firstName || user.username || "Unnamed User";
+              return (
+                <Option key={user.id} value={user.id}>
+                  {displayName}
+                </Option>
+              );
+            })}
           </Select>
           <Space>
             <Button
@@ -368,50 +462,63 @@ const TaskList = () => {
       filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
       onFilter: (value, record) => {
         try {
-          const assignees = Array.isArray(record.assignTo)
-            ? record.assignTo
-            : typeof record.assignTo === 'string'
-              ? JSON.parse(record.assignTo)
-              : [record.assignTo];
-          return assignees.includes(value);
+          let assignedUsers = [];
+          if (typeof record.assignTo === 'string') {
+            const parsed = JSON.parse(record.assignTo);
+            assignedUsers = parsed.assignedUsers || [];
+          } else if (record.assignTo?.assignedUsers) {
+            assignedUsers = record.assignTo.assignedUsers;
+          }
+          return assignedUsers.includes(value);
         } catch (error) {
           return false;
         }
       },
       render: (assignTo) => {
+        let assignedUsers = [];
         try {
-          let assignees = [];
           if (typeof assignTo === 'string') {
-            assignees = JSON.parse(assignTo);
-          } else if (Array.isArray(assignTo)) {
-            assignees = assignTo;
-          } else if (assignTo) {
-            assignees = [assignTo];
+            const parsed = JSON.parse(assignTo);
+            const userIds = parsed.assignedUsers || [];
+            assignedUsers = userIds.map(id =>
+              fndassine.find(user => user.id === id)
+            ).filter(Boolean);
+          } else if (assignTo?.assignedUsers) {
+            assignedUsers = assignTo.assignedUsers
+              .map(id => fndassine.find(user => user.id === id))
+              .filter(Boolean);
           }
-
-          return (
-            <div className="assignee-tags">
-              {assignees.map(userId => {
-                const user = fndassine.find(u => u.id === userId);
-                return user ? (
-                  <Tag
-                    key={userId}
-                    className="mb-1"
-                    color="blue"
-                    style={{
-                      padding: '4px 8px',
-                      borderRadius: '12px',
-                      marginRight: '4px'
-                    }}
-                  >
-                    {user.firstName || user.username || "Unnamed User"}
-                  </Tag>
-                ) : null;
-              })}
-            </div>
-          );
         } catch (error) {
-          return <Tag color="red">No Assignees</Tag>;
+          console.error("Error parsing assignTo:", error);
+        }
+
+        return assignedUsers.length > 0 ? (
+          <UserAvatarGroup users={assignedUsers} maxCount={3} />
+        ) : (
+          <span>No users assigned</span>
+        );
+      },
+      sorter: (a, b) => {
+        try {
+          const getFirstAssigneeName = (assignTo) => {
+            let assignedUsers = [];
+            if (typeof assignTo === 'string') {
+              const parsed = JSON.parse(assignTo);
+              assignedUsers = parsed.assignedUsers || [];
+            } else if (assignTo?.assignedUsers) {
+              assignedUsers = assignTo.assignedUsers;
+            }
+
+            if (assignedUsers.length > 0) {
+              const user = fndassine.find(u => u.id === assignedUsers[0]);
+              return user ? (user.firstName || user.username || "").toLowerCase() : "";
+            }
+            return "";
+          };
+
+          return getFirstAssigneeName(a.assignTo).localeCompare(getFirstAssigneeName(b.assignTo));
+        } catch (error) {
+          return 0;
         }
       }
     },
@@ -432,43 +539,49 @@ const TaskList = () => {
       title: "Status",
       dataIndex: "status",
       render: (_, record) => (
-        <Select
-          value={record.status}
-          style={{ width: 140 }}
-          onChange={(value) => handleStatusChange(record.id, value)}
-          disabled={!(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client"))}
-        >
-          <Option value="Incomplete">
-            <div className="flex items-center">
-              <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
-              Incomplete
-            </div>
-          </Option>
-          <Option value="To Do">
-            <div className="flex items-center">
-              <span className="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>
-              To Do
-            </div>
-          </Option>
-          <Option value="In Progress">
-            <div className="flex items-center">
-              <span className="h-2 w-2 rounded-full bg-orange-500 mr-2"></span>
-              In Progress
-            </div>
-          </Option>
-          <Option value="Completed">
-            <div className="flex items-center">
-              <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
-              Completed
-            </div>
-          </Option>
-          <Option value="On Hold">
-            <div className="flex items-center">
-              <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
-              Waiting Approval
-            </div>
-          </Option>
-        </Select>
+        <div className="interactive-cell" onClick={e => e.stopPropagation()}>
+          <Select
+            value={record.status}
+            style={{ width: 140 }}
+            onChange={(value) => handleStatusChange(record.id, value)}
+            onClick={e => e.stopPropagation()}
+            onMouseDown={e => e.stopPropagation()}
+            onMouseUp={e => e.stopPropagation()}
+            disabled={!(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client"))}
+            dropdownStyle={{ zIndex: 1001 }}
+          >
+            <Option value="Incomplete">
+              <div className="flex items-center">
+                <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+                Incomplete
+              </div>
+            </Option>
+            <Option value="To Do">
+              <div className="flex items-center">
+                <span className="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>
+                To Do
+              </div>
+            </Option>
+            <Option value="In Progress">
+              <div className="flex items-center">
+                <span className="h-2 w-2 rounded-full bg-orange-500 mr-2"></span>
+                In Progress
+              </div>
+            </Option>
+            <Option value="Completed">
+              <div className="flex items-center">
+                <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                Completed
+              </div>
+            </Option>
+            <Option value="On Hold">
+              <div className="flex items-center">
+                <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
+                Waiting Approval
+              </div>
+            </Option>
+          </Select>
+        </div>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
     },
@@ -476,31 +589,37 @@ const TaskList = () => {
       title: "Priority",
       dataIndex: "priority",
       render: (_, record) => (
-        <Select
-          value={record.priority}
-          style={{ width: 120 }}
-          onChange={(value) => handlePriorityChange(record.id, value)}
-          disabled={!(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client"))}
-        >
-          <Option value="High">
-            <div className="flex items-center">
-              <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
-              High
-            </div>
-          </Option>
-          <Option value="Medium">
-            <div className="flex items-center">
-              <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
-              Medium
-            </div>
-          </Option>
-          <Option value="Low">
-            <div className="flex items-center">
-              <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
-              Low
-            </div>
-          </Option>
-        </Select>
+        <div className="interactive-cell" onClick={e => e.stopPropagation()}>
+          <Select
+            value={record.priority}
+            style={{ width: 120 }}
+            onChange={(value) => handlePriorityChange(record.id, value)}
+            onClick={e => e.stopPropagation()}
+            onMouseDown={e => e.stopPropagation()}
+            onMouseUp={e => e.stopPropagation()}
+            disabled={!(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client"))}
+            dropdownStyle={{ zIndex: 1001 }}
+          >
+            <Option value="High">
+              <div className="flex items-center">
+                <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+                High
+              </div>
+            </Option>
+            <Option value="Medium">
+              <div className="flex items-center">
+                <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
+                Medium
+              </div>
+            </Option>
+            <Option value="Low">
+              <div className="flex items-center">
+                <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                Low
+              </div>
+            </Option>
+          </Select>
+        </div>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "priority"),
     },
@@ -548,7 +667,7 @@ const TaskList = () => {
       title: "Action",
       dataIndex: "actions",
       render: (_, elm) => (
-        <div className="text-center">
+        <div className="text-center" onClick={(e) => e.stopPropagation()}>
           <EllipsisDropdown menu={dropdownMenu(elm)} />
         </div>
       ),
@@ -657,17 +776,36 @@ const TaskList = () => {
         return;
       }
 
+      // Parse assignTo field properly
+      let assignToObject = {
+        assignedUsers: []
+      };
+
+      try {
+        if (typeof taskToUpdate.assignTo === 'string') {
+          const parsed = JSON.parse(taskToUpdate.assignTo);
+          assignToObject.assignedUsers = parsed.assignedUsers || [];
+        } else if (taskToUpdate.assignTo?.assignedUsers) {
+          assignToObject.assignedUsers = taskToUpdate.assignTo.assignedUsers;
+        } else if (Array.isArray(taskToUpdate.assignTo)) {
+          assignToObject.assignedUsers = taskToUpdate.assignTo;
+        }
+      } catch (error) {
+        console.error("Error parsing assignTo:", error);
+        assignToObject.assignedUsers = [];
+      }
+
       const values = {
         ...taskToUpdate,
         status: newStatus,
-        startDate: taskToUpdate.startDate ? dayjs(taskToUpdate.startDate).toISOString() : null,
-        dueDate: taskToUpdate.dueDate ? dayjs(taskToUpdate.dueDate).toISOString() : null,
-        assignTo: Array.isArray(taskToUpdate.assignTo) ? taskToUpdate.assignTo : [taskToUpdate.assignTo],
+        startDate: taskToUpdate.startDate ? dayjs(taskToUpdate.startDate).format("YYYY-MM-DD") : null,
+        dueDate: taskToUpdate.dueDate ? dayjs(taskToUpdate.dueDate).format("YYYY-MM-DD") : null,
+        assignTo: assignToObject
       };
 
       await dispatch(EditTaskss({ idd: taskId, values }));
       message.success("Status updated successfully");
-      dispatch(GetTasks(id)); // Refresh the task list
+      dispatch(GetTasks(id));
     } catch (error) {
       console.error("Error updating task status:", error);
       message.error("Failed to update status");
@@ -682,17 +820,36 @@ const TaskList = () => {
         return;
       }
 
+      // Parse assignTo field properly
+      let assignToObject = {
+        assignedUsers: []
+      };
+
+      try {
+        if (typeof taskToUpdate.assignTo === 'string') {
+          const parsed = JSON.parse(taskToUpdate.assignTo);
+          assignToObject.assignedUsers = parsed.assignedUsers || [];
+        } else if (taskToUpdate.assignTo?.assignedUsers) {
+          assignToObject.assignedUsers = taskToUpdate.assignTo.assignedUsers;
+        } else if (Array.isArray(taskToUpdate.assignTo)) {
+          assignToObject.assignedUsers = taskToUpdate.assignTo;
+        }
+      } catch (error) {
+        console.error("Error parsing assignTo:", error);
+        assignToObject.assignedUsers = [];
+      }
+
       const values = {
         ...taskToUpdate,
         priority: newPriority,
-        startDate: taskToUpdate.startDate ? dayjs(taskToUpdate.startDate).toISOString() : null,
-        dueDate: taskToUpdate.dueDate ? dayjs(taskToUpdate.dueDate).toISOString() : null,
-        assignTo: Array.isArray(taskToUpdate.assignTo) ? taskToUpdate.assignTo : [taskToUpdate.assignTo],
+        startDate: taskToUpdate.startDate ? dayjs(taskToUpdate.startDate).format("YYYY-MM-DD") : null,
+        dueDate: taskToUpdate.dueDate ? dayjs(taskToUpdate.dueDate).format("YYYY-MM-DD") : null,
+        assignTo: assignToObject
       };
 
       await dispatch(EditTaskss({ idd: taskId, values }));
       message.success("Priority updated successfully");
-      dispatch(GetTasks(id)); // Refresh the task list
+      dispatch(GetTasks(id));
     } catch (error) {
       console.error("Error updating task priority:", error);
       message.error("Failed to update priority");
@@ -807,7 +964,6 @@ const TaskList = () => {
             <Table
               columns={tableColumns}
               dataSource={showPinnedOnly ? getPinnedTasks() : [...list].sort((a, b) => {
-                // Sort by pinned status first
                 const isPinnedA = pinnedTasks.includes(a.id) ? 1 : 0;
                 const isPinnedB = pinnedTasks.includes(b.id) ? 1 : 0;
                 return isPinnedB - isPinnedA;
@@ -821,6 +977,22 @@ const TaskList = () => {
                 ...rowSelection,
               }}
               rowClassName={getRowClassName}
+              onRow={(record) => ({
+                onClick: (e) => {
+                  // Check if click is on an interactive element
+                  const isInteractiveElement = e.target.closest('.interactive-cell') ||
+                    e.target.closest('.ant-select') ||
+                    e.target.closest('.pin-button') ||
+                    e.target.closest('.ant-dropdown-trigger') ||
+                    e.target.closest('.ant-checkbox-wrapper');
+
+                  // Only open view modal if not clicking on interactive elements
+                  if (!isInteractiveElement) {
+                    openViewTaskModal(record);
+                  }
+                },
+                style: { cursor: 'pointer' }
+              })}
             />
           )}
         </div>
@@ -851,14 +1023,24 @@ const TaskList = () => {
           .ant-table-row:hover .pin-button {
             opacity: 1;
           }
-          .assignee-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
+          .ant-table-row {
+            cursor: pointer;
           }
-          .ant-tag {
-            margin-right: 0;
-            margin-bottom: 4px;
+          .ant-table-cell {
+            pointer-events: auto;
+          }
+          .ant-table-row-selected {
+            background-color: #e6f7ff !important;
+          }
+          .ant-table-row:hover td {
+            background-color: #f0f7ff !important;
+          }
+          .interactive-cell {
+            position: relative;
+            z-index: 2;
+          }
+          .ant-select-dropdown {
+            z-index: 1001 !important;
           }
         `}</style>
       </Card>
@@ -886,18 +1068,16 @@ const TaskList = () => {
         <EditTask onClose={closeEditTaskModal} idd={idd} />
       </Modal>
 
-      {/* <Modal
-					title="Task"
-					visible={isViewTaskModalVisible}
-					onCancel={closeViewTaskModal}
-					footer={null}
-					width={1200}
-					className='mt-[-70px]'
-
-
-				>
-					<ViewTask onClose={closeViewTaskModal} />
-				</Modal> */}
+      <Modal
+        title={selectedTask?.taskName || "Task Details"}
+        visible={isViewTaskModalVisible}
+        onCancel={closeViewTaskModal}
+        footer={null}
+        width={1200}
+        className="mt-[-70px]"
+      >
+        <ViewTask task={selectedTask} onClose={closeViewTaskModal} />
+      </Modal>
 
     </>
   );

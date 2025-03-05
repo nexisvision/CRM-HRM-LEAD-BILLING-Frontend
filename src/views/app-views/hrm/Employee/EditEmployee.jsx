@@ -14,7 +14,6 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { empdata, updateEmp } from "./EmployeeReducers/EmployeeSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
 import { getallcountries } from "../../setting/countries/countriesreducer/countriesSlice";
@@ -44,8 +43,8 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
   const countries = useSelector((state) => state.countries.countries);
   const { currencies } = useSelector((state) => state.currencies);
 
-  const allempdata = useSelector((state)=>state.employee.employee.data)
-  const empData = allempdata?.filter((item)=>item.id === idd)
+  const allempdata = useSelector((state) => state.employee.employee.data)
+  const empData = allempdata?.filter((item) => item.id === idd)
 
   useEffect(() => {
     dispatch(empdata());
@@ -58,7 +57,7 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
 
   const onSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await dispatch(updateEmp({idd, values})).unwrap();
+      const response = await dispatch(updateEmp({ idd, values })).unwrap();
       if (response) {
         onClose();
       }
