@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, DatePicker, Select, message, Row, Col, Upload } from "antd";
+import { Input, Button, DatePicker, Select, message, Row, Col, Upload, Tag } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -74,6 +74,7 @@ const AddTask = ({ onClose }) => {
     priority: "",
     assignTo: [],
     description: "",
+    task_reporter: "",
   };
 
   const validationSchema = Yup.object({
@@ -84,6 +85,7 @@ const AddTask = ({ onClose }) => {
     priority: Yup.string().required("Please select priority."),
     assignTo: Yup.array().min(1, "Please select at least one AssignTo."),
     description: Yup.string().required("Please enter a Description."),
+    task_reporter: Yup.string().required("Please select a Task Reporter."),
   });
 
   // File upload configuration
@@ -104,7 +106,7 @@ const AddTask = ({ onClose }) => {
         'application/msword',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
       ].includes(file.type);
-      
+
       // File size validation (2MB)
       const isLt2M = file.size / 1024 / 1024 < 2;
 
@@ -112,7 +114,7 @@ const AddTask = ({ onClose }) => {
         message.error('You can only upload JPG/PNG/PDF/DOC files!');
         return false;
       }
-      
+
       if (!isLt2M) {
         message.error('File must be smaller than 2MB!');
         return false;
@@ -127,10 +129,15 @@ const AddTask = ({ onClose }) => {
 
   const onSubmit = async (values, { resetForm }) => {
     const formData = new FormData();
-    
+
+    // Ensure assignTo is an array before adding to formData
+    const assignToArray = Array.isArray(values.assignTo) ? values.assignTo : [values.assignTo];
+
     // Append all form fields
     Object.keys(values).forEach(key => {
-      if (key !== 'files') {
+      if (key === 'assignTo') {
+        formData.append(key, JSON.stringify(assignToArray));
+      } else if (key !== 'files') {
         formData.append(key, values[key]);
       }
     });
@@ -244,9 +251,70 @@ const AddTask = ({ onClose }) => {
                         className="w-full mt-1"
                         mode="multiple"
                         placeholder="Select AddProjectMember"
-                        onChange={(value) => setFieldValue("assignTo", value)}
+                        onChange={(value) => {
+                          const arrayValue = Array.isArray(value) ? value : [value];
+                          setFieldValue("assignTo", arrayValue);
+                        }}
                         value={values.assignTo}
                         onBlur={() => setFieldTouched("assignTo", true)}
+                        showSearch
+                        optionFilterProp="children"
+                        filterOption={(input, option) => {
+                          if (!option?.children) return false;
+                          return option.children.toLowerCase().includes(input.toLowerCase());
+                        }}
+                      >
+                        {Array.isArray(fndassine) && fndassine.length > 0 ? (
+                          fndassine.map((client) => {
+                            const displayName = client.firstName || client.username || "Unnamed Client";
+                            return (
+                              <Option key={client.id} value={client.id}>
+                                {displayName}
+                              </Option>
+                            );
+                          })
+                        ) : (
+                          <Option value="" disabled>
+                            No Members Available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  {/* Display selected users as tags */}
+                  <div className="mt-2">
+                    {Array.isArray(values.assignTo) && values.assignTo.length > 0 && (
+                      <div className="selected-users">
+                        {values.assignTo.map((userId) => {
+                          const user = fndassine.find(u => u.id === userId);
+                          return user && (
+                            <Tag key={userId} className="mb-1 mr-1">
+                              {user.firstName || user.username || "Unnamed Client"}
+                            </Tag>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                  <ErrorMessage
+                    name="assignTo"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Task Reporter <span className="text-rose-500">*</span></label>
+                  <Field name="task_reporter">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-1"
+                        placeholder="Select Task Reporter"
+                        onChange={(value) => setFieldValue("task_reporter", value)}
+                        value={values.task_reporter}
                       >
                         {Array.isArray(fndassine) && fndassine.length > 0 ? (
                           fndassine.map((client) => (
@@ -263,7 +331,7 @@ const AddTask = ({ onClose }) => {
                     )}
                   </Field>
                   <ErrorMessage
-                    name="assignTo"
+                    name="task_reporter"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -341,7 +409,7 @@ const AddTask = ({ onClose }) => {
                           </div>
                         </Option>
                         <Option value="High">
-                        <div className="flex items-center">
+                          <div className="flex items-center">
                             <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
                             High
                           </div>
@@ -384,7 +452,7 @@ const AddTask = ({ onClose }) => {
               {/* Add File Upload field */}
               <Col span={24} className="mt-3">
                 <div className="form-item">
-                  <label className="font-semibold">Attachments <span className="text-rose-500">*</span></label><br/>
+                  <label className="font-semibold">Attachments <span className="text-rose-500">*</span></label><br />
                   <Upload {...uploadProps} className="mt-3">
                     <Button icon={<UploadOutlined />} className="hover:bg-gray-50">
                       Click to Upload Files

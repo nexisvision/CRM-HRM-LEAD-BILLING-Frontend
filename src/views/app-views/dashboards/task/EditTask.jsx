@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, DatePicker, Select, message, Row, Col } from "antd";
+import { Input, Button, DatePicker, Select, message, Row, Col, Upload } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -12,7 +12,7 @@ import moment from "moment/moment";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
-// import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
+import { UploadOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -21,19 +21,20 @@ const EditTask = ({ onClose, idd, projectId }) => {
   const [loading, setLoading] = useState(true);
   const [isWithoutDueDate, setIsWithoutDueDate] = useState(false);
   const [isOtherDetailsVisible, setIsOtherDetailsVisible] = useState(false);
+  const [fileList, setFileList] = useState([]);
 
   const allloggeduserdata = useSelector((state) => state.user);
   const loggedUserData = allloggeduserdata?.loggedInUser || {};
   const id = loggedUserData?.id;
 
   useEffect(() => {
-     dispatch(GetUsers());
-   
+    dispatch(GetUsers());
+
   }, [dispatch]);
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(GetTasks(id))
-  },[])
+  }, [])
 
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
@@ -49,19 +50,11 @@ const EditTask = ({ onClose, idd, projectId }) => {
     }
   });
 
-  // const loggedusername = useSelector((state) => state.user.loggedInUser.username || [])
- 
-    // const fndassine = empData.filter(((item)=>item.created_by === loggedusername || []))
-
-
-  const taskadata = useSelector((state)=>state.Tasks.Tasks);
+  const taskadata = useSelector((state) => state.Tasks.Tasks);
 
   const fndatatask = taskadata?.data || [];
 
   const [initialValues, setInitialValues] = useState({
-
-
-    
     taskName: "",
     startDate: null,
     dueDate: null,
@@ -69,20 +62,65 @@ const EditTask = ({ onClose, idd, projectId }) => {
     priority: "",
     assignTo: [],
     description: "",
+    task_reporter: "",
   });
 
-  // First fetch the task data
   useEffect(() => {
     const fetchTaskData = async () => {
       setLoading(true);
       try {
-        // If projectId exists, use it in the GetTasks call
-        const response = await dispatch(GetTasks(projectId || idd));
-        console.log("Task data fetch response:", response);
-        
+        const response = await dispatch(GetTasks(id));
         if (!response.payload || !response.payload.data) {
           throw new Error('No data received from API');
         }
+
+        const taskData = response.payload.data.find(task => task.id === idd || task._id === idd);
+        if (!taskData) {
+          throw new Error('Task not found');
+        }
+
+        let assignToArray = [];
+        try {
+          if (taskData.assignTo) {
+            if (typeof taskData.assignTo === 'string') {
+              // Parse JSON string to array
+              assignToArray = JSON.parse(taskData.assignTo);
+            } else if (Array.isArray(taskData.assignTo)) {
+              // Already an array, use as is
+              assignToArray = taskData.assignTo;
+            } else {
+              // Single value, convert to array
+              assignToArray = [taskData.assignTo];
+            }
+          }
+        } catch (error) {
+          console.error("Error parsing assignTo:", error);
+          assignToArray = [];
+        }
+
+        setInitialValues({
+          taskName: taskData.taskName || "",
+          startDate: taskData.startDate ? dayjs(taskData.startDate) : null,
+          dueDate: taskData.dueDate ? dayjs(taskData.dueDate) : null,
+          assignTo: assignToArray,
+          description: taskData.description || "",
+          status: taskData.status || "",
+          priority: taskData.priority || "",
+          task_reporter: taskData.task_reporter || "",
+        });
+
+        // If there are files, set them in the fileList state
+        if (taskData.task_file) {
+          setFileList([
+            {
+              uid: '-1',
+              name: 'Current File',
+              status: 'done',
+              url: taskData.task_file
+            }
+          ]);
+        }
+
       } catch (error) {
         console.error("Error fetching task data:", error);
         message.error("Failed to fetch task data");
@@ -91,68 +129,11 @@ const EditTask = ({ onClose, idd, projectId }) => {
       }
     };
 
-    fetchTaskData();
-  }, [dispatch, idd, projectId]);
-
-  // Then set the initial values once we have the data
-  useEffect(() => {
-    if (!loading && fndatatask.length > 0) {
-      console.log("Finding task with ID:", idd);
-      console.log("Available tasks:", fndatatask);
-      
-      // Try to find the task by both id and _id
-      const task = fndatatask.find((t) => t.id === idd || t._id === idd);
-      
-      if (!task) {
-        console.error("Task not found:", { 
-          taskId: idd, 
-          availableTasks: fndatatask,
-          taskIds: fndatatask.map(t => ({ id: t.id, _id: t._id }))
-        });
-        message.error("Task not found");
-        return;
-      }
-
-      console.log("Found task:", task);
-
-      let assignToArray = [];
-      try {
-        if (task.assignTo) {
-          if (typeof task.assignTo === 'string') {
-            assignToArray = JSON.parse(task.assignTo);
-          } else if (Array.isArray(task.assignTo)) {
-            assignToArray = task.assignTo;
-          } else {
-            assignToArray = [task.assignTo];
-          }
-        }
-      } catch (error) {
-        console.error("Error parsing assignTo:", error);
-        assignToArray = [];
-      }
-
-      // Ensure assignToArray is always an array and filter out null/undefined
-      assignToArray = Array.isArray(assignToArray) ? assignToArray : [assignToArray];
-      assignToArray = assignToArray.filter(item => item !== null && item !== undefined);
-
-      const newInitialValues = {
-        taskName: task.taskName || "",
-        startDate: task.startDate ? dayjs(task.startDate) : null,
-        dueDate: task.dueDate ? dayjs(task.dueDate) : null,
-        assignTo: assignToArray,
-        description: task.description || "",
-        status: task.status || "",
-        priority: task.priority || "",
-      };
-
-      console.log("Setting initial values:", newInitialValues);
-      setInitialValues(newInitialValues);
-      setIsWithoutDueDate(!task.dueDate);
-      setIsOtherDetailsVisible(!!task.otherDetailsVisible);
+    if (idd) {
+      fetchTaskData();
     }
-  }, [fndatatask, idd, loading]);
+  }, [dispatch, idd, id]);
 
-  // Add debug logging for task data
   useEffect(() => {
     console.log("Current task data state:", {
       loading,
@@ -171,27 +152,108 @@ const EditTask = ({ onClose, idd, projectId }) => {
     priority: Yup.string().required("Please select priority."),
     assignTo: Yup.array().min(1, "Please select at least one AssignTo."),
     description: Yup.string().required("Please enter a Description."),
+    task_reporter: Yup.string().required("Please select a Task Reporter."),
   });
 
   const onSubmit = async (values, { resetForm }) => {
     try {
-      const formattedValues = {
-        ...values,
-        startDate: values.startDate ? values.startDate.toISOString() : null,
-        dueDate: values.dueDate ? values.dueDate.toISOString() : null,
-        assignTo: Array.isArray(values.assignTo) ? values.assignTo : [values.assignTo],
-      };
+      if (!idd) {
+        message.error("Task ID is missing or invalid");
+        return;
+      }
 
-      console.log("Submitting values:", formattedValues);
-      
-      await dispatch(EditTaskss({ idd, values: formattedValues }));
+      // Create FormData object
+      const formData = new FormData();
+
+      // Directly append all required fields to FormData
+      formData.append('taskName', values.taskName);
+      formData.append('description', values.description);
+      formData.append('status', values.status);
+      formData.append('priority', values.priority);
+      formData.append('task_reporter', values.task_reporter);
+      formData.append('task_id', idd);
+
+      // Handle dates
+      if (values.startDate) {
+        formData.append('startDate', values.startDate.toISOString());
+      }
+      if (values.dueDate) {
+        formData.append('dueDate', values.dueDate.toISOString());
+      }
+
+      // Handle assignTo array
+      const assignToArray = Array.isArray(values.assignTo) ? values.assignTo : [values.assignTo];
+      formData.append('assignTo', JSON.stringify(assignToArray));
+
+      // Handle file uploads
+      if (fileList.length > 0) {
+        fileList.forEach((file) => {
+          if (file.originFileObj) {
+            formData.append('task_file', file.originFileObj);
+          } else if (file instanceof File) {
+            formData.append('task_file', file);
+          } else if (file.url) {
+            // If it's an existing file with URL, pass the URL
+            formData.append('existing_task_file', file.url);
+          }
+        });
+      }
+
+      // Log the FormData contents for debugging
+      console.log("Form values:", values);
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
+      const response = await dispatch(EditTaskss({ idd, values }));
+
+      if (response.error) {
+        throw new Error(response.error.message || 'Failed to update task');
+      }
+
       message.success("Task updated successfully!");
-      await dispatch(GetTasks(idd));
+      await dispatch(GetTasks(id));
       onClose();
     } catch (error) {
       console.error("Error updating task:", error);
-      message.error("Failed to update task");
+      message.error(error.message || "Failed to update task");
     }
+  };
+
+  const uploadProps = {
+    onRemove: (file) => {
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
+    },
+    beforeUpload: (file) => {
+      const isValidType = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ].includes(file.type);
+
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isValidType) {
+        message.error('You can only upload JPG/PNG/PDF/DOC files!');
+        return false;
+      }
+
+      if (!isLt2M) {
+        message.error('File must be smaller than 2MB!');
+        return false;
+      }
+
+      setFileList([...fileList, file]);
+      return false;
+    },
+    fileList,
+    multiple: true,
   };
 
   if (loading) {
@@ -270,7 +332,10 @@ const EditTask = ({ onClose, idd, projectId }) => {
                         className="w-full mt-1"
                         mode="multiple"
                         placeholder="Select AddProjectMember"
-                        onChange={(value) => setFieldValue("assignTo", value)}
+                        onChange={(value) => {
+                          const arrayValue = Array.isArray(value) ? value : [value];
+                          setFieldValue("assignTo", arrayValue);
+                        }}
                         value={values.assignTo}
                         onBlur={() => setFieldTouched("assignTo", true)}
                       >
@@ -366,7 +431,7 @@ const EditTask = ({ onClose, idd, projectId }) => {
                           </div>
                         </Option>
                         <Option value="High">
-                        <div className="flex items-center">
+                          <div className="flex items-center">
                             <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
                             High
                           </div>
@@ -403,6 +468,51 @@ const EditTask = ({ onClose, idd, projectId }) => {
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
+                </div>
+              </Col>
+
+              <Col span={24} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Task Reporter <span className="text-rose-500">*</span></label>
+                  <Field name="task_reporter">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-1"
+                        placeholder="Select Task Reporter"
+                        onChange={(value) => setFieldValue("task_reporter", value)}
+                        value={values.task_reporter}
+                      >
+                        {Array.isArray(fndassine) && fndassine.length > 0 ? (
+                          fndassine.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.firstName || client.username || "Unnamed Client"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Members Available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="task_reporter"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={24} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Attachments</label><br />
+                  <Upload {...uploadProps} className="mt-3">
+                    <Button icon={<UploadOutlined />} className="hover:bg-gray-50">
+                      Click to Upload Files
+                    </Button>
+                  </Upload>
                 </div>
               </Col>
             </Row>

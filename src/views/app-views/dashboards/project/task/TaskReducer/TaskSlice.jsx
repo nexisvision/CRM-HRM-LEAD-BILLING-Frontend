@@ -100,9 +100,9 @@ export const EditTasks = createAsyncThunk(
 
 export const EditTaskss = createAsyncThunk(
   "users/EditTasks",
-  async ({ iddd, values }, thunkAPI) => {
+  async ({ idd, values }, thunkAPI) => {
     try {
-      const response = await UserService.EditTaskss(iddd, values);
+      const response = await UserService.EditTaskss(idd, values);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -190,7 +190,7 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-     
+
       //delete
       .addCase(DeleteTasks.pending, (state) => {
         state.isLoading = true;

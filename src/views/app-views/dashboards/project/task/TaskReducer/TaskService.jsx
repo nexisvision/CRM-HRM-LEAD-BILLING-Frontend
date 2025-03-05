@@ -85,11 +85,12 @@ const EditTask = async (idd, values) => {
 
 
 
-const EditTaskss = async (iddd, values) => {
+const EditTaskss = async (idd, values) => {
+  console.log(idd, values);
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/tasks/${iddd}`,
+      `http://localhost:5353/api/v1/tasks/${idd}`,
       values,
       {
         headers: {
