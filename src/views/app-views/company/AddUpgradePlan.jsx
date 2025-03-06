@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { GetPlan } from "../plan/PlanReducers/PlanSlice";
 import { addassignplan } from "./CompanyReducers/CompanySlice";
 import moment from "moment"; // Import moment.js for date formatting
+import { getsubplandata } from "../subscribeduserplans/subplanReducer/subplanSlice";
 
 const { Option } = Select;
 
@@ -25,8 +26,6 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
   const [loading, setLoading] = useState(false);
   const allplandata = useSelector((state) => state.Plan);
   const fnsfdtaf = allplandata.Plan;
-
-  console.log(fnsfdtaf, "fnsfdtaf");
 
   // Fetch plan data when component is mounted
   useEffect(() => {
@@ -50,6 +49,10 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
   });
 
   const calculateEndDate = (startDate, duration) => {
+    if (duration.toLowerCase() === 'lifetime') {
+      return moment(startDate).add(100, 'years');
+    }
+
     let endDate = moment(startDate);
     
     const durationMatch = duration.match(/^(\d+)\s*(Month|Year)s?$/i);
@@ -66,10 +69,10 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
           endDate = endDate.add(value, 'years');
           break;
         default:
-          console.error('Unsupported duration unit:', unit);
+          // console.error('Unsupported duration unit:', unit);
       }
     } else {
-      console.error('Invalid duration format:', duration);
+      // console.error('Invalid duration format:', duration);
     }
     
     return endDate;
@@ -79,21 +82,23 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
     try {
       setLoading(true);
 
+      const selectedPlan = fnsfdtaf.find(plan => plan.id === values.plan_id);
+      
       // Convert the date values to strings in YYYY-MM-DD format using moment
       const payload = {
-        ...values, // Include all form data
+        ...values,
         start_date: moment(values.start_date).format("YYYY-MM-DD"),
         end_date: moment(values.end_date).format("YYYY-MM-DD"),
-        client_id: comnyid, // Add client_id
+        client_id: comnyid,
       };
 
       // Dispatch the action with the full payload
       dispatch(addassignplan(payload)).then(() => {
-        message.success("Upgrade plan created successfully!");
+        dispatch(getsubplandata());
         onClose();
       });
     } catch (error) {
-      message.error("Failed to create upgrade plan: " + error.message);
+      // message.error("Failed to create upgrade plan: " + error.message);
     } finally {
       setLoading(false);
     }

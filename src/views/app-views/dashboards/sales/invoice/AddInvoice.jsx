@@ -378,7 +378,7 @@ const AddInvoice = ({ onClose }) => {
 
   // Product selection handler
   const handleProductChange = (productId) => {
-    console.log("Selected product ID:", productId);
+    // console.log("Selected product ID:", productId);
     
     if (productId) {
         const selectedProd = products.find(p => p.id === productId);

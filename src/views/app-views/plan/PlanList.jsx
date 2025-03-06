@@ -175,12 +175,14 @@ const PlanList = () => {
           end_date: endDate
         };
 
-        await dispatch(planbutus(purchasePayload));
-        console.log("purchasePayload", purchasePayload);
-        message.success('Plan purchased successfully');
-        onCancel();
+        await dispatch(planbutus(purchasePayload)).then(() => {
+          dispatch(getsubplandata());
+          onCancel();
+        });
+        // console.log("purchasePayload", purchasePayload);
+        // message.success('Plan purchased successfully');
       } catch (error) {
-        message.error('Failed to purchase plan');
+        // message.error('Failed to purchase plan');
         console.error('Purchase error:', error);
       } finally {
         setLoading(false);

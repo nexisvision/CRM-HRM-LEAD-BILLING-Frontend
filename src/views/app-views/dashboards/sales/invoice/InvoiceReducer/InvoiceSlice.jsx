@@ -127,7 +127,7 @@ const RoleAndPermissionSlice = createSlice({
       .addCase(AddInvoices.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-        message.error(action.payload?.message || "Failed to add invoice");
+        message.error(action.payload?.message);
       })
 
       .addCase(getInvoice.pending, (state) => {

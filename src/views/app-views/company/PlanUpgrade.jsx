@@ -58,7 +58,7 @@ const PlanUpgrade = () => {
   const handlePlanSelect = (id) => {
     setSelectedPlan(id);
     setIsModalVisible(false); // Close modal after selection
-    console.log(`Selected Plan ID: ${id}`);
+    // console.log(`Selected Plan ID: ${id}`);
   };
 
   return (
@@ -113,7 +113,7 @@ const PlanUpgrade = () => {
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent List.Item click
                   setSelectedPlan(plan.id); // Set the selected plan
-                  console.log(`Configure ${plan.name}`);
+                
                 }}
               />
             )}

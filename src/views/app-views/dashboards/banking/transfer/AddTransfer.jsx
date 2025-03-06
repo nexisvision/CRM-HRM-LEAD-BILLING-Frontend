@@ -110,7 +110,7 @@ const AddTransfer = ({ onClose }) => {
                                                 onChange={(value) => {
                                                     setFieldValue('fromAccount', value);
                                                     // When fromAccount is selected, set toAccount to the same value
-                                                    setFieldValue('toAccount', value);
+                                                    // setFieldValue('toAccount', value);
                                                 }}
                                                 placeholder="Select from account"
                                                 className="w-full mt-1"
@@ -161,15 +161,18 @@ const AddTransfer = ({ onClose }) => {
                                 </div>
                             </Col> */}
 
-                            <Col span={12}>
-                                <div className="form-group mt-2">
+<Col span={12}>
+                                <div className="form-group">
                                     <label className="font-semibold">To Account <span className="text-red-500">*</span></label>
                                     <Field name="toAccount">
                                         {({ field }) => (
                                             <Select
                                                 {...field}
-                                                disabled={true}
-                                                value={values.toAccount}
+                                                onChange={(value) => {
+                                                    setFieldValue('toAccount', value);
+                                                    // When fromAccount is selected, set toAccount to the same value
+                                                    // setFieldValue('fromAccount', value);
+                                                }}
                                                 placeholder="Select to account"
                                                 className="w-full mt-1"
                                                 dropdownRender={menu => (

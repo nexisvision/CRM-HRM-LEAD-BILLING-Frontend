@@ -140,68 +140,25 @@ export const SubscribedUserPlansList = () => {
     setIsViewSubscribedUserPlansModalVisible(false);
   };
 
-  const dropdownMenu = (row) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={openViewSubscribedUserPlansModal}>
-          <EyeOutlined />
-          {/* <EyeOutlined /> */}
-          <span className="ml-2">View Details</span>
-        </Flex>
-      </Menu.Item>
-
-      <Menu.Item>
-        <Flex alignItems="center" onClick={openEditSubscribedUserPlansModal}>
-          <EditOutlined />
-          {/* <EditOutlined /> */}
-          <span className="ml-2">Edit</span>
-        </Flex>
-      </Menu.Item>
-
-      <Menu.Item>
-        <Flex alignItems="center">
-          <DeleteOutlined />
-          <span className="ml-2">Delete</span>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+ 
 
   // Add this function to handle status changes
   const handleStatusChange = async (checked, id) => {
     try {
       if (!checked) {
-        Modal.confirm({
-          title: 'Deactivate Plan',
-          content: 'Are you sure you want to deactivate this plan? This action cannot be undone.',
-          okText: 'Yes',
-          cancelText: 'No',
-          onOk: async () => {
-            try {
-              const token = localStorage.getItem('auth_token');
-
-              const response = await axios.delete(`http://localhost:5353/api/v1/subscriptions/remove/${id}`, {
-                headers: {
-                  'Authorization': `Bearer ${token}`
-                }
-              });
-
-              if (response.data.success) {
-                message.success('Plan removed successfully');
-                dispatch(getsubplandata());
-              } else {
-                message.error('Failed to remove plan');
-                return false;
-              }
-            } catch (error) {
-              message.error('Failed to update status: ' + (error.response?.data?.message || error.message));
-              console.error('Error updating status:', error);
-              return false;
-            }
-          },
+        const token = localStorage.getItem('auth_token');
+        const response = await axios.delete(`http://localhost:5353/api/v1/subscriptions/remove/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
         });
+
+        if (response.data.success) {
+          dispatch(getsubplandata());
+        } else {
+          return false;
+        }
       }
-      // Always return false to prevent switch from being toggled
       return false;
     } catch (error) {
       message.error('Error processing request');
@@ -262,16 +219,19 @@ export const SubscribedUserPlansList = () => {
     {
       title: "Status",
       dataIndex: "status",
-      render: (_, record) => (
-        <Switch
-          defaultChecked={record.status !== 'inactive'}
-          onChange={(checked) => handleStatusChange(checked, record.id)}
-          size="small"
-          checkedChildren="Active"
-          unCheckedChildren="Inactive"
-          disabled={record.status === 'inactive'} // Disable switch if status is already inactive
-        />
-      ),
+      render: (_, record) => {
+        const isActive = record.status !== 'cancelled'; // Check if status is not cancelled
+        return (
+          <Switch
+            defaultChecked={isActive}
+            onChange={(checked) => handleStatusChange(checked, record.id)}
+            size="small"
+            checkedChildren="Active"
+            unCheckedChildren="Inactive"
+            disabled={!isActive} // Disable switch if status is cancelled
+          />
+        );
+      },
     },
 
 
@@ -292,27 +252,7 @@ export const SubscribedUserPlansList = () => {
       sorter: (a, b) => utils.antdTableSorter(a, b, "end_date"),
 
     },
-    // {
-    //   title: "Status",
-    //   dataIndex: "status",
-    //   render: (_, record) => (
-    //     <Switch
-    //       defaultChecked={record.status === "active"}
-    //       onChange={(checked) => handleStatusChange(checked, record.id)}
-    //       size="small"
-    //     />
-    //   ),
-    // },
-
-    // {
-    //   title: "Action",
-    //   dataIndex: "actions",
-    //   render: (_, elm) => (
-    //     <div className="text-center">
-    //       <EllipsisDropdown menu={dropdownMenu(elm)} />
-    //     </div>
-    //   ),
-    // },
+   
   ];
 
   const onSearch = (e) => {
