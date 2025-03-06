@@ -10,6 +10,7 @@ import {
   message,
   Button,
   Modal,
+  Select,
 } from "antd";
 import {
   EyeOutlined,
@@ -38,6 +39,8 @@ import { GetJobdata } from '../JobReducer/JobSlice';  // Import the jobs action
 
 import { getjobapplication } from "../JobApplication/JobapplicationReducer/JobapplicationSlice";
 
+const { Option } = Select;
+
 const JobCandidateList = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
@@ -47,6 +50,8 @@ const JobCandidateList = () => {
   const [annualStatisticData] = useState(AnnualStatisticData);
   const [users, setUsers] = useState([]);
   const [searchText, setSearchText] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [uniqueStatuses, setUniqueStatuses] = useState(['All']);
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
@@ -65,8 +70,11 @@ const JobCandidateList = () => {
   useEffect(() => {
     if (fnddta) {
       setUsers(filteredData);
+      // Collect unique statuses
+      const statuses = ['All', ...new Set(filteredData.map(item => item.status).filter(Boolean))];
+      setUniqueStatuses(statuses);
     }
-  }, [fnddta]);
+  }, [fnddta, filteredData]);
 
   // Open Add Job Modal
   const openAddJobCandidateModal = () => {
@@ -99,16 +107,30 @@ const JobCandidateList = () => {
   const getFilteredCandidates = () => {
     if (!users) return [];
     
-    if (!searchText) return users;
+    let filtered = [...users];
 
-    return users.filter(candidate => {
-      return (
-        candidate.name?.toLowerCase().includes(searchText.toLowerCase()) ||
-        candidate.job?.toLowerCase().includes(searchText.toLowerCase()) ||
-        candidate.location?.toLowerCase().includes(searchText.toLowerCase()) ||
-        candidate.current_location?.toLowerCase().includes(searchText.toLowerCase())
+    // Text search filter
+    if (searchText) {
+      filtered = filtered.filter(candidate => {
+        return (
+          candidate.name?.toLowerCase().includes(searchText.toLowerCase()) ||
+          candidate.job?.toLowerCase().includes(searchText.toLowerCase()) ||
+          candidate.location?.toLowerCase().includes(searchText.toLowerCase()) ||
+          candidate.current_location?.toLowerCase().includes(searchText.toLowerCase()) ||
+          candidate.status?.toLowerCase().includes(searchText.toLowerCase()) ||
+          getJobName(candidate.job)?.toLowerCase().includes(searchText.toLowerCase())
+        );
+      });
+    }
+
+    // Status filter from dropdown
+    if (selectedStatus && selectedStatus !== 'All') {
+      filtered = filtered.filter(candidate => 
+        candidate.status?.toLowerCase() === selectedStatus.toLowerCase()
       );
-    });
+    }
+
+    return filtered;
   };
 
   const handleSearch = () => {
@@ -317,6 +339,11 @@ const JobCandidateList = () => {
     },
   ];
 
+  // Add status change handler
+  const handleStatusChange = (value) => {
+    setSelectedStatus(value);
+  };
+
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
       <Flex
@@ -336,6 +363,20 @@ const JobCandidateList = () => {
                 onPressEnter={handleSearch}
               />
             </Input.Group>
+          </div>
+          <div className="mr-md-3 mb-3">
+            <Select
+              defaultValue="All"
+              style={{ minWidth: '120px' }}
+              onChange={handleStatusChange}
+              value={selectedStatus}
+            >
+              {uniqueStatuses.map((status) => (
+                <Option key={status} value={status}>
+                  {status}
+                </Option>
+              ))}
+            </Select>
           </div>
         </Flex>
         {/* <Flex gap="7px">
@@ -436,6 +477,16 @@ const styles = `
 
   .table-responsive {
     overflow-x: auto;
+  }
+
+  .ant-select {
+    min-width: 120px;
+  }
+
+  @media (max-width: 768px) {
+    .ant-select {
+      width: 100%;
+    }
   }
 `;
 
