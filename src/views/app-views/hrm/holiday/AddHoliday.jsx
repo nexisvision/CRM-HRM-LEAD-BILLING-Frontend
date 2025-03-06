@@ -33,9 +33,9 @@ const AddHoliday = ({ onClose }) => {
       return;
     }
 
-    // Convert moment objects to proper date format
-    const startDate = values.start_date ? moment(values.start_date._d || values.start_date).format("DD-MM-YYYY") : null;
-    const endDate = values.end_date ? moment(values.end_date._d || values.end_date).format("DD-MM-YYYY") : null;
+    // Convert the selected dates to the correct format
+    const startDate = moment(values.start_date).format("YYYY-MM-DD");
+    const endDate = moment(values.end_date).format("YYYY-MM-DD");
 
     if (!startDate || !endDate) {
       message.error("Invalid date format");
@@ -50,7 +50,7 @@ const AddHoliday = ({ onClose }) => {
     };
 
     // Validate that end date is not before start date
-    if (moment(formattedValues.end_date).isBefore(formattedValues.start_date)) {
+    if (moment(endDate).isBefore(startDate)) {
       message.error("End date cannot be before start date");
       return;
     }
@@ -114,11 +114,12 @@ const AddHoliday = ({ onClose }) => {
                     style={{ width: "100%" }}
                     className="w-full mt-1"
                     placeholder="Select start date"
-                    value={values.start_date}
+                    value={values.start_date ? moment(values.start_date) : null}
+                    format="YYYY-MM-DD"
                     onChange={(date) => {
-                      setFieldValue("start_date", date);
+                      setFieldValue("start_date", date ? date.format("YYYY-MM-DD") : null);
                       // Reset end date when start date changes
-                      if (values.end_date && date && date.isAfter(values.end_date)) {
+                      if (values.end_date && date && moment(date).isAfter(values.end_date)) {
                         setFieldValue("end_date", null);
                       }
                     }}
@@ -138,11 +139,12 @@ const AddHoliday = ({ onClose }) => {
                     style={{ width: "100%" }}
                     className="w-full mt-1"
                     placeholder="Select end date"
-                    value={values.end_date}
-                    onChange={(date) => setFieldValue("end_date", date)}
+                    format="YYYY-MM-DD"
+                    value={values.end_date ? moment(values.end_date) : null}
+                    onChange={(date) => setFieldValue("end_date", date ? date.format("YYYY-MM-DD") : null)}
                     disabledDate={(current) => {
                       // Can't select days before start date
-                      return values.start_date ? current && current < values.start_date.startOf('day') : false;
+                      return values.start_date ? current && current.isBefore(moment(values.start_date), 'day') : false;
                     }}
                   />
                   {errors.end_date && touched.end_date && (
