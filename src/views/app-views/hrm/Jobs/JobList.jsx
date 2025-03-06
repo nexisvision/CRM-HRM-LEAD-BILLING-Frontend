@@ -54,6 +54,8 @@ const JobList = () => {
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState('');
   const [dateRange, setDateRange] = useState([null, null]);
+  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [uniqueStatuses, setUniqueStatuses] = useState(['All']);
 
   const [annualStatisticData] = useState(AnnualStatisticData);
 
@@ -93,11 +95,11 @@ const JobList = () => {
     setSearchText(value);
   };
 
-  // Update the getFilteredJobs function to include date filtering
+  // Update the getFilteredJobs function to include status filtering
   const getFilteredJobs = () => {
     if (!filteredData) return [];
     
-    let filtered = [...filteredData]; // Create a copy of the array
+    let filtered = [...filteredData];
 
     // Text search filter
     if (searchText) {
@@ -110,13 +112,18 @@ const JobList = () => {
       });
     }
 
+    // Status filter
+    if (selectedStatus && selectedStatus !== 'All') {
+      filtered = filtered.filter(job => job.status === selectedStatus.toLowerCase());
+    }
+
     // Date range filter
-    if (dateRange && dateRange[0] && dateRange[1]) {  // Check if dateRange exists and has both values
+    if (dateRange && dateRange[0] && dateRange[1]) {
       const startDate = dayjs(dateRange[0]).startOf('day');
       const endDate = dayjs(dateRange[1]).endOf('day');
 
       filtered = filtered.filter(job => {
-        if (!job.startDate || !job.endDate) return false; // Skip if job dates are missing
+        if (!job.startDate || !job.endDate) return false;
         
         const jobStartDate = dayjs(job.startDate);
         const jobEndDate = dayjs(job.endDate);
@@ -231,10 +238,13 @@ const JobList = () => {
   useEffect(() => {
     if (filtermin) {
       setList(filteredData);
+      // Extract unique statuses from the data
+      const statuses = ['All', ...new Set(filteredData.map(job => job.status).filter(Boolean))];
+      setUniqueStatuses(statuses);
     }
-  }, [filtermin]);
+  }, [filtermin, filteredData]);
 
-  const jobStatusList = ["active", "blocked"];
+  // const jobStatusList = ["active", "blocked"];
 
   const editFunc = (idd) => {
     openEditJobModal();
@@ -346,7 +356,7 @@ const JobList = () => {
       dataIndex: "status",
       render: (_, record) => (
         <>
-          <Tag color={getjobStatus(record.status)}>{record.status}</Tag>
+         <Tag color={getjobStatus(record.status)}>{record.status}</Tag> 
         </>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
@@ -366,6 +376,11 @@ const JobList = () => {
   // Update handler for date range changes
   const handleDateRangeChange = (dates) => {
     setDateRange(dates || [null, null]); // Ensure we set [null, null] when clearing
+  };
+
+  // Add status change handler
+  const handleStatusChange = (value) => {
+    setSelectedStatus(value);
   };
 
   return (
@@ -409,6 +424,20 @@ const JobList = () => {
               className="w-100"
               allowClear={true}
             />
+          </div>
+          <div className="mr-md-3 mb-3">
+            <Select
+              defaultValue="All"
+              style={{ width: 120 }}
+              onChange={handleStatusChange}
+              value={selectedStatus}
+            >
+              {uniqueStatuses.map((status) => (
+                <Option key={status} value={status}>
+                  {status}
+                </Option>
+              ))}
+            </Select>
           </div>
         </Flex>
         <Flex gap="7px">
@@ -539,8 +568,13 @@ const styles = `
     min-width: 300px;
   }
 
+  .ant-select {
+    min-width: 120px;
+  }
+
   @media (max-width: 768px) {
-    .ant-picker-range {
+    .ant-picker-range,
+    .ant-select {
       width: 100%;
     }
   }

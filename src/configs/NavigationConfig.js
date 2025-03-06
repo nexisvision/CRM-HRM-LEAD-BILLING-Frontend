@@ -188,13 +188,12 @@ const extraNavvTree = [
               },
               {
                 key: 'extra-hrm-attendance-holidaylist',
-                path: `${APP_PREFIX_PATH}/hrm/holiday/holidaylist`,
-                title: 'holiday List',
-                icon: CheckSquareOutlined,
+                path: `${APP_PREFIX_PATH}/hrm/holiday/holidaylist`, 
+                title: 'Holiday List',
+                icon: CalendarOutlined,
                 breadcrumb: true,
                 submenu: []
               },
-             
             ]
           },
           {

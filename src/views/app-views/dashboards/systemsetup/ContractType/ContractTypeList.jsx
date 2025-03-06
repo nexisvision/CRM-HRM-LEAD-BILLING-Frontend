@@ -227,13 +227,7 @@ const ContractTypeList = () => {
             className="flex flex-wrap gap-4 mb-4 md:mb-0"
             mobileFlex={false}
           >
-            <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
-              <Input
-                placeholder="Search"
-                prefix={<SearchOutlined />}
-                onChange={(e) => onSearch(e)}
-              />
-            </div>
+           
           </Flex>
           {/* <Flex gap="7px" className="flex">
 						<Button type="primary" className="ml-2" onClick={openAddPaymentModal}>

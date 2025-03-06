@@ -143,7 +143,6 @@ const AddMeeting = ({ onClose }) => {
           dirty,
         }) => {
           // Log current form values
-          console.log('Current Form Values:', values);
 
           return (
             <Form className="formik-form" onSubmit={handleSubmit}>

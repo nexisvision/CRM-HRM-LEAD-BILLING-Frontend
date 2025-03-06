@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal, DatePicker } from 'antd';
+import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal, DatePicker, Select } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from '../../Users/user-list/UserView';
@@ -27,6 +27,7 @@ const MeetingList = () => {
   const [searchText, setSearchText] = useState('');
   const [isViewMeetingModalVisible, setIsViewMeetingModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -105,10 +106,15 @@ const MeetingList = () => {
 
     // Apply text search filter
     if (searchText) {
+      const searchValue = searchText.toLowerCase().trim();
       result = result.filter(meeting => {
         return (
-          meeting.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-          meeting.startTime?.toLowerCase().includes(searchText.toLowerCase())
+          meeting.title?.toLowerCase().includes(searchValue) ||
+          meeting.startTime?.toLowerCase().includes(searchValue) ||
+          meeting.status?.toLowerCase().includes(searchValue) ||
+          (searchValue === 'completed' && meeting.status?.toLowerCase() === 'completed') ||
+          (searchValue === 'scheduled' && meeting.status?.toLowerCase() === 'scheduled') ||
+          (searchValue === 'cancelled' && meeting.status?.toLowerCase() === 'cancelled')
         );
       });
     }
@@ -120,6 +126,13 @@ const MeetingList = () => {
         const meetingDate = dayjs(meeting.date).format('YYYY-MM-DD');
         return meetingDate === filterDate;
       });
+    }
+
+    // Apply status filter
+    if (selectedStatus) {
+      result = result.filter(meeting => 
+        meeting.status?.toLowerCase() === selectedStatus.toLowerCase()
+      );
     }
 
     return result;
@@ -285,6 +298,28 @@ const MeetingList = () => {
       sorter: (a, b) => utils.antdTableSorter(a, b, 'endTime')
     },
     {
+      title: 'Status',
+      dataIndex: 'status',
+      render: (status) => {
+        let color = 'default';
+        switch (status?.toLowerCase()) {
+          case 'completed':
+            color = 'success';
+            break;
+          case 'pending':
+            color = 'warning';
+            break;
+          case 'cancelled':
+            color = 'error';
+            break;
+          default:
+            color = 'default';
+        }
+        return <Tag color={color}>{status?.toUpperCase() || 'N/A'}</Tag>;
+      },
+      sorter: (a, b) => utils.antdTableSorter(a, b, 'status')
+    },
+    {
       title: 'Action',
       dataIndex: 'actions',
       render: (_, elm) => (
@@ -298,6 +333,11 @@ const MeetingList = () => {
   // Add date change handler
   const handleDateChange = (date) => {
     setSelectedDate(date);
+  };
+
+  // Add status change handler
+  const handleStatusChange = (value) => {
+    setSelectedStatus(value);
   };
 
   return (
@@ -326,6 +366,19 @@ const MeetingList = () => {
               allowClear
               style={{ width: '200px' }}
             />
+          </div>
+          <div className="mr-md-3 mb-3">
+            <Select
+              placeholder="Filter by status"
+              onChange={handleStatusChange}
+              value={selectedStatus}
+              style={{ width: '200px' }}
+              allowClear
+            >
+              <Select.Option value="completed">Completed</Select.Option>
+              <Select.Option value="scheduled">Scheduled</Select.Option>
+              <Select.Option value="cancelled">Cancelled</Select.Option>
+            </Select>
           </div>
         </Flex>
         <Flex gap="7px">

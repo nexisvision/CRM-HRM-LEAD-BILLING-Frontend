@@ -179,13 +179,7 @@ const PipelineList = () => {
           mobileFlex={false}
           className="flex flex-wrap mt-2 gap-4"
         >
-          <div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48">
-            <Input
-              placeholder="Search pipeline..."
-              prefix={<SearchOutlined />}
-              onChange={(e) => onSearch(e)}
-            />
-          </div>
+         
         </Flex>
         <div className="table-responsive">
           <Table

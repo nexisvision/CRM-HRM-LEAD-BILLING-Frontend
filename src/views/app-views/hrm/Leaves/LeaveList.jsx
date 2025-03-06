@@ -351,19 +351,19 @@ const LeaveList = () => {
       dataIndex: "reason",
       sorter: (a, b) => a.leavereason.length - b.leavereason.length,
     },
-    {
-      title: "Status",
-      dataIndex: "status",
-      render: (status) => (
-        <Tag
-          className="text-capitalize"
-          color={status === "active" ? "cyan" : "red"}
-        >
-          {status}
-        </Tag>
-      ),
-      sorter: (a, b) => a.status.length - b.status.length,
-    },
+    // {
+    //   title: "Status",
+    //   dataIndex: "status",
+    //   render: (status) => (
+    //     <Tag
+    //       className="text-capitalize"
+    //       color={status === "active" ? "cyan" : "red"}
+    //     >
+    //       {status}
+    //     </Tag>
+    //   ),
+    //   sorter: (a, b) => a.status.length - b.status.length,
+    // },
     {
       title: "Approval Actions",
       dataIndex: "approval",

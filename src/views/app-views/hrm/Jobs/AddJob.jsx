@@ -81,7 +81,7 @@ const AddJob = ({ onClose }) => {
   };
   const validationSchema = Yup.object({
     title: Yup.string().required("Please enter Job Title."),
-    category: Yup.number().required("Please enter Job Category."),
+    category: Yup.string().required("Please enter Job Category."),
     skillss: Yup.string().required("Please enter Skills."),
     location: Yup.string().required("Please enter Location."),
     interviewRounds: Yup.array().required("please enter Interview Rounds"),

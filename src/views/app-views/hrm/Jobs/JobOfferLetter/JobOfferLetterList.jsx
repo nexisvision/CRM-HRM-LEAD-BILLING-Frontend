@@ -376,20 +376,34 @@ const user = useSelector((state) => state.user.loggedInUser.username);
   );
 
   const tableColumns = [
-    // {
-    //   title: "Offer",
-    //   dataIndex: "Offer",
-    //   //   render: (_, record) => (
-    //   //     <div className="d-flex">
-    //   //       <AvatarStatus
-    //   //         src={record.img}
-    //   //         name={record.name}
-    //   //         subTitle={record.email}
-    //   //       />
-    //   //     </div>
-    //   //   ),
-    //   sorter: (a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? -1 : 1),
-    // },
+    {
+      title: "Job",
+      dataIndex: "job_applicant",
+      render: (_, record) => {
+        // Find the job from alljob array that matches the job_applicant ID
+        const job = alljob?.find(job => job.id === record.job_applicant);
+        return job ? job.title : record.job_applicant;
+      },
+      sorter: (a, b) => {
+        const jobA = alljob?.find(job => job.id === a.job_applicant)?.title || '';
+        const jobB = alljob?.find(job => job.id === b.job_applicant)?.title || '';
+        return jobA.localeCompare(jobB);
+      },
+    },
+    {
+      title: "Job Applicant",
+      dataIndex: "job",
+      render: (_, record) => {
+        // Find the job application from jobappliaction array that matches the job ID
+        const application = jobappliaction?.find(app => app.id === record.job);
+        return application ? application.name : record.job;
+      },
+      sorter: (a, b) => {
+        const appA = jobappliaction?.find(app => app.id === a.job)?.name || '';
+        const appB = jobappliaction?.find(app => app.id === b.job)?.name || '';
+        return appA.localeCompare(appB);
+      },
+    },
     {
       title: "Salary",
       dataIndex: "salary",
@@ -412,21 +426,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
         <div dangerouslySetInnerHTML={{ __html: text }} />
       ),
     },
-    // {
-    //   title: "created_by",
-    //   dataIndex: "created_by",
-    //   sorter: (a, b) => a.created_by.length - b.created_by.length,
-    // },
-    {
-      title: "Status",
-      dataIndex: "status",
-      render: (_, record) => (
-        <>
-          <Tag color={getjobStatus(record.status)}>{record.status}</Tag>
-        </>
-      ),
-      sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
-    },
+  
     {
       title: "Action",
       dataIndex: "actions",

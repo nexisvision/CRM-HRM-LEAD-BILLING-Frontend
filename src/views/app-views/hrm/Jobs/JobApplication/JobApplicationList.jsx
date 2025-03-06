@@ -9,6 +9,7 @@ import {
   Button,
   Modal,
   Select,
+  DatePicker,
 } from "antd";
 import {
   EyeOutlined,
@@ -64,6 +65,8 @@ const JobApplicationList = () => {
   const fnddtaa = fnddta.filter((item) => item.created_by === user);
 
   const [searchText, setSearchText] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [uniqueStatuses, setUniqueStatuses] = useState(['All']);
 
   useEffect(() => {
     dispatch(getjobapplication());
@@ -72,6 +75,9 @@ const JobApplicationList = () => {
   useEffect(() => {
     if (fnddta) {
       setUsers(fnddtaa);
+      // Extract unique statuses from the data
+      const statuses = ['All', ...new Set(fnddtaa.map(item => item.status).filter(Boolean))];
+      setUniqueStatuses(statuses);
     }
   }, [fnddta]);
 
@@ -99,11 +105,27 @@ const JobApplicationList = () => {
   const getFilteredApplications = () => {
     if (!users) return [];
     
-    if (!searchText) return users;
+    let filtered = [...users];
 
-    return users.filter(application => {
-      return application.name?.toLowerCase().includes(searchText.toLowerCase());
-    });
+    // Text search filter
+    if (searchText) {
+      filtered = filtered.filter(application => {
+        return (
+          application.name?.toLowerCase().includes(searchText.toLowerCase()) ||
+          application.status?.toLowerCase().includes(searchText.toLowerCase()) ||
+          application.notice_period?.toLowerCase().includes(searchText.toLowerCase())
+        );
+      });
+    }
+
+    // Status filter
+    if (selectedStatus && selectedStatus !== 'All') {
+      filtered = filtered.filter(application => 
+        application.status?.toLowerCase() === selectedStatus.toLowerCase()
+      );
+    }
+
+    return filtered;
   };
 
   const handleSearch = () => {
@@ -354,6 +376,11 @@ const JobApplicationList = () => {
     },
   ];
 
+  // Add status change handler
+  const handleStatusChange = (value) => {
+    setSelectedStatus(value);
+  };
+
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
       <Flex
@@ -374,18 +401,16 @@ const JobApplicationList = () => {
               />
             </Input.Group>
           </div>
-          <div className="w-full md:w-48 ">
+          <div className="mr-md-3 mb-3">
             <Select
               defaultValue="All"
-              className="w-100"
-              style={{ minWidth: 180 }}
-              onChange={handleShowStatus}
-              placeholder="Status"
+              style={{ minWidth: '120px' }}
+              onChange={handleStatusChange}
+              value={selectedStatus}
             >
-              <Option value="All">All Job </Option>
-              {jobStatusList.map((elm) => (
-                <Option key={elm} value={elm}>
-                  {elm}
+              {uniqueStatuses.map((status) => (
+                <Option key={status} value={status}>
+                  {status}
                 </Option>
               ))}
             </Select>

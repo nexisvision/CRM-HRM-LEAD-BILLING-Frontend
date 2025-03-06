@@ -97,7 +97,7 @@ function ViewNotes() {
     dispatch(delnotess(userId)).then(() => {
       dispatch(getnotess(id));
       setUsers(users.filter((item) => item.id !== userId));
-      message.success({ content: `Deleted user ${userId}`, duration: 2 });
+      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
     });
   };
 

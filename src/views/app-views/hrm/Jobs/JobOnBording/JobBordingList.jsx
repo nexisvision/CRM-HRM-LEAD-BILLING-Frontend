@@ -57,6 +57,8 @@ const JobOnBordingList = () => {
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState('');
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [uniqueStatuses, setUniqueStatuses] = useState(['All']);
 
   const user = useSelector((state) => state.user.loggedInUser.username);
 
@@ -72,8 +74,10 @@ const JobOnBordingList = () => {
   useEffect(() => {
     if (fnddata) {
       setUsers(filteredData);
+      const statuses = ['All', ...new Set(filteredData.map(item => item.Status).filter(Boolean))];
+      setUniqueStatuses(statuses);
     }
-  }, [fnddata]);
+  }, [fnddata, filteredData]);
 
   const [annualStatisticData] = useState(AnnualStatisticData);
 
@@ -102,7 +106,7 @@ const JobOnBordingList = () => {
     setSearchText(value);
   };
 
-  // Update the getFilteredOnboarding function to include date filtering
+  // Update the getFilteredOnboarding function to include status filtering
   const getFilteredOnboarding = () => {
     if (!filteredData) return [];
     
@@ -111,8 +115,19 @@ const JobOnBordingList = () => {
     // Text search filter
     if (searchText) {
       filtered = filtered.filter(onboarding => {
-        return onboarding.Interviewer?.toLowerCase().includes(searchText.toLowerCase());
+        return (
+          onboarding.Interviewer?.toLowerCase().includes(searchText.toLowerCase()) ||
+          onboarding.Status?.toLowerCase().includes(searchText.toLowerCase()) ||
+          onboarding.JobType?.toLowerCase().includes(searchText.toLowerCase())
+        );
       });
+    }
+
+    // Status filter from dropdown
+    if (selectedStatus && selectedStatus !== 'All') {
+      filtered = filtered.filter(onboarding => 
+        onboarding.Status?.toLowerCase() === selectedStatus.toLowerCase()
+      );
     }
 
     // Date filter
@@ -352,6 +367,11 @@ const JobOnBordingList = () => {
     },
   ];
 
+  // Add status change handler
+  const handleStatusChange = (value) => {
+    setSelectedStatus(value);
+  };
+
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
       {/* <Row gutter={16}>
@@ -375,7 +395,7 @@ const JobOnBordingList = () => {
           <div className="mr-md-3 mb-3">
             <Input.Group compact>
               <Input
-                placeholder="Search"
+                placeholder="Search name, status, job type..."
                 prefix={<SearchOutlined />}
                 onChange={onSearch}
                 value={searchText}
@@ -394,6 +414,20 @@ const JobOnBordingList = () => {
               allowClear={true}
               style={{ minWidth: '200px' }}
             />
+          </div>
+          <div className="mr-md-3 mb-3">
+            <Select
+              defaultValue="All"
+              style={{ minWidth: '120px' }}
+              onChange={handleStatusChange}
+              value={selectedStatus}
+            >
+              {uniqueStatuses.map((status) => (
+                <Option key={status} value={status}>
+                  {status}
+                </Option>
+              ))}
+            </Select>
           </div>
         </Flex>
         <Flex gap="7px">
@@ -520,6 +554,17 @@ const styles = `
 
   @media (max-width: 768px) {
     .ant-picker {
+      width: 100%;
+    }
+  }
+
+  .ant-select {
+    min-width: 120px;
+  }
+
+  @media (max-width: 768px) {
+    .ant-picker,
+    .ant-select {
       width: 100%;
     }
   }
