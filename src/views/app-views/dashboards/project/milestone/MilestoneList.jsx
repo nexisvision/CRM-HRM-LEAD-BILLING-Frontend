@@ -17,6 +17,7 @@ import {
   Tag,
   DatePicker,
   Space,
+  Progress,
 } from "antd";
 // import { invoiceData } from '../../../pages/invoice/invoiceData';
 // import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
@@ -32,6 +33,7 @@ import {
   EditOutlined,
   PlusOutlined,
   DeleteOutlined,
+  CalendarOutlined,
 } from "@ant-design/icons";
 import { TiPinOutline } from "react-icons/ti";
 import AvatarStatus from "components/shared-components/AvatarStatus";
@@ -50,6 +52,8 @@ import EditMilestone from "./EditMilestone";
 import { useDispatch, useSelector } from "react-redux";
 import { Deletemins, Getmins } from "./minestoneReducer/minestoneSlice";
 import { useParams } from "react-router-dom";
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import { GetProject } from "../project-list/projectReducer/ProjectSlice";
 
 const { Column } = Table;
 
@@ -82,38 +86,36 @@ const getShippingStatus = (status) => {
 const milestoneStatusList = ["Paid", "Pending", "Expired"];
 
 export const MilestoneList = () => {
+  const dispatch = useDispatch();
+  const { id } = useParams();
+
   const [annualStatisticData] = useState(AnnualStatisticData);
   const [list, setList] = useState(OrderListData);
   const [selectedRows, setSelectedRows] = useState([]);
-  const [isAddMilestoneModalVisible, setIsAddMilestoneModalVisible] =
-    useState(false);
-  const [isEditMilestoneModalVisible, setIsEditMilestoneModalVisible] =
-    useState(false);
-  const [isViewMilestoneModalVisible, setIsViewMilestoneModalVisible] =
-    useState(false);
-
+  const [isAddMilestoneModalVisible, setIsAddMilestoneModalVisible] = useState(false);
+  const [isEditMilestoneModalVisible, setIsEditMilestoneModalVisible] = useState(false);
+  const [isViewMilestoneModalVisible, setIsViewMilestoneModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-
   const [idd, setIdd] = useState("");
-
-  const allempdata = useSelector((state) => state.Milestone);
-  const filtermin = allempdata.Milestone.data;
-
-  
-
-  const dispatch = useDispatch();
-
   const [searchText, setSearchText] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [dateRange, setDateRange] = useState(null);
 
+  // Add selectors for data
+  const allempdata = useSelector((state) => state.Milestone);
+  const filtermin = allempdata.Milestone.data;
+  const { currencies } = useSelector((state) => state.currencies);
+  const curr = currencies?.data || [];
+  const projectData = useSelector((state) => state?.Project?.Project?.data) || [];
+  const currentProject = projectData.find(project => project.id === id);
+
   // Get unique statuses from milestone data
   const getUniqueStatuses = () => {
     if (!filtermin) return [];
-    
+
     // Get all unique statuses from the data
     const statuses = [...new Set(filtermin.map(item => item.milestone_status))];
-    
+
     // Create status options array with 'All Status' as first option
     return [
       { value: 'all', label: 'All Status' },
@@ -157,11 +159,12 @@ export const MilestoneList = () => {
     setIsViewMilestoneModalVisible(false);
   };
 
-  const { id } = useParams();
-
+  // Add useEffect to fetch currencies and project data
   useEffect(() => {
+    dispatch(getcurren());
+    dispatch(GetProject());
     dispatch(Getmins(id));
-  }, []);
+  }, [dispatch, id]);
 
   useEffect(() => {
     if (filtermin) {
@@ -170,7 +173,7 @@ export const MilestoneList = () => {
   }, [filtermin]);
 
   const deleetfuc = (userId) => {
-    dispatch(Deletemins(userId)).then(()=>{
+    dispatch(Deletemins(userId)).then(() => {
       dispatch(Getmins(id));
       // message.success("Milestone deleted successfully!");
     });
@@ -180,7 +183,7 @@ export const MilestoneList = () => {
     openEditMilestoneModal();
     setIdd(id);
   };
-// console.log(idd,"idddd");
+  // console.log(idd,"idddd");
   const dropdownMenu = (row) => (
     <Menu>
       <Menu.Item>
@@ -198,72 +201,144 @@ export const MilestoneList = () => {
     </Menu>
   );
 
+  // Add currency formatting helper
+  const formatCurrency = (value) => {
+    if (!currentProject?.currency || !curr?.length) {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR'
+      }).format(value);
+    }
+
+    const projectCurrency = curr.find(c => c.id === currentProject.currency);
+    if (!projectCurrency) {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR'
+      }).format(value);
+    }
+
+    // Use the project's currency for formatting
+    return `${projectCurrency.currencyIcon || '₹'}${Number(value).toLocaleString()}`;
+  };
+
   const tableColumns = [
     {
       title: "Milestone Title",
       dataIndex: "milestone_title",
+      key: "milestone_title",
+      render: (text) => (
+        <span className="font-medium text-gray-800">{text}</span>
+      ),
       sorter: {
-        compare: (a, b) => a.milestone_title.length - b.milestone_title.length,
+        compare: (a, b) => a.milestone_title.localeCompare(b.milestone_title),
       },
     },
-    
     {
-      title: "Milestone Cost",
+      title: "Cost",
       dataIndex: "milestone_cost",
+      key: "milestone_cost",
+      render: (cost) => (
+        <span className="font-medium">
+          {formatCurrency(cost)}
+        </span>
+      ),
       sorter: {
         compare: (a, b) => a.milestone_cost - b.milestone_cost,
       },
     },
-    // {
-    //   title: "Budget",
-    //   dataIndex: "add_cost_to_project_budget",
-    //   sorter: {
-    //     compare: (a, b) =>
-    //       a.add_cost_to_project_budget.length -
-    //       b.add_cost_to_project_budget.length,
-    //   },
-    // },
     {
-      title: "Start Date",
-      dataIndex: "milestone_start_date",
-      render: (date) => date ? new Date(date).toLocaleDateString('en-GB') : 'N/A',
-      sorter: {
-        compare: (a, b) => new Date(a.milestone_start_date) - new Date(b.milestone_start_date),
+      title: "Progress",
+      key: "progress",
+      render: (_, record) => {
+        const now = dayjs();
+        const startDate = dayjs(record.milestone_start_date);
+        const endDate = dayjs(record.milestone_end_date);
+        const totalDays = endDate.diff(startDate, 'days');
+        const elapsedDays = now.diff(startDate, 'days');
+        const progress = Math.min(100, Math.max(0, (elapsedDays / totalDays) * 100));
+
+        const getProgressColor = () => {
+          if (record.milestone_status?.toLowerCase() === 'completed' ||
+            record.milestone_status?.toLowerCase() === 'done') {
+            return '#52c41a';
+          }
+          if (progress >= 100) return '#f5222d';
+          if (progress >= 70) return '#faad14';
+          return '#1890ff';
+        };
+
+        return (
+          <div>
+            <Progress
+              percent={Math.round(progress)}
+              size="small"
+              strokeColor={getProgressColor()}
+              className="mb-1"
+            />
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>{dayjs(record.milestone_start_date).format('DD MMM')}</span>
+              <span>{dayjs(record.milestone_end_date).format('DD MMM')}</span>
+            </div>
+          </div>
+        );
       },
+      width: 200,
     },
     {
-      title: "End Date",
-      dataIndex: "milestone_end_date",
-      render: (date) => date ? new Date(date).toLocaleDateString('en-GB') : 'N/A',
-      sorter: {
-        compare: (a, b) => new Date(a.milestone_end_date) - new Date(b.milestone_end_date),
+      title: "Timeline",
+      key: "timeline",
+      render: (_, record) => {
+        const startDate = dayjs(record.milestone_start_date);
+        const endDate = dayjs(record.milestone_end_date);
+        const now = dayjs();
+        const isOverdue = now.isAfter(endDate);
+
+        return (
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <Tag
+                icon={<CalendarOutlined />}
+                color={isOverdue ? 'error' : 'default'}
+                className="rounded-full"
+              >
+                {endDate.format('DD MMM YYYY')}
+              </Tag>
+            </div>
+            <div className="text-xs text-gray-500">
+              {isOverdue
+                ? `Overdue by ${now.diff(endDate, 'days')} days`
+                : `${endDate.diff(now, 'days')} days remaining`}
+            </div>
+          </div>
+        );
       },
-    },
-    {
-      title: "Start Date",
-      dataIndex: "milestone_start_date",
-      render: (date) => dayjs(date).format('YYYY-MM-DD'),
-      sorter: (a, b) => dayjs(a.milestone_start_date).unix() - dayjs(b.milestone_start_date).unix(),
-    },
-    {
-      title: "End Date",
-      dataIndex: "milestone_end_date",
-      render: (date) => dayjs(date).format('YYYY-MM-DD'),
-      sorter: (a, b) => dayjs(a.milestone_end_date).unix() - dayjs(b.milestone_end_date).unix(),
     },
     {
       title: "Status",
       dataIndex: "milestone_status",
-      render: (_, record) => (
-        <Tag color={getMilestoneStatus(record.milestone_status)}>
-          {record.milestone_status}
-        </Tag>
-      ),
+      key: "milestone_status",
+      render: (status) => {
+        const getStatusColor = (status) => {
+          const normalizedStatus = status?.toLowerCase();
+          if (normalizedStatus === "completed" || normalizedStatus === "done") return "success";
+          if (normalizedStatus === "in progress") return "processing";
+          if (normalizedStatus === "pending") return "warning";
+          if (normalizedStatus === "expired") return "error";
+          return "default";
+        };
+
+        return (
+          <Tag color={getStatusColor(status)} className="rounded-full px-3 py-1">
+            {status || 'Not Set'}
+          </Tag>
+        );
+      },
       sorter: (a, b) => utils.antdTableSorter(a, b, "milestone_status"),
     },
     {
-      title: "Action",
-      dataIndex: "actions",
+      title: "Actions",
+      key: "actions",
       render: (_, elm) => (
         <div className="text-center">
           <EllipsisDropdown menu={dropdownMenu(elm)} />
@@ -282,16 +357,16 @@ export const MilestoneList = () => {
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
-    
+
     if (!value) {
       setList(filtermin);
       return;
     }
-    
-    const filtered = filtermin.filter(milestone => 
+
+    const filtered = filtermin.filter(milestone =>
       milestone.milestone_title?.toLowerCase().includes(value)
     );
-    
+
     setList(filtered);
   };
 
@@ -303,19 +378,19 @@ export const MilestoneList = () => {
   // Update the filter function to include date range
   const getFilteredMilestones = () => {
     if (!filtermin) return [];
-    
+
     let filtered = filtermin;
 
     // Apply search filter
     if (searchText) {
-      filtered = filtered.filter(milestone => 
+      filtered = filtered.filter(milestone =>
         milestone.milestone_title?.toLowerCase().includes(searchText.toLowerCase())
       );
     }
 
     // Apply status filter
     if (selectedStatus !== 'all') {
-      filtered = filtered.filter(milestone => 
+      filtered = filtered.filter(milestone =>
         milestone.milestone_status === selectedStatus
       );
     }
@@ -324,11 +399,11 @@ export const MilestoneList = () => {
     if (dateRange && dateRange[0] && dateRange[1]) {
       const startRange = dayjs(dateRange[0]).startOf('day');
       const endRange = dayjs(dateRange[1]).endOf('day');
-      
+
       filtered = filtered.filter(milestone => {
         const milestoneStartDate = dayjs(milestone.milestone_start_date);
-        return (milestoneStartDate.isAfter(startRange) || milestoneStartDate.isSame(startRange)) && 
-               (milestoneStartDate.isBefore(endRange) || milestoneStartDate.isSame(endRange));
+        return (milestoneStartDate.isAfter(startRange) || milestoneStartDate.isSame(startRange)) &&
+          (milestoneStartDate.isBefore(endRange) || milestoneStartDate.isSame(endRange));
       });
     }
 
@@ -401,19 +476,20 @@ export const MilestoneList = () => {
           </Flex>
         </Flex>
       </div>
-      <Card>
+      <Card className="mt-4">
         <div className="table-responsive">
           <Table
             columns={tableColumns}
             dataSource={getFilteredMilestones()}
             rowKey="id"
-            scroll={{ x: 1000 }}
+            scroll={{ x: 1200 }}
             pagination={{
               total: getFilteredMilestones().length,
               pageSize: 10,
               showSizeChanger: true,
               showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
             }}
+            className="milestone-table"
           />
         </div>
 

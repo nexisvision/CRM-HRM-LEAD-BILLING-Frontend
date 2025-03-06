@@ -34,32 +34,38 @@ const EditMilestone = ({ idd, onClose }) => {
   const [tags, setTags] = useState([]);
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [newTag, setNewTag] = useState("");
-
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
-  const allempdatass = useSelector((state) => state.currencies);
-const fnddatass = allempdatass?.currencies?.data;
 
-// const curren = curr?.filter((item) => item.created_by === user);
-  
-  // console.log("Milestone ID:", id);
+  // Get project data to access its currency
+  const projectData = useSelector((state) => state?.Project) || {};
+  const filterdata = projectData?.Project?.data || [];
+  const currentProject = filterdata.find(project => project.id === id);
+
+  const { currencies } = useSelector((state) => state.currencies);
+  const curr = currencies?.data || [];
 
   const getInitialCurrency = () => {
-    if (fnddatass?.length > 0) {
-      const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
-      return usdCurrency?.id || fnddatass[0]?.id;
+    if (currentProject?.currency) {
+      return currentProject.currency;
     }
     return '';
   };
+
+  useEffect(() => {
+    dispatch(getcurren());
+  }, [dispatch]);
+
   const [initialValues, setInitialValues] = useState({
     milestone_title: "",
     milestone_cost: "",
     milestone_status: "",
-    currency: getInitialCurrency(),
+    currency: getInitialCurrency(), // Set the currency from project
     add_cost_to_project_budget: false,
     milestone_summary: "",
     milestone_start_date: null,
     milestone_end_date: null,
   });
+
   useEffect(() => {
     const milestone = milestones.find((item) => item.id === idd);
     if (milestone) {
@@ -68,6 +74,7 @@ const fnddatass = allempdatass?.currencies?.data;
         milestone_title: milestone.milestone_title || "",
         milestone_cost: milestone.milestone_cost || "",
         milestone_status: milestone.milestone_status || "",
+        currency: milestone.currency || getInitialCurrency(), // Use milestone currency or project currency
         add_cost_to_project_budget: milestone.add_cost_to_project_budget === true || 
             milestone.add_cost_to_project_budget === 'true' || 
             milestone.add_cost_to_project_budget === 'yes',
@@ -82,7 +89,8 @@ const fnddatass = allempdatass?.currencies?.data;
     } else {
       message.error("Milestone not found!");
     }
-  }, [idd, milestones]);
+  }, [idd, milestones, getInitialCurrency]);
+
   const fetchTags = async () => {
     try {
       const response = await dispatch(GetLable(id));
@@ -203,55 +211,21 @@ const fnddatass = allempdatass?.currencies?.data;
                       <div className="form-group">
                         <label className="text-gray-600 mb-2 font-semibold block">Milestone Cost & Currency <span className="text-red-500">*</span></label>
                         <div className="flex gap-0">
-                          <Field name="currency">
-                            {({ field }) => (
-                              <Select
-                                {...field}
-                                className="currency-select"
-                                style={{
-                                  width: '60px',
-                                  borderTopRightRadius: 0,
-                                  borderBottomRightRadius: 0,
-                                  borderRight: 0,
-                                  backgroundColor: '#f8fafc',
-                                }}
-                                placeholder={<span className="text-gray-400">$</span>}
-                                onChange={(value) => {
-                                  if (value === 'add_new') {
-                                    setIsAddCurrencyModalVisible(true);
-                                  } else {
-                                    setFieldValue("currency", value);
-                                  }
-                                }}
-                                value={values.currency}
-                                dropdownStyle={{ minWidth: '180px' }}
-                                suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-                                loading={!fnddatass}
-                                dropdownRender={menu => (
-                                  <div>
-                                    <div
-                                      className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                                      onClick={() => setIsAddCurrencyModalVisible(true)}
-                                    >
-                                      <PlusOutlined className="mr-2" />
-                                      <span className="text-sm">Add New</span>
-                                    </div>
-                                    {menu}
-                                  </div>
-                                )}
-                              >
-                                {fnddatass?.map((currency) => (
-                                  <Option key={currency.id} value={currency.id}>
-                                    <div className="flex items-center w-full px-1">
-                                      <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
-                                      <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
-                                      <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
-                                    </div>
-                                  </Option>
-                                ))}
-                              </Select>
-                            )}
-                          </Field>
+                          <div className="currency-display" style={{
+                            width: '60px',
+                            padding: '4px 11px',
+                            background: '#f8fafc',
+                            border: '1px solid #d9d9d9',
+                            borderRight: 0,
+                            borderRadius: '2px 0 0 2px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            <span className="text-gray-600 font-medium">
+                              {curr?.find(c => c.id === values.currency)?.currencyIcon || '₹'}
+                            </span>
+                          </div>
                           <Field name="milestone_cost">
                             {({ field, form }) => (
                               <Input
@@ -261,7 +235,7 @@ const fnddatass = allempdatass?.currencies?.data;
                                   borderTopLeftRadius: 0,
                                   borderBottomLeftRadius: 0,
                                   borderLeft: '1px solid #d9d9d9',
-                                  width: 'calc(100% - 100px)'
+                                  width: 'calc(100% - 60px)'
                                 }}
                                 type="number"
                                 min="0"
@@ -282,13 +256,6 @@ const fnddatass = allempdatass?.currencies?.data;
                                     e.preventDefault();
                                   }
                                 }}
-                                prefix={
-                                  values.currency && (
-                                    <span className="text-gray-600 font-medium mr-1">
-                                      {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
-                                    </span>
-                                  )
-                                }
                               />
                             )}
                           </Field>
@@ -668,7 +635,7 @@ export default EditMilestone;
 //       }
 
 //       await dispatch(Editmins({ idd, data: formattedValues })).unwrap();
-//       dispatch(Getmins(id));
+//       dispatch(Getmins());
 //       onClose();
 //       message.success("Milestone updated successfully!");
 //     } catch (error) {
@@ -1091,28 +1058,60 @@ export default EditMilestone;
 //                       />
 //                     </div>
 //                   </Col>
-//                   <Col span={12} className="mt-2">
-//                     <div className="form-item">
-//                       <label className="font-semibold mb-2">Status</label>
-//                       <Select
-//                         value={values.milestone_status}
-//                         onChange={(value) =>
-//                           setFieldValue("milestone_status", value)
-//                         }
-//                         onBlur={() => setFieldTouched("milestone_status", true)}
-//                         className="w-full"
-//                         placeholder="Select Status"
-//                       >
-//                         <Option value="active">Active</Option>
-//                         <Option value="inactive">Inactive</Option>
-//                       </Select>
-//                       <ErrorMessage
-//                         name="milestone_status"
-//                         component="div"
-//                         className="error-message text-red-500 my-1"
-//                       />
-//                     </div>
-//                   </Col>
+//                     <Col span={24} className="mt-4">
+//                                       <div className="form-item">
+//                                         <label className="font-semibold">Status</label>
+//                                         <div className="flex gap-2">
+//                                           <Field name="milestone_status">
+//                                             {({ field, form }) => (
+//                                               <Select
+//                                                 {...field}
+//                                                 className="w-full"
+//                                                 placeholder="Select or add new tag"
+//                                                 onChange={(value) =>
+//                                                   form.setFieldValue("milestone_status", value)
+//                                                 }
+//                                                 onBlur={() =>
+//                                                   form.setFieldTouched("milestone_status", true)
+//                                                 }
+//                                                 dropdownRender={(menu) => (
+//                                                   <div>
+//                                                     {menu}
+//                                                     <div
+//                                                       style={{
+//                                                         padding: "8px",
+//                                                         borderTop: "1px solid #e8e8e8",
+//                                                       }}
+//                                                     >
+//                                                       <Button
+//                                                         type="link"
+//                                                         // icon={<PlusOutlined />}
+//                                                         onClick={() => setIsTagModalVisible(true)}
+//                                                         block
+//                                                       >
+//                                                         Add New Status
+//                                                       </Button>
+//                                                     </div>
+//                                                   </div>
+//                                                 )}
+//                                               >
+//                                                 {tags &&
+//                                                   tags.map((tag) => (
+//                                                     <Option key={tag.id} value={tag.name}>
+//                                                       {tag.name}
+//                                                     </Option>
+//                                                   ))}
+//                                               </Select>
+//                                             )}
+//                                           </Field>
+//                                         </div>
+//                                         <ErrorMessage
+//                                           name="milestone_status"
+//                                           component="div"
+//                                           className="error-message text-red-500 my-1"
+//                                         />
+//                                       </div>
+//                                     </Col>
 //                   <Col span={12} className="mt-2">
 //                     <div className="form-item">
 //                       <label className="font-semibold mb-2">
@@ -1214,6 +1213,20 @@ export default EditMilestone;
 //               </Form>
 //             )}
 //           </Formik>
+
+//            <Modal
+//                       title="Add New Status"
+//                       open={isTagModalVisible}
+//                       onCancel={() => setIsTagModalVisible(false)}
+//                       onOk={handleAddNewTag}
+//                       okText="Add Status"
+//                     >
+//                       <Input
+//                         placeholder="Enter new Status"
+//                         value={newTag}
+//                         onChange={(e) => setNewTag(e.target.value)}
+//                       />
+//                     </Modal>
 //         </div>
 //       </div>
 //     </div>

@@ -263,7 +263,7 @@ const TaskList = () => {
   // Get unique statuses from task data
   const getUniqueStatuses = () => {
     if (!fnddata) return ['All'];
-    
+
     const statuses = [...new Set(fnddata.map(item => item.status))];
     return ['All', ...statuses];
   };
@@ -271,7 +271,7 @@ const TaskList = () => {
   // Add function to get unique priorities
   const getUniquePriorities = () => {
     if (!fnddata) return ['All'];
-    
+
     const priorities = [...new Set(fnddata.map(item => item.priority))];
     return ['All', ...priorities];
   };
@@ -296,7 +296,7 @@ const TaskList = () => {
 
     // Apply search filter
     if (searchValue) {
-      filteredData = filteredData.filter(task => 
+      filteredData = filteredData.filter(task =>
         task.taskName?.toString().toLowerCase().includes(searchValue.toLowerCase()) ||
         stripHtmlTags(task.description)?.toLowerCase().includes(searchValue.toLowerCase()) ||
         task.priority?.toString().toLowerCase().includes(searchValue.toLowerCase())
@@ -317,7 +317,7 @@ const TaskList = () => {
     if (dateRange && dateRange[0] && dateRange[1]) {
       const rangeStart = dayjs(dateRange[0]).startOf('day');
       const rangeEnd = dayjs(dateRange[1]).endOf('day');
-      
+
       filteredData = filteredData.filter(task => {
         const taskStartDate = dayjs(task.startDate);
         const taskDueDate = dayjs(task.dueDate);

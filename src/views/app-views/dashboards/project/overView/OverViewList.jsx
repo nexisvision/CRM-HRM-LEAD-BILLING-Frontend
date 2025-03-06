@@ -18,12 +18,13 @@ import { GetProject } from "../project-list/projectReducer/ProjectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { useNavigate, useParams } from 'react-router-dom';
-import { Modal, Tag, Table, Timeline, Progress, Avatar, Menu } from 'antd';
+import { Modal, Tag, Table, Timeline, Progress, Avatar, Menu, Card } from 'antd';
 import { GetTasks } from "../task/TaskReducer/TaskSlice";
 import { Getmins } from "../milestone/minestoneReducer/minestoneSlice";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import utils from "utils";
 import { ClockCircleOutlined, CheckCircleOutlined, LoadingOutlined, UserOutlined, MailOutlined, PhoneOutlined, GlobalOutlined, TeamOutlined, CalendarOutlined } from '@ant-design/icons';
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 // Register the chart components
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -37,6 +38,10 @@ const OverViewList = () => {
   const [isTaskModalVisible, setIsTaskModalVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(null);
 
+  // Add currencies selector
+  const { currencies } = useSelector((state) => state.currencies);
+  const curr = currencies?.data || [];
+
   // Move all selectors to the top
   const allempdata = useSelector((state) => state?.Project) || {};
   const filterdata = allempdata?.Project?.data || [];
@@ -45,50 +50,132 @@ const OverViewList = () => {
   const allclient = useSelector((state) => state?.SubClient?.SubClient?.data) || [];
   const logged = useSelector((state) => state.user.loggedInUser);
 
+  // Get the current project data based on ID
+  const currentProject = useMemo(() => {
+    return filterdata.find(project => project.id === id) || null;
+  }, [filterdata, id]);
+
+  // Add currency formatting helper
+  const formatCurrency = useMemo(() => (value) => {
+    if (!currentProject?.currency || !curr?.length) return `₹${Number(value).toLocaleString()}`;
+
+    const projectCurrency = curr.find(c => c.id === currentProject.currency);
+    return `${projectCurrency?.currencyIcon || '₹'}${Number(value).toLocaleString()}`;
+  }, [currentProject?.currency, curr]);
+
+  // Add currencies fetch
+  useEffect(() => {
+    dispatch(getcurren());
+  }, [dispatch]);
+
   // Enhanced progress calculation
   const projectMetrics = useMemo(() => {
+    if (!currentProject) return {
+      progress: "0",
+      tasks: { total: 0, completed: 0 },
+      milestones: { total: 0, completed: 0 },
+      time: { total: 0, elapsed: 0, remaining: 0 },
+      isComplete: false
+    };
+
     try {
-      const totalTasks = taskData.length;
-      const totalMilestones = milestoneData.length;
-      const completedTasks = taskData.filter(task => task.status?.toLowerCase() === 'completed').length;
-      const completedMilestones = milestoneData.filter(milestone => milestone.milestone_status?.toLowerCase() === 'completed').length;
+      // Filter tasks and milestones for current project
+      const projectTasks = taskData.filter(task => task.project_id === id);
+      const projectMilestones = milestoneData.filter(milestone => milestone.project_id === id);
 
-      const start = dayjs(filterdata?.[0]?.startDate);
-      const end = dayjs(filterdata?.[0]?.endDate);
+      // Calculate task metrics
+      const totalTasks = projectTasks.length;
+      const completedTasks = projectTasks.filter(task =>
+        task.status?.toLowerCase() === 'completed'
+      ).length;
+      const inProgressTasks = projectTasks.filter(task =>
+        task.status?.toLowerCase() === 'in progress'
+      ).length;
+
+      // Calculate milestone metrics with end date consideration
+      const totalMilestones = projectMilestones.length;
       const now = dayjs();
+      const completedMilestones = projectMilestones.filter(milestone => {
+        const endDate = dayjs(milestone.milestone_end_date);
+        const status = milestone.milestone_status?.toLowerCase();
+        return status === 'completed' || status === 'done' || now.isAfter(endDate, 'day');
+      }).length;
 
-      const taskProgress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-      const milestoneProgress = totalMilestones > 0 ? (completedMilestones / totalMilestones) * 100 : 0;
+      const inProgressMilestones = projectMilestones.filter(milestone => {
+        const endDate = dayjs(milestone.milestone_end_date);
+        const status = milestone.milestone_status?.toLowerCase();
+        return status === 'in progress' && !now.isAfter(endDate, 'day');
+      }).length;
+
+      // Calculate time progress
+      const start = dayjs(currentProject.startDate);
+      const end = dayjs(currentProject.endDate);
+
       const totalDuration = end.diff(start, 'day');
       const elapsed = now.diff(start, 'day');
       const remaining = end.diff(now, 'day');
-      const timeProgress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
 
-      const weightedProgress = totalTasks === 0 && totalMilestones === 0 ? timeProgress :
-        totalTasks === 0 ? milestoneProgress :
-          totalMilestones === 0 ? taskProgress :
-            (taskProgress * 0.4) + (milestoneProgress * 0.6);
+      // Calculate time progress with bounds checking
+      const timeProgress = Number(Math.min(100, Math.max(0, (elapsed / totalDuration) * 100)).toFixed(1));
+
+      // Calculate weighted progress for tasks and milestones
+      const taskProgress = totalTasks > 0
+        ? Number(((completedTasks + (inProgressTasks * 0.5)) / totalTasks) * 100).toFixed(1)
+        : 0;
+
+      const milestoneProgress = totalMilestones > 0
+        ? Number(((completedMilestones + (inProgressMilestones * 0.5)) / totalMilestones) * 100).toFixed(1)
+        : 0;
+
+      // Calculate overall weighted progress
+      // Tasks: 40%, Milestones: 40%, Time: 20%
+      const weightedProgress = totalTasks === 0 && totalMilestones === 0
+        ? timeProgress
+        : totalTasks === 0
+          ? Number((milestoneProgress * 0.8) + (timeProgress * 0.2)).toFixed(1)
+          : totalMilestones === 0
+            ? Number((taskProgress * 0.8) + (timeProgress * 0.2)).toFixed(1)
+            : Number((taskProgress * 0.4) + (milestoneProgress * 0.4) + (timeProgress * 0.2)).toFixed(1);
 
       return {
-        progress: weightedProgress.toFixed(1),
-        tasks: { total: totalTasks, completed: completedTasks },
-        milestones: { total: totalMilestones, completed: completedMilestones },
-        time: { total: totalDuration, elapsed, remaining },
-        isComplete: weightedProgress >= 100 ||
-          (completedTasks === totalTasks &&
-            completedMilestones === totalMilestones)
+        progress: weightedProgress,
+        tasks: {
+          total: totalTasks,
+          completed: completedTasks,
+          inProgress: inProgressTasks,
+          remaining: totalTasks - (completedTasks + inProgressTasks),
+          percentage: taskProgress
+        },
+        milestones: {
+          total: totalMilestones,
+          completed: completedMilestones,
+          inProgress: inProgressMilestones,
+          remaining: totalMilestones - (completedMilestones + inProgressMilestones),
+          percentage: milestoneProgress
+        },
+        time: {
+          total: totalDuration,
+          elapsed,
+          remaining,
+          isOverdue: remaining < 0,
+          percentage: timeProgress
+        },
+        isComplete: Number(weightedProgress) >= 100 || (
+          totalTasks > 0 && completedTasks === totalTasks &&
+          totalMilestones > 0 && completedMilestones === totalMilestones
+        )
       };
     } catch (error) {
       console.error("Error calculating metrics:", error);
       return {
         progress: "0",
-        tasks: { total: 0, completed: 0 },
-        milestones: { total: 0, completed: 0 },
-        time: { total: 0, elapsed: 0, remaining: 0 },
+        tasks: { total: 0, completed: 0, inProgress: 0, remaining: 0 },
+        milestones: { total: 0, completed: 0, inProgress: 0, remaining: 0 },
+        time: { total: 0, elapsed: 0, remaining: 0, isOverdue: false },
         isComplete: false
       };
     }
-  }, [taskData, milestoneData, filterdata]);
+  }, [taskData, milestoneData, currentProject, id]);
 
   // Update progress calculation
   useEffect(() => {
@@ -116,7 +203,7 @@ const OverViewList = () => {
   }, [dispatch, id]);
 
   // Remove console.logs and add proper error handling
-  const fndpro = filterdata.find((item) => item.id === id);
+  const fndpro = currentProject;
   const fndclient = allclient?.find((item) => item?.id === fndpro?.client);
 
   // Safe access to client data with fallbacks
@@ -125,26 +212,26 @@ const OverViewList = () => {
 
   // Safe filtering with existence checks
   const updatedList = useMemo(() => {
-    if (!filterdata?.length || !filterdata[0]?.client || !dataclient?.length) {
+    if (!currentProject?.client || !dataclient?.length) {
       return [];
     }
-    return dataclient.filter((item) => item.id === filterdata[0].client);
-  }, [filterdata, dataclient]);
+    return dataclient.filter((item) => item.id === currentProject.client);
+  }, [currentProject, dataclient]);
 
   // Prepare chart data with safety checks
   const hoursData = useMemo(() => {
-    if (!filterdata?.length || !filterdata[0]?.estimatedhours) {
+    if (!currentProject?.estimatedhours) {
       return [];
     }
-    return [{ name: "Planned", value: filterdata[0].estimatedhours }];
-  }, [filterdata]);
+    return [{ name: "Planned", value: currentProject.estimatedhours }];
+  }, [currentProject]);
 
   const budgetData = useMemo(() => {
-    if (!filterdata?.length || !filterdata[0]?.budget) {
+    if (!currentProject?.budget) {
       return [];
     }
-    return [{ name: "Planned", value: filterdata[0].budget }];
-  }, [filterdata]);
+    return [{ name: "Planned", value: currentProject.budget }];
+  }, [currentProject]);
 
   // Safe date formatting with fallbacks
   const formatDate = (date) => {
@@ -156,14 +243,12 @@ const OverViewList = () => {
     }
   };
 
-  const dateendd = filterdata?.[0]?.startDate
-    ? formatDate(filterdata[0].startDate)
+  const dateendd = currentProject?.startDate
+    ? formatDate(currentProject.startDate)
     : "N/A";
 
-  // const subclient = useSelector((state)=>state.SubClient.SubClient.data)
-
-  const datestartt = filterdata?.[0]?.endDate
-    ? formatDate(filterdata[0].endDate)
+  const datestartt = currentProject?.endDate
+    ? formatDate(currentProject.endDate)
     : "N/A";
 
   const progress = 50;
@@ -328,11 +413,74 @@ const OverViewList = () => {
   }, [fndpro, allclient]);
 
   // Add milestone status helper function
-  const getMilestoneStatus = (status) => {
-    if (status === "Paid") return "success";
-    if (status === "Pending") return "warning";
-    if (status === "Expired") return "error";
-    return "";
+  const getMilestoneProgress = (milestone) => {
+    // If milestone end date has passed, consider it as completed
+    const endDate = dayjs(milestone.milestone_end_date);
+    const now = dayjs();
+    const isOverdue = now.isAfter(endDate, 'day');
+
+    // If milestone is marked as completed or end date has passed, return 100%
+    if (milestone.milestone_status?.toLowerCase() === 'completed' ||
+      milestone.milestone_status?.toLowerCase() === 'done' ||
+      isOverdue) {
+      return 100;
+    }
+
+    // Calculate progress based on tasks if available
+    const tasks = taskData.filter(task => task.milestone_id === milestone.id);
+    if (!tasks.length) {
+      // If no tasks, calculate progress based on timeline
+      const startDate = dayjs(milestone.milestone_start_date);
+      const totalDuration = endDate.diff(startDate, 'day');
+      const elapsed = now.diff(startDate, 'day');
+      return Math.min(100, Math.round((elapsed / totalDuration) * 100));
+    }
+
+    const completed = tasks.filter(task => task.status?.toLowerCase() === 'completed').length;
+    return Math.round((completed / tasks.length) * 100);
+  };
+
+  // Update milestone status helper function
+  const getMilestoneStatus = (status, milestone) => {
+    const normalizedStatus = status?.toLowerCase();
+    const endDate = dayjs(milestone?.milestone_end_date);
+    const now = dayjs();
+
+    // If milestone is marked as completed or done
+    if (normalizedStatus === "completed" || normalizedStatus === "done") {
+      return "success";
+    }
+
+    // If end date has passed, consider it completed
+    if (now.isAfter(endDate, 'day')) {
+      return "success";
+    }
+
+    if (normalizedStatus === "in progress") return "processing";
+    if (normalizedStatus === "pending") return "warning";
+    if (normalizedStatus === "expired") return "error";
+    return "default";
+  };
+
+  const getMilestoneStatusText = (status, milestone) => {
+    const normalizedStatus = status?.toLowerCase();
+    const endDate = dayjs(milestone?.milestone_end_date);
+    const now = dayjs();
+
+    // If milestone is marked as completed or done
+    if (normalizedStatus === "completed" || normalizedStatus === "done") {
+      return "Done";
+    }
+
+    // If end date has passed, show as Done
+    if (now.isAfter(endDate, 'day')) {
+      return "Done";
+    }
+
+    if (normalizedStatus === "in progress") return "In Progress";
+    if (normalizedStatus === "pending") return "Pending";
+    if (normalizedStatus === "expired") return "Expired";
+    return status || "Not Set";
   };
 
   // Add milestone table columns
@@ -362,8 +510,8 @@ const OverViewList = () => {
       title: "Status",
       dataIndex: "milestone_status",
       render: (status) => (
-        <Tag color={getMilestoneStatus(status)}>
-          {status}
+        <Tag color={getMilestoneStatus(status, currentProject)}>
+          {getMilestoneStatusText(status, currentProject)}
         </Tag>
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "milestone_status"),
@@ -382,33 +530,51 @@ const OverViewList = () => {
     'Overdue': '#f5222d',     // Red
   };
 
+  // Update the Progress Circle component to show different colors based on status
+  const getProgressColor = (progress, isComplete, isOverdue) => {
+    if (isComplete) return '#059669'; // Green-600
+    if (isOverdue) return '#DC2626';  // Red-600
+    if (progress >= 70) return '#10B981'; // Green-500
+    if (progress >= 30) return '#F59E0B'; // Yellow-500
+    return '#EF4444'; // Red-500
+  };
+
   const ProjectProgress = () => (
     <div className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Project Progress</h2>
-        <span className={`px-3 py-1 rounded-full text-sm ${projectMetrics.isComplete ? 'bg-green-100 text-green-800' :
-          parseFloat(projectMetrics.progress) > 70 ? 'bg-blue-100 text-blue-800' :
-            'bg-yellow-100 text-yellow-800'
-          }`}>
-          {projectMetrics.isComplete ? 'Completed' : 'In Progress'}
-        </span>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-800">Project Progress</h2>
+          <p className="text-sm text-gray-500 mt-1">
+            {projectMetrics.tasks.total} Tasks · {projectMetrics.milestones.total} Milestones
+          </p>
+        </div>
+        <Tag
+          className={`px-3 py-1 rounded-full text-sm ${projectMetrics.isComplete ? 'bg-green-100 text-green-800' :
+            projectMetrics.time.isOverdue ? 'bg-red-100 text-red-800' :
+              parseFloat(projectMetrics.progress) > 70 ? 'bg-blue-100 text-blue-800' :
+                'bg-yellow-100 text-yellow-800'
+            }`}
+        >
+          {projectMetrics.isComplete ? 'Completed' :
+            projectMetrics.time.isOverdue ? 'Overdue' : 'In Progress'}
+        </Tag>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Progress Circle */}
-        <div className="flex flex-col items-center">
-          <div className="w-48 h-48">
+        <div className="flex flex-col items-center justify-center">
+          <div className="w-48 h-48 mb-4">
             <CircularProgressbar
               value={parseFloat(projectMetrics.progress)}
               text={`${projectMetrics.progress}%`}
               styles={{
                 root: { width: '100%', height: '100%' },
                 path: {
-                  stroke: `${projectMetrics.isComplete ? '#059669' :
-                    parseFloat(projectMetrics.progress) >= 70 ? '#10B981' :
-                      parseFloat(projectMetrics.progress) >= 30 ? '#F59E0B' :
-                        '#EF4444'
-                    }`,
+                  stroke: getProgressColor(
+                    parseFloat(projectMetrics.progress),
+                    projectMetrics.isComplete,
+                    projectMetrics.time.isOverdue
+                  ),
                   strokeLinecap: 'round',
                   transition: 'stroke-dashoffset 0.5s ease',
                   strokeWidth: '8',
@@ -426,71 +592,138 @@ const OverViewList = () => {
               }}
             />
           </div>
-        </div>
-
-        {/* Progress Stats */}
-        <div className="flex flex-col justify-center space-y-6">
-          <div className="space-y-4">
-            <div>
-              <div className="flex justify-between mb-2">
-                <span className="text-gray-600">Tasks</span>
-                <span className="text-gray-900 font-medium">
-                  {projectMetrics.tasks.completed}/{projectMetrics.tasks.total}
-                </span>
-              </div>
-              <Progress
-                percent={(projectMetrics.tasks.completed / projectMetrics.tasks.total) * 100}
-                strokeColor="#10B981"
-                size="small"
-              />
-            </div>
-
-            <div>
-              <div className="flex justify-between mb-2">
-                <span className="text-gray-600">Milestones</span>
-                <span className="text-gray-900 font-medium">
-                  {projectMetrics.milestones.completed}/{projectMetrics.milestones.total}
-                </span>
-              </div>
-              <Progress
-                percent={(projectMetrics.milestones.completed / projectMetrics.milestones.total) * 100}
-                strokeColor="#3B82F6"
-                size="small"
-              />
-            </div>
-
-            <div>
-              <div className="flex justify-between mb-2">
-                <span className="text-gray-600">Timeline</span>
-                <span className="text-gray-900 font-medium">
-                  {projectMetrics.time.elapsed}/{projectMetrics.time.total} days
-                </span>
-              </div>
-              <Progress
-                percent={(projectMetrics.time.elapsed / projectMetrics.time.total) * 100}
-                strokeColor="#8B5CF6"
-                size="small"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+          <div className="grid grid-cols-2 gap-4 w-full max-w-xs">
             <div className="text-center p-3 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-500">Start Date</p>
               <p className="font-semibold">
-                {filterdata?.[0]?.startDate
-                  ? dayjs(filterdata[0].startDate).format('DD MMM YYYY')
+                {currentProject?.startDate
+                  ? dayjs(currentProject.startDate).format('DD MMM YYYY')
                   : 'N/A'}
               </p>
             </div>
             <div className="text-center p-3 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-500">End Date</p>
               <p className="font-semibold">
-                {filterdata?.[0]?.endDate
-                  ? dayjs(filterdata[0].endDate).format('DD MMM YYYY')
+                {currentProject?.endDate
+                  ? dayjs(currentProject.endDate).format('DD MMM YYYY')
                   : 'N/A'}
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Progress Stats */}
+        <div className="flex flex-col justify-center space-y-6">
+          {/* Tasks Progress */}
+          <div className="bg-gray-50 rounded-xl p-4">
+            <div className="flex justify-between items-center mb-3">
+              <div>
+                <h3 className="text-gray-800 font-medium">Tasks</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <Tag color="success" className="rounded-full">
+                    {projectMetrics.tasks.completed} Completed
+                  </Tag>
+                  {projectMetrics.tasks.inProgress > 0 && (
+                    <Tag color="processing" className="rounded-full">
+                      {projectMetrics.tasks.inProgress} In Progress
+                    </Tag>
+                  )}
+                  {projectMetrics.tasks.remaining > 0 && (
+                    <Tag color="default" className="rounded-full">
+                      {projectMetrics.tasks.remaining} Remaining
+                    </Tag>
+                  )}
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-2xl font-semibold text-gray-800">
+                  {projectMetrics.tasks.percentage}%
+                </span>
+              </div>
+            </div>
+            <Progress
+              percent={Number(projectMetrics.tasks.percentage)}
+              successPercent={Number((projectMetrics.tasks.inProgress / projectMetrics.tasks.total) * 100).toFixed(1)}
+              strokeColor={{
+                '0%': '#10B981',
+                '100%': '#10B981'
+              }}
+              trailColor="#E5E7EB"
+              size="small"
+            />
+          </div>
+
+          {/* Milestones Progress */}
+          <div className="bg-gray-50 rounded-xl p-4">
+            <div className="flex justify-between items-center mb-3">
+              <div>
+                <h3 className="text-gray-800 font-medium">Milestones</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <Tag color="success" className="rounded-full">
+                    {projectMetrics.milestones.completed} Completed
+                  </Tag>
+                  {projectMetrics.milestones.inProgress > 0 && (
+                    <Tag color="processing" className="rounded-full">
+                      {projectMetrics.milestones.inProgress} In Progress
+                    </Tag>
+                  )}
+                  {projectMetrics.milestones.remaining > 0 && (
+                    <Tag color="default" className="rounded-full">
+                      {projectMetrics.milestones.remaining} Remaining
+                    </Tag>
+                  )}
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-2xl font-semibold text-gray-800">
+                  {projectMetrics.milestones.percentage}%
+                </span>
+              </div>
+            </div>
+            <Progress
+              percent={Number(projectMetrics.milestones.percentage)}
+              successPercent={Number((projectMetrics.milestones.inProgress / projectMetrics.milestones.total) * 100).toFixed(1)}
+              strokeColor={{
+                '0%': '#3B82F6',
+                '100%': '#3B82F6'
+              }}
+              trailColor="#E5E7EB"
+              size="small"
+            />
+          </div>
+
+          {/* Timeline Progress */}
+          <div className="bg-gray-50 rounded-xl p-4">
+            <div className="flex justify-between items-center mb-3">
+              <div>
+                <h3 className="text-gray-800 font-medium">Timeline</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <Tag
+                    color={projectMetrics.time.isOverdue ? 'error' : 'default'}
+                    className="rounded-full"
+                  >
+                    {projectMetrics.time.elapsed} Days Elapsed
+                  </Tag>
+                  <Tag
+                    color={projectMetrics.time.remaining < 0 ? 'error' : 'processing'}
+                    className="rounded-full"
+                  >
+                    {Math.abs(projectMetrics.time.remaining)} Days {projectMetrics.time.remaining < 0 ? 'Overdue' : 'Remaining'}
+                  </Tag>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-2xl font-semibold text-gray-800">
+                  {projectMetrics.time.percentage}%
+                </span>
+              </div>
+            </div>
+            <Progress
+              percent={Number(projectMetrics.time.percentage)}
+              strokeColor={projectMetrics.time.isOverdue ? '#DC2626' : '#8B5CF6'}
+              trailColor="#E5E7EB"
+              size="small"
+            />
           </div>
         </div>
       </div>
@@ -498,108 +731,140 @@ const OverViewList = () => {
   );
 
   const ClientCard = ({ client }) => (
-    <div className="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
-        <TeamOutlined className="mr-2" />
-        Client Details
-      </h2>
+    <div className="bg-white rounded-xl shadow-md p-6 h-full transform transition-all duration-300 hover:shadow-md">
       {client ? (
-        <div className="flex flex-col">
-          {/* Client Header */}
-          <div className="flex items-start space-x-6 mb-6">
-            <div className="flex-shrink-0">
-              {client?.profilePic ? (
-                <div className="w-24 h-24 rounded-xl overflow-hidden border-4 border-gray-100 shadow-sm hover:border-blue-200 transition-colors">
+        <div className="flex flex-col h-full">
+          {/* Header with Profile */}
+          <div className="flex items-center space-x-6 pb-6 border-b border-gray-200">
+            <div className="relative">
+              <div className="w-24 h-24 rounded-xl border-4 border-blue-100 overflow-hidden shadow-lg">
+                {client.profilePic ? (
                   <img
                     src={client.profilePic}
-                    alt={client.firstName || client.username}
+                    alt={`${client.firstName} ${client.lastName}`}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = '/img/avatars/default.png';
                     }}
                   />
-                </div>
-              ) : (
-                <div className="w-24 h-24 rounded-xl bg-blue-50 flex items-center justify-center border-4 border-gray-100">
-                  <UserOutlined className="text-4xl text-blue-400" />
-                </div>
-              )}
+                ) : (
+                  <div className="w-full h-full bg-blue-50 flex items-center justify-center">
+                    <UserOutlined className="text-3xl text-blue-400" />
+                  </div>
+                )}
+              </div>
             </div>
             <div className="flex-grow">
-              <h3 className="text-xl font-semibold text-gray-800 mb-1">
-                {client?.firstName || client?.username || 'No Name Available'}
-              </h3>
-              <p className="text-gray-500 text-sm mb-2">
-                {client?.company || 'Company Not Specified'}
-              </p>
-              <div className="flex items-center space-x-2">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium 
-                  ${client?.status === 'active' ? 'bg-green-100 text-green-700' :
-                    client?.status === 'inactive' ? 'bg-red-100 text-red-700' :
-                      'bg-gray-100 text-gray-700'}`}>
-                  {client?.status?.toUpperCase() || 'STATUS N/A'}
-                </span>
-                <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
-                  Client since {dayjs(client?.createdAt).format('MMM YYYY')}
-                </span>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800">
+                    {`${client.firstName} ${client.lastName}`}
+                  </h3>
+                  <p className="text-gray-500">@{client.username}</p>
+                </div>
+                <Tag color="blue" className="rounded-full px-3">
+                  {client.gender?.charAt(0).toUpperCase() + client.gender?.slice(1)}
+                </Tag>
+              </div>
+              <div className="mt-2 flex items-center gap-4">
+                <Tag icon={<MailOutlined className="text-blue-500" />} className="rounded-full px-3 bg-blue-50 text-blue-600 border-blue-200">
+                  {client.email}
+                </Tag>
+                <Tag icon={<PhoneOutlined className="text-green-500" />} className="rounded-full px-3 bg-green-50 text-green-600 border-green-200">
+                  {client.phoneCode} {client.phone}
+                </Tag>
               </div>
             </div>
           </div>
 
-          {/* Client Details Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <MailOutlined className="text-lg text-blue-500" />
-              <div>
-                <p className="text-xs text-gray-500">Email</p>
-                <p className="text-sm font-medium">{client?.email || 'No Email'}</p>
+          {/* Content Grid */}
+          <div className="grid grid-cols-2 gap-6 mt-6">
+            {/* Bank Details Section */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                <span className="flex items-center gap-2">
+                  <FaCoins className="text-blue-500" />
+                  Banking Information
+                </span>
+              </h4>
+              <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+                <div>
+                  <p className="text-xs text-gray-500">Bank Name</p>
+                  <p className="font-medium">{client.bankname || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Account Holder</p>
+                  <p className="font-medium">{client.accountholder || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Account Number</p>
+                  <p className="font-medium">{client.accountnumber || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Account Type</p>
+                  <p className="font-medium capitalize">{client.accounttype || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">IFSC Code</p>
+                  <p className="font-medium">{client.ifsc || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Bank Location</p>
+                  <p className="font-medium">{client.banklocation || 'N/A'}</p>
+                </div>
               </div>
             </div>
 
-            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <PhoneOutlined className="text-lg text-green-500" />
-              <div>
-                <p className="text-xs text-gray-500">Phone</p>
-                <p className="text-sm font-medium">{client?.phone || 'No Phone'}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <GlobalOutlined className="text-lg text-purple-500" />
-              <div>
-                <p className="text-xs text-gray-500">Website</p>
-                <p className="text-sm font-medium">
-                  {client?.website ? (
-                    <a href={client.website} target="_blank" rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800">
-                      {client.website}
-                    </a>
-                  ) : 'No Website'}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <CalendarOutlined className="text-lg text-orange-500" />
-              <div>
-                <p className="text-xs text-gray-500">Projects</p>
-                <p className="text-sm font-medium">{client?.totalProjects || '1'} Active</p>
+            {/* Business Details Section */}
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-gray-800 mb-3">
+                <span className="flex items-center gap-2">
+                  <GlobalOutlined className="text-blue-500" />
+                  Business Information
+                </span>
+              </h4>
+              <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+                <div>
+                  <p className="text-xs text-gray-500">Website</p>
+                  <a
+                    href={client.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline font-medium"
+                  >
+                    {client.website || 'N/A'}
+                  </a>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">GST Number</p>
+                  <p className="font-medium">{client.gstIn || 'N/A'}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-xs text-gray-500">City</p>
+                    <p className="font-medium capitalize">{client.city || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">State</p>
+                    <p className="font-medium">{client.state || 'N/A'}</p>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Country</p>
+                  <p className="font-medium">{client.country || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500">Address</p>
+                  <p className="font-medium">{client.address || 'N/A'}</p>
+                </div>
               </div>
             </div>
           </div>
-
-          {/* Additional Info */}
-          {client?.address && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p className="text-xs text-gray-500 mb-1">Address</p>
-              <p className="text-sm">{client.address}</p>
-            </div>
-          )}
         </div>
       ) : (
-        <div className="text-center py-8 bg-gray-50 rounded-lg">
-          <UserOutlined className="text-4xl text-gray-300 mb-2" />
+        <div className="flex flex-col items-center justify-center p-8">
+          <UserOutlined className="text-4xl text-gray-300 mb-3" />
           <p className="text-gray-500">No client information available</p>
         </div>
       )}
@@ -609,14 +874,231 @@ const OverViewList = () => {
   // Add this new component after the CompactTimeline component
   const ProjectActivities = ({ milestoneData, taskData }) => {
     const [activeTab, setActiveTab] = useState('milestones');
+    const [viewType, setViewType] = useState('card');
     const [selectedMilestone, setSelectedMilestone] = useState(null);
 
-    const getMilestoneProgress = (milestone) => {
-      const tasks = taskData.filter(task => task.milestone_id === milestone.id);
-      if (!tasks.length) return 0;
-      const completed = tasks.filter(task => task.status?.toLowerCase() === 'completed').length;
-      return Math.round((completed / tasks.length) * 100);
+    const renderMilestoneCard = (milestone) => {
+      const progress = getMilestoneProgress(milestone);
+      const statusColor = getMilestoneStatus(milestone.milestone_status, milestone);
+      const statusText = getMilestoneStatusText(milestone.milestone_status, milestone);
+
+      return (
+        <Card
+          key={milestone.id}
+          className="mb-4 shadow-sm hover:shadow-md transition-shadow duration-200"
+          bodyStyle={{ padding: '16px' }}
+        >
+          <div className="flex justify-between items-start">
+            <div className="flex-grow">
+              <h4 className="text-lg font-semibold mb-2">{milestone.milestone_title}</h4>
+              <div className="grid grid-cols-2 gap-4 mb-3">
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Cost</p>
+                  <p className="font-medium">{formatCurrency(milestone.milestone_cost)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 mb-1">Status</p>
+                  <Tag color={statusColor}>
+                    {statusText}
+                  </Tag>
+                </div>
+              </div>
+              {/* Progress Line */}
+              <div className="mt-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-500">Progress</span>
+                  <span className="text-sm font-medium">{progress}%</span>
+                </div>
+                <Progress
+                  percent={progress}
+                  size="small"
+                  strokeColor={{
+                    '0%': statusText.toLowerCase() === 'done' ? '#10B981' : '#3B82F6',
+                    '100%': statusText.toLowerCase() === 'done' ? '#10B981' : '#10B981'
+                  }}
+                  trailColor="#E5E7EB"
+                />
+              </div>
+              <div className="flex items-center gap-4 mt-4">
+                <Tag color={statusColor} className="rounded-full">
+                  {statusText}
+                </Tag>
+                <span className="text-xs text-gray-500">
+                  Due: {dayjs(milestone.milestone_end_date).format('DD MMM YYYY')}
+                </span>
+              </div>
+            </div>
+          </div>
+        </Card>
+      );
     };
+
+    // Milestone table columns
+    const milestoneColumns = [
+      {
+        title: "Title",
+        dataIndex: "milestone_title",
+        key: "milestone_title",
+        sorter: (a, b) => a.milestone_title.localeCompare(b.milestone_title),
+      },
+      {
+        title: "Cost",
+        dataIndex: "milestone_cost",
+        key: "milestone_cost",
+        render: (cost) => formatCurrency(cost),
+        sorter: (a, b) => a.milestone_cost - b.milestone_cost,
+      },
+      {
+        title: "Status",
+        dataIndex: "milestone_status",
+        key: "milestone_status",
+        render: (status, record) => (
+          <Tag color={getMilestoneStatus(status, record)}>
+            {getMilestoneStatusText(status, record)}
+          </Tag>
+        ),
+        sorter: (a, b) => a.milestone_status.localeCompare(b.milestone_status),
+      },
+      {
+        title: "Progress",
+        key: "progress",
+        render: (_, record) => {
+          const progress = getMilestoneProgress(record);
+          const statusText = getMilestoneStatusText(record.milestone_status, record);
+          return (
+            <Progress
+              percent={progress}
+              size="small"
+              strokeColor={{
+                '0%': statusText.toLowerCase() === 'done' ? '#10B981' : '#3B82F6',
+                '100%': statusText.toLowerCase() === 'done' ? '#10B981' : '#10B981'
+              }}
+              trailColor="#E5E7EB"
+            />
+          );
+        },
+        sorter: (a, b) => getMilestoneProgress(a) - getMilestoneProgress(b),
+      },
+      {
+        title: "Due Date",
+        dataIndex: "milestone_end_date",
+        key: "milestone_end_date",
+        render: (date) => dayjs(date).format('DD MMM YYYY'),
+        sorter: (a, b) => dayjs(a.milestone_end_date).unix() - dayjs(b.milestone_end_date).unix(),
+      },
+      {
+        title: "Actions",
+        key: "actions",
+        render: (_, record) => (
+          <EllipsisDropdown
+            menu={
+              <Menu>
+                <Menu.Item key="view">View Details</Menu.Item>
+                <Menu.Item key="edit">Edit Milestone</Menu.Item>
+              </Menu>
+            }
+          />
+        ),
+      },
+    ];
+
+    // Task table columns
+    const taskColumns = [
+      {
+        title: "Title",
+        dataIndex: "task_title",
+        key: "task_title",
+        sorter: (a, b) => a.task_title.localeCompare(b.task_title),
+      },
+      {
+        title: "Status",
+        dataIndex: "status",
+        key: "status",
+        render: (status) => (
+          <Tag color={getStatusColor(status)} className="rounded-full">
+            {status}
+          </Tag>
+        ),
+        sorter: (a, b) => a.status.localeCompare(b.status),
+      },
+      {
+        title: "Priority",
+        dataIndex: "priority",
+        key: "priority",
+        render: (priority) => (
+          <Tag
+            color={
+              priority?.toLowerCase() === 'high' ? 'error' :
+                priority?.toLowerCase() === 'medium' ? 'warning' : 'success'
+            }
+            className="rounded-full"
+          >
+            {priority || 'Low'}
+          </Tag>
+        ),
+        sorter: (a, b) => (a.priority || '').localeCompare(b.priority || ''),
+      },
+      {
+        title: "Progress",
+        dataIndex: "progress",
+        key: "progress",
+        render: (progress, record) => (
+          <Progress
+            percent={progress || 0}
+            size="small"
+            strokeColor={getStatusColor(record.status)}
+            className="mb-1"
+          />
+        ),
+        sorter: (a, b) => (a.progress || 0) - (b.progress || 0),
+      },
+      {
+        title: "Due Date",
+        dataIndex: "end_date",
+        key: "end_date",
+        render: (date) => dayjs(date).format('DD MMM YYYY'),
+        sorter: (a, b) => dayjs(a.end_date).unix() - dayjs(b.end_date).unix(),
+      },
+      {
+        title: "Assignee",
+        dataIndex: "assignee",
+        key: "assignee",
+        render: (assignee) => (
+          <Avatar.Group maxCount={3} size="small">
+            {Array.isArray(assignee) ? (
+              assignee.map((a, idx) => (
+                <Avatar
+                  key={idx}
+                  size="small"
+                  className="border-2 border-white"
+                  src={a.avatar}
+                >
+                  {a.name?.[0]}
+                </Avatar>
+              ))
+            ) : (
+              <Avatar size="small" className="border-2 border-white">
+                {assignee?.[0] || 'U'}
+              </Avatar>
+            )}
+          </Avatar.Group>
+        ),
+      },
+      {
+        title: "Actions",
+        key: "actions",
+        render: (_, record) => (
+          <EllipsisDropdown
+            menu={
+              <Menu>
+                <Menu.Item key="view" onClick={() => handleTaskClick(record.id)}>View Details</Menu.Item>
+                <Menu.Item key="edit">Edit Task</Menu.Item>
+              </Menu>
+            }
+          />
+        ),
+      },
+    ];
 
     return (
       <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 mb-8">
@@ -625,278 +1107,225 @@ const OverViewList = () => {
           <div>
             <h2 className="text-2xl font-semibold text-gray-800">Project Activities</h2>
             <p className="text-sm text-gray-500 mt-1">
-              {activeTab === 'milestones'
-                ? `${milestoneData.length} Milestones`
-                : `${taskData.length} Tasks`}
+              {`${activeTab === 'milestones' ? milestoneData.length + ' Milestones' : taskData.length + ' Tasks'}`}
             </p>
           </div>
-          <div className="flex space-x-2 bg-gray-100 p-1 rounded-lg">
-            <button
-              onClick={() => setActiveTab('milestones')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-all
+          <div className="flex items-center gap-4">
+            <div className="flex space-x-2 bg-gray-100 p-1 rounded-lg">
+              <button
+                onClick={() => setActiveTab('milestones')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all
                 ${activeTab === 'milestones'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'}`}
-            >
-              Milestones
-            </button>
-            <button
-              onClick={() => setActiveTab('tasks')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-all
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'}`}
+              >
+                Milestones
+              </button>
+              <button
+                onClick={() => setActiveTab('tasks')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all
                 ${activeTab === 'tasks'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'}`}
-            >
-              Tasks
-            </button>
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'}`}
+              >
+                Tasks
+              </button>
+            </div>
+            <div className="flex space-x-2 bg-gray-100 p-1 rounded-lg">
+              <button
+                onClick={() => setViewType('card')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all
+                  ${viewType === 'card'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'}`}
+              >
+                Cards
+              </button>
+              <button
+                onClick={() => setViewType('table')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all
+                  ${viewType === 'table'
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'}`}
+              >
+                Table
+              </button>
+            </div>
           </div>
         </div>
 
         <div className="overflow-hidden">
           {activeTab === 'milestones' ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {milestoneData.map((milestone) => {
-                const progress = getMilestoneProgress(milestone);
-                const isSelected = selectedMilestone?.id === milestone.id;
-
-                return (
+            viewType === 'card' ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {milestoneData.map(renderMilestoneCard)}
+              </div>
+            ) : (
+              <Table
+                columns={milestoneColumns}
+                dataSource={milestoneData}
+                rowKey="id"
+                pagination={{ pageSize: 10 }}
+                className="milestone-table"
+              />
+            )
+          ) : (
+            viewType === 'card' ? (
+              <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
+                {Object.entries(tasksByStatus).map(([status, tasks]) => (
                   <div
-                    key={milestone.id}
-                    className={`p-4 rounded-lg border transition-all cursor-pointer
-                      ${isSelected
-                        ? 'border-blue-200 bg-blue-50 shadow-md'
-                        : 'border-gray-200 bg-white hover:border-blue-200 hover:shadow-sm'}`}
-                    onClick={() => setSelectedMilestone(isSelected ? null : milestone)}
+                    key={status}
+                    className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
                   >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-grow">
+                    {/* Status Header */}
+                    <div className="p-4 bg-gray-50 border-b border-gray-200">
+                      <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`w-2 h-2 rounded-full ${milestone.milestone_status?.toLowerCase() === 'completed'
-                              ? 'bg-green-500'
-                              : progress >= 50
-                                ? 'bg-blue-500'
-                                : 'bg-yellow-500'
-                              }`}
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: getStatusColor(status) }}
                           />
-                          <h3 className="font-medium text-gray-800 line-clamp-1">
-                            {milestone.milestone_title}
-                          </h3>
+                          <h3 className="font-medium text-gray-800">{status}</h3>
                         </div>
-                        <div className="flex items-center gap-4 mt-2">
-                          <Tag color={milestone.milestone_status?.toLowerCase() === 'completed'
-                            ? 'success'
-                            : progress >= 50 ? 'processing' : 'warning'}
-                          >
-                            {milestone.milestone_status}
-                          </Tag>
-                          <span className="text-xs text-gray-500">
-                            Due: {dayjs(milestone.milestone_end_date).format('DD MMM YYYY')}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-end">
-                        <div className="text-sm font-medium text-gray-900">
-                          ${milestone.milestone_cost || 0}
-                        </div>
-                        <div className="text-xs text-gray-500">Budget</div>
-                      </div>
-                    </div>
-
-                    <div className="mt-3">
-                      <div className="flex justify-between mb-1">
-                        <span className="text-xs text-gray-500">Progress</span>
-                        <span className="text-xs font-medium text-gray-700">{progress}%</span>
-                      </div>
-                      <Progress
-                        percent={progress}
-                        size="small"
-                        strokeColor={{
-                          '0%': '#1890ff',
-                          '100%': '#52c41a',
-                        }}
-                        showInfo={false}
-                      />
-                    </div>
-
-                    {isSelected && (
-                      <div className="mt-4 pt-4 border-t border-gray-200">
-                        <p className="text-sm text-gray-600 mb-3">
-                          {milestone.milestone_summary ? (
-                            <span className="leading-relaxed">
-                              {milestone.milestone_summary.replace(/<[^>]*>/g, '')}
-                            </span>
-                          ) : (
-                            'No description available'
-                          )}
-                        </p>
-                        <div className="flex flex-wrap gap-2">
-                          {taskData
-                            .filter(task => task.milestone_id === milestone.id)
-                            .map(task => (
-                              <Tag
-                                key={task.id}
-                                color={task.status?.toLowerCase() === 'completed' ? 'success' : 'default'}
-                                className="px-2 py-1"
-                              >
-                                {task.task_title}
-                              </Tag>
-                            ))
-                          }
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
-              {Object.entries(tasksByStatus).map(([status, tasks]) => (
-                <div 
-                  key={status} 
-                  className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
-                >
-                  {/* Status Header */}
-                  <div className="p-4 bg-gray-50 border-b border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: getStatusColor(status) }}
-                        />
-                        <h3 className="font-medium text-gray-800">{status}</h3>
-                      </div>
-                      <Tag 
-                        color={status.toLowerCase() === 'completed' ? 'success' : 'processing'}
-                        className="rounded-full"
-                      >
-                        {tasks.length} Tasks
-                      </Tag>
-                    </div>
-                  </div>
-
-                  {/* Tasks List */}
-                  <div className="p-3">
-                    <div className="space-y-3">
-                      {tasks.map(task => (
-                        <div
-                          key={task.id}
-                          className="group bg-white rounded-lg border border-gray-200 hover:border-blue-300 
-                                   hover:shadow-md transition-all duration-300"
+                        <Tag
+                          color={status.toLowerCase() === 'completed' ? 'success' : 'processing'}
+                          className="rounded-full"
                         >
-                          <div className="p-4">
-                            {/* Task Header */}
-                            <div className="flex items-start justify-between mb-3">
-                              <div className="flex-grow">
-                                <h4 
-                                  className="text-sm font-medium text-gray-800 hover:text-blue-600 
+                          {tasks.length} Tasks
+                        </Tag>
+                      </div>
+                    </div>
+
+                    {/* Tasks List */}
+                    <div className="p-3">
+                      <div className="space-y-3">
+                        {tasks.map(task => (
+                          <div
+                            key={task.id}
+                            className="group bg-white rounded-lg border border-gray-200 hover:border-blue-300 
+                                   hover:shadow-md transition-all duration-300"
+                          >
+                            <div className="p-4">
+                              {/* Task Header */}
+                              <div className="flex items-start justify-between mb-3">
+                                <div className="flex-grow">
+                                  <h4
+                                    className="text-sm font-medium text-gray-800 hover:text-blue-600 
                                            cursor-pointer line-clamp-2 mb-1"
-                                  onClick={() => handleTaskClick(task.id)}
-                                >
-                                  {task.task_title}
-                                </h4>
-                                <div className="flex items-center gap-2 text-xs text-gray-500">
-                                  <CalendarOutlined className="text-blue-400" />
-                                  <span>Due: {dayjs(task.end_date).format('DD MMM YYYY')}</span>
+                                    onClick={() => handleTaskClick(task.id)}
+                                  >
+                                    {task.task_title}
+                                  </h4>
+                                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                                    <CalendarOutlined className="text-blue-400" />
+                                    <span>Due: {dayjs(task.end_date).format('DD MMM YYYY')}</span>
+                                  </div>
+                                </div>
+                                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <EllipsisDropdown
+                                    menu={
+                                      <Menu>
+                                        <Menu.Item key="view">View Details</Menu.Item>
+                                        <Menu.Item key="edit">Edit Task</Menu.Item>
+                                      </Menu>
+                                    }
+                                  />
                                 </div>
                               </div>
-                              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                <EllipsisDropdown 
-                                  menu={
-                                    <Menu>
-                                      <Menu.Item key="view">View Details</Menu.Item>
-                                      <Menu.Item key="edit">Edit Task</Menu.Item>
-                                    </Menu>
-                                  }
-                                />
-                              </div>
-                            </div>
 
-                            {/* Task Progress */}
-                            {task.progress !== undefined && (
-                              <div className="mb-3">
-                                <Progress 
-                                  percent={task.progress} 
-                                  size="small" 
-                                  strokeColor={getStatusColor(status)}
-                                  className="mb-1"
-                                />
-                              </div>
-                            )}
+                              {/* Task Progress */}
+                              {task.progress !== undefined && (
+                                <div className="mb-3">
+                                  <Progress
+                                    percent={task.progress}
+                                    size="small"
+                                    strokeColor={getStatusColor(status)}
+                                    className="mb-1"
+                                  />
+                                </div>
+                              )}
 
-                            {/* Task Footer */}
-                            <div className="flex items-center justify-between pt-2">
-                              <div className="flex items-center gap-3">
-                                {/* Priority Tag */}
-                                {task.priority && (
-                                  <Tag 
-                                    color={
-                                      task.priority.toLowerCase() === 'high' ? 'error' :
-                                      task.priority.toLowerCase() === 'medium' ? 'warning' : 
-                                      'success'
-                                    }
-                                    className="rounded-full text-xs"
-                                  >
-                                    {task.priority}
-                                  </Tag>
-                                )}
-                                
-                                {/* Task Type */}
-                                {task.task_type && (
-                                  <span className="text-xs text-gray-500 flex items-center gap-1">
-                                    <TeamOutlined className="text-gray-400" />
-                                    {task.task_type}
-                                  </span>
-                                )}
-                              </div>
+                              {/* Task Footer */}
+                              <div className="flex items-center justify-between pt-2">
+                                <div className="flex items-center gap-3">
+                                  {/* Priority Tag */}
+                                  {task.priority && (
+                                    <Tag
+                                      color={
+                                        task.priority.toLowerCase() === 'high' ? 'error' :
+                                          task.priority.toLowerCase() === 'medium' ? 'warning' :
+                                            'success'
+                                      }
+                                      className="rounded-full text-xs"
+                                    >
+                                      {task.priority}
+                                    </Tag>
+                                  )}
 
-                              {/* Assignees */}
-                              <div className="flex items-center">
-                                {task.assignee && (
-                                  <Tooltip title={`Assigned to: ${task.assignee}`}>
-                                    <Avatar.Group maxCount={3} size="small">
-                                      {Array.isArray(task.assignee) ? (
-                                        task.assignee.map((assignee, idx) => (
-                                          <Avatar 
-                                            key={idx}
+                                  {/* Task Type */}
+                                  {task.task_type && (
+                                    <span className="text-xs text-gray-500 flex items-center gap-1">
+                                      <TeamOutlined className="text-gray-400" />
+                                      {task.task_type}
+                                    </span>
+                                  )}
+                                </div>
+
+                                {/* Assignees */}
+                                <div className="flex items-center">
+                                  {task.assignee && (
+                                    <Tooltip title={`Assigned to: ${task.assignee}`}>
+                                      <Avatar.Group maxCount={3} size="small">
+                                        {Array.isArray(task.assignee) ? (
+                                          task.assignee.map((assignee, idx) => (
+                                            <Avatar
+                                              key={idx}
+                                              size="small"
+                                              className="border-2 border-white"
+                                              src={assignee.avatar}
+                                            >
+                                              {assignee.name?.[0]}
+                                            </Avatar>
+                                          ))
+                                        ) : (
+                                          <Avatar
                                             size="small"
                                             className="border-2 border-white"
-                                            src={assignee.avatar}
                                           >
-                                            {assignee.name?.[0]}
+                                            {task.assignee[0]}
                                           </Avatar>
-                                        ))
-                                      ) : (
-                                        <Avatar 
-                                          size="small"
-                                          className="border-2 border-white"
-                                        >
-                                          {task.assignee[0]}
-                                        </Avatar>
-                                      )}
-                                    </Avatar.Group>
-                                  </Tooltip>
-                                )}
+                                        )}
+                                      </Avatar.Group>
+                                    </Tooltip>
+                                  )}
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          {/* Task Description Preview */}
-                          {task.description && (
-                            <div className="px-4 pb-3">
-                              <p className="text-xs text-gray-500 line-clamp-2">
-                                {task.description.replace(/<[^>]*>/g, '')}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                            {/* Task Description Preview */}
+                            {task.description && (
+                              <div className="px-4 pb-3">
+                                <p className="text-xs text-gray-500 line-clamp-2">
+                                  {task.description.replace(/<[^>]*>/g, '')}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <Table
+                columns={taskColumns}
+                dataSource={taskData}
+                rowKey="id"
+                pagination={{ pageSize: 10 }}
+                className="task-table"
+              />
+            )
           )}
         </div>
       </div>
@@ -925,33 +1354,38 @@ const OverViewList = () => {
           {[
             {
               title: 'Project Budget',
-              value: filterdata[0]?.budget || '0',
+              value: formatCurrency(currentProject?.budget || '0'),
               icon: <FaCoins />,
               color: 'blue',
+              isCurrency: true,
             },
             {
               title: 'Hours Logged',
-              value: filterdata[0]?.estimatedhours || '0',
+              value: `${currentProject?.estimatedhours || '0'} hrs`,
               icon: <TbClockHour3Filled />,
               color: 'green',
+              isCurrency: false,
             },
             {
               title: 'Earnings',
-              value: '30,644.00',
+              value: formatCurrency(currentProject?.earnings || '0'),
               icon: <FaCoins />,
               color: 'indigo',
+              isCurrency: true,
             },
             {
               title: 'Expenses',
-              value: '0.00',
+              value: formatCurrency(currentProject?.expenses || '0'),
               icon: <FaCoins />,
               color: 'red',
+              isCurrency: true,
             },
             {
               title: 'Profit',
-              value: '30,644.00',
+              value: formatCurrency(currentProject?.profit || '0'),
               icon: <FaCoins />,
               color: 'emerald',
+              isCurrency: true,
             },
           ].map((stat, index) => (
             <div

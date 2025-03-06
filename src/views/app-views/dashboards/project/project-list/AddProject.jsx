@@ -12,8 +12,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
-import utils from "utils";
-
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,14 +24,12 @@ import { AddLablee, GetLablee } from "../milestone/LableReducer/LableSlice";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import AddUser from "views/app-views/Users/user-list/AddUser";
-import AddClient from "views/app-views/Users/client-list/AddClient";      
+import AddClient from "views/app-views/Users/client-list/AddClient";
 import AddCurrencies from '../../../setting/currencies/AddCurrencies';
 
 const { Option } = Select;
 
 const AddProject = ({ onClose }) => {
-  const navigate = useNavigate();
-  const [list, setList] = useState();
   const dispatch = useDispatch();
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
@@ -43,22 +39,15 @@ const AddProject = ({ onClose }) => {
   const [newCategory, setNewCategory] = useState("");
   const [newStatus, setNewStatus] = useState("");
   const [tags, setTags] = useState([]);
-
   const [categories, setCategories] = useState([]);
   const [statuses, setStatuses] = useState([]);
-
-  const AllLoggedData = useSelector((state) => state.user);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
   const [isAddUserModalVisible, setIsAddUserModalVisible] = useState(false);
   const [isAddClientModalVisible, setIsAddClientModalVisible] = useState(false);
-
-
+  const AllLoggedData = useSelector((state) => state.user);
   const allempdatass = useSelector((state) => state.currencies);
   const fnddatass = allempdatass?.currencies?.data;
-
   const getInitialCurrency = () => {
     if (fnddatass?.length > 0) {
       const inrCurrency = fnddatass.find(c => c.currencyCode === 'INR');
@@ -98,21 +87,21 @@ const AddProject = ({ onClose }) => {
     fetchData();
   }, [dispatch]);
 
-  const allloggeduser = useSelector((state)=>state.user.loggedInUser.username)
+  const allloggeduser = useSelector((state) => state.user.loggedInUser.username)
 
 
   const { currencies } = useSelector((state) => state.currencies);
 
   const curr = currencies?.data || [];
-  
+
   // const curren = curr?.filter((item) => item.created_by === allloggeduser);
 
   const alluserdatas = useSelector((state) => state.Users);
   const fnadat = alluserdatas?.Users?.data;
-  
-  const fnd = fnadat?.filter((item)=>item?.created_by === allloggeduser)
 
-  
+  const fnd = fnadat?.filter((item) => item?.created_by === allloggeduser)
+
+
 
   const Tagsdetail = useSelector((state) => state.Tags);
   const AllTags = Tagsdetail?.Tags?.data;
@@ -124,32 +113,30 @@ const AddProject = ({ onClose }) => {
   const employeedata = AllEmployee.SubClient.data;
 
 
-  const fnd2 = employeedata?.filter((item)=>item?.created_by === allloggeduser)
+  const fnd2 = employeedata?.filter((item) => item?.created_by === allloggeduser)
 
 
   const AllLoggeddtaa = useSelector((state) => state.user);
 
-  const initialValues = { 
+  const initialValues = {
     project_name: "",
-    currency: getInitialCurrency(),
     project_category: "",
     startDate: null,
     endDate: null,
-    // projectimage: "",
     client: "",
-    user: "",
+    project_members: [],
+    currency: getInitialCurrency(),
     budget: "",
     estimatedmonths: "",
     estimatedhours: "",
     project_description: "",
     tag: "",
     status: "",
-    
   };
 
   useEffect(() => {
     dispatch(getcurren());
-}, [dispatch]);
+  }, [dispatch]);
 
   const validationSchema = Yup.object({
     project_name: Yup.string().required("Please enter a Project Name."),
@@ -157,16 +144,13 @@ const AddProject = ({ onClose }) => {
     startDate: Yup.date().nullable().required("Start date is required."),
     endDate: Yup.date().nullable().required("End date is required."),
     currency: Yup.string().required("Please select Currency."),
-    // projectimage: Yup.mixed().required("Please upload a Project Image."),
     client: Yup.string().required("Please select Client."),
-    user: Yup.string().required("Please select User."),
+    project_members: Yup.array().min(1, "Please select at least one project member."),
     budget: Yup.number()
       .required("Please enter a Project Budget.")
       .positive("Budget must be positive."),
-      estimatedmonths: Yup.string()
+    estimatedmonths: Yup.string()
       .required("Please enter Estimated Months."),
-      // .positive("Months must be positive.")
-      // .integer("Months must be a whole number"),
     estimatedhours: Yup.number()
       .required("Please enter Estimated Hours.")
       .positive("Hours must be positive.")
@@ -179,21 +163,24 @@ const AddProject = ({ onClose }) => {
   });
 
   const onSubmit = (values, { resetForm }) => {
-    // Convert estimatedmonths to number before sending
     const payload = {
       ...values,
-      // estimatedmonths: parseInt(values.estimatedmonths, 10)
+      project_members: {
+        project_members: values.project_members // Send as an object directly, not stringified
+      }
     };
 
     dispatch(AddPro(payload))
       .then(() => {
         dispatch(GetProject())
           .then(() => {
+            message.success("Project created successfully!");
             resetForm();
             onClose();
           })
           .catch((error) => {
             console.error("Project Data API error:", error);
+            message.error("Failed to refresh project list.");
           });
       })
       .catch((error) => {
@@ -203,7 +190,7 @@ const AddProject = ({ onClose }) => {
   };
 
   useEffect(() => {
-    
+
     const lid = AllLoggeddtaa.loggedInUser.role_id;
 
     GetLablee(lid);
@@ -244,20 +231,17 @@ const AddProject = ({ onClose }) => {
         name: newValue.trim(),
         lableType,
       };
-      
+
       const response = await dispatch(AddLablee({ lid, payload }));
-      
+
       if (response.payload && response.payload.success) {
         message.success(`${lableType} added successfully.`);
-        
-        // Refresh the labels immediately after adding
+
         const labelsResponse = await dispatch(GetLablee(lid));
         if (labelsResponse.payload && labelsResponse.payload.data) {
           const filteredLables = labelsResponse.payload.data
             .filter((lable) => lable.lableType === lableType)
             .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
-          
-          // Update the appropriate state based on label type
           switch (lableType) {
             case "tag":
               setTags(filteredLables);
@@ -273,7 +257,7 @@ const AddProject = ({ onClose }) => {
               break;
           }
         }
-        
+
         // Reset input and close modal
         setter("");
         modalSetter(false);
@@ -387,7 +371,7 @@ const AddProject = ({ onClose }) => {
                         const endDate = values.endDate;
                         const daysDiff = endDate.diff(startDate, 'days');
                         const monthsDiff = endDate.diff(startDate, 'months', true);
-                        
+
                         let displayValue;
                         if (daysDiff < 30) {
                           displayValue = `${daysDiff} day${daysDiff !== 1 ? 's' : ''}`; // Show days if less than 30 days
@@ -395,7 +379,7 @@ const AddProject = ({ onClose }) => {
                           const roundedMonths = Math.max(1, Math.ceil(monthsDiff));
                           displayValue = `${roundedMonths} month${roundedMonths !== 1 ? 's' : ''}`;
                         }
-                        
+
                         setFieldValue("estimatedmonths", displayValue);
                       }
                     }}
@@ -428,7 +412,7 @@ const AddProject = ({ onClose }) => {
                         const endDate = date;
                         const daysDiff = endDate.diff(startDate, 'days');
                         const monthsDiff = endDate.diff(startDate, 'months', true);
-                        
+
                         let displayValue;
                         if (daysDiff < 30) {
                           displayValue = `${daysDiff} day${daysDiff !== 1 ? 's' : ''}`; // Show days if less than 30 days
@@ -436,7 +420,7 @@ const AddProject = ({ onClose }) => {
                           const roundedMonths = Math.max(1, Math.ceil(monthsDiff));
                           displayValue = `${roundedMonths} month${roundedMonths !== 1 ? 's' : ''}`;
                         }
-                        
+
                         setFieldValue("estimatedmonths", displayValue);
                       }
                     }}
@@ -497,7 +481,7 @@ const AddProject = ({ onClose }) => {
                   >
                     {fnd2 && fnd2?.length > 0 ? (
                       fnd2
-                        .filter(client => client.created_by === AllLoggedData.loggedInUser.username) 
+                        .filter(client => client.created_by === AllLoggedData.loggedInUser.username)
                         .map((client) => (
                           <Option key={client.id} value={client.id}>
                             {client.firstName || client.username || "Unnamed Client"}
@@ -519,15 +503,16 @@ const AddProject = ({ onClose }) => {
 
               <Col span={12} className="mt-4">
                 <div className="form-item">
-                  <label className="font-semibold">User <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Project Members <span className="text-red-500">*</span></label>
                   <Select
+                    mode="multiple"
                     style={{ width: "100%" }}
                     className="mt-1"
-                    placeholder="Select User"
+                    placeholder="Select Project Members"
                     loading={!fnd}
-                    value={values.user}
-                    onChange={(value) => setFieldValue("user", value)}
-                    onBlur={() => setFieldTouched("user", true)}
+                    value={values.project_members}
+                    onChange={(value) => setFieldValue("project_members", value)}
+                    onBlur={() => setFieldTouched("project_members", true)}
                     dropdownRender={(menu) => (
                       <div>
                         {menu}
@@ -556,7 +541,7 @@ const AddProject = ({ onClose }) => {
                     )}
                   </Select>
                   <ErrorMessage
-                    name="user"
+                    name="project_members"
                     component="div"
                     className="error-message text-red-500 my-1"
                   />
@@ -582,102 +567,102 @@ const AddProject = ({ onClose }) => {
               </Col> */}
 
               <Col span={12} className="mt-4">
-                      <div className="form-group">
-                        <label className="text-gray-600 font-semibold mb-2 block"> Currency <span className="text-red-500">*</span></label>
-                        <div className="flex gap-0">
-                          <Field name="currency">
-                            {({ field }) => (
-                              <Select
-                                {...field}
-                                className="currency-select"
-                                style={{
-                                  width: '60px',
-                                  borderTopRightRadius: 0,
-                                  borderBottomRightRadius: 0,
-                                  borderRight: 0,
-                                  backgroundColor: '#f8fafc',
-                                }}
-                                placeholder={<span className="text-gray-400">$</span>}
-                                onChange={(value) => {
-                                  if (value === 'add_new') {
-                                    setIsAddCurrencyModalVisible(true);
-                                  } else {
-                                    setFieldValue("currency", value);
-                                  }
-                                }}
-                                value={values.currency}
-                                dropdownStyle={{ minWidth: '180px' }}
-                                suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-                                loading={!fnddatass}
-                                dropdownRender={menu => (
-                                  <div>
-                                    <div
-                                      className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                                      onClick={() => setIsAddCurrencyModalVisible(true)}
-                                    >
-                                      <PlusOutlined className="mr-2" />
-                                      <span className="text-sm">Add New</span>
-                                    </div>
-                                    {menu}
-                                  </div>
-                                )}
+                <div className="form-group">
+                  <label className="text-gray-600 font-semibold mb-2 block"> Currency <span className="text-red-500">*</span></label>
+                  <div className="flex gap-0">
+                    <Field name="currency">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="currency-select"
+                          style={{
+                            width: '60px',
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRight: 0,
+                            backgroundColor: '#f8fafc',
+                          }}
+                          placeholder={<span className="text-gray-400">$</span>}
+                          onChange={(value) => {
+                            if (value === 'add_new') {
+                              setIsAddCurrencyModalVisible(true);
+                            } else {
+                              setFieldValue("currency", value);
+                            }
+                          }}
+                          value={values.currency}
+                          dropdownStyle={{ minWidth: '180px' }}
+                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                          loading={!fnddatass}
+                          dropdownRender={menu => (
+                            <div>
+                              <div
+                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                onClick={() => setIsAddCurrencyModalVisible(true)}
                               >
-                                {fnddatass?.map((currency) => (
-                                  <Option key={currency.id} value={currency.id}>
-                                    <div className="flex items-center w-full px-1">
-                                      <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
-                                      <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
-                                      <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
-                                    </div>
-                                  </Option>
-                                ))}
-                              </Select>
-                            )}
-                          </Field>
-                          <Field name="budget">
-                            {({ field, form }) => (
-                              <Input
-                                {...field}
-                                className="price-input"
-                                style={{
-                                  borderTopLeftRadius: 0,
-                                  borderBottomLeftRadius: 0,
-                                  borderLeft: '1px solid #d9d9d9',
-                                  width: 'calc(100% - 100px)'
-                                }}
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                placeholder="0.00"
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
-                                    form.setFieldValue('budget', value);
-                                  }
-                                }}
-                                onKeyPress={(e) => {
-                                  const charCode = e.which ? e.which : e.keyCode;
-                                  if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
-                                    e.preventDefault();
-                                  }
-                                  if (charCode === 46 && field.value.includes('.')) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                                prefix={
-                                  values.currency && (
-                                    <span className="text-gray-600 font-medium mr-1">
-                                      {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
-                                    </span>
-                                  )
-                                }
-                              />
-                            )}
-                          </Field>
-                        </div>
-                        <ErrorMessage name="budget" component="div" className="text-red-500 mt-1 text-sm" />
-                      </div>
-                    </Col>
+                                <PlusOutlined className="mr-2" />
+                                <span className="text-sm">Add New</span>
+                              </div>
+                              {menu}
+                            </div>
+                          )}
+                        >
+                          {fnddatass?.map((currency) => (
+                            <Option key={currency.id} value={currency.id}>
+                              <div className="flex items-center w-full px-1">
+                                <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                              </div>
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
+                    <Field name="budget">
+                      {({ field, form }) => (
+                        <Input
+                          {...field}
+                          className="price-input"
+                          style={{
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderLeft: '1px solid #d9d9d9',
+                            width: 'calc(100% - 100px)'
+                          }}
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="0.00"
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                              form.setFieldValue('budget', value);
+                            }
+                          }}
+                          onKeyPress={(e) => {
+                            const charCode = e.which ? e.which : e.keyCode;
+                            if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                              e.preventDefault();
+                            }
+                            if (charCode === 46 && field.value.includes('.')) {
+                              e.preventDefault();
+                            }
+                          }}
+                          prefix={
+                            values.currency && (
+                              <span className="text-gray-600 font-medium mr-1">
+                                {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                              </span>
+                            )
+                          }
+                        />
+                      )}
+                    </Field>
+                  </div>
+                  <ErrorMessage name="budget" component="div" className="text-red-500 mt-1 text-sm" />
+                </div>
+              </Col>
 
               {/* <Col span={12} className="mt-4">
                 <div className="form-item">

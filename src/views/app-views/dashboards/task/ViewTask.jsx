@@ -37,16 +37,16 @@ const { Title, Text, Paragraph } = Typography;
 const ViewTask = ({ filterdatass, onClose }) => {
   const dispatch = useDispatch()
 
-  const alllogedata = useSelector((state)=>state.user.loggedInUser.id)
+  const alllogedata = useSelector((state) => state.user.loggedInUser.id)
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(GetTasks(alllogedata))
-  },[dispatch])
+  }, [dispatch])
 
-  const alldatas = useSelector((state)=>state.Tasks.Tasks.data)
+  const alldatas = useSelector((state) => state.Tasks.Tasks.data)
 
-  const task = alldatas?.find((item)=>item?.id === filterdatass?.related_id)
-  
+  const task = alldatas?.find((item) => item?.id === filterdatass?.related_id)
+
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
 
