@@ -461,86 +461,85 @@ useEffect(() => {
 
 
   const calculateTotal = (data, globalDiscountValue) => {
-    // Calculate row-level totals first
-    const calculatedTotals = data.reduce((acc, row) => {
-        // Base calculations
-        const quantity = parseFloat(row.quantity) || 0;
-        const unitPrice = parseFloat(row.price) || 0;
-        const baseAmount = quantity * unitPrice;
+    // Ensure valid inputs
+    const validData = data.map(row => ({
+        ...row,
+        quantity: parseFloat(row.quantity) || 0,
+        price: parseFloat(row.price) || 0,
+        discount: parseFloat(row.discount) || 0,
+        discountType: row.discountType || "percentage"
+    }));
 
-        // Item discount calculation
+    // Calculate totals for each row and sum them up
+    const calculatedTotals = validData.reduce((acc, row) => {
+        const baseAmount = row.quantity * row.price;
+        
+        // Calculate item discount
         let itemDiscountAmount = 0;
         if (row.discountType === "percentage") {
-            const discountPercentage = parseFloat(row.discount) || 0;
-            itemDiscountAmount = (baseAmount * discountPercentage) / 100;
+            itemDiscountAmount = (baseAmount * row.discount) / 100;
         } else {
-            itemDiscountAmount = parseFloat(row.discount) || 0;
+            itemDiscountAmount = Math.min(row.discount, baseAmount); // Cannot discount more than base amount
         }
 
-        // Tax calculation
-        const taxPercentage = parseFloat(row.tax) || 0;
+        // Calculate tax on amount after discount
         const amountAfterDiscount = baseAmount - itemDiscountAmount;
-        const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
-
-        // Row total amount
-        const rowAmount = baseAmount - itemDiscountAmount + taxAmount;
+        const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
+        const gstAmount = (amountAfterDiscount * taxPercentage) / 100;
+        
+        // Calculate row total: baseAmount - itemDiscount + tax
+        const rowTotal = amountAfterDiscount + gstAmount;
 
         return {
             totalBaseAmount: acc.totalBaseAmount + baseAmount,
             totalItemDiscount: acc.totalItemDiscount + itemDiscountAmount,
-            totalTax: acc.totalTax + taxAmount,
-            totalAmount: acc.totalAmount + rowAmount
+            totalTax: acc.totalTax + gstAmount,
+            subtotal: acc.subtotal + rowTotal
         };
-    }, { totalBaseAmount: 0, totalItemDiscount: 0, totalTax: 0, totalAmount: 0 });
+    }, { totalBaseAmount: 0, totalItemDiscount: 0, totalTax: 0, subtotal: 0 });
 
     // Calculate global discount
+    const validGlobalDiscountValue = parseFloat(globalDiscountValue) || 0;
     let globalDiscountAmount = 0;
     if (discountType === 'percentage') {
-        globalDiscountAmount = (calculatedTotals.totalAmount * globalDiscountValue) / 100;
+        globalDiscountAmount = (calculatedTotals.subtotal * validGlobalDiscountValue) / 100;
     } else {
-        globalDiscountAmount = parseFloat(globalDiscountValue) || 0;
+        globalDiscountAmount = validGlobalDiscountValue;
     }
 
     // Calculate final total
-    const finalTotal = calculatedTotals.totalAmount - globalDiscountAmount;
+    const finalTotal = Math.max(0, calculatedTotals.subtotal - globalDiscountAmount);
 
     // Update totals state
     setTotals({
-        subtotal: calculatedTotals.totalAmount.toFixed(2),
+        subtotal: calculatedTotals.subtotal.toFixed(2),
         itemDiscount: calculatedTotals.totalItemDiscount.toFixed(2),
         globalDiscount: globalDiscountAmount.toFixed(2),
         totalTax: calculatedTotals.totalTax.toFixed(2),
         finalTotal: finalTotal.toFixed(2)
     });
 
-    // Update table data with calculated amounts
-    const updatedData = data.map(row => {
-        const quantity = parseFloat(row.quantity) || 0;
-        const unitPrice = parseFloat(row.price) || 0;
-        const baseAmount = quantity * unitPrice;
-
-        // Calculate item discount
+    // Update row amounts
+    const updatedData = validData.map(row => {
+        const baseAmount = row.quantity * row.price;
+        
         let itemDiscountAmount = 0;
         if (row.discountType === "percentage") {
-            const discountPercentage = parseFloat(row.discount) || 0;
-            itemDiscountAmount = (baseAmount * discountPercentage) / 100;
+            itemDiscountAmount = (baseAmount * row.discount) / 100;
         } else {
-            itemDiscountAmount = parseFloat(row.discount) || 0;
+            itemDiscountAmount = Math.min(row.discount, baseAmount);
         }
 
-        // Calculate tax
-        const taxPercentage = parseFloat(row.tax) || 0;
         const amountAfterDiscount = baseAmount - itemDiscountAmount;
-        const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
-
-        // Calculate row total
-        const rowAmount = baseAmount - itemDiscountAmount + taxAmount;
+        const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
+        const gstAmount = (amountAfterDiscount * taxPercentage) / 100;
+        const rowAmount = amountAfterDiscount + gstAmount;
 
         return {
             ...row,
             base_amount: baseAmount.toFixed(2),
             discount_amount: itemDiscountAmount.toFixed(2),
-            tax_amount: taxAmount.toFixed(2),
+            tax_amount: gstAmount.toFixed(2),
             amount: rowAmount.toFixed(2)
         };
     });
@@ -551,10 +550,91 @@ useEffect(() => {
   const handleTableDataChange = (id, field, value) => {
     const updatedData = tableData.map(row => {
         if (row.id === id) {
-            return { ...row, [field]: value };
+            let updatedRow = { ...row };
+
+            if (field === 'tax') {
+                if (!value) {
+                    updatedRow = {
+                        ...updatedRow,
+                        tax: null,
+                        tax_name: '',
+                        tax_amount: 0
+                    };
+                } else {
+                    const baseAmount = updatedRow.quantity * updatedRow.price;
+                    const itemDiscountAmount = updatedRow.discountType === "percentage" 
+                        ? (baseAmount * updatedRow.discount) / 100 
+                        : Math.min(updatedRow.discount, baseAmount);
+                    const amountAfterDiscount = baseAmount - itemDiscountAmount;
+                    const gstAmount = (amountAfterDiscount * value.gstPercentage) / 100;
+
+                    updatedRow = {
+                        ...updatedRow,
+                        tax: value,
+                        tax_name: value.gstName,
+                        tax_percentage: value.gstPercentage,
+                        tax_amount: gstAmount,
+                        amount: amountAfterDiscount + gstAmount
+                    };
+                }
+            } else if (field === 'discountType') {
+                updatedRow = {
+                    ...updatedRow,
+                    discountType: value,
+                    discount: 0,
+                    discount_amount: 0
+                };
+            } else if (field === 'discount') {
+                const baseAmount = updatedRow.quantity * updatedRow.price;
+                let discountAmount = 0;
+                if (updatedRow.discountType === 'percentage') {
+                    discountAmount = (baseAmount * value) / 100;
+                } else {
+                    discountAmount = Math.min(value, baseAmount);
+                }
+
+                const amountAfterDiscount = baseAmount - discountAmount;
+                const taxPercentage = updatedRow.tax ? updatedRow.tax.gstPercentage : 0;
+                const gstAmount = (amountAfterDiscount * taxPercentage) / 100;
+
+                updatedRow = {
+                    ...updatedRow,
+                    discount: value,
+                    discount_amount: discountAmount,
+                    tax_amount: gstAmount,
+                    amount: amountAfterDiscount + gstAmount
+                };
+            } else {
+                updatedRow[field] = value;
+
+                if (field === 'quantity' || field === 'price') {
+                    const baseAmount = updatedRow.quantity * updatedRow.price;
+                    let discountAmount = 0;
+                    if (updatedRow.discountType === 'percentage') {
+                        discountAmount = (baseAmount * updatedRow.discount) / 100;
+                    } else {
+                        discountAmount = Math.min(updatedRow.discount, baseAmount);
+                    }
+
+                    const amountAfterDiscount = baseAmount - discountAmount;
+                    const taxPercentage = updatedRow.tax ? updatedRow.tax.gstPercentage : 0;
+                    const gstAmount = (amountAfterDiscount * taxPercentage) / 100;
+
+                    updatedRow = {
+                        ...updatedRow,
+                        base_amount: baseAmount,
+                        discount_amount: discountAmount,
+                        tax_amount: gstAmount,
+                        amount: amountAfterDiscount + gstAmount
+                    };
+                }
+            }
+
+            return updatedRow;
         }
         return row;
     });
+
     setTableData(updatedData);
     calculateTotal(updatedData, discountValue);
 };

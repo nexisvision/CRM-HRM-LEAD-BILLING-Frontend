@@ -28,120 +28,87 @@ function ProductSummaryList({ billingId }) {
         dispatch(getAllDebitNotes());
     }, [dispatch]);
 
-    useEffect(() => {
-        if (billingId && payments.length > 0) {
-            // Filter payments for current billing
-            const currentBillingPayments = payments.filter(
-                payment => payment.bill === billingId  // Changed from billing_id to bill to match API data
-            );
-
-            // Filter debit notes for current billing
-            const currentBillingDebitNotes = debitNotes.filter(
-                note => note.bill === billingId
-            );
-
-            // Calculate total paid amount
-            const totalPaidAmount = currentBillingPayments.reduce(
-                (sum, payment) => sum + Number(payment.amount || 0), 
-                0
-            );
-
-            // Calculate total debit note amount
-            const totalDebitNoteAmount = currentBillingDebitNotes.reduce(
-                (sum, note) => sum + Number(note.amount || 0),
-                0
-            );
-
-            // Update totals with both paid and debit note amounts
-            setTotals(prev => ({
-                ...prev,
-                amount: totalPaidAmount,
-                debitNote: totalDebitNoteAmount,
-                updated_total: prev.total - totalPaidAmount - totalDebitNoteAmount // Subtract both payments and debit notes
-            }));
-        }
-    }, [billingId, payments, debitNotes]);
-
-    // Get billing data from Redux store
     const allBillingItems = useSelector((state) => state.salesbilling?.salesbilling?.data || []);
 
     useEffect(() => {
         if (billingId && allBillingItems.length > 0) {
-            // Find the specific billing item
             const selectedBilling = allBillingItems.find(item => item.id === billingId);
-            
-
-console.log("selectedBilertretling",selectedBilling);
 
             if (selectedBilling) {
                 try {
-                    // Parse description if it's a string
-                    const description = typeof selectedBilling.discription === 'string' 
-                        ? JSON.parse(selectedBilling.discription) 
-                        : selectedBilling.discription;
+                    // Parse items array from string
+                    const itemsArray = JSON.parse(selectedBilling.items || '[]');
+                    
+                    // Transform items to table format
+                    const transformedItems = itemsArray.map((item, index) => ({
+                        id: index,
+                        billNumber: selectedBilling.billNumber,
+                        billDate: selectedBilling.billDate,
+                        vendor: selectedBilling.vendor,
+                        product: item.item,
+                        quantity: item.quantity,
+                        unitPrice: item.price,
+                        tax: item.tax_percentage,
+                        tax_name: item.tax_name,
+                        amount: item.amount,
+                        description: item.description || ''
+                    }));
 
-                    // Check if description exists
-                    if (description) {
-                        const items = [];
-                        
-                        // Handle both single item and array of items
-                        if (Array.isArray(description.items)) {
-                            items.push(...description.items.map((item, index) => ({
-                                id: index,
-                                billNumber: selectedBilling.billNumber,
-                                billDate: selectedBilling.billDate,
-                                vendor: selectedBilling.vendor,
-                                product: item.name,
-                                quantity: item.quantity,
-                                unitPrice: item.unitPrice,
-                                tax: item.tax,
-                                tax_name: item.tax_name,
-                                amount: item.amount,
-                                // Add any additional fields from database
-                                ...item
-                            })));
-                        } else {
-                            // If it's a single item
-                            items.push({
-                                id: 0,
-                                billNumber: selectedBilling.billNumber,
-                                billDate: selectedBilling.billDate,
-                                vendor: selectedBilling.vendor,
-                                product: description.name,
-                                quantity: description.quantity,
-                                unitPrice: description.unitPrice,
-                                tax: description.tax,
-                                tax_name: description.tax_name,
-                                amount: description.amount,
-                                // Add any additional fields from database
-                                ...description
-                            });
-                        }
-                        
-                        setBillingData(items);
-                        calculateTotals(selectedBilling);
-                    } else {
-                        setBillingData([]);
-                        console.warn('No description found in billing data');
-                    }
+                    setBillingData(transformedItems);
+                    
+                    // Get current payments and debit notes
+                    const currentBillingPayments = payments.filter(
+                        payment => payment.bill === billingId
+                    );
+                    const currentBillingDebitNotes = debitNotes.filter(
+                        note => note.bill === billingId
+                    );
+
+                    // Calculate total paid amount
+                    const totalPaidAmount = currentBillingPayments.reduce(
+                        (sum, payment) => {
+                            const paymentAmount = typeof payment.amount === 'number' ? payment.amount : parseFloat(payment.amount || '0');
+                            return sum + (isNaN(paymentAmount) ? 0 : paymentAmount);
+                        }, 
+                        0
+                    );
+
+                    // Calculate total debit note amount
+                    const totalDebitNoteAmount = currentBillingDebitNotes.reduce(
+                        (sum, note) => {
+                            const noteAmount = parseFloat(note.amount || '0');
+                            return sum + (isNaN(noteAmount) ? 0 : noteAmount);
+                        }, 
+                        0
+                    );
+
+                    // Get the total from billing
+                    const billingTotal = selectedBilling.total || 0;
+
+                    // Calculate remaining amount
+                    const remainingAmount = Math.max(0, billingTotal - totalPaidAmount - totalDebitNoteAmount);
+
+                    console.log('Billing Total:', billingTotal);
+                    console.log('Total Paid:', totalPaidAmount);
+                    console.log('Total Debit Notes:', totalDebitNoteAmount);
+                    console.log('Remaining Amount:', remainingAmount);
+
+                    setTotals(prev => ({
+                        ...prev,
+                        discount: selectedBilling.discount || 0,
+                        tax: selectedBilling.tax || 0,
+                        total: billingTotal,
+                        amount: totalPaidAmount,
+                        debitNote: totalDebitNoteAmount,
+                        updated_total: remainingAmount
+                    }));
                 } catch (error) {
                     console.error('Error processing billing data:', error);
                     setBillingData([]);
                 }
             }
         }
-    }, [billingId, allBillingItems]);
-
-    const calculateTotals = (billing) => {
-        if (!billing) return;
-
-        setTotals({
-            // subtotal: billing.total - billing.discount + billing.tax || 0,
-            discount: billing.discount || 0,
-            tax: billing.tax || 0,
-            total: billing.total || 0
-        });
-    };
+    }, [billingId, allBillingItems, payments, debitNotes]);
 
     const columns = [
         {
@@ -250,7 +217,7 @@ console.log("selectedBilertretling",selectedBilling);
                                     <NumberFormat
                                         displayType="text"
                                         value={totals.discount}
-                                        suffix="%"
+                                        prefix="₹"
                                         thousandSeparator={true}
                                     />
                                 </p>
@@ -281,7 +248,8 @@ console.log("selectedBilertretling",selectedBilling);
                                         value={totals.amount}
                                         prefix="₹"
                                         thousandSeparator={true}
-                                        // className="text-success"  // Added success color for paid amount
+                                        decimalScale={2}
+                                        fixedDecimalScale={true}
                                     />
                                 </p>
                                 <p className="mb-2 border-bottom">
@@ -291,6 +259,9 @@ console.log("selectedBilertretling",selectedBilling);
                                         value={totals.debitNote}
                                         prefix="₹"
                                         thousandSeparator={true}
+                                        decimalScale={2}
+                                        fixedDecimalScale={true}
+                                       
                                     />
                                 </p>
                                 <p>
@@ -300,7 +271,9 @@ console.log("selectedBilertretling",selectedBilling);
                                         value={totals.updated_total}
                                         prefix="₹"
                                         thousandSeparator={true}
-                                        // className={totals.updated_total > 0 ? "text-danger" : "text-success"}  // Added conditional color
+                                        decimalScale={2}
+                                        fixedDecimalScale={true}
+                                       
                                     />
                                 </p>
                             </div>

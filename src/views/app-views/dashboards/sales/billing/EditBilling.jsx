@@ -259,33 +259,41 @@ const EditBilling = ({ idd, onClose }) => {
       return;
     }
 
-    let subtotal = 0;
-    let totalTax = 0;
-
-    data.forEach((row) => {
+    const subtotal = data.reduce((sum, row) => {
       const quantity = parseFloat(row.quantity) || 0;
       const price = parseFloat(row.price) || 0;
-      const tax = showTax ? (parseFloat(row.tax) || 0) : 0;
+      const tax = row.tax ? parseFloat(row.tax.gstPercentage) : 0;
       
       const baseAmount = quantity * price;
       const taxAmount = (baseAmount * tax) / 100;
+      const totalAmount = baseAmount + taxAmount;
       
-      subtotal += baseAmount;
-      totalTax += taxAmount;
-    });
+      return sum + totalAmount;
+    }, 0);
 
-    // Calculate discount based on type
-    const discountAmount = type === 'percentage'
-      ? (subtotal * (parseFloat(discountVal) || 0)) / 100
-      : parseFloat(discountVal) || 0;
+    let discountAmount = 0;
+    if (type === 'percentage') {
+      discountAmount = (subtotal * (parseFloat(discountVal) || 0)) / 100;
+    } else {
+      discountAmount = parseFloat(discountVal) || 0;
+    }
 
-    const finalTotal = subtotal - discountAmount + totalTax;
+    const totalTax = data.reduce((sum, row) => {
+      const quantity = parseFloat(row.quantity) || 0;
+      const price = parseFloat(row.price) || 0;
+      const tax = row.tax ? parseFloat(row.tax.gstPercentage) : 0;
+      const baseAmount = quantity * price;
+      const taxAmount = (baseAmount * tax) / 100;
+      return sum + taxAmount;
+    }, 0);
+
+    const finalTotal = Math.max(0, subtotal - discountAmount);
 
     setTotals({
       subtotal: subtotal.toFixed(2),
-      discount: discountVal ? discountAmount.toFixed(2) : '',
+      discount: discountAmount.toFixed(2),
       totalTax: totalTax.toFixed(2),
-      finalTotal: finalTotal.toFixed(2),
+      finalTotal: finalTotal.toFixed(2)
     });
 
     return {
@@ -304,33 +312,22 @@ const EditBilling = ({ idd, onClose }) => {
         if (field === 'quantity' || field === 'price' || field === 'tax') {
           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
           const price = parseFloat(field === 'price' ? value : row.price) || 0;
-          const tax = showTax ? (parseFloat(field === 'tax' ? value : row.tax) || 0) : 0;
-          
-          // Update tax name when tax is selected
-          if (field === 'tax' && taxes?.data) {
-            const selectedTax = taxes.data.find(t => t.gstPercentage === parseFloat(value));
-            if (selectedTax) {
-              updatedRow.tax_name = selectedTax.gstName; // Store tax name directly in row
-              setSelectedTaxDetails(prev => ({
-                ...prev,
-                [id]: {
-                  gstName: selectedTax.gstName,
-                  gstPercentage: selectedTax.gstPercentage
-                }
-              }));
-            }
-          }
+          const tax = field === 'tax' ? 
+            (value ? parseFloat(value.gstPercentage) : 0) : 
+            (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
           
           const baseAmount = quantity * price;
           const taxAmount = (baseAmount * tax) / 100;
-          updatedRow.amount = (baseAmount + taxAmount).toFixed(2);
+          const totalAmount = baseAmount + taxAmount;
+          
+          updatedRow.amount = totalAmount.toFixed(2);
         }
         
         return updatedRow;
       }
       return row;
     });
-
+  
     setTableData(updatedData);
     calculateTotal(updatedData, discountValue, discountType);
   };
@@ -509,15 +506,25 @@ const EditBilling = ({ idd, onClose }) => {
 
     return (
       <select
-        value={row.tax}
-        onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
+        value={row.tax ? `${row.tax.gstName}|${row.tax.gstPercentage}` : "0"}
+        onChange={(value) => {
+          if (!value || value === '0') {
+            handleTableDataChange(row.id, "tax", null);
+            return;
+          }
+          const [gstName, gstPercentage] = value.split('|');
+          handleTableDataChange(row.id, "tax", {
+            gstName,
+            gstPercentage: parseFloat(gstPercentage) || 0
+          });
+        }}
         className="w-full p-2 border rounded"
       >
         <option value="0">Select Tax</option>
         {taxes?.data?.map((tax) => (
           <option 
             key={tax.id} 
-            value={tax.gstPercentage}
+            value={`${tax.gstName}|${tax.gstPercentage}`}
             title={`${tax.gstName}: ${tax.gstPercentage}%`}
           >
             {tax.gstName} ({tax.gstPercentage}%)
@@ -760,8 +767,39 @@ const EditBilling = ({ idd, onClose }) => {
                             className="w-full p-2 border rounded-s"
                           />
                         </td>
-                        <td className="px-4 py-2 border-b">
-                          {renderTaxSelector(row)}
+                        <td className="px-2 py-2 border-b">
+                          {showTax ? (
+                            <Select
+                              value={row.tax ? `${row.tax.gstName}|${row.tax.gstPercentage}` : "0"}
+                              onChange={(value) => {
+                                if (!value) {
+                                  handleTableDataChange(row.id, "tax", null);
+                                  return;
+                                }
+                                const [gstName, gstPercentage] = value.split('|');
+                                handleTableDataChange(row.id, "tax", {
+                                  gstName,
+                                  gstPercentage: parseFloat(gstPercentage) || 0
+                                });
+                              }}
+                              placeholder="Select Tax"
+                              className="w-[150px]"
+                              allowClear
+                            >
+                              {taxes && taxes.data && taxes.data.map(tax => (
+                                <Option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
+                                  {tax.gstName} ({tax.gstPercentage}%)
+                                </Option>
+                              ))}
+                            </Select>
+                          ) : (
+                            <Input
+                              type="text"
+                              value="0"
+                              disabled
+                              className="w-full p-2 border bg-gray-100"
+                            />
+                          )}
                         </td>
                         <td className="px-4 py-2 border-b">
                           ₹{row.amount}
@@ -806,40 +844,31 @@ const EditBilling = ({ idd, onClose }) => {
                 <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
                   <td className="font-medium">Discount</td>
                   <td className="flex items-center space-x-2">
-                   
-                      <div className="flex items-center gap-2 mb-2">
-                        <Select
-                          value={discountType}
-                          onChange={(value) => {
-                            setDiscountType(value);
-                            setDiscountValue(0);
-                            calculateTotal(tableData, 0, value);
-                          }}
-                          style={{ width: 120 }}
-                        >
-                          <Option value="percentage">Percentage</Option>
-                          <Option value="fixed">Fixed Amount</Option>
-                        </Select>
-                        <input
-                          type="number"
-                          min="0"
-                          max={discountType === 'percentage' ? 100 : undefined}
-                          value={discountValue || ""}
-                          onChange={(e) => {
-                            const newValue = e.target.value === '' ? 0 : parseFloat(e.target.value);
-                            setDiscountValue(newValue);
-                            calculateTotal(tableData, newValue, discountType);
-                          }}
-                          onBlur={(e) => {
-                            if (e.target.value === "") {
-                              setDiscountValue(0);
-                              calculateTotal(tableData, 0, discountType);
-                            }
-                          }}
-                          className="mt-1 block p-2 border rounded"
-                          placeholder="0"
-                        />
-                      </div>
+                    <Select
+                      value={discountType}
+                      onChange={(value) => {
+                        setDiscountType(value);
+                        calculateTotal(tableData, discountValue, value);
+                      }}
+                      style={{ width: 120 }}
+                    >
+                      <Option value="percentage">Percentage (%)</Option>
+                      <Option value="fixed">Fixed Amount</Option>
+                    </Select>
+                    <Input
+                      type="number"
+                      min="0"
+                      max={discountType === 'percentage' ? 100 : undefined}
+                      value={discountValue}
+                      onChange={(e) => {
+                        const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                        setDiscountValue(value);
+                        calculateTotal(tableData, value, discountType);
+                      }}
+                      style={{ width: 120 }}
+                      prefix={discountType === 'fixed' ? '₹' : ''}
+                      suffix={discountType === 'percentage' ? '%' : ''}
+                    />
                   </td>
                 </tr>
 

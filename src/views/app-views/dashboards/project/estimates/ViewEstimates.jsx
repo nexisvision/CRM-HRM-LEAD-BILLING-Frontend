@@ -72,6 +72,12 @@ function ViewEstimates({ estimateId, onClose }) {
             )
         },
         {
+            title: "Discount (%)",
+            dataIndex: "discount",
+            key: "discount",
+            render: (discount) => `${discount || 0}%`
+        },
+        {
             title: "Tax (%)",
             dataIndex: "tax",
             key: "tax",

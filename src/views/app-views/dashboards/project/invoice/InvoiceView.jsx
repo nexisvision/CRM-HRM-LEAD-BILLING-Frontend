@@ -516,9 +516,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                         <span className="font-weight-semibold ">Total Tax Amount: </span>
                                         <NumberFormat
                                             displayType="text"
-                                            value={parsedInvoice.tax
-                                                || 0}
-                                            // prefix="$"
+                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.tax_amount || 0), 0)}
                                             thousandSeparator={true}
                                         />
                                     </p>
@@ -791,9 +789,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                         <span className="font-weight-semibold ">Total Tax Amount: </span>
                                         <NumberFormat
                                             displayType="text"
-                                            value={parsedInvoice.tax
-                                                || 0}
-                                            // prefix="$"
+                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.tax_amount || 0), 0)}
                                             thousandSeparator={true}
                                         />
                                     </p>
@@ -1057,9 +1053,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                         <span className="font-weight-semibold ">Total Tax Amount: </span>
                                         <NumberFormat
                                             displayType="text"
-                                            value={parsedInvoice.tax
-                                                || 0}
-                                            // prefix="$"
+                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.tax_amount || 0), 0)}
                                             thousandSeparator={true}
                                         />
                                     </p>
@@ -1321,9 +1315,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                         <span className="font-weight-semibold ">Total Tax Amount: </span>
                                         <NumberFormat
                                             displayType="text"
-                                            value={parsedInvoice.tax
-                                                || 0}
-                                            // prefix="$"
+                                            value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.tax_amount || 0), 0)}
                                             thousandSeparator={true}
                                         />
                                     </p>

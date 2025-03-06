@@ -41,6 +41,7 @@ const EditInvoice = ({ idd, onClose }) => {
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
+  const [invoiceType, setInvoiceType] = useState('standard');
 
   const alladatas = useSelector((state) => state?.salesInvoices);
   const fnddata = alladatas?.salesInvoices?.data;
@@ -62,11 +63,11 @@ const EditInvoice = ({ idd, onClose }) => {
       id: Date.now(),
       item: "",
       quantity: 1,
-      price: 0,
+      price: "0",
       discountType: 'percentage',
-      discountValue: 0,
+      discountValue: "0",
       tax: 0,
-      amount: 0,
+      amount: "0.00",
       description: "",
     }
   ]);
@@ -79,6 +80,7 @@ const EditInvoice = ({ idd, onClose }) => {
     category: "",
     items: [],
     currency: "",
+    invoiceType: "standard",
   });
 
   // Get currencies from the store
@@ -92,6 +94,7 @@ const EditInvoice = ({ idd, onClose }) => {
     itemDiscount: "0.00",
     globalDiscount: "0.00",
     totalTax: "0.00",
+    additionalCharges: "0.00",
     finalTotal: "0.00"
   });
 
@@ -184,79 +187,97 @@ const handleProductChange = (productId) => {
 
   useEffect(() => {
     if (fnd) {
-      try {
-        // Parse items from the invoice data
-        const parsedItems = JSON.parse(fnd.items || '[]');
-        
-        // Convert items object to array if it's not already
-        const itemsArray = Array.isArray(parsedItems) 
-          ? parsedItems 
-          : Object.values(parsedItems);
-        
-        // Set initial form values
-        setInitialValues({
-          customer: fnd.customer || '',
-          issueDate: fnd.issueDate ? moment(fnd.issueDate) : null,
-          dueDate: fnd.dueDate ? moment(fnd.dueDate) : null,
-          category: fnd.category || '',
-          invoicenub: fnd.salesInvoiceNumber || '',
-          currency: fnd.currency || '',
-          items: itemsArray || []
-        });
+        try {
+            const parsedItems = JSON.parse(fnd.items || '{}');
+            
+            setInitialValues({
+                customer: fnd.customer || '',
+                issueDate: fnd.issueDate ? moment(fnd.issueDate) : null,
+                dueDate: fnd.dueDate ? moment(fnd.dueDate) : null,
+                category: fnd.category || '',
+                invoicenub: fnd.salesInvoiceNumber || '',
+                currency: fnd.currency || '',
+                items: parsedItems || {},
+                invoiceType: fnd.invoiceType || 'standard',
+            });
 
-        // Set table data with the parsed items
-        const formattedTableData = itemsArray.map(item => ({
-          id: Date.now() + Math.random(),
-          item: item.item || '',
-          quantity: Math.max(parseFloat(item.quantity) || 1, 1),
-          price: parseFloat(item.price) || 0,
-          discountType: item.discount_type || 'percentage',
-          discountValue: parseFloat(item.discount_value) || 0,
-          tax: item.tax_percentage ? {
-            gstName: item.tax_name || '',
-            gstPercentage: parseFloat(item.tax_percentage) || 0
-          } : null,
-          amount: parseFloat(item.amount) || 0,
-          description: item.description || ''
-        }));
+            setInvoiceType(fnd.invoiceType || 'standard');
 
-        // If no items exist, provide a default empty row
-        if (formattedTableData.length === 0) {
-          formattedTableData.push({
-            id: Date.now(),
-            item: '',
-            quantity: 1,
-            price: 0,
-            discountType: 'percentage',
-            discountValue: 0,
-            tax: null,
-            amount: 0,
-            description: ''
-          });
+            // Set global discount type and value
+            const savedDiscountType = fnd.discountType || 'percentage';
+            setGlobalDiscountType(savedDiscountType);
+            
+            // Set the correct discount value based on type
+            if (savedDiscountType === 'percentage') {
+                setGlobalDiscountValue(parseFloat(fnd.discountValue) || 0);
+            } else {
+                setGlobalDiscountValue(parseFloat(fnd.discount) || 0);
+            }
+
+            const formattedTableData = Object.entries(parsedItems).map(([key, item]) => {
+                const quantity = Math.max(parseFloat(item.quantity) || 1, 1);
+                const price = parseFloat(item.price) || 0;
+                const baseAmount = quantity * price;
+                
+                // Get the correct discount value based on type
+                const savedItemDiscountType = item.discount_type || 'percentage';
+                const discountValue = savedItemDiscountType === 'percentage' 
+                    ? parseFloat(item.discount_percentage) || 0 
+                    : parseFloat(item.discount_value) || 0;
+
+                // Calculate item discount
+                let itemDiscountAmount = 0;
+                if (savedItemDiscountType === 'percentage') {
+                    itemDiscountAmount = (baseAmount * discountValue) / 100;
+                } else {
+                    itemDiscountAmount = Math.min(discountValue, baseAmount);
+                }
+
+                const amountAfterDiscount = baseAmount - itemDiscountAmount;
+                const taxPercentage = parseFloat(item.tax_percentage) || 0;
+                const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
+                
+                return {
+                id: Date.now() + Math.random(),
+                item: item.item || '',
+                    quantity: quantity,
+                    price: price.toString(),
+                    discountType: savedItemDiscountType,
+                    discountValue: discountValue.toString(),
+                tax: item.tax_name ? {
+                    gstName: item.tax_name,
+                        gstPercentage: taxPercentage
+                } : null,
+                    amount: (amountAfterDiscount + taxAmount).toFixed(2),
+                description: item.description || '',
+                hsn_sac: item.hsn_sac || ''
+                };
+            });
+
+            if (formattedTableData.length === 0) {
+                formattedTableData.push({
+                    id: Date.now(),
+                    item: '',
+                    quantity: 1,
+                    price: "0",
+                    discountType: 'percentage',
+                    discountValue: "0",
+                    tax: null,
+                    amount: '0.00',
+                    description: '',
+                    hsn_sac: ''
+                });
+            }
+
+            setTableData(formattedTableData);
+            calculateTotal(formattedTableData, fnd.discountValue || 0, savedDiscountType);
+
+        } catch (error) {
+            console.error('Error parsing invoice data:', error);
+            message.error('Error loading invoice data');
         }
-
-        setTableData(formattedTableData);
-        
-        // Set discount rate if it exists in the invoice
-        setDiscountRate(parseFloat(fnd.discount) || 0);
-
-        // Calculate totals with the loaded data
-        calculateTotal(formattedTableData, parseFloat(fnd.discount) || 0);
-
-        // Set currency icon if available
-        if (fnd.currency && currencies) {
-          const currencyData = currencies.find(c => c.currencyCode === fnd.currency);
-          if (currencyData) {
-            setSelectedCurrencyIcon(currencyData.currencyIcon);
-          }
-        }
-
-      } catch (error) {
-        console.error('Error parsing invoice data:', error);
-        message.error('Error loading invoice data');
-      }
     }
-  }, [fnd, currencies]);
+  }, [fnd]);
 
   // const [rows, setRows] = useState(initialValues.items);
 
@@ -267,11 +288,11 @@ const handleProductChange = (productId) => {
         id: Date.now(),
         item: "",
         quantity: 1,
-        price: 0,
+        price: "0",
         discountType: 'percentage',
-        discountValue: 0,
+        discountValue: "0",
         tax: null,
-        amount: 0,
+        amount: "0.00",
         description: "",
         isNew: true,
       },
@@ -288,77 +309,41 @@ const handleProductChange = (productId) => {
     }
   };
 
-  const calculateTotal = (data, globalDiscount, discountType) => {
-    let subtotal = 0;
-    let itemDiscount = 0;
-    let totalTax = 0;
-    let rowTotalSum = 0;
-
-    data.forEach(row => {
-        // Calculate base amount for each row (quantity * price)
-        const quantity = parseFloat(row.quantity) || 0;
-        const price = parseFloat(row.price) || 0;
-        const rowTotal = quantity * price;
-        rowTotalSum += rowTotal;
-
-        // Calculate row discount
-        const rowDiscountValue = parseFloat(row.discountValue) || 0;
-        const rowDiscountAmount = row.discountType === 'percentage' 
-            ? (rowTotal * rowDiscountValue) / 100 
-            : rowDiscountValue;
-        
-        itemDiscount += rowDiscountAmount;
-
-        // Calculate tax
-        if (row.tax) {
-            const taxRate = parseFloat(row.tax.gstPercentage) || 0;
-            totalTax += ((rowTotal - rowDiscountAmount) * taxRate) / 100;
-        }
-    });
-
-    // Set subtotal as sum of row totals (before tax and discounts)
-    subtotal = rowTotalSum;
-
-    // Calculate global discount
-    const globalDiscountAmount = discountType === 'percentage'
-        ? (subtotal * parseFloat(globalDiscount)) / 100
-        : parseFloat(globalDiscount) || 0;
-
-    // Calculate final total
-    const finalTotal = subtotal - globalDiscountAmount - itemDiscount + totalTax;
-
-    setTotals({
-        subtotal: subtotal.toFixed(2),
-        itemDiscount: itemDiscount.toFixed(2),
-        globalDiscount: globalDiscountAmount.toFixed(2),
-        totalTax: totalTax.toFixed(2),
-        finalTotal: finalTotal.toFixed(2)
-    });
-  };
-
   const handleTableDataChange = (id, field, value) => {
     const updatedData = tableData.map(row => {
         if (row.id === id) {
-            const updatedRow = { ...row, [field]: value };
+            const updatedRow = { ...row };
             
-            // Calculate base amount
+            // Handle empty values for numeric fields
+            if (field === 'price' || field === 'discountValue') {
+                updatedRow[field] = value === '' ? '0' : value;
+            } else if (field === 'quantity') {
+                updatedRow[field] = value === '' ? 1 : parseFloat(value);
+            } else {
+                updatedRow[field] = value;
+            }
+            
+            // Calculate amounts
             const quantity = parseFloat(updatedRow.quantity) || 0;
             const price = parseFloat(updatedRow.price) || 0;
             const baseAmount = quantity * price;
             
-            // Calculate discount
+            // Calculate item discount
+            let itemDiscountAmount = 0;
             const discountValue = parseFloat(updatedRow.discountValue) || 0;
-            const discountAmount = updatedRow.discountType === 'percentage' 
-                ? (baseAmount * discountValue) / 100 
-                : discountValue;
+            if (updatedRow.discountType === 'percentage') {
+                itemDiscountAmount = (baseAmount * discountValue) / 100;
+            } else {
+                itemDiscountAmount = Math.min(discountValue, baseAmount);
+            }
             
             // Calculate tax
+            const amountAfterDiscount = baseAmount - itemDiscountAmount;
             const taxPercentage = updatedRow.tax ? parseFloat(updatedRow.tax.gstPercentage) || 0 : 0;
-            const taxableAmount = baseAmount - discountAmount;
-            const taxAmount = (taxableAmount * taxPercentage) / 100;
+            const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
             
-            // Set final amount
-            updatedRow.amount = (baseAmount - discountAmount + taxAmount).toFixed(2);
+            // Update final amount
+            updatedRow.amount = (amountAfterDiscount + taxAmount).toFixed(2);
             
             return updatedRow;
         }
@@ -367,6 +352,84 @@ const handleProductChange = (productId) => {
 
     setTableData(updatedData);
     calculateTotal(updatedData, globalDiscountValue, globalDiscountType);
+  };
+
+  const calculateTotal = (data, globalDiscountValue, discountType) => {
+    // Calculate item-level totals
+    const calculations = data.reduce((acc, row) => {
+        const quantity = parseFloat(row.quantity) || 0;
+        const price = parseFloat(row.price) || 0;
+        const baseAmount = quantity * price;
+        
+        // Calculate item discount
+        let itemDiscountAmount = 0;
+        const discountValue = parseFloat(row.discountValue) || 0;
+        if (row.discountType === 'percentage') {
+            itemDiscountAmount = (baseAmount * discountValue) / 100;
+        } else {
+            itemDiscountAmount = Math.min(discountValue, baseAmount);
+        }
+
+        // Calculate tax based on invoice type
+        const amountAfterDiscount = baseAmount - itemDiscountAmount;
+        let taxAmount = 0;
+        const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
+
+        switch(invoiceType) {
+            case 'proforma':
+                taxAmount = 0;
+                break;
+            case 'commercial':
+                const dutyPercentage = 5;
+                const baseTax = (amountAfterDiscount * taxPercentage) / 100;
+                const dutyAmount = (amountAfterDiscount * dutyPercentage) / 100;
+                taxAmount = baseTax + dutyAmount;
+                break;
+            default:
+                taxAmount = (amountAfterDiscount * taxPercentage) / 100;
+                break;
+        }
+
+        // Additional charges for commercial invoices
+        const additionalCharges = invoiceType === 'commercial' ? baseAmount * 0.02 : 0;
+
+        return {
+            totalBaseAmount: acc.totalBaseAmount + baseAmount,
+            totalItemDiscount: acc.totalItemDiscount + itemDiscountAmount,
+            totalTax: acc.totalTax + taxAmount,
+            totalAdditionalCharges: acc.totalAdditionalCharges + additionalCharges,
+            subtotal: acc.subtotal + amountAfterDiscount + taxAmount + additionalCharges
+        };
+    }, {
+        totalBaseAmount: 0,
+        totalItemDiscount: 0,
+        totalTax: 0,
+        totalAdditionalCharges: 0,
+        subtotal: 0
+    });
+
+    // Calculate global discount
+    let globalDiscountAmount = 0;
+    if (invoiceType !== 'proforma' && globalDiscountValue) {
+        if (discountType === 'percentage') {
+            globalDiscountAmount = (calculations.subtotal * globalDiscountValue) / 100;
+        } else {
+            globalDiscountAmount = parseFloat(globalDiscountValue) || 0;
+        }
+    }
+
+    // Calculate final total
+    const finalTotal = Math.max(0, calculations.subtotal - globalDiscountAmount);
+
+    // Update totals state
+    setTotals({
+        subtotal: calculations.subtotal.toFixed(2),
+        itemDiscount: calculations.totalItemDiscount.toFixed(2),
+        globalDiscount: globalDiscountAmount.toFixed(2),
+        totalTax: calculations.totalTax.toFixed(2),
+        additionalCharges: calculations.totalAdditionalCharges.toFixed(2),
+        finalTotal: finalTotal.toFixed(2)
+    });
   };
 
   const handleAddNewTag = async () => {
@@ -420,7 +483,8 @@ const handleProductChange = (productId) => {
         tax_amount: taxAmount,
         tax_name: item.tax ? item.tax.gstName : '',
         discount_type: item.discountType,
-        discount_value: itemDiscountValue,
+        discount_percentage: item.discountType === 'percentage' ? itemDiscountValue : 0,
+        discount_value: item.discountType === 'fixed' ? itemDiscountValue : 0,
         discount_amount: itemDiscountAmount,
         base_amount: baseAmount,
         final_amount: finalAmount,
@@ -430,22 +494,19 @@ const handleProductChange = (productId) => {
       return acc;
     }, {});
 
-    // Calculate global discount on subtotal
-    const subtotal = Object.values(itemsForDatabase).reduce((sum, item) =>
-      sum + item.final_amount, 0);
-    const globalDiscountAmount = (subtotal * discountRate) / 100;
-    const finalTotal = subtotal - globalDiscountAmount;
-
     const prepareInvoiceData = () => ({
       customer: values.customer,
       issueDate: values.issueDate.format("YYYY-MM-DD"),
       dueDate: values.dueDate.format("YYYY-MM-DD"),
       category: values.category,
       items: itemsForDatabase,
-      discount: discountRate.toFixed(2),
-      tax: totals.totalTax,
-      total: finalTotal.toFixed(2),
-      status: "pending"
+      discountType: globalDiscountType,
+      discountValue: globalDiscountValue,
+      discount: parseFloat(totals.globalDiscount),
+      tax: parseFloat(totals.totalTax),
+      total: parseFloat(totals.finalTotal),
+      status: "pending",
+      invoiceType: values.invoiceType,
     });
 
     const selectedTag = tags.find((tag) => tag.name === values.category);
@@ -786,71 +847,119 @@ const handleProductChange = (productId) => {
 
                 </Flex>
               </Flex>
-            <div className="mt-4">
-             
-              <div className="overflow-x-auto">
-                <table className="w-full border border-gray-200 bg-white">
-                  <thead className="bg-gray-100">
-                    <tr>
-                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                      Item<span className="text-red-500">*</span>
-                      </th>
-                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                        Quantity<span className="text-red-500">*</span>
-                      </th>
-                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                        Unit Price<span className="text-red-500">*</span>
-                      </th>
-                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                        HSN/SAC
-                      </th>
-                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                        Discount (%)
-                      </th>
-                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                        TAX (%)
-                      </th>
-                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                        Amount
-                      </th>
-                      <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tableData.map((row) => (
-                      <React.Fragment key={row.id}>
-                        <tr>
-                          <td className="px-2 py-2 border-b">
-                            <input
-                              type="text"
-                              value={row.item}
-                              onChange={(e) => handleTableDataChange(row.id, "item", e.target.value)}
-                              placeholder="Item Name"
-                              className="w-full p-2 border rounded-s"
-                            />
-                          </td>
-                          <td className="px-2 py-2 border-b">
-                            <input
-                              type="number"
-                              min="1"
-                              value={row.quantity}
-                              onChange={(e) => handleTableDataChange(row.id, "quantity", e.target.value)}
-                              placeholder="Qty"
-                              className="w-full p-2 border rounded"
-                            />
-                          </td>
-                          <td className="px-2 py-2 border-b">
-                            <input
-                             prefix={selectedCurrencyIcon}
+           
+          <div className="mt-4">
+           
+            <div className="overflow-x-auto">
+              <table className="w-full border border-gray-200 bg-white">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                    Item<span className="text-red-500">*</span>
+                    </th>
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Quantity<span className="text-red-500">*</span>
+                    </th>
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Unit Price<span className="text-red-500">*</span>
+                    </th>
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      HSN/SAC
+                    </th>
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Discount (%)
+                    </th>
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      TAX (%)
+                    </th>
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Amount
+                    </th>
+                    <th className="px-2 py-2 text-left text-sm font-medium text-gray-700 border-b">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tableData.map((row) => (
+                    <React.Fragment key={row.id}>
+                      <tr>
+                        <td className="px-2 py-2 border-b">
+                          <input
+                            type="text"
+                            value={row.item}
+                            onChange={(e) => handleTableDataChange(row.id, "item", e.target.value)}
+                            placeholder="Item Name"
+                            className="w-full p-2 border rounded-s"
+                          />
+                        </td>
+                        <td className="px-2 py-2 border-b">
+                          <input
+                            type="number"
+                            min="1"
+                            value={row.quantity}
+                            onChange={(e) => handleTableDataChange(row.id, "quantity", e.target.value)}
+                            placeholder="Qty"
+                            className="w-full p-2 border rounded"
+                          />
+                        </td>
+                        <td className="px-2 py-2 border-b">
+                          <input
+                           prefix={selectedCurrencyIcon}
+                            type="number"
+                            min="0"
+                            value={row.price}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              // If user starts typing and current value is "0", clear it
+                              if (row.price === "0" && value !== "") {
+                                handleTableDataChange(row.id, "price", value.replace(/^0+/, ''));
+                              } else {
+                                handleTableDataChange(row.id, "price", value || "0");
+                              }
+                            }}
+                            placeholder="0"
+                            className="w-full p-2 border rounded-s"
+                          />
+                        </td>
+                        <td className="px-2 py-2 border-b">
+                          <input
+                            type="text"
+                            value={row.hsn_sac}
+                            onChange={(e) => handleTableDataChange(row.id, "hsn_sac", e.target.value)}
+                            placeholder="HSN/SAC"
+                            className="w-full p-2 border rounded"
+                            readOnly
+                          />
+                        </td>
+                        <td className="px-2 py-2 border-b">
+                          <div className="flex space-x-2">
+                            <Select
+                              value={row.discountType}
+                              onChange={(value) => handleTableDataChange(row.id, "discountType", value)}
+                              style={{ width: '100px' }}
+                            >
+                              <Option value="percentage">Percentage</Option>
+                              <Option value="fixed">Fixed</Option>
+                            </Select>
+                            <Input
                               type="number"
                               min="0"
-                              value={row.price}
-                              onChange={(e) => handleTableDataChange(row.id, "price", e.target.value)}
-                              placeholder="Price"
-                              className="w-full p-2 border rounded-s"
+                              value={row.discountValue}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                // If user starts typing and current value is "0", clear it
+                                if (row.discountValue === "0" && value !== "") {
+                                  handleTableDataChange(row.id, "discountValue", value.replace(/^0+/, ''));
+                                } else {
+                                  handleTableDataChange(row.id, "discountValue", value || "0");
+                                }
+                              }}
+                              placeholder="0"
+                              prefix={row.discountType === 'fixed' ? selectedCurrencyIcon : ''}
+                              suffix={row.discountType === 'percentage' ? '%' : ''}
                             />
+                          </div>
                           </td>
                           <td className="px-2 py-2 border-b">
                             <input

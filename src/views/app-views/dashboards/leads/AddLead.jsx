@@ -333,7 +333,7 @@ const AddLead = ({ onClose }) => {
               {...field}
               className="currency-select"
               style={{
-                width: '60px',
+                width: '80px',
                 borderTopRightRadius: 0,
                 borderBottomRightRadius: 0,
                 borderRight: 0,
@@ -350,19 +350,6 @@ const AddLead = ({ onClose }) => {
               value={form.values.currency}
               dropdownStyle={{ minWidth: '180px' }}
               suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-              loading={!fndcurr}
-              dropdownRender={menu => (
-                <div>
-                  <div
-                    className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                    onClick={() => setIsAddCurrencyModalVisible(true)}
-                  >
-                    <PlusOutlined className="mr-2" />
-                    <span className="text-sm">Add New</span>
-                  </div>
-                  {menu}
-                </div>
-              )}
             >
               {fndcurr?.map((currency) => (
                 <Option key={currency.id} value={currency.id}>
@@ -385,11 +372,9 @@ const AddLead = ({ onClose }) => {
                 borderTopLeftRadius: 0,
                 borderBottomLeftRadius: 0,
                 borderLeft: '1px solid #d9d9d9',
-                width: 'calc(100% - 100px)'
+                width: 'calc(100% - 60px)'
               }}
               type="number"
-              min="0"
-              step="0.01"
               placeholder="0.00"
               onChange={(e) => {
                 const value = e.target.value;
@@ -397,27 +382,10 @@ const AddLead = ({ onClose }) => {
                   form.setFieldValue('leadValue', value);
                 }
               }}
-              onKeyPress={(e) => {
-                const charCode = e.which ? e.which : e.keyCode;
-                if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
-                  e.preventDefault();
-                }
-                if (charCode === 46 && field.value.includes('.')) {
-                  e.preventDefault();
-                }
-              }}
-              prefix={
-                form.values.currency && (
-                  <span className="text-gray-600 font-medium mr-1">
-                    {fndcurr?.find(c => c.id === form.values.currency)?.currencyIcon}
-                  </span>
-                )
-              }
             />
           )}
         </Field>
       </div>
-      <ErrorMessage name="leadValue" component="div" className="text-red-500 mt-1 text-sm" />
     </div>
   );
 
@@ -501,15 +469,15 @@ const AddLead = ({ onClose }) => {
                   />
                 </div>
               </Col>
-              <Col span={12}>
+              <Col span={12} className="mt-3">
                 <div className="form-group">
-                  <label className="text-gray-600 font-semibold mb-2 block">Telephone <span className="text-red-500">*</span></label>
-                  <div className="flex gap-0">
+                  <label className="font-semibold">Telephone <span className="text-red-500">*</span></label>
+                  <div className="flex gap-0 mt-2">
                     <Field name="phoneCode">
                       {({ field }) => (
                         <Select
                           {...field}
-                          className="phone-code-select"
+                          className="currency-select"
                           style={{
                             width: '80px',
                             borderTopRightRadius: 0,
@@ -518,7 +486,6 @@ const AddLead = ({ onClose }) => {
                             backgroundColor: '#f8fafc',
                           }}
                           placeholder={<span className="text-gray-400">+91</span>}
-                          // defaultValue={getInitialPhoneCode()}
                           onChange={(value) => {
                             if (value === 'add_new') {
                               setIsAddPhoneCodeModalVisible(true);
@@ -529,18 +496,6 @@ const AddLead = ({ onClose }) => {
                           value={values.phoneCode}
                           dropdownStyle={{ minWidth: '180px' }}
                           suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-                          dropdownRender={menu => (
-                            <div>
-                              <div
-                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                                onClick={() => setIsAddPhoneCodeModalVisible(true)}
-                              >
-                                <PlusOutlined className="mr-2" />
-                                <span className="text-sm">Add New</span>
-                              </div>
-                              {menu}
-                            </div>
-                          )}
                         >
                           {countries?.map((country) => (
                             <Option key={country.id} value={country.phoneCode}>
@@ -558,7 +513,7 @@ const AddLead = ({ onClose }) => {
                       {({ field }) => (
                         <Input
                           {...field}
-                          className="phone-input"
+                          className="price-input"
                           style={{
                             borderTopLeftRadius: 0,
                             borderBottomLeftRadius: 0,
@@ -568,13 +523,6 @@ const AddLead = ({ onClose }) => {
                           type="number"
                           placeholder="Enter telephone number"
                           onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                          // prefix={
-                          //   values.phoneCode && (
-                          //     <span className="text-gray-600 font-medium mr-1">
-                          //       {values.phoneCode}
-                          //     </span>
-                          //   )
-                          // }
                         />
                       )}
                     </Field>
@@ -592,7 +540,7 @@ const AddLead = ({ onClose }) => {
                     Lead Stage
                     <span className="text-rose-500"> *</span>
                   </label>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 mt-1">
                     {filterdatas ? (
                       <Field name="leadStage">
                         {({ field, form }) => (
@@ -667,7 +615,7 @@ const AddLead = ({ onClose }) => {
               <Col span={12} className="mt-3">
                 <div className="form-item ">
                   <label className="font-semibold">Lead Value </label>
-                  <Field name="leadValue" component={LeadValueField} className="mt-1" />
+                  <Field name="leadValue" component={LeadValueField} className="mt-2" />
                   <ErrorMessage
                     name="leadValue.amount"
                     component="div"
@@ -1179,81 +1127,92 @@ const AddLead = ({ onClose }) => {
 export default AddLead;
 
 <style jsx>{`
+  /* Common styles for selectors and inputs */
+  .currency-select .ant-select-selector {
+    height: 40px !important;
+    background-color: #f8fafc !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-right: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
   .currency-select .ant-select-selection-item {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-size: 16px !important;
+    font-size: 14px !important;
+    height: 40px !important;
+    line-height: 40px !important;
   }
 
-  .currency-select .ant-select-selection-item > div {
+  .price-input {
+    height: 32px !important;
+    line-height: 32px !important;
+    padding: 4px 11px !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-left: 1px solid #d9d9d9 !important;
+  }
+
+  /* Remove spinner arrows from number inputs */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield !important;
+  }
+
+  /* Dropdown styles */
+  .ant-select-dropdown .ant-select-item {
+    padding: 8px 12px !important;
+  }
+
+  .ant-select-dropdown .ant-select-item-option-content > div {
     display: flex !important;
     align-items: center !important;
+    width: 100% !important;
   }
 
-  .currency-select .ant-select-selection-item span:not(:first-child) {
-    display: none !important;
+  /* Form field spacing */
+  .form-item {
+    margin-bottom: 16px !important;
   }
 
- .ant-select-dropdown .ant-select-item {
-          padding: 8px 12px !important;
-        }
+  .form-item label {
+    margin-bottom: 4px !important;
+    display: block !important;
+  }
 
-        .ant-select-dropdown .ant-select-item-option-content > div {
-          display: flex !important;
-          align-items: center !important;
-          width: 100% !important;
-        }
+  /* Make all inputs full width */
+  .form-item .ant-input,
+  .form-item .ant-select {
+    width: 100% !important;
+  }
 
-        //    .contract-select .ant-select-selection-item {
-        //   display: flex !important;
-        //   align-items: center !important;
-        //   justify-content: center !important;
-        //   font-size: 16px !important;
-        // }
+  /* Ensure consistent heights */
+  .ant-input,
+  .ant-select-selector,
+  .ant-picker {
+    height: 32px !important;
+  }
 
-        // .contract-select .ant-select-selection-item > div {
-        //   display: flex !important;
-        //   align-items: center !important;
-        // }
+  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+    height: 32px !important;
+  }
 
-        // .contract-select .ant-select-selection-item span:not(:first-child) {
-        //   display: none !important;
-        // }
+  .ant-select-selection-search-input {
+    height: 30px !important;
+  }
 
-        .phone-code-select .ant-select-selector {
-          // height: 32px !important;
-          // padding: 0 8px !important;
-          background-color: #f8fafc !important;
-          border-top-right-radius: 0 !important;
-          border-bottom-right-radius: 0 !important;
-          border-right: 0 !important;
-        }
-
-        .phone-code-select .ant-select-selection-item {
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          font-size: 16px !important;
-        }
-
-        .phone-code-select .ant-select-selection-item > div {
-          display: flex !important;
-          align-items: center !important;
-        }
-
-        .phone-code-select .ant-select-selection-item span:not(:first-child) {
-          display: none !important;
-        }
-
-        // .phone-input::-webkit-inner-spin-button,
-        // .phone-input::-webkit-outer-spin-button {
-        //   -webkit-appearance: none;
-        //   margin: 0;
-        // }
-
-        // .phone-input {
-        //   -moz-appearance: textfield;
-        // }
+  /* Text area specific height */
+  textarea.ant-input {
+    min-height: 80px !important;
+    line-height: 1.5 !important;
+  }
 `}</style>
 

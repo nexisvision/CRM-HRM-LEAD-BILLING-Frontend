@@ -99,6 +99,11 @@ const EditEstimates = ({ idd, onClose }) => {
         finalTotal: 0,
     });
 
+    const [selectedCurrencyIcon, setSelectedCurrencyIcon] = useState('₹');
+    const [invoiceType, setInvoiceType] = useState('standard');
+
+    const [products, setProducts] = useState([]);
+
     // Fetch estimate and currencies data
     useEffect(() => {
         dispatch(getcurren());
@@ -125,7 +130,6 @@ const EditEstimates = ({ idd, onClose }) => {
                     form.setFieldsValue({
                         valid_till: dayjs(currentEstimate.valid_till),
                         currency: currentEstimate.currency,
-                        // lead: leadDetails?.id,
                         client: currentEstimate.client,
                         calculatedTax: currentEstimate.calculatedTax,
                         projectName: fnddata?.project_name
@@ -153,13 +157,16 @@ const EditEstimates = ({ idd, onClose }) => {
                                 item: item.item || '',
                                 quantity: Number(item.quantity) || 0,
                                 price: Number(item.price) || 0,
-                                tax: Number(item.tax_percentage || item.tax) || 0,
+                                tax: {
+                                    gstName: item.tax_name || '',
+                                    gstPercentage: Number(item.tax) || 0
+                                },
                                 tax_name: item.tax_name || '',
-                                amount: Number(item.final_amount || item.amount) || 0,
+                                amount: Number(item.amount) || 0,
                                 description: item.description || '',
                                 base_amount: Number(item.base_amount) || 0,
                                 tax_amount: Number(item.tax_amount) || 0,
-                                discount_percentage: Number(item.discount_percentage) || 0,
+                                discount_percentage: Number(item.discount) || 0,
                                 discount_amount: Number(item.discount_amount) || 0
                             }));
 
@@ -173,7 +180,7 @@ const EditEstimates = ({ idd, onClose }) => {
                                         ...prev,
                                         [item.id]: {
                                             gstName: item.tax_name,
-                                            gstPercentage: item.tax
+                                            gstPercentage: Number(item.tax)
                                         }
                                     }));
                                 }
@@ -183,24 +190,21 @@ const EditEstimates = ({ idd, onClose }) => {
                             const subtotal = formattedItems.reduce((sum, item) => 
                                 sum + (Number(item.base_amount) || 0), 0);
                             
-                            const totalTax = formattedItems.reduce((sum, item) => 
-                                sum + (Number(item.tax_amount) || 0), 0);
+                            const totalTax = Number(currentEstimate.tax) || 0;
+
+                            // Set discount value and type
+                            const discountAmount = Number(currentEstimate.discount) || 0;
+                            // If discount is a round number and less than 100, assume it's a percentage
+                            const isPercentage = discountAmount <= 100 && Number.isInteger(discountAmount);
+                            setDiscountType(isPercentage ? 'percentage' : 'fixed');
+                            setDiscountValue(discountAmount);
 
                             setTotals({
                                 subtotal: subtotal,
-                                itemDiscount: Number(currentEstimate.discount) || 0,
+                                itemDiscount: discountAmount,
                                 totalTax: totalTax,
                                 finalTotal: Number(currentEstimate.total) || 0
                             });
-
-                            // Set discount type and value
-                            if (currentEstimate.discountType) {
-                                setDiscountType(currentEstimate.discountType);
-                            } else {
-                                // If no discount type is set, default to 'fixed' if there's a discount value
-                                setDiscountType(currentEstimate.discount > 0 ? 'fixed' : 'percentage');
-                            }
-                            setDiscountValue(Number(currentEstimate.discountValue || currentEstimate.discount) || 0);
 
                         } catch (error) {
                             console.error("Error parsing items:", error);
@@ -223,42 +227,53 @@ const EditEstimates = ({ idd, onClose }) => {
         console.log("Current Table Data:", tableData);
     }, [tableData]);
 
-    const calculateTotal = (data = tableData, discountVal = discountValue, type = discountType) => {
-        if (!Array.isArray(data)) {
-            console.error('Invalid data passed to calculateTotal');
-            return;
-        }
-
-        // Calculate subtotal
-        const subtotal = data.reduce((sum, row) => {
-            return sum + (parseFloat(row.amount) || 0);
-        }, 0);
-
-        // Calculate discount amount based on type
-        let discountAmount = 0;
-        if (type === 'percentage') {
-            discountAmount = (subtotal * (parseFloat(discountVal) || 0)) / 100;
-        } else {
-            discountAmount = parseFloat(discountVal) || 0;
-        }
-
-        // Calculate total tax
-        const totalTax = data.reduce((sum, row) => {
+    const calculateTotal = (data = tableData, globalDiscountValue, discountType) => {
+        // Calculate item-level totals
+        const calculations = data.reduce((acc, row) => {
             const quantity = parseFloat(row.quantity) || 0;
             const price = parseFloat(row.price) || 0;
-            const tax = (parseFloat(row.tax) || 0);
             const baseAmount = quantity * price;
-            const taxAmount = (baseAmount * tax) / 100;
-            return sum + taxAmount;
-        }, 0);
+            
+            // Calculate item discount
+            let itemDiscountAmount = 0;
+            const discountValue = parseFloat(row.discountValue) || 0;
+            if (row.discountType === 'percentage') {
+                itemDiscountAmount = (baseAmount * discountValue) / 100;
+            } else {
+                itemDiscountAmount = Math.min(discountValue, baseAmount);
+            }
+
+            // Calculate tax
+            const amountAfterDiscount = baseAmount - itemDiscountAmount;
+            const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
+            const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
+
+            return {
+                totalBaseAmount: acc.totalBaseAmount + baseAmount,
+                totalItemDiscount: acc.totalItemDiscount + itemDiscountAmount,
+                totalTax: acc.totalTax + taxAmount,
+                subtotal: acc.subtotal + amountAfterDiscount + taxAmount
+            };
+        }, { totalBaseAmount: 0, totalItemDiscount: 0, totalTax: 0, subtotal: 0 });
+
+        // Calculate global discount
+        const validGlobalDiscountValue = parseFloat(globalDiscountValue) || 0;
+        let globalDiscountAmount = 0;
+        if (discountType === 'percentage') {
+            globalDiscountAmount = (calculations.subtotal * validGlobalDiscountValue) / 100;
+        } else {
+            globalDiscountAmount = validGlobalDiscountValue;
+        }
 
         // Calculate final total
-        const finalTotal = subtotal - discountAmount;
+        const finalTotal = Math.max(0, calculations.subtotal - globalDiscountAmount);
 
+        // Update totals state
         setTotals({
-            subtotal: subtotal.toFixed(2),
-            discount: discountAmount.toFixed(2),
-            totalTax: totalTax.toFixed(2),
+            subtotal: calculations.subtotal.toFixed(2),
+            itemDiscount: calculations.totalItemDiscount.toFixed(2),
+            globalDiscount: globalDiscountAmount.toFixed(2),
+            totalTax: calculations.totalTax.toFixed(2),
             finalTotal: finalTotal.toFixed(2)
         });
     };
@@ -275,32 +290,52 @@ const EditEstimates = ({ idd, onClose }) => {
     const handleFinish = async (values) => {
         try {
             setLoading(true);
+            
+            const formattedItems = {};
+            tableData.forEach((item, index) => {
+                const quantity = parseFloat(item.quantity) || 0;
+                const price = parseFloat(item.price) || 0;
+                const baseAmount = quantity * price;
+                
+                // Calculate item discount
+                let itemDiscountAmount = 0;
+                const discountValue = parseFloat(item.discountValue) || 0;
+                if (item.discountType === 'percentage') {
+                    itemDiscountAmount = (baseAmount * discountValue) / 100;
+                } else {
+                    itemDiscountAmount = Math.min(discountValue, baseAmount);
+                }
 
-            // Convert items array to object with numeric keys
-            const formattedItems = tableData.reduce((acc, item, index) => {
-                acc[index] = {
-                    id: item.id,
-                    item: item.item || '',
-                    quantity: parseFloat(item.quantity) || 0,
-                    price: parseFloat(item.price) || 0,
-                    tax: parseFloat(item.tax) || 0,
-                    amount: parseFloat(item.amount) || 0,
+                // Calculate tax
+                const amountAfterDiscount = baseAmount - itemDiscountAmount;
+                const taxPercentage = item.tax ? parseFloat(item.tax.gstPercentage) || 0 : 0;
+                const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
+                
+                formattedItems[`item_${index + 1}`] = {
+                    item: item.item,
                     description: item.description || '',
-                    tax_name: selectedTaxDetails[item.id]?.gstName || ''
+                    quantity: quantity,
+                    price: price,
+                    tax_name: item.tax?.gstName || '',
+                    tax_percentage: taxPercentage,
+                    tax_amount: taxAmount,
+                    discount_type: item.discountType,
+                    discount_percentage: item.discountType === 'percentage' ? discountValue : 0,
+                    discount_amount: itemDiscountAmount,
+                    base_amount: baseAmount,
+                    amount_after_discount: amountAfterDiscount,
+                    final_amount: amountAfterDiscount + taxAmount,
+                    hsn_sac: item.hsn_sac || ''
                 };
-                return acc;
-            }, {});
-
-            const subtotal = calculateSubTotal();
-            const discountAmount = parseFloat(totals.discount);
+            });
 
             const estimateData = {
                 id: idd,
                 valid_till: values.valid_till.format('YYYY-MM-DD'),
                 currency: values.currency,
-                // lead: leadDetails?.id,
                 client: values.client,
-                discount: discountAmount,
+                invoiceType: invoiceType,
+                discount: parseFloat(totals.globalDiscount),
                 discountType: discountType,
                 discountValue: parseFloat(discountValue),
                 calculatedTax: parseFloat(values.calculatedTax) || 0,
@@ -315,9 +350,7 @@ const EditEstimates = ({ idd, onClose }) => {
                 data: estimateData
             })).unwrap();
 
-            // message.success('Estimate updated successfully');
             onClose();
-            // navigate("/app/dashboards/project/list");
         } catch (error) {
             message.error('Failed to update estimate: ' + (error.message || 'Unknown error'));
         } finally {
@@ -341,32 +374,44 @@ const EditEstimates = ({ idd, onClose }) => {
     // Handle table data changes
     const handleTableDataChange = (id, field, value) => {
         const updatedData = tableData.map((row) => {
-          if (row.id === id) {
-            const updatedRow = { ...row, [field]: value };
-            
-            // Calculate amount if quantity, price, or tax changes
-            if (field === 'quantity' || field === 'price' || field === 'tax') {
-              const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
-              const price = parseFloat(field === 'price' ? value : row.price) || 0;
-              const tax = field === 'tax' ? 
-                (value ? parseFloat(value.gstPercentage) : 0) : 
-                (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
-              
-              const baseAmount = quantity * price;
-              const taxAmount = (baseAmount * tax) / 100;
-              const totalAmount = baseAmount + taxAmount;
-              
-              updatedRow.amount = totalAmount.toFixed(2);
+            if (row.id === id) {
+                const updatedRow = { ...row, [field]: value };
+                
+                // Calculate amount if quantity, price, or tax changes
+                if (field === 'quantity' || field === 'price' || field === 'tax' || field === 'discountType' || field === 'discountValue') {
+                    const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
+                    const price = parseFloat(field === 'price' ? value : row.price) || 0;
+                    const baseAmount = quantity * price;
+                    
+                    // Calculate item discount
+                    let itemDiscountAmount = 0;
+                    const discountValue = parseFloat(updatedRow.discountValue) || 0;
+                    if (updatedRow.discountType === 'percentage') {
+                        itemDiscountAmount = (baseAmount * discountValue) / 100;
+                    } else {
+                        itemDiscountAmount = Math.min(discountValue, baseAmount);
+                    }
+
+                    // Calculate tax on amount after discount
+                    const amountAfterDiscount = baseAmount - itemDiscountAmount;
+                    const tax = field === 'tax' ? 
+                        (value ? parseFloat(value.gstPercentage) : 0) : 
+                        (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
+                    const taxAmount = (amountAfterDiscount * tax) / 100;
+                    
+                    // Calculate final amount
+                    const finalAmount = amountAfterDiscount + taxAmount;
+                    updatedRow.amount = finalAmount.toFixed(2);
+                }
+                
+                return updatedRow;
             }
-            
-            return updatedRow;
-          }
-          return row;
+            return row;
         });
-      
+
         setTableData(updatedData);
         calculateTotal(updatedData, discountValue, discountType);
-      };
+    };
       
 
     return (
@@ -493,6 +538,24 @@ const EditEstimates = ({ idd, onClose }) => {
                                             rules={[{ required: true, message: "Please select the date" }]}
                                         >
                                             <DatePicker className="w-full" format="DD-MM-YYYY" />
+                                        </Form.Item>
+                                    </Col>
+
+                                    <Col span={12}>
+                                        <Form.Item
+                                            name="invoiceType"
+                                            label="Invoice Type"
+                                            rules={[{ required: true, message: "Please select invoice type" }]}
+                                        >
+                                            <Select
+                                                value={invoiceType}
+                                                onChange={(value) => setInvoiceType(value)}
+                                                placeholder="Select Invoice Type"
+                                            >
+                                                <Option value="standard">Standard Invoice</Option>
+                                                <Option value="proforma">Proforma Invoice</Option>
+                                                <Option value="commercial">Commercial Invoice</Option>
+                                            </Select>
                                         </Form.Item>
                                     </Col>
 

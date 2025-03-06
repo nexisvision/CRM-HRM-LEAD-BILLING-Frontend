@@ -159,7 +159,7 @@ const AddAccount = ({ onClose }) => {
                 </div>
               </Col>
 
-              <Col span={12}>
+              <Col span={12} className="mt-3">
                 <div className="form-group">
                   <label className="text-gray-600 font-semibold mb-2 block">Phone<span className="text-red-500">*</span></label>
                   <div className="flex gap-0">

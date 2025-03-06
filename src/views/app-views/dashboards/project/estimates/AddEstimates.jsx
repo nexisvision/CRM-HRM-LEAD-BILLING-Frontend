@@ -142,9 +142,7 @@ const AddEstimates = ({ onClose }) => {
             const requiredFields = {
                 valid_till: values.valid_till,
                 currency: values.currency,
-                // lead: values.lead,
-                client: values.client,
-                calculatedTax: values.calculatedTax
+                client: values.client
             };
 
             const missingFields = Object.entries(requiredFields)
@@ -160,23 +158,41 @@ const AddEstimates = ({ onClose }) => {
                 throw new Error('Please add at least one item to the estimate');
             }
 
-            // Calculate subtotal from tableData directly
+            // Calculate totals
             const subtotal = calculateSubTotal();
             const discountAmount = (subtotal * discountRate) / 100;
-            const finalTotal = parseFloat(totals.finalTotal);
+            const totalTax = tableData.reduce((sum, item) => {
+                const quantity = parseFloat(item.quantity) || 0;
+                const price = parseFloat(item.price) || 0;
+                const baseAmount = quantity * price;
+                const tax = item.tax ? parseFloat(item.tax.gstPercentage) : 0;
+                const taxAmount = (baseAmount * tax) / 100;
+                return sum + taxAmount;
+            }, 0);
+
+            const finalTotal = subtotal - discountAmount;
             
             // Format items for the database
             const formattedItems = {};
             tableData.forEach((item, index) => {
                 const itemKey = `item_${index + 1}`;
+                const quantity = parseFloat(item.quantity) || 0;
+                const price = parseFloat(item.price) || 0;
+                const taxPercentage = item.tax?.gstPercentage || 0;
+                const baseAmount = quantity * price;
+                const taxAmount = (baseAmount * taxPercentage) / 100;
+                const itemTotal = baseAmount + taxAmount;
+                
                 formattedItems[itemKey] = {
                     id: (index + 1).toString(),
                     item: item.item || '',
-                    quantity: parseFloat(item.quantity) || 0,
-                    price: parseFloat(item.price) || 0,
-                    tax_name: selectedTaxDetails[item.id]?.gstName || '',
-                    tax: parseFloat(item.tax) || 0,
-                    amount: parseFloat(item.amount) || 0,
+                    quantity: quantity,
+                    price: price,
+                    tax_name: item.tax?.gstName || '',
+                    tax: taxPercentage,
+                    base_amount: baseAmount.toFixed(2),
+                    tax_amount: taxAmount.toFixed(2),
+                    amount: itemTotal.toFixed(2),
                     discount: parseFloat(discountRate) || 0
                 };
             });
@@ -184,15 +200,13 @@ const AddEstimates = ({ onClose }) => {
             const estimateData = {
                 valid_till: values.valid_till.format('YYYY-MM-DD'),
                 currency: values.currency,
-                // lead: values.lead,
                 client: values.client,
                 related_id: id,
                 subtotal: subtotal.toFixed(2),
-                calculatedTax: values.calculatedTax,
                 items: formattedItems,
                 total: finalTotal.toFixed(2),
-                tax: totals.totalTax,
-                discount: discountAmount,
+                tax: totalTax.toFixed(2),
+                discount: discountAmount.toFixed(2),
                 discountRate: discountRate,
                 created_by: user
             };
@@ -203,13 +217,10 @@ const AddEstimates = ({ onClose }) => {
                 form.resetFields();
                 onClose();
                 dispatch(getallestimate(id));
-                // message.success('Estimate created successfully');
-            } else {
-                // throw new Error(result.payload?.message || 'Failed to create estimate');
             }
         } catch (error) {
             console.error("Estimate Creation Error:", error);
-            //  message.error(error.message);
+            message.error(error.message);
         } finally {
             setLoading(false);
         }
@@ -261,11 +272,15 @@ const AddEstimates = ({ onClose }) => {
     // Calculate subtotal (sum of all row amounts before discount)
     const calculateSubTotal = () => {
         return tableData.reduce((sum, row) => {
-          const quantity = parseFloat(row.quantity) || 0;
-          const price = parseFloat(row.price) || 0;
-          return sum + (quantity * price);
+            const quantity = parseFloat(row.quantity) || 0;
+            const price = parseFloat(row.price) || 0;
+            const baseAmount = quantity * price;
+            const tax = row.tax ? parseFloat(row.tax.gstPercentage) : 0;
+            const taxAmount = (baseAmount * tax) / 100;
+            const totalAmount = baseAmount + taxAmount;
+            return sum + totalAmount;
         }, 0);
-      };
+    };
 
 
       const calculateTotal = (data = tableData, discountVal = discountValue, type = discountType) => {
@@ -274,9 +289,10 @@ const AddEstimates = ({ onClose }) => {
             return;
         }
     
-        // Calculate subtotal (sum of all item amounts)
+        // Calculate subtotal (sum of all item total amounts including their taxes)
         const subtotal = data.reduce((sum, row) => {
-            return sum + (parseFloat(row.amount) || 0);
+            const amount = parseFloat(row.amount) || 0;
+            return sum + amount;
         }, 0);
     
         // Calculate discount amount based on type
@@ -287,17 +303,17 @@ const AddEstimates = ({ onClose }) => {
             discountAmount = parseFloat(discountVal) || 0;
         }
     
-        // Calculate total tax
+        // Calculate total tax (sum of all item tax amounts)
         const totalTax = data.reduce((sum, row) => {
             const quantity = parseFloat(row.quantity) || 0;
             const price = parseFloat(row.price) || 0;
-            const tax = (parseFloat(row.tax) || 0);
+            const tax = row.tax ? parseFloat(row.tax.gstPercentage) : 0;
             const baseAmount = quantity * price;
             const taxAmount = (baseAmount * tax) / 100;
             return sum + taxAmount;
         }, 0);
     
-        // Calculate final total: subtotal - discount + tax
+        // Calculate final total: subtotal - discount
         const finalTotal = subtotal - discountAmount;
     
         setTotals({
@@ -308,76 +324,34 @@ const AddEstimates = ({ onClose }) => {
         });
     };
 
-//    const handleTableDataChange = (id, field, value) => {
-//     const updatedData = tableData.map((row) => {
-//       if (row.id === id) {
-//         const updatedRow = { ...row, [field]: value };
-        
-//         if (field === 'tax' && taxes?.data) {
-//           const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
-//           if (selectedTax) {
-//             setSelectedTaxDetails(prevDetails => ({
-//               ...prevDetails,
-//               [id]: {
-//                 gstName: selectedTax.gstName,
-//                 gstPercentage: selectedTax.gstPercentage
-//               }
-//             }));
-//           }
-//         }
-//         // Calculate amount if quantity, price, or tax changes
-//         if (field === 'quantity' || field === 'price' || field === 'tax') {
-//           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
-//           const price = parseFloat(field === 'price' ? value : row.price) || 0;
-//           const tax = parseFloat(field === 'tax' ? value : row.tax) || 0;
-          
-//           const baseAmount = quantity * price;
-//           const taxAmount = (baseAmount * tax) / 100;
-//           const totalAmount = baseAmount + taxAmount;
-          
-//           updatedRow.amount = totalAmount.toFixed(2);
-//         }
-        
-//         return updatedRow;
-//       }
-//       return row;
-//     });
-
-//     setTableData(updatedData);
-//     calculateTotal(updatedData, discountValue, discountType);
-//   };
-
-// ... existing code ...
-
-const handleTableDataChange = (id, field, value) => {
-    const updatedData = tableData.map((row) => {
-      if (row.id === id) {
-        const updatedRow = { ...row, [field]: value };
-        
-        // Calculate amount if quantity, price, or tax changes
-        if (field === 'quantity' || field === 'price' || field === 'tax') {
-          const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
-          const price = parseFloat(field === 'price' ? value : row.price) || 0;
-          const tax = field === 'tax' ? 
-            (value ? parseFloat(value.gstPercentage) : 0) : 
-            (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
-          
-          const baseAmount = quantity * price;
-          const taxAmount = (baseAmount * tax) / 100;
-          const totalAmount = baseAmount + taxAmount;
-          
-          updatedRow.amount = totalAmount.toFixed(2);
-        }
-        
-        return updatedRow;
-      }
-      return row;
-    });
-  
-    setTableData(updatedData);
-    calculateTotal(updatedData, discountValue, discountType);
-  };
-  
+    const handleTableDataChange = (id, field, value) => {
+        const updatedData = tableData.map((row) => {
+          if (row.id === id) {
+            const updatedRow = { ...row, [field]: value };
+            
+            // Calculate amount if quantity, price, or tax changes
+            if (field === 'quantity' || field === 'price' || field === 'tax') {
+              const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
+              const price = parseFloat(field === 'price' ? value : row.price) || 0;
+              const tax = field === 'tax' ? 
+                (value ? parseFloat(value.gstPercentage) : 0) : 
+                (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
+              
+              const baseAmount = quantity * price;
+              const taxAmount = (baseAmount * tax) / 100;
+              const totalAmount = baseAmount + taxAmount; // Item total = base amount + tax amount
+              
+              updatedRow.amount = totalAmount.toFixed(2);
+            }
+            
+            return updatedRow;
+          }
+          return row;
+        });
+      
+        setTableData(updatedData);
+        calculateTotal(updatedData, discountValue, discountType);
+    };
 
     return (
         <>
