@@ -4,6 +4,7 @@ import LeadMember from './leadMember/LeadMember';
 import FileList from './File/FileList';
 import NotesList from './notes/NotesList';
 import EstimatesList from './estimates/EstimatesList';
+import ReminderList from './Reminder/ReminderList';
 // import TaskList from './task/TaskList';
 // import InvoiceList from './invoice/InvoiceList';
 // import PaymentList from './payment/PaymentList';
@@ -26,6 +27,7 @@ const ViewLead  = () => {
     // { id: 'invoices', label: 'Invoices' },
     // { id: 'expenses', label: 'Expenses' },
     // { id: 'payments', label: 'Payments' },
+    {id:'reminder',label:'Reminder'},
     { id: 'notes', label: 'Notes' },
     { id: 'products', label: 'Products & Services' },
     // { id: 'activity', label: 'Activity' }
@@ -44,6 +46,7 @@ const ViewLead  = () => {
       // case "expenses": return <ExpensesList />;
       // case "payments": return <PaymentList />;
       case "notes": return <NotesList />;
+      case "reminder": return <ReminderList />;
       // case 'activity': return <ActivityList />;
       default: return <OverViewList />;
     }
