@@ -149,6 +149,20 @@ export const updateUser = createAsyncThunk(
   }
 );
 
+
+
+export const updateSuperAdmin = createAsyncThunk(
+  "users/updatesuperadmin",
+  async ({id, data}, thunkAPI) => {
+    try {
+      const response = await UserService.updatesuperadmin(id, data);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // Async thunk for updating a user
 
 const initialUser = () => {
@@ -339,7 +353,21 @@ const usersSlice = createSlice({
       .addCase(updateUser.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
+      })
+
+      .addCase(updateSuperAdmin.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateSuperAdmin.fulfilled, (state, action) => {
+        state.isLoading = false;
+        toast.success(action.payload.message);
+      })
+      .addCase(updateSuperAdmin.rejected, (state, action) => {
+        state.isLoading = false;
+        toast.error(action.payload?.response?.data?.message);
       });
+
+
   },
 });
 

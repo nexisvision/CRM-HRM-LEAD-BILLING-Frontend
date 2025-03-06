@@ -83,7 +83,7 @@ const SideNavContent = (props) => {
 			? JSON.parse(roleData?.permissions) 
 			: roleData?.permissions;
 
-		console.log('Parsed Permissions:', parsedPermissions);
+		
 
 		if (isSuper) {
 			return getSideNavMenuItem(extraNavvvTree);

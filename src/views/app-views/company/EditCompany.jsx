@@ -22,7 +22,7 @@ const EditCompany = ({ comnyid, onClose }) => {
   useEffect(() => {
     dispatch(ClientData());
     dispatch(getallcountries());
-  }, [dispatch]);
+  }, []);
 
   const alldatas = useSelector((state) => state.ClientData.ClientData.data);
 
@@ -66,7 +66,7 @@ const EditCompany = ({ comnyid, onClose }) => {
 
   useEffect(() => {
     if (loggedInUser && formik) {
-      formik.setValues({
+      const newValues = {
         firstName: loggedInUser.firstName || '',
         lastName: loggedInUser.lastName || '',
         phoneCode: loggedInUser.phoneCode || '',
@@ -85,9 +85,13 @@ const EditCompany = ({ comnyid, onClose }) => {
         banklocation: loggedInUser.banklocation || '',
         accounttype: loggedInUser.accounttype || '',
         profilePic: loggedInUser.profilePic || null,
-      });
+      };
+
+      if (JSON.stringify(newValues) !== JSON.stringify(formik.values)) {
+        formik.setValues(newValues);
+      }
     }
-  }, [loggedInUser, formik]);
+  }, [loggedInUser]);
 
   return (
     <div className="edit-company-modal">

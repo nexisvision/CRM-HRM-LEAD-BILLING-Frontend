@@ -322,17 +322,7 @@ const CompanyList = () => {
             onChange={onSearch}
             className="w-60"
           />
-          {/* <Select
-            defaultValue="All"
-            style={{ width: 180 }}
-            onChange={handleShowStatus}
-            className="w-60"
-            placeholder="Status"
-          >
-            <Option value="All">All Status</Option>
-            <Option value="active">Active</Option>
-            <Option value="blocked">Blocked</Option>
-          </Select> */}
+         
         </div>
 
         <div className="flex gap-4 ">

@@ -102,10 +102,19 @@ const resetpass = async (payload) => {
 //     return res.data
 // }
 
-// const updateUser = async (data) => {
-//     const res = await axios.put(`${baseUrl}users/${data?.id}`, data?.data, getToken());
-//     return res.data
-// }
+const updatesuperadmin = async (id ,data) => {
+  const token = localStorage.getItem("auth_token");
+
+    const res = await axios.put(`http://localhost:5353/api/v1/super-admin/${id}`,
+     data,
+     {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+    );
+    return res.data
+}
 
 const UserService = {
     // addUser,
@@ -114,6 +123,7 @@ const UserService = {
     forgotpass,
     forgototps,
     resetpass,
+    updatesuperadmin,
     // getAllUsers,    
     // getUserById,
     // deleteUser,

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Button, Form, Input, Divider, Alert, Modal } from 'antd';
+import { Button, Form, Input, Divider, Modal } from 'antd';
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 import { GoogleSVG, FacebookSVG } from 'assets/svg/icon';
@@ -14,8 +14,7 @@ import {
 	signInWithFacebook 
 } from 'store/slices/authSlice';
 import { useNavigate } from 'react-router-dom'
-import { motion } from "framer-motion"
-import UserService from '../auth-reducers/UserService';
+
 import { useDispatch } from 'react-redux';
 import { autol, forgototp, forgotpass, resetpass, userLogin } from '../auth-reducers/UserSlice';
 
@@ -174,20 +173,15 @@ export const LoginForm = props => {
 
 
 	const { 
-		otherSignIn, 
-		showForgetPassword, 
+		
 		hideAuthMessage,
-		onForgetPasswordClick,
 		showLoading,
 		signInWithGoogle,
 		signInWithFacebook,
-		extra, 
-		signIn, 
 		token, 
 		loading,
 		redirect,
 		showMessage,
-		message,
 		allowRedirect = true
 	} = props
 
@@ -205,9 +199,9 @@ export const LoginForm = props => {
 
 			if (localemail) {
 				try {
-					console.log('Attempting auto login with:', localemail); // Debug log
+					
 					const response = await dispatch(autol({localemail,localtoken}));
-					console.log('Auto login response:', response); // Debug log
+					
 
 					if (response.meta.requestStatus === 'fulfilled') { 
 						localStorage.removeItem('email');
@@ -304,13 +298,7 @@ export const LoginForm = props => {
 	return (
 		<div className="bg-white rounded-2xl p-8 w-full max-w-md mx-auto ">
 			<div className="mb-6">
-				{/* <h1 className="text-2xl font-bold text-gray-800 mb-2">emilus</h1>
-				<p className="text-gray-600">
-					Don't have an account yet? 
-					<span className="text-blue-600 hover:text-blue-700 cursor-pointer ml-1">
-						Sign Up
-					</span>
-				</p> */} 
+				
 			</div>
 
 			<Form 

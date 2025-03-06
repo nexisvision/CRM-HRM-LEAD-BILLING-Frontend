@@ -17,62 +17,148 @@ const templates = {
 		placeholders: {
 			app_name: "My App",
 			company_name: "My Company",
-			app_url: "http://myapp.com",
 			support_name: "John Doe",
 			support_title: "Issue with login",
 			support_priority: "High",
 			support_end_date: "2024-12-20",
 			support_description: "Cannot log into the account.",
+			ticket_id: "TKT-001",
+			assigned_to: "Support Team",
+			department: "Technical Support"
 		},
-		emailMessage: `Hi {support_name},
-    					New support ticket has been opened.
+		emailMessage: `Dear {support_name},
 
+A new support ticket has been created for {app_name}.
+
+Ticket Details:
+---------------
+Ticket ID: {ticket_id}
 Title: {support_title}
 Priority: {support_priority}
 End Date: {support_end_date}
+Assigned To: {assigned_to}
+Department: {department}
 
-Support message:
-{support_description}`,
+Description:
+{support_description}
+
+Please contact {company_name} support team if you have any questions.
+
+Best regards,
+{company_name} Support Team`
 	},
-	"Bug Report": {
+	"Welcome Email": {
 		placeholders: {
-			bug_name: "Bug Tracker",
-			company_name: "BugFixers Inc.",
-			app_url: "http://bugtracker.com",
-			support_name: "Jane Smith",
-			support_title: "UI Bug in Dashboard",
-			support_priority: "Medium",
+			user_name: "John Doe",
+			company_name: "My Company",
+			app_name: "My App",
+			login_url: "https://myapp.com/login",
+			support_email: "support@myapp.com",
+			help_center_url: "https://help.myapp.com",
+			getting_started_url: "https://myapp.com/getting-started"
 		},
-		emailMessage: `Hi {bug_name},
-    
-A new bug report has been submitted.
+		emailMessage: `Welcome to {app_name}, {user_name}!
 
-company_name: {BugFixers Inc.}
-support_name: {Jane Smith}
-End Date: {support_end_dateee}
+We're excited to have you on board with {company_name}. Here's everything you need to get started:
 
-Details:
-{bug_description}`,
+1. Login to your account: {login_url}
+2. Check out our getting started guide: {getting_started_url}
+3. Browse our help center: {help_center_url}
+
+If you need any assistance, please don't hesitate to contact us at {support_email}.
+
+Best regards,
+The {company_name} Team`
 	},
-	"Lead Assigned": {
+	"Invoice Payment": {
 		placeholders: {
-			lead_name: "lead name",
-			lead_email: "lead email",
-			lead_subject: "lead subject",
-			lead_pipeline: "lead pipeline",
-			lead_stage: "lead stage",
+			client_name: "John Doe",
+			company_name: "My Company",
+			invoice_number: "INV-001",
+			invoice_date: "2024-03-06",
+			due_date: "2024-03-20",
+			amount: "$1,000.00",
+			payment_link: "https://payment.mycompany.com/inv-001",
+			currency: "USD",
+			payment_terms: "Net 15"
 		},
-		emailMessage: `Hi {lead_name},
-    
-A new lead has been assigned.
+		emailMessage: `Dear {client_name},
 
-Lead Email: {lead_email}
-Lead Subject: {lead_subject}
-Lead Pipeline: {lead_pipeline}
-Lead Stage: {lead_stage}
+This email is to inform you that invoice #{invoice_number} has been generated for your recent services with {company_name}.
 
-Details:
-{lead_description}`,
+Invoice Details:
+---------------
+Invoice Number: {invoice_number}
+Date Issued: {invoice_date}
+Due Date: {due_date}
+Amount Due: {amount} {currency}
+Payment Terms: {payment_terms}
+
+To make your payment, please click here: {payment_link}
+
+If you have any questions about this invoice, please don't hesitate to contact us.
+
+Thank you for your business!
+
+Best regards,
+{company_name} Team`
+	},
+	"Meeting Schedule": {
+		placeholders: {
+			recipient_name: "John Doe",
+			meeting_title: "Project Review",
+			meeting_date: "March 10, 2024",
+			meeting_time: "10:00 AM EST",
+			meeting_duration: "1 hour",
+			meeting_link: "https://meet.google.com/xxx",
+			agenda: "1. Project Updates\n2. Timeline Review\n3. Next Steps",
+			host_name: "Jane Smith",
+			host_title: "Project Manager"
+		},
+		emailMessage: `Dear {recipient_name},
+
+You are invited to attend a meeting for {meeting_title}.
+
+Meeting Details:
+---------------
+Date: {meeting_date}
+Time: {meeting_time}
+Duration: {meeting_duration}
+Meeting Link: {meeting_link}
+
+Agenda:
+{agenda}
+
+Host: {host_name}
+Title: {host_title}
+
+Please confirm your attendance by accepting the calendar invitation.
+
+Best regards,
+{host_name}`
+	},
+	"Password Reset": {
+		placeholders: {
+			user_name: "John Doe",
+			reset_link: "https://myapp.com/reset-password",
+			expiry_time: "1 hour",
+			company_name: "My Company",
+			support_email: "support@mycompany.com",
+			app_name: "My App"
+		},
+		emailMessage: `Dear {user_name},
+
+We received a request to reset your password for your {app_name} account.
+
+To reset your password, please click on the following link:
+{reset_link}
+
+Please note that this link will expire in {expiry_time}.
+
+If you didn't request this password reset, please ignore this email or contact us at {support_email}.
+
+Best regards,
+{company_name} Security Team`
 	}
 };
 
@@ -84,15 +170,41 @@ const MailCompose = () => {
 	const [selectedTemplate, setSelectedTemplate] = useState("Select Template");
 	const [placeholders, setPlaceholders] = useState({});
 	const [emailMessage, setEmailMessage] = useState('');
+	const [currentTemplate, setCurrentTemplate] = useState(null);
 
 	const handleTemplateChange = (templateName) => {
 		setSelectedTemplate(templateName);
 		setPlaceholders(templates[templateName].placeholders);
-		setEmailMessage(templates[templateName].emailMessage || '');
+		setCurrentTemplate(templates[templateName].emailMessage || '');
+		
+		// Update the message with default placeholder values
+		const updatedMessage = replacePlaceholders(
+			templates[templateName].emailMessage || '',
+			templates[templateName].placeholders
+		);
+		setEmailMessage(updatedMessage);
 
 		form.setFieldsValue({
-			message: templates[templateName].emailMessage || ''
+			message: updatedMessage
 		});
+	};
+
+	// Update this function to handle placeholder changes
+	const handlePlaceholderChange = (key, value) => {
+		const newPlaceholders = {
+			...placeholders,
+			[key]: value
+		};
+		setPlaceholders(newPlaceholders);
+
+		// Update email message with new placeholder values
+		if (currentTemplate) {
+			const updatedMessage = replacePlaceholders(currentTemplate, newPlaceholders);
+			setEmailMessage(updatedMessage);
+			form.setFieldsValue({
+				message: updatedMessage
+			});
+		}
 	};
 
 	// Replace placeholders in template with actual values
@@ -123,7 +235,7 @@ const MailCompose = () => {
 			dispatch(sendmailslice(emailData))
 				.then(() => {
 					message.success('Email sent successfully');
-					navigate('/app/apps/mail/inbox');
+					navigate('/app/dashboards/mail/inbox');
 				})
 				.catch((error) => {
 					message.error('Failed to send email: ' + (error.message || 'Unknown error'));
@@ -164,14 +276,14 @@ const MailCompose = () => {
 								<Row gutter={[16, 8]}>
 									{Object.entries(placeholders).map(([key, value]) => (
 										<Col xs={24} sm={12} md={8} key={key}>
-											<Form.Item label={key} name={['placeholders', key]} initialValue={value}>
+											<Form.Item 
+												label={key} 
+												name={['placeholders', key]} 
+												initialValue={value}
+											>
 												<Input
-													onChange={(e) => {
-														setPlaceholders(prev => ({
-															...prev,
-															[key]: e.target.value
-														}));
-													}}
+													value={placeholders[key]}
+													onChange={(e) => handlePlaceholderChange(key, e.target.value)}
 												/>
 											</Form.Item>
 										</Col>
@@ -220,7 +332,7 @@ const MailCompose = () => {
 							<TextArea
 								rows={10}
 								value={emailMessage}
-								onChange={(e) => setEmailMessage(e.target.value)}
+								readOnly={selectedTemplate !== "Select Template"}
 								placeholder="Write your message here..."
 							/>
 						</Form.Item>

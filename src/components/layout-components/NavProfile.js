@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Avatar, Modal, Form, Input, Upload, Button, message, Select, Menu, Dropdown } from 'antd';
+import { Avatar, Modal, Form, Input, Upload, Button, message, Select, Menu,  Dropdown } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import {
 	EditOutlined,
@@ -8,17 +8,23 @@ import {
 	QuestionCircleOutlined,
 	LogoutOutlined,
 	UserOutlined,
-	UploadOutlined
+	UploadOutlined,
+	PlusOutlined
 } from '@ant-design/icons';
 import NavItem from './NavItem';
 import Flex from 'components/shared-components/Flex';
 import { signOut } from 'store/slices/authSlice';
-import { updateUser, getUserById } from 'views/auth-views/auth-reducers/UserSlice';
+import { updateUser, getUserById, updateSuperAdmin } from 'views/auth-views/auth-reducers/UserSlice';
 import styled from '@emotion/styled';
 import { FONT_WEIGHT, MEDIA_QUERIES, SPACER } from 'constants/ThemeConstant';
 import EditCompany from 'views/app-views/company/EditCompany';
 import { Formik } from "formik";
 import * as Yup from "yup";
+import AddCountries from "views/app-views/setting/countries/AddCountries";
+import { getallcountries } from 'views/app-views/setting/countries/countriesreducer/countriesSlice';
+
+
+const { Option } = Select;
 
 const StyledModal = styled(Modal)`
 	.ant-modal-content {
@@ -145,16 +151,11 @@ const validationSchema = Yup.object({
 	password: Yup.string().min(6, 'Password must be at least 6 characters')
 });
 
-const FormField = ({ label, name, type = "text", required, children }) => (
+const FormField = ({ label, name, type = "text", required, children, error }) => (
 	<div className="form-field">
 		<label>{label} {required && <span style={{ color: '#dc3545' }}>*</span>}</label>
-		{children || (
-			<Input
-				type={type}
-				name={name}
-				placeholder={`Enter ${label.toLowerCase()}`}
-			/>
-		)}
+		{children}
+		{error && <div className="error-message">{error}</div>}
 	</div>
 );
 
@@ -166,12 +167,18 @@ export const NavProfile = ({ mode }) => {
 	const { loggedInUser } = useSelector((state) => state.user);
 	const [userRole, setUserRole] = useState("");
 	const [userName, setUserName] = useState("");
+	const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
+	const countries = useSelector((state) => state.countries?.countries);
 
 	useEffect(() => {
 		if (!roles || !loggedInUser) return;
 
-		const role = roles.find(r => r?.role_id === loggedInUser?.role_id);
-		setUserRole(role?.role_name || "");
+		const rolee = loggedInUser?.role_id;
+
+		const role = roles.find(r => r?.id === rolee)?.role_name;
+
+		setUserRole(role || "");
+		
 		setUserName(loggedInUser?.username || "");
 
 		if (loggedInUser?.profilePic) {
@@ -184,32 +191,46 @@ export const NavProfile = ({ mode }) => {
 		}
 	}, [roles, loggedInUser]);
 
+	useEffect(() => {
+		dispatch(getallcountries());
+	}, [dispatch]);
+
 	const handleSubmit = async (values, { setSubmitting }) => {
 		try {
+			// Create FormData object to properly handle file upload
 			const formData = new FormData();
+			
+			// Append basic fields
 			formData.append('id', loggedInUser?.id);
+			formData.append('firstName', values.firstName);
+			formData.append('lastName', values.lastName);
+			formData.append('phone', values.phone);
+			if (values.password) {
+				formData.append('password', values.password);
+			}
 
-			Object.entries(values).forEach(([key, value]) => {
-				if (key !== 'profilePic' && value != null && (value !== '' || key === 'password')) {
-					formData.append(key, value);
-				}
-			});
-
+			// Append profile picture if exists
 			if (fileList[0]?.originFileObj) {
 				formData.append('profilePic', fileList[0].originFileObj);
 			}
 
-			const response = await dispatch(updateUser(formData)).unwrap();
+			let response;
+			if (userRole === "super-admin") {
+				response = await dispatch(updateSuperAdmin({
+					id: loggedInUser.id,
+					data: formData
+				}));
+			} else {
+				response = await dispatch(updateUser(formData));
+			}
 
-			if (response?.success || response?.status === 200) {
+			if (response?.payload?.success || response?.payload?.status === 200) {
 				message.success('Profile updated successfully');
 				await dispatch(getUserById(loggedInUser.id));
 				setIsModalVisible(false);
-			} else {
-				throw new Error(response?.message);
 			}
 		} catch (error) {
-			message.error(error.message || 'Failed to update profile');
+			message.error('Failed to update profile');
 		} finally {
 			setSubmitting(false);
 		}
@@ -223,25 +244,7 @@ export const NavProfile = ({ mode }) => {
 					<span className="ml-2">Edit Profile</span>
 				</Flex>
 			</Menu.Item>
-			<Menu.Item key="settings">
-				<Flex alignItems="center">
-					<SettingOutlined />
-					<span className="ml-2">Account Setting</span>
-				</Flex>
-			</Menu.Item>
-			<Menu.Item key="billing">
-				<Flex alignItems="center">
-					<ShopOutlined />
-					<span className="ml-2">Account Billing</span>
-				</Flex>
-			</Menu.Item>
-			<Menu.Item key="help">
-				<Flex alignItems="center">
-					<QuestionCircleOutlined />
-					<span className="ml-2">Help Center</span>
-				</Flex>
-			</Menu.Item>
-			<Menu.Divider />
+			
 			<Menu.Item key="logout" onClick={() => dispatch(signOut())}>
 				<Flex alignItems="center">
 					<LogoutOutlined />
@@ -266,10 +269,20 @@ export const NavProfile = ({ mode }) => {
 				return false;
 			}
 
-			setFileList([file]);
+			// Store the actual file object
+			setFileList([{
+				originFileObj: file,
+				uid: '-1',
+				name: file.name,
+				status: 'done',
+				url: URL.createObjectURL(file)
+			}]);
 			return false;
 		},
-		onRemove: () => setFileList([]),
+		onRemove: () => {
+			setFileList([]);
+			return true;
+		},
 		fileList
 	};
 
@@ -290,7 +303,7 @@ export const NavProfile = ({ mode }) => {
 							/>
 							<UserInfo>
 								<Name>{userName}</Name>
-								<Title>{userRole}</Title>
+								
 							</UserInfo>
 						</Profile>
 					</NavItem>
@@ -302,61 +315,103 @@ export const NavProfile = ({ mode }) => {
 				visible={isModalVisible}
 				onCancel={() => setIsModalVisible(false)}
 				footer={null}
-				width={720}
-				destroyOnClose
+				width={1000}
+
 				centered
 			>
-				{userRole === "superadmin" ? (
+				{userRole === "super-admin" ? (
 					<Formik
 						initialValues={{
-							email: loggedInUser?.email || '',
 							firstName: loggedInUser?.firstName || '',
 							lastName: loggedInUser?.lastName || '',
+							phoneCode: '+91',
 							phone: loggedInUser?.phone || '',
-							password: ''
+							password: '',
+							profilePic: loggedInUser?.profilePic || ''
 						}}
-						validationSchema={validationSchema}
 						onSubmit={handleSubmit}
 					>
-						{({ handleSubmit, isSubmitting, errors, touched }) => (
+						{({ handleSubmit, isSubmitting, errors, touched, handleChange, values, setFieldValue }) => (
 							<FormContainer>
 								<form onSubmit={handleSubmit}>
 									<div className="form-section">
 										<h3>Personal Information</h3>
 										<div className="form-row">
 											<FormField
-												label="Email"
-												name="email"
-												required
-												error={touched.email && errors.email}
-											/>
-											<FormField
 												label="First Name"
 												name="firstName"
 												required
-												error={touched.firstName && errors.firstName}
-											/>
+											>
+												<Input
+													name="firstName"
+													value={values.firstName}
+													onChange={handleChange}
+													placeholder="Enter first name"
+												/>
+											</FormField>
 										</div>
 										<div className="form-row">
 											<FormField
 												label="Last Name"
 												name="lastName"
 												required
-												error={touched.lastName && errors.lastName}
-											/>
+											>
+												<Input
+													name="lastName"
+													value={values.lastName}
+													onChange={handleChange}
+													placeholder="Enter last name"
+												/>
+											</FormField>
 											<FormField label="Phone" name="phone" required>
 												<Input.Group compact>
 													<Select
-														defaultValue="91"
-														style={{ width: '30%' }}
+														name="phoneCode"
+														style={{ width: '80px' }}
+														value={values.phoneCode}
+														onChange={(value) => {
+															if (value === 'add_new') {
+																setIsAddPhoneCodeModalVisible(true);
+															} else {
+																setFieldValue('phoneCode', value);
+															}
+														}}
+														className="phone-code-select"
+														dropdownStyle={{ minWidth: '180px' }}
+														suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+														dropdownRender={menu => (
+															<div>
+																<div
+																	className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+																	onClick={() => setIsAddPhoneCodeModalVisible(true)}
+																>
+																	<PlusOutlined className="mr-2" />
+																	<span className="text-sm">Add New</span>
+																</div>
+																{menu}
+															</div>
+														)}
 													>
-														<Select.Option value="91">+91</Select.Option>
-														<Select.Option value="1">+1</Select.Option>
-														<Select.Option value="44">+44</Select.Option>
+														{countries?.map((country) => (
+															<Option key={country.id} value={country.phoneCode}>
+																<div className="flex items-center w-full px-1">
+																	<span className="text-base min-w-[40px]">{country.phoneCode}</span>
+																	<span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+																	<span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+																</div>
+															</Option>
+														))}
 													</Select>
 													<Input
 														style={{ width: '70%' }}
 														name="phone"
+														value={values.phone}
+														onChange={(e) => {
+															const value = e.target.value.replace(/\D/g, '');
+															if (value.length <= 15) {
+																setFieldValue('phone', value);
+															}
+														}}
 														placeholder="Enter phone number"
 													/>
 												</Input.Group>
@@ -371,8 +426,14 @@ export const NavProfile = ({ mode }) => {
 												label="New Password"
 												name="password"
 												type="password"
-												error={touched.password && errors.password}
-											/>
+											>
+												<Input.Password
+													name="password"
+													value={values.password}
+													onChange={handleChange}
+													placeholder="Enter new password"
+												/>
+											</FormField>
 											<FormField label="Profile Picture">
 												<Upload {...uploadProps}>
 													<Button icon={<UploadOutlined />}>
@@ -406,6 +467,46 @@ export const NavProfile = ({ mode }) => {
 					/>
 				)}
 			</StyledModal>
+
+			<Modal
+				title="Add New Country"
+				visible={isAddPhoneCodeModalVisible}
+				onCancel={() => setIsAddPhoneCodeModalVisible(false)}
+				footer={null}
+				width={600}
+			>
+				<AddCountries
+					onClose={() => {
+						setIsAddPhoneCodeModalVisible(false);
+						dispatch(getallcountries());
+					}}
+				/>
+			</Modal>
+
+			<style jsx="true">{`
+				.phone-code-select .ant-select-selector {
+					background-color: #f8fafc !important;
+					border-top-right-radius: 0 !important;
+					border-bottom-right-radius: 0 !important;
+					border-right: 0 !important;
+				}
+
+				.phone-code-select .ant-select-selection-item {
+					display: flex !important;
+					align-items: center !important;
+					justify-content: center !important;
+					font-size: 16px !important;
+				}
+
+				.phone-code-select .ant-select-selection-item > div {
+					display: flex !important;
+					align-items: center !important;
+				}
+
+				.phone-code-select .ant-select-selection-item span:not(:first-child) {
+					display: none !important;
+				}
+			`}</style>
 		</>
 	);
 };
