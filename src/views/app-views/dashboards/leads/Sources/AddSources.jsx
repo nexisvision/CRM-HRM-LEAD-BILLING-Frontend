@@ -55,30 +55,30 @@ const AddSources = () => {
           </Button>,
         ]}
       > */}
-        <Form layout="vertical">
-        <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+      <Form layout="vertical">
 
-          <Checkbox.Group
-            options={sources}
-            onChange={onChange}
-            style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
-          />
-        </Form>
 
-        <Form.Item>
-          <div className="form-buttons text-right">
-            <Button
-              type="default"
-              className="mr-2"
-              onClick={() => navigate('/deals')}
-            >
-              Cancel
-            </Button>
-            <Button type="primary" htmlType="submit">
-              Create
-            </Button>
-          </div>
-        </Form.Item>
+        <Checkbox.Group
+          options={sources}
+          onChange={onChange}
+          style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
+        />
+      </Form>
+
+      <Form.Item>
+        <div className="form-buttons text-right">
+          <Button
+            type="default"
+            className="mr-2"
+            onClick={() => navigate('/deals')}
+          >
+            Cancel
+          </Button>
+          <Button type="primary" htmlType="submit">
+            Create
+          </Button>
+        </div>
+      </Form.Item>
       {/* </Modal> */}
     </div>
   );

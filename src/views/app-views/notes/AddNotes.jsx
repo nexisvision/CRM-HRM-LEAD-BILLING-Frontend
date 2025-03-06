@@ -63,7 +63,7 @@ const AddNotes = ({ onClose }) => {
       >
         {({ values, setFieldValue, isSubmitting, errors, touched }) => (
           <Form>
-            <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+            
             
             <Row gutter={16}>
               <Col span={24}>
@@ -270,7 +270,7 @@ export default AddNotes;
 //       >
 //         {({ values, setFieldValue, isSubmitting, errors, touched }) => (
 //           <Form>
-//             <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+//             
             
 //             <Row gutter={16}>
 //               <Col span={24}>

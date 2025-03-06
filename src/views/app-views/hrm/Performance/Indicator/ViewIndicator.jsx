@@ -26,8 +26,8 @@ const ViewIndicator = ({ visible, onClose }) => {
   ];
 
   return (
-  <>
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+    <>
+
 
       <div className="mb-4">
         <p>
@@ -53,7 +53,7 @@ const ViewIndicator = ({ visible, onClose }) => {
         </div>
       ))}
 
-</>
+    </>
   );
 };
 

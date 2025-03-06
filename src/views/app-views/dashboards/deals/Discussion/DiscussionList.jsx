@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Button, Avatar, Card,Modal } from 'antd';
+import { Table, Button, Avatar, Card, Modal } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import AddDiscussion from './AddDiscussion';
 
@@ -27,11 +27,11 @@ const DiscussionList = () => {
   };
 
   const columns = [
-   
+
     {
-        title: 'Message',
-        dataIndex: 'message',
-        key: 'message',
+      title: 'Message',
+      dataIndex: 'message',
+      key: 'message',
     },
     {
       title: 'Action',
@@ -41,7 +41,7 @@ const DiscussionList = () => {
           type="text"
           icon={<DeleteOutlined />}
           danger
-        //   style={{ background: '#ffefef', color: '#ff4d4f', borderRadius: '5px' }}
+          //   style={{ background: '#ffefef', color: '#ff4d4f', borderRadius: '5px' }}
           onClick={() => deleteMessage(record.id)}
         />
       ),
@@ -53,13 +53,13 @@ const DiscussionList = () => {
       title={<h3>Discussion</h3>}
       extra={
         <Button type="primary" className="ml-2" onClick={openAddDiscussionModal}>
-            <PlusOutlined />
-            {/* <span>New</span> */}
-          </Button>
+          <PlusOutlined />
+          {/* <span>New</span> */}
+        </Button>
       }
       bodyStyle={{ padding: '0' }}
     >
-              <hr style={{ margin: '20px', border: '1px solid #e8e8e8' }} />
+
 
       <Table
         dataSource={messages}
@@ -68,7 +68,7 @@ const DiscussionList = () => {
         rowKey="id"
         style={{ padding: '10px' }}
       />
-       <Modal
+      <Modal
         title="Add Discussion"
         visible={isAddDiscussionModalVisible}
         onCancel={closeAddDiscussionModal}

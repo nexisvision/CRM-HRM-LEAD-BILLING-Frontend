@@ -5,14 +5,17 @@ import {
   Button,
   DatePicker,
   Select,
-  Upload,
   message,
   Row,
   Col,
 } from "antd";
 import { useNavigate } from "react-router-dom";
+<<<<<<< Updated upstream
 import { ReloadOutlined } from "@ant-design/icons";
 import ReactQuill from "react-quill";
+=======
+import { ToTopOutlined } from "@ant-design/icons";
+>>>>>>> Stashed changes
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
@@ -27,12 +30,11 @@ import { PlusOutlined } from '@ant-design/icons';
 import AddDepartment from '../Department/AddDepartment';
 import AddDesignation from '../Designation/AddDesignation';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
-import { AddSalaryss, getSalaryss } from "../PayRoll/Salary/SalaryReducers/SalarySlice";
+import { AddSalaryss } from "../PayRoll/Salary/SalaryReducers/SalarySlice";
 
 const { Option } = Select;
 
 const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -67,12 +69,9 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let password = "";
 
-    // Generate 6 characters
     for (let i = 0; i < length; i++) {
       password += charset[Math.floor(Math.random() * charset.length)];
     }
-
-    // Ensure at least one number
     const randomNum = Math.floor(Math.random() * 10).toString();
     password = password.slice(0, 7) + randomNum;
 
@@ -161,7 +160,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
       if (response.payload?.data?.employeeId) {
         updatedFormValues.employeeId = response.payload.data.employeeId;
         setFormValues(updatedFormValues); // Set formValues here
-        
+
         // Only reset form and close modal after successful employee creation
         if (!response.payload?.data?.sessionToken) {
           resetForm();
@@ -280,10 +279,10 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
   };
 
   return (
-    <div className="add-employee p-6">
+    <div className="add-employee">
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}  
+        // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({
@@ -299,80 +298,98 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
             onSubmit={handleSubmit}
             onFinishFailed={onFinishFailed}
           >
-            <h1 className="border-b-2 border-gray-300 pb-4 mt-[-35px] "></h1>
-            <h1 className="text-lg font-bold mb-4">Personal Details</h1>
+            <h2 className="text-lg font-medium text-gray-700 mb-4">Personal Details</h2>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">First Name <span className="text-red-500">*</span></label>
-                  <Field name="firstName" as={Input} placeholder="John" className="mt-1" />
-                  <ErrorMessage name="firstName" component="div" className="text-red-500" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    First Name <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    name="firstName"
+                    as={Input}
+                    placeholder="John"
+                    className="w-full rounded-md border-gray-300 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                  <ErrorMessage name="firstName" component="div" className="mt-1 text-sm text-red-500" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Last Name <span className="text-red-500">*</span></label>
-                  <Field name="lastName" as={Input} placeholder="Doe" className="mt-1" />
-                  <ErrorMessage name="lastName" component="div" className="text-red-500" />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Last Name <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    name="lastName"
+                    as={Input}
+                    placeholder="Doe"
+                    className="w-full rounded-md border-gray-300 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                  <ErrorMessage name="lastName" component="div" className="mt-1 text-sm text-red-500" />
                 </div>
               </Col>
             </Row>
-            <Row gutter={16}>
+
+            <Row gutter={16} className="mt-4">
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Username <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Username <span className="text-rose-500">*</span></label>
                   <Field name="username" as={Input} placeholder="john_doe" className="mt-1" />
-                  <ErrorMessage name="username" component="div" className="text-red-500" />
+                  <ErrorMessage name="username" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
               <Col span={12}>
-                <div className="form-item mt-2">
-                  <label className="font-semibold">Password <span className="text-red-500">*</span></label>
-                  <div className="relative">
+                <div className="form-item">
+                  <label className="font-semibold">Password <span className="text-rose-500">*</span></label>
+                  <div className="relative flex items-center">
                     <Field
                       name="password"
                       as={Input.Password}
                       placeholder="Password"
-                      className="mt-1 w-full"
+                      className="mt-1 pr-12 w-full"
                     />
                     <Button
-                      className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 px-2 border-0 bg-transparent hover:bg-gray-50"
                       onClick={() => setFieldValue("password", generatePassword())}
+                      style={{ marginTop: '2px' }}
                     >
                      <ReloadOutlined/>
                     </Button>
                   </div>
-                  <ErrorMessage
-                    name="password"
-                    component="div"
-                    className="text-red-500"
-                  />
+                  <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
             </Row>
-            <Row gutter={16}>
+
+            <Row gutter={16} className="mt-4">
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Email <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Email <span className="text-rose-500">*</span></label>
                   <Field name="email" as={Input} placeholder="johndoe@example.com" className="mt-1" />
-                  <ErrorMessage name="email" component="div" className="text-red-500" />
+                  <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
-              <Col span={12} className="mt-2">
+              <Col span={12}>
                 <div className="form-item">
-                  <label className="">Phone <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Phone <span className="text-rose-500">*</span></label>
                   <div className="flex">
                     <Select
                       style={{ width: '30%', marginRight: '8px' }}
                       placeholder="Code"
                       name="phoneCode"
+                      defaultValue="91"
                       onChange={(value) => setFieldValue('phoneCode', value)}
+                      className="mt-1"
                     >
-                      {countries.map((country) => (
-                        <Option key={country.id} value={country.phoneCode}>
-                          ({country.phoneCode})
-                        </Option>
-                      ))}
+                      {countries && countries.length > 0 ? (
+                        countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            {country.phoneCode}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option value="91">+91</Option>
+                      )}
                     </Select>
                     <Field name="phone">
                       {({ field }) => (
@@ -381,24 +398,16 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                           type="string"
                           style={{ width: '70%' }}
                           placeholder="Enter phone number"
-                          onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                          }}
-                          className="hide-number-spinner"
+                          className="mt-1"
                         />
                       )}
                     </Field>
                   </div>
-                  <ErrorMessage
-                    name="phoneNumber"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <ErrorMessage name="phone" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
             </Row>
+
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
@@ -542,7 +551,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
               <Col span={12}>
                 <div className="form-item mt-2">
                   <label className="font-semibol">Salary <span className="text-red-500">*</span></label>
-                  <Field name="salary" as={Input} placeholder="$" type="number" className="mt-1" />
+                  <Field name="salary" as={Input} placeholder="$" type="text" className="mt-1" />
                   <ErrorMessage name="salary" component="div" className="text-red-500" />
                 </div>
               </Col>
@@ -726,16 +735,20 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                 </Row>
               </>
             )}
-            <div className="text-right mt-4">
-              <Button type="default" className="mr-2" onClick={() => onClose()}>
+            <div className="text-right mt-6 space-x-2">
+              <Button
+                onClick={onClose}
+                className="hover:bg-gray-50 border-gray-300 text-gray-600"
+              >
                 Cancel
               </Button>
               <Button
                 type="primary"
                 htmlType="submit"
                 loading={isSubmitting}
+                className="bg-blue-500 hover:bg-blue-600 border-0"
               >
-                {isSubmitting ? "Submitting..." : "Submit"}
+                {isSubmitting ? "Creating..." : "Create Employee"}
               </Button>
             </div>
           </Form>
@@ -769,29 +782,47 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
         </div>
       </Modal>
       <Modal
-        title="Add Branch"
+        title={
+          <div className="flex items-center gap-2 text-gray-700">
+            <PlusOutlined className="text-lg" />
+            <span className="font-medium">Add Branch</span>
+          </div>
+        }
         visible={isAddBranchModalVisible}
         onCancel={closeAddBranchModal}
         footer={null}
         width={800}
+        className="custom-modal"
       >
         <AddBranch onClose={closeAddBranchModal} />
       </Modal>
       <Modal
-        title="Add Department"
+        title={
+          <div className="flex items-center gap-2 text-gray-700">
+            <PlusOutlined className="text-lg" />
+            <span className="font-medium">Add Department</span>
+          </div>
+        }
         visible={isAddDepartmentModalVisible}
         onCancel={closeAddDepartmentModal}
         footer={null}
         width={800}
+        className="custom-modal"
       >
         <AddDepartment onClose={closeAddDepartmentModal} />
       </Modal>
       <Modal
-        title="Add Designation"
+        title={
+          <div className="flex items-center gap-2 text-gray-700">
+            <PlusOutlined className="text-lg" />
+            <span className="font-medium">Add Designation</span>
+          </div>
+        }
         visible={isAddDesignationModalVisible}
         onCancel={closeAddDesignationModal}
         footer={null}
         width={800}
+        className="custom-modal"
       >
         <AddDesignation onClose={closeAddDesignationModal} />
       </Modal>

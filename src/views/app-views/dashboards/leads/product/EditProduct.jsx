@@ -81,7 +81,7 @@
 
 //   return (
 //     <div className="add-expenses-form">
-//       <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+//       
 //       <Formik
 //         initialValues={initialValues}
 //         validationSchema={validationSchema}
@@ -389,7 +389,7 @@ const EditProduct = ({ idd, onClose }) => {
     for (const key in values) {
       formData.append(key, values[key]);
     }
-    
+
     dispatch(EditProdu({ idd, formData })).then(() => {
       dispatch(GetProdu(id));
       onClose();
@@ -398,7 +398,7 @@ const EditProduct = ({ idd, onClose }) => {
 
   return (
     <div className="add-expenses-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -514,7 +514,7 @@ const EditProduct = ({ idd, onClose }) => {
 
               <Col span={24} className="mt-4">
                 <div className="form-item">
-                    <label className="font-semibold">Description</label>
+                  <label className="font-semibold">Description</label>
                   <ReactQuill
                     value={values.description}
                     onChange={(value) => setFieldValue("description", value)}
@@ -530,7 +530,7 @@ const EditProduct = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              
+
 
               <Col span={24} className="mt-4">
                 <span className="block font-semibold p-2">
@@ -556,10 +556,10 @@ const EditProduct = ({ idd, onClose }) => {
               <Row justify="end" className="mt-6">
                 <Col>
                   <Space className="flex justify-end">
-                    <Button 
+                    <Button
                       onClick={onClose}
                       className="px-4"
-                      style={{ 
+                      style={{
                         borderRadius: '6px',
                         color: '#666666',
                         borderColor: '#d9d9d9',
@@ -568,11 +568,11 @@ const EditProduct = ({ idd, onClose }) => {
                     >
                       Cancel
                     </Button>
-                    <Button 
-                      type="primary" 
+                    <Button
+                      type="primary"
                       htmlType="submit"
                       className="px-4 "
-                      style={{ 
+                      style={{
                         borderRadius: '6px',
                         backgroundColor: '#3366FF'
                       }}
@@ -587,8 +587,8 @@ const EditProduct = ({ idd, onClose }) => {
         )}
       </Formik>
 
-        {/* Add Category Modal */}
-        <Modal
+      {/* Add Category Modal */}
+      <Modal
         title="Add New Category"
         open={isCategoryModalVisible}
         onCancel={() => setIsCategoryModalVisible(false)}
@@ -601,7 +601,7 @@ const EditProduct = ({ idd, onClose }) => {
           onChange={(e) => setNewCategory(e.target.value)}
         />
       </Modal>
-      
+
     </div>
   );
 };

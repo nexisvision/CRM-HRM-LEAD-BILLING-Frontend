@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import {createTax} from '../tax/taxreducer/taxSlice';
+import { createTax } from '../tax/taxreducer/taxSlice';
 
 
 
@@ -44,11 +44,11 @@ const AddTax = ({ onClose }) => {
     return (
         <div className="add-tax-form">
             {/* <h2 className="mb-4">Create Tax</h2> */}
-            <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
-            onSubmit={onSubmit}
+                onSubmit={onSubmit}
             >
                 {({ values, setFieldValue, handleSubmit, setFieldTouche }) => (
                     <Form className="formik-form" onSubmit={handleSubmit}>

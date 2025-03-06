@@ -1,113 +1,54 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import "react-circular-progressbar/dist/styles.css";
 import { TfiMenuAlt } from "react-icons/tfi";
-import { FaLayerGroup } from "react-icons/fa";
+import { FaLayerGroup, FaCoins } from "react-icons/fa";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import {
-    EyeOutlined,
-    DeleteOutlined,
-    CopyOutlined,
-    EditOutlined,
-    FundProjectionScreenOutlined,
-    RiseOutlined,
-    CopyrightOutlined,
-    FormOutlined,
-    MailOutlined,
-    GlobalOutlined,
-    PhoneOutlined,
-    RocketOutlined,
-    BankOutlined,
-    UserOutlined,
-} from "@ant-design/icons";
-import { FaCoins } from "react-icons/fa";
-import { IoLayers } from "react-icons/io5";
+import { EyeOutlined, CopyOutlined, RiseOutlined, CopyrightOutlined, FormOutlined, MailOutlined, GlobalOutlined, PhoneOutlined, RocketOutlined, BankOutlined, UserOutlined } from "@ant-design/icons";
 import { GetProject } from "views/app-views/dashboards/project/project-list/projectReducer/ProjectSlice";
 import { GetTasks } from "views/app-views/dashboards/project/task/TaskReducer/TaskSlice";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { GetLeads } from "views/app-views/dashboards/leads/LeadReducers/LeadSlice";
 import { getAllTicket } from "../customersupports/ticket/TicketReducer/TicketSlice";
-import { useDispatch } from "react-redux";
 import { GetDeals } from "views/app-views/dashboards/deals/DealReducers/DealSlice";
 import { ContaractData } from "views/app-views/dashboards/contract/ContractReducers/ContractSlice";
 import { ClientData } from "views/app-views/company/CompanyReducers/CompanySlice";
+
 ChartJS.register(ArcElement, Tooltip, Legend);
+
 const ProfileData = () => {
-
     const dispatch = useDispatch();
-    // const [tasks, setTasks] = useState([
-    //     { id: 1, task: "March Hare moved.", status: "To Do", dueDate: "Sun 06 Oct 2024" },
-    //     { id: 2, task: "This seemed to be.", status: "Doing", dueDate: "Fri 28 Jun 2024" },
-    //     { id: 3, task: "Mock Turtle, and.", status: "Doing", dueDate: "Fri 11 Oct 2024" },
-    //     { id: 4, task: "The moment Alice.", status: "Doing", dueDate: "Wed 14 Feb 2024" },
-    // ]);
-    // State for managing profile data
-    const [openTasks, setOpenTasks] = useState(4);
-    const [projects, setProjects] = useState(2);
-    const [pendingTasks, setPendingTasks] = useState(4);
-    const [overdueTasks, setOverdueTasks] = useState(4);
-    const [expenses, setExpenses] = useState(0);
-
-    const idd = useSelector((state) => state.user.loggedInUser.id)
-
-    useEffect(() => {
-        dispatch(GetProject())
-        dispatch(GetTasks(idd))
-        dispatch(GetLeads())
-        dispatch(getAllTicket())
-        dispatch(GetDeals())
-        dispatch(ContaractData())
-        dispatch(ClientData())
-    }, [dispatch])
-
-
-
-
-    const loggeddatass = useSelector((state) => state.user.loggedInUser.username)
-
-
-    const projectdata = useSelector((state) => state.Project.Project.data);
-    const proijectfilter = projectdata?.filter((item) => item?.created_by === loggeddatass)
-
-    const length = Array.isArray(proijectfilter) ? proijectfilter.length : 0;
-
-    const taskdata = useSelector((state) => state.Tasks.Tasks.data);
-    const taskssfilter = taskdata?.filter((item) => item?.created_by === loggeddatass)
-
-    const tasklenght = Array.isArray(taskssfilter) ? taskssfilter.length : 0;
-
-    const loggeddata = useSelector((state) => state.user.loggedInUser)
-
-    /////
-
-    const allticketdata = useSelector((state) => state.Ticket.Ticket.data)
-
-
-    const leaddata = useSelector((state) => state.Leads.Leads.data);
-
-    const leaddatasss = Array.isArray(leaddata) ? leaddata.length : 0;
-
-    ///
-
-    const dealdata = useSelector((state) => state.Deals.Deals.data)
-
-    const dealdataass = Array.isArray(dealdata) ? dealdata.length : 0;
-
-    const contractdata = useSelector((state) => state.Contract.Contract.data)
-
-    const contractdataass = Array.isArray(contractdata) ? contractdata.length : 0;
-
-
-
-    //////
-
-    const filterdtaa = allticketdata?.filter((item) => item?.created_by === loggeddatass)
-
-    const taskfilter = taskdata?.filter((item) => item?.created_by === loggeddatass)
-
+    const idd = useSelector((state) => state.user.loggedInUser.id);
+    const loggeddatass = useSelector((state) => state.user.loggedInUser.username);
     const filterdatas = useSelector((state) => state.user.loggedInUser);
-
+    const projectdata = useSelector((state) => state.Project.Project.data);
+    const taskdata = useSelector((state) => state.Tasks.Tasks.data);
+    const allticketdata = useSelector((state) => state.Ticket.Ticket.data);
+    const leaddata = useSelector((state) => state.Leads.Leads.data);
+    const dealdata = useSelector((state) => state.Deals.Deals.data);
+    const contractdata = useSelector((state) => state.Contract.Contract.data);
     const alldatas = useSelector((state) => state.ClientData.ClientData.data);
 
+    useEffect(() => {
+        dispatch(GetProject());
+        dispatch(GetTasks(idd));
+        dispatch(GetLeads());
+        dispatch(getAllTicket());
+        dispatch(GetDeals());
+        dispatch(ContaractData());
+        dispatch(ClientData());
+    }, [dispatch, idd]);
+
+    const proijectfilter = projectdata?.filter((item) => item?.created_by === loggeddatass);
+    const length = Array.isArray(proijectfilter) ? proijectfilter.length : 0;
+
+    const taskssfilter = taskdata?.filter((item) => item?.created_by === loggeddatass);
+    const tasklenght = Array.isArray(taskssfilter) ? taskssfilter.length : 0;
+
+    const leaddatasss = Array.isArray(leaddata) ? leaddata.length : 0;
+    const dealdataass = Array.isArray(dealdata) ? dealdata.length : 0;
+    const contractdataass = Array.isArray(contractdata) ? contractdata.length : 0;
+
+    const filterdtaa = allticketdata?.filter((item) => item?.created_by === loggeddatass);
     const loggedInUser = alldatas?.find((item) => item?.id === filterdatas.id);
 
     const stripHtmlTags = (html) => {
@@ -117,63 +58,25 @@ const ProfileData = () => {
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
-            {/* Profile Header Section */}
             <div className="grid grid-cols-1 gap-6 mb-6">
                 <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                    {/* Header Background with Pattern */}
                     <div className="relative">
                         <div className="h-48 relative overflow-hidden">
-                            {/* Professional Gradient Background */}
                             <div className="absolute inset-0 bg-gradient-to-r from-[#ffffff] via-[#f5f9ff] to-[#f0f7ff]">
-                                {/* Modern Grid Pattern */}
-                                <div className="absolute inset-0"
-                                    style={{
-                                        backgroundImage: `
-                                            linear-gradient(rgba(99, 134, 255, 0.03) 1px, transparent 1px),
-                                            linear-gradient(90deg, rgba(99, 134, 255, 0.03) 1px, transparent 1px)
-                                        `,
-                                        backgroundSize: '20px 20px',
-                                        transform: 'skewY(-2deg) scale(1.2)',
-                                        transformOrigin: '0 0'
-                                    }}
-                                />
-                                {/* Professional Icons */}
-                                <div className="absolute inset-0"
-                                    style={{
-                                        backgroundImage: `
-                                            url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 2L20 7V17L12 22L4 17V7L12 2Z' stroke='rgba(99, 134, 255, 0.08)' stroke-width='1'/%3E%3C/svg%3E"),
-                                            url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='9' stroke='rgba(99, 134, 255, 0.06)' stroke-width='1'/%3E%3C/svg%3E"),
-                                            url("data:image/svg+xml,%3Csvg width='18' height='18' viewBox='0 0 18 18' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='1' y='1' width='16' height='16' stroke='rgba(99, 134, 255, 0.07)' stroke-width='1'/%3E%3C/svg%3E")
-                                        `,
-                                        backgroundPosition: '85% 20%, 15% 40%, 50% 70%',
-                                        backgroundRepeat: 'repeat',
-                                        backgroundSize: '64px, 48px, 32px',
-                                        opacity: 0.7
-                                    }}
-                                />
+                                <div className="absolute inset-0" style={{ backgroundImage: `linear-gradient(rgba(99, 134, 255, 0.03) 1px, transparent 1px),linear-gradient(90deg, rgba(99, 134, 255, 0.03) 1px, transparent 1px)`, backgroundSize: '20px 20px', transform: 'skewY(-2deg) scale(1.2)', transformOrigin: '0 0' }} />
+                                <div className="absolute inset-0" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12 2L20 7V17L12 22L4 17V7L12 2Z' stroke='rgba(99, 134, 255, 0.08)' stroke-width='1'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='9' stroke='rgba(99, 134, 255, 0.06)' stroke-width='1'/%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg width='18' height='18' viewBox='0 0 18 18' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='1' y='1' width='16' height='16' stroke='rgba(99, 134, 255, 0.07)' stroke-width='1'/%3E%3C/svg%3E")`, backgroundPosition: '85% 20%, 15% 40%, 50% 70%', backgroundRepeat: 'repeat', backgroundSize: '64px, 48px, 32px', opacity: 0.7 }} />
                             </div>
                         </div>
-
-                        {/* Profile Content */}
                         <div className="absolute bottom-0 left-0 right-0 px-6 py-4">
                             <div className="flex items-center gap-6">
-                                {/* Profile Image */}
                                 <div className="relative">
                                     <div className="w-28 h-28 rounded-xl border-4 border-white shadow-lg overflow-hidden">
-                                        <img
-                                            src={loggedInUser?.profilePic || "https://via.placeholder.com/100"}
-                                            alt={loggedInUser?.username}
-                                            className="w-full h-full object-cover"
-                                        />
+                                        <img src={loggedInUser?.profilePic || "https://via.placeholder.com/100"} alt={loggedInUser?.username} className="w-full h-full object-cover" />
                                     </div>
                                     <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white shadow-md"></div>
                                 </div>
-
-                                {/* User Info */}
                                 <div className="flex flex-col justify-center">
-                                    <h2 className="text-2xl font-semibold text-gray-800">
-                                        {`${loggedInUser?.firstName || ''} ${loggedInUser?.lastName || ''}`}
-                                    </h2>
+                                    <h2 className="text-2xl font-semibold text-gray-800">{`${loggedInUser?.firstName || ''} ${loggedInUser?.lastName || ''}`}</h2>
                                     <div className="flex items-center mt-2">
                                         <div className="flex items-center gap-2 bg-white/90 backdrop-blur-md rounded-full px-4 py-2 shadow-sm">
                                             <MailOutlined className="text-blue-500" />
@@ -184,11 +87,8 @@ const ProfileData = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Company Profile Details */}
                     <div className="px-6 pt-20 pb-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            {/* Company Information */}
                             <div className="bg-white rounded-xl p-6 shadow-sm">
                                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Personal Information</h3>
                                 <div className="space-y-4">
@@ -239,8 +139,6 @@ const ProfileData = () => {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Banking Details */}
                             <div className="bg-white rounded-xl p-6 shadow-sm">
                                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Banking Information</h3>
                                 <div className="space-y-4">
@@ -301,8 +199,6 @@ const ProfileData = () => {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Stats Section */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div className="p-4 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100/50">
                                 <div className="flex items-center gap-4">
@@ -341,8 +237,6 @@ const ProfileData = () => {
                     </div>
                 </div>
             </div>
-
-            {/* Statistics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 {[
                     { title: 'Total Leads', value: leaddatasss, icon: <RiseOutlined />, color: 'purple' },
@@ -363,8 +257,6 @@ const ProfileData = () => {
                     </div>
                 ))}
             </div>
-
-            {/* Tasks Table */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
                 <div className="p-6 border-b border-gray-100">
                     <h2 className="text-xl font-bold text-gray-800">My Tasks</h2>
@@ -387,42 +279,21 @@ const ProfileData = () => {
                                 <tr key={task.id} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-6 py-4 text-sm text-gray-800">{task?.taskName}</td>
                                     <td className="px-6 py-4">
-                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                                            ${task?.status === "Complete"
-                                                ? "bg-green-100 text-green-800"
-                                                : "bg-yellow-100 text-yellow-800"
-                                            }`}>
+                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${task?.status === "Complete" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}>
                                             {task?.status}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                                            ${task?.priority === "High"
-                                                ? "bg-red-100 text-red-800"
-                                                : task?.priority === "Medium"
-                                                    ? "bg-yellow-100 text-yellow-800"
-                                                    : "bg-green-100 text-green-800"
-                                            }`}>
+                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${task?.priority === "High" ? "bg-red-100 text-red-800" : task?.priority === "Medium" ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"}`}>
                                             {task?.priority}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">
-                                        {new Date(task?.startDate).toLocaleDateString()}
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">
-                                        {new Date(task?.dueDate).toLocaleDateString()}
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">
-                                        {stripHtmlTags(task?.description)}
-                                    </td>
+                                    <td className="px-6 py-4 text-sm text-gray-600">{new Date(task?.startDate).toLocaleDateString()}</td>
+                                    <td className="px-6 py-4 text-sm text-gray-600">{new Date(task?.dueDate).toLocaleDateString()}</td>
+                                    <td className="px-6 py-4 text-sm text-gray-600">{stripHtmlTags(task?.description)}</td>
                                     <td className="px-6 py-4 text-sm text-gray-600">
                                         {task?.task_file && (
-                                            <a
-                                                href={task.task_file}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700"
-                                            >
+                                            <a href={task.task_file} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700">
                                                 <CopyOutlined />
                                                 <span>View File</span>
                                             </a>
@@ -433,14 +304,10 @@ const ProfileData = () => {
                         </tbody>
                     </table>
                     {taskssfilter?.length === 0 && (
-                        <div className="text-center py-8 text-gray-500">
-                            No tasks found
-                        </div>
+                        <div className="text-center py-8 text-gray-500">No tasks found</div>
                     )}
                 </div>
             </div>
-
-            {/* Tickets Table */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div className="p-6 border-b border-gray-100">
                     <h2 className="text-xl font-bold text-gray-800">Tickets</h2>
@@ -463,40 +330,19 @@ const ProfileData = () => {
                                     <td className="px-6 py-4 text-sm text-gray-800">{ticket?.ticketSubject}</td>
                                     <td className="px-6 py-4 text-sm text-gray-600">{ticket?.description}</td>
                                     <td className="px-6 py-4">
-                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                                            ${ticket?.status === "Open"
-                                                ? "bg-green-100 text-green-800"
-                                                : ticket?.status === "In Progress"
-                                                    ? "bg-blue-100 text-blue-800"
-                                                    : ticket?.status === "Closed"
-                                                        ? "bg-gray-100 text-gray-800"
-                                                        : "bg-yellow-100 text-yellow-800"
-                                            }`}>
+                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${ticket?.status === "Open" ? "bg-green-100 text-green-800" : ticket?.status === "In Progress" ? "bg-blue-100 text-blue-800" : ticket?.status === "Closed" ? "bg-gray-100 text-gray-800" : "bg-yellow-100 text-yellow-800"}`}>
                                             {ticket?.status}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                                            ${ticket?.priority === "High"
-                                                ? "bg-red-100 text-red-800"
-                                                : ticket?.priority === "Medium"
-                                                    ? "bg-yellow-100 text-yellow-800"
-                                                    : "bg-green-100 text-green-800"
-                                            }`}>
+                                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${ticket?.priority === "High" ? "bg-red-100 text-red-800" : ticket?.priority === "Medium" ? "bg-yellow-100 text-yellow-800" : "bg-green-100 text-green-800"}`}>
                                             {ticket?.priority}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-gray-600">
-                                        {new Date(ticket?.createdAt).toLocaleDateString()}
-                                    </td>
+                                    <td className="px-6 py-4 text-sm text-gray-600">{new Date(ticket?.createdAt).toLocaleDateString()}</td>
                                     <td className="px-6 py-4 text-sm text-gray-600">
                                         {ticket?.file && (
-                                            <a
-                                                href={ticket.file}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700"
-                                            >
+                                            <a href={ticket.file} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700">
                                                 <CopyOutlined />
                                                 <span>View File</span>
                                             </a>
@@ -507,30 +353,12 @@ const ProfileData = () => {
                         </tbody>
                     </table>
                     {filterdtaa?.length === 0 && (
-                        <div className="text-center py-8 text-gray-500">
-                            No tickets found
-                        </div>
+                        <div className="text-center py-8 text-gray-500">No tickets found</div>
                     )}
                 </div>
             </div>
         </div>
     );
 };
+
 export default ProfileData;
-
-<style jsx>{`
-    @keyframes float {
-        0% { transform: translateY(0) rotate(0deg); }
-        100% { transform: translateY(-10px) rotate(5deg); }
-    }
-
-    @keyframes pulse {
-        0% { opacity: 0.5; transform: scaleX(0.98); }
-        100% { opacity: 0.8; transform: scaleX(1); }
-    }
-
-    @keyframes glow {
-        0% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.5); }
-        100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
-    }
-`}</style>

@@ -78,7 +78,7 @@ const AddTrainingSetup = ({ onClose }) => {
 
   return (
     <div className="add-trainingSetup">
-       <hr className="mt-3 border border-gray-300" />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, Select, Radio, message, Row, Col ,Upload} from "antd";
+import { Input, Button, Select, Radio, message, Row, Col, Upload } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import ReactQuill from "react-quill";
@@ -110,7 +110,7 @@ const EditJobApplication = ({ idd, onClose }) => {
   });
   return (
     <div>
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8",marginTop:"20px" }} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -173,7 +173,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                 <Col span={12}>
                   <div className="form-item">
                     <label className="font-semibold">Name <span className="text-red-500">*</span></label>
-                    <Field name="name" as={Input} placeholder="Enter Name"  className="w-full mt-1"/>
+                    <Field name="name" as={Input} placeholder="Enter Name" className="w-full mt-1" />
                     <ErrorMessage
                       name="name"
                       component="div"
@@ -185,7 +185,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                 <Col span={12} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Email <span className="text-red-500">*</span></label>
-                    <Field name="email" as={Input} placeholder="Enter Email"  className="w-full mt-1"/>
+                    <Field name="email" as={Input} placeholder="Enter Email" className="w-full mt-1" />
                     <ErrorMessage
                       name="email"
                       component="div"
@@ -244,7 +244,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                   </div>
                 </Col>
                 {/* Total Experience */}
-                <Col span={12}  className="mt-3">
+                <Col span={12} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Total Experience <span className="text-red-500">*</span></label>
                     <Select
@@ -309,7 +309,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                 {/* Status */}
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Status <span className="text-red-500">*</span></label><br/>
+                    <label className="font-semibold">Status <span className="text-red-500">*</span></label><br />
                     <Radio.Group
                       value={values.status}
                       onChange={(e) => setFieldValue("status", e.target.value)}
@@ -341,10 +341,10 @@ const EditJobApplication = ({ idd, onClose }) => {
                     />
                   </div>
                 </Col>
-                 {/* CV Upload */}
-                 <Col span={12} className="mt-3">
+                {/* CV Upload */}
+                <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Upload CV</label><br/>
+                    <label className="font-semibold">Upload CV</label><br />
                     <Field name="cv">
                       {({ field, form }) => (
                         <Upload
@@ -360,7 +360,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                           maxCount={1}
                         >
-                          <Button 
+                          <Button
                             icon={<UploadOutlined />}
                             disabled={cvFileList.length > 0}
                           >
@@ -377,7 +377,7 @@ const EditJobApplication = ({ idd, onClose }) => {
                   </div>
                 </Col>
 
-                
+
 
                 {/* Cover Letter */}
                 <Col span={24} className="mt-3">

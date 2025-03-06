@@ -37,7 +37,7 @@ const ResetPassword = () => {
       {/* <Button type="primary" onClick={showModal}>
         Reset Password
       </Button> */}
-{/* 
+      {/* 
       <Modal
         title="Reset Password"
         visible={isModalVisible}
@@ -45,51 +45,51 @@ const ResetPassword = () => {
         footer={null}
         centered
       > */}
-        <Form
-          form={form}
-          layout="vertical"
-          name="reset_password_form"
-          initialValues={{ remember: true }}
+      <Form
+        form={form}
+        layout="vertical"
+        name="reset_password_form"
+        initialValues={{ remember: true }}
+      >
+
+
+        <Form.Item
+          name="password"
+          label="Password"
+          rules={[{ required: true, message: 'Please enter a password!' }]}
         >
-                  <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+          <Input.Password placeholder="Enter Password" />
+        </Form.Item>
 
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[{ required: true, message: 'Please enter a password!' }]}
-          >
-            <Input.Password placeholder="Enter Password" />
-          </Form.Item>
+        <Form.Item
+          name="confirmPassword"
+          label="Confirm Password"
+          rules={[
+            { required: true, message: 'Please confirm your password!' },
+          ]}
+        >
+          <Input.Password placeholder="Enter Confirm Password" />
+        </Form.Item>
 
-          <Form.Item
-            name="confirmPassword"
-            label="Confirm Password"
-            rules={[
-              { required: true, message: 'Please confirm your password!' },
-            ]}
-          >
-            <Input.Password placeholder="Enter Confirm Password" />
-          </Form.Item>
-
-          <Form.Item>
-            <div className="form-buttons text-right">
-              <Button
-                type="default"
-                onClick={handleCancel}
-                style={{ marginRight: '10px' }}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="primary"
-                onClick={handleReset}
-                // style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
-              >
-                Reset
-              </Button>
-            </div>
-          </Form.Item>
-        </Form>
+        <Form.Item>
+          <div className="form-buttons text-right">
+            <Button
+              type="default"
+              onClick={handleCancel}
+              style={{ marginRight: '10px' }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              onClick={handleReset}
+            // style={{ backgroundColor: '#52c41a', borderColor: '#52c41a' }}
+            >
+              Reset
+            </Button>
+          </div>
+        </Form.Item>
+      </Form>
       {/* </Modal> */}
     </div>
   );

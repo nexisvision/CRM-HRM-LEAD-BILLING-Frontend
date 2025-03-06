@@ -49,14 +49,14 @@ const AddpolicyList = ({ onClose }) => {
       formData.append("branch", values.branch);
       formData.append("title", values.title);
       formData.append("description", values.description);
-      
+
       if (values.file) {
         formData.append("file", values.file);
       }
 
       await dispatch(Addpolicys(formData)).unwrap();
       await dispatch(getpolicys());
-      
+
       message.success("Policy added successfully");
       resetForm();
       setFileList([]);
@@ -77,7 +77,7 @@ const AddpolicyList = ({ onClose }) => {
       >
         {({ setFieldValue }) => (
           <Form>
-            <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
 
             <Row gutter={16}>
               <Col span={12}>
@@ -172,16 +172,16 @@ const AddpolicyList = ({ onClose }) => {
             </Row>
 
             <div className="flex justify-end gap-2 mt-4">
-              <Button 
-                onClick={onClose} 
+              <Button
+                onClick={onClose}
                 disabled={loading}
                 style={{ marginRight: '8px' }}
               >
                 Cancel
               </Button>
-              <Button 
-                type="primary" 
-                htmlType="submit" 
+              <Button
+                type="primary"
+                htmlType="submit"
                 loading={loading}
               >
                 Create

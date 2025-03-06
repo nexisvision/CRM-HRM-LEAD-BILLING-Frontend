@@ -14,7 +14,7 @@ const AddTask = ({ visible, onCancel, onCreate }) => {
     // >
     <form className="space-y-6">
       {/* Task Name Input */}
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
 
       <div>
         <label className="block font-medium mb-1">
@@ -71,7 +71,7 @@ const AddTask = ({ visible, onCancel, onCreate }) => {
         <Button
           type="primary"
           onClick={onCreate}
-          // className="bg-green-500 text-white"
+        // className="bg-green-500 text-white"
         >
           Create
         </Button>

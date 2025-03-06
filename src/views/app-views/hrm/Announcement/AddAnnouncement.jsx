@@ -24,7 +24,7 @@ const validationSchema = Yup.object().shape({
 const AddAnnouncement = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   // Get branches from Redux store
   const branches = useSelector((state) => state.Branch?.Branch?.data || []);
 
@@ -77,7 +77,7 @@ const AddAnnouncement = ({ onClose }) => {
   return (
     <div className="add-attendance-form">
       {/* <h2 className="mb-4 text-center">Add Announcement</h2> */}
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
 
       <Formik
         initialValues={{
@@ -90,7 +90,7 @@ const AddAnnouncement = ({ onClose }) => {
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ errors, touched, handleSubmit, resetForm, setFieldTouched, values, setFieldValue}) => (
+        {({ errors, touched, handleSubmit, resetForm, setFieldTouched, values, setFieldValue }) => (
           <FormikForm onSubmit={handleSubmit}>
             <Row gutter={16}>
               <Col span={12}>
@@ -124,8 +124,8 @@ const AddAnnouncement = ({ onClose }) => {
                     dropdownRender={menu => (
                       <>
                         {menu}
-                        <Button 
-                          type="link" 
+                        <Button
+                          type="link"
                           block
                           onClick={() => setIsAddBranchModalVisible(true)}
                         >

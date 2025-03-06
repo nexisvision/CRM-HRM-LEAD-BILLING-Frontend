@@ -42,7 +42,7 @@ const EditGoalTracking = ({ goalData }) => {
   return (
     <div className="edit-goal-tracking">
       {/* <h2 className="mb-4">Edit Goal Tracking</h2> */}
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
 
       <Form
         layout="vertical"

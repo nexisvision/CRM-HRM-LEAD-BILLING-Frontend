@@ -4,17 +4,13 @@ import {
   EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
-  PlusOutlined,
   EditOutlined,
-  FilePdfOutlined,
+  PlusOutlined,
   FileExcelOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-import UserView from "../../Users/user-list/UserView";
 import Flex from "components/shared-components/Flex";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddEmployee from "./AddEmployee";
 import EditEmployee from "./EditEmployee";
 import ViewEmployee from "./ViewEmployee";
@@ -30,55 +26,30 @@ import moment from "moment";
 import { MdOutlineEmail } from "react-icons/md";
 import EmailVerification from "views/app-views/company/EmailVerification";
 import { handleSalaryStatusChange } from '../PayRoll/Salary/SalaryList';
-import { editSalaryss, getSalaryss } from '../PayRoll/Salary/SalaryReducers/SalarySlice';
-
+import { getSalaryss } from '../PayRoll/Salary/SalaryReducers/SalarySlice';
 import { Option } from "antd/es/mentions";
-import AddAttendance from "../Attendance/AddAttendance";
 import { addAttendance, editAttendance } from "../Attendance/AttendanceReducer/AttendanceSlice";
 
 const EmployeeList = () => {
-  // State declarations
   const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
-  const [userProfileVisible, setUserProfileVisible] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [list, setList] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [isAddEmployeeModalVisible, setIsAddEmployeeModalVisible] =
-    useState(false);
-  const [isEditEmployeeModalVisible, setIsEditEmployeeModalVisible] =
-    useState(false);
-  const [isViewEmployeeModalVisible, setIsViewEmployeeModalVisible] =
-    useState(false);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+  const [isAddEmployeeModalVisible, setIsAddEmployeeModalVisible] = useState(false);
+  const [isEditEmployeeModalVisible, setIsEditEmployeeModalVisible] = useState(false);
+  const [isViewEmployeeModalVisible, setIsViewEmployeeModalVisible] = useState(false);
   const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
   const [comnyid, setCompnyid] = useState("");
-  const [initialValues, setInitialValues] = useState({ email: '' });
-  const [isOtpModalVisible, setIsOtpModalVisible] = useState(false);
-  const [otp, setOtp] = useState('');
-  const [emailForOtp, setEmailForOtp] = useState('');
   const [selectedBranch, setSelectedBranch] = useState('all');
   const [searchText, setSearchText] = useState('');
+  const [sub, setSub] = useState(false);
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.employee);
-
-  const [sub, setSub] = useState(false);
-
-
   const allroledata = useSelector((state) => state.role);
   const fndroledata = allroledata.role.data;
-
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
-
-  // console.log("tData", designationData);
-
   const branchDataa = useSelector((state) => state.Branch?.Branch?.data || []);
-
-  // const branchData = branchDataa.filter(item => item.created_by === user);
-
-  // console.log("branchData", branchData);
-
   const salaryData = useSelector((state) => state.salary?.salary?.data || []);
 
   useEffect(() => {
@@ -86,7 +57,6 @@ const EmployeeList = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch all required data
     dispatch(empdata());
     dispatch(getSalaryss());
     dispatch(getDept());
@@ -95,67 +65,33 @@ const EmployeeList = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (tabledata && tabledata.employee && tabledata.employee.data) {
-      const datas = tabledata.employee.data;
+    if (tabledata?.employee?.data) {
+      const mappedData = tabledata.employee.data.map(employee => {
+        const department = departmentData.find(dept => dept.id === employee.department);
+        const designation = designationData.find(desig => desig.id === employee.designation);
+        const branch = branchDataa.find(br => br.id === employee.branch);
 
-      if (datas) {
-        // Filter employees by created_by matching the logged-in user's username
-        // const datas = datas.filter(
-        //   (item) => item.created_by === user && item.employeeId
-        // );
+        return {
+          ...employee,
+          department: department?.department_name || 'N/A',
+          designation: designation?.designation_name || 'N/A',
+          branch: branch?.branchName || 'N/A'
+        };
+      });
 
-        // Map the data to include names instead of IDs
-        const mappedData = datas.map(employee => {
-          // Find corresponding department
-          const department = departmentData.find(
-            dept => dept.id === employee.department
-          );
-
-          // Find corresponding designation
-          const designation = designationData.find(
-            desig => desig.id === employee.designation
-          );
-
-          // Find corresponding branch
-          const branch = branchDataa.find(
-            br => br.id === employee.branch
-          );
-
-          return {
-            ...employee,
-            department: department?.department_name || 'N/A',
-            designation: designation?.designation_name || 'N/A',
-            branch: branch?.branchName || 'N/A'
-          };
-        });
-
-        setUsers(mappedData);
-      }
+      setUsers(mappedData);
     }
-  }, [tabledata, user, departmentData, designationData]);
+  }, [tabledata, departmentData, designationData, branchDataa]);
 
-  // Modal handlers
-  const openAddEmployeeModal = () => setIsAddEmployeeModalVisible(true);
-  const closeAddEmployeeModal = () => setIsAddEmployeeModalVisible(false);
-  // const openEditEmployeeModal = () => setIsEditEmployeeModalVisible(true);
-  const openViewEmployeeModal = () => setIsViewEmployeeModalVisible(true);
-  const closeViewEmployeeModal = () => setIsViewEmployeeModalVisible(false);
-
-  const closeEditEmployeeModal = () => setIsEditEmployeeModalVisible(false);
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
-
-  const openEditEmployeeModal = (empId) => {
-    setSelectedEmployeeId(empId);
-    setIsEditEmployeeModalVisible(true);
-  };
-
-  //// permission
+  useEffect(() => {
+    dispatch(empdata());
+    setSub(false);
+  }, [sub, dispatch]);
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
   const roleData = roles?.find(role => role.id === roleId);
-
-  const whorole = roleData.role_name;
+  const whorole = roleData?.role_name;
 
   const parsedPermissions = Array.isArray(roleData?.permissions)
     ? roleData.permissions
@@ -163,170 +99,128 @@ const EmployeeList = () => {
       ? JSON.parse(roleData.permissions)
       : [];
 
-
-  let allpermisson;
-
-  if (parsedPermissions["extra-hrm-employee"] && parsedPermissions["extra-hrm-employee"][0]?.permissions) {
-    allpermisson = parsedPermissions["extra-hrm-employee"][0].permissions;
-    // console.log('Parsed Permissions:', allpermisson);
-
-  } else {
-    // console.log('extra-hrm-employee is not available');
-  }
+  const allpermisson = parsedPermissions["extra-hrm-employee"]?.[0]?.permissions;
 
   const canCreateClient = allpermisson?.includes('create');
   const canEditClient = allpermisson?.includes('edit');
   const canDeleteClient = allpermisson?.includes('delete');
   const canViewClient = allpermisson?.includes('view');
 
-  ///endpermission
+  const getEmployeeSalaryStatus = (employeeId) => {
+    return salaryData.find(salary => salary.employeeId === employeeId && salary.created_by === user);
+  };
 
+  const handleEmployeeSalaryStatus = (record, checked) => {
+    const salaryRecord = getEmployeeSalaryStatus(record.id);
+    if (salaryRecord) {
+      handleSalaryStatusChange(dispatch, salaryRecord, checked)
+        .then(() => {
+          dispatch(empdata());
+          dispatch(getSalaryss());
+        });
+    } else {
+      message.warning('No salary record found for this employee');
+    }
+  };
 
-  // Search handler
-  const onSearch = (e) => {
-    const value = e.target.value;
-    setSearchText(value);
+  const getFilteredEmployees = () => {
+    if (!users) return [];
+
+    let filteredData = users;
+
+    if (selectedBranch !== 'all') {
+      filteredData = filteredData.filter(employee => employee.branch === selectedBranch);
+    }
+
+    if (searchText) {
+      const searchLower = searchText.toLowerCase();
+      filteredData = filteredData.filter(employee => {
+        return (
+          employee.username?.toLowerCase().includes(searchLower) ||
+          employee.firstName?.toLowerCase().includes(searchLower) ||
+          employee.lastName?.toLowerCase().includes(searchLower) ||
+          employee.department?.toLowerCase().includes(searchLower) ||
+          employee.designation?.toLowerCase().includes(searchLower) ||
+          employee.branch?.toLowerCase().includes(searchLower)
+        );
+      });
+    }
+
+    return filteredData;
+  };
+
+  const handleCheckIn = (empId) => {
+    const currentDate = moment().format('YYYY-MM-DD');
+    const currentTime = moment().format('HH:mm:ss');
+
+    dispatch(addAttendance({
+      employee: empId,
+      date: currentDate,
+      startTime: currentTime,
+    }))
+      .then(() => message.success("Checked in successfully!"))
+      .catch(() => message.error("Failed to check in. Please try again."));
+  };
+
+  const handleCheckOut = (empId) => {
+    const currentDate = moment().format('YYYY-MM-DD');
+    const currentTime = moment().format('HH:mm:ss');
+
+    dispatch(editAttendance({
+      id: empId,
+      values: {
+        employee: empId,
+        endTime: currentTime,
+        date: currentDate,
+      }
+    }))
+      .then(() => message.success("Checked out successfully!"))
+      .catch(() => message.error("Failed to check out. Please try again."));
+  };
+
+  const exportToExcel = () => {
+    try {
+      const ws = utils.json_to_sheet(users);
+      const wb = utils.book_new();
+      utils.book_append_sheet(wb, ws, "Employee");
+      writeFile(wb, "EmployeeData.xlsx");
+      message.success("Data exported successfully!");
+    } catch (error) {
+      message.error("Failed to export data. Please try again.");
+    }
   };
 
   const deleteUser = async (userId) => {
     try {
       await dispatch(deleteEmp(userId));
-
       const updatedData = await dispatch(empdata());
-      // console.log("lll", updatedData);
-
       setUsers(updatedData.employee.data || updatedData.payload.data);
-
-      message.success({ content: "Deleted employee successfully", duration: 2 });
+      message.success("Deleted employee successfully");
     } catch (error) {
-      console.error("Error deleting user:", error);
+      message.error("Failed to delete employee");
     }
   };
 
-  const exportToExcel = () => {
-    try {
-      const ws = utils.json_to_sheet(users); // Convert JSON data to a sheet
-      const wb = utils.book_new(); // Create a new workbook
-      utils.book_append_sheet(wb, ws, "Employee"); // Append the sheet to the workbook
-
-      writeFile(wb, "EmployeeData.xlsx"); // Save the file as ProposalData.xlsx
-      message.success("Data exported successfully!"); // Show success message
-    } catch (error) {
-      console.error("Error exporting to Excel:", error);
-      message.error("Failed to export data. Please try again."); // Show error message
-    }
-  };
-
-  const showUserProfile = (userInfo) => {
-    setUserProfileVisible(true);
-    setSelectedUser(userInfo);
-  };
-
-  const closeUserProfile = () => {
-    setUserProfileVisible(false);
-    setSelectedUser(null);
-  };
-
-  useEffect(() => {
-    dispatch(empdata());
-    setSub(false);
-  }, [sub, dispatch]);
-
-
-  useEffect(() => {
-    dispatch(empdata())
-  }, [dispatch])
-
-
-  const viewfunction = (empId) => {
-    setSelectedEmployeeId(empId);
-    openViewEmployeeModal();
-  };
-
-
-
-
-
-
-  // useEffect(() => {
-  //   if (tabledata && tabledata.employee && tabledata.employee.data) {
-  //     const datas = tabledata.employee.data;
-
-  //     if (datas) {
-  //       // const matchingRoleData = fndroledata.find(
-  //       //   (item) => item.role_name === "employee"
-  //       // );
-
-  //       // const datas = datas.filter(
-  //       //   (item) => item.role_id && item.role_name === "employee"
-  //       // );
-
-  //       setUsers(datas);
-  //     }
-  //   }
-  // }, [tabledata]); // Make sure to include roleiddd in dependencies if it changes
-
-  // Dropdown menu component
   const dropdownMenu = (elm) => (
     <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EyeOutlined />}
-            onClick={openViewEmployeeModal}
-            size="small"
-          >
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<MailOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span className="">Send Mail</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<FilePdfOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span className="">Download CV</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-
-
-
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
+      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) && (
         <Menu.Item>
           <Flex alignItems="center">
             <Button
               type=""
               className=""
               icon={<EditOutlined />}
-              onClick={() => openEditEmployeeModal(elm.id)}
+              onClick={() => {
+                setSelectedEmployeeId(elm.id);
+                setIsEditEmployeeModalVisible(true);
+              }}
               size="small"
             >
               <span className="ml-2">Edit</span>
             </Button>
           </Flex>
         </Menu.Item>
-      ) : null}
-
+      )}
 
       <Menu.Item>
         <Flex alignItems="center">
@@ -339,7 +233,6 @@ const EmployeeList = () => {
               setCompnyid(elm.id);
             }}
             size="small"
-          // style={{ display: "block", marginBottom: "8px" }}
           >
             <span>Update Email</span>
           </Button>
@@ -352,15 +245,16 @@ const EmployeeList = () => {
             type=""
             className=""
             icon={<EyeOutlined />}
-            // onClick={() => openViewEmployeeModal()}
-            onClick={() => viewfunction(elm.id)}
+            onClick={() => {
+              setSelectedEmployeeId(elm.id);
+              setIsViewEmployeeModalVisible(true);
+            }}
             size="small"
           >
             <span className="ml-2">View</span>
           </Button>
         </Flex>
       </Menu.Item>
-
 
       <Menu.Item>
         <Flex alignItems="center">
@@ -390,8 +284,7 @@ const EmployeeList = () => {
         </Flex>
       </Menu.Item>
 
-
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
+      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) && (
         <Menu.Item>
           <Flex alignItems="center">
             <Button
@@ -405,45 +298,10 @@ const EmployeeList = () => {
             </Button>
           </Flex>
         </Menu.Item>
-      ) : null}
-
-
+      )}
     </Menu>
   );
 
-  // Add this component at the top of the file after the imports
-  const SalaryStatusSwitch = ({ record }) => {
-    const [status, setStatus] = useState(record.salaryStatus || 'unpaid');
-
-    const handleStatusChange = (checked) => {
-      setStatus(checked ? 'paid' : 'unpaid');
-      message.success(`Salary status changed to ${checked ? 'paid' : 'unpaid'}`);
-    };
-
-    return (
-      <div className="flex items-center gap-2">
-        <Switch
-          checked={status === 'paid'}
-          onChange={handleStatusChange}
-          className={status === 'paid' ? 'bg-green-500' : 'bg-red-500'}
-        />
-        <Badge
-          status={status === 'paid' ? 'success' : 'error'}
-          text={status.charAt(0).toUpperCase() + status.slice(1)}
-        />
-      </div>
-    );
-  };
-
-  // Add this function to get salary status for an employee
-  const getEmployeeSalaryStatus = (employeeId) => {
-    const salaryRecord = salaryData.find(
-      salary => salary.employeeId === employeeId && salary.created_by === user
-    );
-    return salaryRecord;
-  };
-
-  // Update your tableColumns to include salary status
   const tableColumns = [
     {
       title: "Employee",
@@ -452,16 +310,9 @@ const EmployeeList = () => {
         <div className="flex items-center">
           <div className="mr-3">
             {record.profilePic ? (
-              <Avatar
-                src={record.profilePic}
-                size={40}
-                className="border-2 border-white shadow-md"
-              />
+              <Avatar src={record.profilePic} size={40} className="border-2 border-white shadow-md" />
             ) : (
-              <Avatar
-                size={40}
-                className="bg-indigo-600 border-2 border-white shadow-md flex items-center justify-center"
-              >
+              <Avatar size={40} className="bg-indigo-600 border-2 border-white shadow-md flex items-center justify-center">
                 {record.firstName?.charAt(0)?.toUpperCase() || record.username?.charAt(0)?.toUpperCase() || 'U'}
               </Avatar>
             )}
@@ -473,9 +324,7 @@ const EmployeeList = () => {
                 : record.username || 'N/A'
               }
             </div>
-            <div className="text-gray-500 text-sm">
-              {record.email || 'No email'}
-            </div>
+            <div className="text-gray-500 text-sm">{record.email || 'No email'}</div>
           </div>
         </div>
       ),
@@ -489,14 +338,7 @@ const EmployeeList = () => {
           <span className="text-gray-700">{branch || 'N/A'}</span>
         </div>
       ),
-      sorter: {
-        compare: (a, b) => {
-          if (a.branch && b.branch) {
-            return a.branch.localeCompare(b.branch);
-          }
-          return 0;
-        },
-      },
+      sorter: (a, b) => a.branch?.localeCompare(b.branch) || 0,
     },
     {
       title: "Department",
@@ -506,14 +348,7 @@ const EmployeeList = () => {
           {department || 'N/A'}
         </Tag>
       ),
-      sorter: {
-        compare: (a, b) => {
-          if (a.department && b.department) {
-            return a.department.localeCompare(b.department);
-          }
-          return 0;
-        },
-      },
+      sorter: (a, b) => a.department?.localeCompare(b.department) || 0,
     },
     {
       title: "Designation",
@@ -523,14 +358,7 @@ const EmployeeList = () => {
           {designation || 'N/A'}
         </Tag>
       ),
-      sorter: {
-        compare: (a, b) => {
-          if (a.designation && b.designation) {
-            return a.designation.localeCompare(b.designation);
-          }
-          return 0;
-        },
-      },
+      sorter: (a, b) => a.designation?.localeCompare(b.designation) || 0,
     },
     {
       title: "Date OF Joining",
@@ -540,9 +368,7 @@ const EmployeeList = () => {
           {text ? moment(text).format('DD MMM YYYY') : 'N/A'}
         </div>
       ),
-      sorter: {
-        compare: (a, b) => moment(a.joiningDate) - moment(b.joiningDate),
-      },
+      sorter: (a, b) => moment(a.joiningDate) - moment(b.joiningDate),
     },
     {
       title: "Leave Date",
@@ -552,16 +378,13 @@ const EmployeeList = () => {
           {text ? moment(text).format('DD MMM YYYY') : 'N/A'}
         </div>
       ),
-      sorter: {
-        compare: (a, b) => moment(a.leaveDate) - moment(b.leaveDate),
-      },
+      sorter: (a, b) => moment(a.leaveDate) - moment(b.leaveDate),
     },
     {
       title: "Salary Status",
       key: "salaryStatus",
       render: (_, record) => {
         const salaryRecord = getEmployeeSalaryStatus(record.id);
-
         return (
           <div className="flex items-center gap-2">
             <Switch
@@ -597,234 +420,127 @@ const EmployeeList = () => {
     },
   ];
 
-  // Update handleEmployeeSalaryStatus function
-  const handleEmployeeSalaryStatus = (record, checked) => {
-    const salaryRecord = getEmployeeSalaryStatus(record.id);
-
-    if (salaryRecord) {
-      handleSalaryStatusChange(dispatch, salaryRecord, checked)
-        .then(() => {
-          // Refresh both employee and salary data
-          dispatch(empdata());
-          dispatch(getSalaryss());
-        });
-    } else {
-      message.warning('No salary record found for this employee');
-    }
-  };
-
-  const handleEmailVerification = (email) => {
-    setInitialValues({ email });
-    setIsEmailVerificationModalVisible(true);
-  };
-
-  const handleSendOTP = () => {
-    setEmailForOtp(initialValues.email);
-    setIsEmailVerificationModalVisible(false);
-    setIsOtpModalVisible(true);
-  };
-
-  // Add this handler for OTP verification
-  const handleVerifyOTP = () => {
-    // Add your OTP verification logic here
-
-    // Close the OTP modal
-    setIsOtpModalVisible(false);
-
-    // Clear the OTP input
-    setOtp('');
-
-    // Optionally show a success message
-    message.success('Email verified successfully');
-  };
-
-  // Add this function to filter employees by branch
-  const getFilteredEmployees = () => {
-    if (!users) return [];
-
-    let datas = users;
-
-    // Filter by branch
-    if (selectedBranch !== 'all') {
-      datas = datas.filter(employee => employee.branch === selectedBranch);
-    }
-
-    // Filter by search text
-    if (searchText) {
-      const searchLower = searchText.toLowerCase();
-      datas = datas.filter(employee => {
-        return (
-          employee.username?.toLowerCase().includes(searchLower) ||
-          employee.firstName?.toLowerCase().includes(searchLower) ||
-          employee.lastName?.toLowerCase().includes(searchLower) ||
-          employee.department?.toLowerCase().includes(searchLower) ||
-          employee.designation?.toLowerCase().includes(searchLower) ||
-          employee.branch?.toLowerCase().includes(searchLower)
-        );
-      });
-    }
-
-    return datas;
-  };
-
-  // Add this before the table component
-  const BranchFilter = () => (
-    <div style={{ marginBottom: '1rem' }}>
-      <Select
-        style={{ width: 200 }}
-        placeholder="Filter by Branch"
-        value={selectedBranch}
-        onChange={setSelectedBranch}
-      >
-        <Option value="all">All Branches</Option>
-        {branchDataa.map(branch => (
-          <Option key={branch.id} value={branch.branchName}>
-            {branch.branchName}
-          </Option>
-        ))}
-      </Select>
-    </div>
-  );
-
-  const handleCheckIn = (empId) => {
-    const currentDate = moment().format('YYYY-MM-DD'); // Get current date
-    const currentTime = moment().format('HH:mm:ss'); // Get current time
-
-    const values = {
-      employee: empId,
-      date: currentDate,
-      startTime: currentTime,
-    };
-
-    dispatch(addAttendance(values))
-      .then(() => {
-        message.success("Checked in successfully!");
-      })
-      .catch((error) => {
-        console.error("Error checking in:", error);
-        message.error("Failed to check in. Please try again.");
-      });
-  };
-
-  const handleCheckOut = (empId) => {
-    const currentDate = moment().format('YYYY-MM-DD'); // Get current date
-    const currentTime = moment().format('HH:mm:ss'); // Get current time
-
-    const values = {
-      employee: empId,
-      endTime: currentTime,
-      date: currentDate,
-    };
-
-    dispatch(editAttendance({ id: empId, values }))
-      .then(() => {
-        message.success("Checked out successfully!");
-      })
-      .catch((error) => {
-        console.error("Error checking out:", error);
-        message.error("Failed to check out. Please try again.");
-      });
-  };
-
   return (
-    <Card bodyStyle={{ padding: "0" }} className="rounded-xl overflow-hidden">
-      <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 p-6 border-b border-gray-100">
-        <Flex
-          alignItems="center"
-          justifyContent="space-between"
-          mobileFlex={false}
-        >
-          <Flex className="mb-1" mobileFlex={false}>
-            <div className="mr-md-3 mb-3">
-              <Input
-                placeholder="Search employees..."
-                prefix={<SearchOutlined className="text-gray-400" />}
-                onChange={onSearch}
-                allowClear
-                className="min-w-[250px] hover:border-indigo-400 focus:border-indigo-500"
-                style={{ borderRadius: '8px' }}
-              />
-            </div>
-            <div className="mb-3 ml-2">
-              <BranchFilter />
-            </div>
-          </Flex>
-          <Flex gap="7px">
-            {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) && (
+    <Card bodyStyle={{ padding: "0" }} className="rounded-lg shadow-sm">
+      <div className="bg-white border-b">
+        <div className="p-6">
+          <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
+            <Flex className="mb-1" mobileFlex={false}>
+              <div className="mr-md-3 mb-3">
+                <Input
+                  placeholder="Search employees..."
+                  prefix={<SearchOutlined className="text-gray-400" />}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  allowClear
+                  className="min-w-[250px] rounded-md border-gray-300 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div className="mb-3 ml-2">
+                <Select
+                  style={{ width: 200 }}
+                  placeholder="Filter by Branch"
+                  value={selectedBranch}
+                  onChange={setSelectedBranch}
+                  className="rounded-md border-gray-300"
+                >
+                  <Option value="all">All Branches</Option>
+                  {branchDataa.map(branch => (
+                    <Option key={branch.id} value={branch.branchName}>
+                      {branch.branchName}
+                    </Option>
+                  ))}
+                </Select>
+              </div>
+            </Flex>
+            <Flex gap="8px">
+              {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) && (
+                <Button
+                  type="primary"
+                  onClick={() => setIsAddEmployeeModalVisible(true)}
+                  className="bg-blue-500 hover:bg-blue-600 border-0 rounded-md shadow-sm hover:shadow flex items-center"
+                >
+                  <PlusOutlined />
+                  <span className="ml-2">Add Employee</span>
+                </Button>
+              )}
               <Button
-                type="primary"
-                className="rounded-lg flex items-center shadow-md hover:shadow-lg transition-all"
-                onClick={openAddEmployeeModal}
+                onClick={exportToExcel}
+                className="bg-blue-500 hover:bg-blue-600 text-white border-0 rounded-md shadow-sm hover:shadow flex items-center"
               >
-                <PlusOutlined />
-                Add Employee
+                <FileExcelOutlined />
+                <span className="ml-2">Export</span>
               </Button>
-            )}
-            <Button
-              type="primary"
-              icon={<FileExcelOutlined />}
-              onClick={exportToExcel}
-              className="rounded-lg shadow-md hover:shadow-lg transition-all"
-            >
-              Export
-            </Button>
+            </Flex>
           </Flex>
-        </Flex>
+        </div>
       </div>
-      <div className="overflow-hidden">
+
+      <div className="bg-white">
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
           <Table
             columns={tableColumns}
             dataSource={getFilteredEmployees()}
             rowKey="id"
             className="ant-table-striped"
-            rowClassName={(record, index) =>
-              index % 2 === 0 ? 'bg-gray-50 hover:bg-gray-100 transition-colors' : 'bg-white hover:bg-gray-50 transition-colors'
-            }
+            rowClassName={(record, index) => index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}
           />
         )}
       </div>
 
       <Modal
         title={
-          <div className="flex items-center gap-2 text-indigo-600">
-            <PlusOutlined className="text-xl" />
-            <span>Add New Employee</span>
+          <div className="flex items-center gap-2 text-gray-700">
+            <PlusOutlined className="text-lg" />
+            <span className="font-medium">Add New Employee</span>
           </div>
         }
         visible={isAddEmployeeModalVisible}
-        onCancel={closeAddEmployeeModal}
+        onCancel={() => setIsAddEmployeeModalVisible(false)}
         footer={null}
         width={800}
         className="custom-modal"
       >
-        <AddEmployee onClose={closeAddEmployeeModal} />
+        <AddEmployee onClose={() => setIsAddEmployeeModalVisible(false)} />
       </Modal>
 
       <Modal
         title={
-          <div className="flex items-center gap-2 text-indigo-600">
-            <EditOutlined className="text-xl" />
-            <span>Edit Employee</span>
+          <div className="flex items-center gap-2 text-gray-700">
+            <EditOutlined className="text-lg" />
+            <span className="font-medium">Edit Employee</span>
           </div>
         }
         visible={isEditEmployeeModalVisible}
-        onCancel={closeEditEmployeeModal}
+        onCancel={() => setIsEditEmployeeModalVisible(false)}
         footer={null}
         width={800}
         className="custom-modal"
       >
-        <EditEmployee onClose={closeEditEmployeeModal} idd={selectedEmployeeId} />
+        <EditEmployee
+          onClose={() => setIsEditEmployeeModalVisible(false)}
+          idd={selectedEmployeeId}
+          initialData={users.find(user => user.id === selectedEmployeeId) || {}}
+        />
       </Modal>
 
       <Modal
+        title={
+          <div className="flex items-center gap-2 text-gray-700">
+            <EyeOutlined className="text-lg" />
+            <span className="font-medium">View Employee Details</span>
+          </div>
+        }
         visible={isViewEmployeeModalVisible}
-        onCancel={closeViewEmployeeModal}
+        onCancel={() => setIsViewEmployeeModalVisible(false)}
         footer={null}
         width={800}
         className="custom-modal"
       >
-        <ViewEmployee employeeIdd={selectedEmployeeId} visible={isViewEmployeeModalVisible} close={closeViewEmployeeModal} />
+        <ViewEmployee
+          employeeIdd={selectedEmployeeId}
+          visible={isViewEmployeeModalVisible}
+          close={() => setIsViewEmployeeModalVisible(false)}
+        />
       </Modal>
 
       <EmailVerification
@@ -836,13 +552,13 @@ const EmployeeList = () => {
 
       <style jsx global>{`
         .custom-modal .ant-modal-content {
-          border-radius: 16px;
+          border-radius: 8px;
           overflow: hidden;
         }
         .custom-modal .ant-modal-header {
           padding: 16px 24px;
-          background: #f8fafc;
-          border-bottom: 1px solid #e2e8f0;
+          background: white;
+          border-bottom: 1px solid #f0f0f0;
         }
         .custom-modal .ant-modal-body {
           padding: 24px;
@@ -852,63 +568,42 @@ const EmployeeList = () => {
           right: 16px;
         }
         .ant-table-striped .ant-table-row:nth-child(odd) > td {
-          background-color: #f8fafc;
+          background-color: #fafafa;
         }
         .ant-table-row:hover > td {
-          background-color: #f1f5f9 !important;
+          background-color: #f5f5f5 !important;
         }
         .ant-table-tbody > tr > td {
           padding: 16px 24px;
           transition: all 0.2s;
         }
         .ant-input-affix-wrapper:hover {
-          border-color: #818cf8;
+          border-color: #40a9ff;
         }
         .ant-input-affix-wrapper-focused {
-          border-color: #6366f1;
-          box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+          border-color: #40a9ff;
+          box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+        .ant-select:hover .ant-select-selector {
+          border-color: #40a9ff !important;
+        }
+        .ant-select-focused .ant-select-selector {
+          border-color: #40a9ff !important;
+          box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
         }
         .ant-btn-primary {
-          background: linear-gradient(to right, #4f46e5, #6366f1);
+          background: #1890ff;
           border: none;
-          box-shadow: 0 2px 4px rgba(99, 102, 241, 0.1);
         }
         .ant-btn-primary:hover {
-          background: linear-gradient(to right, #4338ca, #4f46e5);
-          transform: translateY(-1px);
+          background: #40a9ff;
+        }
+        .ant-table {
+          border-radius: 0;
         }
       `}</style>
     </Card>
   );
 };
 
-const styles = `
-  .search-input {
-    transition: all 0.3s;
-  }
-
-  .search-input:hover,
-  .search-input:focus {
-    border-color: #40a9ff;
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
-  }
-
-  .ant-input-affix-wrapper {
-    min-width: 250px;
-  }
-
-  @media (max-width: 768px) {
-    .ant-input-affix-wrapper {
-      width: 100%;
-    }
-  }
-`;
-
-const EmployeeListWithStyles = () => (
-  <>
-    <style>{styles}</style>
-    <EmployeeList />
-  </>
-);
-
-export default EmployeeListWithStyles;
+export default EmployeeList;

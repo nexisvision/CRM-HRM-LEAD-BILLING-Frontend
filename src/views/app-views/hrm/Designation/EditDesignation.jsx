@@ -72,7 +72,7 @@ const EditDesignation = ({ id, onClose }) => {
 
   return (
     <div className="edit-designation">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
 
       <Formik
         initialValues={{

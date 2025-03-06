@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Input, Button, Select, Row, Col, message,Modal } from 'antd';
+import { Input, Button, Select, Row, Col, message, Modal } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { PlusOutlined } from '@ant-design/icons';
 import { editAccount, getAccounts } from './AccountReducer/AccountSlice';
@@ -26,7 +26,7 @@ const EditAccount = ({ onClose, idd }) => {
   const countries = useSelector((state) => state.countries?.countries);
 
   const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
-  
+
   useEffect(() => {
     dispatch(getallcountries());
   }, [dispatch]);
@@ -92,7 +92,7 @@ const EditAccount = ({ onClose, idd }) => {
 
   return (
     <div className="edit-account-form">
-        <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

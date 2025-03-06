@@ -23,6 +23,7 @@ import AddBranch from '../../hrm/Branch/AddBranch';
 import AddDepartment from '../Department/AddDepartment';
 import AddDesignation from '../Designation/AddDesignation';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -30,6 +31,8 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [salary, setSalary] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [employeeData, setEmployeeData] = useState(null);
 
 
   const departmentData = useSelector((state) => state.Department?.Department?.data || []);
@@ -45,56 +48,65 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
   const countries = useSelector((state) => state.countries.countries);
   const { currencies } = useSelector((state) => state.currencies);
 
-  const allempdata = useSelector((state) => state.employee.employee.data)
-  const empData = allempdata?.filter((item) => item.id === idd)
-
+  // Load initial data
   useEffect(() => {
-    dispatch(empdata());
-    dispatch(getallcountries());
-    dispatch(getDept());
-    dispatch(getDes());
-    dispatch(getBranch());
-    dispatch(getcurren());
-  }, [dispatch]);
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        const [
+          empResponse,
+          countriesResponse,
+          deptResponse,
+          desResponse,
+          branchResponse,
+          currencyResponse
+        ] = await Promise.all([
+          dispatch(empdata()),
+          dispatch(getallcountries()),
+          dispatch(getDept()),
+          dispatch(getDes()),
+          dispatch(getBranch()),
+          dispatch(getcurren())
+        ]);
 
-  const onSubmit = async (values, { setSubmitting }) => {
-    try {
-      const response = await dispatch(updateEmp({ idd, values })).unwrap();
-      if (response) {
-        onClose();
+        const empData = empResponse.payload.data.find(emp => emp.id === idd);
+        if (empData) {
+          setEmployeeData(empData);
+          setSelectedBranch(empData.branch);
+          setSalary(Boolean(empData.payroll || empData.netSalary || empData.currency));
+        }
+      } catch (error) {
+        console.error("Error loading data:", error);
+        message.error("Failed to load employee data");
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Error updating employee:", error);
-      message.error(error?.message || "Failed to update employee");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    };
 
-  const onFinishFailed = (errorInfo) => {
-    console.error("Form submission failed:", errorInfo);
-  };
+    loadData();
+  }, [dispatch, idd]);
 
   const initialValues = {
-    firstName: empData.firstName || "",
-    lastName: empData.lastName || "",
-    phone: empData.phone || "",
-    address: empData.address || "",
-    branch: empData.branch || "",
-    joiningDate: empData.joiningDate || null,
-    leaveDate: empData.leaveDate || null,
-    department: empData.department || "",
-    designation: empData.designation || "",
-    salary: empData.salary || "",
-    accountholder: empData.accountholder || "",
-    accountnumber: empData.accountnumber || "",
-    bankname: empData.bankname || "",
-    banklocation: empData.banklocation || "",
-    payroll: empData.payroll || "",
-    bankAccount: empData.bankAccount || "",
-    netSalary: empData.netSalary || "",
-    status: empData.status || "",
-    currency: empData.currency || "",
+    firstName: employeeData?.firstName || "",
+    lastName: employeeData?.lastName || "",
+    phone: employeeData?.phone || "",
+    phoneCode: employeeData?.phoneCode || "+91",
+    address: employeeData?.address || "",
+    branch: employeeData?.branch || "",
+    joiningDate: employeeData?.joiningDate ? dayjs(employeeData.joiningDate) : null,
+    leaveDate: employeeData?.leaveDate ? dayjs(employeeData.leaveDate) : null,
+    department: employeeData?.department || "",
+    designation: employeeData?.designation || "",
+    salary: employeeData?.salary || "",
+    accountholder: employeeData?.accountholder || "",
+    accountnumber: employeeData?.accountnumber || "",
+    bankname: employeeData?.bankname || "",
+    banklocation: employeeData?.banklocation || "",
+    payroll: employeeData?.payroll || "",
+    bankAccount: employeeData?.bankAccount || "",
+    netSalary: employeeData?.netSalary || "",
+    status: employeeData?.status || "",
+    currency: employeeData?.currency || "",
   };
 
   const validationSchema = Yup.object({
@@ -134,13 +146,40 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
     dispatch(getDes());
   };
 
+  const onSubmit = async (values, { setSubmitting }) => {
+    try {
+      const response = await dispatch(updateEmp({ idd, values })).unwrap();
+      if (response) {
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error updating employee:", error);
+      message.error(error?.message || "Failed to update employee");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.error("Form submission failed:", errorInfo);
+  };
+
+  if (isLoading || !employeeData) {
+    return (
+      <div className="flex justify-center items-center h-[200px]">
+        <div className="text-lg">Loading employee data...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="add-employee p-6">
+    <div className="edit-employee">
+
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         onSubmit={onSubmit}
-        enableReinitialize={true}
+        enableReinitialize={false}
       >
         {({
           isSubmitting,
@@ -154,40 +193,45 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
             onSubmit={handleSubmit}
             onFinishFailed={onFinishFailed}
           >
-            <div className="border-b-2 border-gray-300 pb-4 mt-[-35px]"></div>
             <h1 className="text-lg font-bold mb-4">Personal Details</h1>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">First Name <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">First Name <span className="text-rose-500">*</span></label>
                   <Field name="firstName" as={Input} placeholder="John" className="mt-1" />
-                  <ErrorMessage name="firstName" component="div" className="text-red-500" />
+                  <ErrorMessage name="firstName" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Last Name <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Last Name <span className="text-rose-500">*</span></label>
                   <Field name="lastName" as={Input} placeholder="Doe" className="mt-1" />
-                  <ErrorMessage name="lastName" component="div" className="text-red-500" />
+                  <ErrorMessage name="lastName" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
             </Row>
-            <Row gutter={16}>
-              <Col span={12} className="mt-2">
+            <Row gutter={16} className="mt-4">
+              <Col span={12}>
                 <div className="form-item">
-                  <label className="">Phone <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Phone <span className="text-rose-500">*</span></label>
                   <div className="flex">
                     <Select
                       style={{ width: '30%', marginRight: '8px' }}
                       placeholder="Code"
                       name="phoneCode"
+                      defaultValue={employeeData?.phoneCode || "+91"}
                       onChange={(value) => setFieldValue('phoneCode', value)}
+                      className="mt-1"
                     >
-                      {countries.map((country) => (
-                        <Option key={country.id} value={country.phoneCode}>
-                          ({country.phoneCode})
-                        </Option>
-                      ))}
+                      {countries && countries.length > 0 ? (
+                        countries.map((country) => (
+                          <Option key={country.id} value={country.phoneCode}>
+                            {country.phoneCode}
+                          </Option>
+                        ))
+                      ) : (
+                        <Option value="+91">+91</Option>
+                      )}
                     </Select>
                     <Field name="phone">
                       {({ field }) => (
@@ -196,35 +240,27 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
                           type="string"
                           style={{ width: '70%' }}
                           placeholder="Enter phone number"
-                          onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                          }}
-                          className="hide-number-spinner"
+                          className="mt-1"
+                          defaultValue={employeeData?.phone || ""}
                         />
                       )}
                     </Field>
                   </div>
-                  <ErrorMessage
-                    name="phoneNumber"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <ErrorMessage name="phone" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Address <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Address <span className="text-rose-500">*</span></label>
                   <Field name="address" as={Input} placeholder="Enter Address" className="mt-1" />
-                  <ErrorMessage name="address" component="div" className="text-red-500" />
+                  <ErrorMessage name="address" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Joining Date <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Joining Date <span className="text-rose-500">*</span></label>
                   <Field name="joiningDate">
                     {({ field }) => (
                       <DatePicker
@@ -234,12 +270,12 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
                       />
                     )}
                   </Field>
-                  <ErrorMessage name="joiningDate" component="div" className="text-red-500" />
+                  <ErrorMessage name="joiningDate" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Branch <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Branch <span className="text-rose-500">*</span></label>
                   <Field name="branch">
                     {({ field }) => (
                       <Select
@@ -276,14 +312,14 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
                       </Select>
                     )}
                   </Field>
-                  <ErrorMessage name="branch" component="div" className="text-red-500" />
+                  <ErrorMessage name="branch" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item mt-1">
-                  <label className="">Department <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Department <span className="text-rose-500">*</span></label>
                   <Field name="department">
                     {({ field }) => (
                       <Select
@@ -313,13 +349,13 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
                       </Select>
                     )}
                   </Field>
-                  <ErrorMessage name="department" component="div" className="text-red-500" />
+                  <ErrorMessage name="department" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label className="">Designation <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Designation <span className="text-rose-500">*</span></label>
                   <Field name="designation">
                     {({ field }) => (
                       <Select
@@ -349,15 +385,15 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
                       </Select>
                     )}
                   </Field>
-                  <ErrorMessage name="designation" component="div" className="text-red-500" />
+                  <ErrorMessage name="designation" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label className="font-semibol">Salary <span className="text-red-500">*</span></label>
-                  <Field name="salary" as={Input} placeholder="$" type="number" className="mt-1" />
-                  <ErrorMessage name="salary" component="div" className="text-red-500" />
+                  <label className="font-semibold">Salary <span className="text-rose-500">*</span></label>
+                  <Field name="salary" as={Input} placeholder="$" type="text" className="mt-1" />
+                  <ErrorMessage name="salary" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
             </Row>
@@ -365,32 +401,32 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Account Holder Name </label>
+                  <label className="font-semibold">Account Holder Name </label>
                   <Field name="accountholder" as={Input} placeholder="John Doe" className="mt-1" />
-                  <ErrorMessage name="accountholder" component="div" className="text-red-500" />
+                  <ErrorMessage name="accountholder" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Account Number </label>
+                  <label className="font-semibold">Account Number </label>
                   <Field name="accountnumber" as={Input} placeholder="123456789" type="number" className="mt-1" />
-                  <ErrorMessage name="accountnumber" component="div" className="text-red-500" />
+                  <ErrorMessage name="accountnumber" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
             </Row>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Bank Name </label>
+                  <label className="font-semibold">Bank Name </label>
                   <Field name="bankname" as={Input} placeholder="Bank Name" className="mt-1" />
-                  <ErrorMessage name="bankname" component="div" className="text-red-500" />
+                  <ErrorMessage name="bankname" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Bank Location </label>
+                  <label className="font-semibold">Bank Location </label>
                   <Field name="banklocation" as={Input} placeholder="Bank Location" className="mt-1" />
-                  <ErrorMessage name="banklocation" component="div" className="text-red-500" />
+                  <ErrorMessage name="banklocation" component="div" className="text-red-500 text-sm" />
                 </div>
               </Col>
             </Row>
@@ -414,7 +450,7 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
                 <Row gutter={16}>
                   <Col span={12}>
                     <div className="form-item">
-                      <label className="">Payroll Type </label>
+                      <label className="font-semibold">Payroll Type </label>
                       <Field name="payroll">
                         {({ field }) => (
                           <Select
@@ -429,13 +465,13 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
                           </Select>
                         )}
                       </Field>
-                      <ErrorMessage name="payroll" component="div" className="text-red-500" />
+                      <ErrorMessage name="payroll" component="div" className="text-red-500 text-sm" />
                     </div>
                   </Col>
 
                   <Col span={12}>
                     <div className="form-item">
-                      <label className="">Currency </label>
+                      <label className="font-semibold">Currency </label>
                       <Field name="currency">
                         {({ field }) => (
                           <Select
@@ -452,7 +488,7 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
                           </Select>
                         )}
                       </Field>
-                      <ErrorMessage name="currency" component="div" className="text-red-500" />
+                      <ErrorMessage name="currency" component="div" className="text-red-500 text-sm" />
                     </div>
                   </Col>
                 </Row>
@@ -460,7 +496,7 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
                 <Row gutter={16}>
                   <Col span={12}>
                     <div className="form-item">
-                      <label className="">Net Salary </label>
+                      <label className="font-semibold">Net Salary </label>
                       <Field
                         name="netSalary"
                         as={Input}
@@ -468,13 +504,13 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
                         className="w-full mt-1"
                         placeholder="Enter Net Salary Amount"
                       />
-                      <ErrorMessage name="netSalary" component="div" className="text-red-500" />
+                      <ErrorMessage name="netSalary" component="div" className="text-red-500 text-sm" />
                     </div>
                   </Col>
 
                   <Col span={12}>
                     <div className="form-item">
-                      <label className="">Status </label>
+                      <label className="font-semibold">Status </label>
                       <Field name="status">
                         {({ field }) => (
                           <Select
@@ -489,13 +525,13 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
                           </Select>
                         )}
                       </Field>
-                      <ErrorMessage name="status" component="div" className="text-red-500" />
+                      <ErrorMessage name="status" component="div" className="text-red-500 text-sm" />
                     </div>
                   </Col>
                 </Row>
               </>
             )}
-            <div className="text-right mt-4">
+            <div className="text-right mt-6">
               <Button type="default" className="mr-2" onClick={() => onClose()}>
                 Cancel
               </Button>
@@ -503,8 +539,9 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
                 type="primary"
                 htmlType="submit"
                 loading={isSubmitting}
+                className="bg-blue-600 hover:bg-blue-500"
               >
-                {isSubmitting ? "Submitting..." : "Submit"}
+                {isSubmitting ? "Submitting..." : "Save Changes"}
               </Button>
             </div>
           </Form>

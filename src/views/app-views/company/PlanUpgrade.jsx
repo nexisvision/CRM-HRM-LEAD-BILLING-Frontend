@@ -76,50 +76,50 @@ const PlanUpgrade = () => {
         footer={null}
         centered
       > */}
-            <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
 
-        <List
-          dataSource={initialPlans}
-          renderItem={(plan) => (
-            <List.Item
-              key={plan.id}
-              onClick={() => handlePlanSelect(plan.id)}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "5px",
-                padding: "10px 20px",
-                cursor: "pointer",
-                backgroundColor: selectedPlan === plan.id ? "#f5f5f5" : "white",
-                border: selectedPlan === plan.id ? "1px solid #1890ff" : "1px solid #e8e8e8",
-                borderRadius: 5,
-              }}
-            >
-              <Space direction="vertical" size={0}>
-                <Text strong>
-                  {plan.name} ({plan.price}) / {plan.duration}
-                </Text>
-                <Text>Users: {plan.users}</Text>
-                <Text>Customers: {plan.customers}</Text>
-                <Text>Vendors: {plan.vendors}</Text>
-              </Space>
-              {selectedPlan === plan.id ? (
-                <CheckOutlined style={{ color: "green", fontSize: 24 }} />
-              ) : (
-                <Button
-                  icon={<ShoppingCartOutlined />}
+
+      <List
+        dataSource={initialPlans}
+        renderItem={(plan) => (
+          <List.Item
+            key={plan.id}
+            onClick={() => handlePlanSelect(plan.id)}
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "5px",
+              padding: "10px 20px",
+              cursor: "pointer",
+              backgroundColor: selectedPlan === plan.id ? "#f5f5f5" : "white",
+              border: selectedPlan === plan.id ? "1px solid #1890ff" : "1px solid #e8e8e8",
+              borderRadius: 5,
+            }}
+          >
+            <Space direction="vertical" size={0}>
+              <Text strong>
+                {plan.name} ({plan.price}) / {plan.duration}
+              </Text>
+              <Text>Users: {plan.users}</Text>
+              <Text>Customers: {plan.customers}</Text>
+              <Text>Vendors: {plan.vendors}</Text>
+            </Space>
+            {selectedPlan === plan.id ? (
+              <CheckOutlined style={{ color: "green", fontSize: 24 }} />
+            ) : (
+              <Button
+                icon={<ShoppingCartOutlined />}
                 //   shape="circle"
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent List.Item click
-                    setSelectedPlan(plan.id); // Set the selected plan
-                    console.log(`Configure ${plan.name}`);
-                  }}
-                />
-              )}
-            </List.Item>
-          )}
-        />
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent List.Item click
+                  setSelectedPlan(plan.id); // Set the selected plan
+                  console.log(`Configure ${plan.name}`);
+                }}
+              />
+            )}
+          </List.Item>
+        )}
+      />
       {/* </Modal> */}
     </>
   );
@@ -206,7 +206,7 @@ export default PlanUpgrade;
 //       {/* <Button type="primary" onClick={showModal}>
 //         Upgrade Plan
 //       </Button> */}
-// {/* 
+// {/*
 //       <Modal
 //         title="Upgrade Plan"
 //         visible={isModalVisible}

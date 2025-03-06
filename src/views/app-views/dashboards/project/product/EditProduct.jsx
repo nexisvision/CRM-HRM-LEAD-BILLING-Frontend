@@ -81,7 +81,7 @@
 
 //   return (
 //     <div className="add-expenses-form">
-//       <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+//       
 //       <Formik
 //         initialValues={initialValues}
 //         validationSchema={validationSchema}
@@ -348,7 +348,7 @@ const EditProduct = ({ idd, onClose }) => {
   // Handle file upload changes
   const handleFileChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
-};
+  };
 
   // Declare state for initial values
   const [initialValues, setInitialValues] = useState({
@@ -401,7 +401,7 @@ const EditProduct = ({ idd, onClose }) => {
     }
 
     const formData = new FormData();
-    
+
     // Append all form values except image
     Object.keys(values).forEach(key => {
       if (key !== 'image') {
@@ -413,7 +413,7 @@ const EditProduct = ({ idd, onClose }) => {
     if (fileList[0]?.originFileObj) {
       formData.append('image', fileList[0].originFileObj);
     }
-    
+
     dispatch(EditProdu({ idd, formData })).then(() => {
       dispatch(GetProdu(id));
       onClose();
@@ -422,7 +422,7 @@ const EditProduct = ({ idd, onClose }) => {
 
   return (
     <div className="add-expenses-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -506,10 +506,10 @@ const EditProduct = ({ idd, onClose }) => {
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">SKU <span className="text-red-500">*</span></label>
-                  <Field 
-                    className="mt-2" 
-                    name="sku" 
-                    as={CustomInput} 
+                  <Field
+                    className="mt-2"
+                    name="sku"
+                    as={CustomInput}
                     placeholder="Enter SKU"
                     validate={(value) => {
                       if (!value) {
@@ -526,10 +526,10 @@ const EditProduct = ({ idd, onClose }) => {
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">HSN/SAC <span className="text-red-500">*</span></label>
-                  <Field 
-                    className="mt-2" 
-                    name="hsn_sac" 
-                    as={CustomInput} 
+                  <Field
+                    className="mt-2"
+                    name="hsn_sac"
+                    as={CustomInput}
                     placeholder="Enter HSN/SAC"
                     validate={(value) => {
                       if (!value) {
@@ -546,7 +546,7 @@ const EditProduct = ({ idd, onClose }) => {
 
               <Col span={24} className="mt-4">
                 <div className="form-item">
-                    <label className="font-semibold">Description</label>
+                  <label className="font-semibold">Description</label>
                   <ReactQuill
                     value={values.description}
                     onChange={(value) => setFieldValue("description", value)}
@@ -562,7 +562,7 @@ const EditProduct = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              
+
 
               <div className="mt-4 w-full">
                 <span className="block font-semibold p-2">Product Image</span>
@@ -574,7 +574,7 @@ const EditProduct = ({ idd, onClose }) => {
                     maxCount={1}
                     fileList={fileList}
                     onChange={handleFileChange}
-                    showUploadList={{ 
+                    showUploadList={{
                       showRemoveIcon: true,
                       showPreviewIcon: true,
                       className: "upload-list-inline"
@@ -589,10 +589,10 @@ const EditProduct = ({ idd, onClose }) => {
               <Row justify="end" className="mt-6">
                 <Col>
                   <Space>
-                    <Button 
+                    <Button
                       onClick={onClose}
                       className="px-4"
-                      style={{ 
+                      style={{
                         borderRadius: '6px',
                         color: '#666666',
                         borderColor: '#d9d9d9',
@@ -601,11 +601,11 @@ const EditProduct = ({ idd, onClose }) => {
                     >
                       Cancel
                     </Button>
-                    <Button 
-                      type="primary" 
+                    <Button
+                      type="primary"
                       htmlType="submit"
                       className="px-4"
-                      style={{ 
+                      style={{
                         borderRadius: '6px',
                         backgroundColor: '#3366FF'
                       }}
@@ -620,8 +620,8 @@ const EditProduct = ({ idd, onClose }) => {
         )}
       </Formik>
 
-        {/* Add Category Modal */}
-        <Modal
+      {/* Add Category Modal */}
+      <Modal
         title="Add New Category"
         open={isCategoryModalVisible}
         onCancel={() => setIsCategoryModalVisible(false)}
@@ -634,7 +634,7 @@ const EditProduct = ({ idd, onClose }) => {
           onChange={(e) => setNewCategory(e.target.value)}
         />
       </Modal>
-      
+
     </div>
   );
 };

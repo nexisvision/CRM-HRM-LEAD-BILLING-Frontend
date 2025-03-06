@@ -23,7 +23,7 @@ const AllowanceSchema = Yup.object().shape({
     .positive("Amount must be positive"),
 });
 
-const AddAllowance = ({ id, onClose}) => {
+const AddAllowance = ({ id, onClose }) => {
   const [employees, setEmployees] = useState([]);
   const dispatch = useDispatch();
 
@@ -36,7 +36,7 @@ const AddAllowance = ({ id, onClose}) => {
 
   const filteredEmployees = fnddata?.filter((employee) => employee.id === id);
 
-  console.log("filteredEmployees",filteredEmployees);
+  console.log("filteredEmployees", filteredEmployees);
 
   useEffect(() => {
     dispatch(getcurren());
@@ -62,7 +62,7 @@ const AddAllowance = ({ id, onClose}) => {
   return (
     <div className="allowance">
       {/* <h3>Allowance</h3> */}
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
       <Formik
         initialValues={{
           employeeId: "",
@@ -214,10 +214,10 @@ const AddAllowance = ({ id, onClose}) => {
               </Col>
             </Row>
 
-            <Button 
-              type="primary" 
-              htmlType="submit" 
-              onClick={onClose} 
+            <Button
+              type="primary"
+              htmlType="submit"
+              onClick={onClose}
               className="mt-4 mb-0"
             >
               Submit

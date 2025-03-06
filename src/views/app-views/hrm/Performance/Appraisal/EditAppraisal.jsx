@@ -81,7 +81,7 @@ const EditAppraisal = ({ id , onClose }) => {
 
   return (
     <div className="add-appraisal">
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+      
       <Formik
         // initialValues={{ branch: '', employee: '', businessProcess: '', oralCommunication: '', 
         //   leadership: '', overallRating: '', allocatingResources: '', projectManagement: '' }}
@@ -299,7 +299,7 @@ export default EditAppraisal;
 //   return (
 //     <div className="add-employee">
 //       {/* <h2 className="mb-4">Add New Appraisal</h2> */}
-//       <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+//       
 
 //       <Form
 //         layout="vertical"

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Input, Form, Modal, Typography, Row, Col } from "antd";
-import { DownloadOutlined, StarFilled,PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import { DownloadOutlined, StarFilled, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import AddInterviewSchedule from "./AddInterviewSchedule";
 
 const { Title, Text } = Typography;
@@ -8,12 +8,12 @@ const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 const AdditionalDetailsList = () => {
-  
+
   const [isAddJobModalVisible, setIsAddJobModalVisible] = useState(false);
-  
-  
-  
-  
+
+
+
+
   const openAddJobOnBoard = () => {
     setIsAddJobModalVisible(true);
   };
@@ -21,7 +21,7 @@ const AdditionalDetailsList = () => {
   const closeAddJobModal = () => {
     setIsAddJobModalVisible(false);
   };
-  
+
   const handleAddSkills = () => {
     console.log("Add Skills clicked");
   };
@@ -48,19 +48,19 @@ const AdditionalDetailsList = () => {
         </Button>
       </div> */}
 
-<Row justify="space-between" align="middle">
-          <Col>
-            <Title level={4}>Additional Details</Title>
-          </Col>
-          <Col>
-            <Button type="primary">
+      <Row justify="space-between" align="middle">
+        <Col>
+          <Title level={4}>Additional Details</Title>
+        </Col>
+        <Col>
+          <Button type="primary">
             <PlusOutlined />
-            Create Interview Schedule         
-            </Button>
-          </Col>
-        </Row>
+            Create Interview Schedule
+          </Button>
+        </Col>
+      </Row>
 
-        <hr style={{ marginBottom: '10px', marginTop: '10px', border: '1px solid #e8e8e8' }} />
+
 
       <Form layout="vertical">
         <Form.Item className="text-sm font-semibold" label="What Do You Consider to Be Your Weaknesses?">
@@ -107,7 +107,7 @@ const AdditionalDetailsList = () => {
         footer={null}
         width={1100}
         className='mt-[-70px]'
-        // height={1000}
+      // height={1000}
       >
         <AddInterviewSchedule onClose={closeAddJobModal} />
       </Modal>

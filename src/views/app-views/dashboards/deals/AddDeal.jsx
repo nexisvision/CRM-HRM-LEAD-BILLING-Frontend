@@ -1,6 +1,6 @@
 //SHURSTI
-import React, { useEffect,useState } from "react";
-import { Input, Button, Select, DatePicker, message, Row, Col,Modal } from "antd";
+import React, { useEffect, useState } from "react";
+import { Input, Button, Select, DatePicker, message, Row, Col, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
@@ -14,7 +14,7 @@ import { GetLeads } from "../leads/LeadReducers/LeadSlice";
 import { AddLable, GetLable } from "../../dashboards/sales/LableReducer/LableSlice";
 import { GetProject } from "../project/project-list/projectReducer/ProjectSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
-import {getallcountries} from "../../setting/countries/countriesreducer/countriesSlice";
+import { getallcountries } from "../../setting/countries/countriesreducer/countriesSlice";
 import AddDealStages from "../systemsetup/DealStages/AddDealStages";
 import AddPipeLine from "../systemsetup/Pipeline/AddPipeLine";
 import AddCurrencies from "views/app-views/setting/currencies/AddCurrencies";
@@ -29,18 +29,18 @@ const AddDeal = ({ onClose }) => {
   const allpipline = Piplines || [];
 
   const logged = useSelector((state) => state.user?.loggedInUser?.username);
-  
-  const fnddatas = logged && Array.isArray(allpipline) 
+
+  const fnddatas = logged && Array.isArray(allpipline)
     ? allpipline.filter((item) => item?.created_by === logged)
     : [];
 
   const { data: StagesLeadsDealss = [] } = useSelector(
     (state) => state.StagesLeadsDeals.StagesLeadsDeals || {}
   );
-  const StagesLeadsDeals = logged && Array.isArray(StagesLeadsDealss) 
-    ? StagesLeadsDealss.filter((item) => 
-        item?.created_by === logged && item?.stageType === "deal"
-      )
+  const StagesLeadsDeals = logged && Array.isArray(StagesLeadsDealss)
+    ? StagesLeadsDealss.filter((item) =>
+      item?.created_by === logged && item?.stageType === "deal"
+    )
     : [];
 
   // console.log(dealstages,"dealstages")
@@ -48,7 +48,7 @@ const AddDeal = ({ onClose }) => {
 
   const { data: Leadss = [] } = useSelector((state) => state.Leads.Leads || {});
 
-  const Leads = logged && Array.isArray(Leadss) 
+  const Leads = logged && Array.isArray(Leadss)
     ? Leadss.filter((item) => item?.created_by === logged)
     : [];
 
@@ -56,9 +56,9 @@ const AddDeal = ({ onClose }) => {
 
   const { data: Projectt = [] } = useSelector((state) => state.Project.Project || {});
 
-  const Project = logged && Array.isArray(Projectt) 
-  ? Projectt.filter((item) => item?.created_by === logged)
-  : [];
+  const Project = logged && Array.isArray(Projectt)
+    ? Projectt.filter((item) => item?.created_by === logged)
+    : [];
 
 
   const clientdata = tabledata?.SubClient?.data || [];
@@ -69,6 +69,7 @@ const AddDeal = ({ onClose }) => {
     dispatch(getallcountries());
   }, [dispatch]);
 
+<<<<<<< Updated upstream
    // category start
    const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
    const [newCategory, setNewCategory] = useState("");
@@ -142,6 +143,73 @@ const AddDeal = ({ onClose }) => {
    };
  
    // category end
+=======
+  // category start
+  const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
+  const [newCategory, setNewCategory] = useState("");
+  const [categories, setCategories] = useState([]);
+
+  const AllLoggedData = useSelector((state) => state.user);
+
+  const lid = AllLoggedData.loggedInUser.id;
+
+  const fetchLables = async (lableType, setter) => {
+    try {
+      const lid = AllLoggedData.loggedInUser.id;
+      const response = await dispatch(GetLable(lid));
+
+      if (response.payload && response.payload.data) {
+        const uniqueCategories = response.payload.data
+          .filter((label) => label && label.name) // Filter out invalid labels
+          .map((label) => ({
+            id: label.id,
+            name: label.name.trim(),
+          }))
+          .filter(
+            (label, index, self) =>
+              index === self.findIndex((t) => t.name === label.name)
+          ); // Remove duplicates
+
+        setCategories(uniqueCategories);
+      }
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+      message.error("Failed to load categories");
+    }
+  };
+
+  useEffect(() => {
+    fetchLables("category", setCategories);
+  }, []);
+
+  const handleAddNewCategory = async () => {
+    if (!newCategory.trim()) {
+      message.error("Please enter a category name");
+      return;
+    }
+
+    try {
+      const lid = AllLoggedData.loggedInUser.id;
+      const payload = {
+        name: newCategory.trim(),
+        labelType: "status",
+      };
+
+      await dispatch(AddLable({ lid, payload }));
+      message.success("Category added successfully");
+      setNewCategory("");
+      setIsCategoryModalVisible(false);
+
+      // Fetch updated categories
+      await fetchLables();
+    } catch (error) {
+      console.error("Failed to add Category:", error);
+      message.error("Failed to add Category");
+    }
+  };
+
+  // category end
+>>>>>>> Stashed changes
 
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
@@ -185,7 +253,7 @@ const AddDeal = ({ onClose }) => {
     price: Yup.string().required("Please enter a Price."),
     leadTitle: Yup.string().required("Please select a Lead Title."),
     currency: Yup.string().required("Please select a Currency."),
-    category: Yup.string().optional ("Please select a Category."),
+    category: Yup.string().optional("Please select a Category."),
     pipeline: Yup.string().required("Please select a Pipeline."),
     stage: Yup.string().required("Please select a Stage."),
     closedDate: Yup.date().required("Please select a Closed Date."),
@@ -222,7 +290,7 @@ const AddDeal = ({ onClose }) => {
   useEffect(() => {
     dispatch(GetProject());
   }, [dispatch]);
- 
+
   const [isAddDealStagesModalVisible, setIsAddDealStagesModalVisible] = useState(false);
 
   const openAddDealStagesModal = () => {
@@ -259,6 +327,7 @@ const AddDeal = ({ onClose }) => {
         // validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
+<<<<<<< Updated upstream
         {({
           values,
           setFieldValue,
@@ -382,6 +451,272 @@ const AddDeal = ({ onClose }) => {
                                   <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
                                   <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
                                 </div>
+=======
+        {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
+          <Form className="formik-form" onSubmit={handleSubmit}>
+
+            {/* <h2 className="mb-4 border-b pb-2 font-medium">Add Deal</h2> */}
+            <Row gutter={16}>
+              <Col span={12}>
+                <div className="form-item mt-3">
+                  <label className="font-semibold">Deal Name <span className="text-rose-500">*</span></label>
+                  <Field
+                    className="mt-1"
+                    name="dealName"
+                    as={Input}
+                    placeholder="Enter Deal Name"
+                  />
+                  <ErrorMessage
+                    name="dealName"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+              <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Phone
+                    <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="flex gap-0">
+                    <Field name="phoneCode">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="phone-code-select"
+                          style={{
+                            width: '80px',
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRight: 0,
+                            backgroundColor: '#f8fafc',
+                          }}
+                          placeholder={<span className="text-gray-400">+91</span>}
+                          onChange={(value) => {
+                            if (value === 'add_new') {
+                              setIsAddPhoneCodeModalVisible(true);
+                            } else {
+                              setFieldValue('phoneCode', value);
+                            }
+                          }}
+                          value={values.phoneCode || getInitialCountry()}
+                          dropdownStyle={{ minWidth: '180px' }}
+                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                          loading={!countries}
+                          dropdownRender={menu => (
+                            <div>
+                              <div
+                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                              >
+                                <PlusOutlined className="mr-2" />
+                                <span className="text-sm">Add New</span>
+                              </div>
+                              {menu}
+                            </div>
+                          )}
+                        >
+                          {countries?.map((country) => (
+                            <Option key={country.id} value={country.phoneCode}>
+                              <div className="flex items-center w-full px-1">
+                                <span className="text-base min-w-[40px]">{country.phoneCode}</span>
+                                <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+                                <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                              </div>
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
+                    <Field name="phoneNumber">
+                      {({ field }) => (
+                        <Input
+                          {...field}
+                          className="phone-input"
+                          style={{
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderLeft: 0,
+                            width: 'calc(100% - 80px)'
+                          }}
+                          type="tel"
+                          placeholder="Enter 10-digit number"
+                          onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
+                          maxLength={15}
+                        />
+                      )}
+                    </Field>
+                  </div>
+                  <ErrorMessage name="phoneNumber" component="div" className="text-red-500 mt-1 text-sm" />
+                </div>
+              </Col>
+              <Col span={12} className="mt-3">
+                <div className="form-group">
+                  <label className="text-gray-600 font-semibold mb-2 block">Currency <span className="text-red-500">*</span></label>
+                  <div className="flex gap-0">
+                    <Field name="currency">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="currency-select"
+                          style={{
+                            width: '80px',
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRight: 0,
+                            backgroundColor: '#f8fafc',
+                          }}
+                          placeholder={<span className="text-gray-400">₹</span>}
+                          onChange={(value) => {
+                            if (value === 'add_new') {
+                              setIsAddCurrencyModalVisible(true);
+                            } else {
+                              setFieldValue("currency", value);
+                            }
+                          }}
+                          defaultValue={getInitialCurrency()}
+                          value={values.currency}
+                          dropdownStyle={{ minWidth: '180px' }}
+                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                          loading={!fnddatass}
+                          dropdownRender={menu => (
+                            <div>
+                              <div
+                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                onClick={() => setIsAddCurrencyModalVisible(true)}
+                              >
+                                <PlusOutlined className="mr-2" />
+                                <span className="text-sm">Add New</span>
+                              </div>
+                              {menu}
+                            </div>
+                          )}
+                        >
+                          {fnddatass?.map((currency) => (
+                            <Option key={currency.id} value={currency.id}>
+                              <div className="flex items-center w-full px-1">
+                                <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                              </div>
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
+                    <Field name="price">
+                      {({ field, form }) => (
+                        <Input
+                          {...field}
+                          className="price-input"
+                          style={{
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderLeft: '1px solid #d9d9d9',
+                            width: 'calc(100% - 100px)'
+                          }}
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          placeholder="0.00"
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                              form.setFieldValue('price', value);
+                            }
+                          }}
+                          onKeyPress={(e) => {
+                            const charCode = e.which ? e.which : e.keyCode;
+                            if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                              e.preventDefault();
+                            }
+                            if (charCode === 46 && field.value.includes('.')) {
+                              e.preventDefault();
+                            }
+                          }}
+                          prefix={
+                            values.currency && (
+                              <span className="text-gray-600 font-medium mr-1">
+                                {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                              </span>
+                            )
+                          }
+                        />
+                      )}
+                    </Field>
+                  </div>
+                  <ErrorMessage name="price" component="div" className="text-red-500 mt-1 text-sm" />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Category </label>
+                  <Select
+                    name="category"
+                    style={{ width: "100%" }}
+                    className="w-full mt-1"
+                    placeholder="Select or add new category"
+                    value={values.category}
+                    onChange={(value) => setFieldValue("category", value)}
+                    dropdownRender={(menu) => (
+                      <div>
+                        {menu}
+                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                          <Button
+                            type="link"
+                            icon={<PlusOutlined />}
+                            className="w-full mt-1"
+                            onClick={() => setIsCategoryModalVisible(true)}
+                          >
+                            Add New Category
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  >
+                    {categories.map((category) => (
+                      <Option key={category.id} value={category.name}>
+                        {category.name}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage
+                    name="project_category"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+
+              <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Lead Title <span className="text-rose-500">*</span></label>
+                  <div className="flex gap-2">
+                    <Field name="leadTitle">
+                      {({ field, form }) => (
+                        <Select
+                          {...field} // Spread Formik field props to manage the value
+                          className="w-full mt-1"
+                          placeholder="Select Lead Title"
+                          value={field.value || ""} // Ensure the select value is controlled by Formik
+                          onChange={(value) => {
+                            // Find the selected lead from the Leads array
+                            const selectedLead =
+                              Array.isArray(Leads) &&
+                              Leads.find((e) => e.id === value);
+                            // Update Formik's field value with the selected lead's title
+                            form.setFieldValue(
+                              "leadTitle",
+                              selectedLead?.leadTitle || ""
+                            );
+                          }}
+                        >
+                          {Array.isArray(Leads) &&
+                            Leads.map((lead) => (
+                              <Option key={lead.id} value={lead.id}>
+                                {lead.leadTitle}
+>>>>>>> Stashed changes
                               </Option>
                             ))}
                           </Select>
@@ -432,9 +767,18 @@ const AddDeal = ({ onClose }) => {
                   </div>
                 </Col>
 
+<<<<<<< Updated upstream
                 <Col span={12} className="mt-3">
                       <div className="form-item">
                         <label className="font-semibold">Category </label>
+=======
+              <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Pipeline <span className="text-rose-500">*</span></label>
+                  <div className="flex gap-2">
+                    <Field name="pipeline">
+                      {({ field, form }) => (
+>>>>>>> Stashed changes
                         <Select
                           name="category"
                           style={{ width: "100%" }}
@@ -705,6 +1049,24 @@ const AddDeal = ({ onClose }) => {
         )}
       </Formik>
 
+<<<<<<< Updated upstream
+=======
+      {/* Add Category Modal */}
+      <Modal
+        title="Add New Category"
+        open={isCategoryModalVisible}
+        onCancel={() => setIsCategoryModalVisible(false)}
+        onOk={() => handleAddNewCategory("category", newCategory, setNewCategory, setIsCategoryModalVisible)}
+        okText="Add Category"
+      >
+        <Input
+          placeholder="Enter new category name"
+          value={newCategory}
+          onChange={(e) => setNewCategory(e.target.value)}
+        />
+      </Modal>
+
+>>>>>>> Stashed changes
       {/* Add Deal Stages Modal */}
       <Modal
         title="Add Deal Stages"

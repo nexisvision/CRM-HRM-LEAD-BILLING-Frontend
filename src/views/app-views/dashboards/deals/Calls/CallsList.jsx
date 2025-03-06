@@ -90,7 +90,7 @@ const CallsList = () => {
 
   return (
     <Card title="Calls" extra={<Button type='primary' icon={<PlusOutlined />} onClick={openAddCallModal}></Button>}>
-              <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
 
       <Input
         placeholder="Search"

@@ -19,8 +19,8 @@ class BasicDetails extends Component {
     const { user, status } = this.state;
 
     return (
-      <Card title="Basic Details" extra={<Button type="primary">UnArchive</Button>} style={{ width: 400 , height:500 }}>
-            <hr style={{ marginBottom: '10px', border: '1px solid #e8e8e8' }} />
+      <Card title="Basic Details" extra={<Button type="primary">UnArchive</Button>} style={{ width: 400, height: 500 }}>
+        <
 
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
           <Avatar size={64} src={user.image} />

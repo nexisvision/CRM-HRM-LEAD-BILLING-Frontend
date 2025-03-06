@@ -45,7 +45,7 @@ const AddCurrencies = ({ onClose }) => {
 
   return (
     <div>
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
 
       <Formik
         initialValues={initialValues}

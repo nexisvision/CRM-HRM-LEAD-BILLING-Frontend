@@ -107,7 +107,7 @@ const AddProduct = ({ idd, onClose }) => {
 
   return (
     <div className="add-expenses-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+
       <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
@@ -195,7 +195,7 @@ const AddProduct = ({ idd, onClose }) => {
               </Col>
               <Col span={24} className="mt-4">
                 <div className="form-item">
-                    <label className="font-semibold">Description <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Description <span className="text-red-500">*</span></label>
                   <ReactQuill
                     className="mt-1"
                     value={values.description}

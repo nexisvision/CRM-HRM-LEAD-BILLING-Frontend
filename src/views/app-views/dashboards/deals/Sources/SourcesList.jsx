@@ -49,7 +49,7 @@ const SourcesList = () => {
           type="text"
           icon={<DeleteOutlined />}
           danger
-        //   style={{ background: '#ffefef', color: '#ff4d4f', borderRadius: '5px' }}
+          //   style={{ background: '#ffefef', color: '#ff4d4f', borderRadius: '5px' }}
           onClick={() => deleteUser(record.id)}
         />
       ),
@@ -61,13 +61,13 @@ const SourcesList = () => {
       title={<h3>Sources</h3>}
       extra={
         <Button type="primary" className="ml-2" onClick={openAddSourcesModal}>
-            <PlusOutlined />
-            {/* <span>New</span> */}
-          </Button>
+          <PlusOutlined />
+          {/* <span>New</span> */}
+        </Button>
       }
       bodyStyle={{ padding: '0' }}
     >
-              <hr style={{ margin: '20px', border: '1px solid #e8e8e8' }} />
+
 
       <Table
         dataSource={users}
@@ -76,7 +76,7 @@ const SourcesList = () => {
         rowKey="id"
         style={{ padding: '10px' }}
       />
-       <Modal
+      <Modal
         title="Add Sources"
         visible={isAddSourcesModalVisible}
         onCancel={closeAddSourcesModal}

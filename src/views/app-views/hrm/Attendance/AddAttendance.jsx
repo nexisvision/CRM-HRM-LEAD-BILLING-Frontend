@@ -18,7 +18,7 @@ import {
   addAttendance,
   getAttendances,
 } from "./AttendanceReducer/AttendanceSlice";
-import moment from "moment-timezone"; 
+import moment from "moment-timezone";
 // import moment from "moment";
 
 
@@ -64,7 +64,7 @@ const AddAttendance = ({ onClose }) => {
       endTime: values.endTime.format("HH:mm:ss"),
       halfDay: values.halfDay === "yes",
     };
-  
+
 
 
     dispatch(addAttendance(formattedValues))
@@ -86,7 +86,7 @@ const AddAttendance = ({ onClose }) => {
 
   return (
     <div className="add-attendance-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
 
       <Formik
         initialValues={{
@@ -223,7 +223,7 @@ const AddAttendance = ({ onClose }) => {
                     </div>
                   )}
                 </div>
-              </Col> */} 
+              </Col> */}
 
               {/* Comment Field */}
               <Col span={24}>

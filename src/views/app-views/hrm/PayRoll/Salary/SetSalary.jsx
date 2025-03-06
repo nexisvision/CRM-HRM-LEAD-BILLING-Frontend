@@ -64,7 +64,7 @@ export default SetSalary;
 
 // const SetSalary = () => (
 //   <div className="p-6 min-h-screen w-[1550px]">
-//           <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+//
 
 //     {/* <h2 className="text-2xl font-bold mb-6 text-gray-800">Set Salary</h2> */}
 //     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">

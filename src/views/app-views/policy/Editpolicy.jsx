@@ -67,7 +67,7 @@ const EditpolicyList = ({ idd, onClose }) => {
   const onSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
       const formData = new FormData();
-      
+
       Object.keys(values).forEach(key => {
         if (key === 'file' && values[key]) {
           formData.append('file', values[key]);
@@ -76,8 +76,8 @@ const EditpolicyList = ({ idd, onClose }) => {
         }
       });
 
-      const response = await dispatch(editpolicys({idd,formData})).unwrap();
-      
+      const response = await dispatch(editpolicys({ idd, formData })).unwrap();
+
       if (response) {
         message.success('Policy added successfully!');
         dispatch(getpolicys());
@@ -103,7 +103,7 @@ const EditpolicyList = ({ idd, onClose }) => {
   });
   return (
     <div>
-      <hr style={{ marginBottom: "15px", border: "1px solid #E8E8E8" }} />
+
 
       <Formik
         initialValues={initialValues}
@@ -182,7 +182,7 @@ const EditpolicyList = ({ idd, onClose }) => {
               <div className="mt-4 w-full">
                 <span className="block  font-semibold p-2">Add File</span>
                 <Col span={24}>
-                <Field name="file">
+                  <Field name="file">
                     {({ field }) => (
                       <Upload
                         fileList={fileList}

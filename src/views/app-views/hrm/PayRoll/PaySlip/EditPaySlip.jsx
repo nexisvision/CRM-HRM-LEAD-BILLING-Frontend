@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {  Input, Button, DatePicker, Select, message, Row, Col, Checkbox } from 'antd';
+import { Input, Button, DatePicker, Select, message, Row, Col, Checkbox } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
@@ -75,7 +75,7 @@ const EditPaySlip = () => {
 
   return (
     <div className="edit-payslip-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

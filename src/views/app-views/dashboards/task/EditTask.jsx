@@ -235,7 +235,7 @@ const EditTask = ({ onClose, idd, projectId }) => {
 
   return (
     <div className="add-expenses-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

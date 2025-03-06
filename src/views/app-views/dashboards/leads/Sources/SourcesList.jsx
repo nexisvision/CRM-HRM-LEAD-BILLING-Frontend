@@ -67,7 +67,7 @@ const SourcesList = () => {
       }
       bodyStyle={{ padding: "0" }}
     >
-      <hr style={{ margin: "20px", border: "1px solid #e8e8e8" }} />
+
 
       <Table
         dataSource={users}

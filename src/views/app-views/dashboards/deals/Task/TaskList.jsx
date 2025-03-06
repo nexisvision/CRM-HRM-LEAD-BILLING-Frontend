@@ -91,14 +91,14 @@ const TaskList = () => {
         <Col>
           <h1 className='font-bold text-lg mt-15px'>Tasks</h1>
         </Col>
-        
+
         <Col>
           <Button type="primary" onClick={openAddTaskModal}>
             <PlusOutlined />
           </Button>
         </Col>
       </Row>
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
 
       <Table
         dataSource={tasks}

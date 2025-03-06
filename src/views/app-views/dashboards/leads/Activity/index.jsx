@@ -23,7 +23,7 @@ const Activity = () => {
     // <div style={{padding:'10px', background: '#fff', borderRadius: '8px' }}>
     <Card>
       <h1 className='mb-3 text-lg font-bold'>Activity</h1>
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
 
       <List
         itemLayout="horizontal"

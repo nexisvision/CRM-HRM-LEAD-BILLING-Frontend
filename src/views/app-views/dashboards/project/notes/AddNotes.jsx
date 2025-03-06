@@ -90,11 +90,11 @@ const AddNotes = ({ onClose }) => {
       // if (result) {
       //   // message.success("Note added successfully!");
       //   resetForm();
-      
+
       // }
 
-      dispatch(AddNote({id,values}))
-        .then(()=>{
+      dispatch(AddNote({ id, values }))
+        .then(() => {
           // message.success("Note added successfully!");
           dispatch(GetNote(id))
           resetForm();
@@ -109,7 +109,7 @@ const AddNotes = ({ onClose }) => {
 
   return (
     <div className="add-expenses-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

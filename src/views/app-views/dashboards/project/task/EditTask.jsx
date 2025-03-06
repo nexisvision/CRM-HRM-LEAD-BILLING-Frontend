@@ -188,14 +188,14 @@ const EditTask = ({ idd, onClose }) => {
     }
   };
 
-// Handle file upload changes
-const handleFileChange = ({ fileList: newFileList }) => {
-  setFileList(newFileList);
-};
+  // Handle file upload changes
+  const handleFileChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+  };
 
 
   const onSubmit = (values, { resetForm }) => {
-     
+
     // Prepare the data for submission
     const formData = {
       taskName: values.taskTitle,
@@ -210,17 +210,17 @@ const handleFileChange = ({ fileList: newFileList }) => {
       // addfile: values.addfile
     };
 
-     // Append all form values
-     Object.keys(values).forEach(key => {
+    // Append all form values
+    Object.keys(values).forEach(key => {
       if (key !== 'Add File') {
-          formData.append(key, values[key]);
+        formData.append(key, values[key]);
       }
-  });
+    });
 
-  // Append the file if exists
-  if (fileList[0]?.originFileObj) {
+    // Append the file if exists
+    if (fileList[0]?.originFileObj) {
       formData.append('Add File', fileList[0].originFileObj);
-  }
+    }
 
     dispatch(EditTasks({ idd, values: formData }))
       .then(() => {
@@ -244,7 +244,7 @@ const handleFileChange = ({ fileList: newFileList }) => {
 
   return (
     <div className="add-expenses-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -519,7 +519,7 @@ const handleFileChange = ({ fileList: newFileList }) => {
                     maxCount={1}
                     fileList={fileList}
                     onChange={handleFileChange}
-                    showUploadList={{ 
+                    showUploadList={{
                       showRemoveIcon: true,
                       showPreviewIcon: true,
                       className: "upload-list-inline"

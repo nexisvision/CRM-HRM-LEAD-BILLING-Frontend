@@ -70,7 +70,7 @@ const EditDepartment = ({ comnyid, onClose }) => {
 
   return (
     <div className="edit-department">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
 
       <Formik
         initialValues={{
@@ -117,8 +117,8 @@ const EditDepartment = ({ comnyid, onClose }) => {
                         dropdownRender={menu => (
                           <>
                             {menu}
-                            <Button 
-                              type="link" 
+                            <Button
+                              type="link"
                               block
                               onClick={openAddBranchModal}
                             >

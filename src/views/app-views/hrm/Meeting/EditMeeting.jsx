@@ -96,7 +96,7 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
       try {
         // Parse the employee JSON string to array
         const employeeIds = JSON.parse(dataM.employee);
-        
+
         setInitialValues({
           department: dataM.department || "",
           employee: employeeIds, // Set the parsed array directly
@@ -122,10 +122,10 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
 
   const getEmployeeNames = (employeeIds) => {
     if (!employeeIds || !filteredEmpData) return [];
-    
+
     return employeeIds.map(id => {
       const employee = filteredEmpData.find(emp => emp.id === id);
-      console.log('employee',employee);
+      console.log('employee', employee);
       return employee ? employee.username : "Unknown Employee";
     });
   };
@@ -173,7 +173,7 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
       >
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
-            <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
 
             <Row gutter={16}>
               <Col span={12} className="mt-2">
@@ -197,8 +197,8 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
                         dropdownRender={menu => (
                           <>
                             {menu}
-                            <Button 
-                              type="link" 
+                            <Button
+                              type="link"
                               block
                               onClick={openAddDepartmentModal}
                             >

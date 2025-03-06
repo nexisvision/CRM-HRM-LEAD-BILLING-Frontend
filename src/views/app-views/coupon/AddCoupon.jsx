@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Button, DatePicker, Select, message, Row, Col, Checkbox,Radio } from 'antd';
+import { Form, Input, Button, DatePicker, Select, message, Row, Col, Checkbox, Radio } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
@@ -25,7 +25,7 @@ const AddCoupon = () => {
         name="add-job"
         onFinish={onFinish}
       >
-              <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
 
         <Row gutter={16}>
           <Col span={24}>
@@ -35,17 +35,17 @@ const AddCoupon = () => {
           </Col>
           <Col span={12}>
             <Form.Item name="discount" label="Discount" rules={[{ required: true, message: 'Please enter a Discount.' }]}>
-              <Input placeholder="Enter Discount" type='number'/>
+              <Input placeholder="Enter Discount" type='number' />
               <p className='text-xs'>Note: Discount in Percentage</p>
             </Form.Item>
           </Col>
           <Col span={12}>
             <Form.Item name="limit" label="Limit" rules={[{ required: true, message: 'Please enter a Limit.' }]}>
-              <Input placeholder="Enter Limit" type='number'/>
+              <Input placeholder="Enter Limit" type='number' />
             </Form.Item>
           </Col>
           <Col span={24}>
-          <Form.Item
+            <Form.Item
               name="code"
               label="Code"
               rules={[{ required: true, message: 'Please select a Coupon Type.' }]}
@@ -54,7 +54,7 @@ const AddCoupon = () => {
                 <Radio value="percentage" defaultChecked>Manual</Radio>
                 <Radio value="fixed">Auto Generate</Radio>
               </Radio.Group>
-              <Input placeholder="Enter Code"/>
+              <Input placeholder="Enter Code" />
             </Form.Item>
           </Col>
 

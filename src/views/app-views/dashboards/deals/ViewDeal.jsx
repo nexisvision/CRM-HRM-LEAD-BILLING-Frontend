@@ -36,7 +36,7 @@ const ViewDeal = () => {
     <>
         <h1 className="text-lg font-bold ml-3">Deal</h1>
     <div className="flex flex-col lg:flex-row ml-[-24px] mb-[-24px] rounded-b-lg mr-[-24px] mt-[-51px] rounded-t-lg bg-gray-100">
-      <hr style={{ marginTop:"50px", border: '2px solid #e8e8e8' }} />
+      
       {/* Sidebar */}
       {/* <Card className="w-[500px] h-[650px] ml-[20px] mt-[10px]"> */}
       <div className="sm:w-full md:w-[95%] md:mr-[30px] lg:w-[240px] md:ml-[23px] h-full mt-16 px-[30px] md:p-0 lg:p-0">

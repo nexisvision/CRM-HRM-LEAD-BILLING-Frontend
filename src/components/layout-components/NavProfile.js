@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { Dropdown, Avatar, Modal, Form, Input, Upload, Button, message, Select } from 'antd';
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useEffect, useState } from 'react';
+import { Avatar, Modal, Form, Input, Upload, Button, message, Select, Menu, Dropdown } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
 import {
 	EditOutlined,
 	SettingOutlined,
@@ -15,492 +15,399 @@ import Flex from 'components/shared-components/Flex';
 import { signOut } from 'store/slices/authSlice';
 import { updateUser, getUserById } from 'views/auth-views/auth-reducers/UserSlice';
 import styled from '@emotion/styled';
-import { FONT_WEIGHT, MEDIA_QUERIES, SPACER, FONT_SIZES } from 'constants/ThemeConstant';
+import { FONT_WEIGHT, MEDIA_QUERIES, SPACER } from 'constants/ThemeConstant';
 import EditCompany from 'views/app-views/company/EditCompany';
-// import { Avatar } from 'antd';
-// import { UserOutlined } from '@ant-design/icons';
+import { Formik } from "formik";
+import * as Yup from "yup";
 
+const StyledModal = styled(Modal)`
+	.ant-modal-content {
+		border-radius: 12px;
+		overflow: hidden;
+	}
+	
+	.ant-modal-header {
+		background: #f8f9fa;
+		padding: 16px 24px;
+		border-bottom: 1px solid #e9ecef;
+	}
 
-const Icon = styled.div(() => ({
-	fontSize: FONT_SIZES.LG
-}))
+	.ant-modal-body {
+		padding: 24px;
+		max-height: calc(100vh - 200px);
+		overflow-y: auto;
+	}
 
-const Profile = styled.div(() => ({
-	display: 'flex',
-	alignItems: 'center'
-}))
+	@media screen and (max-width: 768px) {
+		width: 90vw !important;
+		margin: 0 auto;
+		
+		.ant-modal-body {
+			padding: 16px;
+		}
+	}
+`;
 
-const UserInfo = styled('div')`
+const FormContainer = styled.div`
+	.form-section {
+		margin-bottom: 32px;
+
+		h3 {
+			font-size: 16px;
+			font-weight: 600;
+			margin-bottom: 24px;
+			color: #2c3e50;
+		}
+	}
+
+	.form-row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 24px;
+		margin-bottom: 24px;
+
+		@media screen and (max-width: 576px) {
+			grid-template-columns: 1fr;
+			gap: 16px;
+		}
+	}
+
+	.form-field {
+		label {
+			display: block;
+			margin-bottom: 8px;
+			font-weight: 500;
+			color: #2c3e50;
+		}
+
+		.ant-input,
+		.ant-select,
+		.ant-input-password {
+			width: 100%;
+			border-radius: 6px;
+		}
+
+		.error-message {
+			color: #dc3545;
+			font-size: 12px;
+			margin-top: 4px;
+		}
+	}
+
+	.form-actions {
+		display: flex;
+		justify-content: flex-end;
+		gap: 12px;
+		margin-top: 32px;
+		padding-top: 16px;
+		border-top: 1px solid #e9ecef;
+
+		button {
+			min-width: 100px;
+		}
+	}
+`;
+
+const Profile = styled.div`
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 0 12px;
+`;
+
+const UserInfo = styled.div`
 	padding-left: ${SPACER[2]};
+	display: flex;
+	flex-direction: column;
 
 	@media ${MEDIA_QUERIES.MOBILE} {
-		display: none
+		display: none;
 	}
-`
+`;
 
-const Name = styled.div(() => ({
-	fontWeight: FONT_WEIGHT.SEMIBOLD
-}))
+const Name = styled.div`
+	font-weight: ${FONT_WEIGHT.SEMIBOLD};
+	font-size: 14px;
+	line-height: 1.2;
+`;
 
-const Title = styled.span(() => ({
-	opacity: 0.8
-}))
+const Title = styled.span`
+	opacity: 0.8;
+	font-size: 12px;
+	line-height: 1.2;
+`;
 
-const MenuItem = (props) => {
-	const { onClick } = props;
-	return (
-		<Flex as="div" onClick={onClick} style={{ cursor: 'pointer' }} alignItems="center" gap={SPACER[2]}>
-			<Icon>{props.icon}</Icon>
-			<span>{props.label}</span>
-		</Flex>
-	);
-}
+const validationSchema = Yup.object({
+	email: Yup.string().email('Invalid email').required('Email is required'),
+	firstName: Yup.string().required('First name is required'),
+	lastName: Yup.string().required('Last name is required'),
+	phone: Yup.string().required('Phone number is required'),
+	password: Yup.string().min(6, 'Password must be at least 6 characters')
+});
 
-const MenuItemSignOut = (props) => {
-
-	const dispatch = useDispatch();
-
-
-
-	const handleSignOut = () => {
-		dispatch(signOut())
-	}
-
-	return (
-		<div onClick={handleSignOut}>
-			<Flex alignItems="center" gap={SPACER[2]} >
-				<Icon>
-					<LogoutOutlined />
-				</Icon>
-				<span>{props.label}</span>
-			</Flex>
-		</div>
-	)
-}
+const FormField = ({ label, name, type = "text", required, children }) => (
+	<div className="form-field">
+		<label>{label} {required && <span style={{ color: '#dc3545' }}>*</span>}</label>
+		{children || (
+			<Input
+				type={type}
+				name={name}
+				placeholder={`Enter ${label.toLowerCase()}`}
+			/>
+		)}
+	</div>
+);
 
 export const NavProfile = ({ mode }) => {
-	const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-	const [showProfileMenu, setShowProfileMenu] = useState(false);
-	const [menuPosition, setMenuPosition] = useState();
-	const profileRef = useRef(null);
+	const [isModalVisible, setIsModalVisible] = useState(false);
+	const [fileList, setFileList] = useState([]);
 	const dispatch = useDispatch();
-	const roles = useSelector((state) => state.role);
-	const currentuser = useSelector((state) => state.user);
-	const [roleu, setRoleu] = useState("");
-	const [current, setCurrent] = useState("");
-	const [form] = Form.useForm();
-
-	// Move items inside the component
-	const items = [
-		{
-			key: 'Edit Profile',
-			label: (
-				<MenuItem
-					label="Edit Profile"
-					icon={<EditOutlined />}
-					className="mb-3"
-					onClick={() => setIsEditModalVisible(true)}
-				/>
-			),
-		},
-		{
-			key: 'Account Setting',
-			label: <MenuItem path="/" label="Account Setting" icon={<SettingOutlined />} />,
-		},
-		{
-			key: 'Account Billing',
-			label: <MenuItem path="/" label="Account Billing" icon={<ShopOutlined />} />,
-		},
-		{
-			key: 'Help Center',
-			label: <MenuItem path="/" label="Help Center" icon={<QuestionCircleOutlined />} />,
-		},
-		{
-			key: 'Sign Out',
-			label: <MenuItemSignOut label="Sign Out" />,
-		}
-	]
+	const { role: { data: roles } = {} } = useSelector((state) => state.role);
+	const { loggedInUser } = useSelector((state) => state.user);
+	const [userRole, setUserRole] = useState("");
+	const [userName, setUserName] = useState("");
 
 	useEffect(() => {
-		const roless = roles?.role.data;
-		const userRole = roless && roless?.find(
-			(role) => role?.role_id === currentuser?.loggedInUser?.role_id
-		);
+		if (!roles || !loggedInUser) return;
 
-		setRoleu(userRole?.role_name || "");
-		setCurrent(currentuser?.loggedInUser?.username || "");
+		const role = roles.find(r => r?.role_id === loggedInUser?.role_id);
+		setUserRole(role?.role_name || "");
+		setUserName(loggedInUser?.username || "");
 
-		// Set initial form values with all available user data
-		if (currentuser?.loggedInUser) {
-			form.setFieldsValue({
-				email: currentuser?.loggedInUser?.email,
-				firstName: currentuser?.loggedInUser?.firstName,
-				lastName: currentuser?.loggedInUser?.lastName,
-				phone: currentuser?.loggedInUser?.phone,
-				address: currentuser?.loggedInUser?.address,
-				state: currentuser?.loggedInUser?.state,
-				gstIn: currentuser?.loggedInUser?.gstIn,
-				accountholder: currentuser?.loggedInUser?.accountholder,
-				accountnumber: currentuser?.loggedInUser?.accountnumber,
-				bankname: currentuser?.loggedInUser?.bankname,
-				ifsc: currentuser?.loggedInUser?.ifsc,
-				banklocation: currentuser?.loggedInUser?.banklocation,
-				accounttype: currentuser?.loggedInUser?.accounttype,
-			});
+		if (loggedInUser?.profilePic) {
+			setFileList([{
+				uid: '-1',
+				name: 'Profile Picture',
+				status: 'done',
+				url: loggedInUser.profilePic,
+			}]);
 		}
-	}, [roles, currentuser, roleu, form]);
+	}, [roles, loggedInUser]);
 
-	const handleProfileClick = () => {
-		if (profileRef.current) {
-			const rect = profileRef.current.getBoundingClientRect();
-			setMenuPosition({
-				top: rect.bottom + 5,
-				right: window.innerWidth - rect.right
-			});
-			setShowProfileMenu(!showProfileMenu);
-		}
-	};
-
-	// Function to refresh user data after profile update
-	const refreshUserData = async () => {
-		if (currentuser?.loggedInUser?.id) {
-			try {
-				await dispatch(getUserById(currentuser.loggedInUser.id));
-			} catch (error) {
-				console.error('Error refreshing user data:', error);
-			}
-		}
-	};
-
-	const handleSuperAdminSubmit = async (values) => {
+	const handleSubmit = async (values, { setSubmitting }) => {
 		try {
-			// Create form data for user update
 			const formData = new FormData();
+			formData.append('id', loggedInUser?.id);
 
-			// Add user ID to formData
-			formData.append('id', currentuser?.loggedInUser?.id);
-
-			// Loop through all values and append to formData
-			Object.keys(values).forEach(key => {
-				// For all fields except profilePic
-				if (key !== 'profilePic') {
-					// Skip empty values, except for fields that can be legitimately empty like password
-					if (values[key] !== undefined && values[key] !== null && (values[key] !== '' || key === 'password')) {
-						formData.append(key, values[key]);
-					}
+			Object.entries(values).forEach(([key, value]) => {
+				if (key !== 'profilePic' && value != null && (value !== '' || key === 'password')) {
+					formData.append(key, value);
 				}
 			});
 
-			// Special handling for profile pic
-			if (values.profilePic && values.profilePic.length > 0) {
-				// Check if it's a new file being uploaded
-				const fileItem = values.profilePic[0];
-				if (fileItem.originFileObj) {
-					formData.append('profilePic', fileItem.originFileObj);
-				}
+			if (fileList[0]?.originFileObj) {
+				formData.append('profilePic', fileList[0].originFileObj);
 			}
 
-			// For debugging - log the form data (except file contents)
-			console.log('Form data keys being sent:', [...formData.entries()]
-				.map(entry => entry[0] === 'profilePic' ? ['profilePic', '[File object]'] : entry));
-
-			// Dispatch the update user action
 			const response = await dispatch(updateUser(formData)).unwrap();
 
-			if (response && (response.status === 200 || response.success)) {
+			if (response?.success || response?.status === 200) {
 				message.success('Profile updated successfully');
-
-				// Refresh user data after successful update
-				await refreshUserData();
-
-				// Close the modal
-				setIsEditModalVisible(false);
+				await dispatch(getUserById(loggedInUser.id));
+				setIsModalVisible(false);
 			} else {
-				throw new Error(response?.message || 'Failed to update profile');
+				throw new Error(response?.message);
 			}
 		} catch (error) {
-			console.error('Profile update error:', error);
 			message.error(error.message || 'Failed to update profile');
+		} finally {
+			setSubmitting(false);
 		}
 	};
 
-	const SuperAdminEditForm = () => {
-		// Get the default file list for the Upload component
-		const getDefaultFileList = () => {
-			if (currentuser?.loggedInUser?.profilePic) {
-				return [
-					{
-						uid: '-1',
-						name: 'Profile Picture',
-						status: 'done',
-						url: currentuser.loggedInUser.profilePic,
-					}
-				];
-			}
-			return [];
-		};
-
-		// Custom normalization for file upload
-		const normFile = (e) => {
-			if (Array.isArray(e)) {
-				return e;
-			}
-			return e?.fileList;
-		};
-
-		return (
-			<Form
-				form={form}
-				layout="vertical"
-				onFinish={handleSuperAdminSubmit}
-				className="grid grid-cols-1 md:grid-cols-2 gap-4"
-				initialValues={{
-					...currentuser?.loggedInUser,
-					password: '' // Initialize password as empty
-				}}
-			>
-				<div className="col-span-2">
-					<h3 className="text-lg font-semibold mb-4">Personal Information</h3>
-				</div>
-
-				<Form.Item
-					label="Email"
-					name="email"
-					rules={[{ required: true, type: 'email', message: 'Please enter a valid email' }]}
-				>
-					<Input />
-				</Form.Item>
-
-				<Form.Item
-					label="First Name"
-					name="firstName"
-					rules={[{ required: true, message: 'Please enter your first name' }]}
-				>
-					<Input />
-				</Form.Item>
-
-				<Form.Item
-					label="Last Name"
-					name="lastName"
-					rules={[{ required: true, message: 'Please enter your last name' }]}
-				>
-					<Input />
-				</Form.Item>
-
-				<Form.Item
-					label="Phone"
-					name="phone"
-					rules={[{ required: true, message: 'Please enter your phone number' }]}
-				>
-					<Input />
-				</Form.Item>
-
-				<Form.Item
-					label="Address"
-					name="address"
-					className="col-span-2"
-				>
-					<Input.TextArea rows={2} />
-				</Form.Item>
-
-				<Form.Item
-					label="State"
-					name="state"
-				>
-					<Input />
-				</Form.Item>
-
-				<Form.Item
-					label="GST Number"
-					name="gstIn"
-				>
-					<Input />
-				</Form.Item>
-
-				<div className="col-span-2">
-					<h3 className="text-lg font-semibold mb-4 mt-4">Banking Information</h3>
-				</div>
-
-				<Form.Item
-					label="Bank Name"
-					name="bankname"
-				>
-					<Input />
-				</Form.Item>
-
-				<Form.Item
-					label="Account Holder"
-					name="accountholder"
-				>
-					<Input />
-				</Form.Item>
-
-				<Form.Item
-					label="Account Number"
-					name="accountnumber"
-				>
-					<Input />
-				</Form.Item>
-
-				<Form.Item
-					label="IFSC Code"
-					name="ifsc"
-				>
-					<Input />
-				</Form.Item>
-
-				<Form.Item
-					label="Bank Location"
-					name="banklocation"
-				>
-					<Input />
-				</Form.Item>
-
-				<Form.Item
-					label="Account Type"
-					name="accounttype"
-				>
-					<Select>
-						<Select.Option value="saving">Saving</Select.Option>
-						<Select.Option value="current">Current</Select.Option>
-					</Select>
-				</Form.Item>
-
-				<div className="col-span-2">
-					<h3 className="text-lg font-semibold mb-4 mt-4">Security</h3>
-				</div>
-
-				<Form.Item
-					label="New Password"
-					name="password"
-					rules={[{ min: 6, message: 'Password must be at least 6 characters' }]}
-					className="col-span-2"
-				>
-					<Input.Password />
-				</Form.Item>
-
-				<Form.Item
-					label="Profile Picture"
-					name="profilePic"
-					className="col-span-2"
-					valuePropName="fileList"
-					getValueFromEvent={normFile}
-					initialValue={getDefaultFileList()}
-				>
-					<Upload
-						name="profilePic"
-						listType="picture-card"
-						maxCount={1}
-						beforeUpload={() => false}
-						accept="image/*"
-					>
-						<div>
-							<UploadOutlined />
-							<div style={{ marginTop: 8 }}>Upload</div>
-						</div>
-					</Upload>
-				</Form.Item>
-
-				<Form.Item className="col-span-2">
-					<Button type="primary" htmlType="submit" block>
-						Update Profile
-					</Button>
-				</Form.Item>
-			</Form>
-		);
-	};
-
-	const ProfileMenu = () => (
-		<div
-			style={{
-				position: 'fixed',
-				top: menuPosition.top,
-				right: menuPosition.right,
-				backgroundColor: 'white',
-				boxShadow: '0 3px 6px -4px rgba(0,0,0,.12), 0 6px 16px 0 rgba(0,0,0,.08), 0 9px 28px 8px rgba(0,0,0,.05)',
-				borderRadius: '8px',
-				padding: '4px 0',
-				zIndex: 1000,
-				minWidth: '160px'
-			}}
-		>
-			{items.map(item => (
-				<div
-					key={item.key}
-					style={{
-						padding: '5px 12px',
-						lineHeight: '22px',
-						cursor: 'pointer',
-						transition: 'all 0.3s',
-						display: 'flex',
-						alignItems: 'center',
-						gap: '8px'
-					}}
-					className="ant-dropdown-menu-item mt-[12px]"
-
-					onClick={() => {
-						setShowProfileMenu(false);
-						if (item.key === 'Edit Profile') {
-							setIsEditModalVisible(true);
-						}
-						// Handle other menu item clicks
-					}}
-				>
-					{item.label}
-				</div>
-			))}
-		</div>
+	const menu = (
+		<Menu>
+			<Menu.Item key="edit" onClick={() => setIsModalVisible(true)}>
+				<Flex alignItems="center">
+					<EditOutlined />
+					<span className="ml-2">Edit Profile</span>
+				</Flex>
+			</Menu.Item>
+			<Menu.Item key="settings">
+				<Flex alignItems="center">
+					<SettingOutlined />
+					<span className="ml-2">Account Setting</span>
+				</Flex>
+			</Menu.Item>
+			<Menu.Item key="billing">
+				<Flex alignItems="center">
+					<ShopOutlined />
+					<span className="ml-2">Account Billing</span>
+				</Flex>
+			</Menu.Item>
+			<Menu.Item key="help">
+				<Flex alignItems="center">
+					<QuestionCircleOutlined />
+					<span className="ml-2">Help Center</span>
+				</Flex>
+			</Menu.Item>
+			<Menu.Divider />
+			<Menu.Item key="logout" onClick={() => dispatch(signOut())}>
+				<Flex alignItems="center">
+					<LogoutOutlined />
+					<span className="ml-2">Sign Out</span>
+				</Flex>
+			</Menu.Item>
+		</Menu>
 	);
+
+	const uploadProps = {
+		beforeUpload: file => {
+			const isValid = ['image/jpeg', 'image/png', 'image/webp'].includes(file.type);
+			const isLt2M = file.size / 1024 / 1024 < 2;
+
+			if (!isValid) {
+				message.error('Please upload JPG/PNG/WEBP file');
+				return false;
+			}
+
+			if (!isLt2M) {
+				message.error('Image must be smaller than 2MB');
+				return false;
+			}
+
+			setFileList([file]);
+			return false;
+		},
+		onRemove: () => setFileList([]),
+		fileList
+	};
 
 	return (
 		<>
-			<div ref={profileRef} onClick={handleProfileClick} style={{ cursor: 'pointer', margin: 'auto', alignItems: 'center' }}>
-				<NavItem mode={mode}>
-					<Profile >
-						{currentuser?.loggedInUser?.profilePic ? (
+			<div className="nav-profile">
+				<Dropdown overlay={menu} trigger={['click']} placement="bottomRight">
+					<NavItem mode={mode}>
+						<Profile>
 							<Avatar
-								src={currentuser?.loggedInUser?.profilePic}
-								onError={(e) => {
-									e.target.onerror = null;
-									e.target.src = "";
-									e.target.style.display = "none";
+								size={36}
+								src={loggedInUser?.profilePic}
+								icon={!loggedInUser?.profilePic && <UserOutlined />}
+								style={{
+									backgroundColor: !loggedInUser?.profilePic ? '#f0f0f0' : undefined,
+									flexShrink: 0
 								}}
 							/>
-						) : (
-							<Avatar
-								icon={<UserOutlined style={{ color: '#666666' }} />}
-								style={{ backgroundColor: '#f0f0f0' }}
-							/>
-						)}
-						<UserInfo className="profile-text">
-							<Name>{current}</Name>
-							<Title>{roleu}</Title>
-						</UserInfo>
-					</Profile>
-				</NavItem>
+							<UserInfo>
+								<Name>{userName}</Name>
+								<Title>{userRole}</Title>
+							</UserInfo>
+						</Profile>
+					</NavItem>
+				</Dropdown>
 			</div>
 
-			{showProfileMenu && <ProfileMenu />}
-
-			{/* Edit Profile Modal */}
-			<Modal
+			<StyledModal
 				title="Edit Profile"
-				visible={isEditModalVisible}
-				onCancel={() => setIsEditModalVisible(false)}
+				visible={isModalVisible}
+				onCancel={() => setIsModalVisible(false)}
 				footer={null}
-				width={800}
+				width={720}
+				destroyOnClose
+				centered
 			>
-				{roleu === "superadmin" ? (
-					<SuperAdminEditForm />
+				{userRole === "superadmin" ? (
+					<Formik
+						initialValues={{
+							email: loggedInUser?.email || '',
+							firstName: loggedInUser?.firstName || '',
+							lastName: loggedInUser?.lastName || '',
+							phone: loggedInUser?.phone || '',
+							password: ''
+						}}
+						validationSchema={validationSchema}
+						onSubmit={handleSubmit}
+					>
+						{({ handleSubmit, isSubmitting, errors, touched }) => (
+							<FormContainer>
+								<form onSubmit={handleSubmit}>
+									<div className="form-section">
+										<h3>Personal Information</h3>
+										<div className="form-row">
+											<FormField
+												label="Email"
+												name="email"
+												required
+												error={touched.email && errors.email}
+											/>
+											<FormField
+												label="First Name"
+												name="firstName"
+												required
+												error={touched.firstName && errors.firstName}
+											/>
+										</div>
+										<div className="form-row">
+											<FormField
+												label="Last Name"
+												name="lastName"
+												required
+												error={touched.lastName && errors.lastName}
+											/>
+											<FormField label="Phone" name="phone" required>
+												<Input.Group compact>
+													<Select
+														defaultValue="91"
+														style={{ width: '30%' }}
+													>
+														<Select.Option value="91">+91</Select.Option>
+														<Select.Option value="1">+1</Select.Option>
+														<Select.Option value="44">+44</Select.Option>
+													</Select>
+													<Input
+														style={{ width: '70%' }}
+														name="phone"
+														placeholder="Enter phone number"
+													/>
+												</Input.Group>
+											</FormField>
+										</div>
+									</div>
+
+									<div className="form-section">
+										<h3>Security</h3>
+										<div className="form-row">
+											<FormField
+												label="New Password"
+												name="password"
+												type="password"
+												error={touched.password && errors.password}
+											/>
+											<FormField label="Profile Picture">
+												<Upload {...uploadProps}>
+													<Button icon={<UploadOutlined />}>
+														Upload Photo
+													</Button>
+												</Upload>
+											</FormField>
+										</div>
+									</div>
+
+									<div className="form-actions">
+										<Button onClick={() => setIsModalVisible(false)}>
+											Cancel
+										</Button>
+										<Button
+											type="primary"
+											htmlType="submit"
+											loading={isSubmitting}
+										>
+											Save Changes
+										</Button>
+									</div>
+								</form>
+							</FormContainer>
+						)}
+					</Formik>
 				) : (
 					<EditCompany
-						comnyid={currentuser?.loggedInUser?.id}
-						onClose={() => setIsEditModalVisible(false)}
+						comnyid={loggedInUser?.id}
+						onClose={() => setIsModalVisible(false)}
 					/>
 				)}
-			</Modal>
+			</StyledModal>
 		</>
 	);
 };
 
-export default NavProfile;
+export default React.memo(NavProfile);

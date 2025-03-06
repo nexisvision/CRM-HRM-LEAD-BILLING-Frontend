@@ -90,7 +90,7 @@ const AddAppraisal = ({ onClose }) => {
         onFinish={handleSubmit}
         onFinishFailed={onFinishFailed}
       >
-        <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+        
 
         <Row gutter={16}>
         <Col span={12}>
@@ -258,7 +258,7 @@ export default AddAppraisal;
 //   return (
 //     <div className="add-employee">
 //       {/* <h2 className="mb-4">Add New Appraisal</h2> */}
-//       <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+//       
 
 //       <Form
 //         layout="vertical"

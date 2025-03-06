@@ -59,7 +59,7 @@ const AddDepartment = ({ onClose }) => {
 
   return (
     <div className="add-employee">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
 
       <Formik
         initialValues={{
@@ -113,8 +113,8 @@ const AddDepartment = ({ onClose }) => {
                         dropdownRender={menu => (
                           <>
                             {menu}
-                            <Button 
-                              type="link" 
+                            <Button
+                              type="link"
                               block
                               onClick={openAddBranchModal}
                             >

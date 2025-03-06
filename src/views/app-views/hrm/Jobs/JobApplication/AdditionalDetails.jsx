@@ -6,7 +6,7 @@ const AdditionalDetails = () => {
   const [skills, setSkills] = useState(['Marketing', 'Sales']);
   const [newSkill, setNewSkill] = useState('');
   const [notes, setNotes] = useState('');
-  
+
   const addSkill = () => {
     if (newSkill.trim() && !skills.includes(newSkill.trim())) {
       setSkills([...skills, newSkill.trim()]);
@@ -32,7 +32,6 @@ const AdditionalDetails = () => {
       }
       style={{ maxWidth: 1100, margin: '0 auto' }}
     >
-            <hr style={{ marginBottom: '10px', border: '1px solid #e8e8e8' }} />
 
       <Space direction="vertical" style={{ width: '100%' }} size="large">
         <div>

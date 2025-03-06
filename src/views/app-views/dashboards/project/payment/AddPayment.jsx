@@ -38,9 +38,9 @@ const AddPayment = ({ onClose }) => {
   const user = useSelector((state) => state.user.loggedInUser.username);
 
   const { currencies } = useSelector((state) => state.currencies);
-const curren = currencies?.data || [];
+  const curren = currencies?.data || [];
 
-// const curren = curr?.filter((item) => item.created_by === user);
+  // const curren = curr?.filter((item) => item.created_by === user);
 
   // Safely access the expense data with optional chaining
   const invoiceData = useSelector((state) => state.invoice?.invoices) || [];
@@ -131,28 +131,28 @@ const curren = currencies?.data || [];
     //     console.error("Add API error:", error);
     //   });
 
-            const formData = new FormData();
-                for (const key in values) {
-                  formData.append(key, values[key]);
-                }
-            
-                dispatch(AddPay({ id, formData })).then(() => {
-                  dispatch(Getpay(id));
-                  onClose();
-                  resetForm();
-                });
+    const formData = new FormData();
+    for (const key in values) {
+      formData.append(key, values[key]);
+    }
+
+    dispatch(AddPay({ id, formData })).then(() => {
+      dispatch(Getpay(id));
+      onClose();
+      resetForm();
+    });
   };
 
   return (
     <div className="add-expenses-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => {
-           const handleInvoiceChange = (invoiceId) => {
+          const handleInvoiceChange = (invoiceId) => {
             if (!invoiceId) {
               setSelectedType(null);
               setFieldValue("selectedType", null);
@@ -160,7 +160,7 @@ const curren = currencies?.data || [];
               setFieldValue("amount", "");
               return;
             }
-        
+
             const selectedInvoice = invoiceData?.find(invoice => invoice.id === invoiceId);
             if (selectedInvoice) {
               setSelectedType('invoice');
@@ -170,7 +170,7 @@ const curren = currencies?.data || [];
               setFieldValue("amount", amount.toString());
             }
           };
-        
+
           const handleEstimateChange = (estimateId) => {
             if (!estimateId) {
               setSelectedType(null);
@@ -179,7 +179,7 @@ const curren = currencies?.data || [];
               setFieldValue("amount", "");
               return;
             }
-        
+
             const selectedEstimate = estimateData?.find(estimate => estimate.id === estimateId);
             if (selectedEstimate) {
               setSelectedType('estimate');
@@ -189,7 +189,7 @@ const curren = currencies?.data || [];
               setFieldValue("amount", amount.toString());
             }
           };
-        
+
           const handleExpenseChange = (expenseId) => {
             if (!expenseId) {
               setSelectedType(null);
@@ -198,7 +198,7 @@ const curren = currencies?.data || [];
               setFieldValue("amount", "");
               return;
             }
-        
+
             const selectedExpense = expenseData?.find(expense => expense.id === expenseId);
             if (selectedExpense) {
               setSelectedType('expense');
@@ -220,7 +220,7 @@ const curren = currencies?.data || [];
                       placeholder="Enter Project"
                       className="mt-1"
                       initialValue={fnddata?.project_name}
-                      value={fnddata?.project_name} 
+                      value={fnddata?.project_name}
                       disabled
                     />
                   </div>
@@ -271,11 +271,11 @@ const curren = currencies?.data || [];
                           allowClear={true}
                         >
                           {estimateData?.map((estimate) => (
-                            <Option 
-                              key={estimate.id} 
+                            <Option
+                              key={estimate.id}
                               value={estimate.id}
                             >
-                              {estimate.quotationNumber} 
+                              {estimate.quotationNumber}
                             </Option>
                           ))}
                         </Select>
@@ -363,42 +363,42 @@ const curren = currencies?.data || [];
                   </div>
                 </Col>
                 <Col span={12} className="mt-4">
-                      <div className="form-item">
-                        <label className="font-semibold">Currency <span className="text-red-500">*</span></label>
-                        <div className="flex gap-2">
-                          <Field name="currency">
-                            {({ field, form }) => (
-                              <Select
-                                {...field}
-                                className="w-full mt-1"
-                                placeholder="Select Currency"
-                                onChange={(value) => {
-                                  const selectedCurrency = curren.find(
-                                    (c) => c.id === value
-                                  );
-                                  form.setFieldValue(
-                                    "currency",
-                                    selectedCurrency?.currencyCode || ""
-                                  );
-                                }}
-                              >
-                                {curren.map((currency) => (
-                                  <Option key={currency.id} value={currency.id}>
-                                    {currency.currencyCode}
-                                    ({currency.currencyIcon})
-                                  </Option>
-                                ))}
-                              </Select>
-                            )}
-                          </Field>
-                        </div>
-                        <ErrorMessage
-                          name="currency"
-                          component="div"
-                          className="error-message text-red-500 my-1"
-                        />
-                      </div>
-                    </Col>
+                  <div className="form-item">
+                    <label className="font-semibold">Currency <span className="text-red-500">*</span></label>
+                    <div className="flex gap-2">
+                      <Field name="currency">
+                        {({ field, form }) => (
+                          <Select
+                            {...field}
+                            className="w-full mt-1"
+                            placeholder="Select Currency"
+                            onChange={(value) => {
+                              const selectedCurrency = curren.find(
+                                (c) => c.id === value
+                              );
+                              form.setFieldValue(
+                                "currency",
+                                selectedCurrency?.currencyCode || ""
+                              );
+                            }}
+                          >
+                            {curren.map((currency) => (
+                              <Option key={currency.id} value={currency.id}>
+                                {currency.currencyCode}
+                                ({currency.currencyIcon})
+                              </Option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
+                    </div>
+                    <ErrorMessage
+                      name="currency"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
                 {/* <Col span={6}>
                   <div className="form-item">
                     <label className="font-semibold">Exchange Rate </label>
@@ -494,24 +494,24 @@ const curren = currencies?.data || [];
                     Receipt <QuestionCircleOutlined />
                   </span>
                   <Col span={24} className="mt-1">
-                  <Field name="receipt">
-                    {({ field }) => (
-                      <div>
-                        <Upload
-                          beforeUpload={(file) => {
-                            setFieldValue("receipt", file);
-                            return false;
-                          }}
-                          showUploadList={true}
-                          maxCount={1}
-                          listType="text"
-                        >
-                          <Button icon={<UploadOutlined />}>Choose File</Button>
-                        </Upload>
-                      </div>
-                    )}
-                  </Field>
-                </Col>
+                    <Field name="receipt">
+                      {({ field }) => (
+                        <div>
+                          <Upload
+                            beforeUpload={(file) => {
+                              setFieldValue("receipt", file);
+                              return false;
+                            }}
+                            showUploadList={true}
+                            maxCount={1}
+                            listType="text"
+                          >
+                            <Button icon={<UploadOutlined />}>Choose File</Button>
+                          </Upload>
+                        </div>
+                      )}
+                    </Field>
+                  </Col>
                 </div>
                 <Col span={24} className="mt-4">
                   <div className="form-item">

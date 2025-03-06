@@ -80,7 +80,7 @@
 
 //   return (
 //     <div className="add-expenses-form">
-//       <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+//       
 //       <Formik
 //         initialValues={initialValues}
 //         validationSchema={validationSchema}
@@ -180,16 +180,16 @@ const EditNotes = ({ idd, onClose }) => {
   const { id } = useParams();
 
   // const { data: employee } = useSelector((state) => state.employee.employee);
-// const user = useSelector((state)=>state.user.loggedInUser.username)
+  // const user = useSelector((state)=>state.user.loggedInUser.username)
 
-    const filterdata = useSelector((state)=>state.employee.employee.data)
-  
-    const loggeduesr = useSelector((state)=>state.user.loggedInUser.username)
-  
-    const employee = filterdata.filter((item)=>item.created_by === loggeduesr)
+  const filterdata = useSelector((state) => state.employee.employee.data)
+
+  const loggeduesr = useSelector((state) => state.user.loggedInUser.username)
+
+  const employee = filterdata.filter((item) => item.created_by === loggeduesr)
 
   const employeeData = employee?.filter((item) => item.created_by === loggeduesr);
-  
+
 
   useEffect(() => {
     dispatch(empdata());
@@ -234,7 +234,7 @@ const EditNotes = ({ idd, onClose }) => {
   const onSubmit = async (values, { resetForm }) => {
     try {
       const employeesObject = values.employees ? { id: values.employees } : null;
-      
+
       const payload = {
         ...values,
         employees: employeesObject
@@ -257,7 +257,7 @@ const EditNotes = ({ idd, onClose }) => {
 
   return (
     <div className="add-expenses-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
       <Formik
         enableReinitialize={true}
         initialValues={initialValues}

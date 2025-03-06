@@ -102,7 +102,7 @@ const AddJob = ({ onClose }) => {
     // Check if all required fields are filled
     const requiredFields = [
       'title',
-      'category', 
+      'category',
       'skillss',
       'location',
       'interviewRounds',
@@ -118,7 +118,7 @@ const AddJob = ({ onClose }) => {
     ];
 
     const missingFields = requiredFields.filter(field => !values[field]);
-    
+
     if (missingFields.length > 0) {
       message.error('Please fill in all required fields');
       return;
@@ -210,7 +210,7 @@ const AddJob = ({ onClose }) => {
         const filteredLabels = response.payload.data
           .filter((label) => label.lableType === lableType)
           .map((label) => ({ id: label.id, name: label.name.trim() }));
-        
+
         if (lableType === "jobcategory") {
           setJobCategories(filteredLabels);
           setFieldValue("category", newValue.trim());
@@ -229,7 +229,7 @@ const AddJob = ({ onClose }) => {
   };
   return (
     <div className="add-expenses-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -328,7 +328,7 @@ const AddJob = ({ onClose }) => {
                   <div className="form-item">
                     <label className="font-semibold mb-2">Location <span className="text-red-500">*</span></label>
                     <Field
-                        className="mt-1"
+                      className="mt-1"
                       name="location"
                       as={Input}
                       placeholder="Enter location"

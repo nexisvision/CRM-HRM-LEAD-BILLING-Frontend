@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Input, Button, DatePicker, Select, message, Row, Col ,Modal} from "antd";
+import { Input, Button, DatePicker, Select, message, Row, Col, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { PlusOutlined } from "@ant-design/icons";
 import axios from "axios"; // Import axios for API requests
-import {  editJobonBoardingss, getJobonBoarding } from "./JobOnBoardingReducer/jobonboardingSlice";
+import { editJobonBoardingss, getJobonBoarding } from "./JobOnBoardingReducer/jobonboardingSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { AddLable, GetLable } from "../../../dashboards/sales/LableReducer/LableSlice";
 import moment from "moment/moment";
@@ -21,7 +21,7 @@ const EditJobOnBording = ({ idd, onClose }) => {
   const alldata = useSelector((state) => state.jobonboarding);
   const fnddtaa = alldata.jobonboarding.data || [];
 
-  console.log("fnddtaa",fnddtaa)
+  console.log("fnddtaa", fnddtaa)
 
   const fnd = fnddtaa.find((item) => item.id === idd);
 
@@ -129,7 +129,7 @@ const EditJobOnBording = ({ idd, onClose }) => {
         Status: values.status,
       };
 
-      dispatch(editJobonBoardingss({idd,data})).then(() => {
+      dispatch(editJobonBoardingss({ idd, data })).then(() => {
         dispatch(getJobonBoarding());
         // message.success("Job Candidate added successfully!");
         resetForm();
@@ -166,7 +166,7 @@ const EditJobOnBording = ({ idd, onClose }) => {
 
   return (
     <div className="add-job-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

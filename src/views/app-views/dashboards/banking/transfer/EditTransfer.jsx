@@ -92,7 +92,7 @@ const EditTransfer = ({ onClose, initialData, idd }) => {
 
     return (
         <div className="create-account-form">
-            <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
@@ -102,27 +102,27 @@ const EditTransfer = ({ onClose, initialData, idd }) => {
                 {({ handleSubmit, isSubmitting, setFieldValue, values, setFieldTouched }) => (
                     <FormikForm onSubmit={handleSubmit}>
                         <Row gutter={16}>
-                        <Col span={12} className="">
-                        <div className="form-item">
-                      <label className="font-semibold">Date <span className="text-red-500">*</span></label>
-                      <Field name="date">
-                        {({ field }) => (
-                          <input
-                            {...field}
-                            type="date"
-                            className="w-full mt-2 p-2 border rounded"
-                            value={values.date ? moment(values.date).format('YYYY-MM-DD') : ''}
-                            onChange={(e) => setFieldValue('date', e.target.value)}
-                          />
-                        )}
-                      </Field>
-                      <ErrorMessage
-                        name="date"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
-                    </div>
-                  </Col>
+                            <Col span={12} className="">
+                                <div className="form-item">
+                                    <label className="font-semibold">Date <span className="text-red-500">*</span></label>
+                                    <Field name="date">
+                                        {({ field }) => (
+                                            <input
+                                                {...field}
+                                                type="date"
+                                                className="w-full mt-2 p-2 border rounded"
+                                                value={values.date ? moment(values.date).format('YYYY-MM-DD') : ''}
+                                                onChange={(e) => setFieldValue('date', e.target.value)}
+                                            />
+                                        )}
+                                    </Field>
+                                    <ErrorMessage
+                                        name="date"
+                                        component="div"
+                                        className="error-message text-red-500 my-1"
+                                    />
+                                </div>
+                            </Col>
 
                             <Col span={12}>
                                 <div className="form-group">

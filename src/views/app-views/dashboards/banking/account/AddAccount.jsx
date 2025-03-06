@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, DatePicker, Select, Row, Col, Checkbox, message,Modal } from 'antd';
+import { Form, Input, Button, DatePicker, Select, Row, Col, Checkbox, message, Modal } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';
@@ -18,7 +18,7 @@ const AddAccount = ({ onClose }) => {
   const countries = useSelector((state) => state.countries?.countries);
 
   const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
-  
+
   useEffect(() => {
     dispatch(getallcountries());
   }, [dispatch]);
@@ -84,7 +84,7 @@ const AddAccount = ({ onClose }) => {
   return (
     <div className="create-account-form">
       {/* <h2>Create Job</h2> */}
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

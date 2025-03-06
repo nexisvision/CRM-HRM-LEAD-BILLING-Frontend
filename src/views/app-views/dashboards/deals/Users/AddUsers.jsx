@@ -57,23 +57,23 @@ const AddUsers = () => {
           </Button>,
         ]}
       > */}
-        <Form form={form} layout="vertical" name="add_user_form">
-        <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+      <Form form={form} layout="vertical" name="add_user_form">
 
-          <Form.Item
-            name="user"
-            label="User"
-            rules={[{ required: true, message: 'Please select a user!' }]}
-          >
-            <Select placeholder="Select Users">
-              <Option value="User 1">User 1</Option>
-              <Option value="User 2">User 2</Option>
-              <Option value="User 3">User 3</Option>
-            </Select>
 
-            
-          </Form.Item>
-          <Form.Item>
+        <Form.Item
+          name="user"
+          label="User"
+          rules={[{ required: true, message: 'Please select a user!' }]}
+        >
+          <Select placeholder="Select Users">
+            <Option value="User 1">User 1</Option>
+            <Option value="User 2">User 2</Option>
+            <Option value="User 3">User 3</Option>
+          </Select>
+
+
+        </Form.Item>
+        <Form.Item>
           <div className="form-buttons text-right">
             <Button
               type="default"
@@ -87,7 +87,7 @@ const AddUsers = () => {
             </Button>
           </div>
         </Form.Item>
-        </Form>
+      </Form>
       {/* </Modal> */}
     </div>
   );

@@ -20,7 +20,7 @@ const AddDesignation = ({ onClose }) => {
   // Get branch data from Redux store
   const branchData = useSelector((state) => state.Branch);
   const allBranches = branchData.Branch.data || [];
-  
+
   // Filter branches for the current user
   const userBranches = allBranches.filter((item) => item.created_by === user);
 
@@ -59,7 +59,7 @@ const AddDesignation = ({ onClose }) => {
 
   return (
     <div className="add-designation">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
       <Formik
         initialValues={{
           designation_name: "",

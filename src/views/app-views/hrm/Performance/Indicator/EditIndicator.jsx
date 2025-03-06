@@ -90,7 +90,7 @@ const EditIndicator = ({ id, onClose }) => {
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
-        <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
 
         <Row gutter={16}>
           <Col span={12}>
@@ -104,8 +104,8 @@ const EditIndicator = ({ id, onClose }) => {
                 dropdownRender={menu => (
                   <>
                     {menu}
-                    <Button 
-                      type="link" 
+                    <Button
+                      type="link"
                       block
                       onClick={openAddBranchModal}
                     >

@@ -359,7 +359,7 @@ const AddProposal = ({ onClose }) => {
             {/* <Card className="border-0 mt-2"> */}
             <div className="">
               <div className=" p-2">
-                {/* <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} /> */}
+                {/*  */}
 
                 <Row gutter={16}>
                   <Col span={12}>

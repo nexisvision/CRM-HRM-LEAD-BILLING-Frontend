@@ -34,13 +34,13 @@ const AddExpenses = ({ onClose }) => {
 
     const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
-const user = useSelector((state) => state.user.loggedInUser.username);
+    const user = useSelector((state) => state.user.loggedInUser.username);
 
     const { currencies } = useSelector((state) => state.currencies);
 
-const curren = currencies?.data || [];
+    const curren = currencies?.data || [];
 
-// const curren = curr?.filter((item) => item.created_by === user);
+    // const curren = curr?.filter((item) => item.created_by === user);
 
 
     // const { data: employee } = useSelector((state) => state.employee.employee);
@@ -52,15 +52,15 @@ const curren = currencies?.data || [];
     const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
 
     const allempdatass = useSelector((state) => state.currencies);
-  const fnddatass = allempdatass?.currencies?.data;
+    const fnddatass = allempdatass?.currencies?.data;
 
-  const getInitialCurrency = () => {
-    if (fnddatass?.length > 0) {
-      const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
-      return usdCurrency?.id || fnddatass[0]?.id;
-    }
-    return '';
-  };
+    const getInitialCurrency = () => {
+        if (fnddatass?.length > 0) {
+            const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
+            return usdCurrency?.id || fnddatass[0]?.id;
+        }
+        return '';
+    };
 
     useEffect(() => {
         dispatch(getcurren());
@@ -100,9 +100,9 @@ const curren = currencies?.data || [];
 
     const onSubmit = (values, { resetForm }) => {
         const formData = new FormData();
-        
+
         formData.append('project', id || values.project || '');
-        
+
         Object.keys(values).forEach(key => {
             if (key !== 'bill' && key !== 'project' && values[key]) {
                 formData.append(key, values[key]);
@@ -133,7 +133,7 @@ const curren = currencies?.data || [];
 
     return (
         <div className="add-expenses-form">
-            <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
@@ -360,7 +360,7 @@ const curren = currencies?.data || [];
                                 <div className="form-item">
                                     <label className="font-semibold">Project <span className="text-red-500">*</span></label>
 
-                                        <Input
+                                    <Input
                                         className="mt-1"
                                         defaultValue={fnddata?.project_name}
                                         placeholder="Enter project"
@@ -418,12 +418,12 @@ const curren = currencies?.data || [];
                                         maxCount={1}
                                         fileList={fileList}
                                         onChange={handleFileChange}
-                                        showUploadList={{ 
+                                        showUploadList={{
                                             showRemoveIcon: true,
                                             showPreviewIcon: true,
                                             className: "upload-list-inline"
-                                          }}
-                                         className="border-2 flex flex-col justify-center items-center p-10"
+                                        }}
+                                        className="border-2 flex flex-col justify-center items-center p-10"
                                     >
                                         <Button icon={<UploadOutlined />}>Choose File</Button>
                                     </Upload>
@@ -441,26 +441,26 @@ const curren = currencies?.data || [];
                     </Form>
                 )}
             </Formik>
- 
 
-                     {/* Add Currency Modal */}
-      <Modal
-        title="Add New Currency"
-        visible={isAddCurrencyModalVisible}
-        onCancel={() => setIsAddCurrencyModalVisible(false)}
-        footer={null}
-        width={600}
-      >
-        <AddCurrencies
-          onClose={() => {
-            setIsAddCurrencyModalVisible(false);
-            dispatch(getcurren()); // Refresh currency list after adding
-          }}
-        />
-      </Modal>
 
-      {/* Custom render for selected value */}
-      <style jsx>{`
+            {/* Add Currency Modal */}
+            <Modal
+                title="Add New Currency"
+                visible={isAddCurrencyModalVisible}
+                onCancel={() => setIsAddCurrencyModalVisible(false)}
+                footer={null}
+                width={600}
+            >
+                <AddCurrencies
+                    onClose={() => {
+                        setIsAddCurrencyModalVisible(false);
+                        dispatch(getcurren()); // Refresh currency list after adding
+                    }}
+                />
+            </Modal>
+
+            {/* Custom render for selected value */}
+            <style jsx>{`
         .currency-select .ant-select-selection-item {
           display: flex !important;
           align-items: center !important;
@@ -585,7 +585,7 @@ export default AddExpenses;
 
 //     return (
 //         <div className="add-expenses-form">
-//             <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+//
 //             <Formik
 //                 initialValues={initialValues}
 //                 validationSchema={validationSchema}

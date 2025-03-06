@@ -146,7 +146,7 @@ const AddMeeting = ({ onClose }) => {
 
           return (
             <Form className="formik-form" onSubmit={handleSubmit}>
-              <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
 
               <Row gutter={16}>
                 {/* Department Field */}
@@ -171,8 +171,8 @@ const AddMeeting = ({ onClose }) => {
                           dropdownRender={menu => (
                             <>
                               {menu}
-                              <Button 
-                                type="link" 
+                              <Button
+                                type="link"
                                 block
                                 onClick={openAddDepartmentModal}
                               >
@@ -331,7 +331,7 @@ const AddMeeting = ({ onClose }) => {
                           if (!values.startTime) return [];
                           const startHour = dayjs(values.startTime).hour();
                           const startMinute = dayjs(values.startTime).minute();
-                          
+
                           if (selectedHour === startHour) {
                             return Array.from({ length: startMinute }, (_, i) => i);
                           }
@@ -354,7 +354,7 @@ const AddMeeting = ({ onClose }) => {
                       value={values.status}
                       onChange={(value) => setFieldValue("status", value)}
 
-                       className="w-full mt-1"
+                      className="w-full mt-1"
                     >
                       <Option value="scheduled">scheduled</Option>
                       <Option value="completed">completed</Option>
@@ -368,7 +368,7 @@ const AddMeeting = ({ onClose }) => {
                   </div>
                 </Col>
                 {/* Meeting Notes Field */}
-                  <Col span={24} className="mt-3">
+                <Col span={24} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Meeting Note <span className="text-red-500">*</span></label>
                     <Field name="description">
@@ -395,7 +395,7 @@ const AddMeeting = ({ onClose }) => {
 
                 <Col span={24} className="mt-3">
                   <div className="form-item">
-                      <label className="font-semibold">meetingLink Title <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">meetingLink Title <span className="text-red-500">*</span></label>
                     <Field name="meetingLink" as={Input} placeholder="Event meetingLink" className="w-full mt-1" />
                     <ErrorMessage
                       name="meetingLink"

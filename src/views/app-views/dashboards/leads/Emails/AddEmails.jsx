@@ -58,7 +58,7 @@ const AddEmails = () => {
         width={800}
       > */}
         <Form form={form} layout="vertical" name="add_email_form"> 
-        <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+        
 
           <Form.Item
             name="mailTo"
@@ -162,7 +162,7 @@ export default AddEmails;
 //     <div>
      
 //         <Form form={form} layout="vertical" name="add_email_form">
-//         <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+//         
 
 //           <Form.Item
 //             name="mailTo"

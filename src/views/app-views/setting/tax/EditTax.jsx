@@ -6,7 +6,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { updateTax, getAllTaxes } from '../tax/taxreducer/taxSlice';
 
-const EditTax = ({idd, tax, onClose }) => {
+const EditTax = ({ idd, tax, onClose }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     // const { id } = useParams();
@@ -53,7 +53,7 @@ const EditTax = ({idd, tax, onClose }) => {
     return (
         <div className="edit-tax-form">
             {/* <h2 className="mb-4">Create Tax</h2> */}
-            <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}

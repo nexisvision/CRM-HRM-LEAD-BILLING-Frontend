@@ -10,7 +10,7 @@ import {
   AddJobonBoarding,
   getJobonBoarding,
 } from "./JobOnBoardingReducer/jobonboardingSlice";
-import { useDispatch , useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AddLable, GetLable } from "../../../dashboards/sales/LableReducer/LableSlice";
 
 const { Option } = Select;
@@ -31,7 +31,7 @@ const AddJobOnBoarding = ({ onClose }) => {
     try {
       const lid = AllLoggedData.loggedInUser.id;
       const response = await dispatch(GetLable(lid));
-  
+
       if (response.payload && response.payload.data) {
         const uniqueStatuses = response.payload.data
           .filter((label) => label && label.name && label.lableType === lableType) // Filter by lableType
@@ -43,7 +43,7 @@ const AddJobOnBoarding = ({ onClose }) => {
             (label, index, self) =>
               index === self.findIndex((t) => t.name === label.name) // Remove duplicates
           );
-  
+
         setter(uniqueStatuses);
       }
     } catch (error) {
@@ -51,11 +51,11 @@ const AddJobOnBoarding = ({ onClose }) => {
       message.error(`Failed to load ${lableType}`);
     }
   };
-  
+
   useEffect(() => {
     fetchLables("job-on-bording-status", setStatuses);
   }, []);
-  
+
   const handleAddNewStatus = async (newValue, setter, modalSetter, setFieldValue) => {
     if (!newValue.trim()) {
       message.error("Please enter a Job On Boarding Status name");
@@ -80,7 +80,7 @@ const AddJobOnBoarding = ({ onClose }) => {
         const filteredStatuses = response.payload.data
           .filter((label) => label.lableType === "job-on-bording-status")
           .map((label) => ({ id: label.id, name: label.name.trim() }));
-        
+
         setStatuses(filteredStatuses);
         setFieldValue("status", newValue.trim()); // Set the newly created status in the form
       }
@@ -146,7 +146,7 @@ const AddJobOnBoarding = ({ onClose }) => {
 
   return (
     <div className="add-job-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

@@ -11,7 +11,7 @@ const ViewLeave = ({ visible, onClose, editid }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(GetLeave()); 
+    dispatch(GetLeave());
   }, [dispatch]);
 
   const leaveData = useSelector((state) => state.Leave);
@@ -40,7 +40,7 @@ const ViewLeave = ({ visible, onClose, editid }) => {
 
   return (
     <>
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
 
       <Row gutter={[16, 16]}>
         <Col span={8}>

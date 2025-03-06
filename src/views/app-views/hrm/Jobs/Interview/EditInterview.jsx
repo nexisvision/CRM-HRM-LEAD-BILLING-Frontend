@@ -131,7 +131,7 @@ const EditInterviewForm = ({ idd, onClose, onEditInterview }) => {
     >
       {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
         <Form onSubmit={handleSubmit}>
-          <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
           <Row gutter={16}>
             {/* Job Dropdown */}
             <Col span={12} className="mt-2">

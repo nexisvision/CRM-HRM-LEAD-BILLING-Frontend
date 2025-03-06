@@ -36,7 +36,7 @@ const JobCandidateDetails = () => {
             </Button>
           </Col>
         </Row>
-        <hr style={{ marginBottom: '10px', marginTop: '10px', border: '1px solid #e8e8e8' }} />
+
 
         <Row gutter={[16, 16]} style={{ marginTop: 20 }}>
           <Col span={4}>

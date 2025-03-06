@@ -55,7 +55,7 @@ const ViewJob = () => {
         <Row gutter={16}>
           <Col span={24}>
             <h1 className="text-lg font-semibold">Job Details</h1>
-            <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
 
           </Col>
           <Col span={12}>
@@ -216,8 +216,8 @@ export default ViewJob;
 //       "Virtual meetings",
 //     ],
 //     jobRequirement: `
-//       Looking for business jobs has never been easier. Business encompasses a wide range of career options. 
-//       Whether you are looking for an entry-level position as a receptionist or clerk or seeking a top-level profession as a corporate executive, 
+//       Looking for business jobs has never been easier. Business encompasses a wide range of career options.
+//       Whether you are looking for an entry-level position as a receptionist or clerk or seeking a top-level profession as a corporate executive,
 //       we have jobs available right now.
 //     `,
 //   };

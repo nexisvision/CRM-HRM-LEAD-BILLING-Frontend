@@ -35,22 +35,22 @@ const AddTransfer = ({ onClose }) => {
         description: Yup.string().required('Please enter a description.'),
     });
 
-    useEffect(()=>{
+    useEffect(() => {
         dispatch(getAccounts())
-    },[dispatch])
+    }, [dispatch])
 
-    const accountdata = useSelector((state)=>state.account.account.data);
+    const accountdata = useSelector((state) => state.account.account.data);
 
-    const onSubmit = async (values, { setSubmitting,resetForm }) => {
+    const onSubmit = async (values, { setSubmitting, resetForm }) => {
         try {
             // Add your API call here
             dispatch(addaccountsss(values))
-                .then(()=>{
+                .then(() => {
                     onClose();
                     resetForm();
                     dispatch(transferdatas())
                 })
-        
+
         } catch (error) {
             message.error('Failed to create account');
         } finally {
@@ -69,37 +69,37 @@ const AddTransfer = ({ onClose }) => {
     return (
         <div className="create-account-form">
             {/* <h2>Create Job</h2> */}
-            <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
                 onSubmit={onSubmit}
             >
-                {({ handleSubmit, isSubmitting, setFieldValue, values, setFieldTouched ,resetForm}) => (
+                {({ handleSubmit, isSubmitting, setFieldValue, values, setFieldTouched, resetForm }) => (
                     <FormikForm onSubmit={handleSubmit}>
                         <Row gutter={16}>
-                        <Col span={12} className="">
-                    <div className="form-item">
-                      <label className="font-semibold">Date <span className="text-red-500">*</span></label>
-                      <Field name="date">
-                        {({ field }) => (
-                          <input
-                            {...field}
-                            type="date"
-                            className="w-full mt-1 p-2 border rounded"
-                            onChange={(e) => {
-                              setFieldValue('date', e.target.value);
-                            }}
-                          />
-                        )}
-                      </Field>
-                      <ErrorMessage
-                        name="date"
-                        component="div"
-                        className="error-message text-red-500 my-1"
-                      />
-                    </div>
-                  </Col>
+                            <Col span={12} className="">
+                                <div className="form-item">
+                                    <label className="font-semibold">Date <span className="text-red-500">*</span></label>
+                                    <Field name="date">
+                                        {({ field }) => (
+                                            <input
+                                                {...field}
+                                                type="date"
+                                                className="w-full mt-1 p-2 border rounded"
+                                                onChange={(e) => {
+                                                    setFieldValue('date', e.target.value);
+                                                }}
+                                            />
+                                        )}
+                                    </Field>
+                                    <ErrorMessage
+                                        name="date"
+                                        component="div"
+                                        className="error-message text-red-500 my-1"
+                                    />
+                                </div>
+                            </Col>
                             <Col span={12}>
                                 <div className="form-group">
                                     <label className="font-semibold">From Account <span className="text-red-500">*</span></label>
@@ -219,7 +219,7 @@ const AddTransfer = ({ onClose }) => {
                                 </div>
                             </Col>
 
-                            
+
 
                             {/* <Col span={24}>
                                 <div className="form-group mt-2">

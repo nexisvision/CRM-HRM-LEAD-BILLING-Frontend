@@ -45,9 +45,9 @@ const AddLeadMember = ({ onClose }) => {
 
   const { id } = useParams();
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(GetLeads())
-  },[dispatch])
+  }, [dispatch])
 
   const Addmember = async (payload) => {
     const token = localStorage.getItem("auth_token");
@@ -102,12 +102,12 @@ const AddLeadMember = ({ onClose }) => {
     }
   };
 
-const loggeduserdata = useSelector((state)=>state.user.loggedInUser.username)
+  const loggeduserdata = useSelector((state) => state.user.loggedInUser.username)
 
   const allempdata = useSelector((state) => state.employee);
   const empData = allempdata?.employee?.data || [];
 
-  const fndemp = empData.filter((item)=>item?.created_by === loggeduserdata) || [];
+  const fndemp = empData.filter((item) => item?.created_by === loggeduserdata) || [];
 
   const Allpeoject = useSelector((state) => state.Project);
   const Filterdta = Allpeoject?.Project?.data || [];
@@ -123,7 +123,7 @@ const loggeduserdata = useSelector((state)=>state.user.loggedInUser.username)
 
   return (
     <div className="add-project-member-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

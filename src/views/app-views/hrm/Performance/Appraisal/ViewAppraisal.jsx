@@ -1,12 +1,12 @@
 import React from "react";
 import { Row, Col, Divider, Badge, Card } from "antd";
-import { 
-  StarFilled, 
-  StarOutlined, 
-  UserOutlined, 
-  BankOutlined, 
-  CalendarOutlined,
-  TrophyOutlined 
+import {
+    StarFilled,
+    StarOutlined,
+    UserOutlined,
+    BankOutlined,
+    CalendarOutlined,
+    TrophyOutlined
 } from '@ant-design/icons';
 
 const ViewAppraisal = () => {
@@ -66,7 +66,7 @@ const ViewAppraisal = () => {
                                 Performance Appraisal Review
                             </h1>
                         </div>
-                        
+
                         <Row gutter={[24, 24]} className="items-start">
                             <Col xs={24} sm={12} lg={8}>
                                 <div className="bg-white rounded-xl p-4 border border-gray-100 hover:shadow-md transition-all duration-300">
@@ -131,8 +131,8 @@ const ViewAppraisal = () => {
                 {/* Competencies Sections */}
                 <div className="space-y-6 mt-6">
                     {data.map((section, index) => (
-                        <Card 
-                            key={index} 
+                        <Card
+                            key={index}
                             className="overflow-hidden hover:shadow-md transition-shadow duration-300"
                             bodyStyle={{ padding: 0 }}
                         >
@@ -147,8 +147,8 @@ const ViewAppraisal = () => {
                             <div className="p-4">
                                 <div className="space-y-4">
                                     {section.items.map((item, idx) => (
-                                        <div 
-                                            key={idx} 
+                                        <div
+                                            key={idx}
                                             className="grid grid-cols-12 gap-6 items-center p-3 hover:bg-gray-50 rounded-xl transition-all duration-200"
                                         >
                                             <div className="col-span-12 md:col-span-4">
@@ -232,7 +232,7 @@ export default ViewAppraisal;
 //     //   width={700}
 //     // >
 //     <>
-//           <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+//
 
 //       <div className="mb-4">
 //         <p>

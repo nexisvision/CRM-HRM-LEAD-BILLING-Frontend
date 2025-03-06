@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Card, Button, Row, Col,Modal, Typography } from "antd";
-import { DownloadOutlined, StarFilled,PlusOutlined } from "@ant-design/icons";
+import { Card, Button, Row, Col, Modal, Typography } from "antd";
+import { DownloadOutlined, StarFilled, PlusOutlined } from "@ant-design/icons";
 import AddJobOnBoard from "./AddJobOnBoard";
 
 const { Title, Text } = Typography;
@@ -8,7 +8,7 @@ const { Title, Text } = Typography;
 
 const BasicInfoList = () => {
 
-    const [isAddJobModalVisible, setIsAddJobModalVisible] = useState(false);
+  const [isAddJobModalVisible, setIsAddJobModalVisible] = useState(false);
 
 
   const openAddJobOnBoard = () => {
@@ -21,22 +21,22 @@ const BasicInfoList = () => {
 
   return (
     <div>
- <Row justify="space-between" align="middle">
-          <Col>
-            <Title level={4}>Basic Information</Title>
-          </Col>
-          <Col>
-            <Button type="primary">
+      <Row justify="space-between" align="middle">
+        <Col>
+          <Title level={4}>Basic Information</Title>
+        </Col>
+        <Col>
+          <Button type="primary">
             <PlusOutlined />
-            Add to Job OnBoard          
-            </Button>
-          </Col>
-        </Row>
-{/* <h1 className="text-lg font-bold mb-3">Basic Info</h1>
+            Add to Job OnBoard
+          </Button>
+        </Col>
+      </Row>
+      {/* <h1 className="text-lg font-bold mb-3">Basic Info</h1>
     <Button type="primary" style={{ backgroundColor: "#66dd66", borderColor: "#66dd66" }} onClick={openAddJobOnBoard}>
     
   </Button> */}
-      <hr style={{ marginBottom: '10px', marginTop: '10px', border: '1px solid #e8e8e8' }} />
+
 
       <Row gutter={[16, 16]}>
         <Col span={24}>
@@ -75,7 +75,7 @@ const BasicInfoList = () => {
         footer={null}
         width={1100}
         className='mt-[-70px]'
-        // height={1000}
+      // height={1000}
       >
         <AddJobOnBoard onClose={closeAddJobModal} />
       </Modal>

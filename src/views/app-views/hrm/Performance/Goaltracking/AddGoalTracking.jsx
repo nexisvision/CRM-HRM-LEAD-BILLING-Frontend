@@ -23,7 +23,7 @@ const AddGoalTracking = () => {
   return (
     <div className="add-goal-tracking">
       {/* <h2 className="mb-4">Create New Goal Tracking</h2> */}
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+      
 
       <Form
         layout="vertical"

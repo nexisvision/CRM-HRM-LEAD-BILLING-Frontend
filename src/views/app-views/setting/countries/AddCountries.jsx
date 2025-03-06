@@ -13,7 +13,7 @@ const validationSchema = Yup.object().shape({
   phoneCode: Yup.string().required('Please enter phone code')
 });
 
-const AddCountries = ({onClose}) => {
+const AddCountries = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -47,7 +47,7 @@ const AddCountries = ({onClose}) => {
 
   return (
     <div>
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+
 
       <Formik
         initialValues={initialValues}

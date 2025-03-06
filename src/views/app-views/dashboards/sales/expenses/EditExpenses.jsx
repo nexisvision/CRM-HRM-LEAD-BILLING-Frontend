@@ -69,14 +69,14 @@ const EditExpenses = () => {
 
     return (
         <div className="edit-expenses-form">
-            <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
             <Formik
                 enableReinitialize
                 initialValues={initialValues}
                 validationSchema={validationSchema}
                 onSubmit={onSubmit}
             >
-                {({ values, setFieldValue, handleSubmit,setFieldTouched }) => (
+                {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
                     <Form className="formik-form" onSubmit={handleSubmit}>
                         <Row gutter={16}>
                             <Col span={12} className="mt-2">
@@ -391,7 +391,7 @@ export default EditExpenses;
 //         name="add-job"
 //         onFinish={onFinish}
 //       >
-//         <Row gutter={16}>     
+//         <Row gutter={16}>
 
 //           <Col span={12}>
 //             <Form.Item name="date" label="Date" rules={[{ required: true, message: 'Date is required.' }]}>
@@ -403,7 +403,7 @@ export default EditExpenses;
 //             <Form.Item name="description" label="Description">
 //               <ReactQuill placeholder="Enter Description" />
 //             </Form.Item>
-//           </Col>         
+//           </Col>
 
 //           <Col span={12}>
 //             <Form.Item name="name" label="Client" rules={[{ required: true, message: 'Please enter a client name.' }]}>
@@ -427,7 +427,7 @@ export default EditExpenses;
 //             <Form.Item name="amount" label="Amount" rules={[{ required: true, message: 'Please enter a Amount.' }]}>
 //               <Input type='number' placeholder="Enter Amount" />
 //             </Form.Item>
-//           </Col>         
+//           </Col>
 
 //           <Col span={12}>
 //             <Form.Item name="status" label="Status" rules={[{ required: true, message: 'Please Select Status.' }]}>
@@ -436,7 +436,7 @@ export default EditExpenses;
 //                 <Option value="abc">Shipped</Option>
 //               </Select>
 //             </Form.Item>
-//           </Col>       
+//           </Col>
 
 //         </Row>
 

@@ -90,7 +90,7 @@ const AddProjectMember = ({ onClose }) => {
 
       await Addmember(payload);
       await dispatch(GetProject()).unwrap();
-      
+
       message.success("Project added successfully!");
       resetForm();
       onClose(); // Close modal after successful submission
@@ -100,7 +100,7 @@ const AddProjectMember = ({ onClose }) => {
     }
   };
 
-// const loggeduserdata = useSelector((state)=>state.user.loggedInUser.username)
+  // const loggeduserdata = useSelector((state)=>state.user.loggedInUser.username)
 
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
@@ -116,7 +116,7 @@ const AddProjectMember = ({ onClose }) => {
     }
   });
 
-  
+
 
 
   // const fndemp = empData.filter((item)=>item?.created_by === loggeduserdata) || [];
@@ -137,7 +137,7 @@ const AddProjectMember = ({ onClose }) => {
 
   return (
     <div className="add-project-member-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Button, Avatar, List,Modal } from 'antd';
+import { Card, Button, Avatar, List, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import AddEmails from './AddEmails';
 
@@ -35,12 +35,12 @@ const EmailsList = () => {
           // shape="circle"
           onClick={openAddEmailsModal}
           icon={<PlusOutlined />}
-          // style={{ backgroundColor: '#39d039', borderColor: '#39d039' }}
+        // style={{ backgroundColor: '#39d039', borderColor: '#39d039' }}
         />
       }
       style={{ borderRadius: '10px', overflow: 'hidden' }}
     >
-              <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
 
       <List
         itemLayout="horizontal"
@@ -68,7 +68,7 @@ const EmailsList = () => {
           </List.Item>
         )}
       />
-       <Modal
+      <Modal
         title="Add Emails"
         visible={isAddEmailsModalVisible}
         onCancel={closeAddEmailsModal}

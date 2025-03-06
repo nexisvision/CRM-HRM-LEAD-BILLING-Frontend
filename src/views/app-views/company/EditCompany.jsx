@@ -149,6 +149,7 @@ const EditCompany = ({ comnyid, onClose }) => {
                       name="phoneCode"
                       style={{ width: '30%' }}
                       placeholder="Code"
+                      defaultValue="91"
                       className="rounded-lg hover:border-indigo-400 focus:border-indigo-500"
                       onChange={value => formik.setFieldValue('phoneCode', value)}
                       onBlur={() => formik.setFieldTouched('phoneCode', true)}
@@ -157,11 +158,11 @@ const EditCompany = ({ comnyid, onClose }) => {
                       {countries && countries.length > 0 ? (
                         countries.map((country) => (
                           <Option key={country.id} value={country.phoneCode}>
-                            ({country.phoneCode})
+                            {country.phoneCode}
                           </Option>
                         ))
                       ) : (
-                        <Option value="" disabled>Loading country codes...</Option>
+                        <Option value="91">+91</Option>
                       )}
                     </Select>
                     <Input

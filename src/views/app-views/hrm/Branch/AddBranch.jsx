@@ -53,7 +53,7 @@ const AddBranch = ({ onClose }) => {
 
   return (
     <div className="add-employee">
-      <hr style={{ marginBottom: '20px', border: '1px solid #e8e8e8' }} />
+
 
       <Formik
         initialValues={{
@@ -68,7 +68,7 @@ const AddBranch = ({ onClose }) => {
           <FormikForm>
             <Row gutter={16}>
               <Col span={12}>
-                <div style={{ marginBottom: '16px'}}>
+                <div style={{ marginBottom: '16px' }}>
                   <label className="font-semibold">Branch <span className="text-red-500">*</span></label>
                   <Field
                     as={Input}
@@ -82,7 +82,7 @@ const AddBranch = ({ onClose }) => {
                   )}
                 </div>
               </Col>
-               <Col span={12}>
+              <Col span={12}>
                 <div className="form-item">
                   <label className="font-semibold">Branch Manager <span className="text-red-500">*</span></label>
                   <Field name="branchManager">
@@ -94,8 +94,8 @@ const AddBranch = ({ onClose }) => {
                         dropdownRender={(menu) => (
                           <>
                             {menu}
-                            <Button 
-                              type="link" 
+                            <Button
+                              type="link"
                               block
                               onClick={() => {
                                 setIsAddUserModalVisible(true);
@@ -129,7 +129,7 @@ const AddBranch = ({ onClose }) => {
                 </div>
               </Col>
               <Col span={12}>
-                <div style={{ marginBottom: '16px'}}>
+                <div style={{ marginBottom: '16px' }}>
                   <label className="font-semibold">Address <span className="text-red-500">*</span></label>
                   <Field
                     as={Input}

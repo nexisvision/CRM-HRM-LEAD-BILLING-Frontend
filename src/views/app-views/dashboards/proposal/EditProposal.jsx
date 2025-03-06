@@ -52,23 +52,23 @@ const EditProposal = ({ id, onClose }) => {
 
   const { data: Leadss } = useSelector((state) => state.Leads.Leads);
 
-  const Leads = loggeduser && Array.isArray(Leadss) 
-  ? Leadss.filter((item) => item?.created_by === loggeduser)
-  : [];
+  const Leads = loggeduser && Array.isArray(Leadss)
+    ? Leadss.filter((item) => item?.created_by === loggeduser)
+    : [];
 
   const { data: Dealss } = useSelector((state) => state.Deals.Deals);
 
-  const Deals = loggeduser && Array.isArray(Dealss) 
-  ? Dealss.filter((item) => item?.created_by === loggeduser)
-  : [];
+  const Deals = loggeduser && Array.isArray(Dealss)
+    ? Dealss.filter((item) => item?.created_by === loggeduser)
+    : [];
 
   const allogged = useSelector((state) => state.user.loggedInUser.username);
-  
+
   const fndlead = Leads.filter((item) => item?.created_by === allogged);
 
 
-   // Add state for selected lead details
-   const [selectedLeadDetails, setSelectedLeadDetails] = useState(null);
+  // Add state for selected lead details
+  const [selectedLeadDetails, setSelectedLeadDetails] = useState(null);
 
 
   // console.log("SubClient Data:", subClientData.username);
@@ -91,7 +91,7 @@ const EditProposal = ({ id, onClose }) => {
     const data = empData.find((item) => item.id === id);
     setSingleEmp(data || null);
 
-    console.log("data",data)
+    console.log("data", data)
 
     // Update form values when singleEmp is set
     if (data) {
@@ -165,7 +165,7 @@ const EditProposal = ({ id, onClose }) => {
           if (data.items) {
             const parsedItems = JSON.parse(data.items);
             const formattedItems = Array.isArray(parsedItems) ? parsedItems : [parsedItems];
-            
+
             const formattedTableData = formattedItems.map(item => ({
               id: Date.now() + Math.random(), // Generate unique ID
               item: item.item || '',
@@ -279,30 +279,30 @@ const EditProposal = ({ id, onClose }) => {
     },
   ]);
 
- // Function to handle adding a new row
- const handleAddRow = () => {
-  const newRow = {
-    id: Date.now(),
-    item: "",
-    quantity: 1,
-    price: "",
-    tax: 0,
-    amount: "0",
-    description: "",
+  // Function to handle adding a new row
+  const handleAddRow = () => {
+    const newRow = {
+      id: Date.now(),
+      item: "",
+      quantity: 1,
+      price: "",
+      tax: 0,
+      amount: "0",
+      description: "",
+    };
+    setTableData([...tableData, newRow]);
   };
-  setTableData([...tableData, newRow]);
-};
 
- // Delete row
- const handleDeleteRow = (id) => {
-  if (tableData.length > 1) {
-    const updatedData = tableData.filter((row) => row.id !== id);
-    setTableData(updatedData);
-    calculateTotal(updatedData, discountRate);
-  } else {
-    message.warning("At least one item is required");
-  }
-};
+  // Delete row
+  const handleDeleteRow = (id) => {
+    if (tableData.length > 1) {
+      const updatedData = tableData.filter((row) => row.id !== id);
+      setTableData(updatedData);
+      calculateTotal(updatedData, discountRate);
+    } else {
+      message.warning("At least one item is required");
+    }
+  };
 
 
 
@@ -359,7 +359,7 @@ const EditProposal = ({ id, onClose }) => {
     const updatedData = tableData.map((row) => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
-        
+
         if (field === 'tax' && taxes?.data) {
           const selectedTax = taxes.data.find(tax => tax.gstPercentage.toString() === value.toString());
           if (selectedTax) {
@@ -377,14 +377,14 @@ const EditProposal = ({ id, onClose }) => {
           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
           const price = parseFloat(field === 'price' ? value : row.price) || 0;
           const tax = parseFloat(field === 'tax' ? value : row.tax) || 0;
-          
+
           const baseAmount = quantity * price;
           const taxAmount = (baseAmount * tax) / 100;
           const totalAmount = baseAmount + taxAmount;
-          
+
           updatedRow.amount = totalAmount.toFixed(2);
         }
-        
+
         return updatedRow;
       }
       return row;
@@ -436,11 +436,11 @@ const EditProposal = ({ id, onClose }) => {
               <div className=" p-2">
 
 
-                {/* <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} /> */}
+                {/*  */}
 
                 <Row gutter={16}>
 
-                <Col span={12}>
+                  <Col span={12}>
                     <Form.Item
                       name="lead_title"
                       label="Lead Title"
@@ -579,7 +579,7 @@ const EditProposal = ({ id, onClose }) => {
             {/* </Card> */}
 
             {/* <Card> */}
-            
+
             <div>
               <div className="overflow-x-auto">
 
@@ -638,19 +638,19 @@ const EditProposal = ({ id, onClose }) => {
                             />
                           </td>
                           <td className="px-4 py-2 border-b">
-                          <select
-                            value={row.tax}
-                            onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
-                            className="w-full p-2 border"
-                          >
-                            <option value="0">Nothing Selected</option>
-                            {taxes && taxes.data && taxes.data.map(tax => (
-                              <option key={tax.id} value={tax.gstPercentage}>
-                                {tax.gstName}: {tax.gstPercentage}%
-                              </option>
-                            ))}
-                          </select>
-                        </td>
+                            <select
+                              value={row.tax}
+                              onChange={(e) => handleTableDataChange(row.id, "tax", e.target.value)}
+                              className="w-full p-2 border"
+                            >
+                              <option value="0">Nothing Selected</option>
+                              {taxes && taxes.data && taxes.data.map(tax => (
+                                <option key={tax.id} value={tax.gstPercentage}>
+                                  {tax.gstName}: {tax.gstPercentage}%
+                                </option>
+                              ))}
+                            </select>
+                          </td>
                           <td className="px-4 py-2 border-b">
                             <span>{row.amount}</span>
                           </td>
@@ -668,10 +668,10 @@ const EditProposal = ({ id, onClose }) => {
                   </tbody>
                 </table>
                 <div className="form-buttons text-start mb-2 mt-2">
-              <Button className='border-0 text-white bg-blue-500' onClick={handleAddRow}>
-                <PlusOutlined />  Add Items
-              </Button>
-            </div>
+                  <Button className='border-0 text-white bg-blue-500' onClick={handleAddRow}>
+                    <PlusOutlined />  Add Items
+                  </Button>
+                </div>
               </div>
 
 
@@ -739,7 +739,7 @@ const EditProposal = ({ id, onClose }) => {
                   {/* Terms and Conditions */}
                 </table>
 
-                
+
               </div>
 
             </div>

@@ -187,12 +187,12 @@ const EditJob = ({ idd, onClose }) => {
       if (formik) {
         formik.setFieldValue('title', data.title || '');
         formik.setFieldValue('category', data.category || '');
-        formik.setFieldValue('skillss', 
-          data.skills && data.skills !== "{}" 
+        formik.setFieldValue('skillss',
+          data.skills && data.skills !== "{}"
             ? JSON.parse(data.skills)?.Skills || ""
             : "");
         formik.setFieldValue('location', data.location || '');
-        formik.setFieldValue('interviewRounds', 
+        formik.setFieldValue('interviewRounds',
           data.interviewRounds ? JSON.parse(data.interviewRounds)?.InterviewRounds || [] : []);
         formik.setFieldValue('startDate', data.startDate ? dayjs(data.startDate) : null);
         formik.setFieldValue('endDate', data.endDate ? dayjs(data.endDate) : null);
@@ -212,7 +212,7 @@ const EditJob = ({ idd, onClose }) => {
 
   return (
     <div className="add-expenses-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
+
       <Formik
         innerRef={formikRef}  // Add this line to get Formik reference
         initialValues={{
@@ -565,7 +565,7 @@ const EditJob = ({ idd, onClose }) => {
                       onChange={(value) => setFieldValue("description", value)}
                       placeholder="Enter description"
                       onBlur={() => setFieldTouched("description", true)}
-                        className="mt-1"
+                      className="mt-1"
                     />
                     <ErrorMessage
                       name="description"

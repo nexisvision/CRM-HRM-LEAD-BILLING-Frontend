@@ -111,7 +111,7 @@ const AddDocument = ({ onClose }) => {
 
   return (
     <div className="add-trainingSetup">
-      <hr className="mt-3 border border-gray-300" />
+
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -126,18 +126,18 @@ const AddDocument = ({ onClose }) => {
           >
             <Row gutter={16}>
               <Col span={12} className="mt-3">
-              <label className="font-semibold">Name <span className="text-red-500">*</span></label>
-                  <Field name="name" className="w-full mt-1">
-                    {({ field }) => (
-                      <Input placeholder="Enter Name" {...field} />
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="name"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-             
+                <label className="font-semibold">Name <span className="text-red-500">*</span></label>
+                <Field name="name" className="w-full mt-1">
+                  {({ field }) => (
+                    <Input placeholder="Enter Name" {...field} />
+                  )}
+                </Field>
+                <ErrorMessage
+                  name="name"
+                  component="div"
+                  className="error-message text-red-500 my-1"
+                />
+
               </Col>
               <Col span={12} className="mt-3">
                 <div className="form-item">
