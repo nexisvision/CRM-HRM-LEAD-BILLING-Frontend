@@ -1,183 +1,106 @@
 import React, { useState } from 'react';
-import { Modal, Button, Form, DatePicker, Select, Input, Checkbox, Row, Col } from 'antd';
-import { Formik, Field } from 'formik';
-import * as Yup from 'yup';
-import moment from 'moment';
-
-const { TextArea } = Input;
-
-const reminderOptions = [
-  { value: 'call', label: 'Call Reminder' },
-  { value: 'meeting', label: 'Meeting Reminder' },
-  { value: 'followup', label: 'Follow-up Reminder' },
-  { value: 'other', label: 'Other' }
-];
-
-const validationSchema = Yup.object().shape({
-  notificationDate: Yup.date().required('Date is required'),
-  reminderType: Yup.string().required('Reminder type is required'),
-  description: Yup.string().required('Description is required'),
-  sendEmail: Yup.boolean()
-});
+import { Table, Button, Space, Card, Row, Col } from 'antd';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import AddReminder from './AddReminder';
 
 const ReminderList = () => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [data, setData] = useState([]);
 
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
-  const initialValues = {
-    notificationDate: null,
-    reminderType: undefined,
-    description: '',
-    sendEmail: false
-  };
-
-  const onSubmit = (values, { setSubmitting, resetForm }) => {
-    console.log('Form values:', values);
-    setSubmitting(false);
-    setIsModalVisible(false);
-    resetForm();
-  };
-
-  return (
-    <Row justify="end" className="mb-4">
-      <Col>
-        <Button type="primary" onClick={showModal}>
-          Set Lead Reminder
-        </Button>
-      </Col>
-
-      <Modal
-        title={
-          <div className="flex items-center justify-between border-b pb-3">
-            <span className="text-lg font-medium">Set Lead Reminder</span>
-          </div>
-        }
-        open={isModalVisible}
-        footer={null}
-        onCancel={handleCancel}
-        destroyOnClose
-        width={700}
-        className="reminder-modal"
-      >
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={onSubmit}
-        >
-          {({
-            values,
-            errors,
-            touched,
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            setFieldValue,
-            isSubmitting
-          }) => (
-            <Form onFinish={handleSubmit} layout="vertical" className="mt-4">
-              <Row gutter={[24, 0]}>
-                <Col xs={24} md={12}>
-                  <Form.Item
-                    label="Date to be notified"
-                    required
-                    validateStatus={errors.notificationDate && touched.notificationDate ? 'error' : ''}
-                    help={touched.notificationDate && errors.notificationDate}
-                    className="mb-4"
-                  >
-                    <DatePicker
-                      className="w-full"
-                      onChange={(date) => setFieldValue('notificationDate', date)}
-                      onBlur={handleBlur}
-                      name="notificationDate"
-                      format="YYYY-MM-DD"
-                      placeholder="Select date"
-                    />
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24} md={12}>
-                  <Form.Item
-                    label="Set reminder to"
-                    required
-                    validateStatus={errors.reminderType && touched.reminderType ? 'error' : ''}
-                    help={touched.reminderType && errors.reminderType}
-                    className="mb-4"
-                  >
-                    <Select
-                      className="w-full"
-                      placeholder="Select reminder type"
-                      options={reminderOptions}
-                      onChange={(value) => setFieldValue('reminderType', value)}
-                      onBlur={handleBlur}
-                      name="reminderType"
-                    />
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24}>
-                  <Form.Item
-                    label="Description"
-                    required
-                    validateStatus={errors.description && touched.description ? 'error' : ''}
-                    help={touched.description && errors.description}
-                    className="mb-4"
-                  >
-                    <TextArea
-                      rows={4}
-                      name="description"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.description}
-                      placeholder="Enter reminder description"
-                    />
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24}>
-                  <Form.Item className="mb-6">
-                    <Checkbox
-                      name="sendEmail"
-                      checked={values.sendEmail}
-                      onChange={(e) => setFieldValue('sendEmail', e.target.checked)}
-                    >
-                      Send also an email for this reminder
-                    </Checkbox>
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24}>
-                  <Row justify="end" gutter={[8, 0]}>
-                    <Col>
-                      <Button onClick={handleCancel}>
-                        Close
-                      </Button>
-                    </Col>
-                    <Col>
-                      <Button 
+    // Table columns configuration
+    const columns = [
+        {
+            title: 'Description',
+            dataIndex: 'description',
+            key: 'description',
+            sorter: (a, b) => a.description.localeCompare(b.description),
+        },
+        {
+            title: 'Date',
+            dataIndex: 'date',
+            key: 'date',
+            sorter: (a, b) => a.date.localeCompare(b.date),
+        },
+        {
+            title: 'Remind',
+            dataIndex: 'remind',
+            key: 'remind',
+            sorter: (a, b) => a.remind.localeCompare(b.remind),
+        },
+        {
+            title: 'Is Notified',
+            dataIndex: 'isNotified',
+            key: 'isNotified',
+            sorter: (a, b) => a.isNotified.localeCompare(b.isNotified),
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: (_, record) => (
+                <Space size="middle">
+                    <Button 
                         type="primary" 
-                        htmlType="submit" 
-                        loading={isSubmitting}
-                        // disabled={isSubmitting || Object.keys(errors).length > 0}
-                      >
-                        Save
-                      </Button>
-                    </Col>
-                  </Row>
+                        icon={<EditOutlined />}
+                        onClick={() => handleEdit(record)}
+                        size="small"
+                    >
+                        Edit
+                    </Button>
+                    <Button 
+                        type="primary" 
+                        danger 
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDelete(record.id)}
+                        size="small"
+                    >
+                        Delete
+                    </Button>
+                </Space>
+            ),
+        },
+    ];
+
+    // Handle edit action
+    const handleEdit = (record) => {
+        console.log('Edit record:', record);
+    };
+
+    // Handle delete action
+    const handleDelete = (id) => {
+        console.log('Delete record with id:', id);
+    };
+
+    return (
+        <Card className="w-100">
+            <Row gutter={[0, 16]}>
+                <Col xs={24} className="text-right mb-4">
+                    <AddReminder />
                 </Col>
-              </Row>
-            </Form>
-          )}
-        </Formik>
-      </Modal>
-    </Row>
-  );
+                <Col xs={24}>
+                    <Table
+                        columns={columns}
+                        dataSource={data}
+                        loading={loading}
+                        rowKey="id"
+                        pagination={{
+                            total: data.length,
+                            pageSize: 10,
+                            showSizeChanger: true,
+                            showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`
+                        }}
+                        className="reminder-table"
+                        locale={{
+                            emptyText: (
+                                <div className="text-center py-8">
+                                    <p className="text-gray-500">No data</p>
+                                </div>
+                            )
+                        }}
+                    />
+                </Col>
+            </Row>
+        </Card>
+    );
 };
 
 export default ReminderList;

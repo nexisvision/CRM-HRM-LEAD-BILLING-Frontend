@@ -4,7 +4,7 @@ import LeadMember from './leadMember/LeadMember';
 import FileList from './File/FileList';
 import NotesList from './notes/NotesList';
 import EstimatesList from './estimates/EstimatesList';
-import ReminderList from './Reminder/ReminderList';
+import ReminderList from './Reminder/ReminderList.jsx';
 // import TaskList from './task/TaskList';
 // import InvoiceList from './invoice/InvoiceList';
 // import PaymentList from './payment/PaymentList';
