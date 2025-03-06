@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -11,7 +12,7 @@ const getAttendances = async () => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.get(
-      "http://localhost:5353/api/v1/attendance/",
+      `${env.API_ENDPOINT_URL}/attendance/`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -30,7 +31,7 @@ const addAttendance = async (values) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/attendance/",
+      `${env.API_ENDPOINT_URL}/attendance/`,
       values,
       {
         headers: {
@@ -51,7 +52,7 @@ const deleteAttendance = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/attendance/${id}`,
+      `${env.API_ENDPOINT_URL}/attendance/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -70,7 +71,7 @@ const editAttendance = async (id, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/attendance/${id}`,
+      `${env.API_ENDPOINT_URL}/attendance/${id}`,
       values,
       {
         headers: {

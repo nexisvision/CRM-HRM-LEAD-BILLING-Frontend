@@ -1,11 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Button, Space, Card, Row, Col } from 'antd';
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import AddReminder from './AddReminder';
+import { getssreinderss, deletessreinderss   } from './reminderReducers/reminderSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import toast from 'react-hot-toast';
 
 const ReminderList = () => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
+    console.log(data,"data")
+    const dispatch = useDispatch()
+
+    useEffect(()=>{
+      dispatch(getssreinderss())
+    },[dispatch])
+
+    const allreminders = useSelector((state)=>state?.Reminder?.Reminder?.data)
+    console.log("allreminders",allreminders)
+
+    useEffect(()=>{
+      if(allreminders){
+        setData(allreminders) 
+      }
+    },[allreminders])
 
     // Table columns configuration
     const columns = [
@@ -16,36 +34,50 @@ const ReminderList = () => {
             sorter: (a, b) => a.description.localeCompare(b.description),
         },
         {
-            title: 'Date',
-            dataIndex: 'date',
-            key: 'date',
-            sorter: (a, b) => a.date.localeCompare(b.date),
+            title: 'Start Date',
+            dataIndex: 'start_date',
+            key: 'start_date',
+            render: (text) => new Date(text).toLocaleString(),
+            sorter: (a, b) => new Date(a.start_date) - new Date(b.start_date),
+        },
+        // {
+        //     title: 'Users',
+        //     dataIndex: 'users',
+        //     key: 'users',
+        //     render: (text) => {
+        //         try {
+        //             const usersObj = JSON.parse(text);
+        //             return usersObj.users.join(', ');
+        //         } catch (e) {
+        //             return '';
+        //         }
+        //     },
+        // },
+        {
+            title: 'Created By',
+            dataIndex: 'created_by',
+            key: 'created_by',
         },
         {
-            title: 'Remind',
-            dataIndex: 'remind',
-            key: 'remind',
-            sorter: (a, b) => a.remind.localeCompare(b.remind),
-        },
-        {
-            title: 'Is Notified',
-            dataIndex: 'isNotified',
-            key: 'isNotified',
-            sorter: (a, b) => a.isNotified.localeCompare(b.isNotified),
+            title: 'Created At',
+            dataIndex: 'createdAt',
+            key: 'createdAt',
+            render: (text) => new Date(text).toLocaleString(),
+            sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
         },
         {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button 
+                    {/* <Button 
                         type="primary" 
                         icon={<EditOutlined />}
                         onClick={() => handleEdit(record)}
                         size="small"
                     >
                         Edit
-                    </Button>
+                    </Button> */}
                     <Button 
                         type="primary" 
                         danger 
@@ -67,7 +99,11 @@ const ReminderList = () => {
 
     // Handle delete action
     const handleDelete = (id) => {
-        console.log('Delete record with id:', id);
+        dispatch(deletessreinderss(id))
+          .then(()=>{
+            toast.success("Deleted Successfully")
+            dispatch(getssreinderss())
+          })
     };
 
     return (
@@ -80,7 +116,6 @@ const ReminderList = () => {
                     <Table
                         columns={columns}
                         dataSource={data}
-                        loading={loading}
                         rowKey="id"
                         pagination={{
                             total: data.length,

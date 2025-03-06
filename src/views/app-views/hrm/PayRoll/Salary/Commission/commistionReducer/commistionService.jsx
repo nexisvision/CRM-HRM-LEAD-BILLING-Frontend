@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const getcom = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/commission/", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/commission/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const addcom = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/commission/",
+      `${env.API_ENDPOINT_URL}/commission/`,
       payload,
       {
         headers: {
@@ -48,7 +49,7 @@ const deletecom = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/commission/${id}`,
+      `${env.API_ENDPOINT_URL}/commission/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +68,7 @@ const editcom = async (meetid, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/commission/${meetid}`,
+      `${env.API_ENDPOINT_URL}/commission/${meetid}`,
       values,
       {
         headers: {

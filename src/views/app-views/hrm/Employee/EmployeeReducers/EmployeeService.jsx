@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const fetchEmpData = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/employees/", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/employees/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const createEmp = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/employees/",
+        `${env.API_ENDPOINT_URL}/employees/`,
       payload,
       {
         headers: {
@@ -48,7 +49,7 @@ const Empdelete = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/employees/${id}`,
+      `${env.API_ENDPOINT_URL}/employees/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +68,7 @@ const EditEmp = async (idd, updatedFormValues) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/employees/${idd}`,
+      `${env.API_ENDPOINT_URL}/employees/${idd}`,
       updatedFormValues,
       {
         headers: {

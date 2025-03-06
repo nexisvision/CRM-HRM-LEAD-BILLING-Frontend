@@ -1,4 +1,5 @@
-import axios from "axios";
+    import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -11,7 +12,7 @@ const getotherpayment = async () => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.get(
-      "http://localhost:5353/api/v1/other-payments/",
+      `${env.API_ENDPOINT_URL}/other-payments/`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -30,7 +31,7 @@ const addotherpayment = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/other-payments/",
+      `${env.API_ENDPOINT_URL}/other-payments/`,
       payload,
       {
         headers: {
@@ -51,7 +52,7 @@ const delotherpayment = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/other-payments/${id}`,
+      `${env.API_ENDPOINT_URL}/other-payments/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -70,7 +71,7 @@ const editotherpayment = async (meetid, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/other-paymentsv/${meetid}`,
+      `${env.API_ENDPOINT_URL}/other-paymentsv/${meetid}`,
       values,
       {
         headers: {

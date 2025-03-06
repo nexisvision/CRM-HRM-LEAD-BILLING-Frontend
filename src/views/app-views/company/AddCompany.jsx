@@ -14,6 +14,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { ReloadOutlined } from "@ant-design/icons";
+import { env } from "configs/EnvironmentConfig";
 
 const AddCompany = ({ onClose }) => {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ const AddCompany = ({ onClose }) => {
   const otpapi = async (otp) => {
     try {
       const res = await axios.post(
-        "http://localhost:5353/api/v1/auth/verify-signup",
+        `${env.API_ENDPOINT_URL}/auth/verify-signup`,
         { otp },
         {
           headers: {

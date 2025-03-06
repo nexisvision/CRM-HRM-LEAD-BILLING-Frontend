@@ -27,6 +27,7 @@ import AddDepartment from '../Department/AddDepartment';
 import AddDesignation from '../Designation/AddDesignation';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { AddSalaryss } from "../PayRoll/Salary/SalaryReducers/SalarySlice";
+import { env } from "configs/EnvironmentConfig";
 
 const { Option } = Select;
 
@@ -59,6 +60,10 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
   const countries = useSelector((state) => state.countries.countries);
 
   const { currencies } = useSelector((state) => state.currencies);
+
+  useEffect(()=>{
+    dispatch(empdata());
+  },[dispatch])
 
   const generatePassword = () => {
     const length = 8;
@@ -94,7 +99,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
   const otpapi = async (otp) => {
     try {
       const res = await axios.post(
-        "http://localhost:5353/api/v1/auth/verify-signup",
+        ` ${env.API_ENDPOINT_URL}/auth/verify-signup`,
         { otp },
         {
           headers: {

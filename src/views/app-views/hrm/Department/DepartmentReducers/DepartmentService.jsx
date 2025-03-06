@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const GetDept = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/departments/", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/departments/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const AddDepartment = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/departments/",
+        `${env.API_ENDPOINT_URL}/departments/`,
       payload,
       {
         headers: {
@@ -48,7 +49,7 @@ const DeleteDept = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/departments/${id}`,
+      `${env.API_ENDPOINT_URL}/departments/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -68,7 +69,7 @@ const EditDept = async (comnyid, values) => {
   console.log("idinapi", comnyid);
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/departments/${comnyid}`,
+      `${env.API_ENDPOINT_URL}/departments/${comnyid}`,
       values,
       {
         headers: {

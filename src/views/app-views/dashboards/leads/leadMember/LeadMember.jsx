@@ -9,12 +9,13 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { GetLeads } from "../LeadReducers/LeadSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
+import { env } from "configs/EnvironmentConfig";
 
 const LeadMember = () => {
   const dispatch = useDispatch();
   const [isAddLeadMemberModalVisible, setIsAddLeadMemberModalVisible] =
     useState(false);
-
+  
   const AllLead = useSelector((state) => state.Lead);
   const AllEmployee = useSelector((state) => state.employee);
 
@@ -46,7 +47,7 @@ const LeadMember = () => {
 
   //   try {
   //     const res = await axios.delete(
-  //       `http://localhost:5353/api/v1/leads/membersdel/${id}`,
+  //       `${env.API_ENDPOINT_URL}/leads/membersdel/${id}`,
   //       { lead_members: payload2 },
   //       {
   //         headers: {
@@ -72,7 +73,7 @@ const LeadMember = () => {
 
     try {
       const res = await axios.post(
-        `http://localhost:5353/api/v1/leads/membersdel/${id}`,
+        `${env.API_ENDPOINT_URL}/leads/membersdel/${id}`,
         { lead_members: payload2 },
         {
           headers: {

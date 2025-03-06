@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const getbillsss = async (lid) => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(`http://localhost:5353/api/v1/bills/${lid}`, {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/bills/${lid}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const addbillsss = async (lid, invoiceData) => {
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/bills/${lid}`,
+      `${env.API_ENDPOINT_URL}/bills/${lid}`,
       invoiceData,
       {
         headers: {
@@ -47,7 +48,7 @@ const deltedbillsss = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
-    const res = await axios.delete(`http://localhost:5353/api/v1/bills/${id}`, {
+    const res = await axios.delete(`${env.API_ENDPOINT_URL}/bills/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -64,7 +65,7 @@ const editbillsss = async (idd, invoiceData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/bills/${idd}`,
+      `${env.API_ENDPOINT_URL}/bills/${idd}`,
       invoiceData,
       {
         headers: {

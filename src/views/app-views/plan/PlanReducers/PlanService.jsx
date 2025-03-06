@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const Getplan = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/subscriptions", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/subscriptions`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const AddPlan = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/subscriptions",
+      `${env.API_ENDPOINT_URL}/subscriptions`,
       JSON.stringify(payload), // Convert payload to JSON string
       {
         headers: {
@@ -49,7 +50,7 @@ const DeletePlan = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/subscriptions/${id}`,
+      `${env.API_ENDPOINT_URL}/subscriptions/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -69,7 +70,7 @@ const EditP = async (id, values) => {
   console.log("idinapi", id);
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/subscriptions/${id}`,
+      `${env.API_ENDPOINT_URL}/subscriptions/${id}`,
       values,
       {
         headers: {
@@ -89,7 +90,7 @@ const planbuy = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/subscriptions/request",
+      `${env.API_ENDPOINT_URL}/subscriptions/request`,
       JSON.stringify(payload), // Convert payload to JSON string
       {
         headers: {

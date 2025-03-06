@@ -1,4 +1,5 @@
-import axios from "axios";
+  import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const getsignature = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/esignatures/", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/esignatures/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -31,7 +32,7 @@ const addesignature = async (payload) => {
     
     const res = await axios({
       method: 'post',
-      url: "http://localhost:5353/api/v1/esignatures/",
+        url: `${env.API_ENDPOINT_URL}/esignatures/`,
       data: formData,
       headers: {
         Authorization: `Bearer ${token}`,
@@ -51,7 +52,7 @@ const deletesig = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/esignatures/${id}`,
+      `${env.API_ENDPOINT_URL}/esignatures/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -70,7 +71,7 @@ const editpolicy = async (idd, formData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/policies/${idd}`,
+      `${env.API_ENDPOINT_URL}/policies/${idd}`,
       formData,
       {
         headers: {

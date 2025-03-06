@@ -1,28 +1,27 @@
 const dev = {
-  API_ENDPOINT_URL: '/api'
-};
-
-const prod = {
-  API_ENDPOINT_URL: '/api'
-};
-
-const test = {
-  API_ENDPOINT_URL: '/api'
-};
-
-
-
-const getEnv = () => {
-	switch (process.env.NODE_ENV) {
-		case 'development':
-			return dev
-		case 'production':
-			return prod
-		case 'test':
-			return test
-		default:
-			break;
-	}
-}
-
-export const env = getEnv()
+	API_ENDPOINT_URL: 'http://localhost:5353/api/v1'
+  };
+  
+  const prod = {
+	API_ENDPOINT_URL: 'http://localhost:5353/api/v1' // You should change this to your production URL when deploying
+  };
+  
+  const test = {
+	API_ENDPOINT_URL: 'http://localhost:5353/api/v1'
+  };
+  
+  const getEnv = () => {
+	  switch (process.env.NODE_ENV) {
+		  case 'development':
+			  return dev
+		  case 'production':
+			  return prod
+		  case 'test':
+			  return test
+		  default:
+			  return dev;
+	  }
+  }
+  
+  export const env = getEnv()
+  

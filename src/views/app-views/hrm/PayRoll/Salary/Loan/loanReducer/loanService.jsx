@@ -1,4 +1,5 @@
-import axios from "axios";
+  import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const getloan = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/loan/", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/loan/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const addloan = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/loan/",
+      `${env.API_ENDPOINT_URL}/loan/`,
       payload,
       {
         headers: {
@@ -47,7 +48,7 @@ const deleteloan = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
-    const res = await axios.delete(`http://localhost:5353/api/v1/loan/${id}`, {
+    const res = await axios.delete(`${env.API_ENDPOINT_URL}/loan/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -64,7 +65,7 @@ const editloan = async (meetid, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/loan/${meetid}`,
+      `${env.API_ENDPOINT_URL}/loan/${meetid}`,
       values,
       {
         headers: {

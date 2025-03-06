@@ -1,10 +1,11 @@
 import { Response } from 'miragejs'
 import uniqueId from 'lodash/uniqueId'
 import isEmpty from 'lodash/isEmpty'
+import { env } from 'configs/EnvironmentConfig'
 
 export default function authFakeApi (server, apiPrefix) {
     
-    server.post(`${apiPrefix}/auth/login`, (schema, {requestBody}) => {
+    server.post(`${env.API_ENDPOINT_URL}/auth/login`, (schema, {requestBody}) => {
         const { email, password } = JSON.parse(requestBody)
         const user = schema.db.signInUserData.findBy({ email, password })
         if (user) {
@@ -17,7 +18,7 @@ export default function authFakeApi (server, apiPrefix) {
         return new Response(401, { some: 'header' }, { message: `email: user1@themenate.net | password: 2005ipo` })
     })
 
-    server.post(`${apiPrefix}/auth/loginInOAuth`, (schema) => {
+    server.post(`${env.API_ENDPOINT_URL}/auth/loginInOAuth`, (schema) => {
         return {
             data: {
                 token: 'wVYrxaeNa9OxdnULvde1Au5m5w63'
@@ -25,11 +26,11 @@ export default function authFakeApi (server, apiPrefix) {
         }
     })
 
-    server.post(`${apiPrefix}/logout`, () => {
+    server.post(`${env.API_ENDPOINT_URL}/logout`, () => {
         return true
     })
 
-    server.post(`${apiPrefix}/register`, (schema, {requestBody}) => {
+    server.post(`${env.API_ENDPOINT_URL}/register`, (schema, {requestBody}) => {
         const { userName, password, email } = JSON.parse(requestBody)
         const emailUsed = schema.db.signInUserData.findBy({ email })
         const newUser = {

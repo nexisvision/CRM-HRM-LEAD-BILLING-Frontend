@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const getpolicy = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/policies/", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/policies/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const addpolicy = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/policies/",
+      `${env.API_ENDPOINT_URL}/policies/`,
       payload,
       {
         headers: {
@@ -48,7 +49,7 @@ const deletepolicy = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/policies/${id}`,
+      `${env.API_ENDPOINT_URL}/policies/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +68,7 @@ const editpolicy = async (idd, formData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/policies/${idd}`,
+      `${env.API_ENDPOINT_URL}/policies/${idd}`,
       formData,
       {
         headers: {

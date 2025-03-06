@@ -1,10 +1,10 @@
 import axios from "axios";
-
+import { env } from "configs/EnvironmentConfig";    
 const GetAllPayment = async () => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.get(
-      "http://localhost:5353/api/v1/bill-payments/",
+      `${env.API_ENDPOINT_URL}/bill-payments/`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -22,7 +22,7 @@ const CreatePayment = async (payload) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/bill-payments/",
+      `${env.API_ENDPOINT_URL}/bill-payments/`,
       payload,
       {
         headers: {

@@ -13,6 +13,7 @@ import { message } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { getstages } from '../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice';
+import { env } from 'configs/EnvironmentConfig';
 
 
 
@@ -193,7 +194,7 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
                 try {
 
-                    const response = await axios.post('http://localhost:5353/api/v1/sub-clients', clientData, {
+                    const response = await axios.post(`${env.API_ENDPOINT_URL}/sub-clients`, clientData, {
 
                         headers: {
 
@@ -265,7 +266,7 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
 
 
-            const response = await axios.post('http://localhost:5353/api/v1/deals', dealData, {
+            const response = await axios.post(`${env.API_ENDPOINT_URL}/deals`, dealData, {
 
                 headers: {
 
@@ -307,7 +308,7 @@ const ConvertDeal = ({ onClose, leadData }) => {
 
                 const response = await axios.post(
 
-                    'http://localhost:5353/api/v1/auth/verify-signup',
+                    `${env.API_ENDPOINT_URL}/auth/verify-signup`,
 
                     { otp },
 

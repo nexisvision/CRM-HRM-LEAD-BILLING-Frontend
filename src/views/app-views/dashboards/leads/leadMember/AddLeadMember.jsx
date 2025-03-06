@@ -27,6 +27,7 @@ import {
 } from "../../project/project-list/projectReducer/ProjectSlice";
 import axios from "axios";
 import { GetLeads } from "../LeadReducers/LeadSlice";
+import { env } from "configs/EnvironmentConfig";
 const { Option } = Select;
 const AddLeadMember = ({ onClose }) => {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ const AddLeadMember = ({ onClose }) => {
 
     try {
       const res = await axios.post(
-        `http://localhost:5353/api/v1/leads/membersadd/${id}`,
+        `${env.API_ENDPOINT_URL}/leads/membersadd/${id}`,
         payload,
         {
           headers: {

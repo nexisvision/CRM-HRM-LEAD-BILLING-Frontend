@@ -1,10 +1,10 @@
 import axios from "axios";
-
+import { env } from "configs/EnvironmentConfig";
 const GetAllTax = async () => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.get(
-      "http://localhost:5353/api/v1/taxes/",
+      `${env.API_ENDPOINT_URL}/taxes/`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -22,7 +22,7 @@ const CreateTax = async (payload) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/taxes/",
+      `${env.API_ENDPOINT_URL}/taxes/`,
       payload,
       {
         headers: {
@@ -41,7 +41,7 @@ const UpdateTax = async (id, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/taxes/${id}`,
+      `${env.API_ENDPOINT_URL}/taxes/${id}`,
       values,
       {
         headers: {
@@ -60,7 +60,7 @@ const DeleteTax = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/taxes/${id}`,
+      `${env.API_ENDPOINT_URL}/taxes/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

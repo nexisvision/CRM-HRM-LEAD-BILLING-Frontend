@@ -1,10 +1,11 @@
 import axios from 'axios';
+import { env } from 'configs/EnvironmentConfig';
 
 const fetchEvents = async () => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.get(
-      "http://localhost:5353/api/v1/events/",
+      `${env.API_ENDPOINT_URL}/events/`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -31,7 +32,7 @@ const createEvent = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/events/",
+      `${env.API_ENDPOINT_URL}/events/`,
       payload,
       {
         headers: {
@@ -50,7 +51,7 @@ const updateEventsetUp = async (id, data) => {
 
   try {
       const token = JSON.parse(localStorage.getItem('auth_token'));
-      const res = await axios.put(`http://localhost:5353/api/v1/events/${id}`, data, {
+      const res = await axios.put(`${env.API_ENDPOINT_URL}/events/${id}`, data, {
           headers: {
               Authorization: `Bearer ${token}`,
           },
@@ -69,7 +70,7 @@ const getEventById =  async (id) => {
   try {
     const token = localStorage.getItem("auth_token");
     const response = await axios.get(
-      `http://localhost:5353/api/v1/events/${id}`,
+      `${env.API_ENDPOINT_URL}/events/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -88,7 +89,7 @@ const getEventById =  async (id) => {
 //     console.log(token);
 //     try {
 //       const res = await axios.put(
-//         `http://localhost:5353/api/v1/events/${id}`,
+//         `${env.API_ENDPOINT_URL}/events/${id}`,
 //         payload,
 //         {
 //           headers: {
@@ -107,7 +108,7 @@ const deleteEvent = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/events/${id}`,
+      `${env.API_ENDPOINT_URL}/events/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

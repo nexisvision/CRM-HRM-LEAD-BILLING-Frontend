@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const ClientData = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/clients/", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/clients/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const createClient = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/clients/",
+      `${env.API_ENDPOINT_URL}/clients/`,
       payload,
       {
         headers: {
@@ -48,7 +49,7 @@ const DeleteClient = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/clients/${id}`,
+      `${env.API_ENDPOINT_URL}/clients/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +68,7 @@ const EditClientss = async (comnyid, formData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/clients/${comnyid}`,
+      `${env.API_ENDPOINT_URL}/clients/${comnyid}`,
       formData,
       {
         headers: {
@@ -87,7 +88,7 @@ const assignplan = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/subscriptions/assign",
+      `${env.API_ENDPOINT_URL}/subscriptions/assign`,
       payload,
       {
         headers: {
@@ -107,7 +108,7 @@ const sendemailotp = async (idd,values) => {
 
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/clients/email/${idd}`,
+      `${env.API_ENDPOINT_URL}/clients/email/${idd}`,
       values,
       {
         headers: {
@@ -129,7 +130,7 @@ const otpverify = async (values) => {
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/auth/verify`,
+      `${env.API_ENDPOINT_URL}/auth/verify`,
       values,
       {
         headers: {

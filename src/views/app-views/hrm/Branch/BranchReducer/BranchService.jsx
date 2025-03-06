@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -11,7 +12,7 @@ const getbra = async () => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.get(
-      "http://localhost:5353/api/v1/branches/",
+      `${env.API_ENDPOINT_URL}/branches/`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -30,7 +31,7 @@ const addbra = async (values) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/branches/",
+      `${env.API_ENDPOINT_URL}/branches/`,
       values,
       {
         headers: {
@@ -51,7 +52,7 @@ const deletebra = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/branches/${id}`,
+      `${env.API_ENDPOINT_URL}/branches/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -70,7 +71,7 @@ const editbra = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/branches/${idd}`,
+      `${env.API_ENDPOINT_URL}/branches/${idd}`,
       values,
       {
         headers: {

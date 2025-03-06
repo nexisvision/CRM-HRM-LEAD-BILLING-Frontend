@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const getNotes = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(`http://localhost:5353/api/v1/notes/${id}`, {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/notes/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -29,7 +30,7 @@ const AddNotes = async (id, values) => {
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/notes/${id}`,
+      `${env.API_ENDPOINT_URL}/notes/${id}`,
       values,
       {
         headers: {
@@ -50,7 +51,7 @@ const DeleteNotes = async (userId) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/notes/${userId}`,
+      `${env.API_ENDPOINT_URL}/notes/${userId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -69,7 +70,7 @@ const Editnote = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/notes/${idd}`,
+      `${env.API_ENDPOINT_URL}/notes/${idd}`,
       values,
       {
         headers: {

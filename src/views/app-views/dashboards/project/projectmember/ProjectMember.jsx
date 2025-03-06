@@ -8,6 +8,7 @@ import Flex from "components/shared-components/Flex";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
+import { env } from "configs/EnvironmentConfig";
 
 const ProjectMember = () => {
   const dispatch = useDispatch();
@@ -38,7 +39,7 @@ const ProjectMember = () => {
 
     try {
       const res = await axios.post(
-        `http://localhost:5353/api/v1/projects/membersdelete/${id}`,
+        `${env.API_ENDPOINT_URL}/projects/membersdelete/${id}`,
         { project_members: payload2 },
         {
           headers: {

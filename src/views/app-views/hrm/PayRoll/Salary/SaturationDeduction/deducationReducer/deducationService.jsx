@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const gtededu = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/deduction/", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/deduction/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const adddedu = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/deduction/",
+      `${env.API_ENDPOINT_URL}/deduction/`,
       payload,
       {
         headers: {
@@ -48,7 +49,7 @@ const deldedu = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/deduction/${id}`,
+      `${env.API_ENDPOINT_URL}/deduction/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +68,7 @@ const editdedu = async (meetid, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/deductionv/${meetid}`,
+      `${env.API_ENDPOINT_URL}/deductionv/${meetid}`,
       values,
       {
         headers: {

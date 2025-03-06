@@ -1,4 +1,5 @@
-import axios from "axios";
+  import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const getgeneralsetting = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/settings/", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/settings/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const creategenaral = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/settings/",
+      `${env.API_ENDPOINT_URL}/settings/`,
       payload,
       // console.log("payload", payload),
       {
@@ -49,7 +50,7 @@ const deletesetting = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/settings/${id}`,
+      `${env.API_ENDPOINT_URL}/settings/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -68,7 +69,7 @@ const Editticket = async (idd, formData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/tickets/${idd}`,
+      `${env.API_ENDPOINT_URL}/tickets/${idd}`,
       formData,
       {
         headers: {

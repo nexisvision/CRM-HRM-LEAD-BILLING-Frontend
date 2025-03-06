@@ -28,6 +28,7 @@ import { useDispatch } from "react-redux";
 import { DeleteLea, GetLeave } from "./LeaveReducer/LeaveSlice";
 import { empdata } from "../Employee/EmployeeReducers/EmployeeSlice";
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 const { RangePicker } = DatePicker;
 
 const LeaveList = () => {
@@ -217,7 +218,7 @@ const LeaveList = () => {
     const token = localStorage.getItem("auth_token");
     try {
         const res = await axios.put(
-            `http://localhost:5353/api/v1/leaves/approve/${id}`,
+            `${env.API_ENDPOINT_URL}/leaves/approve/${id}`,
             {
                 status: status,
                 remarks: status === "approved" ? "Leave approved." : "Leave rejected."

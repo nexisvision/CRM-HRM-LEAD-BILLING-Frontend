@@ -48,6 +48,10 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
   const countries = useSelector((state) => state.countries.countries);
   const { currencies } = useSelector((state) => state.currencies);
 
+  useEffect(()=>{
+    dispatch(empdata());
+  },[dispatch])
+
   // Load initial data
   useEffect(() => {
     const loadData = async () => {
@@ -177,7 +181,7 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
 
       <Formik
         initialValues={initialValues}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={onSubmit}
         enableReinitialize={false}
       >

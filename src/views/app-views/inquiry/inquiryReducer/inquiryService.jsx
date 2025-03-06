@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const getinq = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/inquiry/", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/inquiry/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const addinq = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/inquiry/",
+      `${env.API_ENDPOINT_URL}/inquiry/`,
       payload,
       {
         headers: {
@@ -48,7 +49,7 @@ const delinq = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/inquiry/${id}`,
+      `${env.API_ENDPOINT_URL}/inquiry/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +68,7 @@ const editinq = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/inquiry/${idd}`,
+      `${env.API_ENDPOINT_URL}/inquiry/${idd}`,
       values,
       {
         headers: {

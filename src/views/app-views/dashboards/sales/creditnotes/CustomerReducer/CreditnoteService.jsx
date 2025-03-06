@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -11,7 +12,7 @@ const getcreditn = async () => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.get(
-      "http://localhost:5353/api/v1/sales-creditnote/",
+      `${env.API_ENDPOINT_URL}/sales-creditnote/`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -30,7 +31,7 @@ const createcredit = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/sales-creditnote/",
+      `${env.API_ENDPOINT_URL}/sales-creditnote/`,
       payload,
       {
         headers: {
@@ -51,7 +52,7 @@ const deletecredit = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/sales-creditnote/${id}`,
+      `${env.API_ENDPOINT_URL}/sales-creditnote/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -70,7 +71,7 @@ const editcredit = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/sales-creditnote/${idd}`,
+      `${env.API_ENDPOINT_URL}/sales-creditnote/${idd}`,
       values,
       {
         headers: {

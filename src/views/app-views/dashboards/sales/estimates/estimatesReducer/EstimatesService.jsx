@@ -1,8 +1,9 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 const getAllQuotations = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(`http://localhost:5353/api/v1/sales-quotations/`, {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/sales-quotations/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -17,7 +18,7 @@ const createQuotations = async (values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/sales-quotations/",
+      ` ${env.API_ENDPOINT_URL}/sales-quotations/`,
       values,
       {
         headers: {
@@ -35,7 +36,7 @@ const deleteQuotations = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/sales-quotations/${id}`,
+      `${env.API_ENDPOINT_URL}/sales-quotations/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -53,7 +54,7 @@ const getQuotationsById = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
     const response = await axios.get(
-      `http://localhost:5353/api/v1/sales-quotations/${id}`,
+      `${env.API_ENDPOINT_URL}/sales-quotations/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -71,7 +72,7 @@ const updateQuotations = async (id, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/sales-quotations/${id}`,values,
+      `${env.API_ENDPOINT_URL}/sales-quotations/${id}`,values,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -109,7 +110,7 @@ export default QuotationsService;
 //     const token = localStorage.getItem('auth_token');
 //     try {
 //         console.log('Fetching Estimate for ID:', id);
-//         const response = await axios.get(`http://localhost:5353/api/v1/estimates/${id}`, {
+//         const response = await axios.get(`${env.API_ENDPOINT_URL}/estimates/${id}`, {
 //             headers: {
 //                 Authorization: `Bearer ${token}`,
 //                 'Content-Type': 'application/json'
@@ -126,7 +127,7 @@ export default QuotationsService;
 // //     const token = localStorage.getItem('auth_token');
 // //     try {
 // //         console.log('Fetching Estimate for ID:', id);
-// //         const response = await axios.get(`http://localhost:5353/api/v1/estimates/${id}`, {
+// //         const response = await axios.get(`${env.API_ENDPOINT_URL}/estimates/${id}`, {
 // //             headers: {
 // //                 Authorization: `Bearer ${token}`,
 // //                 'Content-Type': 'application/json',
@@ -145,7 +146,7 @@ export default QuotationsService;
 //   getEstimateById: async (id) => {
 //     const token = localStorage.getItem('auth_token');
 //     try {
-//       const response = await axios.get(`http://localhost:5353/api/v1/estimates/${id}`, {
+//       const response = await axios.get(`${env.API_ENDPOINT_URL}/estimates/${id}`, {
 //         headers: {
 //           Authorization: `Bearer ${token}`,
 //         },
@@ -162,7 +163,7 @@ export default QuotationsService;
 //   try {
 //     console.log('Creating estimates for Project:', id);
 //     const response = await axios.post(
-//       `http://localhost:5353/api/v1/estimates/${id}`, 
+//       `${env.API_ENDPOINT_URL}/estimates/${id}`, 
 //       estimateData,
 //       {
 //         headers: {
@@ -189,7 +190,7 @@ export default QuotationsService;
 //   updateEstimate: async (id,data) => {
 //     const token = localStorage.getItem('auth_token');
 //     try {
-//       const response = await axios.put(`http://localhost:5353/api/v1/estimates/${id}`, data, {
+//       const response = await axios.put(`${env.API_ENDPOINT_URL}/estimates/${id}`, data, {
 //         headers: {
 //           Authorization: `Bearer ${token}`,
 //           'Content-Type': 'application/json',
@@ -205,7 +206,7 @@ export default QuotationsService;
 // deleteEstimate: async (id) => {
 //   const token = localStorage.getItem('auth_token');
 //   try {
-//       const response = await axios.delete(`http://localhost:5353/api/v1/estimates/${id}`, {
+//       const response = await axios.delete(`${env.API_ENDPOINT_URL}/estimates/${id}`, {
 //           headers: {
 //               Authorization: `Bearer ${token}`,
 //               'Content-Type': 'application/json'
@@ -238,7 +239,7 @@ export default QuotationsService;
 // const getAllEstimate = async (id) => {
 //   const token = localStorage.getItem("auth_token");
 //   try {
-//     const res = await axios.get(`http://localhost:5353/api/v1/estimates/${id}`, {
+//     const res = await axios.get(`${env.API_ENDPOINT_URL}/estimates/${id}`, {
 //       headers: {
 //         Authorization: `Bearer ${token}`,
 //       },
@@ -257,7 +258,7 @@ export default QuotationsService;
 
 //   try {
 //     const res = await axios.post(
-//       `http://localhost:5353/api/v1/estimates/${id}`,
+//       `${env.API_ENDPOINT_URL}/estimates/${id}`,
 //       values,
 //       {
 //         headers: {
@@ -278,7 +279,7 @@ export default QuotationsService;
 
 //   try {
 //     const res = await axios.delete(
-//       `http://localhost:5353/api/v1/estimates/${exid}`,
+//       `${env.API_ENDPOINT_URL}/estimates/${exid}`,
 //       {
 //         headers: {
 //           Authorization: `Bearer ${token}`,
@@ -297,7 +298,7 @@ export default QuotationsService;
 //   const token = localStorage.getItem("auth_token");
 //   try {
 //     const res = await axios.put(
-//       `http://localhost:5353/api/v1/estimates/${id}`,
+//       `${env.API_ENDPOINT_URL}/estimates/${id}`,
 //       values,
 //       {
 //         headers: {

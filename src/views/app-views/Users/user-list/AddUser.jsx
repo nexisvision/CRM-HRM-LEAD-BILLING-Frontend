@@ -8,7 +8,7 @@ import { roledata } from "views/app-views/hrm/RoleAndPermission/RoleAndPermissio
 import axios from "axios";
 import { KeyOutlined, ReloadOutlined, SyncOutlined, ToTopOutlined, PlusOutlined } from "@ant-design/icons";
 import AddRole from "views/app-views/hrm/RoleAndPermission/Role/AddRole";
-
+import { env } from "configs/EnvironmentConfig";
 const { Option } = Select;
 
 const validationSchema = Yup.object().shape({
@@ -104,7 +104,7 @@ const AddUser = ({ visible, onClose }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5353/api/v1/auth/verify-signup",
+        `${env.API_ENDPOINT_URL}/auth/verify-signup`,
         { otp },
         {
           headers: {

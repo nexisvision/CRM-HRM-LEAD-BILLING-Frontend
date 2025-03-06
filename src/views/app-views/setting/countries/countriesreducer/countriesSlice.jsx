@@ -3,6 +3,7 @@ import UserAddCountries from "./countriesService";
 import { toast } from "react-toastify";
 import axios from 'axios';
 import { message } from "antd";
+import { env } from "configs/EnvironmentConfig";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
@@ -10,7 +11,7 @@ export const addCountry = createAsyncThunk(
     "countries/AddCountry",
     async (data, { rejectWithValue }) => {
         try {
-            const response = await axios.post(`http://localhost:5353/api/v1/countries/`, data, {
+            const response = await axios.post(`${env.API_ENDPOINT_URL}/countries/`, data, {
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem('auth_token')}`,

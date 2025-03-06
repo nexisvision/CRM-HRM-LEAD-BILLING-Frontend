@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -11,7 +12,7 @@ const getjobapp = async () => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.get(
-      "http://localhost:5353/api/v1/job-applications/",
+      `${env.API_ENDPOINT_URL}/job-applications/`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -30,7 +31,7 @@ const addjobapp = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/job-applications/",
+      `${env.API_ENDPOINT_URL}/job-applications/`,
       payload,
       {
         headers: {
@@ -51,7 +52,7 @@ const deletejobapp = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/job-applications/${id}`,
+      `${env.API_ENDPOINT_URL}/job-applications/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -70,7 +71,7 @@ const editjobapp = async (idd, formData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/job-applications/${idd}`,
+      `${env.API_ENDPOINT_URL}/job-applications/${idd}`,
       formData,
       {
         headers: {

@@ -1,6 +1,5 @@
 import axios from "axios";
-import { EditTasks } from "./TaskSlice";
-import { env } from "configs/EnvironmentConfig";
+  import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -9,10 +8,10 @@ import { env } from "configs/EnvironmentConfig";
 //     return res
 // };
 
-const GetTask = async (id) => {
+const getreinderss = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(`${env.API_ENDPOINT_URL}/tasks/${id}`, {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/reminders/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -24,13 +23,13 @@ const GetTask = async (id) => {
   }
 };
 
-const Addtask = async (id, values) => {
+const addreinderss = async (payload) => {
   const token = localStorage.getItem("auth_token");
 
   try {
     const res = await axios.post(
-      `${env.API_ENDPOINT_URL}/tasks/${id}`,
-      values,
+        `${env.API_ENDPOINT_URL}/reminders/`,
+      payload,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -45,18 +44,15 @@ const Addtask = async (id, values) => {
   }
 };
 
-const Deletetask = async (idd) => {
+const deletereinderss = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
-    const res = await axios.delete(
-      `${env.API_ENDPOINT_URL}/tasks/${idd}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const res = await axios.delete(`${env.API_ENDPOINT_URL}/reminders/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     //   dispatch(empdata());
     return res.data;
   } catch (error) {
@@ -65,34 +61,12 @@ const Deletetask = async (idd) => {
   }
 };
 
-const EditTask = async (idd, values) => {
+const EditLeads = async (id, formData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `${env.API_ENDPOINT_URL}/tasks/${idd}`,
-      values,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return res.data;
-  } catch (error) {
-    console.error("Error updating employee data:", error);
-    throw error;
-  }
-};
-
-
-
-const EditTaskss = async (idd, values) => {
-  console.log(idd, values);
-  const token = localStorage.getItem("auth_token");
-  try {
-    const res = await axios.put(
-      `${env.API_ENDPOINT_URL}/tasks/${idd}`,
-      values,
+      `${env.API_ENDPOINT_URL}/reminders/${id}`,
+      formData,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -128,11 +102,10 @@ const EditTaskss = async (idd, values) => {
 
 const UserService = {
   // addUser,
-  GetTask,
-  Addtask,
-  Deletetask,
-  EditTask,
-  EditTaskss,
+  getreinderss,
+  addreinderss,
+  deletereinderss,
+  EditLeads,
   // getAllUsers,
   // getUserById,
   // deleteUser,

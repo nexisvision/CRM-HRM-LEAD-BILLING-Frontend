@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -9,14 +10,14 @@ import axios from "axios";
 // };
 
 const userLoginapi = async (data) => {
-    const res = await axios.post(`http://localhost:5353/api/v1/auth/login`, data);
+    const res = await axios.post(`${env.API_ENDPOINT_URL}/auth/login`, data);
     return res.data
 }
 
 const autologin = async (localemail, localtoken) => {
     try {
       const res = await axios.post(
-        "http://localhost:5353/api/v1/super-admin/alllogin",
+        `${env.API_ENDPOINT_URL}/super-admin/alllogin`,
         { login: localemail },
         {
           headers: {
@@ -34,7 +35,7 @@ const autologin = async (localemail, localtoken) => {
 
 
 const forgotpass = async (data) => {
-  const res = await axios.post(`http://localhost:5353/api/v1/auth/forgot-password`, data);
+  const res = await axios.post(`${env.API_ENDPOINT_URL}/auth/forgot-password`, data);
   localStorage.setItem('sessionToken',res.data.data.sessionToken)
   return res.data
 }
@@ -44,7 +45,7 @@ const forgototps = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/auth/verify-otp",
+      `${env.API_ENDPOINT_URL}/auth/verify-otp`,
       payload,
       {
         headers: {
@@ -66,7 +67,7 @@ const resetpass = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/auth/reset-password",
+      `${env.API_ENDPOINT_URL}/auth/reset-password`,
       payload,
       {
         headers: {

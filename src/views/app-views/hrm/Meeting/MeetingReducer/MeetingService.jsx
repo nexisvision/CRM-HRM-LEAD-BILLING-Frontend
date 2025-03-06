@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -12,7 +13,7 @@ import axios from "axios";
         const token = localStorage.getItem("auth_token");
         try {
           const res = await axios.get(
-            "http://localhost:5353/api/v1/meetings/",
+            `${env.API_ENDPOINT_URL}/meetings/`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -32,7 +33,7 @@ import axios from "axios";
       
         try {
           const res = await axios.post(
-            "http://localhost:5353/api/v1/meetings/",
+            `${env.API_ENDPOINT_URL}/meetings/`,
             payload, 
             {
               headers: {
@@ -53,7 +54,7 @@ import axios from "axios";
       
         try {
           const res = await axios.delete(
-            `http://localhost:5353/api/v1/meetings/${id}`, 
+            `${env.API_ENDPOINT_URL}/meetings/${id}`, 
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -73,7 +74,7 @@ import axios from "axios";
         const token = localStorage.getItem("auth_token");
         try {
           const res = await axios.put(
-            `http://localhost:5353/api/v1/meetings/${meetid}`,
+            `${env.API_ENDPOINT_URL}/meetings/${meetid}`,
             values,
             {
               headers: {

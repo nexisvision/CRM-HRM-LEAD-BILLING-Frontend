@@ -1,18 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import UserService from "./UserService";
+import UserService from "./reminderService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
-import axios from "axios";
 import { message } from "antd";
-import { env } from "configs/EnvironmentConfig";
 
 // Async thunk for adding user
 
-export const AddUserss = createAsyncThunk(
-  "users/addtu",
+
+export const adddreinderss = createAsyncThunk(
+  "users/adddreinderss",
   async (userData, thunkAPI) => {
     try {
-      const response = await UserService.Createuser(userData);
+      const response = await UserService.addreinderss(userData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -22,22 +21,14 @@ export const AddUserss = createAsyncThunk(
 
 // Async thunk for user login
 
-export const GetUsers = createAsyncThunk(
-  "emp/getUsers", // action type
-  async (loginData, thunkAPI) => {
-    const token = localStorage.getItem("auth_token");
-    try {
-      const response = await axios.get(`${env.API_ENDPOINT_URL}/userss/`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data; // This will be available in the reducer as `action.payload`
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response ? error.response.data : error.message);
-    }
+export const getssreinderss = createAsyncThunk("emp/getssreinderss", async (thunkAPI) => {
+  try {
+    const response = await UserService.getreinderss();
+    return response;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response.data);
   }
-);
+});
 
 // Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
@@ -66,22 +57,23 @@ export const getUserById = createAsyncThunk(
 );
 
 // Async thunk for deleting a user
-export const Dleteusetr = createAsyncThunk(
-  "users/Dleteusetreet",
+export const deletessreinderss = createAsyncThunk(
+  "users/deletessreinderss",
   async (userId, thunkAPI) => {
     try {
-      const response = await UserService.DeleteUser(userId);
+      const response = await UserService.deletereinderss(userId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
 );
-export const Edituser = createAsyncThunk(
-  "users/Edituser",
-  async ({ idd, values }, thunkAPI) => {
+export const LeadsEdit = createAsyncThunk(
+  "users/LeadsEdit",
+  async ({ id, formData }, thunkAPI) => {
     try {
-      const response = await UserService.Editusers(idd, values);
+      console.log("idinslice", id);
+      const response = await UserService.EditLeads(id, formData);
       return response; // Return the updated data
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -90,6 +82,8 @@ export const Edituser = createAsyncThunk(
     }
   }
 );
+
+// Async thunk for updating a user
 
 const initialUser = () => {
   const item = window.localStorage.getItem("USER");
@@ -101,10 +95,10 @@ const initialIsAuth = () => {
   return item ? JSON.parse(item) : false;
 };
 
-const UserSlice = createSlice({
-  name: "Users",
+const LeadSlice = createSlice({
+  name: "Reminder",
   initialState: {
-    Users: [],
+    Reminder: [],
     editItem: {},
     isLoading: false,
     addModel: false,
@@ -141,83 +135,56 @@ const UserSlice = createSlice({
   extraReducers: (builder) => {
     builder
       //add
-      .addCase(AddUserss.pending, (state) => {
+      .addCase(adddreinderss.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(AddUserss.fulfilled, (state, action) => {
+      .addCase(adddreinderss.fulfilled, (state, action) => {
         state.isLoading = false;
-        message.success(action.payload?.message);
       })
-      .addCase(AddUserss.rejected, (state, action) => {
+      .addCase(adddreinderss.rejected, (state, action) => {
         state.isLoading = false;
         message.error(action.payload?.message);
       })
 
-      .addCase(GetUsers.pending, (state) => {
+      .addCase(getssreinderss.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(GetUsers.fulfilled, (state, action) => {
+      .addCase(getssreinderss.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.Users = action?.payload;
+        state.Reminder = action?.payload;
         toast.success(action.payload?.data?.message);
       })
-      .addCase(GetUsers.rejected, (state, action) => {
+      .addCase(getssreinderss.rejected, (state, action) => {
         state.isLoading = false;
         toast.error(action.payload?.message);
       })
 
       //getall
-      .addCase(getAllUsers.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getAllUsers.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.users = action.payload;
-        toast.success(`Users fetched successfully`);
-      })
-      .addCase(getAllUsers.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
-      })
-
-      //getuserbyid
-      .addCase(getUserById.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getUserById.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.detailItem = action.payload?.user;
-        toast.success(action.payload.message);
-      })
-      .addCase(getUserById.rejected, (state, action) => {
-        state.isLoading = false;
-        toast.error(action.payload?.response?.data?.message);
-      })
+      
       //delete
-      .addCase(Dleteusetr.pending, (state) => {
+      .addCase(deletessreinderss.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(Dleteusetr.fulfilled, (state, action) => {
+      .addCase(deletessreinderss.fulfilled, (state, action) => {
         state.isLoading = false;
         message.success(action.payload?.message);
       })
-      .addCase(Dleteusetr.rejected, (state, action) => {
+      .addCase(deletessreinderss.rejected, (state, action) => {
         state.isLoading = false;
-        message.error(action.payload?.message);
+        message.error(action.payload?.response?.data?.message);
       })
 
       //update
-      .addCase(Edituser.pending, (state) => {
+      .addCase(LeadsEdit.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
-      .addCase(Edituser.fulfilled, (state, action) => {
+      .addCase(LeadsEdit.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; // Update the state with the updated employee data
+        state.editItem = action.payload;
         message.success(action.payload?.message);
       })
-
-      .addCase(Edituser.rejected, (state, action) => {
+      .addCase(LeadsEdit.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
         message.error(action.payload?.message);
@@ -226,5 +193,5 @@ const UserSlice = createSlice({
 });
 
 export const { toggleAddModal, toggleEditModal, handleLogout, editUserData } =
-  UserSlice.actions;
-export default UserSlice.reducer;
+  LeadSlice.actions;
+export default LeadSlice.reducer;

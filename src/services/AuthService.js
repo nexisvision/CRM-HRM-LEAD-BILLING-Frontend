@@ -1,10 +1,11 @@
 import fetch from 'auth/FetchInterceptor'
+import { env } from '../configs/EnvironmentConfig'
 
 const AuthService = {}
 
 AuthService.login = function (data) {
 	return fetch({
-		url: '/auth/login',
+		url: `${env.API_ENDPOINT_URL}/auth/login`,
 		method: 'post',
 		data: data
 	})
@@ -12,7 +13,7 @@ AuthService.login = function (data) {
 
 AuthService.register = function (data) {
 	return fetch({
-		url: '/auth/register',
+		url: `${env.API_ENDPOINT_URL}/auth/register`,
 		method: 'post',
 		data: data
 	})

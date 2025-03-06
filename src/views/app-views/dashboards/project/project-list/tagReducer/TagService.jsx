@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const GetTags = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/tags/", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/tags/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const AddTagP = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/tags/",
+      `${env.API_ENDPOINT_URL}/tags/`,
       payload,
       {
         headers: {
@@ -48,7 +49,7 @@ const DeletePro = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/projects/${id}`,
+      `${env.API_ENDPOINT_URL}/projects/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +68,7 @@ const EditPro = async (id, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/projects/${id}`,
+      `${env.API_ENDPOINT_URL}/projects/${id}`,
       values,
       {
         headers: {

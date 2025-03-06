@@ -1,8 +1,9 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 const AddCountries = async (payload) => {
     const token = localStorage.getItem("auth_token");
     try {
-        const res = await axios.post("http://localhost:5353/api/v1/countries/", payload, {
+        const res = await axios.post(`${env.API_ENDPOINT_URL}/countries/`, payload, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -16,7 +17,7 @@ const AddCountries = async (payload) => {
 const GetAllCountries = async () => {
     const token = localStorage.getItem("auth_token");
     try {
-        const res = await axios.get("http://localhost:5353/api/v1/countries/", {
+        const res = await axios.get(`${env.API_ENDPOINT_URL}/countries/`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -31,7 +32,7 @@ const GetAllCountries = async () => {
 const updateCountries = async (id,values) => {
     const token = localStorage.getItem("auth_token");
     try {
-        const res = await axios.put(`http://localhost:5353/api/v1/countries/${id}`,
+        const res = await axios.put(`${env.API_ENDPOINT_URL}/countries/${id}`,
          values,{
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -50,7 +51,7 @@ const deleteCountries = async (id) => {
   
     try {
       const res = await axios.delete(
-        `http://localhost:5353/api/v1/countries/${id}`,
+        `${env.API_ENDPOINT_URL}/countries/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

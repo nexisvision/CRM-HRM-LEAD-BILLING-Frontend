@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -11,7 +12,7 @@ const GetMin = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.get(
-      `http://localhost:5353/api/v1/milestones/${id}`,
+      `${env.API_ENDPOINT_URL}/milestones/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -32,7 +33,7 @@ const AddMin = async (id, values) => {
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/milestones/${id}`,
+      `${env.API_ENDPOINT_URL}/milestones/${id}`,
       values,
       {
         headers: {
@@ -53,7 +54,7 @@ const Deletemin = async (userId) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/milestones/${userId}`,
+      `${env.API_ENDPOINT_URL}/milestones/${userId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -72,7 +73,7 @@ const EditMin = async (idd, data) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/milestones/${idd}`,
+      `${env.API_ENDPOINT_URL}/milestones/${idd}`,
       data,
       {
         headers: {

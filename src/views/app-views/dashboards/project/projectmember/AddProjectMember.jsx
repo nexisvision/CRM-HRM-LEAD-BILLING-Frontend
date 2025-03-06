@@ -27,6 +27,7 @@ import {
   GetProject,
 } from "../project-list/projectReducer/ProjectSlice";
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 const { Option } = Select;
 const AddProjectMember = ({ onClose }) => {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ const AddProjectMember = ({ onClose }) => {
 
     try {
       const res = await axios.post(
-        `http://localhost:5353/api/v1/projects/membersadd/${id}`,
+        `${env.API_ENDPOINT_URL}/projects/membersadd/${id}`,
         payload,
         {
           headers: {

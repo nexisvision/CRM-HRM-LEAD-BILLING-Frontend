@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const ContaractData = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/contracts/", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/contracts/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const CreateCon = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/contracts/",
+        `${env.API_ENDPOINT_URL}/contracts/`,
       payload,
       {
         headers: {
@@ -48,7 +49,7 @@ const DeleteCon = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/contracts/${id}`,
+      `${env.API_ENDPOINT_URL}/contracts/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +68,7 @@ const Editcon = async (id, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/contracts/${id}`,
+      `${env.API_ENDPOINT_URL}/contracts/${id}`,
       values,
       {
         headers: {

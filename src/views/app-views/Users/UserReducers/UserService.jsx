@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 import { useDispatch, useSelector } from "react-redux";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
@@ -12,7 +13,7 @@ const GetUsers = async () => {
   const token = localStorage.getItem("auth_token");
   const id = useSelector((state)=>state.user.loggedInUser.id)
   try {
-    const res = await axios.get(`http://localhost:5353/api/v1/userss/`, {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/userss/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -29,7 +30,7 @@ const Createuser = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/auth/signup/",
+      `${env.API_ENDPOINT_URL}/auth/signup/`,
       payload,
       {
         headers: {
@@ -49,7 +50,7 @@ const DeleteUser = async (id) => {
   const token = localStorage.getItem("auth_token");
 
   try {
-    const res = await axios.delete(`http://localhost:5353/api/v1/auth/${id}`, {
+    const res = await axios.delete(`${env.API_ENDPOINT_URL}/auth/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -66,7 +67,7 @@ const Editusers = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/auth/${idd}`,
+      `${env.API_ENDPOINT_URL}/auth/${idd}`,
       values,
       {
         headers: {

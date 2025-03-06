@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const GetLable = async (lid) => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(`http://localhost:5353/api/v1/labels/${lid}`, {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/labels/${lid}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const AddLable = async (lid, payload) => {
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/labels/${lid}`,
+      `${env.API_ENDPOINT_URL}/labels/${lid}`,
       payload,
       {
         headers: {
@@ -48,7 +49,7 @@ const Deletemin = async (userId) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/labels/${userId}`,
+      `${env.API_ENDPOINT_URL}/labels/${userId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +68,7 @@ const EditMin = async (idd, data) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/labels/${idd}`,
+      `${env.API_ENDPOINT_URL}/labels/${idd}`,
       data,
       {
         headers: {

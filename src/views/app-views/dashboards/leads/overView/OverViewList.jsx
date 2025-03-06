@@ -39,9 +39,9 @@ const OverViewList = () => {
   },[dispatch])
 
   const alldeaddata = useSelector((state)=>state.Leads.Leads.data)
-  const fnddead = alldeaddata.find((item)=>item.id === id)
+  const fnddead = alldeaddata?.find((item)=>item?.id === id)
 
-  console.log("fnddead",fnddead)
+  console.log("fnddead",fnddead)  
 
 
 

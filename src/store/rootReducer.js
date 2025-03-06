@@ -77,7 +77,7 @@ import debitNotes from "../views/app-views/dashboards/Purchase/debitnotes/debitR
 import payment from "../views/app-views/dashboards/sales/billing/paymentReducer/PaymentSlice"
 import mail from "../views/app-views/dashboards/mail/mailReducer/mailSlice"
 import holidays from "../views/app-views/hrm/holiday/AttendanceReducer/holidaySlice"
-
+import Reminder from "../views/app-views/dashboards/leads/Reminder/reminderReducers/reminderSlice"
 const rootReducer = (asyncReducers) => (state, action) => {
     const combinedReducer = combineReducers({
         theme,
@@ -158,6 +158,7 @@ const rootReducer = (asyncReducers) => (state, action) => {
         payment,
         mail,
         holidays,
+        Reminder,
         // employee,
         // department,
         ...asyncReducers,

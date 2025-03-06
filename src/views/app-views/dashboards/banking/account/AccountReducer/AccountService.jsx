@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const getAccounts = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/accounts/", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/accounts/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const createAccount = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/accounts/",
+      `${env.API_ENDPOINT_URL}/accounts/`,
       payload,
       {
         headers: {
@@ -48,7 +49,7 @@ const deleteAccount = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/accounts/${id}`,
+      `${env.API_ENDPOINT_URL}/accounts/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +68,7 @@ const updateAccount = async (id, payload) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/accounts/${id}`,
+      `${env.API_ENDPOINT_URL}/accounts/${id}`,
       payload,
       {
         headers: {

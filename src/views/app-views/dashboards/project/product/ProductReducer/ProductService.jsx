@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const GetPro = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(`http://localhost:5353/api/v1/products/${id}`, {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/products/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -29,7 +30,7 @@ const AddPro = async (id, formData) => {
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/products/${id}`,
+      `${env.API_ENDPOINT_URL}/products/${id}`,
       formData,
       {
         headers: {
@@ -50,7 +51,7 @@ const DeletePro = async (userId) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/products/${userId}`,
+      `${env.API_ENDPOINT_URL}/products/${userId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -69,7 +70,7 @@ const EditPro = async (idd, formData) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/products/${idd}`,
+      `${env.API_ENDPOINT_URL}/products/${idd}`,
       formData,
       {
         headers: {
@@ -87,7 +88,7 @@ const EditPro = async (idd, formData) => {
 const GetAllPro = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(`http://localhost:5353/api/v1/products`, {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/products`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

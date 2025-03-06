@@ -46,6 +46,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { GetPlan } from "../plan/PlanReducers/PlanSlice";
 import { ClientData } from "../company/CompanyReducers/CompanySlice";
 import axios from 'axios';
+import { env } from "configs/EnvironmentConfig";
 
 // import userData from '../../../../../assets/data/user-list.data.json';
 
@@ -147,7 +148,7 @@ export const SubscribedUserPlansList = () => {
     try {
       if (!checked) {
         const token = localStorage.getItem('auth_token');
-        const response = await axios.delete(`http://localhost:5353/api/v1/subscriptions/remove/${id}`, {
+        const response = await axios.delete(`${env.API_ENDPOINT_URL}/subscriptions/remove/${id}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }

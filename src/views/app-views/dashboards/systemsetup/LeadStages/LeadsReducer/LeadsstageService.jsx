@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const GetAllLeadedelsa = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/stages/", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/stages/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const createAllLeadedelsa = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/stages/",
+      `${env.API_ENDPOINT_URL}/stages/`,
       payload,
       {
         headers: {
@@ -48,7 +49,7 @@ const deleteAllLeadedelsa = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/stages/${id}`,
+      `${env.API_ENDPOINT_URL}/stages/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +68,7 @@ const editAllLeadedelsa = async (idd, payload) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/stages/${idd}`,
+      `${env.API_ENDPOINT_URL}/stages/${idd}`,
       payload,
       {
         headers: {

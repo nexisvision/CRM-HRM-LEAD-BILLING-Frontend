@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
-import { Modal, Button, Form, DatePicker, Select, Input, Checkbox, Row, Col } from 'antd';
-import { Formik, Field } from 'formik';
+import React, { useEffect, useState } from 'react';
+import { Modal, Button, Form, DatePicker, Select, Input, Checkbox, Row, Col, message } from 'antd';
+import { Formik, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import moment from 'moment';
+import { adddreinderss, getssreinderss } from './reminderReducers/reminderSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { GetUsers } from 'views/app-views/Users/UserReducers/UserSlice';
+import { Option } from 'antd/es/mentions';
 
 const { TextArea } = Input;
 
@@ -14,14 +18,33 @@ const reminderOptions = [
 ];
 
 const validationSchema = Yup.object().shape({
-  notificationDate: Yup.date().required('Date is required'),
-  reminderType: Yup.string().required('Reminder type is required'),
+  start_date: Yup.date().required('Date is required'),
+  users: Yup.object().shape({
+    users: Yup.array().min(1, 'Please select at least one user').required('Users are required')
+  }),
   description: Yup.string().required('Description is required'),
   sendEmail: Yup.boolean()
 });
 
 const ReminderList = () => {
+  const dispatch = useDispatch();
   const [isModalVisible, setIsModalVisible] = useState(false);
+
+  useEffect(()=>{
+    dispatch(GetUsers())
+  },[dispatch])
+
+  const alluserdata = useSelector((state)=>state.Users.Users.data);
+  console.log(alluserdata,"alluserdata")
+
+  const allloggedinuser = useSelector((state)=>state.user.loggedInUser);
+  
+  console.log(allloggedinuser,"allloggedinuser")
+
+  const filterdatas = alluserdata?.filter((item)=>item?.created_by == allloggedinuser?.id)
+  console.log(filterdatas,"filterdatas")
+
+
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -32,17 +55,24 @@ const ReminderList = () => {
   };
 
   const initialValues = {
-    notificationDate: null,
-    reminderType: undefined,
+    start_date: null,
+    users: {
+      users: []
+    },
     description: '',
     sendEmail: false
   };
 
   const onSubmit = (values, { setSubmitting, resetForm }) => {
-    console.log('Form values:', values);
-    setSubmitting(false);
-    setIsModalVisible(false);
-    resetForm();
+    dispatch(adddreinderss(values))
+      .then(()=>{
+        dispatch(getssreinderss())
+        message.success("Reminder added successfully")
+        setSubmitting(false);
+        setIsModalVisible(false);
+        resetForm();
+      })
+   
   };
 
   return (
@@ -87,39 +117,48 @@ const ReminderList = () => {
                   <Form.Item
                     label="Date to be notified"
                     required
-                    validateStatus={errors.notificationDate && touched.notificationDate ? 'error' : ''}
-                    help={touched.notificationDate && errors.notificationDate}
+                    validateStatus={errors.start_date && touched.start_date ? 'error' : ''}
+                    help={touched.start_date && errors.start_date}
                     className="mb-4"
                   >
                     <DatePicker
                       className="w-full"
-                      onChange={(date) => setFieldValue('notificationDate', date)}
+                      onChange={(date) => setFieldValue('start_date', date)}
                       onBlur={handleBlur}
-                      name="notificationDate"
+                      name="start_date"
                       format="YYYY-MM-DD"
                       placeholder="Select date"
                     />
                   </Form.Item>
                 </Col>
 
-                <Col xs={24} md={12}>
-                  <Form.Item
-                    label="Set reminder to"
-                    required
-                    validateStatus={errors.reminderType && touched.reminderType ? 'error' : ''}
-                    help={touched.reminderType && errors.reminderType}
-                    className="mb-4"
+               
+                <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Set reminder to </label>
+                  <Select
+                    name="users"
+                    mode="multiple"
+                    style={{ width: "100%" }}
+                    className="w-full mt-1"
+                    placeholder="Select users"
+                    value={values.users.users}
+                    onChange={(selectedUsers) => setFieldValue("users", { users: selectedUsers })}
                   >
-                    <Select
-                      className="w-full"
-                      placeholder="Select reminder type"
-                      options={reminderOptions}
-                      onChange={(value) => setFieldValue('reminderType', value)}
-                      onBlur={handleBlur}
-                      name="reminderType"
-                    />
-                  </Form.Item>
-                </Col>
+                    {alluserdata.map((user) => (
+                      <Option key={user.id} value={user.id}>
+                        {user.username}
+                      </Option>
+                    ))}
+                  </Select>
+                  <ErrorMessage
+                    name="users"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
+               
 
                 <Col xs={24}>
                   <Form.Item
@@ -139,6 +178,8 @@ const ReminderList = () => {
                     />
                   </Form.Item>
                 </Col>
+
+
 
                 <Col xs={24}>
                   <Form.Item className="mb-6">

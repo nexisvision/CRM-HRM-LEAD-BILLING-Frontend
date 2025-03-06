@@ -1,10 +1,10 @@
 import axios from "axios";
-
+  import { env } from "configs/EnvironmentConfig";      
 const GetAllDebit = async () => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.get(
-      "http://localhost:5353/api/v1/bill-debits/",
+      `${env.API_ENDPOINT_URL}/bill-debits/`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -22,7 +22,7 @@ const CreateDebit = async (payload) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/bill-debits/",
+      `${env.API_ENDPOINT_URL}/bill-debits/`,
       payload,
       {
         headers: {
@@ -41,7 +41,7 @@ const UpdateDebit = async (id, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/bill-debits/${id}`,
+      `${env.API_ENDPOINT_URL}/bill-debits/${id}`,
       values,
       {
         headers: {
@@ -60,7 +60,7 @@ const DeleteDebit = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1//bill-debits/${id}`,
+      `${env.API_ENDPOINT_URL}//bill-debits/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const GetPayment = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(`http://localhost:5353/api/v1/payments/${id}`, {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/payments/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -29,7 +30,7 @@ const AddPyment = async (id, formData) => {
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/payments/${id}`,
+      `${env.API_ENDPOINT_URL}/payments/${id}`,
       formData,
       {
         headers: {
@@ -50,7 +51,7 @@ const DeletePayment = async (exid) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/payments/${exid}`,
+      `${env.API_ENDPOINT_URL}/payments/${exid}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -69,7 +70,7 @@ const EditPayment = async (id, data) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/payments/${id}`,
+      `${env.API_ENDPOINT_URL}/payments/${id}`,
       data,
       {
         headers: {

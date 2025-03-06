@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const Getex = async (id) => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get(`http://localhost:5353/api/v1/expenses/${id}`, {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/expenses/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -29,7 +30,7 @@ const AddExpence = async (id, values) => {
 
   try {
     const res = await axios.post(
-      `http://localhost:5353/api/v1/expenses/${id}`,
+      `${env.API_ENDPOINT_URL}/expenses/${id}`,
       values,
       {
         headers: {
@@ -50,7 +51,7 @@ const DeleteEx = async (exid) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/expenses/${exid}`,
+      `${env.API_ENDPOINT_URL}/expenses/${exid}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -69,7 +70,7 @@ const EditEx = async (id, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/expenses/${id}`,
+      `${env.API_ENDPOINT_URL}/expenses/${id}`,
       values,
       {
         headers: {

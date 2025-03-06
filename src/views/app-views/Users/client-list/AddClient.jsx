@@ -6,7 +6,7 @@ import * as Yup from 'yup';
 import { addClient, ClientData } from "./CompanyReducers/CompanySlice";
 import axios from "axios";
 import { ReloadOutlined } from "@ant-design/icons";
-
+import { env } from "configs/EnvironmentConfig";
 const AddClient = ({ visible, onClose, onCreate }) => {
   const dispatch = useDispatch();
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -45,7 +45,7 @@ const AddClient = ({ visible, onClose, onCreate }) => {
   const otpapi = async (otp) => {
     try {
       const res = await axios.post(
-        "http://localhost:5353/api/v1/auth/verify-signup",
+        `${env.API_ENDPOINT_URL}/auth/verify-signup`,
         { otp },
         {
           headers: {

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -11,7 +12,7 @@ const getint = async () => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.get(
-      "http://localhost:5353/api/v1/interview-schedules/",
+      `${env.API_ENDPOINT_URL}/interview-schedules/`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -30,7 +31,7 @@ const addint = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/interview-schedules/",
+      `${env.API_ENDPOINT_URL}/interview-schedules/`,
       payload,
       {
         headers: {
@@ -51,7 +52,7 @@ const deleteint = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/interview-schedules/${id}`,
+      `${env.API_ENDPOINT_URL}/interview-schedules/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -70,7 +71,7 @@ const editint = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/interview-schedules/${idd}`,
+      `${env.API_ENDPOINT_URL}/interview-schedules/${idd}`,
       values,
       {
         headers: {

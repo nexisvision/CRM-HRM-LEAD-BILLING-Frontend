@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 function ActivityList() {
@@ -21,7 +22,7 @@ function ActivityList() {
     const token = localStorage.getItem("auth_token");
     try {
       const res = await axios.get(
-        `http://localhost:5353/api/v1/activities/${id}`,
+        `${env.API_ENDPOINT_URL}/activities/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

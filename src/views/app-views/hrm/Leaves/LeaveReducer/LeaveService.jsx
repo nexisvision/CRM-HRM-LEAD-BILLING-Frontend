@@ -1,4 +1,5 @@
-import axios from "axios";
+  import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -12,7 +13,7 @@ import axios from "axios";
         const token = localStorage.getItem("auth_token");
         try {
           const res = await axios.get(
-            "http://localhost:5353/api/v1/leaves/",
+            `${env.API_ENDPOINT_URL}/leaves/`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -32,7 +33,7 @@ import axios from "axios";
       
         try {
           const res = await axios.post(
-            "http://localhost:5353/api/v1/leaves/",
+            `${env.API_ENDPOINT_URL}/leaves/`,
             payload, 
             {
               headers: {
@@ -53,7 +54,7 @@ import axios from "axios";
       
         try {
           const res = await axios.delete(
-            `http://localhost:5353/api/v1/leaves/${id}`, 
+            `${env.API_ENDPOINT_URL}/leaves/${id}`, 
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -74,7 +75,7 @@ import axios from "axios";
         console.log("idinapi",id)
         try {
           const res = await axios.put(
-            `http://localhost:5353/api/v1/leaves/${id}`,
+            `${env.API_ENDPOINT_URL}/leaves/${id}`,
             values,
             {
               headers: {

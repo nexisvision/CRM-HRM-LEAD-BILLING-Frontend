@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // const baseUrl = import.meta.env.VITE_BASE_URL;
 // import { getToken } from "../../../configs/axiosConfig"
 
@@ -10,7 +11,7 @@ import axios from "axios";
 const GetTask = async () => {
   const token = localStorage.getItem("auth_token");
   try {
-    const res = await axios.get("http://localhost:5353/api/v1/taskcalendars/", {
+    const res = await axios.get(`${env.API_ENDPOINT_URL}/taskcalendars/`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -27,7 +28,7 @@ const AddTask = async (payload) => {
 
   try {
     const res = await axios.post(
-      "http://localhost:5353/api/v1/taskcalendars/",
+      `${env.API_ENDPOINT_URL}/taskcalendars/`,
       payload,
       {
         headers: {
@@ -48,7 +49,7 @@ const DeleteTask = async (id) => {
 
   try {
     const res = await axios.delete(
-      `http://localhost:5353/api/v1/taskcalendars/${id}`,
+      `${env.API_ENDPOINT_URL}/taskcalendars/${id}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,7 +68,7 @@ const EditTask = async (idd, values) => {
   const token = localStorage.getItem("auth_token");
   try {
     const res = await axios.put(
-      `http://localhost:5353/api/v1/taskcalendars/${idd}`,
+      `${env.API_ENDPOINT_URL}/taskcalendars/${idd}`,
       values,
       {
         headers: {

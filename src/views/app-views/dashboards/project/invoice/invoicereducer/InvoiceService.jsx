@@ -1,4 +1,5 @@
 import axios from "axios";
+import { env } from "configs/EnvironmentConfig";
 // import { API_BASE_URL } from 'configs/AppConfig';
 
 const InvoiceService = {
@@ -8,7 +9,7 @@ const InvoiceService = {
     try {
       console.log("Fetching invoices for ID:", id);
       const response = await axios.get(
-        `http://localhost:5353/api/v1/invoices/${id}`,
+        `${env.API_ENDPOINT_URL}/invoices/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -29,7 +30,7 @@ const InvoiceService = {
     const token = localStorage.getItem("auth_token");
     try {
       const response = await axios.get(
-        `http://localhost:5353/api/v1/invoices/${id}`,
+        `${env.API_ENDPOINT_URL}/invoices/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -46,7 +47,7 @@ const InvoiceService = {
     const token = localStorage.getItem("auth_token");
     try {
       const response = await axios.get(
-        `http://localhost:5353/api/v1/milestones/${id}`,
+        `${env.API_ENDPOINT_URL}/milestones/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -64,7 +65,7 @@ const InvoiceService = {
     try {
       console.log("Creating invoice for product:", id);
       const response = await axios.post(
-        `http://localhost:5353/api/v1/invoices/${id}`,
+        `${env.API_ENDPOINT_URL}/invoices/${id}`,
         invoiceData,
         {
           headers: {
@@ -90,7 +91,7 @@ const InvoiceService = {
     const token = localStorage.getItem("auth_token");
     try {
       const response = await axios.put(
-        `http://localhost:5353/api/v1/invoices/${idd}`,
+        `${env.API_ENDPOINT_URL}/invoices/${idd}`,
         data, 
         {
           headers: {
@@ -110,7 +111,7 @@ const InvoiceService = {
     const token = localStorage.getItem("auth_token");
     try {
       const response = await axios.delete(
-        `http://localhost:5353/api/v1/invoices/${id}`,
+        `${env.API_ENDPOINT_URL}/invoices/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
