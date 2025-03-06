@@ -961,7 +961,7 @@ const handleProductChange = (productId) => {
                             />
                           </div>
                           </td>
-                          <td className="px-2 py-2 border-b">
+                          {/* <td className="px-2 py-2 border-b">
                             <input
                               type="text"
                               value={row.hsn_sac}
@@ -989,7 +989,7 @@ const handleProductChange = (productId) => {
                                 placeholder="0"
                               />
                             </div>
-                          </td>
+                          </td> */}
                           <td className="px-2 py-2 border-b">
                             <Select
                               value={row.tax?.gstPercentage ? `${row.tax.gstName}|${row.tax.gstPercentage}` : '0'}
