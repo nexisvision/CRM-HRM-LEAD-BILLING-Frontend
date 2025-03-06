@@ -673,7 +673,7 @@ const AddBilling = ({ onClose }) => {
                             type="text"
                             value={row.item}
                             onChange={(e) => handleTableDataChange(row.id, "item", e.target.value)}
-                            placeholder="Item Name *"
+                            placeholder="Item Name"
                             className="w-full p-2 border rounded-s"
                             required
                           />
@@ -684,7 +684,7 @@ const AddBilling = ({ onClose }) => {
                             min="1"
                             value={row.quantity}
                             onChange={(e) => handleTableDataChange(row.id, "quantity", e.target.value)}
-                            placeholder="Qty *"
+                            // placeholder="Qty *"
                             className="w-full p-2 border rounded"
                             required
                           />
@@ -703,12 +703,12 @@ const AddBilling = ({ onClose }) => {
                                 e.target.value = "";
                               }
                             }}
-                            onBlur={(e) => {
-                              if (e.target.value === "") {
-                                handleTableDataChange(row.id, "price", 0);
-                              }
-                            }}
-                            placeholder="Price *"
+                            // onBlur={(e) => {
+                            //   if (e.target.value === "") {
+                            //     handleTableDataChange(row.id, "price", 0);
+                            //   }
+                            // }}
+                            // placeholder="Price *"
                             className="w-full p-2 border rounded-s"
                             required
                           />

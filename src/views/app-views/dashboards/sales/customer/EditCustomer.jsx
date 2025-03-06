@@ -419,7 +419,7 @@ const EditCustomer = ({ idd, onClose }) => {
                               if (value === 'add_new') {
                                 setIsAddPhoneCodeModalVisible(true);
                               } else {
-                                setFieldValue('country_code', value);
+                                setFieldValue('billing_country_code', value);
                               }
                             }}
                             value={values.billing_country_code}
@@ -613,7 +613,7 @@ const EditCustomer = ({ idd, onClose }) => {
                               if (value === 'add_new') {
                                 setIsAddPhoneCodeModalVisible(true);
                               } else {
-                                setFieldValue('country_code', value);
+                                setFieldValue('shipping_country_code', value);
                               }
                             }}
                             value={values.shipping_country_code}
