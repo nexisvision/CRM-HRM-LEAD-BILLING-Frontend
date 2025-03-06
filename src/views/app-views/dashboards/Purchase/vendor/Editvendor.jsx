@@ -106,7 +106,7 @@ const EditVendor = ({ onClose, vendorData, idd }) => {
             </Col>
             <Col span={8}>
               <div className="form-group mt-3">
-                <label className="font-semibold">Contact <span className="text-red-500">*</span></label>
+                <label className="font-semibold mb-2">Contact <span className="text-red-500">*</span></label>
                 <div className="flex gap-0">
                   <Field name="phoneCode">
                     {({ field }) => (

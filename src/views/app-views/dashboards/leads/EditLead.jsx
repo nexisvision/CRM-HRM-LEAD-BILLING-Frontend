@@ -71,6 +71,15 @@ const currenciesState = useSelector((state) => state.currencies);
     }
   });
 
+
+  const getInitialCurrency = () => {
+    if (fnddatass?.length > 0) {
+      const inrCurrency = fnddatass.find(c => c.currencyCode === 'INR');
+      return inrCurrency?.id || fnddatass[0]?.id;
+    }
+    return '';
+  };
+
   // const loggeduser = useSelector((state)=>state.user.loggedInUser.username);
 
   // const employee = filterdata.filter((item)=>item.created_by === loggeduser)
@@ -207,6 +216,7 @@ const currenciesState = useSelector((state) => state.currencies);
     email: "",
     leadStage: "",
     leadValue: "",
+    currency: getInitialCurrency(),
     currencyIcon: "",
     assigned: "",
     status: "",
@@ -342,102 +352,80 @@ const currenciesState = useSelector((state) => state.currencies);
     })
   },[fnddata])
 
- const LeadValueField = ({ field, form }) => (
-  <div className="form-group">
-    <div className="flex gap-0">
-      <Field name="currency">
-        {({ field }) => (
-          <Select
-            {...field}
-            className="currency-select"
-            style={{
-              width: '60px',
-              borderTopRightRadius: 0,
-              borderBottomRightRadius: 0,
-              borderRight: 0,
-              backgroundColor: '#f8fafc',
-            }}
-            placeholder={<span className="text-gray-400">$</span>}
-            onChange={(value) => {
-              if (value === 'add_new') {
-                setIsAddCurrencyModalVisible(true);
-              } else {
-                form.setFieldValue("currency", value);
+  const LeadValueField = ({ field, form }) => (
+    <div className="form-group mt-2">
+      <div className="flex gap-0">
+        <Field name="currency">
+          {({ field }) => (
+            <Select
+              {...field}
+              className="currency-select"
+              style={{
+                width: '70px',
+                borderTopRightRadius: 0,
+                borderBottomRightRadius: 0,
+                borderRight: 0,
+                backgroundColor: '#f8fafc',
+              }}
+              placeholder={<span className="text-gray-400">₹</span>}
+              onChange={(value) => {
+                if (value === 'add_new') {
+                  setIsAddCurrencyModalVisible(true);
+                } else {
+                  form.setFieldValue("currency", value);
+                }
+              }}
+              value={form.values.currency}
+              dropdownStyle={{ minWidth: '180px' }}
+              suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+            >
+              {fndcurr?.map((currency) => (
+                <Option key={currency.id} value={currency.id}>
+                  <div className="flex items-center w-full px-1">
+                    <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                    <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                    <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                  </div>
+                </Option>
+              ))}
+            </Select>
+          )}
+        </Field>
+        <Field name="leadValue">
+          {({ field, form }) => (
+            <Input
+              {...field}
+              className="price-input"
+              style={{
+                borderTopLeftRadius: 0,
+                borderBottomLeftRadius: 0,
+                borderLeft: '1px solid #d9d9d9',
+                width: 'calc(100% - 80px)'
+              }}
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                  form.setFieldValue('leadValue', value);
+                }
+              }}
+              prefix={
+                form.values.currency && (
+                  <span className="text-gray-600 font-medium mr-1">
+                    {fndcurr?.find(c => c.id === form.values.currency)?.currencyIcon}
+                  </span>
+                )
               }
-            }}
-            value={form.values.currency}
-            dropdownStyle={{ minWidth: '180px' }}
-            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-            loading={!fnddatass}
-            dropdownRender={menu => (
-              <div>
-                <div
-                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                  onClick={() => setIsAddCurrencyModalVisible(true)}
-                >
-                  <PlusOutlined className="mr-2" />
-                  <span className="text-sm">Add New</span>
-                </div>
-                {menu}
-              </div>
-            )}
-          >
-            {fnddatass?.map((currency) => (
-              <Option key={currency.id} value={currency.id}>
-                <div className="flex items-center w-full px-1">
-                  <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
-                  <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
-                  <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
-                </div>
-              </Option>
-            ))}
-          </Select>
-        )}
-      </Field>
-      <Field name="leadValue">
-        {({ field, form }) => (
-          <Input
-            {...field}
-            className="price-input"
-            style={{
-              borderTopLeftRadius: 0,
-              borderBottomLeftRadius: 0,
-              borderLeft: '1px solid #d9d9d9',
-              width: 'calc(100% - 100px)'
-            }}
-            type="number"
-            min="0"
-            step="0.01"
-            placeholder="0.00"
-            onChange={(e) => {
-              const value = e.target.value;
-              if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
-                form.setFieldValue('leadValue', value);
-              }
-            }}
-            onKeyPress={(e) => {
-              const charCode = e.which ? e.which : e.keyCode;
-              if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
-                e.preventDefault();
-              }
-              if (charCode === 46 && field.value.includes('.')) {
-                e.preventDefault();
-              }
-            }}
-            prefix={
-              form.values.currency && (
-                <span className="text-gray-600 font-medium mr-1">
-                  {fnddatass?.find(c => c.id === form.values.currency)?.currencyIcon}
-                </span>
-              )
-            }
-          />
-        )}
-      </Field>
+            />
+          )}
+        </Field>
+      </div>
+      <ErrorMessage name="leadValue" component="div" className="text-red-500 mt-1 text-sm" />
     </div>
-    <ErrorMessage name="leadValue" component="div" className="text-red-500 mt-1 text-sm" />
-  </div>
-);
+  );
 
   const openAddLeadStageModal = () => {
     setIsAddLeadStageModalVisible(true);
@@ -527,17 +515,15 @@ const currenciesState = useSelector((state) => state.currencies);
                   />
                 </div>
               </Col>
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Telephone
-                    <span className="text-rose-500">*</span>
-                  </label>
-                  <div className="flex gap-0">
+             <Col span={12} className="mt-3">
+                <div className="form-group">
+                  <label className="font-semibold">Telephone <span className="text-red-500">*</span></label>
+                  <div className="flex gap-0 mt-2">
                     <Field name="phoneCode">
                       {({ field }) => (
                         <Select
                           {...field}
-                          className="phone-code-select"
+                          className="currency-select"
                           style={{
                             width: '80px',
                             borderTopRightRadius: 0,
@@ -585,17 +571,16 @@ const currenciesState = useSelector((state) => state.currencies);
                       {({ field }) => (
                         <Input
                           {...field}
-                          className="phone-input"
+                          className="price-input"
                           style={{
                             borderTopLeftRadius: 0,
                             borderBottomLeftRadius: 0,
-                            borderLeft: 0,
+                            borderLeft: '1px solid #d9d9d9',
                             width: 'calc(100% - 80px)'
                           }}
-                          type="tel"
-                          placeholder="Enter 10-digit number"
+                          type="number"
+                          placeholder="Enter telephone number"
                           onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                          maxLength={15}
                         />
                       )}
                     </Field>

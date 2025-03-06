@@ -5,6 +5,7 @@ import {
   Button,
   DatePicker,
   Select,
+  Upload,
   message,
   Row,
   Col,
@@ -26,12 +27,15 @@ import { PlusOutlined } from '@ant-design/icons';
 import AddDepartment from '../Department/AddDepartment';
 import AddDesignation from '../Designation/AddDesignation';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
-import { AddSalaryss } from "../PayRoll/Salary/SalaryReducers/SalarySlice";
+
 import { env } from "configs/EnvironmentConfig";
+import { AddSalaryss, getSalaryss } from "../PayRoll/Salary/SalaryReducers/SalarySlice";
+import AddCountries from "views/app-views/setting/countries/AddCountries";
 
 const { Option } = Select;
 
 const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [showOtpModal, setShowOtpModal] = useState(false);
@@ -64,15 +68,27 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
   useEffect(()=>{
     dispatch(empdata());
   },[dispatch])
+  const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
+
+  const getInitialCountry = () => {
+    if (countries?.length > 0) {
+      const indiaCode = countries.find(c => c.countryCode === 'IN');
+      return indiaCode?.phoneCode || "+91";
+    }
+    return "+91";
+  };
 
   const generatePassword = () => {
     const length = 8;
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let password = "";
 
+    // Generate 6 characters
     for (let i = 0; i < length; i++) {
       password += charset[Math.floor(Math.random() * charset.length)];
     }
+
+    // Ensure at least one number
     const randomNum = Math.floor(Math.random() * 10).toString();
     password = password.slice(0, 7) + randomNum;
 
@@ -144,6 +160,13 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
     }
   };
 
+  const handlePhoneNumberChange = (e, setFieldValue) => {
+    const value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 15) {
+      setFieldValue('phone', value);
+    }
+  };
+
   const onSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
       console.log("Form Values:", values);
@@ -161,7 +184,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
       if (response.payload?.data?.employeeId) {
         updatedFormValues.employeeId = response.payload.data.employeeId;
         setFormValues(updatedFormValues); // Set formValues here
-
+        
         // Only reset form and close modal after successful employee creation
         if (!response.payload?.data?.sessionToken) {
           resetForm();
@@ -192,6 +215,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
     firstName: initialData.firstName || "",
     lastName: initialData.lastName || "",
     username: "",
+    phoneCode: getInitialCountry(),
     password: "",
     email: initialData.email || "",
     phone: "",
@@ -280,10 +304,10 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
   };
 
   return (
-    <div className="add-employee">
+    <div className="add-employee p-6">
       <Formik
         initialValues={initialValues}
-        // validationSchema={validationSchema}
+        // validationSchema={validationSchema}  
         onSubmit={onSubmit}
       >
         {({
@@ -299,127 +323,158 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
             onSubmit={handleSubmit}
             onFinishFailed={onFinishFailed}
           >
-            <h2 className="text-lg font-medium text-gray-700 mb-4">Personal Details</h2>
+           
+            <h1 className="text-lg font-bold mb-4">Personal Details</h1>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    First Name <span className="text-red-500">*</span>
-                  </label>
-                  <Field
-                    name="firstName"
-                    as={Input}
-                    placeholder="John"
-                    className="w-full rounded-md border-gray-300 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  />
-                  <ErrorMessage name="firstName" component="div" className="mt-1 text-sm text-red-500" />
+                  <label className="font-semibold">First Name <span className="text-red-500">*</span></label>
+                  <Field name="firstName" as={Input} placeholder="John" className="mt-1" />
+                  <ErrorMessage name="firstName" component="div" className="text-red-500" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Last Name <span className="text-red-500">*</span>
-                  </label>
-                  <Field
-                    name="lastName"
-                    as={Input}
-                    placeholder="Doe"
-                    className="w-full rounded-md border-gray-300 hover:border-blue-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                  />
-                  <ErrorMessage name="lastName" component="div" className="mt-1 text-sm text-red-500" />
+                  <label className="font-semibold">Last Name <span className="text-red-500">*</span></label>
+                  <Field name="lastName" as={Input} placeholder="Doe" className="mt-1" />
+                  <ErrorMessage name="lastName" component="div" className="text-red-500" />
                 </div>
               </Col>
             </Row>
-
-            <Row gutter={16} className="mt-4">
+            <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Username <span className="text-rose-500">*</span></label>
+                  <label className="font-semibold">Username <span className="text-red-500">*</span></label>
                   <Field name="username" as={Input} placeholder="john_doe" className="mt-1" />
-                  <ErrorMessage name="username" component="div" className="text-red-500 text-sm" />
+                  <ErrorMessage name="username" component="div" className="text-red-500" />
                 </div>
               </Col>
               <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Password <span className="text-rose-500">*</span></label>
-                  <div className="relative flex items-center">
+                <div className="form-item mt-2">
+                  <label className="font-semibold">Password <span className="text-red-500">*</span></label>
+                  <div className="relative">
                     <Field
                       name="password"
                       as={Input.Password}
                       placeholder="Password"
-                      className="mt-1 pr-12 w-full"
+                      className="mt-1 w-full"
                     />
                     <Button
-                      className="absolute right-0 top-1/2 -translate-y-1/2 px-2 border-0 bg-transparent hover:bg-gray-50"
+                      className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
                       onClick={() => setFieldValue("password", generatePassword())}
-                      style={{ marginTop: '2px' }}
                     >
-                      <ReloadOutlined />
+                     <ReloadOutlined/>
                     </Button>
                   </div>
-                  <ErrorMessage name="password" component="div" className="text-red-500 text-sm" />
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="text-red-500"
+                  />
                 </div>
               </Col>
             </Row>
-
-            <Row gutter={16} className="mt-4">
+            <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="font-semibold">Email <span className="text-rose-500">*</span></label>
+                  <label className="font-semibold">Email <span className="text-red-500">*</span></label>
                   <Field name="email" as={Input} placeholder="johndoe@example.com" className="mt-1" />
-                  <ErrorMessage name="email" component="div" className="text-red-500 text-sm" />
+                  <ErrorMessage name="email" component="div" className="text-red-500" />
                 </div>
               </Col>
               <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Phone <span className="text-rose-500">*</span></label>
-                  <div className="flex">
-                    <Select
-                      style={{ width: '30%', marginRight: '8px' }}
-                      placeholder="Code"
-                      name="phoneCode"
-                      defaultValue="91"
-                      onChange={(value) => setFieldValue('phoneCode', value)}
-                      className="mt-1"
-                    >
-                      {countries && countries.length > 0 ? (
-                        countries.map((country) => (
-                          <Option key={country.id} value={country.phoneCode}>
-                            {country.phoneCode}
-                          </Option>
-                        ))
-                      ) : (
-                        <Option value="91">+91</Option>
+                <div className="form-group">
+                  <label className="text-gray-600 font-semibold mb-2 block">Phone <span className="text-red-500">*</span></label>
+                  <div className="flex gap-0">
+                    <Field name="phoneCode">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="phone-code-select"
+                          style={{
+                            width: '80px',
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRight: 0,
+                            backgroundColor: '#f8fafc',
+                          }}
+                          placeholder={<span className="text-gray-400">+91</span>}
+                          // defaultValue={getInitialPhoneCode()}
+                          onChange={(value) => {
+                            if (value === 'add_new') {
+                              setIsAddPhoneCodeModalVisible(true);
+                            } else {
+                              setFieldValue('phoneCode', value);
+                            }
+                          }}
+                          value={values.phoneCode}
+                          dropdownStyle={{ minWidth: '180px' }}
+                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                          dropdownRender={menu => (
+                            <div>
+                              <div
+                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                              >
+                                <PlusOutlined className="mr-2" />
+                                <span className="text-sm">Add New</span>
+                              </div>
+                              {menu}
+                            </div>
+                          )}
+                        >
+                          {countries?.map((country) => (
+                            <Option key={country.id} value={country.phoneCode}>
+                              <div className="flex items-center w-full px-1">
+                                <span className="text-base min-w-[40px]">{country.phoneCode}</span>
+                                <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+                                <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                              </div>
+                            </Option>
+                          ))}
+                        </Select>
                       )}
-                    </Select>
+                    </Field>
                     <Field name="phone">
                       {({ field }) => (
                         <Input
                           {...field}
-                          type="string"
-                          style={{ width: '70%' }}
+                          className="phone-input"
+                          style={{
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderLeft: '1px solid #d9d9d9',
+                            width: 'calc(100% - 80px)'
+                          }}
+                          type="number"
                           placeholder="Enter phone number"
-                          className="mt-1"
+                          onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
+                          // prefix={
+                          //   values.phoneCode && (
+                          //     <span className="text-gray-600 font-medium mr-1">
+                          //       {values.phoneCode}
+                          //     </span>
+                          //   )
+                          // }
                         />
                       )}
                     </Field>
                   </div>
-                  <ErrorMessage name="phone" component="div" className="text-red-500 text-sm" />
+                  <ErrorMessage name="phone" component="div" className="text-red-500 mt-1 text-sm" />
                 </div>
               </Col>
             </Row>
-
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Address <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Address <span className="text-red-500">*</span></label>
                   <Field name="address" as={Input} placeholder="Enter Address" className="mt-1" />
                   <ErrorMessage name="address" component="div" className="text-red-500" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Joining Date <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Joining Date <span className="text-red-500">*</span></label>
                   <Field name="joiningDate">
                     {({ field }) => (
                       <DatePicker
@@ -436,7 +491,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Branch <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Branch <span className="text-red-500">*</span></label>
                   <Field name="branch">
                     {({ field }) => (
                       <Select
@@ -479,7 +534,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
 
               <Col span={12}>
                 <div className="form-item mt-1">
-                  <label className="">Department <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Department <span className="text-red-500">*</span></label>
                   <Field name="department">
                     {({ field }) => (
                       <Select
@@ -515,7 +570,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label className="">Designation <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">Designation <span className="text-red-500">*</span></label>
                   <Field name="designation">
                     {({ field }) => (
                       <Select
@@ -551,8 +606,8 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label className="font-semibol">Salary <span className="text-red-500">*</span></label>
-                  <Field name="salary" as={Input} placeholder="$" type="text" className="mt-1" />
+                  <label className="font-semibold">Salary <span className="text-red-500">*</span></label>
+                  <Field name="salary" as={Input} placeholder="$" type="number" className="mt-1" />
                   <ErrorMessage name="salary" component="div" className="text-red-500" />
                 </div>
               </Col>
@@ -561,14 +616,14 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Account Holder Name </label>
+                  <label className="font-semibold">Account Holder Name </label>
                   <Field name="accountholder" as={Input} placeholder="John Doe" className="mt-1" />
                   <ErrorMessage name="accountholder" component="div" className="text-red-500" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Account Number </label>
+                  <label className="font-semibold">Account Number </label>
                   <Field name="accountnumber" as={Input} placeholder="123456789" type="number" className="mt-1" />
                   <ErrorMessage name="accountnumber" component="div" className="text-red-500" />
                 </div>
@@ -577,14 +632,14 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Bank Name </label>
+                  <label className="font-semibold">Bank Name </label>
                   <Field name="bankname" as={Input} placeholder="Bank Name" className="mt-1" />
                   <ErrorMessage name="bankname" component="div" className="text-red-500" />
                 </div>
               </Col>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">IFSC </label>
+                  <label className="font-semibold">IFSC </label>
                   <Field name="ifsc" as={Input} placeholder="IFSC" className="mt-1" />
                   <ErrorMessage name="ifsc" component="div" className="text-red-500" />
                 </div>
@@ -593,7 +648,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">
-                  <label className="">Bank Location   </label>
+                    <label className="font-semibold">Bank Location   </label>
                   <Field name="banklocation" as={Input} placeholder="Bank Location" className="mt-1" />
                   <ErrorMessage name="banklocation" component="div" className="text-red-500" />
                 </div>
@@ -601,7 +656,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
             </Row>
 
             <Col span={24} className="mt-4 "><div className="flex justify-between items-center">
-              <label className="text-lg font-bold mb-3 mt-4">Salary</label>
+              <label className="text-lg font-semibold mb-3 mt-4">Salary</label>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
                   type="checkbox"
@@ -618,7 +673,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                 <Row gutter={16}>
                   <Col span={12}>
                     <div className="form-item">
-                      <label className="">Payroll Type </label>
+                      <label className="font-semibold">Payroll Type </label>
                       <Field name="payslipType">
                         {({ field }) => (
                           <Select
@@ -644,7 +699,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
 
                   <Col span={12}>
                     <div className="form-item">
-                      <label className="">Currency </label>
+                      <label className="font-semibold">Currency </label>
                       <Field name="currency">
                         {({ field }) => (
                           <Select
@@ -673,7 +728,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                 <Row gutter={16}>
                   <Col span={12}>
                     <div className="form-item">
-                      <label className="">Net Salary </label>
+                      <label className="font-semibold">Net Salary </label>
                       <Field
                         name="netSalary"
                         as={Input}
@@ -691,7 +746,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
 
                   <Col span={12}>
                     <div className="form-item">
-                      <label className="">Status </label>
+                      <label className="font-semibold">Status </label>
                       <Field name="status">
                         {({ field }) => (
                           <Select
@@ -717,7 +772,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
 
                   <Col span={12}>
                     <div className="form-item mt-3">
-                      <label className="">Bank Account</label>
+                      <label className="font-semibold">Bank Account</label>
                       <Field
                         name="bankAccount"
                         as={Input}
@@ -736,20 +791,16 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                 </Row>
               </>
             )}
-            <div className="text-right mt-6 space-x-2">
-              <Button
-                onClick={onClose}
-                className="hover:bg-gray-50 border-gray-300 text-gray-600"
-              >
+            <div className="text-right mt-4">
+              <Button type="default" className="mr-2" onClick={() => onClose()}>
                 Cancel
               </Button>
               <Button
                 type="primary"
                 htmlType="submit"
                 loading={isSubmitting}
-                className="bg-blue-500 hover:bg-blue-600 border-0"
               >
-                {isSubmitting ? "Creating..." : "Create Employee"}
+                {isSubmitting ? "Submitting..." : "Submit"}
               </Button>
             </div>
           </Form>
@@ -783,50 +834,109 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
         </div>
       </Modal>
       <Modal
-        title={
-          <div className="flex items-center gap-2 text-gray-700">
-            <PlusOutlined className="text-lg" />
-            <span className="font-medium">Add Branch</span>
-          </div>
-        }
+        title="Add Branch"
         visible={isAddBranchModalVisible}
         onCancel={closeAddBranchModal}
         footer={null}
         width={800}
-        className="custom-modal"
       >
         <AddBranch onClose={closeAddBranchModal} />
       </Modal>
       <Modal
-        title={
-          <div className="flex items-center gap-2 text-gray-700">
-            <PlusOutlined className="text-lg" />
-            <span className="font-medium">Add Department</span>
-          </div>
-        }
+        title="Add Department"
         visible={isAddDepartmentModalVisible}
         onCancel={closeAddDepartmentModal}
         footer={null}
         width={800}
-        className="custom-modal"
       >
         <AddDepartment onClose={closeAddDepartmentModal} />
       </Modal>
       <Modal
-        title={
-          <div className="flex items-center gap-2 text-gray-700">
-            <PlusOutlined className="text-lg" />
-            <span className="font-medium">Add Designation</span>
-          </div>
-        }
+        title="Add Designation"
         visible={isAddDesignationModalVisible}
         onCancel={closeAddDesignationModal}
         footer={null}
         width={800}
-        className="custom-modal"
       >
         <AddDesignation onClose={closeAddDesignationModal} />
       </Modal>
+      <Modal
+        title="Add New Country"
+        visible={isAddPhoneCodeModalVisible}
+        onCancel={() => setIsAddPhoneCodeModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <AddCountries
+          onClose={() => {
+            setIsAddPhoneCodeModalVisible(false);
+            dispatch(getallcountries());
+          }}
+        />
+      </Modal>
+      <style jsx>{`
+
+        .ant-select-dropdown .ant-select-item {
+          padding: 8px 12px !important;
+        }
+
+        .ant-select-dropdown .ant-select-item-option-content > div {
+          display: flex !important;
+          align-items: center !important;
+          width: 100% !important;
+        }
+
+        //    .contract-select .ant-select-selection-item {
+        //   display: flex !important;
+        //   align-items: center !important;
+        //   justify-content: center !important;
+        //   font-size: 16px !important;
+        // }
+
+        // .contract-select .ant-select-selection-item > div {
+        //   display: flex !important;
+        //   align-items: center !important;
+        // }
+
+        // .contract-select .ant-select-selection-item span:not(:first-child) {
+        //   display: none !important;
+        // }
+
+        .phone-code-select .ant-select-selector {
+          // height: 32px !important;
+          // padding: 0 8px !important;
+          background-color: #f8fafc !important;
+          border-top-right-radius: 0 !important;
+          border-bottom-right-radius: 0 !important;
+          border-right: 0 !important;
+        }
+
+        .phone-code-select .ant-select-selection-item {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 16px !important;
+        }
+
+        .phone-code-select .ant-select-selection-item > div {
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .phone-code-select .ant-select-selection-item span:not(:first-child) {
+          display: none !important;
+        }
+
+        // .phone-input::-webkit-inner-spin-button,
+        // .phone-input::-webkit-outer-spin-button {
+        //   -webkit-appearance: none;
+        //   margin: 0;
+        // }
+
+        // .phone-input {
+        //   -moz-appearance: textfield;
+        // }
+      `}</style>
     </div>
   );
 };

@@ -20,7 +20,7 @@ import AddPipeLine from "../systemsetup/Pipeline/AddPipeLine";
 import AddCurrencies from "views/app-views/setting/currencies/AddCurrencies";
 import AddCountries from "views/app-views/setting/countries/AddCountries";
 const { Option } = Select;
-const AddDeal = ({ onClose }) => {
+const AddDeal = ({ onClose,setFieldValue }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const tabledata = useSelector((state) => state?.SubClient);
@@ -359,7 +359,7 @@ const AddDeal = ({ onClose }) => {
               </Col>
               <Col span={12} className="mt-3">
                 <div className="form-group">
-                  <label className="text-gray-600 font-semibold mb-2 block">Currency <span className="text-red-500">*</span></label>
+                  <label className="text-gray-600 font-semibold mb-1 block">Currency & Amount <span className="text-red-500">*</span></label>
                   <div className="flex gap-0">
                     <Field name="currency">
                       {({ field }) => (
@@ -368,6 +368,7 @@ const AddDeal = ({ onClose }) => {
                           className="currency-select"
                           style={{
                             width: '80px',
+                            height: '40px',
                             borderTopRightRadius: 0,
                             borderBottomRightRadius: 0,
                             borderRight: 0,
@@ -381,8 +382,7 @@ const AddDeal = ({ onClose }) => {
                               setFieldValue("currency", value);
                             }
                           }}
-                          defaultValue={getInitialCurrency()}
-                          value={values.currency}
+                          value={values.currency || getInitialCurrency()}
                           dropdownStyle={{ minWidth: '180px' }}
                           suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
                           loading={!fnddatass}
@@ -417,127 +417,11 @@ const AddDeal = ({ onClose }) => {
                           {...field}
                           className="price-input"
                           style={{
+                            // height: '40px',
                             borderTopLeftRadius: 0,
                             borderBottomLeftRadius: 0,
                             borderLeft: '1px solid #d9d9d9',
-                            width: 'calc(100% - 100px)'
-                          }}
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          placeholder="0.00"
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
-                              form.setFieldValue('price', value);
-                            }
-                          }}
-                          onKeyPress={(e) => {
-                            const charCode = e.which ? e.which : e.keyCode;
-                            if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
-                              e.preventDefault();
-                            }
-                            if (charCode === 46 && field.value.includes('.')) {
-                              e.preventDefault();
-                            }
-                          }}
-                          prefix={
-                            values.currency && (
-                              <span className="text-gray-600 font-medium mr-1">
-                                {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
-                              </span>
-                            )
-                          }
-                        />
-                      )}
-                    </Field>
-                  </div>
-                  <ErrorMessage name="price" component="div" className="text-red-500 mt-1 text-sm" />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Category </label>
-                  <Select
-                    name="category"
-                    style={{ width: "100%" }}
-                    className="w-full mt-1"
-                    placeholder="Select or add new category"
-                    value={values.category}
-                    onChange={(value) => setFieldValue("category", value)}
-                    dropdownRender={(menu) => (
-                      <div>
-                        {menu}
-                        <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
-                          <Button
-                            type="link"
-                            icon={<PlusOutlined />}
-                            className="w-full mt-1"
-                            onClick={() => setIsCategoryModalVisible(true)}
-                          >
-                            Add New Category
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-                  >
-                    {categories.map((category) => (
-                      <Option key={category.id} value={category.name}>
-                        {category.name}
-                      </Option>
-                    ))}
-                  </Select>
-                  <ErrorMessage
-                    name="project_category"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold">Lead Title <span className="text-rose-500">*</span></label>
-                  <div className="flex gap-2">
-                    <Field name="leadTitle">
-                      {({ field, form }) => (
-                        <Select
-                          {...field} // Spread Formik field props to manage the value
-                          className="w-full mt-1"
-                          placeholder="Select Lead Title"
-                          value={field.value || ""} // Ensure the select value is controlled by Formik
-                          onChange={(value) => {
-                            // Find the selected lead from the Leads array
-                            const selectedLead =
-                              Array.isArray(Leads) &&
-                              Leads.find((e) => e.id === value);
-                            // Update Formik's field value with the selected lead's title
-                            form.setFieldValue(
-                              "leadTitle",
-                              selectedLead?.leadTitle || ""
-                            );
-                          }}
-                        >
-                          {Array.isArray(Leads) &&
-                            Leads.map((lead) => (
-                              <Option key={lead.id} value={lead.id}>
-                                {lead.leadTitle}
-                              </Option>
-                            ))}
-                        </Select>
-                      )}
-                    </Field>
-                    <Field name="price">
-                      {({ field, form }) => (
-                        <Input
-                          {...field}
-                          className="price-input"
-                          style={{
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0,
-                            borderLeft: '1px solid #d9d9d9',
-                            width: 'calc(100% - 100px)'
+                            width: 'calc(100% - 80px)'
                           }}
                           type="number"
                           min="0"
@@ -646,11 +530,7 @@ const AddDeal = ({ onClose }) => {
                       )}
                     </Field>
                   </div>
-                  <ErrorMessage
-                    name="leadTitle"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <ErrorMessage name="price" component="div" className="text-red-500 mt-1 text-sm" />
                 </div>
               </Col>
 
@@ -936,6 +816,78 @@ const AddDeal = ({ onClose }) => {
 
         .phone-input:hover {
           border-color: #d9d9d9 !important;
+        }
+
+        /* Currency select styles */
+        .currency-select .ant-select-selector {
+          height: 40px !important;
+          padding-top: 4px !important;
+          padding-bottom: 4px !important;
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .currency-select .ant-select-selection-item {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 16px !important;
+          line-height: 32px !important;
+        }
+
+        .currency-select .ant-select-selection-item > div {
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .currency-select .ant-select-selection-item span:not(:first-child) {
+          display: none !important;
+        }
+
+        /* Price input styles */
+        // .price-input {
+        //   height: 40px !important;
+        // }
+
+        /* Dropdown styles */
+        .ant-select-dropdown .ant-select-item {
+          padding: 8px 12px !important;
+        }
+
+        .ant-select-dropdown .ant-select-item-option-content > div {
+          display: flex !important;
+          align-items: center !important;
+          width: 100% !important;
+        }
+
+        /* Make all form fields consistent height */
+      
+        .ant-select-selector,
+        .ant-picker,
+        .ant-input-number,
+        .ant-input-affix-wrapper {
+          height: 40px !important;
+          line-height: 40px !important;
+        }
+
+        .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+          height: 40px !important;
+          padding: 4px 11px !important;
+        }
+
+        .ant-select-selection-search-input {
+          height: 38px !important;
+        }
+
+        /* Remove number input spinners */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+          -webkit-appearance: none !important;
+          margin: 0 !important;
+        }
+
+        input[type="number"] {
+          -moz-appearance: textfield !important;
         }
       `}</style>
     </div>

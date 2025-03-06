@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Input, Button, Select, Radio, message, Row, Col, Upload } from "antd";
+import React, { useEffect, useState } from "react";
+import { Input, Button, Select, Radio, message, Row, Col, Upload,Modal } from "antd";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import ReactQuill from "react-quill";
@@ -10,7 +10,8 @@ import {
 } from "./JobapplicationReducer/JobapplicationSlice";
 import { GetJobdata } from "../JobReducer/JobSlice";
 import { getallcountries } from "../../../setting/countries/countriesreducer/countriesSlice";
-import { UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined,PlusOutlined } from "@ant-design/icons";
+import AddCountries from "views/app-views/setting/countries/AddCountries";
 
 const { Option } = Select;
 const AddJobApplication = ({ onClose }) => {
@@ -32,6 +33,16 @@ const user = useSelector((state) => state.user.loggedInUser.username);
     dispatch(getallcountries());
   }, [dispatch]);
 
+  const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
+
+  const getInitialCountry = () => {
+    if (countries?.length > 0) {
+      const indiaCode = countries.find(c => c.countryCode === 'IN');
+      return indiaCode?.phoneCode || "+91";
+    }
+    return "+91";
+  };
+
   const onSubmit = async (values) => {
     console.log("Form submitted:", values);
     try {
@@ -46,11 +57,18 @@ const user = useSelector((state) => state.user.loggedInUser.username);
       message.error("An error occurred while submitting the job application.");
     }
   };
+  const handlePhoneNumberChange = (e, setFieldValue) => {
+    const value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 15) {
+      setFieldValue('phone', value);
+    }
+  };
   const initialValues = {
     job: "",
     name: "",
     email: "",
     phone: "",
+    phoneCode: getInitialCountry(),
     location: "",
     total_experience: "",
     current_location: "",
@@ -162,36 +180,85 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                 </div>
               </Col>
               {/* Phone */}
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
-                  <div className="flex">
-                    <Select
-                      style={{ width: '30%', marginRight: '8px' }}
-                      placeholder="Code"
-                      className="w-full mt-1"
-                      name="phone"
-                      onChange={(value) => setFieldValue('phone', value)}
-                    >
-                      {countries.map((country) => (
-                        <Option key={country.id} value={country.phoneCode}>
-                          ({country.phoneCode})
-                        </Option>
-                      ))}
-                    </Select>
-                    <Field
-                      name="phone"
-                      as={Input}
-                      type="number"
-                      style={{ width: '70%' }}
-                      placeholder="Enter Phone"
-                    />
+              <Col span={12}>
+                <div className="form-group">
+                  <label className="text-gray-600 font-semibold mb-2 block">Phone <span className="text-red-500">*</span></label>
+                  <div className="flex gap-0">
+                    <Field name="phoneCode">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="phone-code-select"
+                          style={{
+                            width: '80px',
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRight: 0,
+                            backgroundColor: '#f8fafc',
+                          }}
+                          placeholder={<span className="text-gray-400">+91</span>}
+                          // defaultValue={getInitialPhoneCode()}
+                          onChange={(value) => {
+                            if (value === 'add_new') {
+                              setIsAddPhoneCodeModalVisible(true);
+                            } else {
+                              setFieldValue('phoneCode', value);
+                            }
+                          }}
+                          value={values.phoneCode}
+                          dropdownStyle={{ minWidth: '180px' }}
+                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                          dropdownRender={menu => (
+                            <div>
+                              <div
+                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                              >
+                                <PlusOutlined className="mr-2" />
+                                <span className="text-sm">Add New</span>
+                              </div>
+                              {menu}
+                            </div>
+                          )}
+                        >
+                          {countries?.map((country) => (
+                            <Option key={country.id} value={country.phoneCode}>
+                              <div className="flex items-center w-full px-1">
+                                <span className="text-base min-w-[40px]">{country.phoneCode}</span>
+                                <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+                                <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                              </div>
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
+                    <Field name="phone">
+                      {({ field }) => (
+                        <Input
+                          {...field}
+                          className="phone-input"
+                          style={{
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderLeft: '1px solid #d9d9d9',
+                            width: 'calc(100% - 80px)'
+                          }}
+                          type="number"
+                          placeholder="Enter phone number"
+                          onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
+                          // prefix={
+                          //   values.phoneCode && (
+                          //     <span className="text-gray-600 font-medium mr-1">
+                          //       {values.phoneCode}
+                          //     </span>
+                          //   )
+                          // }
+                        />
+                      )}
+                    </Field>
                   </div>
-                  <ErrorMessage
-                    name="phone"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <ErrorMessage name="phone" component="div" className="text-red-500 mt-1 text-sm" />
                 </div>
               </Col>
               {/* Location */}
@@ -370,6 +437,85 @@ const user = useSelector((state) => state.user.loggedInUser.username);
           </Form>
         )}
       </Formik>
+
+      <Modal
+        title="Add New Country"
+        visible={isAddPhoneCodeModalVisible}
+        onCancel={() => setIsAddPhoneCodeModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <AddCountries
+          onClose={() => {
+            setIsAddPhoneCodeModalVisible(false);
+            dispatch(getallcountries());
+          }}
+        />
+      </Modal>
+      <style jsx>{`
+       
+        .ant-select-dropdown .ant-select-item {
+          padding: 8px 12px !important;
+        }
+
+        .ant-select-dropdown .ant-select-item-option-content > div {
+          display: flex !important;
+          align-items: center !important;
+          width: 100% !important;
+        }
+
+        //    .contract-select .ant-select-selection-item {
+        //   display: flex !important;
+        //   align-items: center !important;
+        //   justify-content: center !important;
+        //   font-size: 16px !important;
+        // }
+
+        // .contract-select .ant-select-selection-item > div {
+        //   display: flex !important;
+        //   align-items: center !important;
+        // }
+
+        // .contract-select .ant-select-selection-item span:not(:first-child) {
+        //   display: none !important;
+        // }
+
+        .phone-code-select .ant-select-selector {
+          // height: 32px !important;
+          // padding: 0 8px !important;
+          background-color: #f8fafc !important;
+          border-top-right-radius: 0 !important;
+          border-bottom-right-radius: 0 !important;
+          border-right: 0 !important;
+        }
+
+        .phone-code-select .ant-select-selection-item {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 16px !important;
+        }
+
+        .phone-code-select .ant-select-selection-item > div {
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .phone-code-select .ant-select-selection-item span:not(:first-child) {
+          display: none !important;
+        }
+
+        // .phone-input::-webkit-inner-spin-button,
+        // .phone-input::-webkit-outer-spin-button {
+        //   -webkit-appearance: none;
+        //   margin: 0;
+        // }
+
+        // .phone-input {
+        //   -moz-appearance: textfield;
+        // }
+      `}</style>
+
     </div>
   );
 };

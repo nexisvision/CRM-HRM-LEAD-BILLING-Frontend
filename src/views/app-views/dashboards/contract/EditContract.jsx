@@ -545,7 +545,7 @@ const EditContract = ({ id, onClose }) => {
                                   borderTopLeftRadius: 0,
                                   borderBottomLeftRadius: 0,
                                   borderLeft: '1px solid #d9d9d9',
-                                  width: 'calc(100% - 100px)'
+                                  width: 'calc(100% - 80px)'
                                 }}
                                 type="number"
                                 min="0"

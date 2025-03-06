@@ -493,7 +493,7 @@ const JobList = () => {
         visible={isAddJobModalVisible}
         onCancel={closeAddJobModal}
         footer={null}
-        width={1100}
+        width={1000}
         className="mt-[-70px]"
         // height={1000}
       >

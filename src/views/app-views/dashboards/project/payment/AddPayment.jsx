@@ -11,7 +11,7 @@ import {
   Upload,
   Modal,
 } from "antd";
-import { CloudUploadOutlined, QuestionCircleOutlined, UploadOutlined } from "@ant-design/icons";
+import { CloudUploadOutlined, PlusOutlined, QuestionCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -23,8 +23,9 @@ import { getAllInvoices } from '../invoice/invoicereducer/InvoiceSlice';
 import { getallestimate } from '../estimates/estimatesReducer/EstimatesSlice';
 import { Getexp } from '../expenses/Expencereducer/ExpenseSlice';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+import AddCurrencies from "views/app-views/setting/currencies/AddCurrencies";
 const { Option } = Select;
-const AddPayment = ({ onClose }) => {
+const AddPayment = ({ onClose,setFieldValue }) => {
   const navigate = useNavigate();
   const [showReceiptUpload, setShowReceiptUpload] = useState(false);
 
@@ -67,8 +68,10 @@ const AddPayment = ({ onClose }) => {
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
 
 
+
   // const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
+  const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
   const validationSchema = Yup.object({
     project_name: Yup.string().required("Project is required."),
@@ -101,6 +104,14 @@ const AddPayment = ({ onClose }) => {
     remark: Yup.string().optional(),
   });
 
+  const getInitialCurrency = () => {
+    if (curren?.length > 0) {
+      const inrCurrency = curren.find(c => c.currencyCode === 'INR');
+      return inrCurrency?.id || curren[0]?.id;
+    }
+    return '';
+  };
+
   const initialValues = {
     project_name: fnddata?.id || "",
     invoice: "",
@@ -108,7 +119,7 @@ const AddPayment = ({ onClose }) => {
     expense: "",
     paidOn: "",
     amount: "",
-    currency: "",
+    currency: getInitialCurrency(),
     exchangeRate: "",
     transactionId: "",
     paymentMethod: "",
@@ -142,6 +153,8 @@ const AddPayment = ({ onClose }) => {
       resetForm();
     });
   };
+
+
 
   return (
     <div className="add-expenses-form">
@@ -336,84 +349,104 @@ const AddPayment = ({ onClose }) => {
                   </div>
                 </Col>
                 <Col span={12} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">Amount <span className="text-red-500">*</span></label>
-                    <Field name="amount">
-                      {({ field, form }) => (
-                        <Input
-                          {...field}
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          placeholder="Enter Amount"
-                          className="mt-1"
-                          value={field.value || ''}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            setFieldValue("amount", value ? parseFloat(value) : '');
-                          }}
-                        />
-                      )}
-                    </Field>
-                    <ErrorMessage
-                      name="amount"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col>
-                <Col span={12} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">Currency <span className="text-red-500">*</span></label>
-                    <div className="flex gap-2">
+                  <div className="form-group">
+                    <label className="text-gray-600 font-semibold mb-1 block">Amount & Currency <span className="text-red-500">*</span></label>
+                    <div className="flex gap-0">
                       <Field name="currency">
-                        {({ field, form }) => (
+                        {({ field }) => (
                           <Select
                             {...field}
-                            className="w-full mt-1"
-                            placeholder="Select Currency"
-                            onChange={(value) => {
-                              const selectedCurrency = curren.find(
-                                (c) => c.id === value
-                              );
-                              form.setFieldValue(
-                                "currency",
-                                selectedCurrency?.currencyCode || ""
-                              );
+                            className="currency-select"
+                            style={{
+                              width: '70px',
+                              height: '40px',
+                              borderTopRightRadius: 0,
+                              borderBottomRightRadius: 0,
+                              borderRight: 0,
+                              backgroundColor: '#f8fafc',
                             }}
+                            placeholder={<span className="text-gray-400">₹</span>}
+                            onChange={(value) => {
+                              if (value === 'add_new') {
+                                setIsAddCurrencyModalVisible(true);
+                              } else {
+                                setFieldValue("currency", value);
+                              }
+                            }}
+                            value={values.currency}
+                            dropdownStyle={{ minWidth: '180px' }}
+                            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                            loading={!curren}
+                            dropdownRender={menu => (
+                              <div>
+                                <div
+                                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                  onClick={() => setIsAddCurrencyModalVisible(true)}
+                                >
+                                  <PlusOutlined className="mr-2" />
+                                  <span className="text-sm">Add New</span>
+                                </div>
+                                {menu}
+                              </div>
+                            )}
                           >
-                            {curren.map((currency) => (
+                            {curren?.map((currency) => (
                               <Option key={currency.id} value={currency.id}>
-                                {currency.currencyCode}
-                                ({currency.currencyIcon})
+                                <div className="flex items-center w-full px-1">
+                                  <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                  <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                  <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                                </div>
                               </Option>
                             ))}
                           </Select>
                         )}
                       </Field>
+                      <Field name="amount">
+                        {({ field, form }) => (
+                          <Input
+                            {...field}
+                            className="price-input"
+                            style={{
+                              height: '40px',
+                              borderTopLeftRadius: 0,
+                              borderBottomLeftRadius: 0,
+                              borderLeft: '1px solid #d9d9d9',
+                              width: 'calc(100% - 80px)'
+                            }}
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                form.setFieldValue('amount', value);
+                              }
+                            }}
+                            onKeyPress={(e) => {
+                              const charCode = e.which ? e.which : e.keyCode;
+                              if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                e.preventDefault();
+                              }
+                              if (charCode === 46 && field.value.includes('.')) {
+                                e.preventDefault();
+                              }
+                            }}
+                            prefix={
+                              values.currency && (
+                                <span className="text-gray-600 font-medium mr-1">
+                                  {curren?.find(c => c.id === values.currency)?.currencyIcon}
+                                </span>
+                              )
+                            }
+                          />
+                        )}
+                      </Field>
                     </div>
-                    <ErrorMessage
-                      name="currency"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
+                    <ErrorMessage name="amount" component="div" className="text-red-500 mt-1 text-sm" />
                   </div>
                 </Col>
-                {/* <Col span={6}>
-                  <div className="form-item">
-                    <label className="font-semibold">Exchange Rate </label>
-                    <Field
-                      name="exchangeRate"
-                      as={Input}
-                      placeholder="Enter Exchange Rate"
-                    />
-                    <ErrorMessage
-                      name="exchangeRate"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col> */}
                 <Col span={12} className="mt-4">
                   <div className="form-item">
                     <label className="font-semibold">Transaction Id <span className="text-red-500">*</span></label>
@@ -543,6 +576,23 @@ const AddPayment = ({ onClose }) => {
           );
         }}
       </Formik>
+        
+         {/* Add Currency Modal */}
+         <Modal
+                title="Add New Currency"
+                visible={isAddCurrencyModalVisible}
+                onCancel={() => setIsAddCurrencyModalVisible(false)}
+                footer={null}
+                width={600}
+            >
+                <AddCurrencies
+                    onClose={() => {
+                        setIsAddCurrencyModalVisible(false);
+                        dispatch(getcurren()); // Refresh currency list after adding
+                    }}
+                />
+            </Modal>
+ 
     </div>
   );
 };

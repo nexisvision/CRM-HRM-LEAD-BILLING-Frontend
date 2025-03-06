@@ -14,6 +14,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { empdata, updateEmp } from "./EmployeeReducers/EmployeeSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { PlusOutlined } from "@ant-design/icons";
 // import { useNavigate } from "react-router-dom";
 import { getDept } from "../Department/DepartmentReducers/DepartmentSlice";
 import { getDes } from "../Designation/DesignationReducers/DesignationSlice";
@@ -24,6 +25,7 @@ import AddDepartment from '../Department/AddDepartment';
 import AddDesignation from '../Designation/AddDesignation';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import dayjs from "dayjs";
+import AddCountries from "views/app-views/setting/countries/AddCountries";
 
 const { Option } = Select;
 
@@ -51,6 +53,22 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
   useEffect(()=>{
     dispatch(empdata());
   },[dispatch])
+  const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
+
+  const getInitialCountry = () => {
+    if (countries?.length > 0) {
+      const indiaCode = countries.find(c => c.countryCode === 'IN');
+      return indiaCode?.phoneCode || "+91";
+    }
+    return "+91";
+  };
+
+  const handlePhoneNumberChange = (e, setFieldValue) => {
+    const value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 15) {
+      setFieldValue('phone', value);
+    }
+  };
 
   // Load initial data
   useEffect(() => {
@@ -94,7 +112,7 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
     firstName: employeeData?.firstName || "",
     lastName: employeeData?.lastName || "",
     phone: employeeData?.phone || "",
-    phoneCode: employeeData?.phoneCode || "+91",
+    phoneCode: employeeData?.phoneCode || getInitialCountry(),
     address: employeeData?.address || "",
     branch: employeeData?.branch || "",
     joiningDate: employeeData?.joiningDate ? dayjs(employeeData.joiningDate) : null,
@@ -215,42 +233,85 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
               </Col>
             </Row>
             <Row gutter={16} className="mt-4">
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Phone <span className="text-rose-500">*</span></label>
-                  <div className="flex">
-                    <Select
-                      style={{ width: '30%', marginRight: '8px' }}
-                      placeholder="Code"
-                      name="phoneCode"
-                      defaultValue={employeeData?.phoneCode || "+91"}
-                      onChange={(value) => setFieldValue('phoneCode', value)}
-                      className="mt-1"
-                    >
-                      {countries && countries.length > 0 ? (
-                        countries.map((country) => (
-                          <Option key={country.id} value={country.phoneCode}>
-                            {country.phoneCode}
-                          </Option>
-                        ))
-                      ) : (
-                        <Option value="+91">+91</Option>
+            <Col span={12}>
+                <div className="form-group">
+                  <label className="text-gray-600 font-semibold mb-2 block">Phone <span className="text-red-500">*</span></label>
+                  <div className="flex gap-0">
+                    <Field name="phoneCode">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="phone-code-select"
+                          style={{
+                            width: '80px',
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRight: 0,
+                            backgroundColor: '#f8fafc',
+                          }}
+                          placeholder={<span className="text-gray-400">+91</span>}
+                          // defaultValue={getInitialPhoneCode()}
+                          onChange={(value) => {
+                            if (value === 'add_new') {
+                              setIsAddPhoneCodeModalVisible(true);
+                            } else {
+                              setFieldValue('phoneCode', value);
+                            }
+                          }}
+                          value={values.phoneCode}
+                          dropdownStyle={{ minWidth: '180px' }}
+                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                          dropdownRender={menu => (
+                            <div>
+                              <div
+                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                              >
+                                <PlusOutlined className="mr-2" />
+                                <span className="text-sm">Add New</span>
+                              </div>
+                              {menu}
+                            </div>
+                          )}
+                        >
+                          {countries?.map((country) => (
+                            <Option key={country.id} value={country.phoneCode}>
+                              <div className="flex items-center w-full px-1">
+                                <span className="text-base min-w-[40px]">{country.phoneCode}</span>
+                                <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+                                <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                              </div>
+                            </Option>
+                          ))}
+                        </Select>
                       )}
-                    </Select>
+                    </Field>
                     <Field name="phone">
                       {({ field }) => (
                         <Input
                           {...field}
-                          type="string"
-                          style={{ width: '70%' }}
+                          className="phone-input"
+                          style={{
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderLeft: '1px solid #d9d9d9',
+                            width: 'calc(100% - 80px)'
+                          }}
+                          type="number"
                           placeholder="Enter phone number"
-                          className="mt-1"
-                          defaultValue={employeeData?.phone || ""}
+                          onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
+                          // prefix={
+                          //   values.phoneCode && (
+                          //     <span className="text-gray-600 font-medium mr-1">
+                          //       {values.phoneCode}
+                          //     </span>
+                          //   )
+                          // }
                         />
                       )}
                     </Field>
                   </div>
-                  <ErrorMessage name="phone" component="div" className="text-red-500 text-sm" />
+                  <ErrorMessage name="phone" component="div" className="text-red-500 mt-1 text-sm" />
                 </div>
               </Col>
               <Col span={12}>
@@ -579,6 +640,84 @@ const EditEmployee = ({ idd, onClose, setSub, initialData = {} }) => {
       >
         <AddDesignation onClose={closeAddDesignationModal} />
       </Modal>
+
+      <Modal
+        title="Add New Country"
+        visible={isAddPhoneCodeModalVisible}
+        onCancel={() => setIsAddPhoneCodeModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <AddCountries
+          onClose={() => {
+            setIsAddPhoneCodeModalVisible(false);
+            dispatch(getallcountries());
+          }}
+        />
+      </Modal>
+      <style jsx>{`
+
+        .ant-select-dropdown .ant-select-item {
+          padding: 8px 12px !important;
+        }
+
+        .ant-select-dropdown .ant-select-item-option-content > div {
+          display: flex !important;
+          align-items: center !important;
+          width: 100% !important;
+        }
+
+        //    .contract-select .ant-select-selection-item {
+        //   display: flex !important;
+        //   align-items: center !important;
+        //   justify-content: center !important;
+        //   font-size: 16px !important;
+        // }
+
+        // .contract-select .ant-select-selection-item > div {
+        //   display: flex !important;
+        //   align-items: center !important;
+        // }
+
+        // .contract-select .ant-select-selection-item span:not(:first-child) {
+        //   display: none !important;
+        // }
+
+        .phone-code-select .ant-select-selector {
+          // height: 32px !important;
+          // padding: 0 8px !important;
+          background-color: #f8fafc !important;
+          border-top-right-radius: 0 !important;
+          border-bottom-right-radius: 0 !important;
+          border-right: 0 !important;
+        }
+
+        .phone-code-select .ant-select-selection-item {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 16px !important;
+        }
+
+        .phone-code-select .ant-select-selection-item > div {
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .phone-code-select .ant-select-selection-item span:not(:first-child) {
+          display: none !important;
+        }
+
+        // .phone-input::-webkit-inner-spin-button,
+        // .phone-input::-webkit-outer-spin-button {
+        //   -webkit-appearance: none;
+        //   margin: 0;
+        // }
+
+        // .phone-input {
+        //   -moz-appearance: textfield;
+        // }
+      `}</style>
     </div>
   );
 };

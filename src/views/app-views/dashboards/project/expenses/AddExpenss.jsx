@@ -56,8 +56,8 @@ const AddExpenses = ({ onClose }) => {
 
     const getInitialCurrency = () => {
         if (fnddatass?.length > 0) {
-            const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
-            return usdCurrency?.id || fnddatass[0]?.id;
+            const inrCurrency = fnddatass.find(c => c.currencyCode === 'INR');
+            return inrCurrency?.id || fnddatass[0]?.id;
         }
         return '';
     };
@@ -155,7 +155,7 @@ const AddExpenses = ({ onClose }) => {
                             </Col>
                             <Col span={12}>
                                 <div className="form-group">
-                                    <label className="text-gray-600 mb-2 block"> Currency <span className="text-red-500">*</span></label>
+                                    <label className="text-gray-600 font-semibold mb-1 block">Currency <span className="text-red-500">*</span></label>
                                     <div className="flex gap-0">
                                         <Field name="currency">
                                             {({ field }) => (
@@ -163,13 +163,14 @@ const AddExpenses = ({ onClose }) => {
                                                     {...field}
                                                     className="currency-select"
                                                     style={{
-                                                        width: '60px',
+                                                        width: '80px',
+                                                        height: '40px',
                                                         borderTopRightRadius: 0,
                                                         borderBottomRightRadius: 0,
                                                         borderRight: 0,
                                                         backgroundColor: '#f8fafc',
                                                     }}
-                                                    placeholder={<span className="text-gray-400">$</span>}
+                                                    placeholder={<span className="text-gray-400">₹</span>}
                                                     onChange={(value) => {
                                                         if (value === 'add_new') {
                                                             setIsAddCurrencyModalVisible(true);
@@ -212,10 +213,11 @@ const AddExpenses = ({ onClose }) => {
                                                     {...field}
                                                     className="price-input"
                                                     style={{
+                                                        height: '40px',
                                                         borderTopLeftRadius: 0,
                                                         borderBottomLeftRadius: 0,
                                                         borderLeft: '1px solid #d9d9d9',
-                                                        width: 'calc(100% - 100px)'
+                                                        width: 'calc(100% - 80px)'
                                                     }}
                                                     type="number"
                                                     min="0"
@@ -461,31 +463,53 @@ const AddExpenses = ({ onClose }) => {
 
             {/* Custom render for selected value */}
             <style jsx>{`
+        .currency-select .ant-select-selector {
+            height: 40px !important;
+            padding-top: 4px !important;
+            padding-bottom: 4px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+
         .currency-select .ant-select-selection-item {
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          font-size: 16px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 16px !important;
+            line-height: 32px !important;
         }
 
         .currency-select .ant-select-selection-item > div {
-          display: flex !important;
-          align-items: center !important;
+            display: flex !important;
+            align-items: center !important;
         }
 
         .currency-select .ant-select-selection-item span:not(:first-child) {
-          display: none !important;
+            display: none !important;
+        }
+
+        .price-input {
+            height: 40px !important;
         }
 
         .ant-select-dropdown .ant-select-item {
-          padding: 8px 12px !important;
+            padding: 8px 12px !important;
         }
 
         .ant-select-dropdown .ant-select-item-option-content > div {
-          display: flex !important;
-          align-items: center !important;
-          width: 100% !important;
+            display: flex !important;
+            align-items: center !important;
+            width: 100% !important;
         }
+
+        .ant-input-number-input {
+            height: 40px !important;
+            line-height: 40px !important;
+        }
+
+        // .ant-select-selector, .ant-input {
+        //     border-radius: 6px !important;
+        // }
       `}</style>
         </div>
     );

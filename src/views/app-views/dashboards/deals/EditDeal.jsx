@@ -17,6 +17,8 @@ import AddDealStages from "../systemsetup/DealStages/AddDealStages";
 import { PlusOutlined } from "@ant-design/icons";
 import AddPipeLine from "../systemsetup/Pipeline/AddPipeLine";
 import AddCurrencies from '../../setting/currencies/AddCurrencies';
+import AddCountries from "views/app-views/setting/countries/AddCountries";
+
 
 import dayjs from "dayjs";
 const { Option } = Select;
@@ -43,10 +45,27 @@ const EditDeal = ({ onClose, id }) => {
     return '';
   };
 
+  const [isAddPhoneCodeModalVisible, setIsAddPhoneCodeModalVisible] = useState(false);
+
+  const getInitialCountry = () => {
+    if (countries?.length > 0) {
+      const indiaCode = countries.find(c => c.countryCode === 'IN');
+      return indiaCode?.phoneCode || "+91";
+    }
+    return "+91";
+  };
+
+  const handlePhoneNumberChange = (e, setFieldValue) => {
+    const value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 15) {
+      setFieldValue('phone', value);
+    }
+  };
+
   const [initialValues, setInitialValues] = useState({
     dealName: "",
     phoneNumber: "",
-    phoneCode: "",
+    phoneCode: getInitialCountry(),
     price: "",
     clients: "",
     leadTitle: "",
@@ -67,7 +86,7 @@ const EditDeal = ({ onClose, id }) => {
       setInitialValues({
         dealName: dealData.dealName || "",
         phoneNumber: dealData.phoneNumber || "",
-        phoneCode: dealData.phoneCode || "",
+        phoneCode: dealData.phoneCode || getInitialCountry(),
         price: dealData.price || "",
         clients: dealData.clients || "",
         leadTitle: dealData.leadTitle || "",
@@ -174,45 +193,85 @@ const EditDeal = ({ onClose, id }) => {
                   />
                 </div>
               </Col>
-              <Col span={12} className="">
-                <div className="form-item">
-                  <label className="font-semibold">Phone <span className="text-rose-500">*</span></label>
-                  <div className="flex">
-                    <Select
-                      style={{ width: '30%', marginRight: '8px' }}
-                      placeholder="Code"
-                      name="phoneCode"
-                      className="mt-1"  
-                      onChange={(value) => setFieldValue('phoneCode', value)}
-                    >
-                      {countries.map((country) => (
-                        <Option key={country.id} value={country.phoneCode}>
-                          ({country.phoneCode})
-                        </Option>
-                      ))}
-                    </Select>
+              <Col span={12}>
+                <div className="form-group">
+                  <label className="text-gray-600 font-semibold mb-2 block">Phone <span className="text-red-500">*</span></label>
+                  <div className="flex gap-0">
+                    <Field name="phoneCode">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="phone-code-select"
+                          style={{
+                            width: '80px',
+                            borderTopRightRadius: 0,
+                            borderBottomRightRadius: 0,
+                            borderRight: 0,
+                            backgroundColor: '#f8fafc',
+                          }}
+                          placeholder={<span className="text-gray-400">+91</span>}
+                          // defaultValue={getInitialPhoneCode()}
+                          onChange={(value) => {
+                            if (value === 'add_new') {
+                              setIsAddPhoneCodeModalVisible(true);
+                            } else {
+                              setFieldValue('phoneCode', value);
+                            }
+                          }}
+                          value={values.phoneCode}
+                          dropdownStyle={{ minWidth: '180px' }}
+                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                          dropdownRender={menu => (
+                            <div>
+                              <div
+                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                              >
+                                <PlusOutlined className="mr-2" />
+                                <span className="text-sm">Add New</span>
+                              </div>
+                              {menu}
+                            </div>
+                          )}
+                        >
+                          {countries?.map((country) => (
+                            <Option key={country.id} value={country.phoneCode}>
+                              <div className="flex items-center w-full px-1">
+                                <span className="text-base min-w-[40px]">{country.phoneCode}</span>
+                                <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+                                <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                              </div>
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    </Field>
                     <Field name="phoneNumber">
                       {({ field }) => (
                         <Input
                           {...field}
-                          type="number"
-                          style={{ width: '70%' }}
-                          placeholder="Enter phone number"
-                          onKeyPress={(e) => {
-                            // Allow only numbers
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                          className="phone-input"
+                          style={{
+                            borderTopLeftRadius: 0,
+                            borderBottomLeftRadius: 0,
+                            borderLeft: '1px solid #d9d9d9',
+                            width: 'calc(100% - 80px)'
                           }}
+                          type="number"
+                          placeholder="Enter phone number"
+                          onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
+                          // prefix={
+                          //   values.phoneCode && (
+                          //     <span className="text-gray-600 font-medium mr-1">
+                          //       {values.phoneCode}
+                          //     </span>
+                          //   )
+                          // }
                         />
                       )}
                     </Field>
                   </div>
-                  <ErrorMessage
-                    name="phoneNumber"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
+                  <ErrorMessage name="phoneNumber" component="div" className="text-red-500 mt-1 text-sm" />
                 </div>
               </Col>
               <Col span={12} className="mt-3">
@@ -277,7 +336,7 @@ const EditDeal = ({ onClose, id }) => {
                             borderTopLeftRadius: 0,
                             borderBottomLeftRadius: 0,
                             borderLeft: '1px solid #d9d9d9',
-                            width: 'calc(100% - 100px)'
+                            width: 'calc(100% - 80px)'
                           }}
                           type="number"
                           min="0"
@@ -612,6 +671,22 @@ const EditDeal = ({ onClose, id }) => {
           }}
         />
       </Modal>
+
+      <Modal
+        title="Add New Country"
+        visible={isAddPhoneCodeModalVisible}
+        onCancel={() => setIsAddPhoneCodeModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <AddCountries
+          onClose={() => {
+            setIsAddPhoneCodeModalVisible(false);
+            dispatch(getallcountries());
+          }}
+        />
+      </Modal>
+
     </div>
   );
 };
@@ -644,4 +719,55 @@ export default EditDeal;
     align-items: center !important;
     width: 100% !important;
   }
+
+        //.contract-select .ant-select-selection-item {
+        //   display: flex !important;
+        //   align-items: center !important;
+        //   justify-content: center !important;
+        //   font-size: 16px !important;
+        // }
+
+        // .contract-select .ant-select-selection-item > div {
+        //   display: flex !important;
+        //   align-items: center !important;
+        // }
+
+        // .contract-select .ant-select-selection-item span:not(:first-child) {
+        //   display: none !important;
+        // }
+
+        .phone-code-select .ant-select-selector {
+          // height: 32px !important;
+          // padding: 0 8px !important;
+          background-color: #f8fafc !important;
+          border-top-right-radius: 0 !important;
+          border-bottom-right-radius: 0 !important;
+          border-right: 0 !important;
+        }
+
+        .phone-code-select .ant-select-selection-item {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          font-size: 16px !important;
+        }
+
+        .phone-code-select .ant-select-selection-item > div {
+          display: flex !important;
+          align-items: center !important;
+        }
+
+        .phone-code-select .ant-select-selection-item span:not(:first-child) {
+          display: none !important;
+        }
+
+        // .phone-input::-webkit-inner-spin-button,
+        // .phone-input::-webkit-outer-spin-button {
+        //   -webkit-appearance: none;
+        //   margin: 0;
+        // }
+
+        // .phone-input {
+        //   -moz-appearance: textfield;
+        // }
 `}</style>

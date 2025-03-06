@@ -90,9 +90,9 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
     if (formikRef.current && fnddatass?.length > 0) {
       const { values, setFieldValue } = formikRef.current;
       if (!values.currency) {
-        const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
-        if (usdCurrency) {
-          setFieldValue('currency', usdCurrency.id);
+        const inrCurrency = fnddatass.find(c => c.currencyCode === 'INR');
+        if (inrCurrency) {
+          setFieldValue('currency', inrCurrency.id);
         } else {
           setFieldValue('currency', fnddatass[0].id);
         }
@@ -102,8 +102,8 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
 
   const getDefaultCurrency = () => {
     if (fnddatass?.length > 0) {
-      const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
-      return usdCurrency?.id || fnddatass[0]?.id || '';
+      const inrCurrency = fnddatass.find(c => c.currencyCode === 'INR');
+      return inrCurrency?.id || fnddatass[0]?.id || '';
     }
     return '';
   };

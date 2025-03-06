@@ -285,6 +285,20 @@ const AddRevenue = ({ onClose }) => {
                                 }}
                                 value={values.currency}
                                 dropdownStyle={{ minWidth: '180px' }}
+                                suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                                loading={!currencies}
+                                dropdownRender={menu => (
+                                  <div>
+                                    <div
+                                      className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                      onClick={() => setIsAddCurrencyModalVisible(true)}
+                                    >
+                                      <PlusOutlined className="mr-2" />
+                                      <span className="text-sm">Add New</span>
+                                    </div>
+                                    {menu}
+                                  </div>
+                                )}
                               >
                                 {fnddatass?.map((currency) => (
                                   <Option key={currency.id} value={currency.id}>
@@ -320,6 +334,23 @@ const AddRevenue = ({ onClose }) => {
                                   }
                                 }}
                                 onBlur={() => setFieldTouched("amount", true)}
+                                
+                                onKeyPress={(e) => {
+                                  const charCode = e.which ? e.which : e.keyCode;
+                                  if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                    e.preventDefault();
+                                  }
+                                  if (charCode === 46 && field.value.includes('.')) {
+                                    e.preventDefault();
+                                  }
+                                }}
+                                prefix={
+                                  values.currency && (
+                                    <span className="text-gray-600 font-medium mr-1">
+                                      {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                                    </span>
+                                  )
+                                }
                               />
                             )}
                           </Field>

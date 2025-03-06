@@ -29,7 +29,7 @@ import AddCountries from "views/app-views/setting/countries/AddCountries";
 
 const { Option } = Select;
 
-const AddLead = ({ onClose }) => {
+const AddLead = ({ onClose, setFieldValue }) => {
   const navigate = useNavigate();
 
   const [details, setDetails] = useState(false);
@@ -40,6 +40,10 @@ const AddLead = ({ onClose }) => {
   //  const { currencies } = useSelector((state) => state.currencies);
   const currenciesState = useSelector((state) => state.currencies);
   const currencies = currenciesState?.currencies?.data || [];
+
+  
+  const allempdatass = useSelector((state) => state.currencies);
+  const fnddatass = allempdatass?.currencies?.data;
   // 
   // const { data: employee } = useSelector((state) => state.employee.employee);
 
@@ -47,7 +51,7 @@ const AddLead = ({ onClose }) => {
     dispatch(empdata())
   }, [dispatch])
 
-
+ 
 
 
   const allempdata = useSelector((state) => state.Users);
@@ -64,6 +68,8 @@ const AddLead = ({ onClose }) => {
     }
   });
 
+
+ 
 
 
 
@@ -201,6 +207,13 @@ const AddLead = ({ onClose }) => {
     }
   };
 
+  const getInitialCurrency = () => {
+    if (fnddatass?.length > 0) {
+      const inrCurrency = fnddatass.find(c => c.currencyCode === 'INR');
+      return inrCurrency?.id || fnddatass[0]?.id;
+    }
+    return '';
+  };
   // Then use it in initialValues
   const initialValues = {
     leadTitle: "",
@@ -210,7 +223,7 @@ const AddLead = ({ onClose }) => {
     email: "",
     leadStage: "",
     leadValue: "",
-    currency: "",
+    currency: getInitialCurrency(),
     assigned: "",
     status: "",
     notes: "",
@@ -325,7 +338,7 @@ const AddLead = ({ onClose }) => {
   };
 
   const LeadValueField = ({ field, form }) => (
-    <div className="form-group">
+    <div className="form-group mt-2">
       <div className="flex gap-0">
         <Field name="currency">
           {({ field }) => (
@@ -333,13 +346,13 @@ const AddLead = ({ onClose }) => {
               {...field}
               className="currency-select"
               style={{
-                width: '80px',
+                width: '70px',
                 borderTopRightRadius: 0,
                 borderBottomRightRadius: 0,
                 borderRight: 0,
                 backgroundColor: '#f8fafc',
               }}
-              placeholder={<span className="text-gray-400">$</span>}
+              placeholder={<span className="text-gray-400">₹</span>}
               onChange={(value) => {
                 if (value === 'add_new') {
                   setIsAddCurrencyModalVisible(true);
@@ -372,9 +385,11 @@ const AddLead = ({ onClose }) => {
                 borderTopLeftRadius: 0,
                 borderBottomLeftRadius: 0,
                 borderLeft: '1px solid #d9d9d9',
-                width: 'calc(100% - 60px)'
+                width: 'calc(100% - 80px)'
               }}
               type="number"
+              min="0"
+              step="0.01"
               placeholder="0.00"
               onChange={(e) => {
                 const value = e.target.value;
@@ -382,10 +397,18 @@ const AddLead = ({ onClose }) => {
                   form.setFieldValue('leadValue', value);
                 }
               }}
+              prefix={
+                form.values.currency && (
+                  <span className="text-gray-600 font-medium mr-1">
+                    {fndcurr?.find(c => c.id === form.values.currency)?.currencyIcon}
+                  </span>
+                )
+              }
             />
           )}
         </Field>
       </div>
+      <ErrorMessage name="leadValue" component="div" className="text-red-500 mt-1 text-sm" />
     </div>
   );
 
@@ -396,6 +419,13 @@ const AddLead = ({ onClose }) => {
   const closeAddLeadStageModal = () => {
     setIsAddLeadStageModalVisible(false);
   };
+
+  useEffect(() => {
+    if (fndcurr?.length > 0) {
+      const defaultCurrency = getInitialCurrency();
+      setFieldValue?.('currency', defaultCurrency);
+    }
+  }, [fndcurr]);
 
   return (
     <div className="add-job-form">
@@ -496,7 +526,19 @@ const AddLead = ({ onClose }) => {
                           value={values.phoneCode}
                           dropdownStyle={{ minWidth: '180px' }}
                           suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-                        >
+                          dropdownRender={menu => (
+                            <div>
+                              <div
+                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                              >
+                                <PlusOutlined className="mr-2" />
+                                <span className="text-sm">Add New</span>
+                              </div>
+                              {menu}
+                            </div>
+                          )}
+                       >
                           {countries?.map((country) => (
                             <Option key={country.id} value={country.phoneCode}>
                               <div className="flex items-center w-full px-1">
@@ -1127,36 +1169,58 @@ const AddLead = ({ onClose }) => {
 export default AddLead;
 
 <style jsx>{`
-  /* Common styles for selectors and inputs */
+  /* Form field base styles */
+  .ant-input,
+  .ant-select-selector,
+  .ant-picker,
+  .ant-input-number,
+  .ant-input-affix-wrapper,
+  .ant-btn {
+    height: 40px !important;
+    border-radius: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  /* Select field styles */
+  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+    height: 40px !important;
+    padding: 4px 11px !important;
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .ant-select-selection-search-input {
+    height: 38px !important;
+  }
+
+  /* Currency select specific styles */
   .currency-select .ant-select-selector {
     height: 40px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
     background-color: #f8fafc !important;
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
     border-right: 0 !important;
-    display: flex !important;
-    align-items: center !important;
   }
 
   .currency-select .ant-select-selection-item {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    font-size: 14px !important;
-    height: 40px !important;
-    line-height: 40px !important;
+    font-size: 16px !important;
+    line-height: 32px !important;
   }
 
+  /* Price input styles */
   .price-input {
-    height: 32px !important;
-    line-height: 32px !important;
-    padding: 4px 11px !important;
+    height: 40px !important;
     border-top-left-radius: 0 !important;
     border-bottom-left-radius: 0 !important;
-    border-left: 1px solid #d9d9d9 !important;
   }
 
-  /* Remove spinner arrows from number inputs */
+  /* Remove number input spinners */
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none !important;
@@ -1167,52 +1231,48 @@ export default AddLead;
     -moz-appearance: textfield !important;
   }
 
-  /* Dropdown styles */
-  .ant-select-dropdown .ant-select-item {
-    padding: 8px 12px !important;
-  }
-
-  .ant-select-dropdown .ant-select-item-option-content > div {
-    display: flex !important;
-    align-items: center !important;
+  /* DatePicker styles */
+  .ant-picker {
     width: 100% !important;
   }
 
-  /* Form field spacing */
-  .form-item {
+  /* Dropdown menu styles */
+  .ant-select-dropdown {
+    padding: 4px !important;
+  }
+
+  .ant-select-dropdown .ant-select-item {
+    padding: 8px 12px !important;
+    border-radius: 4px !important;
+  }
+
+  .ant-select-item-option-content {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  /* Form group spacing */
+  .form-group {
     margin-bottom: 16px !important;
   }
 
-  .form-item label {
-    margin-bottom: 4px !important;
+  /* Label styles */
+  .form-group label {
     display: block !important;
+    margin-bottom: 8px !important;
+    font-weight: 500 !important;
   }
 
-  /* Make all inputs full width */
-  .form-item .ant-input,
-  .form-item .ant-select {
-    width: 100% !important;
-  }
-
-  /* Ensure consistent heights */
-  .ant-input,
-  .ant-select-selector,
-  .ant-picker {
-    height: 32px !important;
-  }
-
-  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
-    height: 32px !important;
-  }
-
-  .ant-select-selection-search-input {
-    height: 30px !important;
-  }
-
-  /* Text area specific height */
-  textarea.ant-input {
-    min-height: 80px !important;
-    line-height: 1.5 !important;
+  /* Mobile responsiveness */
+  @media (max-width: 768px) {
+    .ant-input,
+    .ant-select-selector,
+    .ant-picker,
+    .ant-input-number,
+    .ant-input-affix-wrapper,
+    .ant-btn {
+      height: 44px !important; /* Slightly larger on mobile for better touch targets */
+    }
   }
 `}</style>
 

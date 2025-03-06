@@ -57,8 +57,8 @@ const AddPlan = ({ onClose }) => {
 
   const getInitialCurrency = () => {
     if (fnddatass?.length > 0) {
-      const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
-      return usdCurrency?.id || fnddatass[0]?.id;
+      const inrCurrency = fnddatass.find(c => c.currencyCode === 'INR');
+      return inrCurrency?.id || fnddatass[0]?.id;
     }
     return '';
   };
@@ -226,7 +226,7 @@ const AddPlan = ({ onClose }) => {
                                   borderRight: 0,
                                   backgroundColor: '#f8fafc',
                                 }}
-                                placeholder={<span className="text-gray-400">$</span>}
+                                placeholder={<span className="text-gray-400">₹</span>}
                                 onChange={(value) => {
                                   if (value === 'add_new') {
                                     setIsAddCurrencyModalVisible(true);

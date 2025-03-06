@@ -39,6 +39,8 @@ import AddExpenses from "./AddExpenss";
 import EditExpenses from "./EditExpenss";
 import ViewExpenss from "./ViewExpenss";
 import { GetProject } from '../project-list/projectReducer/ProjectSlice';
+import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
+
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -81,6 +83,9 @@ const ExpensesList = () => {
     const projectData = useSelector((state) => state.Project);
     const projects = projectData.Project.data || [];
 
+    const allempdatass = useSelector((state) => state.currencies);
+    const fnddatass = allempdatass?.currencies?.data;
+
     const openAddExpensesModal = () => {
         setIsAddExpensesModalVisible(true);
     };
@@ -111,6 +116,7 @@ const ExpensesList = () => {
                 if (id) {
                     await dispatch(Getexp(id));
                     await dispatch(GetProject());
+                    await dispatch(getcurren());
                 }
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -138,12 +144,15 @@ const ExpensesList = () => {
             if (searchText) {
                 filtered = filtered.filter(item => {
                     const projectName = projects.find(p => p.id === item.project)?.project_name || '';
+                    const currency = fnddatass?.find(c => c.id === item.currency);
+                    const currencyInfo = currency ? 
+                        `${currency.currencyName} ${currency.currencyCode} ${currency.currencyIcon}` : '';
                     
                     return (
                         item.item?.toLowerCase().includes(searchText.toLowerCase()) ||
                         projectName.toLowerCase().includes(searchText.toLowerCase()) ||
                         item.description?.toLowerCase().replace(/<[^>]*>/g, '').includes(searchText.toLowerCase()) ||
-                        item.currency?.toLowerCase().includes(searchText.toLowerCase())
+                        currencyInfo.toLowerCase().includes(searchText.toLowerCase())
                     );
                 });
             }
@@ -180,12 +189,15 @@ const ExpensesList = () => {
 
         const filtered = list.filter(item => {
             const projectName = projects.find(p => p.id === item.project)?.project_name || '';
+            const currency = fnddatass?.find(c => c.id === item.currency);
+            const currencyInfo = currency ? 
+                `${currency.currencyName} ${currency.currencyCode} ${currency.currencyIcon}` : '';
             
             return (
                 item.item?.toLowerCase().includes(value) ||
                 projectName.toLowerCase().includes(value) ||
                 item.description?.toLowerCase().replace(/<[^>]*>/g, '').includes(value) ||
-                item.currency?.toLowerCase().includes(value)
+                currencyInfo.toLowerCase().includes(value)
             );
         });
 
@@ -213,37 +225,30 @@ const ExpensesList = () => {
 
     const exportToExcel = () => {
         try {
-          // Format the data for Excel
-          // const formattedData = list.map(row => ({
-          //   ID: row.id,
-          //   RelatedID: row.related_id,
-          //   TaskName: row.taskName,
-          //   Category: row.category,
-          //   Project: row.project,
-          //   StartDate: row.startDate,
-          //   DueDate: row.dueDate,
-          //   AssignedTo: JSON.parse(row.assignTo).join(", "), // Assuming assignTo is a JSON string
-          //   Status: row.status,
-          //   Priority: row.priority,
-          //   Description: row.description.replace(/<[^>]+>/g, ''), // Remove HTML tags from description
-          //   CreatedBy: row.created_by,
-          //   CreatedAt: row.createdAt,
-          //   UpdatedAt: row.updatedAt,
-          // }));
-    
-          // Create a worksheet from the formatted data
-          const ws = utils.json_to_sheet(list);
-          const wb = utils.book_new(); // Create a new workbook
-          utils.book_append_sheet(wb, ws, "Expenses"); // Append the worksheet to the workbook
-    
-          // Write the workbook to a file
-          writeFile(wb, "ExpensesData.xlsx");
-          message.success("Data exported successfully!");
+            const formattedData = list.map(row => {
+                const currency = fnddatass?.find(c => c.id === row.currency);
+                const projectName = projects.find(p => p.id === row.project)?.project_name || 'N/A';
+                
+                return {
+                    ItemName: row.item,
+                    Project: projectName,
+                    Description: row.description?.replace(/<[^>]+>/g, ''),
+                    Price: `${currency?.currencyIcon || '₹'}${(row.price || 0).toLocaleString()}`,
+                    Currency: currency ? `${currency.currencyName} (${currency.currencyCode})` : 'N/A',
+                    PurchaseDate: row.purchase_date ? dayjs(row.purchase_date).format('DD/MM/YYYY') : 'N/A',
+                };
+            });
+
+            const ws = utils.json_to_sheet(formattedData);
+            const wb = utils.book_new();
+            utils.book_append_sheet(wb, ws, "Expenses");
+            writeFile(wb, "ExpensesData.xlsx");
+            message.success("Data exported successfully!");
         } catch (error) {
-          console.error("Error exporting to Excel:", error);
-          message.error("Failed to export data. Please try again.");
+            console.error("Error exporting to Excel:", error);
+            message.error("Failed to export data. Please try again.");
         }
-      };
+    };
 
     const DeleteFun = async (exid) => {
         try {
@@ -344,16 +349,38 @@ const ExpensesList = () => {
         {
             title: "Price",
             dataIndex: "price",
-            render: (price) => (
-                <span>₹{(price || 0).toLocaleString()}</span>
-            ),
+            render: (price, record) => {
+                const currency = fnddatass?.find(c => c.id === record.currency);
+                return (
+                    <span>
+                        {currency?.currencyIcon || '₹'}
+                        {(price || 0).toLocaleString()}
+                    </span>
+                );
+            },
             sorter: (a, b) => (a.price || 0) - (b.price || 0),
         },
         {
-            title: "currency",
+            title: "Currency",
             dataIndex: "currency",
-            sorter: {
-                compare: (a, b) => a.currency?.length - b.currency?.length,
+            render: (currencyId) => {
+                const currency = fnddatass?.find(c => c.id === currencyId);
+                return (
+                    <span>
+                        {currency ? (
+                            <div className="flex items-center">
+                                <span className="mr-2">{currency.currencyIcon}</span>
+                                <span>{currency.currencyName}</span>
+                                <span className="text-gray-400 text-xs ml-1">({currency.currencyCode})</span>
+                            </div>
+                        ) : 'N/A'}
+                    </span>
+                );
+            },
+            sorter: (a, b) => {
+                const currencyA = fnddatass?.find(c => c.id === a.currency)?.currencyName || '';
+                const currencyB = fnddatass?.find(c => c.id === b.currency)?.currencyName || '';
+                return currencyA.localeCompare(currencyB);
             },
         },
         {

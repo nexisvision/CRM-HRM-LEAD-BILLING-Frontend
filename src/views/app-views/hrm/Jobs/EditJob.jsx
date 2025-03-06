@@ -28,6 +28,7 @@ import {
 import { AddJobs, EditJobs, GetJobdata } from "./JobReducer/JobSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import dayjs from "dayjs";
+import AddCurrencies from "../../setting/currencies/AddCurrencies";
 
 const { Option } = Select;
 
@@ -50,6 +51,7 @@ const EditJob = ({ idd, onClose }) => {
   const AllLoggeddtaa = useSelector((state) => state.user);
   const [newTag, setNewTag] = useState("");
   const [tags, setTags] = useState([]);
+  const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
 
@@ -61,6 +63,17 @@ const EditJob = ({ idd, onClose }) => {
     const data = empData.find((item) => item.id === idd);
     setSingleEmp(data || null);
   }, [idd, alldept]);
+
+  const allempdatass = useSelector((state) => state.currencies);
+  const fnddatass = allempdatass?.currencies?.data;
+
+  const getInitialCurrency = () => {
+    if (fnddatass?.length > 0) {
+      const inrCurrency = fnddatass.find(c => c.currencyCode === 'INR');
+      return inrCurrency?.id || fnddatass[0]?.id;
+    }
+    return '';
+  };
 
   useEffect(() => {
     dispatch(getcurren());
@@ -464,42 +477,103 @@ const EditJob = ({ idd, onClose }) => {
               </Col>
 
               <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold mb-2">Currency <span className="text-red-500">*</span></label>
-                  <div className="flex gap-2">
-                    <Field name="currency">
-                      {({ field, form }) => (
-                        <Select
-                          {...field}
-                          className="w-full mt-1"
-                          placeholder="Select Currency"
-                          onChange={(value) => {
-                            const selectedCurrency = currencies?.data?.find(
-                              (c) => c.id === value
-                            );
-                            form.setFieldValue(
-                              "currency",
-                              selectedCurrency?.currencyCode || ""
-                            );
-                          }}
-                        >
-                          {currencies?.data?.map((currency) => (
-                            <Option key={currency.id} value={currency.id}>
-                              {currency.currencyCode}
-                              ({currency.currencyIcon})
-                            </Option>
-                          ))}
-                        </Select>
-                      )}
-                    </Field>
+                  <div className="form-group">
+                    <label className="text-gray-600 font-semibold mb-2 block">Currency & Expected Salary <span className="text-red-500">*</span></label>
+                    <div className="flex gap-0">
+                      <Field name="currency">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            className="currency-select"
+                            style={{
+                              width: '80px',
+                              borderTopRightRadius: 0,
+                              borderBottomRightRadius: 0,
+                              borderRight: 0,
+                              backgroundColor: '#f8fafc',
+                            }}
+                            placeholder={<span className="text-gray-400">$</span>}
+                            onChange={(value) => {
+                              if (value === 'add_new') {
+                                setIsAddCurrencyModalVisible(true);
+                              } else {
+                                setFieldValue("currency", value);
+                              }
+                            }}
+                            value={values.currency}
+                            dropdownStyle={{ minWidth: '180px' }}
+                            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                            loading={!fnddatass}
+                            dropdownRender={menu => (
+                              <div>
+                                <div
+                                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                  onClick={() => setIsAddCurrencyModalVisible(true)}
+                                >
+                                  <PlusOutlined className="mr-2" />
+                                  <span className="text-sm">Add New</span>
+                                </div>
+                                {menu}
+                              </div>
+                            )}
+                          >
+                            {fnddatass?.map((currency) => (
+                              <Option key={currency.id} value={currency.id}>
+                                <div className="flex items-center w-full px-1">
+                                  <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                  <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                  <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                                </div>
+                              </Option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
+                      <Field name="expectedSalary">
+                        {({ field, form }) => (
+                          <Input
+                            {...field}
+                            className="price-input"
+                            style={{
+                              borderTopLeftRadius: 0,
+                              borderBottomLeftRadius: 0,
+                              borderLeft: '1px solid #d9d9d9',
+                              width: 'calc(100% - 80px)'
+                            }}
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="0.00"
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                form.setFieldValue('expectedSalary', value);
+                              }
+                            }}
+                            onKeyPress={(e) => {
+                              const charCode = e.which ? e.which : e.keyCode;
+                              if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                e.preventDefault();
+                              }
+                              if (charCode === 46 && field.value.includes('.')) {
+                                e.preventDefault();
+                              }
+                            }}
+                            prefix={
+                              values.currency && (
+                                <span className="text-gray-600 font-medium mr-1">
+                                  {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                                </span>
+                              )
+                            }
+                          />
+                        )}
+                      </Field>
+                    </div>
+                    <ErrorMessage name="expectedSalary" component="div" className="text-red-500 mt-1 text-sm" />
                   </div>
-                  <ErrorMessage
-                    name="currency"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+                </Col>
+
 
 
               <Col span={12}>
@@ -538,22 +612,7 @@ const EditJob = ({ idd, onClose }) => {
 
 
 
-              <Col span={12} className="mt-2">
-                <div className="form-item">
-                  <label className="font-semibold">Expect Salary <span className="text-red-500">*</span></label>
-                  <Field
-                    className="mt-1"
-                    name="expectedSalary"
-                    as={Input}
-                    placeholder="Enter expectedSalary"
-                  />
-                  <ErrorMessage
-                    name="expectedSalary"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+            
 
               <div className="mt-2 w-full">
                 <Col span={24} className="mt-2">
@@ -626,6 +685,91 @@ const EditJob = ({ idd, onClose }) => {
           onChange={(e) => setNewJobStatus(e.target.value)}
         />
       </Modal>
+      <Modal
+              title="Add New Currency"
+              visible={isAddCurrencyModalVisible}
+              onCancel={() => setIsAddCurrencyModalVisible(false)}
+              footer={null}
+              width={600}
+            >
+              <AddCurrencies
+                onClose={() => {
+                  setIsAddCurrencyModalVisible(false);
+                  dispatch(getcurren());
+                }}
+              />
+            </Modal>
+            <style jsx>{`
+      .currency-select .ant-select-selector {
+    height: 40px !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    background-color: #f8fafc !important;
+  }
+
+  .currency-select .ant-select-selection-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 16px !important;
+    line-height: 32px !important;
+  }
+
+  .currency-select .ant-select-selection-item > div {
+    display: flex !important;
+    align-items: center !important;
+  }
+
+  .currency-select .ant-select-selection-item span:not(:first-child) {
+    display: none !important;
+  }
+
+  // .price-input {
+  //   height: 40px !important;
+  // }
+
+  /* Remove number input spinners */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield !important;
+  }
+
+  /* Dropdown styles */
+  .ant-select-dropdown .ant-select-item {
+    padding: 8px 12px !important;
+  }
+
+  .ant-select-dropdown .ant-select-item-option-content > div {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+
+  /* Make all form fields consistent height */
+  
+  
+  .ant-select-selector,
+  .ant-picker,
+  .ant-input-number,
+  .ant-input-affix-wrapper {
+    height: 40px !important;
+  }
+
+  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+    padding: 4px 11px !important;
+  }
+
+  .ant-select-selection-search-input {
+    height: 38px !important;
+  }
+      `}</style>
     </div>
   );
 };
