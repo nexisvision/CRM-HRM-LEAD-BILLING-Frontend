@@ -242,6 +242,11 @@ const CalendarApp = () => {
     );
   };
 
+  // Add this function to handle start time changes
+  const handleStartTimeChange = (time) => {
+    form.setFieldsValue({ end: null }); // Reset end time when start time changes
+    form.validateFields(['end']); // Revalidate end time
+  };
 
   return (
     <div className="calendar-container">
@@ -312,12 +317,55 @@ const CalendarApp = () => {
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item name="start" label="Start" rules={[{ required: true, message: 'Please select start time' }]}>
-                  <TimePicker className="w-100" />
+                  <TimePicker 
+                    className="w-100" 
+                    onChange={handleStartTimeChange}
+                  />
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item name="end" label="End" rules={[{ required: true, message: 'Please select end time' }]}>
-                  <TimePicker className="w-100" />
+                <Form.Item 
+                  name="end" 
+                  label="End" 
+                  rules={[
+                    { required: true, message: 'Please select end time' },
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        const startTime = getFieldValue('start');
+                        if (!value || !startTime || value.isAfter(startTime)) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(new Error('End time must be after start time'));
+                      },
+                    }),
+                  ]}
+                >
+                  <TimePicker 
+                    className="w-100"
+                    disabledTime={() => {
+                      const startTime = form.getFieldValue('start');
+                      if (!startTime) return {};
+                      
+                      return {
+                        disabledHours: () => {
+                          const hours = [];
+                          for (let i = 0; i < startTime.hour(); i++) {
+                            hours.push(i);
+                          }
+                          return hours;
+                        },
+                        disabledMinutes: (selectedHour) => {
+                          const minutes = [];
+                          if (selectedHour === startTime.hour()) {
+                            for (let i = 0; i < startTime.minute(); i++) {
+                              minutes.push(i);
+                            }
+                          }
+                          return minutes;
+                        }
+                      };
+                    }}
+                  />
                 </Form.Item>
               </Col>
             </Row>

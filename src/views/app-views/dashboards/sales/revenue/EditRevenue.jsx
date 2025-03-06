@@ -224,14 +224,19 @@ const EditRevenue = ({ idd, onClose }) => {
                 <Row gutter={16}>
                   <Col span={12} className="">
                     <div className="form-item">
-                      <label className="font-semibold"> Date</label>
-                      <DatePicker
-                        className="w-full mt-1"
-                        format="DD-MM-YYYY"
-                        value={values.date}
-                        onChange={(date) => setFieldValue("date", date)}
-                        onBlur={() => setFieldTouched("date", true)}
-                      />
+                      <label className="font-semibold"> Date <span className="text-red-500">*</span></label>
+                      <Field name="date">
+                        {({ field }) => (
+                          <Input
+                            {...field}
+                            type="date"
+                            className="w-full "
+                            value={values.date ? moment(values.date).format('YYYY-MM-DD') : ''}
+                            onChange={(e) => setFieldValue("date", moment(e.target.value))}
+                            onBlur={() => setFieldTouched("date", true)}
+                          />
+                        )}
+                      </Field>
                       <ErrorMessage
                         name="date"
                         component="div"
@@ -239,7 +244,7 @@ const EditRevenue = ({ idd, onClose }) => {
                       />
                     </div>
                   </Col>
-                  <Col span={12} className="mt-3">
+                  <Col span={12} className="">
                       <div className="form-group">
                         <label className="text-gray-600 font-semibold mb-1 block">Currency & Amount <span className="text-red-500">*</span></label>
                         <div className="flex gap-0" style={{ display: 'flex' }}>

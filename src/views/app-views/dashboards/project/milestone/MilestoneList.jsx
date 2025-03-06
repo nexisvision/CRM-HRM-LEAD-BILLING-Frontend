@@ -314,6 +314,7 @@ export const MilestoneList = () => {
         );
       },
     },
+  
     {
       title: "Status",
       dataIndex: "milestone_status",

@@ -1,14 +1,11 @@
-// MailCompose.js
 import React, { useState } from 'react';
 import { Form, Input, Button, message, Col, Row, Card, Select } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { SendOutlined } from '@ant-design/icons';
 import { sendmailslice } from './mailReducer/mailSlice.jsx';
 import { useDispatch } from 'react-redux';
-
 const { Option } = Select;
 const { TextArea } = Input;
-
 const templates = {
 	"Select Template": {
 		placeholders: {},
@@ -161,7 +158,6 @@ Best regards,
 {company_name} Security Team`
 	}
 };
-
 const MailCompose = () => {
 	const [form] = Form.useForm();
 	const navigate = useNavigate();
@@ -356,7 +352,6 @@ const MailCompose = () => {
 		</Card>
 	);
 };
-
 export default MailCompose;
 
 

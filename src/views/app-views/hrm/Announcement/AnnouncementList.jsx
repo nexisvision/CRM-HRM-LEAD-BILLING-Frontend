@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Input, message, Button, Modal } from 'antd';
+import { Card, Table, Menu, Input, message, Button, Modal, DatePicker } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from '../../Users/user-list/UserView';
@@ -23,6 +23,7 @@ const AnnouncementList = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddAnnouncementModalVisible, setIsAddAnnouncementModalVisible] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [searchDate, setSearchDate] = useState(null);
 
   const navigate = useNavigate();
 
@@ -47,16 +48,22 @@ const AnnouncementList = () => {
     setSearchText(value);
   };
 
+  const onDateSearch = (date) => {
+    setSearchDate(date);
+  };
+
   const getFilteredAnnouncements = () => {
     if (!users) return [];
     
-    if (!searchText) return users;
-
     return users.filter(announcement => {
-      return (
+      const matchesText = !searchText || 
         announcement.title?.toLowerCase().includes(searchText.toLowerCase()) ||
-        announcement.description?.toLowerCase().includes(searchText.toLowerCase())
-      );
+        stripHtmlTags(announcement.description)?.toLowerCase().includes(searchText.toLowerCase());
+
+      const matchesDate = !searchDate || 
+        dayjs(announcement.date).format('YYYY-MM-DD') === searchDate.format('YYYY-MM-DD');
+
+      return matchesText && matchesDate;
     });
   };
 
@@ -228,6 +235,11 @@ const AnnouncementList = () => {
       },
     },
     {
+      title: 'Date',
+      dataIndex: 'date',
+      render: (text) => dayjs(text).format('DD-MM-YYYY'),
+    },
+    {
       title: 'Action',
       dataIndex: 'actions',
       render: (_, elm) => (
@@ -242,8 +254,8 @@ const AnnouncementList = () => {
     <Card bodyStyle={{ padding: '-3px' }}>
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
-          <div className="mr-md-3 mb-3">
-            <Input.Group compact>
+          <div className="search-container mr-md-3 mb-3 flex gap-3">
+            {/* <Input.Group compact className="search-group"> */}
               <Input
                 placeholder="Search announcement title"
                 prefix={<SearchOutlined />}
@@ -252,7 +264,14 @@ const AnnouncementList = () => {
                 className="search-input"
                 onPressEnter={handleSearch}
               />
-            </Input.Group>
+              <DatePicker 
+                placeholder="Search by date"
+                onChange={onDateSearch}
+                value={searchDate}
+                className="date-search-input"
+                format="DD-MM-YYYY"
+              />
+            {/* </Input.Group> */}
           </div>
         </Flex>
         <Flex gap="7px">
@@ -303,38 +322,46 @@ const AnnouncementList = () => {
 };
 
 const styles = `
-  .search-input {
-    transition: all 0.3s;
-    min-width: 300px;
-  }
-
-  .search-input:hover,
-  .search-input:focus {
-    border-color: #40a9ff;
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
-  }
-
-  .ant-input-group {
+  .search-container {
     display: flex;
     align-items: center;
   }
 
-  .ant-input-group .ant-input {
-    width: calc(100% - 90px);
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+  .search-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
   }
 
-  .ant-input-group .ant-btn {
-    width: 90px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+  .search-input {
+    transition: all 0.3s;
+    width: 250px !important;
+  }
+
+  .date-search-input {
+    transition: all 0.3s;
+    width: 150px !important;
+  }
+
+  .search-input:hover,
+  .search-input:focus,
+  .date-search-input:hover,
+  .date-search-input:focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
   }
 
   @media (max-width: 768px) {
+    .search-group {
+      flex-direction: row;
+      gap: 8px;
+    }
+
     .search-input,
-    .ant-input-group {
-      width: 100%;
+    .date-search-input {
+      width: auto !important;
+      flex: 1;
     }
     
     .mb-1 {

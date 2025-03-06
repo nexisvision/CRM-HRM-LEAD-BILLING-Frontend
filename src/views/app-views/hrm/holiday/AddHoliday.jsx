@@ -21,7 +21,9 @@ const AddHoliday = ({ onClose }) => {
   const validationSchema = Yup.object().shape({
     holiday_name: Yup.string().required("Holiday name is required"),
     start_date: Yup.date().required("Start Date is required"),
-    end_date: Yup.date().required("End Date is required"),
+    end_date: Yup.date()
+      .required("End Date is required")
+      .min(Yup.ref('start_date'), "End date must be after start date"),
   });
 
   const handleSubmit = (values, { resetForm, setFieldValue }) => {
@@ -32,8 +34,8 @@ const AddHoliday = ({ onClose }) => {
     }
 
     // Convert moment objects to proper date format
-    const startDate = values.start_date ? moment(values.start_date._d || values.start_date).format("YYYY-MM-DD") : null;
-    const endDate = values.end_date ? moment(values.end_date._d || values.end_date).format("YYYY-MM-DD") : null;
+    const startDate = values.start_date ? moment(values.start_date._d || values.start_date).format("DD-MM-YYYY") : null;
+    const endDate = values.end_date ? moment(values.end_date._d || values.end_date).format("DD-MM-YYYY") : null;
 
     if (!startDate || !endDate) {
       message.error("Invalid date format");
@@ -113,7 +115,13 @@ const AddHoliday = ({ onClose }) => {
                     className="w-full mt-1"
                     placeholder="Select start date"
                     value={values.start_date}
-                    onChange={(date) => setFieldValue("start_date", date)}
+                    onChange={(date) => {
+                      setFieldValue("start_date", date);
+                      // Reset end date when start date changes
+                      if (values.end_date && date && date.isAfter(values.end_date)) {
+                        setFieldValue("end_date", null);
+                      }
+                    }}
                   />
                   {errors.start_date && touched.start_date && (
                     <div style={{ color: "red", fontSize: "12px" }}>
@@ -132,6 +140,10 @@ const AddHoliday = ({ onClose }) => {
                     placeholder="Select end date"
                     value={values.end_date}
                     onChange={(date) => setFieldValue("end_date", date)}
+                    disabledDate={(current) => {
+                      // Can't select days before start date
+                      return values.start_date ? current && current < values.start_date.startOf('day') : false;
+                    }}
                   />
                   {errors.end_date && touched.end_date && (
                     <div style={{ color: "red", fontSize: "12px" }}>

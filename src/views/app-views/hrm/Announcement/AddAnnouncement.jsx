@@ -152,7 +152,7 @@ const AddAnnouncement = ({ onClose }) => {
                   <label className="font-semibold">Date <span className="text-red-500">*</span></label>
                   <DatePicker
                     className="w-full mt-1"
-                    format="YYYY-MM-DD"
+                    format="DD-MM-YYYY"
                     value={values.date ? dayjs(values.date) : null}
                     onChange={(date) => setFieldValue("date", date)}
                     onBlur={() => setFieldTouched("date", true)}

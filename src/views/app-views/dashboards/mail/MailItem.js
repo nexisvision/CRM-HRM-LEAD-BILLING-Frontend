@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Avatar, Badge, Tooltip, Dropdown, Menu, Input } from 'antd';
 import { StarOutlined, StarFilled, DeleteOutlined, TagOutlined } from '@ant-design/icons';
-import MailData from 'assets/data/mail.data.json';
+// import MailData from 'assets/data/mail.data.json';
 import { labels, getLabelColor } from './MailLabels';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -100,24 +100,24 @@ const MailItem = () => {
 
 
 	const getCurrentCategory = () => {
-		const { category } = params;
-		if (labels.includes(category)) {
-			return MailData.inbox.filter(elm => elm.label === category);
-		}
-		switch (category) {
-			case 'inbox':
-				return MailData.inbox
-			case 'sent':
-				return MailData.sent
-			case 'draft':
-				return MailData.draft
-			case 'starred':
-				return MailData.inbox.filter(elm => elm.starred)
-			case 'deleted':
-				return MailData.deleted
-			default:
-				break;
-		}
+		// const { category } = params;
+		// if (labels.includes(category)) {
+		// 	return MailData.inbox.filter(elm => elm.label === category);
+		// }
+		// switch (category) {
+		// 	case 'inbox':
+		// 		return MailData.inbox
+		// 	case 'sent':
+		// 		return MailData.sent
+		// 	case 'draft':
+		// 		return MailData.draft
+		// 	case 'starred':
+		// 		return MailData.inbox.filter(elm => elm.starred)
+		// 	case 'deleted':
+		// 		return MailData.deleted
+		// 	default:
+		// 		break;
+		// }
 	}
 
 	const rowSelection = {
@@ -128,8 +128,9 @@ const MailItem = () => {
 	const locale = {
 		emptyText: (
 			<div className="text-center my-5">
-				<img src="/img/others/img-10.png" alt="Add credit card" />
-				<h3 className="mt-3 font-weight-light">There is no mail!</h3>
+				<h3 className="mt-3 font-weight-light font-size-lg">
+					{`No data found`}
+				</h3>
 			</div>
 		)
 	};

@@ -92,16 +92,16 @@ const AddAttendance = ({ onClose }) => {
         initialValues={{
           employee: "",
           date: "",
-          startTime: "", // Default start time
-          endTime: "", // Default end time
+          startTime: "",
+          endTime: "",
           late: "",
           halfDay: "",
           comment: "",
         }}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
-        {({ errors, touched, setFieldValue, resetForm }) => (
+        {({ errors, touched, setFieldValue, values }) => (
           <FormikForm>
             <Row gutter={16}>
               <Col span={24}>
@@ -154,7 +154,10 @@ const AddAttendance = ({ onClose }) => {
                     placeholder="Select time"
                     className="w-full mt-1"
                     defaultValue={moment("09:00", "HH:mm")}
-                    onChange={(time) => setFieldValue("startTime", time)}
+                    onChange={(time) => {
+                      setFieldValue("startTime", time);
+                      setFieldValue("endTime", null);
+                    }}
                   />
                   {errors.startTime && touched.startTime && (
                     <div style={{ color: "red", fontSize: "12px" }}>
@@ -174,6 +177,29 @@ const AddAttendance = ({ onClose }) => {
                     className="w-full mt-1"
                     defaultValue={moment("18:00", "HH:mm")}
                     onChange={(time) => setFieldValue("endTime", time)}
+                    disabledTime={() => {
+                      const startTime = values.startTime;
+                      if (!startTime) return {};
+                      
+                      return {
+                        disabledHours: () => {
+                          const hours = [];
+                          for (let i = 0; i < startTime.hour(); i++) {
+                            hours.push(i);
+                          }
+                          return hours;
+                        },
+                        disabledMinutes: (selectedHour) => {
+                          const minutes = [];
+                          if (selectedHour === startTime.hour()) {
+                            for (let i = 0; i < startTime.minute(); i++) {
+                              minutes.push(i);
+                            }
+                          }
+                          return minutes;
+                        }
+                      };
+                    }}
                   />
                   {errors.endTime && touched.endTime && (
                     <div style={{ color: "red", fontSize: "12px" }}>

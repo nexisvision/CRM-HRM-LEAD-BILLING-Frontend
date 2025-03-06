@@ -126,13 +126,13 @@ const HolidayList = () => {
     {
       title: 'Start Date',
       dataIndex: 'start_date',
-      render: (text) => dayjs(text).format('YYYY-MM-DD'),
+      render: (text) => dayjs(text).format('DD-MM-YYYY'),
       sorter: (a, b) => dayjs(a.start_date).unix() - dayjs(b.start_date).unix(),
     },
     {
       title: 'End Date',
       dataIndex: 'end_date',
-      render: (text) => dayjs(text).format('YYYY-MM-DD'),
+      render: (text) => dayjs(text).format('DD-MM-YYYY'),
       sorter: (a, b) => dayjs(a.end_date).unix() - dayjs(b.end_date).unix(),
     },
     {
