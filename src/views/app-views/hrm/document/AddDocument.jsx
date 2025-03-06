@@ -111,7 +111,7 @@ const AddDocument = ({ onClose }) => {
 
   return (
     <div className="add-trainingSetup">
-
+      basi
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
