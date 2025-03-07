@@ -174,17 +174,17 @@ const AddProject = ({ onClose }) => {
       .then(() => {
         dispatch(GetProject())
           .then(() => {
-            message.success("Project created successfully!");
+           
             resetForm();
             onClose();
           })
           .catch((error) => {
             console.error("Project Data API error:", error);
-            message.error("Failed to refresh project list.");
+           
           });
       })
       .catch((error) => {
-        message.error("Failed to add project.");
+       
         console.error("AddProject API error:", error);
       });
   };

@@ -186,8 +186,6 @@ const TaskList = () => {
   const alldatas = useSelector((state) => state.Tasks);
   const fnddata = alldatas.Tasks.data;
 
-  console.log("sn", fnddata)
-
   const navigate = useNavigate();
 
   useEffect(() => {

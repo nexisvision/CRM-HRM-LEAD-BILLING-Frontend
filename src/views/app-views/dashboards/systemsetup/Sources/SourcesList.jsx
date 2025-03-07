@@ -4,35 +4,22 @@ import {
   Card,
   Table,
   Select,
-  Input,
   Button,
-  Badge,
   Menu,
-  Tag,
   Modal,
-  Row,
-  Col,
   message,
 } from "antd";
-import OrderListData from "../../../../../assets/data/order-list.data.json";
 import {
-  EyeOutlined,
-  FileExcelOutlined,
-  SearchOutlined,
-  PlusCircleOutlined,
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-
 import utils from "utils";
 import { PaymentStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import AddSources from "./AddSources";
 import EditSources from "./EditSources";
 import {
-  DeleteLabless,
   Deletemins,
   GetLable,
 } from "../../project/milestone/LableReducer/LableSlice";
@@ -41,10 +28,8 @@ import { useDispatch } from "react-redux";
 
 const { Option } = Select;
 
-const paymentStatusList = ["paypal"];
-
 const SourcesList = () => {
-  const [list, setList] = useState(OrderListData);
+  const [list, setList] = useState([]);
   const dispatch = useDispatch();
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -63,18 +48,10 @@ const SourcesList = () => {
 
   const lid = userdata.id;
 
-  const user = userdata.username;
-
-
   
   const alltagdata = useSelector((state) => state.Lable);
 
   const alltaggdata = alltagdata.Lable.data || [];
-
-
-  const fndddata = alltaggdata.filter(item => item.created_by === user);
-
-  // console.log("fndddata", fndddata);
 
   const datas = alltaggdata?.filter(item => item.lableType === "source");  
 
@@ -177,20 +154,17 @@ const SourcesList = () => {
             <DeleteOutlined className="text-xl" />
           </button>
         </div>
-        // <div className="text-center">
-        // 	<EllipsisDropdown menu={dropdownMenu(elm)} />
-        // </div>
       ),
     },
   ];
 
-  const onSearch = (e) => {
-    const value = e.currentTarget.value;
-    const searchArray = e.currentTarget.value ? list : OrderListData;
-    const data = utils.wildCardSearch(searchArray, value);
-    setList(data);
-    setSelectedRowKeys([]);
-  };
+  // const onSearch = (e) => {
+  //   const value = e.currentTarget.value;
+  //   const searchArray = e.currentTarget.value ? list : OrderListData;
+  //   const data = utils.wildCardSearch(searchArray, value);
+  //   setList(data);
+  //   setSelectedRowKeys([]);
+  // };
 
   return (
     <>

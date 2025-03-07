@@ -52,6 +52,8 @@ const EmployeeList = () => {
   const branchDataa = useSelector((state) => state.Branch?.Branch?.data || []);
   const salaryData = useSelector((state) => state.salary?.salary?.data || []);
 
+
+
   useEffect(() => {
     dispatch(roledata());
   }, []);
@@ -106,17 +108,76 @@ const EmployeeList = () => {
   const canDeleteClient = allpermisson?.includes('delete');
   const canViewClient = allpermisson?.includes('view');
 
-  const getEmployeeSalaryStatus = (employeeId) => {
-    return salaryData.find(salary => salary.employeeId === employeeId && salary.created_by === user);
+  const checkAndUpdateSalaryStatus = (salaryRecord) => {
+    if (!salaryRecord || !salaryRecord.paymentDate) return salaryRecord;
+
+    const lastPaymentDate = moment(salaryRecord.paymentDate);
+    const today = moment();
+    const nextPaymentDue = lastPaymentDate.add(1, 'month');
+
+    if (today.isAfter(nextPaymentDue) && salaryRecord.status === 'paid') {
+      handleSalaryStatusChange(dispatch, salaryRecord, false)
+        .then(() => {
+          dispatch(getSalaryss());
+        })
+        .catch((error) => {
+          console.error('Error updating salary status:', error);
+        });
+      return { ...salaryRecord, status: 'unpaid' };
+    }
+
+    return salaryRecord;
   };
 
-  const handleEmployeeSalaryStatus = (record, checked) => {
-    const salaryRecord = getEmployeeSalaryStatus(record.id);
+  const getEmployeeSalaryStatus = (employeeId) => {
+    const salaryRecord = salaryData.find(salary => 
+      salary.employeeId === employeeId && 
+      salary.created_by === user
+    );
+
     if (salaryRecord) {
-      handleSalaryStatusChange(dispatch, salaryRecord, checked)
+      return checkAndUpdateSalaryStatus(salaryRecord);
+    }
+    return null;
+  };
+
+  useEffect(() => {
+    const checkSalaryStatuses = () => {
+      if (salaryData && salaryData.length > 0) {
+        salaryData.forEach(salary => {
+          checkAndUpdateSalaryStatus(salary);
+        });
+      }
+    };
+
+    checkSalaryStatuses();
+
+    const intervalId = setInterval(checkSalaryStatuses, 86400000);
+
+    return () => clearInterval(intervalId);
+  }, [salaryData]);
+
+  const handleEmployeeSalaryStatus = (record, checked) => {
+    const salaryRecord = salaryData.find(salary => 
+      salary.employeeId === record.id && 
+      salary.created_by === user
+    );
+
+    if (salaryRecord) {
+      const updates = {
+        ...salaryRecord,
+        status: checked ? 'paid' : 'unpaid',
+        paymentDate: checked ? moment().format('YYYY-MM-DD') : salaryRecord.paymentDate
+      };
+
+      handleSalaryStatusChange(dispatch, updates, checked)
         .then(() => {
           dispatch(empdata());
           dispatch(getSalaryss());
+        })
+        .catch((error) => {
+          message.error('Failed to update salary status');
+          console.error('Error:', error);
         });
     } else {
       message.warning('No salary record found for this employee');
@@ -385,26 +446,35 @@ const EmployeeList = () => {
       key: "salaryStatus",
       render: (_, record) => {
         const salaryRecord = getEmployeeSalaryStatus(record.id);
+        const nextPaymentDate = salaryRecord?.paymentDate 
+          ? moment(salaryRecord.paymentDate).add(1, 'month').format('DD MMM YYYY')
+          : 'N/A';
+
         return (
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={salaryRecord?.status === 'paid'}
-              onChange={(checked) => handleEmployeeSalaryStatus(record, checked)}
-              checkedChildren="Paid"
-              unCheckedChildren="Unpaid"
-              disabled={!(whorole === "super-admin" || whorole === "client" || canEditClient)}
-              className={`${salaryRecord?.status === 'paid' ? 'bg-green-500' : 'bg-gray-400'} shadow-sm`}
-            />
-            <Badge
-              status={salaryRecord?.status === 'paid' ? 'success' : 'error'}
-              text={
-                <span className="text-sm font-medium">
-                  {salaryRecord?.status
-                    ? salaryRecord.status.charAt(0).toUpperCase() + salaryRecord.status.slice(1)
-                    : 'No Salary'}
-                </span>
-              }
-            />
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={salaryRecord?.status === 'paid'}
+                onChange={(checked) => handleEmployeeSalaryStatus(record, checked)}
+                checkedChildren="Paid"
+                unCheckedChildren="Unpaid"
+                disabled={!(whorole === "super-admin" || whorole === "client" || canEditClient)}
+                className={`${salaryRecord?.status === 'paid' ? 'bg-green-500' : 'bg-gray-400'} shadow-sm`}
+              />
+              <Badge
+                status={salaryRecord?.status === 'paid' ? 'success' : 'error'}
+                text={
+                  <span className="text-sm font-medium">
+                    {salaryRecord?.status
+                      ? salaryRecord.status.charAt(0).toUpperCase() + salaryRecord.status.slice(1)
+                      : 'No Salary'}
+                  </span>
+                }
+              />
+            </div>
+            <div className="text-xs text-gray-500">
+              Next Payment: {nextPaymentDate}
+            </div>
           </div>
         );
       },

@@ -202,7 +202,7 @@ const AddUser = ({ visible, onClose }) => {
                       </>
                     )}
                   >
-                    {filterdata.map((tag) => (
+                    {filteredRoles.map((tag) => (
                       <Option key={tag?.id} value={tag?.id}>
                         {tag?.role_name}
                       </Option>

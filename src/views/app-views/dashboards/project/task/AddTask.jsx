@@ -104,6 +104,7 @@ const AddTask = ({ onClose }) => {
     dueDate: null,
     assignTo: [],
     description: "",
+    task_reporter: "",
     files: [] // Add files to initial values
   };
 
@@ -129,7 +130,8 @@ const AddTask = ({ onClose }) => {
     priority: Yup.string()
       .required("Priority is required"),
     status: Yup.string()
-      .required("Status is required")
+      .required("Status is required"),
+      task_reporter: Yup.string().required("Please select a Task Reporter."),
   });
 
     useEffect(() => {
@@ -484,6 +486,40 @@ const AddTask = ({ onClose }) => {
                     />
                   </div>
                 </Col>
+
+                <Col span={12} className="mt-3">
+                <div className="form-item">
+                  <label className="font-semibold">Task Reporter <span className="text-rose-500">*</span></label>
+                  <Field name="task_reporter">
+                    {({ field }) => (
+                      <Select
+                        {...field}
+                        className="w-full mt-1"
+                        placeholder="Select Task Reporter"
+                        onChange={(value) => setFieldValue("task_reporter", value)}
+                        value={values.task_reporter}
+                      >
+                        {Array.isArray(fnduserdatas) && fnduserdatas.length > 0 ? (
+                          fnduserdatas.map((client) => (
+                            <Option key={client.id} value={client.id}>
+                              {client.firstName || client.username || "Unnamed Client"}
+                            </Option>
+                          ))
+                        ) : (
+                          <Option value="" disabled>
+                            No Employee Available
+                          </Option>
+                        )}
+                      </Select>
+                    )}
+                  </Field>
+                  <ErrorMessage
+                    name="task_reporter"
+                    component="div"
+                    className="error-message text-red-500 my-1"
+                  />
+                </div>
+              </Col>
 
                 <Col span={24} className="mt-4">
                   <div className="form-item">
