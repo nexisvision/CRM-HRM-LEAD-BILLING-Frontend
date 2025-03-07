@@ -29,7 +29,7 @@ import { useDispatch } from "react-redux";
 const { Option } = Select;
 
 const SourcesList = () => {
-  const [list, setList] = useState([]);
+  const [list, setList] = useState();
   const dispatch = useDispatch();
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -48,12 +48,18 @@ const SourcesList = () => {
 
   const lid = userdata.id;
 
-  
+  const user = userdata.username;
+
+
+
   const alltagdata = useSelector((state) => state.Lable);
 
   const alltaggdata = alltagdata.Lable.data || [];
 
-  const datas = alltaggdata?.filter(item => item.lableType === "source");  
+
+  const fndddata = alltaggdata.filter(item => item.created_by === user);
+
+  const datas = alltaggdata?.filter(item => item.lableType === "source");
 
 
 
@@ -196,7 +202,7 @@ const SourcesList = () => {
             className="flex flex-wrap gap-4 mb-4 md:mb-0"
             mobileFlex={false}
           >
-       
+
           </Flex>
           {/* <Flex gap="7px" className="flex">
 						<Button type="primary" className="ml-2" onClick={openAddPaymentModal}>
@@ -210,13 +216,13 @@ const SourcesList = () => {
             columns={tableColumns}
             dataSource={list}
             rowKey="id"
-            // scroll={{x:1000}}
-            // rowSelection={{
-            // 	selectedRowKeys: selectedRowKeys,
-            // 	type: 'checkbox',
-            // 	preserveSelectedRowKeys: false,
-            // 	...rowSelection,
-            // }}
+          // scroll={{x:1000}}
+          // rowSelection={{
+          // 	selectedRowKeys: selectedRowKeys,
+          // 	type: 'checkbox',
+          // 	preserveSelectedRowKeys: false,
+          // 	...rowSelection,
+          // }}
           />
         </div>
       </Card>
@@ -227,7 +233,7 @@ const SourcesList = () => {
         onCancel={closeAddSourcesModal}
         footer={null}
         width={700}
-        // className='mt-[-70px]'
+      // className='mt-[-70px]'
       >
         <AddSources onClose={closeAddSourcesModal} />
       </Modal>
@@ -237,7 +243,7 @@ const SourcesList = () => {
         onCancel={closeEditSourcesModal}
         footer={null}
         width={700}
-        // className='mt-[-70px]'
+      // className='mt-[-70px]'
       >
         <EditSources onClose={closeEditSourcesModal} idd={idd} />
       </Modal>

@@ -3,13 +3,12 @@ import { Provider, useSelector } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeSwitcherProvider } from 'react-css-theme-switcher';
 import store from './store';
-import history from './history';
 import Layouts from './layouts';
 import { THEME_CONFIG } from './configs/AppConfig';
 import './lang';
 import "react-toastify/dist/ReactToastify.css";
-import socketService from './services/SocketService';
 import './assets/styles/custom-scrollbar.css';
+import { ConfigProvider } from 'antd';
 
 const themes = {
   dark: `${process.env.PUBLIC_URL}/css/dark-theme.css`,
@@ -36,17 +35,7 @@ function AppContent() {
     if (appleIcon && companyData?.favicon) {
       appleIcon.href = companyData.favicon;
     }
-  }, [companyData,alldata]);
-
-  useEffect(() => {
-    // Initialize socket connection
-    const socket = socketService.connect();
-
-    // Cleanup on unmount
-    return () => {
-      socketService.disconnect();
-    };
-  }, []);
+  }, [companyData, alldata]);
 
   return (
     <ThemeSwitcherProvider
@@ -59,16 +48,18 @@ function AppContent() {
   );
 }
 
-function App() {
+const App = () => {
   return (
     <div className="App">
       <Provider store={store}>
-        <BrowserRouter history={history}>
-          <AppContent />
+        <BrowserRouter>
+          <ConfigProvider>
+            <AppContent />
+          </ConfigProvider>
         </BrowserRouter>
       </Provider>
     </div>
   );
-}
+};
 
 export default App;

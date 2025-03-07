@@ -1,0 +1,28 @@
+/* Add these styles to fix the findDOMNode warning */
+.ant-dropdown-trigger {
+    display: inline-block;
+}
+
+.ellipsis-dropdown {
+    cursor: pointer;
+    padding: 5px;
+    font-size: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Fix for menu item alignment */
+.ant-dropdown-menu-item {
+    display: flex !important;
+    align-items: center !important;
+}
+
+/* Fix for tooltip positioning */
+.ant-tooltip {
+    pointer-events: none;
+}
+
+.ant-tooltip-inner {
+    min-height: auto;
+}
