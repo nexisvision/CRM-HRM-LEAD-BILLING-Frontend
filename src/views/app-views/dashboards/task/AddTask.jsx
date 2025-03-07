@@ -159,6 +159,7 @@ const AddTask = ({ onClose }) => {
 
   return (
     <div className="add-expenses-form">
+      <h2 className="mb-4 border-b pb-2 font-medium"></h2>
 
       <Formik
         initialValues={initialValues}
@@ -169,7 +170,7 @@ const AddTask = ({ onClose }) => {
           <Form className="formik-form" onSubmit={handleSubmit}>
             <Row gutter={16}>
               <Col span={24}>
-                <div className="form-item">
+                <div className="form-item ">
                   <label className="font-semibold">Task Name <span className="text-rose-500">*</span></label>
                   <Field
                     name="taskName"
@@ -273,21 +274,6 @@ const AddTask = ({ onClose }) => {
                       </Select>
                     )}
                   </Field>
-                  {/* Display selected users as tags */}
-                  <div className="mt-2">
-                    {Array.isArray(values.assignTo) && values.assignTo.length > 0 && (
-                      <div className="selected-users">
-                        {values.assignTo.map((userId) => {
-                          const user = fndassine.find(u => u.id === userId);
-                          return user && (
-                            <Tag key={userId} className="mb-1 mr-1">
-                              {user.firstName || user.username || "Unnamed Client"}
-                            </Tag>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
                   <ErrorMessage
                     name="assignTo"
                     component="div"

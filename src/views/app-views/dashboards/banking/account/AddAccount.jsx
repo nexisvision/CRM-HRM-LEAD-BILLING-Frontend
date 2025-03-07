@@ -83,6 +83,7 @@ const AddAccount = ({ onClose }) => {
 
   return (
     <div className="create-account-form">
+      <hr className='border-b border-gray-200 my-2'></hr>
       {/* <h2>Create Job</h2> */}
 
       <Formik
@@ -94,7 +95,7 @@ const AddAccount = ({ onClose }) => {
           <FormikForm onSubmit={handleSubmit}>
             <Row gutter={16}>
               <Col span={12}>
-                <div className="form-group">
+                <div className="form-group mt-2">
                   <label className="font-semibold">Bank Holder Name <span className="text-red-500">*</span></label>
                   <Field
                     name="bankHolderName"
@@ -111,7 +112,7 @@ const AddAccount = ({ onClose }) => {
               </Col>
 
               <Col span={12}>
-                <div className="form-group">
+                <div className="form-group mt-2">
                   <label className="font-semibold">Bank Name <span className="text-red-500">*</span></label>
                   <Field
                     name="bankName"
@@ -128,7 +129,7 @@ const AddAccount = ({ onClose }) => {
               </Col>
 
               <Col span={12}>
-                <div className="form-group mt-2">
+                <div className="form-group mt-3">
                   <label className="font-semibold">Account Number <span className="text-red-500">*</span></label>
                   <Field name="accountNumber">
                     {({ field }) => (
@@ -144,7 +145,7 @@ const AddAccount = ({ onClose }) => {
               </Col>
 
               <Col span={12}>
-                <div className="form-group mt-2">
+                <div className="form-group mt-3">
                   <label className="font-semibold">Opening Balance <span className="text-red-500">*</span></label>
                   <Field name="openingBalance">
                     {({ field }) => (
@@ -237,7 +238,7 @@ const AddAccount = ({ onClose }) => {
 
 
               <Col span={24}>
-                <div className="form-group mt-2">
+                <div className="form-group mt-3">
                   <label className="font-semibold">Bank Address <span className="text-red-500">*</span></label>
                   <Field
                     name="bankAddress"

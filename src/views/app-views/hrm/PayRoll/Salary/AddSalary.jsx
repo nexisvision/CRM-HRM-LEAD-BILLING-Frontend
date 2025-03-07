@@ -104,6 +104,7 @@ const AddSalary = ({ onClose }) => {
         validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
+       
         {({
           values,
           setFieldValue,
@@ -117,6 +118,7 @@ const AddSalary = ({ onClose }) => {
             className="formik-form"
             onSubmit={handleSubmit}
           >
+            <h2 className="mb-3 border-b pb-1 font-medium"></h2>
             <Row gutter={16}>
               <Col span={24}>
                 <div className="form-item">

@@ -43,23 +43,7 @@ const VendorList = () => {
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [idd, setIdd] = useState("");
 
-  // Add account type options
-  const accountTypeList = ['All', 'Salary', 'Savings', 'Current'];
-
-  // useEffect(() => {
-  //   // Fetch data from an API or state management store
-  //   const fetchVendorData = async () => {
-  //     try {
-  //       const response = await fetch('/api/vendors'); // Replace with actual API endpoint
-  //       const data = await response.json();
-  //       setList(data);
-  //     } catch (error) {
-  //       console.error('Failed to fetch vendor data:', error);
-  //     }
-  //   };
-
-  //   fetchVendorData();
-  // }, []);
+ 
 
   useEffect(()=>{
     dispatch(vendordataedata())
@@ -155,45 +139,12 @@ const VendorList = () => {
     return ''
   }
   
-  const handleShowStatus = value => {
-        if (value !== 'All') {
-            const key = 'status'
-            const data = utils.filterArray(userData, key, value)
-            setUsers(data)
-        } else {
-            setUsers(userData)
-        }
-    }
+ 
   
   const jobStatusList = ['active', 'blocked']
   const dropdownMenu = (record) => (
     <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EyeOutlined />}
-            onClick={handleJob}
-            size="small"
-          >
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<MailOutlined />}
-            onClick={() => showUserProfile(record)}
-            size="small"
-          >
-            <span className="">Send Mail</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
+      
       <Menu.Item>
         <Flex alignItems="center">
           <Button
@@ -369,21 +320,6 @@ const VendorList = () => {
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
             <Input placeholder="Search" prefix={<SearchOutlined />} onChange={(e) => onSearch(e)} />
-          </div>
-          <div className="w-full md:w-48 ">
-            <Select
-              value={accountType}
-              className="w-100"
-              style={{ minWidth: 180 }}
-              onChange={handleAccountTypeFilter}
-              placeholder="Account Type"
-            >
-              {accountTypeList.map(type => (
-                <Option key={type} value={type}>
-                  {type}
-                </Option>
-              ))}
-            </Select>
           </div>
         </Flex>
         <Flex gap="7px">

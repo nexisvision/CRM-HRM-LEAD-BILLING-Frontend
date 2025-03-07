@@ -293,34 +293,6 @@ const ContractList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<CopyOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span className="">Duplicate</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EyeOutlined />}
-            onClick={openViewContractModal}
-            size="small"
-          >
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-      
-
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
                     <Menu.Item>
@@ -355,22 +327,6 @@ const ContractList = () => {
                    </Menu.Item>
                     ) : null}
 
-
-
-
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<PushpinOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span className="ml-2">Pin</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
       
     </Menu>
   );
@@ -438,19 +394,9 @@ const ContractList = () => {
       compare: (a, b) => a.subject.length - b.subject.length,
     },
   },
-    // {
-    //   title: "Contract Type",
-    //   dataIndex: "type",
-    //   compare: (a, b) => a.type.length - b.type.length,
-    // },
     {
       title: "Contract Value",
       dataIndex: "value",
-      // render: (_, record) => (
-      //     <div className="d-flex">
-      //         <AvatarStatus size={30} src={record.image} name={record.name}/>
-      //     </div>
-      // ),
       sorter: {
         compare: (a, b) => a.value.length - b.value.length,
       },
@@ -487,18 +433,6 @@ const ContractList = () => {
   ];
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
-      {/* <Row gutter={16}>
-        {dealStatisticData.map((elm, i) => (
-          <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-            <StatisticWidget
-              title={elm.title}
-              value={elm.value}
-              status={elm.status}
-              subtitle={elm.subtitle}
-            />
-          </Col>
-        ))}
-      </Row> */}
       <Flex
         alignItems="center"
         justifyContent="space-between"

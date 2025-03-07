@@ -41,6 +41,8 @@ const AddTransfer = ({ onClose }) => {
 
     const accountdata = useSelector((state) => state.account.account.data);
 
+
+
     const onSubmit = async (values, { setSubmitting, resetForm }) => {
         try {
             // Add your API call here
@@ -68,7 +70,7 @@ const AddTransfer = ({ onClose }) => {
 
     return (
         <div className="create-account-form">
-            {/* <h2>Create Job</h2> */}
+            <hr className='border-b border-gray-200 my-2'></hr>
 
             <Formik
                 initialValues={initialValues}
@@ -78,7 +80,7 @@ const AddTransfer = ({ onClose }) => {
                 {({ handleSubmit, isSubmitting, setFieldValue, values, setFieldTouched, resetForm }) => (
                     <FormikForm onSubmit={handleSubmit}>
                         <Row gutter={16}>
-                            <Col span={12} className="">
+                            <Col span={12} className="mt-2">
                                 <div className="form-item">
                                     <label className="font-semibold">Date <span className="text-red-500">*</span></label>
                                     <Field name="date">
@@ -101,7 +103,7 @@ const AddTransfer = ({ onClose }) => {
                                 </div>
                             </Col>
                             <Col span={12}>
-                                <div className="form-group">
+                                <div className="form-group mt-2">
                                     <label className="font-semibold">From Account <span className="text-red-500">*</span></label>
                                     <Field name="fromAccount">
                                         {({ field }) => (
@@ -109,8 +111,10 @@ const AddTransfer = ({ onClose }) => {
                                                 {...field}
                                                 onChange={(value) => {
                                                     setFieldValue('fromAccount', value);
-                                                    // When fromAccount is selected, set toAccount to the same value
-                                                    // setFieldValue('toAccount', value);
+                                                    // If selected bank is same as toAccount, clear toAccount
+                                                    if (value === values.toAccount) {
+                                                        setFieldValue('toAccount', '');
+                                                    }
                                                 }}
                                                 placeholder="Select from account"
                                                 className="w-full mt-1"
@@ -145,24 +149,8 @@ const AddTransfer = ({ onClose }) => {
                                 </div>
                             </Col>
 
-                            {/* <Col span={12}>
-                                <div className="form-group mt-2">
-                                    <label className="font-semibold">To Account <span className="text-red-500">*</span></label>
-                                    <Field name="toAccount">
-                                        {({ field }) => (
-                                            <Input {...field} placeholder="Enter to account" className="w-full mt-1" />
-                                        )}
-                                    </Field>
-                                    <ErrorMessage
-                                        name="toAccount"
-                                        component="div"
-                                        className="text-red-500 mt-1"
-                                    />
-                                </div>
-                            </Col> */}
-
-<Col span={12}>
-                                <div className="form-group">
+                            <Col span={12}>
+                                <div className="form-group mt-3">
                                     <label className="font-semibold">To Account <span className="text-red-500">*</span></label>
                                     <Field name="toAccount">
                                         {({ field }) => (
@@ -170,8 +158,6 @@ const AddTransfer = ({ onClose }) => {
                                                 {...field}
                                                 onChange={(value) => {
                                                     setFieldValue('toAccount', value);
-                                                    // When fromAccount is selected, set toAccount to the same value
-                                                    // setFieldValue('fromAccount', value);
                                                 }}
                                                 placeholder="Select to account"
                                                 className="w-full mt-1"
@@ -190,11 +176,13 @@ const AddTransfer = ({ onClose }) => {
                                                     </>
                                                 )}
                                             >
-                                                {accountdata && accountdata.map((account) => (
-                                                    <Option key={account.id} value={account.id}>
-                                                        {account.bankName}
-                                                    </Option>
-                                                ))}
+                                                {accountdata && accountdata
+                                                    .filter(account => account.id !== values.fromAccount) // Filter out the selected fromAccount
+                                                    .map((account) => (
+                                                        <Option key={account.id} value={account.id}>
+                                                            {account.bankName}
+                                                        </Option>
+                                                    ))}
                                             </Select>
                                         )}
                                     </Field>
@@ -207,7 +195,7 @@ const AddTransfer = ({ onClose }) => {
                             </Col>
 
                             <Col span={12}>
-                                <div className="form-group mt-2">
+                                <div className="form-group mt-3">
                                     <label className="font-semibold">Amount <span className="text-red-500">*</span></label>
                                     <Field name="amount">
                                         {({ field }) => (

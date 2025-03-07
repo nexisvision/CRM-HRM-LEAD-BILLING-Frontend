@@ -102,7 +102,7 @@ const AddVendor = ({ onClose }) => {
                   name="name"
                   as={Input}
                   placeholder="Enter Name"
-                  className={errors.name && touched.name ? 'is-invalid' : 'mt-1'}
+                  className={errors.name && touched.name ? 'is-invalid mt-1' : 'mt-1'}
                 />
                 {errors.name && touched.name && (
                   <div className="text-red-500">{errors.name}</div>
@@ -117,7 +117,7 @@ const AddVendor = ({ onClose }) => {
                     {({ field }) => (
                       <Select
                         {...field}
-                        className="phone-code-select"
+                        className="phone-code-select mt-1"
                         style={{
                           width: '80px',
                           borderTopRightRadius: 0,
@@ -165,7 +165,7 @@ const AddVendor = ({ onClose }) => {
                     {({ field }) => (
                       <Input
                         {...field}
-                        className="phone-input"
+                        className="phone-input mt-1"
                         style={{
                           borderTopLeftRadius: 0,
                           borderBottomLeftRadius: 0,
@@ -195,7 +195,7 @@ const AddVendor = ({ onClose }) => {
                   as={Input}
                   placeholder="Enter email"
                   type="email"
-                  className={errors.email && touched.email ? 'is-invalid' : 'mt-1'}
+                  className={errors.email && touched.email ? 'is-invalid mt-1' : 'mt-1'}
                 />
                 {errors.email && touched.email && (
                   <div className="text-red-500">{errors.email}</div>

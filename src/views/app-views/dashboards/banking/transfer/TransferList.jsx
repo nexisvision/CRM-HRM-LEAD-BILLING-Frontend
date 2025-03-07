@@ -1,25 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal ,Select} from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, EditOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined } from '@ant-design/icons';
+import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal, Select, DatePicker } from 'antd';
+import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, EditOutlined, PlusOutlined, FileExcelOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import UserView from '../../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
-import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-import StatisticWidget from 'components/shared-components/StatisticWidget';
-import { AnnualStatisticData } from '../../../dashboards/default/DefaultDashboardData';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-// import AddJob from './AddJob';
 import { useNavigate } from 'react-router-dom';
 import utils from 'utils';
 import AddTransfer from './AddTransfer';
 import EditTransfer from './EditTransfer';
 import { transferdatas, transferdeltess } from './transferReducers/transferSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import List from 'rc-virtual-list';
-// import AddAccount from './AddAccount';
-// import EditAccount from './EditAccount';
-// import EditJob from './EditJob'
-const { Option } = Select
+import { getAccounts } from '../account/AccountReducer/AccountSlice';
+
+const { Option } = Select;
 
 const TransferList = () => {
   const [users, setUsers] = useState([]);
@@ -32,21 +25,19 @@ const TransferList = () => {
   const [isAddAccountModalVisible, setIsAddAccountModalVisible] = useState(false);
   const [isEditAccountModalVisible, setIsEditAccountModalVisible] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch()
-  // const [isViewJobModalVisible, setIsViewJobModalVisible] = useState(false);
-  const [annualStatisticData] = useState(AnnualStatisticData);
+  const dispatch = useDispatch();
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [accountType, setAccountType] = useState('All');
   const [isAddTransferModalVisible, setIsAddTransferModalVisible] = useState(false);
   const [isEditTransferModalVisible, setIsEditTransferModalVisible] = useState(false);
   const [selectedTransfer, setSelectedTransfer] = useState(null);
   const [idd, setIdd] = useState("");
-
-  // Add account type options
-  const accountTypeList = ['All', 'Salary', 'Savings', 'Current'];
+  const [accountsList, setAccountsList] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(()=>{
     dispatch(transferdatas())
+    dispatch(getAccounts())
   },[dispatch])
 
   // Open Add Job Modal
@@ -135,100 +126,57 @@ const TransferList = () => {
     return ''
   }
   
-  const handleShowStatus = value => {
-        if (value !== 'All') {
-            const key = 'status'
-            const data = utils.filterArray(users, key, value)
-            setUsers(data)
-        } else {
-            setUsers(users)
-        }
-    }
+  
   
   const jobStatusList = ['active', 'blocked']
-  const dropdownMenu = (record) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EyeOutlined />}
-            onClick={handleJob}
-            size="small"
-          >
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<MailOutlined />}
-            onClick={() => showUserProfile(record)}
-            size="small"
-          >
-            <span className="">Send Mail</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EditOutlined />}
-            onClick={() => openEditTransferModal(record)}
-            size="small"
-          >
-            <span className="ml-2">Edit</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<DeleteOutlined />}
-            onClick={() => deleteUser(record.id)}
-            size="small"
-          >
-            <span className="">Delete</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+
+  // Add this helper function at the top of your component
+  const stripHtmlTags = (html) => {
+    if (!html) return '';
+    // Create a temporary div element
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    // Return the text content only
+    return temp.textContent || temp.innerText || '';
+  };
+
   const tableColumns = [
-    // {
-    //   title: 'Chart Of Account	',
-    //   dataIndex: 'chartofaccount',
-    //   sorter: {
-    //     compare: (a, b) => a.chartofaccount.length - b.chartofaccount.length,
-    //   },
-    // },
     {
       title: 'Date',
       dataIndex: 'date',
+      render: (date) => dayjs(date).format('DD/MM/YYYY'),
       sorter: {
-        compare: (a, b) => a.date.length - b.date.length,
+        compare: (a, b) => dayjs(a.date).unix() - dayjs(b.date).unix(),
       },
     },
     {
       title: 'From Account',
       dataIndex: 'fromAccount',
+      render: (fromAccount) => {
+        const account = accountsList.find(acc => acc.id === fromAccount);
+        return account ? account.bankName : 'Unknown Account';
+      },
       sorter: {
-        compare: (a, b) => a.fromaccount.length - b.fromaccount.length,
+        compare: (a, b) => {
+          const accountA = accountsList.find(acc => acc.id === a.fromAccount);
+          const accountB = accountsList.find(acc => acc.id === b.fromAccount);
+          return accountA?.bankName.localeCompare(accountB?.bankName) || 0;
+        },
       },
     },
     {
       title: 'To Account',
       dataIndex: 'toAccount',
+      render: (toAccount) => {
+        const account = accountsList.find(acc => acc.id === toAccount);
+        return account ? account.bankName : 'Unknown Account';
+      },
       sorter: {
-        compare: (a, b) => a.toaccount.length - b.toaccount.length,
+        compare: (a, b) => {
+          const accountA = accountsList.find(acc => acc.id === a.toAccount);
+          const accountB = accountsList.find(acc => acc.id === b.toAccount);
+          return accountA?.bankName.localeCompare(accountB?.bankName) || 0;
+        },
       },
     },
     {
@@ -241,43 +189,12 @@ const TransferList = () => {
     {
       title: 'Description',
       dataIndex: 'description',
+      render: (description) => stripHtmlTags(description),
       sorter: {
-        compare: (a, b) => a.description.length - b.description.length,
+        compare: (a, b) => stripHtmlTags(a.description).localeCompare(stripHtmlTags(b.description)),
       },
     },
-    // {
-    //   title: 'Bank Branch',
-    //   dataIndex: 'bankbranch',
-    //   sorter: {
-    //     compare: (a, b) => a.bankbranch.length - b.bankbranch.length,
-    //   },
-    // },
-    // {
-    //   title: 'Account Type',
-    //   dataIndex: 'accounttype',
-    //   sorter: {
-    //     compare: (a, b) => {
-    //       if (a.accounttype && b.accounttype) {
-    //         return a.accounttype.localeCompare(b.accounttype);
-    //       }
-    //       return 0;
-    //     },
-    //   },
-    //   render: (accounttype) => (
-    //     <Tag color={getAccountTypeColor(accounttype)}>
-    //       {accounttype}
-    //     </Tag>
-    //   ),
-    // },
-    {
-      title: 'Action',
-      dataIndex: 'actions',
-      render: (_, elm) => (
-        <div className="text-center">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
-        </div>
-      ),
-    },
+   
   ];
   // Open Add Account Modal
   const openAddAccountModal = () => {
@@ -332,39 +249,49 @@ const TransferList = () => {
     setSelectedTransfer(null);
   };
 
+  const allAccountsData = useSelector((state) => state?.account?.account?.data);
+
+  useEffect(() => {
+    if (allAccountsData) {
+      setAccountsList(allAccountsData);
+    }
+  }, [allAccountsData]);
+
+  // Add date search handler
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    if (date) {
+      const formattedDate = dayjs(date).format('YYYY-MM-DD');
+      const filteredData = alltransferdata.filter(item => 
+        dayjs(item.date).format('YYYY-MM-DD') === formattedDate
+      );
+      setList(filteredData);
+    } else {
+      // If date is cleared, reset to original data
+      setList(alltransferdata);
+    }
+  };
+
   return (
     <Card bodyStyle={{ padding: '-3px' }}>
-      {/* <Row gutter={16}>
-        {annualStatisticData.map((elm, i) => (
-          <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-            <StatisticWidget
-              title={elm.title}
-              value={elm.value}
-              status={elm.status}
-              subtitle={elm.subtitle}
-            />
-          </Col>
-        ))}
-      </Row> */}
+     
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">
-            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={(e) => onSearch(e)} />
+            <Input 
+              placeholder="Search" 
+              prefix={<SearchOutlined />} 
+              onChange={(e) => onSearch(e)} 
+            />
           </div>
-          <div className="w-full md:w-48 ">
-            <Select
-              value={accountType}
-              className="w-100"
-              style={{ minWidth: 180 }}
-              onChange={handleAccountTypeFilter}
-              placeholder="Account Type"
-            >
-              {accountTypeList.map(type => (
-                <Option key={type} value={type}>
-                  {type}
-                </Option>
-              ))}
-            </Select>
+          <div className="mr-md-3 mb-3">
+            <DatePicker 
+              placeholder="Select Date"
+              onChange={handleDateChange}
+              value={selectedDate}
+              format="DD/MM/YYYY"
+              style={{ width: '200px' }}
+            />
           </div>
         </Flex>
         <Flex gap="7px">

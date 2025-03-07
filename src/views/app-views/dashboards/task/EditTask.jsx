@@ -235,6 +235,7 @@ const EditTask = ({ onClose, idd, projectId }) => {
 
   return (
     <div className="add-expenses-form">
+      <h2 className="mb-4 border-b pb-2 font-medium"></h2>
 
       <Formik
         initialValues={initialValues}
@@ -336,20 +337,7 @@ const EditTask = ({ onClose, idd, projectId }) => {
                     )}
                   </Field>
                   {/* Display selected users as tags */}
-                  <div className="mt-2">
-                    {Array.isArray(values.assignTo) && values.assignTo.length > 0 && (
-                      <div className="selected-users">
-                        {values.assignTo.map((userId) => {
-                          const user = fndassine.find(u => u.id === userId);
-                          return user && (
-                            <Tag key={userId} className="mb-1 mr-1" color="blue">
-                              {user.firstName || user.username || "Unnamed Client"}
-                            </Tag>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
+                  
                   <ErrorMessage
                     name="assignTo"
                     component="div"

@@ -95,6 +95,7 @@ const EditAppraisal = ({ id , onClose }) => {
                   onFinish={onFinish}
                   onFinishFailed={onFinishFailed}
           >
+            <h2 className="mb-3 border-b pb-1 font-medium"></h2>
             <Row gutter={16}>
               {/* Branch Dropdown */}
               <Col span={12}>

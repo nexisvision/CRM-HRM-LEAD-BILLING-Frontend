@@ -55,6 +55,7 @@ const AddTaskcalendar = ({ open, onCancel, selectedDate }) => {
       destroyOnClose={true}
       onCancel={onCancel}
     >
+      <h2 className="mb-4 border-b pb-2 font-medium"></h2>
       <Form form={form} layout="vertical" name="new-task" preserve={false} onFinish={onSubmit}>
         <Form.Item 
           name="title" 

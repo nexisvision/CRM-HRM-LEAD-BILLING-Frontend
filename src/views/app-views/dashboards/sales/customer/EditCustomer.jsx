@@ -217,7 +217,7 @@ const EditCustomer = ({ idd, onClose }) => {
                         {({ field }) => (
                           <Select
                             {...field}
-                            className="phone-code-select"
+                            className="phone-code-select mt-1"
                             style={{
                               width: '80px',
                               borderTopRightRadius: 0,
@@ -265,7 +265,7 @@ const EditCustomer = ({ idd, onClose }) => {
                         {({ field, form }) => (
                           <Input
                             {...field}
-                            className="phone-input"
+                            className="phone-input mt-1"
                             style={{
                               borderTopLeftRadius: 0,
                               borderBottomLeftRadius: 0,
@@ -329,7 +329,7 @@ const EditCustomer = ({ idd, onClose }) => {
                         {({ field }) => (
                           <Select
                             {...field}
-                            className="phone-code-select"
+                            className="phone-code-select mt-1"
                             style={{
                               width: '80px',
                               borderTopRightRadius: 0,
@@ -359,7 +359,7 @@ const EditCustomer = ({ idd, onClose }) => {
                         {({ field }) => (
                           <Input
                             {...field}
-                            className="phone-input"
+                            className="phone-input mt-1"
                             style={{
                               borderTopLeftRadius: 0,
                               borderBottomLeftRadius: 0,
@@ -400,13 +400,13 @@ const EditCustomer = ({ idd, onClose }) => {
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Phone </label>
                     <div className="flex gap-0">
                       <Field name="billing_country_code">
                         {({ field }) => (
                           <Select
                             {...field}
-                            className="phone-code-select"
+                            className="phone-code-select mt-1"
                             style={{
                               width: '80px',
                               borderTopRightRadius: 0,
@@ -454,7 +454,7 @@ const EditCustomer = ({ idd, onClose }) => {
                         {({ field, form }) => (
                           <Input
                             {...field}
-                            className="phone-input"
+                            className="phone-input mt-1"
                             style={{
                               borderTopLeftRadius: 0,
                               borderBottomLeftRadius: 0,
@@ -594,13 +594,13 @@ const EditCustomer = ({ idd, onClose }) => {
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Phone </label>
                     <div className="flex gap-0">
                       <Field name="shipping_country_code">
                         {({ field }) => (
                           <Select
                             {...field}
-                            className="phone-code-select"
+                            className="phone-code-select mt-1"
                             style={{
                               width: '80px',
                               borderTopRightRadius: 0,
@@ -648,7 +648,7 @@ const EditCustomer = ({ idd, onClose }) => {
                         {({ field, form }) => (
                           <Input
                             {...field}
-                            className="phone-input"
+                            className="phone-input mt-1"
                             style={{
                               borderTopLeftRadius: 0,
                               borderBottomLeftRadius: 0,

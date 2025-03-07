@@ -26,16 +26,11 @@ const AddAppraisal = ({ onClose }) => {
   const [selectedBranch, setSelectedBranch] = useState(null);
 
 
-  // const employeeData = useSelector((state) => state.employee?.employee?.data || []);
-
   const employeeData = useSelector((state) => 
       (state.employee?.employee?.data || []).filter((employee) => employee.employeeId)
     );
 
   const { data: employeee } = useSelector((state) => state.employee.employee);
-
-  // const employeee = employeee.filter((item) => item.created_by === user);
-// console.log("sdfsdf",selectedBranch );
 
   const filteredEmployees = employeee.filter((emp) => emp.branch === selectedBranch);
 
@@ -64,7 +59,6 @@ const AddAppraisal = ({ onClose }) => {
 
   const initialValues = {
     branch: "",
-  
     employee:"",
     businessProcess: "",
     oralCommunication: "",
@@ -90,7 +84,7 @@ const AddAppraisal = ({ onClose }) => {
         onFinish={handleSubmit}
         onFinishFailed={onFinishFailed}
       >
-        
+        <h2 className="mb-3 border-b pb-1 font-medium"></h2>
 
         <Row gutter={16}>
         <Col span={12}>

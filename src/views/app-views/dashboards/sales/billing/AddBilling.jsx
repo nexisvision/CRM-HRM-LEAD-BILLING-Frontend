@@ -448,7 +448,7 @@ const AddBilling = ({ onClose }) => {
           <Row gutter={16}>
             <Col span={12} className="mt-1">
               <Form.Item
-                label={<span>Vendor <span className="text-red-500">*</span></span>}
+                label={<span>Vendor </span>}
                 name="vendor"
                 rules={[{ required: true, message: "Please select a vendor" }]}
               >
@@ -486,7 +486,7 @@ const AddBilling = ({ onClose }) => {
 
             <Col span={12}>
               <Form.Item
-                label={<span>Bill Date <span className="text-red-500">*</span></span>}
+                label={<span>Bill Date </span>}
                 name="billDate"
                 rules={[{ required: true, message: "Please select bill date" }]}
               >
@@ -496,7 +496,7 @@ const AddBilling = ({ onClose }) => {
 
             <Col span={12}>
               <Form.Item
-                label={<span>Category <span className="text-red-500">*</span></span>}
+                label={<span>Category</span>}
                 name="category"
                 rules={[{ required: true, message: "Please select or add a category" }]}
               >
@@ -529,7 +529,7 @@ const AddBilling = ({ onClose }) => {
 
             <Col span={12}>
               <Form.Item
-                label={<span>Status <span className="text-red-500">*</span></span>}
+                label={<span>Status </span>}
                 name="status"
                 rules={[{ required: true, message: "Please select or add a status" }]}
               >

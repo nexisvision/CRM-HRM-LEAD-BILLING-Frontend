@@ -122,7 +122,7 @@ const EditTicket = ({ idd, onClose }) => {
             <Row gutter={16}>
               {/* Subject */}
               <Col span={24}>
-                <div className="mb-4">
+                <div className="mt-3">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Subject <span className="text-red-500">*</span>
                   </label>
@@ -145,7 +145,7 @@ const EditTicket = ({ idd, onClose }) => {
 
               {/* Employee Selection */}
               <Col span={12}>
-                <div className="mb-4">
+                <div className="mt-3">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Employee <span className="text-red-500">*</span>
                   </label>
@@ -175,7 +175,7 @@ const EditTicket = ({ idd, onClose }) => {
 
               {/* Priority */}
               <Col span={12}>
-                <div className="mb-4">
+                <div className="mt-3">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Priority <span className="text-red-500">*</span>
                   </label>
@@ -202,7 +202,7 @@ const EditTicket = ({ idd, onClose }) => {
 
               {/* Status */}
               <Col span={12}>
-                <div className="mb-4">
+                <div className="mt-3">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Status <span className="text-red-500">*</span>
                   </label>
@@ -229,7 +229,7 @@ const EditTicket = ({ idd, onClose }) => {
 
               {/* End Date */}
               <Col span={12}>
-                <div className="mb-4">
+                <div className="mt-3">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     End Date <span className="text-red-500">*</span>
                   </label>
@@ -249,7 +249,7 @@ const EditTicket = ({ idd, onClose }) => {
 
               {/* Description */}
               <Col span={24}>
-                <div className="mb-4">
+                <div className="mt-3">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Description <span className="text-red-500">*</span>
                   </label>
@@ -273,7 +273,7 @@ const EditTicket = ({ idd, onClose }) => {
 
               {/* File Upload */}
               <Col span={24}>
-                <div className="mb-4">
+                  <div className="mt-3">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Attachment
                   </label>

@@ -41,9 +41,9 @@ const AddContract = ({ onClose }) => {
   
   const user = useSelector((state) => state.user.loggedInUser.username);
 
-  const [isContracttypeModalVisible, setIsContracttypeModalVisible] = useState(false);
-  const [newContracttype, setNewContracttype] = useState("");
-  const [contracttypes, setContracttypes] = useState([]);
+  const [contractTypes, setContractTypes] = useState([]);
+  const [newContractType, setNewContractType] = useState("");
+  const [isContractTypeModalVisible, setIsContractTypeModalVisible] = useState(false);
   const [filteredProjects, setFilteredProjects] = useState([]);
   const allempdatass = useSelector((state) => state.currencies);
   const fnddatass = allempdatass?.currencies?.data;
@@ -55,7 +55,7 @@ const AddContract = ({ onClose }) => {
       const inrCurrency = fnddatass.find(c => c.currencyCode === 'INR');
       return inrCurrency?.id || fnddatass[0]?.id;
     }
-    return '';
+    return '₹';
   };
 
   const getInitialCountry = () => {
@@ -79,7 +79,7 @@ const AddContract = ({ onClose }) => {
   }, [dispatch]);
 
   useEffect(() => {
-    fetchLables("contracttype", setContracttypes);
+    fetchLables("contracttype", setContractTypes);
   }, []);
 
   // const getInitialCountry = () => {
@@ -134,16 +134,24 @@ const AddContract = ({ onClose }) => {
         if (!value) return true;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        return value >= today;
-      }),
+        return moment(value).isSameOrAfter(today, 'day');
+      })
+      .test("startDate", "Start date is required", (value) => value !== null),
     endDate: Yup.date()
       .required("End date is required.")
       .nullable()
       .test("endDate", "End date must be after start date", function(value) {
         const { startDate } = this.parent;
         if (!startDate || !value) return true;
-        return value > startDate;
-      }),
+        return moment(value).isAfter(moment(startDate), 'day');
+      })
+      .test("endDate", "End date cannot be in the past", function(value) {
+        if (!value) return true;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return moment(value).isSameOrAfter(today, 'day');
+      })
+      .test("endDate", "End date is required", (value) => value !== null),
     zipcode: Yup.string()
       .required("Please enter a Zip Code.")
       .matches(/^\d+$/, "Zip code must contain only digits")
@@ -207,6 +215,10 @@ const AddContract = ({ onClose }) => {
     }
   };
 
+  // Create a ref to store setFieldValue function
+  const setFieldValueRef = React.useRef(null);
+
+  // Update the handleAddNewLable function
   const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
     if (!newValue.trim()) {
       message.error(`Please enter a ${lableType} name.`);
@@ -223,7 +235,12 @@ const AddContract = ({ onClose }) => {
       message.success(`${lableType} added successfully.`);
       setter("");
       modalSetter(false);
-      await fetchLables(lableType, setContracttypes);
+      
+      // Fetch updated labels and set the new value
+      await fetchLables(lableType, setContractTypes);
+      if (setFieldValueRef.current) {
+        setFieldValueRef.current("type", newValue.trim());
+      }
     } catch (error) {
       console.error(`Failed to add ${lableType}:`, error);
       message.error(`Failed to add ${lableType}.`);
@@ -255,471 +272,521 @@ const AddContract = ({ onClose }) => {
         validationSchema={validationSchema}
         onSubmit={onSubmit}
       >
-        {({ handleSubmit, setFieldValue, values,setFieldTouched }) => (
-          <Form className="formik-form" onSubmit={handleSubmit}>
-            <Row gutter={16}>
-              <Col span={12}>
-                <div className="form-item">
-                  <label className="font-semibold">Subject <span className="text-red-500">*</span></label>
-                  <Field
-                    name="subject"
-                    className="mt-1"
-                    as={Input}
-                    placeholder="Enter Subject Name"
-                  />
-                  <ErrorMessage
-                    name="subject"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+        {({ handleSubmit, setFieldValue, values,setFieldTouched }) => {
+          // Store setFieldValue in ref when Formik renders
+          setFieldValueRef.current = setFieldValue;
 
-              <Col span={12}>
-                <div className="form-group">
-                  <label className="text-gray-600 font-semibold mb-2 block">Phone <span className="text-red-500">*</span></label>
-                  <div className="flex gap-0">
-                    <Field name="phoneCode">
+          return (
+            <Form className="formik-form" onSubmit={handleSubmit}>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <div className="form-item">
+                    <label className="font-semibold">Subject <span className="text-red-500">*</span></label>
+                    <Field
+                      name="subject"
+                      className="mt-2"
+                      as={Input}
+                      placeholder="Enter Subject Name"
+                    />
+                    <ErrorMessage
+                      name="subject"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={12}>
+                  <div className="form-group">
+                    <label className="text-gray-600 font-semibold mb-2 block">Phone <span className="text-red-500">*</span></label>
+                    <div className="flex gap-0">
+                      <Field name="phoneCode">
+                        {({ field }) => (
+                          <Select
+                            {...field}
+                            className="phone-code-select"
+                            style={{
+                              width: '80px',
+                              borderTopRightRadius: 0,
+                              borderBottomRightRadius: 0,
+                              borderRight: 0,
+                              backgroundColor: '#f8fafc',
+                            }}
+                            placeholder={<span className="text-gray-400">+91</span>}
+                            // defaultValue={getInitialPhoneCode()}
+                            onChange={(value) => {
+                              if (value === 'add_new') {
+                                setIsAddPhoneCodeModalVisible(true);
+                              } else {
+                                setFieldValue('phoneCode', value);
+                              }
+                            }}
+                            value={values.phoneCode}
+                            dropdownStyle={{ minWidth: '180px' }}
+                            suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                            dropdownRender={menu => (
+                              <div>
+                                <div
+                                  className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                  onClick={() => setIsAddPhoneCodeModalVisible(true)}
+                                >
+                                  <PlusOutlined className="mr-2" />
+                                  <span className="text-sm">Add New</span>
+                                </div>
+                                {menu}
+                              </div>
+                            )}
+                          >
+                            {countries?.map((country) => (
+                              <Option key={country.id} value={country.phoneCode}>
+                                <div className="flex items-center w-full px-1">
+                                  <span className="text-base min-w-[40px]">{country.phoneCode}</span>
+                                  <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
+                                  <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
+                                </div>
+                              </Option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
+                      <Field name="phone">
+                        {({ field }) => (
+                          <Input
+                            {...field}
+                            className="phone-input"
+                            style={{
+                              borderTopLeftRadius: 0,
+                              borderBottomLeftRadius: 0,
+                              borderLeft: '1px solid #d9d9d9',
+                              width: 'calc(100% - 80px)'
+                            }}
+                            type="number"
+                            placeholder="Enter phone number"
+                            onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
+                            // prefix={
+                            //   values.phoneCode && (
+                            //     <span className="text-gray-600 font-medium mr-1">
+                            //       {values.phoneCode}
+                            //     </span>
+                            //   )
+                            // }
+                          />
+                        )}
+                      </Field>
+                    </div>
+                    <ErrorMessage name="phone" component="div" className="text-red-500 mt-1 text-sm" />
+                  </div>
+                </Col>
+
+                <Col span={24} className="mt-4">
+                    <div className="form-item">
+                      <label className="font-semibold">Address <span className="text-red-500">*</span></label>
+                      <Field name="address" className="mt-1" as={Input} placeholder="Enter Address" />
+                      <ErrorMessage
+                        name="address"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">City <span className="text-red-500">*</span></label>
+                    <Field
+                      name="city"
+                      className="mt-1"
+                      as={Input}
+                      placeholder="Enter City Name"
+                    />
+                    <ErrorMessage
+                      name="city"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Country <span className="text-red-500">*</span></label>
+                    <Select
+                     
+                      className="w-full mt-1"
+                      placeholder="Select Country"
+                      name="country"
+                      onChange={(value) => setFieldValue('country', value)}
+                      value={values.country}
+                    >
+                      {countries.map((country) => (
+                        <Option key={country.id} value={country.countryName}>
+                          {country.countryName}
+                        </Option>
+                      ))}
+                    </Select>
+                    <ErrorMessage
+                      name="country"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">State <span className="text-red-500">*</span></label>
+                    <Field
+                      name="state"
+                      className="mt-1"
+                      as={Input}
+                      placeholder="Enter State Name"
+                    />
+                    <ErrorMessage
+                      name="state"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Zip Code <span className="text-red-500">*</span></label>
+                    <Field
+                      name="zipcode"
+                      className="mt-1"
+                      type="number"
+                      as={Input}
+                      placeholder="Enter Zip Code"
+                    />
+                    <ErrorMessage
+                      name="zipcode"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Client <span className="text-red-500">*</span></label>
+                    <Field name="client">
                       {({ field }) => (
                         <Select
                           {...field}
-                          className="phone-code-select"
-                          style={{
-                            width: '80px',
-                            borderTopRightRadius: 0,
-                            borderBottomRightRadius: 0,
-                            borderRight: 0,
-                            backgroundColor: '#f8fafc',
-                          }}
-                          placeholder={<span className="text-gray-400">+91</span>}
-                          // defaultValue={getInitialPhoneCode()}
-                          onChange={(value) => {
-                            if (value === 'add_new') {
-                              setIsAddPhoneCodeModalVisible(true);
-                            } else {
-                              setFieldValue('phoneCode', value);
-                            }
-                          }}
-                          value={values.phoneCode}
-                          dropdownStyle={{ minWidth: '180px' }}
-                          suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-                          dropdownRender={menu => (
-                            <div>
-                              <div
-                                className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                                onClick={() => setIsAddPhoneCodeModalVisible(true)}
-                              >
-                                <PlusOutlined className="mr-2" />
-                                <span className="text-sm">Add New</span>
-                              </div>
-                              {menu}
-                            </div>
-                          )}
+                          className="w-full mt-1"
+                          placeholder="Select Client"
+                          onChange={(value) => handleClientChange(value, setFieldValue)}
+                          value={values.client}
                         >
-                          {countries?.map((country) => (
-                            <Option key={country.id} value={country.phoneCode}>
-                              <div className="flex items-center w-full px-1">
-                                <span className="text-base min-w-[40px]">{country.phoneCode}</span>
-                                <span className="text-gray-600 text-sm ml-3">{country.countryName}</span>
-                                <span className="text-gray-400 text-xs ml-auto">{country.countryCode}</span>
-                              </div>
+                          {clientdata && clientdata.length > 0 ? (
+                            clientdata.map((client) => (
+                              <Option key={client.id} value={client.id}>
+                                {client.username || client.name || "Unnamed Client"}
+                              </Option>
+                            ))
+                          ) : (
+                            <Option value="" disabled>
+                              No Client Available
                             </Option>
-                          ))}
+                          )}
                         </Select>
                       )}
                     </Field>
-                    <Field name="phone">
-                      {({ field }) => (
-                        <Input
-                          {...field}
-                          className="phone-input"
-                          style={{
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0,
-                            borderLeft: '1px solid #d9d9d9',
-                            width: 'calc(100% - 80px)'
-                          }}
-                          type="number"
-                          placeholder="Enter phone number"
-                          onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                          // prefix={
-                          //   values.phoneCode && (
-                          //     <span className="text-gray-600 font-medium mr-1">
-                          //       {values.phoneCode}
-                          //     </span>
-                          //   )
-                          // }
-                        />
-                      )}
-                    </Field>
-                  </div>
-                  <ErrorMessage name="phone" component="div" className="text-red-500 mt-1 text-sm" />
-                </div>
-              </Col>
-
-              <Col span={24} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">Address <span className="text-red-500">*</span></label>
-                    <Field name="address" className="mt-1" as={Input} placeholder="Enter Address" />
                     <ErrorMessage
-                      name="address"
+                      name="client"
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
                   </div>
                 </Col>
 
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">City <span className="text-red-500">*</span></label>
-                  <Field
-                    name="city"
-                    className="mt-1"
-                    as={Input}
-                    placeholder="Enter City Name"
-                  />
-                  <ErrorMessage
-                    name="city"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
+               
 
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Country <span className="text-red-500">*</span></label>
-                  <Select
-                   
-                    className="w-full mt-1"
-                    placeholder="Select Country"
-                    name="country"
-                    onChange={(value) => setFieldValue('country', value)}
-                    value={values.country}
-                  >
-                    {countries.map((country) => (
-                      <Option key={country.id} value={country.countryName}>
-                        {country.countryName}
-                      </Option>
-                    ))}
-                  </Select>
-                  <ErrorMessage
-                    name="country"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">State <span className="text-red-500">*</span></label>
-                  <Field
-                    name="state"
-                    className="mt-1"
-                    as={Input}
-                    placeholder="Enter State Name"
-                  />
-                  <ErrorMessage
-                    name="state"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Zip Code <span className="text-red-500">*</span></label>
-                  <Field
-                    name="zipcode"
-                    className="mt-1"
-                    type="number"
-                    as={Input}
-                    placeholder="Enter Zip Code"
-                  />
-                  <ErrorMessage
-                    name="zipcode"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Client <span className="text-red-500">*</span></label>
-                  <Field name="client">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        placeholder="Select Client"
-                        onChange={(value) => handleClientChange(value, setFieldValue)}
-                        value={values.client}
-                      >
-                        {clientdata && clientdata.length > 0 ? (
-                          clientdata.map((client) => (
-                            <Option key={client.id} value={client.id}>
-                              {client.username || client.name || "Unnamed Client"}
-                            </Option>
-                          ))
-                        ) : (
-                          <Option value="" disabled>
-                            No Client Available
-                          </Option>
-                        )}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="client"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-             
-
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Projects <span className="text-red-500">*</span></label>
-                  <Field name="project">
-                    {({ field }) => (
-                      <Select
-                        {...field}
-                        className="w-full mt-1"
-                        placeholder="Select Projects"
-                        onChange={(value) => setFieldValue("project", value)}
-                        value={values.project}
-                      >
-                        {filteredProjects && filteredProjects.length > 0 ? (
-                          filteredProjects.map((project) => (
-                            <Option key={project.id} value={project.id}>
-                              {project.project_name || "Unnamed Project"}
-                            </Option>
-                          ))
-                        ) : (
-                          <Option value="" disabled>
-                            No Projects Available
-                          </Option>
-                        )}
-                      </Select>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="project"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-               <Col span={12} className="mt-4">
-                      <div className="form-group">
-                        <label className="text-gray-600 font-semibold mb-2 block"> Currency <span className="text-red-500">*</span></label>
-                        <div className="flex gap-0">
-                          <Field name="currency">
-                            {({ field }) => (
-                              <Select
-                                {...field}
-                                className="currency-select"
-                                style={{
-                                  width: '80px',
-                                  borderTopRightRadius: 0,
-                                  borderBottomRightRadius: 0,
-                                  borderRight: 0,
-                                  backgroundColor: '#f8fafc',
-                                }}
-                                placeholder={<span className="text-gray-400">$</span>}
-                                onChange={(value) => {
-                                  if (value === 'add_new') {
-                                    setIsAddCurrencyModalVisible(true);
-                                  } else {
-                                    setFieldValue("currency", value);
-                                  }
-                                }}
-                                value={values.currency}
-                                dropdownStyle={{ minWidth: '180px' }}
-                                suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
-                                loading={!fnddatass}
-                                dropdownRender={menu => (
-                                  <div>
-                                    <div
-                                      className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
-                                      onClick={() => setIsAddCurrencyModalVisible(true)}
-                                    >
-                                      <PlusOutlined className="mr-2" />
-                                      <span className="text-sm">Add New</span>
-                                    </div>
-                                    {menu}
-                                  </div>
-                                )}
-                              >
-                                {fnddatass?.map((currency) => (
-                                  <Option key={currency.id} value={currency.id}>
-                                    <div className="flex items-center w-full px-1">
-                                      <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
-                                      <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
-                                      <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
-                                    </div>
-                                  </Option>
-                                ))}
-                              </Select>
-                            )}
-                          </Field>
-                          <Field name="value">
-                            {({ field, form }) => (
-                              <Input
-                                {...field}
-                                className="price-input"
-                                style={{
-                                  borderTopLeftRadius: 0,
-                                  borderBottomLeftRadius: 0,
-                                  borderLeft: '1px solid #d9d9d9',
-                                  width: 'calc(100% - 80px)'
-                                }}
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                placeholder="0.00"
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
-                                    form.setFieldValue('value', value);
-                                  }
-                                }}
-                                onKeyPress={(e) => {
-                                  const charCode = e.which ? e.which : e.keyCode;
-                                  if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
-                                    e.preventDefault();
-                                  }
-                                  if (charCode === 46 && field.value.includes('.')) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                                prefix={
-                                  values.currency && (
-                                    <span className="text-gray-600 font-medium mr-1">
-                                      {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
-                                    </span>
-                                  )
-                                }
-                              />
-                            )}
-                          </Field>
-                        </div>
-                        <ErrorMessage name="value" component="div" className="text-red-500 mt-1 text-sm" />
-                      </div>
-                    </Col>
-
-              <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold ">StartDate <span className="text-rose-500">*</span></label>
-                  <DatePicker
-                    name="startDate"
-                    className="w-full mt-1"
-                    placeholder="Select startDate"
-                    onChange={(value) => setFieldValue("startDate", value)}
-                    value={values.startDate}
-                    onBlur={() => setFieldTouched("startDate", true)}
-                  />
-                  <ErrorMessage
-                    name="startDate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={12} className="mt-3">
-                <div className="form-item">
-                  <label className="font-semibold ">EndDate <span className="text-rose-500">*</span></label>
-                  <DatePicker
-                    name="endDate"
-                    className="w-full mt-1"
-                    placeholder="Select endDate"
-                    onChange={(value) => setFieldValue("endDate", value)}
-                    value={values.endDate}
-                    onBlur={() => setFieldTouched("endDate", true)}
-                  />
-                  <ErrorMessage
-                    name="endDate"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-
-              <Col span={24} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Description <span className="text-red-500">*</span></label>
-                  <Field name="description">
-                    {({ field }) => (
-                      <ReactQuill
-                        className="mt-1"
-                        value={field.value}
-                        onChange={(value) => setFieldValue("description", value)}
-                        placeholder="Enter description"
-                      />
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="description"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col>
-                    
-              <Col span={24} className="mt-4">
+                <Col span={12} className="mt-4">
                   <div className="form-item">
-                    <label className="font-semibold">Notes <span className="text-red-500">*</span></label>
-                    <Field name="notes">
+                    <label className="font-semibold">Projects <span className="text-red-500">*</span></label>
+                    <Field name="project">
+                      {({ field }) => (
+                        <Select
+                          {...field}
+                          className="w-full mt-1"
+                          placeholder="Select Projects"
+                          onChange={(value) => setFieldValue("project", value)}
+                          value={values.project}
+                        >
+                          {filteredProjects && filteredProjects.length > 0 ? (
+                            filteredProjects.map((project) => (
+                              <Option key={project.id} value={project.id}>
+                                {project.project_name || "Unnamed Project"}
+                              </Option>
+                            ))
+                          ) : (
+                            <Option value="" disabled>
+                              No Projects Available
+                            </Option>
+                          )}
+                        </Select>
+                      )}
+                    </Field>
+                    <ErrorMessage
+                      name="project"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Contract Type <span className="text-red-500">*</span></label>
+                    <Select
+                      style={{ width: "100%" }}
+                      className="mt-1"
+                      placeholder="Select or add new contract type"
+                      value={values.type}
+                      onChange={(value) => setFieldValue("type", value)}
+                      dropdownRender={(menu) => (
+                        <div>
+                          {menu}
+                          <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
+                            <Button
+                              type="link"
+                              icon={<PlusOutlined />}
+                              onClick={() => setIsContractTypeModalVisible(true)}
+                            >
+                              Add New Contract Type
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    >
+                      {contractTypes.map((type) => (
+                        <Option key={type.id} value={type.name}>
+                          {type.name}
+                        </Option>
+                      ))}
+                    </Select>
+                    <ErrorMessage
+                      name="type"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                 <Col span={12} className="mt-4">
+                        <div className="form-group">
+                          <label className="text-gray-600 font-semibold mb-2 block"> Currency <span className="text-red-500">*</span></label>
+                          <div className="flex gap-0">
+                            <Field name="currency">
+                              {({ field }) => (
+                                <Select
+                                  {...field}
+                                  className="currency-select"
+                                  style={{
+                                    width: '80px',
+                                    borderTopRightRadius: 0,
+                                    borderBottomRightRadius: 0,
+                                    borderRight: 0,
+                                    backgroundColor: '#f8fafc',
+                                  }}
+                                  placeholder={<span className="text-gray-400">$</span>}
+                                  onChange={(value) => {
+                                    if (value === 'add_new') {
+                                      setIsAddCurrencyModalVisible(true);
+                                    } else {
+                                      setFieldValue("currency", value);
+                                    }
+                                  }}
+                                  value={values.currency}
+                                  dropdownStyle={{ minWidth: '180px' }}
+                                  suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
+                                  loading={!fnddatass}
+                                  dropdownRender={menu => (
+                                    <div>
+                                      <div
+                                        className="text-blue-600 flex items-center justify-center py-2 px-3 border-b hover:bg-blue-50 cursor-pointer sticky top-0 bg-white z-10"
+                                        onClick={() => setIsAddCurrencyModalVisible(true)}
+                                      >
+                                        <PlusOutlined className="mr-2" />
+                                        <span className="text-sm">Add New</span>
+                                      </div>
+                                      {menu}
+                                    </div>
+                                  )}
+                                >
+                                  {fnddatass?.map((currency) => (
+                                    <Option key={currency.id} value={currency.id}>
+                                      <div className="flex items-center w-full px-1">
+                                        <span className="text-base min-w-[24px]">{currency.currencyIcon}</span>
+                                        <span className="text-gray-600 text-sm ml-3">{currency.currencyName}</span>
+                                        <span className="text-gray-400 text-xs ml-auto">{currency.currencyCode}</span>
+                                      </div>
+                                    </Option>
+                                  ))}
+                                </Select>
+                              )}
+                            </Field>
+                            <Field name="value">
+                              {({ field, form }) => (
+                                <Input
+                                  {...field}
+                                  className="price-input"
+                                  style={{
+                                    borderTopLeftRadius: 0,
+                                    borderBottomLeftRadius: 0,
+                                    borderLeft: '1px solid #d9d9d9',
+                                    width: 'calc(100% - 80px)'
+                                  }}
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  placeholder="0.00"
+                                  onChange={(e) => {
+                                    const value = e.target.value;
+                                    if (value === '' || /^\d*\.?\d{0,2}$/.test(value)) {
+                                      form.setFieldValue('value', value);
+                                    }
+                                  }}
+                                  onKeyPress={(e) => {
+                                    const charCode = e.which ? e.which : e.keyCode;
+                                    if (charCode !== 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                                      e.preventDefault();
+                                    }
+                                    if (charCode === 46 && field.value.includes('.')) {
+                                      e.preventDefault();
+                                    }
+                                  }}
+                                  prefix={
+                                    values.currency && (
+                                      <span className="text-gray-600 font-medium mr-1">
+                                        {fnddatass?.find(c => c.id === values.currency)?.currencyIcon}
+                                      </span>
+                                    )
+                                  }
+                                />
+                              )}
+                            </Field>
+                          </div>
+                          <ErrorMessage name="value" component="div" className="text-red-500 mt-1 text-sm" />
+                        </div>
+                      </Col>
+
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">StartDate <span className="text-rose-500">*</span></label>
+                    <DatePicker
+                      name="startDate"
+                      className="w-full mt-1"
+                      placeholder="DD-MM-YYYY"
+                      format="DD-MM-YYYY"
+                      onChange={(value) => setFieldValue("startDate", value)}
+                      value={values.startDate}
+                      onBlur={() => setFieldTouched("startDate", true)}
+                    />
+                    <ErrorMessage
+                      name="startDate"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={12} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">EndDate <span className="text-rose-500">*</span></label>
+                    <DatePicker
+                      name="endDate"
+                      className="w-full mt-1"
+                      placeholder="DD-MM-YYYY"
+                      format="DD-MM-YYYY"
+                      onChange={(value) => setFieldValue("endDate", value)}
+                      value={values.endDate}
+                      onBlur={() => setFieldTouched("endDate", true)}
+                    />
+                    <ErrorMessage
+                      name="endDate"
+                      component="div"
+                      className="error-message text-red-500 my-1"
+                    />
+                  </div>
+                </Col>
+
+                <Col span={24} className="mt-4">
+                  <div className="form-item">
+                    <label className="font-semibold">Description <span className="text-red-500">*</span></label>
+                    <Field name="description">
                       {({ field }) => (
                         <ReactQuill
-                          {...field}
                           className="mt-1"
-                          value={values.notes}
-                          onChange={(value) =>
-                            setFieldValue("notes", value)
-                          }
+                          value={field.value}
+                          onChange={(value) => setFieldValue("description", value)}
+                          placeholder="Enter description"
                         />
                       )}
                     </Field>
                     <ErrorMessage
-                      name="notes"
+                      name="description"
                       component="div"
                       className="error-message text-red-500 my-1"
                     />
                   </div>
                 </Col>
-            </Row>
+                      
+                <Col span={24} className="mt-4">
+                    <div className="form-item">
+                      <label className="font-semibold">Notes <span className="text-red-500">*</span></label>
+                      <Field name="notes">
+                        {({ field }) => (
+                          <ReactQuill
+                            {...field}
+                            className="mt-1"
+                            value={values.notes}
+                            onChange={(value) =>
+                              setFieldValue("notes", value)
+                            }
+                          />
+                        )}
+                      </Field>
+                      <ErrorMessage
+                        name="notes"
+                        component="div"
+                        className="error-message text-red-500 my-1"
+                      />
+                    </div>
+                  </Col>
+              </Row>
 
-            <div className="form-buttons text-right mt-4">
-              <Button type="default" className="mr-2" onClick={onClose}>
-                Cancel
-              </Button>
-              <Button type="primary" htmlType="submit">
-                Create
-              </Button>
-            </div>
-          </Form>
-        )}
+              <div className="form-buttons text-right mt-4">
+                <Button type="default" className="mr-2" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button type="primary" htmlType="submit">
+                  Create
+                </Button>
+              </div>
+            </Form>
+          );
+        }}
       </Formik>
 
       <Modal
         title="Add New Contract Type"
-        visible={isContracttypeModalVisible}
-        onCancel={() => setIsContracttypeModalVisible(false)}
-        onOk={() => handleAddNewLable("contracttype", newContracttype, setNewContracttype, setIsContracttypeModalVisible)}
-        okText="Add Type"
+        open={isContractTypeModalVisible}
+        onCancel={() => setIsContractTypeModalVisible(false)}
+        onOk={() => handleAddNewLable(
+          "contracttype",
+          newContractType,
+          setNewContractType,
+          setIsContractTypeModalVisible
+        )}
+        okText="Add Contract Type"
       >
         <Input
           placeholder="Enter new contract type"
-          value={newContracttype}
-          onChange={(e) => setNewContracttype(e.target.value)}
+          value={newContractType}
+          onChange={(e) => setNewContractType(e.target.value)}
         />
       </Modal>
 

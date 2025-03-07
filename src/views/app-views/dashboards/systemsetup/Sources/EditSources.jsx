@@ -100,7 +100,7 @@ const EditSources = ({ idd, onClose }) => {
           <h2 className="mb-1 border-b font-medium"></h2>
 
           <div className="">
-            <div className="p-2">
+            <div className="">
               <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}

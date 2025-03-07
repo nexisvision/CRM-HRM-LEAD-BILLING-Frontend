@@ -182,44 +182,9 @@ const AddRole = ({ onClose,resetForm }) => {
 };
 
 
-
-
-//final code \=\=-=\\=-=\\=-=\-\=-\=-=
-  // const onFinish = (values) => {
-  //   const payload = {
-  //     role_name: values.role_name,
-  //     permissions: {
-  //       hrm: []
-  //     }
-  //   };
-
-  //   // Format permissions for API
-  //   Object.entries(modulePermissions).forEach(([submoduleKey, perms]) => {
-  //     const selectedPermissions = Object.entries(perms)
-  //       .filter(([perm, isSelected]) => isSelected)
-  //       .map(([perm]) => perm.toLowerCase());
-
-  //     if (selectedPermissions.length > 0) {
-  //       payload.permissions.hrm.push({
-  //         key: submoduleKey,
-  //         permissions: selectedPermissions
-  //       });
-  //     }
-  //   });
-
-  //   dispatch(addRole(payload))
-  //     .then(() => {
-  //       dispatch(getRoles());
-  //       message.success('Role added successfully!');
-  //       onClose();
-  //     })
-  //     .catch((error) => {
-  //       message.error('Failed to add role.');
-  //     });
-  // };
-
   return (
-    <div className="p-4">
+    <div className="">
+      
       <Form form={form} onFinish={onFinish} layout="vertical">
         <Form.Item
           name="role_name"

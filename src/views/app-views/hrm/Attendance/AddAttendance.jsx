@@ -98,7 +98,7 @@ const AddAttendance = ({ onClose }) => {
           halfDay: "",
           comment: "",
         }}
-        validationSchema={validationSchema}
+        // validationSchema={validationSchema}
         onSubmit={handleSubmit}
       >
         {({ errors, touched, setFieldValue, values }) => (

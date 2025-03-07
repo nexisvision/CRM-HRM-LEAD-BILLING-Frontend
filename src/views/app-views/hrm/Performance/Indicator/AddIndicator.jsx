@@ -18,28 +18,13 @@ const AddIndicator = ({ onClose }) => {
   const user = useSelector((state) => state.user.loggedInUser.username);
 
   const fndbranchdata = useSelector((state) => state.Branch?.Branch?.data || []);
-  // const fndbranchdata = branchData.filter((item) => item.created_by === user);
-  
-// console.log('fndbranchdata',fndbranchdata);
-
   const fnddepartmentdata = useSelector((state) => state.Department?.Department?.data || []);
-  // const fnddepartmentdata = departmentData.filter((item) => item.created_by === user);
-
-// console.log('fnddepartmentdata',fnddepartmentdata);
-
   const fnddesignationdata = useSelector((state) => state.Designation?.Designation?.data || []);
-  // const fnddesignationdata = designationData.filter((item) => item.created_by === user);
-
-
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
-
-  // Filter departments and designations based on selected branch
   const filteredDepartments = fnddepartmentdata.filter((dept) => dept.branch === selectedBranch);
   const filteredDesignations = fnddesignationdata.filter((des) => des.branch === selectedBranch);
 
-
-// console.log('fnddesignationdata',fnddesignationdata);
 
   useEffect(() => {
     dispatch(getBranch());
@@ -104,7 +89,7 @@ const AddIndicator = ({ onClose }) => {
         onFinishFailed={onFinishFailed}
       >
         
-
+        <h2 className="mb-3 border-b pb-1 font-medium"></h2>
         <Row gutter={16}>
         <Col span={12}>
             <Form.Item

@@ -92,6 +92,7 @@ const EditAccount = ({ onClose, idd }) => {
 
   return (
     <div className="edit-account-form">
+      <hr className='border-b border-gray-200 my-2'></hr>
 
       <Formik
         initialValues={initialValues}
@@ -178,7 +179,7 @@ const EditAccount = ({ onClose, idd }) => {
               </Col>
 
               <Col span={12}>
-                <div className="form-group">
+                <div className="form-group mt-3">
                   <label className="text-gray-600 font-semibold mb-2 block">Phone <span className="text-red-500">*</span></label>
                   <div className="flex gap-0">
                     <Field name="phoneCode">
@@ -194,7 +195,6 @@ const EditAccount = ({ onClose, idd }) => {
                             backgroundColor: '#f8fafc',
                           }}
                           placeholder={<span className="text-gray-400">+91</span>}
-                          // defaultValue={getInitialPhoneCode()}
                           onChange={(value) => {
                             if (value === 'add_new') {
                               setIsAddPhoneCodeModalVisible(true);

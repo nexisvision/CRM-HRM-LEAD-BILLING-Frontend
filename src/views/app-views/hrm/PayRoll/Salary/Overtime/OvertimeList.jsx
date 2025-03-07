@@ -78,11 +78,6 @@ const OvertimeList = ({ id, onClose }) => {
   // Dropdown menu for action options
   const dropdownMenu = (record) => (
     <Menu>
-      {/* <Menu.Item>
-        <Button type="text" icon={<EyeOutlined />} size="small">
-          View Details
-        </Button>
-      </Menu.Item> */}
       <Menu.Item>
         <Button
           type="text"

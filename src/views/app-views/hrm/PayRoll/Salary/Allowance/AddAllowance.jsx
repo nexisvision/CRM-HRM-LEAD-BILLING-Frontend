@@ -36,7 +36,7 @@ const AddAllowance = ({ id, onClose }) => {
 
   const filteredEmployees = fnddata?.filter((employee) => employee.id === id);
 
-  console.log("filteredEmployees", filteredEmployees);
+ 
 
   useEffect(() => {
     dispatch(getcurren());
@@ -77,6 +77,7 @@ const AddAllowance = ({ id, onClose }) => {
       >
         {({ errors, touched, setFieldValue, values }) => (
           <Form className="formik-form">
+            <h2 className="mb-3 border-b pb-1 font-medium"></h2>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">

@@ -65,7 +65,7 @@ const AddSaturationDeduction = ({ id, onClose }) => {
 
   return (
     <div className="employee-salary">
-      <hr className="my-2 border-gray-300" />
+     <h2 className="mb-3 border-b pb-1 font-medium"></h2>
       <Formik
         initialValues={{
           title: "",

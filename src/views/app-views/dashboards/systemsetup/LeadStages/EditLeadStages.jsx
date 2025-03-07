@@ -119,7 +119,7 @@ const EditLeadStages = ({ idd, onClose }) => {
     <div>
       <div className="">
         <h2 className="mb-1 border-b font-medium"></h2>
-        <div className="p-2">
+        <div className="">
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}

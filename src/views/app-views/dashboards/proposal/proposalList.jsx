@@ -148,32 +148,6 @@ const ProposalList = () => {
   }, [fnddatas, user, Leads, Deals]);
 
 
-
-
-
-
-
-
-  // useEffect(() => {
-  //   if (fnddatas?.length && Leads?.length && Deals?.length) {
-  //     const enrichedData = fnddatas.map((proposal) => {
-  //       const lead = Leads.find((l) => l.id === proposal.lead_title); // Match lead by ID
-  //       const deal = Deals.find((d) => d.id === proposal.deal_title);
-  //       // 
-
-  //       return {
-  //         ...proposal,
-  //         lead_title: lead?.leadTitle || "N/A", // Use `title` from Leads or fallback to "N/A"
-  //         deal_title: deal?.dealName || "N/A",
-  //         // Use `title` from Deals or fallback to "N/A"
-  //       };
-  //     });
-
-  //     // setUsers(enrichedData); // Set enriched data for the table
-  //   }
-  // }, [fnddatas, Leads, Deals]);
-
-   //// permission
               
                         const roleId = useSelector((state) => state.user.loggedInUser.role_id);
                         const roles = useSelector((state) => state.role?.role?.data);
@@ -304,25 +278,7 @@ const ProposalList = () => {
     setSelectedUser(null);
   };
 
-  //   useEffect(() => {
-  //     dispatch(GetallTrainng());
-  //   }, []);
-
-  // useEffect(() => {
-  //   if (fnddata) {
-  //     setUsers(fnddata);
-  //   }
-  // }, [fnddata]);
-
-  // const showViewApplication = (userInfo) => {
-  //   setViewApplicationVisible(true);
-  //   setSelectedUser(userInfo);
-  // };
-
-  // const closeViewApplication = () => {
-  //   setViewApplicationVisible(false);
-  //   setSelectedUser(null);
-  // };
+ 
 
   const getjobStatus = (status) => {
     if (status === "active") {
@@ -357,19 +313,7 @@ const ProposalList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EyeOutlined />}
-            size="small"
-          // onClick={() => viewfun(elm.id)}
-          >
-            <span>View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
+     
      
      
 
@@ -413,31 +357,6 @@ const ProposalList = () => {
     {
       title: "Lead title",
       dataIndex: "lead_title",
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <Input
-            placeholder="Search lead title"
-            value={selectedKeys[0]}
-            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-            onPressEnter={() => confirm()}
-            style={{ width: 188, marginBottom: 8, display: 'block' }}
-          />
-          <Space>
-            <Button
-              type="primary"
-              onClick={() => confirm()}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Search
-            </Button>
-            <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
-              Reset
-            </Button>
-          </Space>
-        </div>
-      ),
-      filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
       onFilter: (value, record) =>
         record.lead_title
           ? record.lead_title.toString().toLowerCase().includes(value.toLowerCase())

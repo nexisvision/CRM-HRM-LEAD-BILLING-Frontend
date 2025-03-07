@@ -20,9 +20,6 @@ const EditIndicator = ({ id, onClose }) => {
   const fndbranchdata = useSelector((state) => state.Branch?.Branch?.data || []);
   const fnddepartmentdata = useSelector((state) => state.Department?.Department?.data || []);
   const fnddesignationdata = useSelector((state) => state.Designation?.Designation?.data || []);
-  // const fndbranchdata = branchData.filter((item) => item.created_by === user);
-  // const fnddepartmentdata = departmentData.filter((item) => item.created_by === user);
-  // const fnddesignationdata = designationData.filter((item) => item.created_by === user);
   const [singleEmp, setSingleEmp] = useState(null);
   const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
 
@@ -90,7 +87,7 @@ const EditIndicator = ({ id, onClose }) => {
         onFinish={onFinish}
         onFinishFailed={onFinishFailed}
       >
-
+        <h2 className="mb-3 border-b pb-1 font-medium"></h2>
 
         <Row gutter={16}>
           <Col span={12}>

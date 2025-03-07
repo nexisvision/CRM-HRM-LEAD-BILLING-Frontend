@@ -44,10 +44,10 @@ const EditContract = ({ id, onClose }) => {
 
   const getInitialCurrency = () => {
     if (fnddatass?.length > 0) {
-      const usdCurrency = fnddatass.find(c => c.currencyCode === 'USD');
-      return usdCurrency?.id || fnddatass[0]?.id;
+      const inrCurrency = fnddatass.find(c => c.currencyCode === 'INR');
+      return inrCurrency?.id || fnddatass[0]?.id;
     }
-    return '';
+    return '₹';
   };
 
   const getInitialCountry = () => {
@@ -679,14 +679,21 @@ const EditContract = ({ id, onClose }) => {
               <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold ">StartDate <span className="text-rose-500">*</span></label>
-                  <DatePicker
-                    name="startDate"
-                    className="w-full mt-1"
-                    placeholder="Select startDate"
-                    onChange={(value) => setFieldValue("startDate", value)}
-                    value={values.startDate}
-                    onBlur={() => setFieldTouched("startDate", true)}
-                  />
+                  <Field name="startDate">
+                    {({ field }) => (
+                      <Input
+                        {...field}
+                        type="date"
+                        className="w-full mt-1"
+                        onChange={(e) => {
+                          const date = e.target.value;
+                          setFieldValue("startDate", moment(date));
+                        }}
+                        value={values.startDate ? moment(values.startDate).format('YYYY-MM-DD') : ''}
+                        onBlur={() => setFieldTouched("startDate", true)}
+                      />
+                    )}
+                  </Field>
                   <ErrorMessage
                     name="startDate"
                     component="div"
@@ -698,14 +705,21 @@ const EditContract = ({ id, onClose }) => {
               <Col span={12} className="mt-3">
                 <div className="form-item">
                     <label className="font-semibold ">EndDate <span className="text-rose-500">*</span></label>
-                  <DatePicker
-                    name="endDate"
-                    className="w-full mt-1"
-                    placeholder="Select endDate"
-                    onChange={(value) => setFieldValue("endDate", value)}
-                    value={values.endDate}
-                    onBlur={() => setFieldTouched("endDate", true)}
-                  />
+                  <Field name="endDate">
+                    {({ field }) => (
+                      <Input
+                        {...field}
+                        type="date"
+                        className="w-full mt-1"
+                        onChange={(e) => {
+                          const date = e.target.value;
+                          setFieldValue("endDate", moment(date));
+                        }}
+                        value={values.endDate ? moment(values.endDate).format('YYYY-MM-DD') : ''}
+                        onBlur={() => setFieldTouched("endDate", true)}
+                      />
+                    )}
+                  </Field>
                   <ErrorMessage
                     name="endDate"
                     component="div"

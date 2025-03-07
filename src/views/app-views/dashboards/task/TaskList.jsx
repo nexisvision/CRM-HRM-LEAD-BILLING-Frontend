@@ -378,12 +378,6 @@ const TaskList = () => {
   const dropdownMenu = (row) => (
     <Menu onClick={(e) => e.domEvent.stopPropagation()}>
       <Menu.Item>
-        <Flex alignItems="center" onClick={() => openViewTaskModal(row)}>
-          <EyeOutlined />
-          <span className="ml-2">View Details</span>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
         <Flex alignItems="center" onClick={() => togglePinTask(row.id)}>
           <PushpinOutlined style={{ color: pinnedTasks.includes(row.id) ? "#1890ff" : undefined }} />
           <span className="ml-2">{pinnedTasks.includes(row.id) ? "Unpin" : "Pin"}</span>
@@ -437,30 +431,6 @@ const TaskList = () => {
     {
       title: "Title",
       dataIndex: "taskName",
-      // filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-      //   <div style={{ padding: 8 }}>
-      //     <Input
-      //       placeholder="Search title"
-      //       value={selectedKeys[0]}
-      //       onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-      //       onPressEnter={() => confirm()}
-      //       style={{ width: 188, marginBottom: 8, display: 'block' }}
-      //     />
-      //     <Space>
-      //       <Button
-      //         type="primary"
-      //         onClick={() => confirm()}
-      //         size="small"
-      //         style={{ width: 90 }}
-      //       >
-      //         Search
-      //       </Button>
-      //       <Button onClick={() => clearFilters()} size="small" style={{ width: 90 }}>
-      //         Reset
-      //       </Button>
-      //     </Space>
-      //   </div>
-      // ),
       filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
       onFilter: (value, record) =>
         record.taskName
@@ -471,47 +441,6 @@ const TaskList = () => {
     {
       title: "Assigned To",
       dataIndex: "assignTo",
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <Select
-            mode="multiple"
-            style={{ width: 200, marginBottom: 8 }}
-            placeholder="Select users"
-            value={selectedKeys}
-            onChange={values => setSelectedKeys(values)}
-            allowClear
-            showSearch
-            optionFilterProp="children"
-            filterOption={(input, option) => {
-              if (!option?.children) return false;
-              return option.children.toLowerCase().includes(input.toLowerCase());
-            }}
-          >
-            {fndassine.map(user => {
-              const displayName = user.firstName || user.username || "Unnamed User";
-              return (
-                <Option key={user.id} value={user.id}>
-                  {displayName}
-                </Option>
-              );
-            })}
-          </Select>
-          <Space>
-            <Button
-              type="primary"
-              onClick={() => confirm()}
-              size="small"
-              style={{ width: 90 }}
-            >
-              Filter
-            </Button>
-            <Button onClick={clearFilters} size="small" style={{ width: 90 }}>
-              Reset
-            </Button>
-          </Space>
-        </div>
-      ),
-      filterIcon: filtered => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
       onFilter: (value, record) => {
         try {
           let assignedUsers = [];
@@ -812,12 +741,6 @@ const TaskList = () => {
     debouncedSearch(searchValue, dates, selectedStatus, selectedPriority, fnddata, setList);
   };
 
-  // const exportToExcel = () => {
-  //   const ws = utils.json_to_sheet(list); // Convert the list to a worksheet
-  //   const wb = utils.book_new(); // Create a new workbook
-  //   utils.book_append_sheet(wb, ws, "Tasks"); // Append the worksheet to the workbook
-  //   utils.writeFile(wb, "Tasks.xlsx"); // Write the workbook to a file
-  // };
 
   const exportToExcel = () => {
     const ws = utils.json_to_sheet(list);

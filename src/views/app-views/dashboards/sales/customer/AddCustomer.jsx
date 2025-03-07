@@ -185,7 +185,7 @@ const AddCustomer = ({ onClose }) => {
                         {({ field }) => (
                           <Select
                             {...field}
-                            className="phone-code-select"
+                            className="phone-code-select mt-1"
                             style={{
                               width: '80px',
                               borderTopRightRadius: 0,
@@ -233,7 +233,7 @@ const AddCustomer = ({ onClose }) => {
                         {({ field, form }) => (
                           <Input
                             {...field}
-                            className="phone-input"
+                            className="phone-input mt-1"
                             style={{
                               borderTopLeftRadius: 0,
                               borderBottomLeftRadius: 0,
@@ -298,7 +298,7 @@ const AddCustomer = ({ onClose }) => {
                         {({ field }) => (
                           <Select
                             {...field}
-                            className="phone-code-select"
+                            className="phone-code-select mt-1"
                             style={{
                               width: '80px',
                               borderTopRightRadius: 0,
@@ -328,7 +328,7 @@ const AddCustomer = ({ onClose }) => {
                         {({ field }) => (
                           <Input
                             {...field}
-                            className="phone-input"
+                            className="phone-input mt-1"
                             style={{
                               borderTopLeftRadius: 0,
                               borderBottomLeftRadius: 0,
@@ -367,57 +367,17 @@ const AddCustomer = ({ onClose }) => {
                   </div>
                 </Col>
 
-                {/* <Col span={12} className="mt-3">
-                  <div className="form-item">
-                    <label className="font-semibold">Phone  </label>
-                    <div className="flex">
-                      <Select
-                        className="mt-1"
-                        style={{ width: '30%', marginRight: '8px' }}
-                        placeholder="Code"
-                        name="billing_country_code"
-                        onChange={(value) => setFieldValue('billing_country_code', value)}
-                        value={values.billing_country_code}
-                      >
-                        {countries.map((country) => (
-                          <Option key={country.id} value={country.phoneCode}>
-                            {country.phoneCode}
-                          </Option>
-                        ))}
-                      </Select>
-                      <Field
-                        name="billing_phone"
-                        as={Input}
-                        type="number"
-                        className="mt-1"
-                        maxLength={10}
-                        style={{ width: '70%' }}
-                        placeholder="Enter phone"
-                        onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'billing_phone')}
-                        onKeyPress={(e) => {
-                          if (!/[0-9]/.test(e.key)) {
-                            e.preventDefault();
-                          }
-                        }}
-                      />
-                    </div>
-                    <ErrorMessage
-                      name="billing_phone"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col> */}
+              
 
                 <Col span={12} className="mt-3">
                   <div className="form-item">
-                    <label className="font-semibold">Phone <span className="text-red-500">*</span></label>
+                    <label className="font-semibold">Phone </label>
                     <div className="flex gap-0">
                       <Field name="billing_country_code">
                         {({ field }) => (
                           <Select
                             {...field}
-                            className="phone-code-select"
+                            className="phone-code-select mt-1"
                             style={{
                               width: '80px',
                               borderTopRightRadius: 0,
@@ -465,7 +425,7 @@ const AddCustomer = ({ onClose }) => {
                         {({ field, form }) => (
                           <Input
                             {...field}
-                            className="phone-input"
+                            className="phone-input mt-1"
                             style={{
                               borderTopLeftRadius: 0,
                               borderBottomLeftRadius: 0,
@@ -634,7 +594,7 @@ const AddCustomer = ({ onClose }) => {
                         {({ field }) => (
                           <Select
                             {...field}
-                            className="phone-code-select"
+                            className="phone-code-select mt-1"
                             style={{
                               width: '80px',
                               borderTopRightRadius: 0,
@@ -682,7 +642,7 @@ const AddCustomer = ({ onClose }) => {
                         {({ field, form }) => (
                           <Input
                             {...field}
-                            className="phone-input"
+                            className="phone-input mt-1"
                             style={{
                               borderTopLeftRadius: 0,
                               borderBottomLeftRadius: 0,
