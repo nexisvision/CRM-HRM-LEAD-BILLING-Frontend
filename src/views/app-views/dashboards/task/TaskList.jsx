@@ -1146,7 +1146,7 @@ const TaskList = () => {
         width={1200}
         className="mt-[-70px]"
       >
-        <ViewTask task={selectedTask} onClose={closeViewTaskModal} />
+        <ViewTask filterdatass={selectedTask} onClose={closeViewTaskModal} />
       </Modal>
 
     </>

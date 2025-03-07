@@ -3,12 +3,25 @@ const dev = {
   };
   
   const prod = {
-	API_ENDPOINT_URL: 'http://localhost:5353/api/v1' // You should change this to your production URL when deploying
+	API_ENDPOINT_URL: 'http://localhost:5353/api/v1' 
   };
   
   const test = {
 	API_ENDPOINT_URL: 'http://localhost:5353/api/v1'
   };
+
+
+//   const dev = {
+// 	API_ENDPOINT_URL: 'http://localhost:5353/api/v1'
+//   };
+  
+//   const prod = {
+// 	API_ENDPOINT_URL: 'http://localhost:5353/api/v1' 
+//   };
+  
+//   const test = {
+// 	API_ENDPOINT_URL: 'http://localhost:5353/api/v1'
+//   };
   
   const getEnv = () => {
 	  switch (process.env.NODE_ENV) {

@@ -55,8 +55,6 @@ const AddHoliday = ({ onClose }) => {
       return;
     }
 
-    console.log("Sending payload:", formattedValues); // Debug log
-
     dispatch(addsholidayss(formattedValues))
       .then(() => {
         dispatch(getsholidayss());

@@ -35,6 +35,7 @@ import { GetTasks } from '../project/task/TaskReducer/TaskSlice';
 const { Title, Text, Paragraph } = Typography;
 
 const ViewTask = ({ filterdatass, onClose }) => {
+
   const dispatch = useDispatch()
 
   const alllogedata = useSelector((state) => state.user.loggedInUser.id)
@@ -45,7 +46,15 @@ const ViewTask = ({ filterdatass, onClose }) => {
 
   const alldatas = useSelector((state) => state.Tasks.Tasks.data)
 
-  const task = alldatas?.find((item) => item?.id === filterdatass?.related_id)
+  let task = null;
+  if (alldatas?.length) {
+    if (filterdatass?.related_id) {
+      task = alldatas.find((item) => item?.id === filterdatass.related_id);
+    } else if (filterdatass?.id) {
+      task = alldatas.find((item) => item?.id === filterdatass.id);
+    }
+  }
+  task = task || filterdatass || null;
 
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
@@ -251,7 +260,7 @@ const ViewTask = ({ filterdatass, onClose }) => {
                       target="_blank"
                       icon={<FileOutlined />}
                     >
-                      View File
+                      View File 
                     </Button>
                   </div>
                 </div>
