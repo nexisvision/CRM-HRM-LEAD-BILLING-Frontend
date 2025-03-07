@@ -16,6 +16,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import calendar from 'dayjs/plugin/calendar';
 import NotificationDetailModal from './NotificationDetailModal';
 import ViewTask from '../../dashboards/task/ViewTask';
+import ViewPlanModal from '../../plan/ViewPlanModal';
 
 dayjs.extend(relativeTime);
 dayjs.extend(calendar);
@@ -79,7 +80,9 @@ const NotificationPage = () => {
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isViewTaskModalVisible, setIsViewTaskModalVisible] = useState(false);
+  const [isViewPlanModalVisible, setIsViewPlanModalVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const [noti, setNoti] = useState(null);
 
   useEffect(() => {
@@ -158,7 +161,6 @@ const NotificationPage = () => {
   };
 
   const handleNotificationClick = (notification) => {
-    console.log('Clicked notification:', notification); // Debug log
     setNoti(notification);
 
     // Parse assignTo to include only user data
@@ -183,9 +185,14 @@ const NotificationPage = () => {
       notification: notification
     };
 
-    console.log('Setting task data:', taskData); // Debug log
-    setSelectedTask(taskData);
-    setIsViewTaskModalVisible(true);
+    // Check notification type and show appropriate modal
+    if (notification.title === "New Plan") {
+      setSelectedPlan(notification);
+      setIsViewPlanModalVisible(true);
+    } else {
+      setSelectedTask(taskData);
+      setIsViewTaskModalVisible(true);
+    }
   };
 
   const handleModalClose = () => {
@@ -196,6 +203,11 @@ const NotificationPage = () => {
   const handleTaskModalClose = () => {
     setIsViewTaskModalVisible(false);
     setSelectedTask(null);
+  };
+
+  const handlePlanModalClose = () => {
+    setIsViewPlanModalVisible(false);
+    setSelectedPlan(null);
   };
 
   const NotificationCard = ({ notification }) => {
@@ -402,12 +414,23 @@ const NotificationPage = () => {
       >
         {selectedTask && (
           <ViewTask 
-          filterdatass={noti} 
+            filterdatass={noti} 
             notificationData={selectedTask.notificationData} 
             onClose={handleTaskModalClose} 
           />
         )}
       </Modal>
+
+      <ViewPlanModal
+        visible={isViewPlanModalVisible}
+        onClose={handlePlanModalClose}
+        plan={selectedPlan}
+        currencyData={[]} // Add your currency data here
+        isAdmin={false} // Set based on user role
+        onEdit={(id) => {/* Handle edit */}}
+        onDelete={(id) => {/* Handle delete */}}
+        onBuy={(plan) => {/* Handle buy */}}
+      />
     </div>
   );
 };

@@ -7,7 +7,6 @@ const InvoiceService = {
   getAllInvoices: async (id) => {
     const token = localStorage.getItem("auth_token");
     try {
-      console.log("Fetching invoices for ID:", id);
       const response = await axios.get(
         `${env.API_ENDPOINT_URL}/invoices/${id}`,
         {
@@ -17,7 +16,6 @@ const InvoiceService = {
           },
         }
       );
-      console.log("Invoice response:", response.data);
       return response;
     } catch (error) {
       console.error("Error fetching invoices:", error);
@@ -63,7 +61,6 @@ const InvoiceService = {
   createInvoice: async (id, invoiceData) => {
     const token = localStorage.getItem("auth_token");
     try {
-      console.log("Creating invoice for product:", id);
       const response = await axios.post(
         `${env.API_ENDPOINT_URL}/invoices/${id}`,
         invoiceData,
@@ -119,7 +116,6 @@ const InvoiceService = {
           },
         }
       );
-      console.log("Deleting invoice with ID:", id);
       return response.data;
     } catch (error) {
       console.error("Delete error:", error);

@@ -41,7 +41,6 @@ const AddSalary = ({ onClose }) => {
 
   const fnddata = fndddata.filter((item) => item.created_by === user);
 
-  // console.log("fnddata", fnddata);
 
   const allloged = useSelector((state) => state.user.loggedInUser.username)
 
@@ -72,7 +71,6 @@ const AddSalary = ({ onClose }) => {
       resetForm();
       // message.success("salary added successfully");
     });
-    console.log("Submitted values:", payload);
     // message.success("Job added successfully!");
   };
 

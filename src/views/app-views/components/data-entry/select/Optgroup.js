@@ -4,7 +4,6 @@ import { Select } from "antd";
 const { Option, OptGroup } = Select;
 
 function handleChange(value) {
-  console.log(`selected ${value}`);
 }
 
 export class Optgroup extends Component {

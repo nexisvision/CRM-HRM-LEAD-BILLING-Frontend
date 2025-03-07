@@ -25,7 +25,6 @@ const formItemLayout = {
 };
 
 const normFile = (e) => {
-  console.log('Upload event:', e);
 
   if (Array.isArray(e)) {
     return e;
@@ -36,7 +35,6 @@ const normFile = (e) => {
 
 const Demo = () => {
   const onFinish = (values) => {
-    console.log('Received values of form: ', values);
   };
 
   return (

@@ -27,8 +27,6 @@ const ProductForm = props => {
 
 	useEffect(() => {
     	if(mode === EDIT) {
-			console.log('is edit')
-			console.log('props', props)
 			const { id } = param
 			const produtId = parseInt(id)
 			const productData = ProductListData.filter( product => product.id === produtId)
@@ -73,7 +71,6 @@ const ProductForm = props => {
 			}, 1500);
 		}).catch(info => {
 			setSubmitLoading(false)
-			console.log('info', info)
 			message.error('Please enter all required field ');
 		});
 	};

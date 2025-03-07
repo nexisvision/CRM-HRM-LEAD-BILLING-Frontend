@@ -29,7 +29,6 @@ const GetMin = async (id) => {
 const AddMin = async (id, values) => {
   const token = localStorage.getItem("auth_token");
 
-  console.log("wewwew", values);
 
   try {
     const res = await axios.post(

@@ -22,10 +22,8 @@ const ResetPassword = ({ onClose }) => {
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       // Logic for resetting the password goes here
-      console.log('Password reset values:', values);
       resetForm();
     } catch (error) {
-      console.error('Reset password failed:', error);
     } finally {
       setSubmitting(false);
     }

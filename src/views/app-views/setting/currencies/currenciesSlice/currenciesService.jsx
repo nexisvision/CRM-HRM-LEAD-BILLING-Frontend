@@ -67,7 +67,6 @@ const delcurr = async (id) => {
 
 const editcurr = async (id, values) => {
   const token = localStorage.getItem("auth_token");
-  console.log("idinapi", id);
   try {
     const res = await axios.put(
       `${env.API_ENDPOINT_URL}/currencies/${id}`,

@@ -19,7 +19,6 @@ const EditSubscribedUserPlans = () => {
     });
 
     const onSubmit = (values) => {
-      console.log('Submitted values:', values);
       message.success('Subscribed Plans added successfully!');
       navigate('setting/subscribeduserplans');
     };

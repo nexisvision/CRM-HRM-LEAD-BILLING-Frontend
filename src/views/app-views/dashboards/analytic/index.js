@@ -57,7 +57,6 @@ export const AnalyticDashboard = () => {
   const { direction } = useSelector(state => state.theme)
 
   const handleVisitorsChartChange = value => {
-    console.log(value)
     switch (value) {
       case 'day':
         setUniqueVisitorsData(uniqueVisitorsDataDay)

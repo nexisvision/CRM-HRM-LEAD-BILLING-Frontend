@@ -71,7 +71,6 @@ const AddAttendance = ({ onClose }) => {
 
 
     .then(() => {
-      console.log("formattedValues", formattedValues);
 
         dispatch(getAttendances());
         message.success("Attendance added successfully!");

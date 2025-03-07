@@ -66,7 +66,6 @@ const DeleteDept = async (id) => {
 
 const EditDept = async (comnyid, values) => {
   const token = localStorage.getItem("auth_token");
-  console.log("idinapi", comnyid);
   try {
     const res = await axios.put(
       `${env.API_ENDPOINT_URL}/departments/${comnyid}`,

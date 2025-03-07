@@ -150,10 +150,8 @@ const JobApplicationList = () => {
                      
                         if (parsedPermissions["extra-hrm-jobs-jobonbording"] && parsedPermissions["extra-hrm-jobs-jobonbording"][0]?.permissions) {
                           allpermisson = parsedPermissions["extra-hrm-jobs-jobonbording"][0].permissions;
-                          // console.log('Parsed Permissions:', allpermisson);
                         
                         } else {
-                          // console.log('extra-hrm-jobs-jobonbording is not available');
                         }
                         
                         const canCreateClient = allpermisson?.includes('create');

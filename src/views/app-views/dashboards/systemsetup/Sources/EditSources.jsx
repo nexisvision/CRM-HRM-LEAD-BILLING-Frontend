@@ -75,7 +75,6 @@ const EditSources = ({ idd, onClose }) => {
     dispatch(GetLable(lid));
     onClose();
     resetForm();
-    console.log("Submitted values:", payload);
     message.success("Country added successfully!");
   };
 

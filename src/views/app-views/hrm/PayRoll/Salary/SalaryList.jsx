@@ -81,7 +81,6 @@ const SalaryList = () => {
 
   const openSetSalaryModall = (id) => {
     setId(id);
-    console.log("userId", id);
     openSetSalaryModal();
   };
 

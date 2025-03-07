@@ -75,15 +75,9 @@ const ContractTypeList = () => {
   const fndddata = alltagdata.Lable.data || [];
 
 
-  // const fndddata = alltaggdata.filter(item => item.created_by === user);
 
-  // console.log("fndddata", fndddata);
 
   const datas = fndddata?.filter(item => item.lableType === "contract");  
-
-
-  // const alltagdata = useSelector((state) => state.Lable);
-  // const datas = alltagdata.Lable.data;
 
   // Open Add Job Modal
   const openAddSourcesModal = () => {

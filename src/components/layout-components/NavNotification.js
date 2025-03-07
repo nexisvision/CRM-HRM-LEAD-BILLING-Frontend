@@ -24,6 +24,7 @@ import { GetAllNotifications } from 'views/app-views/pages/setting/NotificationR
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import ViewTask from 'views/app-views/dashboards/task/ViewTask';
+import ViewPlanModal from 'views/app-views/plan/ViewPlanModal';
 
 dayjs.extend(relativeTime);
 
@@ -289,6 +290,8 @@ const NavNotification = ({ mode }) => {
   const [isViewTaskModalVisible, setIsViewTaskModalVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [noti, setNoti] = useState(null);
+  const [isViewPlanModalVisible, setIsViewPlanModalVisible] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -364,7 +367,6 @@ const NavNotification = ({ mode }) => {
   // Handle notification click
   const handleNotificationClick = (notification) => {
     setIsPopupVisible(false);
-    console.log('Clicked notification:', notification);
     setNoti(notification);
 
     // Parse assignTo to include only user data
@@ -389,14 +391,24 @@ const NavNotification = ({ mode }) => {
       notification: notification
     };
 
-    console.log('Setting task data:', taskData);
-    setSelectedTask(taskData);
-    setIsViewTaskModalVisible(true);
+    // Check notification type and show appropriate modal
+    if (notification.title === "New Plan") {
+      setSelectedPlan(notification);
+      setIsViewPlanModalVisible(true);
+    } else {
+      setSelectedTask(taskData);
+      setIsViewTaskModalVisible(true);
+    }
   };
 
   const handleTaskModalClose = () => {
     setIsViewTaskModalVisible(false);
     setSelectedTask(null);
+  };
+
+  const handlePlanModalClose = () => {
+    setIsViewPlanModalVisible(false);
+    setSelectedPlan(null);
   };
 
   // Update the EmptyState component
@@ -620,6 +632,17 @@ const NavNotification = ({ mode }) => {
           />
         )}
       </Modal>
+
+      <ViewPlanModal
+        visible={isViewPlanModalVisible}
+        onClose={handlePlanModalClose}
+        plan={selectedPlan}
+        currencyData={[]} // Add your currency data here
+        isAdmin={false} // Set based on user role
+        onEdit={(id) => {/* Handle edit */}}
+        onDelete={(id) => {/* Handle delete */}}
+        onBuy={(plan) => {/* Handle buy */}}
+      />
     </>
   );
 };

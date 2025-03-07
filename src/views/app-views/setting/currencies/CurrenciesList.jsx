@@ -40,9 +40,6 @@ export const CurrenciesList = () => {
         return userRole?.role_name === 'super-admin';
     };
 
-    console.log('User Role ID:', userData?.role_id);
-    console.log('Roles:', roles);
-    console.log('Is Super Admin:', isSuperAdmin());
 
     useEffect(() => {
         if (!filterdata || filterdata.length === 0) {

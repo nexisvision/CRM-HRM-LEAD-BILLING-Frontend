@@ -8,10 +8,8 @@ const showConfirm = () => {
     icon: <ExclamationCircleOutlined />,
     content: 'Some descriptions',
     onOk() {
-      console.log('OK');
     },
     onCancel() {
-      console.log('Cancel');
     },
   });
 };
@@ -37,10 +35,8 @@ const showDeleteConfirm = () => {
     okType: 'danger',
     cancelText: 'No',
     onOk() {
-      console.log('OK');
     },
     onCancel() {
-      console.log('Cancel');
     },
   });
 };
@@ -56,10 +52,8 @@ const showPropsConfirm = () => {
     },
     cancelText: 'No',
     onOk() {
-      console.log('OK');
     },
     onCancel() {
-      console.log('Cancel');
     },
   });
 };

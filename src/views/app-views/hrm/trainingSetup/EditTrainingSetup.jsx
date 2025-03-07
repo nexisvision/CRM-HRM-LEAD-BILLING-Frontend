@@ -89,7 +89,6 @@ const EditTrainingSetup = ({ idd, onClose }) => {
       links,
     };
 
-    console.log("Payload to send:", payload);
     dispatch(EditTraing({ idd, payload }));
     dispatch(GetallTrainng());
     onClose();

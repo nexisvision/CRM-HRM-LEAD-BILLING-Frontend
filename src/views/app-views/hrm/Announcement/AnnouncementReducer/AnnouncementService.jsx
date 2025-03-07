@@ -70,50 +70,6 @@
       };
 
 
-    //   const EditDept = async (comnyid, values) => {
-    //     const token = localStorage.getItem("auth_token");
-    //     console.log("idinapi",comnyid)
-    //     try {
-    //       const res = await axios.put(
-    //         `${env.API_ENDPOINT_URL}/departments/${comnyid}`,
-    //         values,
-    //         {
-    //           headers: {
-    //             Authorization: `Bearer ${token}`,
-    //           },
-    //         }
-    //       );
-    //       return res.data;
-    //     } catch (error) {
-    //       console.error("Error updating employee data:", error);
-    //       throw error;
-    //     }
-    //   };
-    
-   
-
-// const getAllUsers = async () => {
-//     const res = await axios.get(`${baseUrl}users/all`, getToken());
-//     return res.data
-// }
-
-
-
-
-// const getUserById = async (data) => {
-//     const res = await axios.get(`${baseUrl}users/${data}`, getToken());
-//     return res.data
-// }
-
-// const deleteUser = async (data) => {
-//     const res = await axios.delete(`${baseUrl}users/${data}`, getToken());
-//     return res.data
-// }
-
-// const updateUser = async (data) => {
-//     const res = await axios.put(`${baseUrl}users/${data?.id}`, data?.data, getToken());
-//     return res.data
-// }
 
 const UserService = {
     // addUser,

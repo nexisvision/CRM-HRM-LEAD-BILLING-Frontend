@@ -33,17 +33,12 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     const [generalSettings, setGeneralSettings] = useState(null);
 
 
-    // console.log("ssssssssss", idd);
 
     const allloggeduser = useSelector((state) => state.user.loggedInUser)
-    console.log(allloggeduser, "allloggeduser");
 
     // Get the client data for the selected ID
     const allclient = useSelector((state) => state.SubClient.SubClient.data);
 
-    // console.log(allclient, "allclient");
-
-    // console.log(invoiceDataa, "invoiceDataa");
 
     const [selectedSignature, setSelectedSignature] = useState(null);
     const [selectedSignatureName, setSelectedSignatureName] = useState(null);
@@ -59,10 +54,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     const generalSettingsData = useSelector((state) => state.generalsetting.generalsetting.data);
 
 
-    // console.log("ppppppppppppp", clientDataa, "clientDataa");
-    // const clientDataa = allclient.find((SubClient) => SubClient.id === id);
-
-     // Add this useEffect to fetch general settings
      useEffect(() => {
         dispatch(getgeneralsettings());
     }, [dispatch]);
@@ -309,10 +300,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     const finalTotal = calculateFinalTotal(subtotal, totalTax, totalDiscount);
 
     const renderModernTemplate = () => {
-        console.log(invoiceDataa, "invoiceDataa");
-        console.log(allclient, "allclient");
-        console.log(allloggeduser, "allloggeduser");
-
         return (
             <div className="bg-white p-6">
                 {/* Header with gradient background */}

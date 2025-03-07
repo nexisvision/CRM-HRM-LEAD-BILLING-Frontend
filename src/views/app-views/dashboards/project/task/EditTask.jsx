@@ -109,9 +109,7 @@ const EditTask = ({ idd, onClose }) => {
     if (idd) {
       const milestone = taskadata.find((item) => item.id === idd);
 
-      console.log("xxx", milestone)
 
-      console.log("lpp", milestone)
 
       if (milestone) {
         const assignToArray = typeof milestone.assignTo === 'string'

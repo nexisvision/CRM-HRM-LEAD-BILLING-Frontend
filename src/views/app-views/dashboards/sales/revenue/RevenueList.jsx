@@ -153,10 +153,8 @@ const RevenueList = () => {
           
               if (parsedPermissions["dashboards-sales-revenue"] && parsedPermissions["dashboards-sales-revenue"][0]?.permissions) {
                 allpermisson = parsedPermissions["dashboards-sales-revenue"][0].permissions;
-                console.log('Parsed Permissions:', allpermisson);
               
               } else {
-                console.log('dashboards-sales-revenue is not available');
               }
               
               const canCreateClient = allpermisson?.includes('create');

@@ -7,7 +7,6 @@ const AddJobOnBoard = ({ visible, onCancel, onCreate }) => {
   const [form] = Form.useForm();
 
   const handleFinish = (values) => {
-    console.log("Form Values:", values);
     onCreate(values);
   };
 

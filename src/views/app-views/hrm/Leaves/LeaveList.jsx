@@ -134,10 +134,8 @@ const LeaveList = () => {
              
                 if (parsedPermissions["extra-hrm-leave-leavelist"] && parsedPermissions["extra-hrm-leave-leavelist"][0]?.permissions) {
                   allpermisson = parsedPermissions["extra-hrm-leave-leavelist"][0].permissions;
-                  // console.log('Parsed Permissions:', allpermisson);
                 
                 } else {
-                  // console.log('extra-hrm-leave-leavelist is not available');
                 }
                 
                 const canCreateClient = allpermisson?.includes('create');
@@ -149,7 +147,6 @@ const LeaveList = () => {
 
   const deleteUser = async (userId) => {
     try {
-      // console.log("dddddd", userId);
       await dispatch(DeleteLea(userId));
 
       const updatedData = await dispatch(GetLeave());

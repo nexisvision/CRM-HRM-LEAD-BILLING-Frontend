@@ -23,11 +23,6 @@ const InvoiceDetails = ({idd, onClose}) => {
   const invoiceDataa = invoices.find(invoice => invoice.id === idd);
 
     
-    //  useEffect(() => {
-    //     console.log("Fetching invoices for ID:", id);
-    //     dispatch(getAllInvoices(id));
-    //   }, [dispatch]);
-
     const handlePrint = () => {
         const printContent = document.getElementById('printable-content');
         const printWindow = window.open('', '_blank');

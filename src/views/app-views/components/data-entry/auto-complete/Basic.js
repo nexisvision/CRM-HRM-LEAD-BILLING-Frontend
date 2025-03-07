@@ -16,7 +16,6 @@ const Complete = () => {
   };
 
   const onSelect = data => {
-    console.log('onSelect', data);
   };
 
   const onChange = data => {

@@ -21,7 +21,6 @@ const AddNewCardForm = ({ visible, onCreate, onCancel }) => {
             onCreate(values);
           })
           .catch(info => {
-            console.log('Validate Failed:', info);
           });
       }}
     >

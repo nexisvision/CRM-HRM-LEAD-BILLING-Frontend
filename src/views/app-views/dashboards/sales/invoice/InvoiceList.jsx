@@ -169,10 +169,8 @@ export const InvoiceList = () => {
       
           if (parsedPermissions["dashboards-sales-invoice"] && parsedPermissions["dashboards-sales-invoice"][0]?.permissions) {
             allpermisson = parsedPermissions["dashboards-sales-invoice"][0].permissions;
-            console.log('Parsed Permissions:', allpermisson);
           
           } else {
-            console.log('dashboards-sales-invoice is not available');
           }
           
           const canCreateClient = allpermisson?.includes('create');

@@ -175,7 +175,6 @@ const CalendarApp = () => {
   };
 
   const handleDateSelect = (date) => {
-    console.log('Selected date:', date.format('YYYY-MM-DD')); // Debugging
     setSelectedDate(date.format('YYYY-MM-DD'));
     setModalVisible(true);
   };
@@ -198,10 +197,8 @@ const CalendarApp = () => {
 
   if (parsedPermissions["extra-hrm-trainingSetup"] && parsedPermissions["extra-hrm-trainingSetup"][0]?.permissions) {
     allpermisson = parsedPermissions["extra-hrm-trainingSetup"][0].permissions;
-    console.log('Parsed Permissions:', allpermisson);
 
   } else {
-    console.log('extra-hrm-trainingSetup is not available');
   }
 
   const canCreateClient = allpermisson?.includes('create');

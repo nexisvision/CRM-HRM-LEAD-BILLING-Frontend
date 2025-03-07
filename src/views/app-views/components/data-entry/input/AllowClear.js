@@ -4,7 +4,6 @@ import { Input } from "antd";
 const { TextArea } = Input;
 
 const onChange = e => {
-  console.log(e);
 };
 
 export class AllowClear extends Component {

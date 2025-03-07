@@ -118,7 +118,6 @@ const Page = ({ popupPlacement }) => {
   const cascaderFilter = (inputValue, path) =>
     path.some((option) => option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1);
   const onCascaderChange = (value) => {
-    console.log(value);
   };
   // ==== End Cascader ====
 

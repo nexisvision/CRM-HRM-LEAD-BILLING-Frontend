@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Checkbox, Row, Col } from "antd";
 
 function onChange(checkedValues) {
-  console.log("checked = ", checkedValues);
 }
 
 export class Layout extends Component {

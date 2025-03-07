@@ -12,7 +12,6 @@ function ViewEstimates({ estimateId, onClose }) {
     const estimate = useSelector((state) => 
         state.estimate.estimates.find(est => est.id === estimateId)
     );
-    console.log('Current Estimate:', estimate); // Debug log
     
     const [tableData, setTableData] = useState([]);
 
@@ -23,7 +22,6 @@ function ViewEstimates({ estimateId, onClose }) {
                 // Parse the items string to object if needed
                 const itemsObj = typeof estimate.items === 'string' ? 
                     JSON.parse(estimate.items) : estimate.items;
-                console.log('Parsed Items:', itemsObj); // Debug log
 
                 // Convert items object to array
                 const itemsArray = Object.entries(itemsObj).map(([key, item]) => ({
@@ -31,7 +29,6 @@ function ViewEstimates({ estimateId, onClose }) {
                     ...item
                 }));
 
-                console.log('Items Array:', itemsArray); // Debug log
                 setTableData(itemsArray);
             } catch (error) {
                 console.error('Error processing items:', error);

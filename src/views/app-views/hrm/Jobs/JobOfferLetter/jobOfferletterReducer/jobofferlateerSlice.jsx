@@ -187,7 +187,6 @@ const jobofferlateerSlice = createSlice({
         state.error = action.payload;
         // message.error(action.payload?.message);
 
-        // console.log("action.payload",action.payload)
       });
   },
 });

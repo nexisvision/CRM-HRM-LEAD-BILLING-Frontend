@@ -252,7 +252,6 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
     const setInvoiceData = async () => {
         if (currentInvoice) {
             try {
-                console.log("Current Invoice:", currentInvoice);
 
                 // Set basic form fields
                 form.setFieldsValue({
@@ -268,7 +267,6 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
                 if (currentInvoice.items) {
                     try {
                         const parsedItems = JSON.parse(currentInvoice.items);
-                        console.log("Parsed Items:", parsedItems);
 
                         // Create formatted items array
                         const formattedItems = parsedItems.map(item => {
@@ -291,7 +289,6 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
                             };
                         });
 
-                        console.log("Formatted Items:", formattedItems);
 
                         // Set table data
                         setTableData(formattedItems);
@@ -352,7 +349,6 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
 
 // Add this debug useEffect
 useEffect(() => {
-    console.log("Current Table Data:", tableData);
 }, [tableData]);
 
   const initialValues = {

@@ -27,8 +27,6 @@ const ProductSummaryList = ({ selectedCreditNote, invoiceData }) => {
     
     // Get all invoices from Redux store
     const allInvoices = useSelector((state) => state?.salesInvoices?.salesInvoices?.data);
-    console.log('All Invoices:', allInvoices); // Debug log
-    console.log('Selected Credit Note:', selectedCreditNote); // Debug log
 
     useEffect(() => {
         dispatch(getInvoice());
@@ -39,7 +37,6 @@ const ProductSummaryList = ({ selectedCreditNote, invoiceData }) => {
         if (selectedCreditNote && allInvoices) {
             // Find invoice using related_id from credit note
             const matchingInvoice = allInvoices.find(inv => inv.id === selectedCreditNote.related_id);
-            console.log('Matching Invoice:', matchingInvoice); // Debug log
 
             if (matchingInvoice?.items) {
                 try {
@@ -47,7 +44,6 @@ const ProductSummaryList = ({ selectedCreditNote, invoiceData }) => {
                         ? JSON.parse(matchingInvoice.items) 
                         : matchingInvoice.items;
                     
-                    console.log('Parsed Items:', parsedItems); // Debug log
 
                     // Convert items object to array and set state
                     const itemsArray = Object.entries(parsedItems).map(([key, item]) => ({

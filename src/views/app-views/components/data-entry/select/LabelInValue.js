@@ -4,7 +4,6 @@ import { Select } from "antd";
 const { Option } = Select;
 
 function handleChange(value) {
-  console.log(value); // { key: "lucy", label: "Lucy (101)" }
 }
 
 export class LabelInValue extends Component {

@@ -75,10 +75,8 @@ const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
   
      if (parsedPermissions["extra-hrm-performance-indicator"] && parsedPermissions["extra-hrm-performance-indicator"][0]?.permissions) {
        allpermisson = parsedPermissions["extra-hrm-performance-indicator"][0].permissions;
-      //  console.log('Parsed Permissions:', allpermisson);
      
      } else {
-      //  console.log('extra-hrm-performance-indicator is not available');
      }
      
      const canCreateClient = allpermisson?.includes('create');

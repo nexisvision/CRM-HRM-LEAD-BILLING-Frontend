@@ -137,14 +137,12 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
 
     try {
       const response = await otpapi(otp);
-      console.log("Response:", response);
       if (response.success) {
         message.success("OTP Verified Successfully");
         setShowOtpModal(false);
         dispatch(empdata());
 
         // Debugging: Log formValues to ensure it's populated
-        console.log("Form Values:", formValues);
 
         const payloadss = {
           ...formValues2,
@@ -169,7 +167,6 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
 
   const onSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
-      console.log("Form Values:", values);
       setFormValues2(values);
       // Store employeeId in formValues  
       const updatedFormValues = { ...values };

@@ -72,7 +72,6 @@ export const Editcon = createAsyncThunk(
   "users/Editcon",
   async ({ id, values }, thunkAPI) => {
     try {
-      console.log("jkjkjkjkjjkj", id);
       const response = await UserService.Editcon(id, values);
       return response; // Return the updated data
     } catch (error) {

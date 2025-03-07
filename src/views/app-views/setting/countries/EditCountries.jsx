@@ -18,8 +18,6 @@ const EditCountries = ({ idd, onClose }) => {
 
     const alladats = useSelector((state) => state.countries.countries);
 
-    // console.log("ppp",alladats)
-    // console.log("ppp",idd)
 
     useEffect(() => {
         dispatch(getallcountries());
@@ -28,7 +26,6 @@ const EditCountries = ({ idd, onClose }) => {
     useEffect(() => {
         if (alladats && idd) {
             const data = alladats.find((x) => x.id === idd);
-            // console.log("ppsssp",data)
             if (data) {
                 setInitialValues({
                     countryName: data.countryName || '',
@@ -40,7 +37,6 @@ const EditCountries = ({ idd, onClose }) => {
     }, [alladats, idd]);
 
     const onSubmit = (values) => {
-        console.log('Submitted values:', values);
 
         dispatch(updatecountries({ idd, values }))
             .then(() => {

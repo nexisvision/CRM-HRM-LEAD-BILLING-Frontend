@@ -133,10 +133,8 @@ const AnnouncementList = () => {
                    
                       if (parsedPermissions["extra-hrm-announcement"] && parsedPermissions["extra-hrm-announcement"][0]?.permissions) {
                         allpermisson = parsedPermissions["extra-hrm-announcement"][0].permissions;
-                        console.log('Parsed Permissions:', allpermisson);
                       
                       } else {
-                        console.log('extra-hrm-announcement is not available');
                       }
                       
                       const canCreateClient = allpermisson?.includes('create');

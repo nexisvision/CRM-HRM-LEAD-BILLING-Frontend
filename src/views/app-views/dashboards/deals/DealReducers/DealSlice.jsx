@@ -69,7 +69,6 @@ export const EditDeals = createAsyncThunk(
   "users/EditDeals",
   async ({ id, values }, thunkAPI) => {
     try {
-      console.log("jkjkjkjkjjkj", id);
       const response = await UserService.EditDeals(id, values);
       return response; // Return the updated data
     } catch (error) {

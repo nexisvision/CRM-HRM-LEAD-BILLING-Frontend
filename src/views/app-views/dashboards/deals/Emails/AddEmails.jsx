@@ -33,7 +33,6 @@ const AddEmails = () => {
           description,
         };
 
-        console.log('Email Data:', emailData);
         message.success(`Email sent to "${values.mailTo}" successfully!`);
         setIsModalVisible(false);
         form.resetFields();

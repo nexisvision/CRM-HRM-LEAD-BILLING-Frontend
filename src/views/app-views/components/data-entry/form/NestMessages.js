@@ -22,7 +22,6 @@ const validateMessages = {
 
 const Demo = () => {
   const onFinish = values => {
-    console.log(values);
   };
 
   return (

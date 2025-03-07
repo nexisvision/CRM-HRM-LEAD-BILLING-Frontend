@@ -67,7 +67,6 @@ const CreditNotesList = () => {
   const alldata = useSelector((state) => state.creditnotes);
   const fnddata = alldata.creditnotes.data;
 
-  console.log('fnddata', fnddata);
 
   const [isAddCreditNotesModalVisible, setIsAddCreditNotesModalVisible] =
     useState(false);
@@ -198,10 +197,8 @@ const CreditNotesList = () => {
 
   if (parsedPermissions["dashboards-sales-creditnotes"] && parsedPermissions["dashboards-sales-creditnotes"][0]?.permissions) {
     allpermisson = parsedPermissions["dashboards-sales-creditnotes"][0].permissions;
-    console.log('Parsed Permissions:', allpermisson);
 
   } else {
-    console.log('dashboards-sales-creditnotes is not available');
   }
 
   const canCreateClient = allpermisson?.includes('create');

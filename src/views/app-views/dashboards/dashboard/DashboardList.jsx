@@ -273,7 +273,6 @@ const DashboardList = () => {
   const allplandata = useSelector((state) => state.Plan);
   const fnddataplan = allplandata.Plan;
 
-  // console.log("fnddataplan",fnddataplan);
 
   const planNames = fnddataplan?.map((plan) => plan.name) || [];
 const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
@@ -286,7 +285,6 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
   const alldatas = useSelector((state) => state.subplan);
   const fnddtat = alldatas.subplan.data || [];
 
-  console.log("fnddtat",fnddtat);
 
   useEffect(() => {
     dispatch(getsubplandata());
@@ -559,9 +557,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
     <div className="p-2 bg-gray-50">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
-        {/* <DateRangeFilter onDateRangeChange={(range) => { 
-                  console.log('Selected range:', range);
-                }} /> */}
+     
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -741,7 +737,6 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
               <div className="flex-shrink-0">
                 <DateRangeFilter
                   onDateRangeChange={(range) => {
-                    // console.log("Selected range:", range);
                   }}
                 />
               </div>

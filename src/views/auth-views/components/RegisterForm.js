@@ -51,7 +51,6 @@ export const RegisterForm = (props) => {
 			showLoading()
 			signUp(values)
 		}).catch(info => {
-			console.log('Validate Failed:', info);
 		});
 	}
 

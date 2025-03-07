@@ -132,7 +132,6 @@ const ProjectList = () => {
 
 	const AllProject = useSelector((state) => state.Project);
 	const properdata = AllProject.Project.data;
-	//   console.log("opopopopop",properdata)
 
 	const loggedInUser = useSelector((state) => state.user.loggedInUser);
 	const username = loggedInUser ? loggedInUser.client_id : "";

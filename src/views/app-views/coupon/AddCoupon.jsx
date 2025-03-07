@@ -11,7 +11,6 @@ const AddCoupon = () => {
   const navigate = useNavigate();
 
   const onFinish = (values) => {
-    console.log('Submitted values:', values);
     message.success('Job added successfully!');
     navigate('/app/hrm/jobs');
   };

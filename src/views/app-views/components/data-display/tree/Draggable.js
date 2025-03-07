@@ -36,15 +36,10 @@ export class Draggable extends Component {
   };
 
   onDragEnter = info => {
-    console.log(info);
-    // expandedKeys 需要受控时设置
-    // this.setState({
-    //   expandedKeys: info.expandedKeys,
-    // });
+    
   };
 
   onDrop = info => {
-    console.log(info);
     const dropKey = info.node.props.eventKey;
     const dragKey = info.dragNode.props.eventKey;
     const dropPos = info.node.props.pos.split('-');

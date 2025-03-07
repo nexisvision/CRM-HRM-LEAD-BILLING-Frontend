@@ -47,14 +47,12 @@ const AddContractType = ({ onClose }) => {
       lableType: "contract",
     };
 
-    // console.log("payload", payload);
 
     dispatch(AddLablee({ lid, payload }));
     dispatch(GetLablee(lid));
     dispatch(GetLablee(lid));
     onClose();
     resetForm();
-    // console.log("Submitted values:", payload);
     message.success("Contract Type added successfully!");
   };
 

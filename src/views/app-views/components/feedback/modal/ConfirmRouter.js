@@ -12,10 +12,8 @@ const showConfirm = () => {
         icon: <ExclamationCircleOutlined />,
         content: <Button onClick={destroyAll}>Click to destroy all</Button>,
         onOk() {
-          console.log('OK');
         },
         onCancel() {
-          console.log('Cancel');
         },
       });
     }, i * 500);

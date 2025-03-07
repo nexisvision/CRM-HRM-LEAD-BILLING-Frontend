@@ -27,7 +27,6 @@ export class ControlRef extends Component {
   };
 
   onFinish = values => {
-    console.log(values);
   };
 
   onReset = () => {

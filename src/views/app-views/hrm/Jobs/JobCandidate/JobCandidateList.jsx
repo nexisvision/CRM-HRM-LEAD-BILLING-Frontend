@@ -149,15 +149,12 @@ const JobCandidateList = () => {
 
    // Debug logs
    useEffect(() => {
-     console.log('Jobs Data:', jobsData);
-     console.log('Job Application Data:', fnddta);
    }, [jobsData, fnddta]);
 
    // Function to get job name from job id
    const getJobName = (jobId) => {
     const job = jobsData.find(job => job.id === jobId);
     if (job) {
-      console.log('Found job:', job); // Debug log
       return job.title;
     }
     return 'N/A';
@@ -193,10 +190,8 @@ const JobCandidateList = () => {
                    
                       if (parsedPermissions["extra-hrm-jobs-jobcandidate"] && parsedPermissions["extra-hrm-jobs-jobcandidate"][0]?.permissions) {
                         allpermisson = parsedPermissions["extra-hrm-jobs-jobcandidate"][0].permissions;
-                        // console.log('Parsed Permissions:', allpermisson);
                       
                       } else {
-                        // console.log('extra-hrm-jobs-jobcandidate is not available');
                       }
                       
                       const canCreateClient = allpermisson?.includes('create');
@@ -302,7 +297,6 @@ const JobCandidateList = () => {
       title: "Job",
       dataIndex: "job",
       render: (jobId) => {
-        console.log('Rendering job ID:', jobId); // Debug log
         return <span>{getJobName(jobId)}</span>;
       },
       sorter: (a, b) => {

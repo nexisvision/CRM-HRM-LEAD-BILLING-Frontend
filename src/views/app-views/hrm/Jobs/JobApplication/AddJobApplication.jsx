@@ -44,7 +44,6 @@ const user = useSelector((state) => state.user.loggedInUser.username);
   };
 
   const onSubmit = async (values) => {
-    console.log("Form submitted:", values);
     try {
       dispatch(Addjobapplication(values)).then(() => {
         dispatch(getjobapplication());

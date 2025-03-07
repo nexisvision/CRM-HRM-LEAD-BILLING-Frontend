@@ -27,7 +27,6 @@ function ViewEstimates({ quotationId, onClose }) {
             try {
                 // Parse the items string to object
                 const itemsObj = JSON.parse(currentQuotation.items);
-                console.log('Parsed Items:', itemsObj); // Debug log
 
                 // Convert items object to array
                 const itemsArray = Object.entries(itemsObj).map(([key, item]) => ({
@@ -35,7 +34,6 @@ function ViewEstimates({ quotationId, onClose }) {
                     ...item
                 }));
 
-                console.log('Items Array:', itemsArray); // Debug log
                 setTableData(itemsArray);
             } catch (error) {
                 console.error('Error processing items:', error);

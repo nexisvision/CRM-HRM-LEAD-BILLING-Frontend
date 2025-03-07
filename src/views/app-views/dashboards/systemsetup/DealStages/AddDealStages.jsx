@@ -75,7 +75,6 @@ const AddDealStages = ({ onClose }) => {
     dispatch(getstages());
     onClose();
     resetForm();
-    console.log("Submitted values:", payload);
     message.success("Lead stage added successfully!");
   };
 

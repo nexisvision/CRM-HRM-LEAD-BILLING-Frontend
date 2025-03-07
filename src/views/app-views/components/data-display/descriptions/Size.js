@@ -7,7 +7,6 @@ export class Size extends Component {
   };
 
   onChange = e => {
-    console.log("size checked", e.target.value);
     this.setState({
       size: e.target.value
     });

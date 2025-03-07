@@ -32,7 +32,6 @@ const EditHoliday = ({ onClose, idd }) => {
   useEffect(() => {
     if (allholidaudata && idd) {
       const filterdata = allholidaudata.find((item) => item.id === idd);
-      console.log("filterdata",filterdata);
       if (filterdata) {
         setInitialValues({
           holiday_name: filterdata.holiday_name,

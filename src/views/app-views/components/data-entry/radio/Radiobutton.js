@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Radio } from "antd";
 
 function onChange(e) {
-  console.log(`radio checked:${e.target.value}`);
 }
 
 export class Radiobutton extends Component {

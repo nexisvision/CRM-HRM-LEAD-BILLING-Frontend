@@ -205,9 +205,7 @@ const EditClient = ({ comnyid, onClose }) => {
           setFieldValue,
           errors,
         }) => {
-          console.log("Formik errors:", errors); // Debugging
-          console.log("Is form valid?", isValid); // Debugging
-          console.log("Is form dirty?", dirty); // Debugging
+  
 
           return (
             <Form className="formik-form" onSubmit={handleSubmit}>

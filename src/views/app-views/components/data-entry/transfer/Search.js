@@ -37,7 +37,6 @@ export class Search extends Component {
   };
 
   handleSearch = (dir, value) => {
-    console.log("search:", dir, value);
   };
 
   render() {

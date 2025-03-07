@@ -151,10 +151,8 @@ const TrainingSetupList = () => {
                              
                                 if (parsedPermissions["extra-hrm-trainingSetup"] && parsedPermissions["extra-hrm-trainingSetup"][0]?.permissions) {
                                   allpermisson = parsedPermissions["extra-hrm-trainingSetup"][0].permissions;
-                                  // console.log('Parsed Permissions:', allpermisson);
                                 
                                 } else {
-                                  // console.log('extra-hrm-trainingSetup is not available');
                                 }
                                 
                                 const canCreateClient = allpermisson?.includes('create');

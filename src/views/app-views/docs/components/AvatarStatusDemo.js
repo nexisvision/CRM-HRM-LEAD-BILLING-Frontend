@@ -42,7 +42,6 @@ export default const Demo = () =>  (
 const Demo = () => {
 
 	const handleClick = (data) => {
-		console.log(data)
 	}
 
 	return (

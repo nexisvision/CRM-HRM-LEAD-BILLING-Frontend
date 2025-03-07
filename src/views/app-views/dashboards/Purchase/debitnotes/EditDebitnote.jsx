@@ -27,7 +27,6 @@ const EditDebitnote = ({ onClose, debitnoteData }) => {
     setLoading(true);
     try {
       // Add your update API call here
-      console.log('Updated values:', values);
       message.success('Debit note updated successfully!');
       onClose();
     } catch (error) {

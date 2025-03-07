@@ -59,7 +59,6 @@ const AddProjectMember = ({ onClose }) => {
           },
         }
       );
-      // console.log("Addmember API response:", res.data); // Log response
       return res.data;
     } catch (error) {
       if (error.response) {
@@ -126,8 +125,6 @@ const AddProjectMember = ({ onClose }) => {
   const Filterdta = Allpeoject?.Project?.data || [];
 
   const project = Filterdta.find((item) => item.id === id);
-
-  // console.log("swswswsw", project.project_members);
 
   useEffect(() => {
     // dispatch(empdata());

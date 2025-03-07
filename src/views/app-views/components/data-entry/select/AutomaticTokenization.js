@@ -9,7 +9,6 @@ for (let i = 10; i < 36; i++) {
 }
 
 function handleChange(value) {
-  console.log(`selected ${value}`);
 }
 
 export class AutomaticTokenization extends Component {

@@ -37,7 +37,6 @@ const PaySlipList = () => {
   const onDateChange = (date) => {
     setSelectedDate(date);
     // Add logic to filter data based on the selected date
-    console.log('Selected Date:', date);
   };
   // Open Add Job Modal
   const openAddPaySlipModal = () => {

@@ -4,7 +4,6 @@ import { Anchor } from "antd";
 const { Link } = Anchor;
 
 const onChange = link => {
-  console.log("Anchor:OnChange", link);
 };
 
 export class OnChange extends Component {

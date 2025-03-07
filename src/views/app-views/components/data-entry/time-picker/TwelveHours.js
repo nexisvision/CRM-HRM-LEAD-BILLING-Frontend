@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { TimePicker } from "antd";
 
 function onChange(time, timeString) {
-  console.log(time, timeString);
 }
 
 export class TwelveHours extends Component {

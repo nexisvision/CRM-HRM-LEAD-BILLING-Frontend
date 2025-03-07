@@ -236,10 +236,8 @@ export const BillingList = () => {
         
             if (parsedPermissions["dashboards-sales-billing"] && parsedPermissions["dashboards-sales-billing"][0]?.permissions) {
               allpermisson = parsedPermissions["dashboards-sales-billing"][0].permissions;
-              console.log('Parsed Permissions:', allpermisson);
             
             } else {
-              console.log('dashboards-sales-billing is not available');
             }
             
             const canCreateClient = allpermisson?.includes('create');

@@ -113,7 +113,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 		const typingTimeouts = new Map();
 
 		newSocket.on('user_typing', ({ userId, isTyping }) => {
-			console.log('Typing event received:', { userId, isTyping }); // Debug log
 
 			// Clear existing timeout
 			if (typingTimeouts.has(userId)) {
@@ -152,7 +151,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 		});
 
 		newSocket.on('group_created', (newGroup) => {
-			console.log('New group created:', newGroup);
 			setGroups(prev => [...prev, newGroup]);
 		});
 
@@ -311,7 +309,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 
 		const handleSubmit = (e) => {
 			e.preventDefault();
-			console.log('Submitting group:', { groupName, selectedMembers });
 
 			if (groupName && selectedMembers.length > 0) {
 				onCreateGroup({
@@ -396,7 +393,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 
 	// Simplified group creation handler
 	const handleCreateGroup = (data) => {
-		console.log('Creating group:', data);
 		if (!socket) return;
 
 		const groupData = {

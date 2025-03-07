@@ -4,11 +4,9 @@ import { Mentions } from "antd";
 const { Option } = Mentions;
 
 function onChange(value) {
-  console.log("Change:", value);
 }
 
 function onSelect(option) {
-  console.log("select", option);
 }
 
 export class Basic extends Component {

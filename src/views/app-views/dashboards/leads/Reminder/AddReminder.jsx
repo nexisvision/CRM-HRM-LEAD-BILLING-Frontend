@@ -35,14 +35,11 @@ const ReminderList = () => {
   },[dispatch])
 
   const alluserdata = useSelector((state)=>state.Users.Users.data);
-  console.log(alluserdata,"alluserdata")
 
   const allloggedinuser = useSelector((state)=>state.user.loggedInUser);
   
-  console.log(allloggedinuser,"allloggedinuser")
 
   const filterdatas = alluserdata?.filter((item)=>item?.created_by == allloggedinuser?.id)
-  console.log(filterdatas,"filterdatas")
 
 
 

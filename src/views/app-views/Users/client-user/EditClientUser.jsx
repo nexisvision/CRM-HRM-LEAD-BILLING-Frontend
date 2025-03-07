@@ -24,7 +24,6 @@ const EditClientUser = ({ isVisible, onCancel, onSubmit, userData }) => {
     form
       .validateFields()
       .then((values) => {
-        console.log('Form Values:', values); // Replace with your API call
         onSubmit(values);
         form.resetFields();
       })

@@ -176,7 +176,6 @@ export const TaskList = () => {
 
   useEffect(() => {
     if (fnddata) {
-      // console.log("fnddata",fnddata);
       setList(fnddata);
     }
   }, [fnddata]);

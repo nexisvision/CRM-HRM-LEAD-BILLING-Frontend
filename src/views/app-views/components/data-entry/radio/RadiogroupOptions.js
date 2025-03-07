@@ -21,21 +21,18 @@ export class RadiogroupOptions extends Component {
   };
 
   onChange1 = e => {
-    console.log("radio1 checked", e.target.value);
     this.setState({
       value1: e.target.value
     });
   };
 
   onChange2 = e => {
-    console.log("radio2 checked", e.target.value);
     this.setState({
       value2: e.target.value
     });
   };
 
   onChange3 = e => {
-    console.log("radio3 checked", e.target.value);
     this.setState({
       value3: e.target.value
     });

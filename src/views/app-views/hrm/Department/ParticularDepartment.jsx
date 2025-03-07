@@ -48,7 +48,6 @@ const ParticularDepartment = () => {
     },
   ];
   const handleView = (record) => {
-    console.log('Viewing:', record);
   };
 
   return (

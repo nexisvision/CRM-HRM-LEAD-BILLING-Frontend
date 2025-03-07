@@ -19,7 +19,6 @@ export class CustomDropdownMenu extends Component {
   };
 
   addItem = () => {
-    console.log('addItem');
     const { items, name } = this.state;
     this.setState({
       items: [...items, name || `New item ${index++}`],

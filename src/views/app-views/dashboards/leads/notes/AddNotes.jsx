@@ -62,17 +62,6 @@ const AddNotes = ({ onClose }) => {
 
       values.employees = employeeObject;
 
-      // console.log("Dispatching AddNote with values:", { id, values });
-      // const result = await dispatch(AddNote({ id, values })).unwrap();
-      // dispatch(GetNote(id));
-      // onClose();
-      // // console.log("Dispatch result:", result);
-
-      // if (result) {
-      //   // message.success("Note added successfully!");
-      //   resetForm();
-
-      // }
 
       dispatch(AddNote({ id, values }))
         .then(() => {

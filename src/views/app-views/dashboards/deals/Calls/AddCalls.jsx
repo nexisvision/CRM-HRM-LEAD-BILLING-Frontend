@@ -9,7 +9,6 @@ const AddCalls = ({ visible, onClose }) => {
   const [form] = Form.useForm();
 
   const onSubmit = (values) => {
-    console.log('Form Values:', values);
     message.success('Call added successfully!');
     onClose();
     form.resetFields();

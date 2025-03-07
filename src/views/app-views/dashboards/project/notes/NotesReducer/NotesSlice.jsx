@@ -71,7 +71,6 @@ export const EditeNotes = createAsyncThunk(
   "users/EditeNotes",
   async ({ idd, values }, thunkAPI) => {
     try {
-      console.log("idinslice", idd);
       const response = await UserService.Editnote(idd, values);
       return response; // Return the updated data
     } catch (error) {

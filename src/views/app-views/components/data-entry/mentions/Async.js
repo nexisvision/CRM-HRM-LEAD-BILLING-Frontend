@@ -19,7 +19,6 @@ class AsyncMention extends React.Component {
 
   onSearch = search => {
     this.setState({ search, loading: !!search, users: [] });
-    console.log("Search:", search);
     this.loadGithubUsers(search);
   };
 

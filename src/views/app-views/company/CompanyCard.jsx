@@ -78,12 +78,6 @@ const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) =>
     });
   };
 
-  const ClickFun = (idd) => {
-    // console.log("dsfvysdvf", idd);
-
-  };
-
-
   const handleEdit = () => {
     setIsEditCompanyCardModalVisible(true);
     setSelectedUser(company);

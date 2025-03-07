@@ -47,7 +47,6 @@ const EditCrediteNotes = ({ idd, onClose }) => {
       dispatch(getcreditnote());
       dispatch(getcreditnote());
       onClose();
-      console.log("Submitted values:", values);
       message.success("Credit Note updated successfully!");
     });
   };

@@ -30,7 +30,6 @@ export class LargeData extends Component {
   };
 
   handleChange = (targetKeys, direction, moveKeys) => {
-    console.log(targetKeys, direction, moveKeys);
     this.setState({ targetKeys });
   };
 

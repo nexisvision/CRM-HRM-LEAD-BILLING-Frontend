@@ -29,7 +29,6 @@ const EditGoalTracking = ({ goalData }) => {
   }, [goalData, form]);
 
   const onFinish = (values) => {
-    console.log('Updated values:', values);
     message.success('Goal updated successfully!');
     navigate('/app/hrm/goaltracking');
   };

@@ -69,7 +69,6 @@ const Demo = () => {
   const [showIcon, setShowIcon] = useState(false);
 
   const onSelect = (selectedKeys, info) => {
-    console.log('selected', selectedKeys, info);
   };
 
   return (

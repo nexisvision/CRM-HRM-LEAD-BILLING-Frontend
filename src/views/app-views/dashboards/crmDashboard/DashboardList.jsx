@@ -76,10 +76,8 @@ const DashboardList = () => {
 
     if (parsedPermissions["dashboards-project-Contract"] && parsedPermissions["dashboards-project-Contract"][0]?.permissions) {
         allpermisson = parsedPermissions["dashboards-project-Contract"][0].permissions;
-        console.log('Parsed Permissions:', allpermisson);
 
     } else {
-        console.log('dashboards-project-Contract is not available');
     }
 
     const canCreateClient = allpermisson?.includes('create');

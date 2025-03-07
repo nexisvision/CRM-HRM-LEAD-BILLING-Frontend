@@ -43,12 +43,10 @@ const AddSources = ({ onClose }) => {
 
     dispatch(AddLablee({ lid, payload }));
 
-    // console.log("payload", payload);
     dispatch(GetLablee(lid));
     dispatch(GetLablee(lid));
     onClose();
     resetForm();
-    // console.log("Submitted values:", payload);
     message.success("Source added successfully!");
   };
 

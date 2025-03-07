@@ -77,7 +77,6 @@ const AddMeeting = ({ onClose }) => {
     };
 
     // Log the payload
-    console.log('Meeting Payload:', formattedValues);
 
     dispatch(AddMeet(formattedValues))
       .then(() => {
@@ -290,7 +289,6 @@ const AddMeeting = ({ onClose }) => {
                       format="HH:mm"
                       value={values.startTime ? dayjs(values.startTime, 'HH:mm:ss') : null}
                       onChange={(time) => {
-                        console.log('Selected Start Time:', time ? time.format('HH:mm:ss') : null);
                         setFieldValue("startTime", time);
                       }}
                       onBlur={() => setFieldTouched("startTime", true)}
@@ -314,7 +312,6 @@ const AddMeeting = ({ onClose }) => {
                       format="HH:mm"
                       value={values.endTime ? dayjs(values.endTime, 'HH:mm:ss') : null}
                       onChange={(time) => {
-                        console.log('Selected End Time:', time ? time.format('HH:mm:ss') : null);
                         setFieldValue("endTime", time);
                       }}
                       onBlur={() => setFieldTouched("endTime", true)}

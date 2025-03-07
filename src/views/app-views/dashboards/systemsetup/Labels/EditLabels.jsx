@@ -86,7 +86,6 @@ const EditLabels = ({ idd, onClose }) => {
     dispatch(getstages());
     dispatch(getstages());
     onClose();
-    console.log("Submitted values:", payload);
     message.success("Lead stage added successfully!");
   };
 

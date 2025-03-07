@@ -62,15 +62,10 @@ const sub = subClientsss?.SubClient?.data;
 
     const subClientData = sub?.find((subClient) => subClient?.id === client);
 
-     // Add this selector to get products from Redux store
-    //  const { data: products } = useSelector((state) => state.Product.Product);
 
-      // Add this to get taxes from Redux store
     const { taxes } = useSelector((state) => state.tax);
 
-    // console.log("SubClient Data:", subClientData.username);
 
-    // const { subClients } = useSelector((state) => state.SubClient.SubClient.data); 
 
     const [form] = Form.useForm();
     const [totals, setTotals] = useState({

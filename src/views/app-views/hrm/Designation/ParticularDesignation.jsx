@@ -44,7 +44,6 @@ const ParticularDesignation = () => {
   ];
 
   const handleView = (record) => {
-    console.log('Viewing:', record);
   };
 
 

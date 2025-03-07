@@ -92,10 +92,8 @@ const ClientList = () => {
 
   if (parsedPermissions["extra-users-client-list"] && parsedPermissions["extra-users-client-list"][0]?.permissions) {
     allpermisson = parsedPermissions["extra-users-client-list"][0].permissions;
-    // console.log('Parsed Permissions:', allpermisson);
 
   } else {
-    // console.log('extra-users-client-list is not available');
   }
 
   const canCreateClient = allpermisson?.includes('create');
@@ -262,9 +260,7 @@ const ClientList = () => {
   };
 
   const ClickFun = (idd) => {
-    // console.log("dsfvysdvf", idd);
     setIdd(idd);
-    // navigate("/app/dashboards/project/list");
 
     navigate("/app/dashboards/project/list", {
       state: {

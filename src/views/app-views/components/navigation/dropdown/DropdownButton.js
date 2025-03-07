@@ -3,11 +3,9 @@ import { Button, Dropdown, Menu, message, Space, Tooltip } from 'antd';
 import React from 'react';
 const handleButtonClick = (e) => {
   message.info('Click on left button.');
-  console.log('click left button', e);
 };
 const handleMenuClick = (e) => {
   message.info('Click on menu item.');
-  console.log('click', e);
 };
 const menu = (
   <Menu

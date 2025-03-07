@@ -2,11 +2,9 @@ import React, { Component } from "react";
 import { Slider } from "antd";
 
 function onChange(value) {
-  console.log("onChange: ", value);
 }
 
 function onAfterChange(value) {
-  console.log("onAfterChange: ", value);
 }
 
 export class Event extends Component {

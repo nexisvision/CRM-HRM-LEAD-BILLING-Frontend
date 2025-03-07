@@ -64,7 +64,6 @@ const JobList = () => {
   const filtermin = allempdata.Jobs.data || [];
   const filteredData = filtermin.filter((item) => item.created_by === user);
 
-  // console.log("filteredData", filteredData);
   // Open Add Job Modal
   const openAddJobModal = () => {
     setIsAddJobModalVisible(true);
@@ -184,10 +183,8 @@ const JobList = () => {
                  
                     if (parsedPermissions["extra-hrm-jobs-joblist"] && parsedPermissions["extra-hrm-jobs-joblist"][0]?.permissions) {
                       allpermisson = parsedPermissions["extra-hrm-jobs-joblist"][0].permissions;
-                      // console.log('Parsed Permissions:', allpermisson);
                     
                     } else {
-                      // console.log('extra-hrm-jobs-joblist is not available');
                     }
                     
                     const canCreateClient = allpermisson?.includes('create');

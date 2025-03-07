@@ -157,10 +157,8 @@ const DocumentList = () => {
 
   if (parsedPermissions["extra-hrm-document"] && parsedPermissions["extra-hrm-document"][0]?.permissions) {
     allpermisson = parsedPermissions["extra-hrm-document"][0].permissions;
-    console.log('Parsed Permissions:', allpermisson);
 
   } else {
-    console.log('extra-hrm-document is not available');
   }
 
   const canCreateClient = allpermisson?.includes('create');

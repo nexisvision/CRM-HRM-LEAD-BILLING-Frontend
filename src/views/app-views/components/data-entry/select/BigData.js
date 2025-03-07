@@ -13,7 +13,6 @@ for (let i = 0; i < 100000; i++) {
 }
 
 function handleChange(value) {
-  console.log(`selected ${value}`);
 }
 
 export class BigData extends Component {

@@ -133,7 +133,6 @@ const DroppableColumn = ({ status, leads }) => {
 
 const DealCards = () => {
   const [leadData, setLeadData] = useState([]);
-  console.log("leadData", leadData);
   const [isAddLeadCardsVisible, setIsAddLeadCardsVisible] = useState(false);
   const dispatch = useDispatch();
   const [selectedPipeline, setSelectedPipeline] = useState("all");

@@ -88,7 +88,6 @@ export const Editplan = createAsyncThunk(
     "users/updateEmployee",
     async ({ id, values }, thunkAPI) => {
       try {
-        console.log("idinslice",id)
         const response = await UserService.EditP(id, values);
         return response; // Return the updated data
       } catch (error) {

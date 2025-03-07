@@ -58,7 +58,6 @@ const AddAnnouncement = ({ onClose }) => {
       }
     };
 
-    console.log('Sending payload:', payload);
 
     dispatch(addAnnounce(payload))
       .then(() => {
@@ -252,76 +251,3 @@ const AddAnnouncement = ({ onClose }) => {
 
 export default AddAnnouncement;
 
-
-// import React from 'react';
-// import { Form, Input, Button, DatePicker, Select, TimePicker, message, Row, Col } from 'antd';
-// import { useNavigate } from 'react-router-dom';
-
-// const { Option } = Select;
-
-// const AddAnnouncement = () => {
-//   const [form] = Form.useForm();
-//   const navigate = useNavigate();
-
-//   const onFinish = (values) => {
-//     console.log('Submitted values:', values);
-//     message.success('Announcement added successfully!');
-//     // Add logic to save data
-//     navigate('/app/hrm/attendance');
-//   };
-
-//   const onFinishFailed = (errorInfo) => {
-//     console.error('Form submission failed:', errorInfo);
-//     message.error('Please fill out all required fields.');
-//   };
-
-//   return (
-//     <div className="add-attendance-form">
-//       <h2 className="mb-4 text-center">Add Announcement</h2>
-//       {/* <p className="text-center text-danger">* Please fill Date and Time</p> */}
-//       <Form
-//         layout="vertical"
-//         form={form}
-//         name="add-employee"
-//         onFinish={onFinish}
-//         onFinishFailed={onFinishFailed}
-//       >
-//         {/* User Information */}
-//         <Row gutter={16}>
-//           <Col span={12}>
-//             <Form.Item
-//               name="title"
-//               label="title"
-//               rules={[{ required: true, message: 'title is required' }]}
-//             >
-//               <Input placeholder="" />
-//             </Form.Item>
-//           </Col>
-//           <Col span={12}>
-//             <Form.Item
-//               name="description"
-//               label="description"
-//               rules={[{ required: true, message: 'description is required' }]}
-//             >
-//               <Input placeholder="description" />
-//             </Form.Item>
-//           </Col>
-//         </Row>
-
-
-//         <Form.Item>
-//           <div className="text-right">
-//             <Button type="default" className="mr-2" onClick={() => navigate('/app/hrm/desigantion')}>
-//               Cancel
-//             </Button>
-//             <Button type="primary" htmlType="submit">
-//               Submit
-//             </Button>
-//           </div>
-//         </Form.Item>
-//       </Form>
-//     </div>
-//   );
-// };
-
-// export default AddAnnouncement;

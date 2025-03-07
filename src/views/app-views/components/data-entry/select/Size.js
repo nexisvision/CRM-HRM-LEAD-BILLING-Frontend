@@ -9,7 +9,6 @@ for (let i = 10; i < 36; i++) {
 }
 
 function handleChange(value) {
-  console.log(`Selected: ${value}`);
 }
 
 export class Size extends Component {

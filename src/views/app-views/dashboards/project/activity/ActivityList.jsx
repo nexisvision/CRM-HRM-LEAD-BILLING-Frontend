@@ -29,7 +29,6 @@ function ActivityList() {
           },
         }
       );
-      console.log("iiii", res);
       setTimelineItems(res.data.data);
       return res.data;
     } catch (error) {
@@ -52,7 +51,6 @@ function ActivityList() {
   // Combine date and time with a space
   const displayTime = `${formattedDate}     ${formattedTime}`;
 
-  console.log(displayTime); // Output: 2025-01-03 11:02:10
 
   return (
     <div className="bg-gray-100 p-4 rounded-lg">

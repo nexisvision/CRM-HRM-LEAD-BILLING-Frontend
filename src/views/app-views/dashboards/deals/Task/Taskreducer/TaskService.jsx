@@ -26,7 +26,6 @@ const Getex = async (id) => {
 const AddExpence = async (id, values) => {
   const token = localStorage.getItem("auth_token");
 
-  console.log("wewwew", values);
 
   try {
     const res = await axios.post(

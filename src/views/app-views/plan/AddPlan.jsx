@@ -97,7 +97,6 @@ const AddPlan = ({ onClose }) => {
       trial_period: values.trial ? String(values.trial_period) : ''
     };
 
-    console.log('Payload:', payload);
 
     dispatch(CreatePlan(payload))
       .then(() => {

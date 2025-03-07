@@ -187,7 +187,6 @@ const AddLead = ({ onClose }) => {
         assigned: values.employee
       };
 
-      console.log('Submitting values:', transformedValues);
       await dispatch(LeadsAdd(transformedValues));
       message.success("Lead added successfully!");
       resetForm();
@@ -250,7 +249,6 @@ const AddLead = ({ onClose }) => {
               if (setFieldValue) setFieldValue("source", newValue.trim());
               break;
             default:
-              console.log(`Unhandled label type: ${lableType}`);
               break;
           }
         }

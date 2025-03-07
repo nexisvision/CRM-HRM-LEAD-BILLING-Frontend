@@ -88,7 +88,6 @@ const EditEventSetUp = ({ initialEventData, onCancel, id, onSuccess }) => {
   const events = tabledata?.events || []; // Add safety check for events
 
   const dataM = events.find((item) => item.id === id); // Use events if it's an array
-  console.log("tyytyt", dataM);
 
   useEffect(() => {
     if (dataM) {

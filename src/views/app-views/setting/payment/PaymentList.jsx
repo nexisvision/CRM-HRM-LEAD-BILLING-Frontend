@@ -38,7 +38,6 @@ const PaymentList = () => {
   };
 
   const handleSubmit = (values, { setSubmitting }) => {
-    console.log('Form Values:', values);
     message.success('Payment settings updated successfully');
     setSubmitting(false);
   };

@@ -75,7 +75,6 @@ export const TicketList = () => {
 
   const alldatat = useSelector((state) => state?.Ticket);
   const fnddata = alldatat?.Ticket?.data || [];
-  console.log(",mm,,m,m", fnddata);
 
   // Open Add Job Modal
   const openAddTicketModal = () => {

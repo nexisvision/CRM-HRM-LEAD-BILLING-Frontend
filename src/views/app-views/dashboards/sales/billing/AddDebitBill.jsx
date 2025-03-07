@@ -13,7 +13,6 @@ const AddDebitBill = () => {
     const navigate = useNavigate();
 
     const onSubmit = (values) => {
-        console.log('Submitted values:', values);
         message.success('Job added successfully!');
         navigate('/apps/sales/billing/');
     };

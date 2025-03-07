@@ -102,7 +102,6 @@ const EditRole = ({ id, onClose }) => {
             const rolePermissions = role.permissions;
             // Set initial module permissions based on the existing role permissions
             const initialPermissions = {};
-            console.log("Role permissions:", rolePermissions); // Log the role permissions for debugging
             
             // Iterate over the keys of role.permissions
             Object?.keys(rolePermissions)?.forEach(moduleKey => {
@@ -121,7 +120,6 @@ const EditRole = ({ id, onClose }) => {
                     console.warn(`Expected an array for moduleKey: ${moduleKey}, but got:`, subModules);
                 }
             });
-            console.log("initialPermissions", initialPermissions); // Log the initial permissions
             setModulePermissions(initialPermissions); // Set the permissions for the edit modal
         }
     }

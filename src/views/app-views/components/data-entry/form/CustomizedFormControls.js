@@ -71,7 +71,6 @@ const PriceInput = ({ value = {}, onChange }) => {
 
 const Demo = () => {
   const onFinish = values => {
-    console.log('Received values from form: ', values);
   };
 
   const checkPrice = (rule, value) => {

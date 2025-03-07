@@ -65,21 +65,9 @@ const ProposalList = () => {
 
 
   const user = useSelector((state) => state.user.loggedInUser.username);
-  // console.log("user",user);
 
   const allproposal = useSelector((state) => state?.proposal);
   const fnddatas = allproposal?.proposal?.data;
-
-// console.log("fnddatas",fnddatas);
-
-  // useEffect(() => {
-  //   if (fnddatas) {
-  //     // Filter proposals by created_by matching the logged-in user's username
-  //     const filteredProposals = fnddatas.filter(proposal => proposal.created_by === user);
-      
-  //     setUsers(filteredProposals);
-  //   }
-  // }, [fnddatas, user]);
 
 
   const allempdata = useSelector((state) => state.Training);
@@ -166,10 +154,8 @@ const ProposalList = () => {
                     
                         if (parsedPermissions["dashboards-proposal"] && parsedPermissions["dashboards-proposal"][0]?.permissions) {
                           allpermisson = parsedPermissions["dashboards-proposal"][0].permissions;
-                          console.log('Parsed Permissions:', allpermisson);
                         
                         } else {
-                          // console.log('dashboards-proposal is not available');
                         }
                         
                         const canCreateClient = allpermisson?.includes('create');

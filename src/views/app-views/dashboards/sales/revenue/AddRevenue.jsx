@@ -145,7 +145,6 @@ const AddRevenue = ({ onClose }) => {
   });
 
   useEffect(() => {
-    console.log('Current currencies:', currencies);
   }, [currencies]);
 
   const customerdata = useSelector((state) => state.customers);

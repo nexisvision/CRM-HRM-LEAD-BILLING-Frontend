@@ -23,19 +23,15 @@ const AdditionalDetailsList = () => {
   };
 
   const handleAddSkills = () => {
-    console.log("Add Skills clicked");
   };
 
   const handleAddNotes = () => {
-    console.log("Add Notes clicked");
   };
 
   const handleCreateInterview = () => {
-    console.log("Create Interview Schedule clicked");
   };
 
   const handleDelete = () => {
-    console.log("Delete clicked");
   };
 
   return (

@@ -55,15 +55,12 @@ const ProjectMember = () => {
     }
   };
 
-  // console.log("tt", projectData);
 
   const project = projectData[0]; // Accessing the first project as an example
 
-// console.log("sdfsdfsdf",project);
 
   const userField = fnddata?.project_members; // The 'user' field in the project
   let userArray = [];
-  // console.log("popopop", userField);
 
   try {
     const parsedUserField = JSON.parse(userField); // Parse the JSON string
@@ -82,7 +79,6 @@ const ProjectMember = () => {
     })
     .filter((employee) => employee !== null); // Remove null values
 
-  // console.log("Filtered Employee Data:", userEmployeeData);
 
   const tableColumns = [
     {

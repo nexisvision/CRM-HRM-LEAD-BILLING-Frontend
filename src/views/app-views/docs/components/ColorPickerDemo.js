@@ -22,7 +22,6 @@ export default const Demo = () =>  (
 const Demo = () => {
 
 	const onColorChange = (value) => {
-		console.log('Selected color: ', value)
 	}
 
 	return (

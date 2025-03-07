@@ -13,7 +13,6 @@ const AddJobCandidate = () => {
   const navigate = useNavigate();
 
   const onSubmit = (values) => {
-    console.log('Submitted values:', values);
     message.success('JobCandidate added successfully!');
     navigate('/app/hrm/jobcandidate');
   };

@@ -18,7 +18,6 @@ const CollectionCreateForm = ({ visible, onCreate, onCancel }) => {
             onCreate(values);
           })
           .catch(info => {
-            console.log('Validate Failed:', info);
           });
       }}
     >
@@ -60,7 +59,6 @@ const CollectionsPage = () => {
   const [visible, setVisible] = useState(false);
 
   const onCreate = values => {
-    console.log('Received values of form: ', values);
     setVisible(false);
   };
 

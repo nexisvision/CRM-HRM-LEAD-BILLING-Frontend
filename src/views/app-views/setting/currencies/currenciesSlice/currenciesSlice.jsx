@@ -75,7 +75,6 @@ export const editscurren = createAsyncThunk(
     "users/editscurren",
     async ({ id, values }, thunkAPI) => {
       try {
-        console.log("idinslice",id)
         const response = await UserService.editcurr(id, values);
         return response; // Return the updated data
       } catch (error) {

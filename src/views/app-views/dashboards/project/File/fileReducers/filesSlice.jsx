@@ -73,7 +73,6 @@ export const Editpro = createAsyncThunk(
   "users/Editpro",
   async ({ id, values }, thunkAPI) => {
     try {
-      console.log("idinslice", id);
       const response = await UserService.EditPro(id, values);
       return response; // Return the updated data
     } catch (error) {

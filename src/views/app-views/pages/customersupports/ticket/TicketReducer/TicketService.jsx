@@ -30,7 +30,6 @@ const CreateTicket = async (payload) => {
     const res = await axios.post(
       `${env.API_ENDPOINT_URL}/tickets/`,
       payload,
-      // console.log("payload", payload),
       {
         headers: {
           Authorization: `Bearer ${token}`,

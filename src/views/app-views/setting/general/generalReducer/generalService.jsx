@@ -30,14 +30,12 @@ const creategenaral = async (payload) => {
     const res = await axios.post(
       `${env.API_ENDPOINT_URL}/settings/`,
       payload,
-      // console.log("payload", payload),
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       }
     );
-    //    dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);

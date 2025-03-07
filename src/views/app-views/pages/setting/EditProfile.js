@@ -49,7 +49,6 @@ export class EditProfile extends Component {
 		};
 	
 		const onFinishFailed = errorInfo => {
-			console.log('Failed:', errorInfo);
 		};
 
 		const onUploadAavater = info => {

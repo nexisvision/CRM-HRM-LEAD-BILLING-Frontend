@@ -71,7 +71,6 @@ export const EditPay = createAsyncThunk(
   "users/EditPay",
   async ({ id, data }, thunkAPI) => {
     try {
-      console.log("idinslice", id);
       const response = await UserService.EditPayment(id, data);
       return response; // Return the updated data
     } catch (error) {

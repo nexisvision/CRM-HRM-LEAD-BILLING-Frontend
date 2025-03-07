@@ -67,7 +67,6 @@ const EditPaySlip = () => {
   });
 
   const onSubmit = (values, { resetForm }) => {
-    console.log('Updated values:', values);
     message.success('Pay slip updated successfully!');
     resetForm();
     navigate('/app/hrm/jobs');

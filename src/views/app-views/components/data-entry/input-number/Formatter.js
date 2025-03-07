@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { InputNumber } from "antd";
 
 function onChange(value) {
-  console.log("changed", value);
 }
 
 export class Formatter extends Component {

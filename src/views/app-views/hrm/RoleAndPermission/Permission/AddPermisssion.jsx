@@ -9,7 +9,6 @@ const AddPermission = () => {
   const navigate = useNavigate();
 
   const onFinish = (values) => {
-    console.log('Submitted values:', values);
     message.success('Permission added successfully!');
     navigate('app/hrm/permission')
     // Navigate or perform additional actions here

@@ -125,7 +125,6 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
 
     return employeeIds.map(id => {
       const employee = filteredEmpData.find(emp => emp.id === id);
-      console.log('employee', employee);
       return employee ? employee.username : "Unknown Employee";
     });
   };

@@ -161,7 +161,6 @@ const AttendanceList = () => {
       // Only set users if the data has changed
       if (JSON.stringify(users) !== JSON.stringify(aggregatedData)) {
         setUsers(aggregatedData);
-        // console.log(aggregatedData, "users");
       }
     }
   }, [fnddat, employeeData, fndleavedata, selectedMonth]);
@@ -203,10 +202,8 @@ const AttendanceList = () => {
                                  
                                     if (parsedPermissions["extra-hrm-role"] && parsedPermissions["extra-hrm-role"][0]?.permissions) {
                                       allpermisson = parsedPermissions["extra-hrm-role"][0].permissions;
-                                      console.log('Parsed Permissions:', allpermisson);
                                     
                                     } else {
-                                      console.log('extra-hrm-role is not available');
                                     }
                                     
                                     const canCreateClient = allpermisson?.includes('create');

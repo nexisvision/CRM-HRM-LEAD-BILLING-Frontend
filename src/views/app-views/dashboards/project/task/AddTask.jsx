@@ -262,8 +262,6 @@ const AddTask = ({ onClose }) => {
   };
 
 
-// console.log("asdasdasd",values);
-
 
   const handleCheckboxChange = () => {
     setIsWithoutDueDate(!isWithoutDueDate);

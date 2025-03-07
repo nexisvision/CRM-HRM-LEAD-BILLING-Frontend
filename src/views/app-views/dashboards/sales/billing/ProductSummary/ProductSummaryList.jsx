@@ -88,10 +88,7 @@ function ProductSummaryList({ billingId }) {
                     // Calculate remaining amount
                     const remainingAmount = Math.max(0, billingTotal - totalPaidAmount - totalDebitNoteAmount);
 
-                    console.log('Billing Total:', billingTotal);
-                    console.log('Total Paid:', totalPaidAmount);
-                    console.log('Total Debit Notes:', totalDebitNoteAmount);
-                    console.log('Remaining Amount:', remainingAmount);
+                   
 
                     setTotals(prev => ({
                         ...prev,

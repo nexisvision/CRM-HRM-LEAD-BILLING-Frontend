@@ -24,10 +24,6 @@ export class Basic extends Component {
 
   handleChange = (nextTargetKeys, direction, moveKeys) => {
     this.setState({ targetKeys: nextTargetKeys });
-
-    console.log("targetKeys: ", nextTargetKeys);
-    console.log("direction: ", direction);
-    console.log("moveKeys: ", moveKeys);
   };
 
   handleSelectChange = (sourceSelectedKeys, targetSelectedKeys) => {
@@ -35,13 +31,9 @@ export class Basic extends Component {
       selectedKeys: [...sourceSelectedKeys, ...targetSelectedKeys]
     });
 
-    console.log("sourceSelectedKeys: ", sourceSelectedKeys);
-    console.log("targetSelectedKeys: ", targetSelectedKeys);
   };
 
   handleScroll = (direction, e) => {
-    console.log("direction:", direction);
-    console.log("target:", e.target);
   };
 
   handleDisable = disabled => {

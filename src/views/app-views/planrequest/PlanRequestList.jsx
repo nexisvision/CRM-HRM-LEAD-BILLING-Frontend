@@ -117,18 +117,15 @@ export const PlanRequestList = () => {
 const handleStatusChange = (checked, userId) => {
     const newStatus = checked ? 'active' : 'inactive';
     // Update your data/API here
-    console.log(`User ${userId} status changed to ${newStatus}`);
   };
 
     const handleAccept = (id) => {
        
-        console.log(`Accepted request with ID: ${id}`);
         
     };
 
     const handleReject = (id) => {
         
-        console.log(`Rejected request with ID: ${id}`);
       
     };
 

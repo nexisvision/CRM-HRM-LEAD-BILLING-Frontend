@@ -26,7 +26,6 @@ const GetPro = async (id) => {
 const AddPro = async (id, formData) => {
   const token = localStorage.getItem("auth_token");
 
-  console.log("Making API request with:", { id, formData });
 
   try {
     const res = await axios.post(
@@ -38,7 +37,6 @@ const AddPro = async (id, formData) => {
         },
       }
     );
-    console.log("API Response:", res.data);
     return res.data;
   } catch (error) {
     console.error("Error in API call:", error);

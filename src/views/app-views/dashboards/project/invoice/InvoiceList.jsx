@@ -103,7 +103,6 @@ export const InvoiceList = () => {
   const [dateRange, setDateRange] = useState(null);
   // Fetch invoices when component mounts
   useEffect(() => {
-    console.log("Fetching invoices for ID:", id);
     dispatch(getAllInvoices(id));
     dispatch(ClientData());
   }, [dispatch]);
@@ -125,7 +124,6 @@ export const InvoiceList = () => {
     setIdd(id);
     openViewInvoiceModal();
   };
-  //   console.log(idd, "idddd");
     
     const handleDelete = async (id) => {
         try {

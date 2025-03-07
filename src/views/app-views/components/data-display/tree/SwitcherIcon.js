@@ -4,11 +4,9 @@ import { DownOutlined } from '@ant-design/icons';
 
 export class SwitcherIcon extends Component {
   onSelect = (selectedKeys, info) => {
-    console.log('selected', selectedKeys, info);
   };
 
   onSelect = (selectedKeys, info) => {
-    console.log('selected', selectedKeys, info);
   };
 
   render() {

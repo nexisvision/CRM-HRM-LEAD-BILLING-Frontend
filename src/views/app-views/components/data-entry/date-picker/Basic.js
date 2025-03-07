@@ -4,7 +4,6 @@ import { DatePicker } from "antd";
 const { MonthPicker, RangePicker, WeekPicker } = DatePicker;
 
 function onChange(date, dateString) {
-  console.log(date, dateString);
 }
 
 export class Basic extends Component {

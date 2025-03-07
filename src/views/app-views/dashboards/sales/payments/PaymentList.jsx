@@ -75,7 +75,6 @@ const PaymentList = () => {
 
 	const exportToExcel = () => {
 		try {
-			console.log("data",list)
 		  const ws = utils.json_to_sheet(list); // Convert JSON data to a sheet
 		  const wb = utils.book_new(); // Create a new workbook
 		  utils.book_append_sheet(wb, ws, "Payment"); // Append the sheet to the workbook

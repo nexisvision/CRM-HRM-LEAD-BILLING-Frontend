@@ -98,7 +98,6 @@ const AddLeadCards = ({ onClose }) => {
   }, [dispatch, lid]);
 
   useEffect(() => {
-    console.log('Currencies Data:', currenciesData);
   }, [currenciesData]);
 
   

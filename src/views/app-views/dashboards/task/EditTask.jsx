@@ -98,7 +98,6 @@ const EditTask = ({ onClose, idd, projectId }) => {
           assignToArray = [];
         }
 
-        console.log("Parsed assignTo array:", assignToArray);
 
         setInitialValues({
           taskName: taskData.taskName || "",

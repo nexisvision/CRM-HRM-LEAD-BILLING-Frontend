@@ -7,7 +7,6 @@ const { Option } = Select;
 export class ComplexFormControl extends Component {
 
   onFinish = values => {
-    console.log('Received values of form: ', values);
   };
 	render() {
 		return (

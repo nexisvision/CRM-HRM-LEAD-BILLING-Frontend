@@ -149,7 +149,6 @@ const EstimatesList = () => {
   const EditFun = (id) => {
     openEditEstimatesModal();
     setIdd(id);
-    console.log("iddd",id);
     
 };
   // Update the exportToExcel function to use filteredData instead of list
@@ -197,10 +196,8 @@ const EstimatesList = () => {
             
                 if (parsedPermissions["dashboards-sales-estimates"] && parsedPermissions["dashboards-sales-estimates"][0]?.permissions) {
                   allpermisson = parsedPermissions["dashboards-sales-estimates"][0].permissions;
-                  console.log('Parsed Permissions:', allpermisson);
                 
                 } else {
-                  console.log('dashboards-sales-estimates is not available');
                 }
                 
                 const canCreateClient = allpermisson?.includes('create');
@@ -215,7 +212,6 @@ const EstimatesList = () => {
     <Menu>
         {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) ? (
         <Menu.Item onClick={() => {
-                              console.log("View Quotation:", row); // Debug log
                               setSelectedQuotationId(row.id);
                               openviewEstimatesModal();
                           }}>

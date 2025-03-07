@@ -37,7 +37,6 @@ const options = [
 ];
 
 function onChange(value) {
-  console.log(value);
 }
 
 export class Basic extends Component {

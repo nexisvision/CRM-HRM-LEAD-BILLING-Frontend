@@ -59,8 +59,6 @@ const ContractList = () => {
   const tabledata = useSelector((state) => state.Contract);
   const clientData = useSelector((state) => state.SubClient?.SubClient?.data);
   const projectData = useSelector((state) => state.Project?.Project?.data);
-  console.log('projectData',projectData);
-  console.log('clientData',clientData);
 
   // First useEffect to fetch initial data
   useEffect(() => {
@@ -275,10 +273,8 @@ const ContractList = () => {
   
       if (parsedPermissions["dashboards-project-Contract"] && parsedPermissions["dashboards-project-Contract"][0]?.permissions) {
         allpermisson = parsedPermissions["dashboards-project-Contract"][0].permissions;
-        // console.log('Parsed Permissions:', allpermisson);
       
       } else {
-        // console.log('dashboards-project-Contract is not available');
       }
       
       const canCreateClient = allpermisson?.includes('create');
@@ -349,7 +345,6 @@ const ContractList = () => {
         compare: (a, b) => {
           const clientA = String(clientData?.find(client => client.id === a.client)?.username || a.client);
           const clientB = String(clientData?.find(client => client.id === b.client)?.username || b.client);
-          console.log('Comparing clients:', clientA, clientB); // Debugging line
           return clientA.localeCompare(clientB);
         }
       }
@@ -366,7 +361,6 @@ const ContractList = () => {
         compare: (a, b) => {
           const projectA = String(projectData?.find(project => project.id === a.project)?.project_name || a.project);
           const projectB = String(projectData?.find(project => project.id === b.project)?.project_name || b.project);
-          console.log('Comparing projects:', projectA, projectB); // Debugging line
           return projectA.localeCompare(projectB);
         }
       }

@@ -255,7 +255,6 @@ const EditLead = ({ id, onClose }) => {
         assigned: values.employee
       };
 
-      console.log('Submitting values:', transformedValues);
 
       const response = await dispatch(LeadsEdit({ id, formData: transformedValues }));
 

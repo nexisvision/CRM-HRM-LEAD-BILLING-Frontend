@@ -33,9 +33,7 @@ const FormDynamicRule = () => {
   const onCheck = async () => {
     try {
       const values = await form.validateFields();
-      console.log('Success:', values);
     } catch (errorInfo) {
-      console.log('Failed:', errorInfo);
     }
   };
 

@@ -17,11 +17,9 @@ export class Event extends Component {
 	}
 
 	onChange = (props) => {
-		console.log('onChange works!', props)
   }
 
   onClick = (value) => {
-		console.log('onClick works!', value)
 		const {lat, lng} = value;
 		this.setState({
 			center: [lat, lng]
@@ -29,11 +27,9 @@ export class Event extends Component {
   }
 
   onChildMouseEnter = (key , childProps ) => {
-		console.log('onChildMouseEnter works!', key, childProps)
   }
 
   onChildMouseLeave = (key , childProps ) => {
-		console.log('onChildMouseLeave works!', key, childProps)
   }
 
 	render() {

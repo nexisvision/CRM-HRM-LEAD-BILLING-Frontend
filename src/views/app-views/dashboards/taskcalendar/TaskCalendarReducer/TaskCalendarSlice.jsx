@@ -72,7 +72,6 @@ export const EditTask = createAsyncThunk(
   "users/EditTask",
   async ({ idd, values }, thunkAPI) => {
     try {
-      console.log("szszsz", idd);
       const response = await UserService.EditTask(idd, values);
       return response;
     } catch (error) {

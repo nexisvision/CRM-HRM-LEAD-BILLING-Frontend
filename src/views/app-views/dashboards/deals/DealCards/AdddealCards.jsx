@@ -98,7 +98,6 @@ const AddDealCards = ({ onClose }) => {
   }, [dispatch, lid]);
 
   useEffect(() => {
-    console.log('Currencies Data:', currenciesData);
   }, [currenciesData]);
 
   
@@ -537,7 +536,6 @@ const AddDealCards = ({ onClose }) => {
                         name="source" 
                         placeholder="Select Source"
                         className="w-full mt-1"
-                        // loading={loading}
                         onChange={(value) => console.log("Selected:", value)}
                       >
                         {datas.map((source) => (

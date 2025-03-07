@@ -43,7 +43,6 @@ const AddDeal = ({ onClose,setFieldValue }) => {
     )
     : [];
 
-  // console.log(dealstages,"dealstages")
 
 
   const { data: Leadss = [] } = useSelector((state) => state.Leads.Leads || {});

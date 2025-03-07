@@ -67,9 +67,7 @@ const CustomerList = () => {
   // Update users state whenever customer data changes
   useEffect(() => {
     if (loggid && fnddata.length > 0) {
-      // const filterdata = fnddata.filter((item) => item?.created_by === loggid.username);
       setUsers(fnddata);
-      // console.log("Filtered Customer Data:", filterdata);
     }
   }, [fnddata]);
   
@@ -92,10 +90,8 @@ const CustomerList = () => {
     
         if (parsedPermissions["dashboards-sales-customer"] && parsedPermissions["dashboards-sales-customer"][0]?.permissions) {
           allpermisson = parsedPermissions["dashboards-sales-customer"][0].permissions;
-          // console.log('Parsed Permissions:', allpermisson);
         
         } else {
-          // console.log('dashboards-sales-customer is not available');
         }
         
         const canCreateClient = allpermisson?.includes('create');

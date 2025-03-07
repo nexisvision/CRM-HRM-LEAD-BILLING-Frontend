@@ -219,10 +219,8 @@ const TaskList = () => {
 
   if (parsedPermissions["dashboards-Task"] && parsedPermissions["dashboards-Task"][0]?.permissions) {
     allpermisson = parsedPermissions["dashboards-Task"][0].permissions;
-    // console.log('Parsed Permissions:', allpermisson);
 
   } else {
-    // console.log('dashboards-Task is not available');
   }
 
   const canCreateClient = allpermisson?.includes('create');

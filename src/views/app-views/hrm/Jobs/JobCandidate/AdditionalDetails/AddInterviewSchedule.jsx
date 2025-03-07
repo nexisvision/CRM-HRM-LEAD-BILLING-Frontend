@@ -9,7 +9,6 @@ const AddInterviewSchedule = ({ visible, onCancel, onCreate }) => {
   const handleCreate = () => {
     form.validateFields()
       .then(values => {
-        console.log('Form Values:', values); // Replace with actual logic
         onCreate(values); // Call parent handler with form data
       })
       .catch(info => {

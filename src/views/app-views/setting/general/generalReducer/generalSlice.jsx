@@ -12,7 +12,6 @@ export const creategenaralsett = createAsyncThunk(
     try {
       const response = await UserService.creategenaral(userData);
 
-      // console.log("response", userData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);

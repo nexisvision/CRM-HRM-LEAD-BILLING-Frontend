@@ -9,7 +9,6 @@ import toast from 'react-hot-toast';
 const ReminderList = () => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
-    console.log(data,"data")
     const dispatch = useDispatch()
 
     useEffect(()=>{
@@ -17,7 +16,6 @@ const ReminderList = () => {
     },[dispatch])
 
     const allreminders = useSelector((state)=>state?.Reminder?.Reminder?.data)
-    console.log("allreminders",allreminders)
 
     useEffect(()=>{
       if(allreminders){
@@ -94,7 +92,6 @@ const ReminderList = () => {
 
     // Handle edit action
     const handleEdit = (record) => {
-        console.log('Edit record:', record);
     };
 
     // Handle delete action

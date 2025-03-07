@@ -74,7 +74,6 @@ export const EditProdu = createAsyncThunk(
   "users/EditProdu",
   async ({ idd, formData }, thunkAPI) => {
     try {
-      console.log("idinslice", idd);
       const response = await UserService.EditPro(idd, formData);
       return response; // Return the updated data
     } catch (error) {

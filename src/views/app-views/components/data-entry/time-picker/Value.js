@@ -7,7 +7,6 @@ export class Value extends Component {
   };
 
   onChange = time => {
-    console.log(time);
     this.setState({ value: time });
   };
 

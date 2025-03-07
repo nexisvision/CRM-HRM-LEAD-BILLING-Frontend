@@ -2,12 +2,10 @@ import React, { Component } from "react";
 import { Tag } from "antd";
 
 function log(e) {
-  console.log(e);
 }
 
 function preventDefault(e) {
   e.preventDefault();
-  console.log("Clicked! But prevent default.");
 }
 
 export class Basic extends Component {

@@ -21,8 +21,6 @@ const EditJobOnBording = ({ idd, onClose }) => {
   const alldata = useSelector((state) => state.jobonboarding);
   const fnddtaa = alldata.jobonboarding.data || [];
 
-  console.log("fnddtaa", fnddtaa)
-
   const fnd = fnddtaa.find((item) => item.id === idd);
 
 

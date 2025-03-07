@@ -36,7 +36,6 @@ const AddAllowance = ({ id, onClose }) => {
 
   const filteredEmployees = fnddata?.filter((employee) => employee.id === id);
 
- 
 
   useEffect(() => {
     dispatch(getcurren());

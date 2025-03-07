@@ -98,10 +98,8 @@ const BranchList = () => {
            
               if (parsedPermissions["extra-hrm-branch"] && parsedPermissions["extra-hrm-branch"][0]?.permissions) {
                 allpermisson = parsedPermissions["extra-hrm-branch"][0].permissions;
-                // console.log('Parsed Permissions:', allpermisson);
               
               } else {
-                // console.log('extra-hrm-branch is not available');
               }
               
               const canCreateClient = allpermisson?.includes('create');

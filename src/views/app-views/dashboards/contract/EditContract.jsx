@@ -116,13 +116,7 @@ const EditContract = ({ id, onClose }) => {
   });
 
   const onSubmit = (values) => {
-    // const payload = {
-    //   ...values,
-    //   startdate: values.startDate ? values.startDate.toISOString() : null,
-    //   endDate: values.endDate ? values.endDate.toISOString() : null,
-    // };
-    // dispatch(Editcon(id, payload));
-    // console.log("Submitted values:", payload);
+    
 
     dispatch(Editcon({ id, values }))
       .then(() => {
@@ -200,7 +194,6 @@ const EditContract = ({ id, onClose }) => {
 
   useEffect(() => {
     const filcon = filcon0.find((item) => item.id === id);
-    console.log("ioi", filcon);
     if (filcon) {
       setInitialValues({
         subject: filcon.subject || "",

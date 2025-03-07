@@ -4,19 +4,15 @@ import { Select } from "antd";
 const { Option } = Select;
 
 function onChange(value) {
-  console.log(`selected ${value}`);
 }
 
 function onBlur() {
-  console.log("blur");
 }
 
 function onFocus() {
-  console.log("focus");
 }
 
 function onSearch(val) {
-  console.log("search:", val);
 }
 
 export class Search extends Component {

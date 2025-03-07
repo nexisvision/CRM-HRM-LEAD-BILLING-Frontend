@@ -354,7 +354,6 @@ const AddInvoice = ({ onClose }) => {
     const fetchProducts = async () => {
       try {
         const response = await dispatch(GetAllProdu());
-        console.log("Products response:", response); // Debug log
         
         if (response?.payload?.data) {
           setProducts(response.payload.data);
@@ -371,18 +370,15 @@ const AddInvoice = ({ onClose }) => {
   // Update local state when Redux store changes
   useEffect(() => {
     if (productsData?.data) {
-      console.log("Products from Redux:", productsData.data);
       setProducts(productsData.data);
     }
   }, [productsData]);
 
   // Product selection handler
   const handleProductChange = (productId) => {
-    // console.log("Selected product ID:", productId);
     
     if (productId) {
         const selectedProd = products.find(p => p.id === productId);
-        console.log("Found product:", selectedProd);
         
         if (selectedProd) {
             const updatedData = tableData.map((row, index) => {

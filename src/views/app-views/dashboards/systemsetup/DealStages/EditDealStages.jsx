@@ -70,10 +70,8 @@ const EditDealStages = ({ idd, onClose }) => {
   useEffect(() => {
     if (fndpip && idd) {
       const fndproperdata = fndpip.find((item) => item.id === idd);
-      console.log("opopopo", fndproperdata);
 
       const sssss = fndpips.find((item) => item.id === fndproperdata.pipeline);
-      console.log("ssss", sssss);
       if (fndproperdata) {
         setInitialValues({
           stageName: fndproperdata?.stageName || "",
@@ -84,13 +82,11 @@ const EditDealStages = ({ idd, onClose }) => {
   }, [fndpip, idd]);
 
   const onSubmit = (values, { resetForm }) => {
-    console.log("onSubmit", values);
     const payload = { ...values, stageType: "deal" };
     dispatch(Editstages({ idd, payload }));
     dispatch(getstages());
     dispatch(getstages());
     onClose();
-    console.log("Submitted values:", payload);
     message.success("Lead stage added successfully!");
   };
 

@@ -27,7 +27,6 @@ const Demo = () => {
   };
 
   const onFinish = values => {
-    console.log(values);
   };
 
   const onReset = () => {

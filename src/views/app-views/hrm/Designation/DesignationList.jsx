@@ -62,10 +62,8 @@ const DesignationList = () => {
 
   if (parsedPermissions["extra-hrm-designation"] && parsedPermissions["extra-hrm-designation"][0]?.permissions) {
     allpermisson = parsedPermissions["extra-hrm-designation"][0].permissions;
-    // console.log('Parsed Permissions:', allpermisson);
   
   } else {
-    // console.log('extra-hrm-designation is not available');
   }
   
   const canCreateClient = allpermisson?.includes('create');

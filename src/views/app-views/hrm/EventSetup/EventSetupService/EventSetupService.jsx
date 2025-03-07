@@ -84,25 +84,6 @@ const getEventById =  async (id) => {
   }
 }
 
-// const updateEventsetUp = async (id, payload) => {
-//     const token = localStorage.getItem("auth_token");
-//     console.log(token);
-//     try {
-//       const res = await axios.put(
-//         `${env.API_ENDPOINT_URL}/events/${id}`,
-//         payload,
-//         {
-//           headers: {
-//             Authorization: `Bearer ${token}`,
-//           },
-//         }
-//       );
-//       return res.data;
-//     } catch (error) {
-//       console.error("Error updating event:", error);
-//       throw error;
-//     }
-//   };
 
 const deleteEvent = async (id) => {
   const token = localStorage.getItem("auth_token");

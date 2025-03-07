@@ -76,10 +76,8 @@ const MeetingList = () => {
 
   if (parsedPermissions["extra-hrm-meeting"] && parsedPermissions["extra-hrm-meeting"][0]?.permissions) {
     allpermisson = parsedPermissions["extra-hrm-meeting"][0].permissions;
-    // console.log('Parsed Permissions:', allpermisson);
 
   } else {
-    // console.log('extra-hrm-meeting is not available');
   }
 
   const canCreateClient = allpermisson?.includes('create');

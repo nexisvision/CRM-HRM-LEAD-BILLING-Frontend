@@ -28,11 +28,6 @@ const ViewInvoice = ({idd, onClose}) => {
     const [customerData, setCustomerData] = useState({});
     const [generalSettings, setGeneralSettings] = useState(null);
 
-    // const { id } = useParams();
-    // const [idd, setIdd] = useState("");
-
-    console.log(idd, "idd");
-    // console.log(id,"iddddddddddddd");
 
     useEffect(()=>{
         dispatch(Getcus())
@@ -57,7 +52,6 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
  const generalSettingsData = useSelector((state) => state.generalsetting.generalsetting.data);
 // const customerData = allCustomers?.find(customer => customer.related_id === invoiceData.related_id) || {};
 
-  console.log(customerData, "customerData");
 
   // Get logged in user data
   const loggedInUser = useSelector((state) => state?.user?.loggedInUser);
@@ -71,20 +65,8 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
   const [isSignatureConfirmed, setIsSignatureConfirmed] = useState(false);
 
-    // useEffect(() => {
-    //     console.log('Fetching data...'); // Debug log
-    //     dispatch(getInvoice())
-    //         .then(response => console.log('Invoices Response:', response))
-    //         .catch(error => console.error('Invoices Error:', error));
-            
-    //     dispatch(ClientData())
-    //         .then(response => console.log('Clients Response:', response))
-    //         .catch(error => console.error('Clients Error:', error));
-    // }, [dispatch]);
-
     
      useEffect(() => {
-        // console.log("Fetching invoices for ID:", id);
         dispatch(getInvoice());
       }, [dispatch]);
 

@@ -63,7 +63,6 @@ const AddLeadMember = ({ onClose }) => {
           },
         }
       );
-      console.log("Addmember API response:", res.data); // Log response
       return res.data;
     } catch (error) {
       if (error.response) {
@@ -115,7 +114,6 @@ const AddLeadMember = ({ onClose }) => {
 
   const project = Filterdta.find((item) => item.id === id);
 
-  // console.log("swswswsw", project.lead_members);
 
   useEffect(() => {
     dispatch(empdata());

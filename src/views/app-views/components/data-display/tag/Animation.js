@@ -14,7 +14,6 @@ const Animation = () => {
   }, []);
   const handleClose = (removedTag) => {
     const newTags = tags.filter((tag) => tag !== removedTag);
-    console.log(newTags);
     setTags(newTags);
   };
   const showInput = () => {

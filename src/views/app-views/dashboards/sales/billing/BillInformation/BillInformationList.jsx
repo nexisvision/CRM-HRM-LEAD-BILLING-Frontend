@@ -112,7 +112,6 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
             .join(' ');
     };
 
-    console.log("Current Bill Status:", selectedBill?.bill_status); // Debug log
 
     return (
         <div className="">

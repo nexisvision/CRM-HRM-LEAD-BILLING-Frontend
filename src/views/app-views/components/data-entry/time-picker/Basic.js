@@ -3,7 +3,6 @@ import { TimePicker } from "antd";
 import dayjs from "dayjs";
 
 function onChange(time, timeString) {
-  console.log(time, timeString);
 }
 
 export class Basic extends Component {

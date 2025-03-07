@@ -23,7 +23,6 @@ const EditEstimates = ({ idd, onClose }) => {
 
     const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
 
-    // console.log("sddsdfsd",idd)
 
     const user = useSelector((state) => state.user.loggedInUser.username);
 
@@ -34,7 +33,6 @@ const EditEstimates = ({ idd, onClose }) => {
 
     const currentEstimate = currentEstimatee.find((item) => item.id === idd);
 
-    // console.log("sdfdsf",currentEstimate);
 
     const { currencies } = useSelector((state) => state.currencies);
     const condata = currencies.data || [];
@@ -124,7 +122,6 @@ const EditEstimates = ({ idd, onClose }) => {
         const fetchAndSetEstimateData = async () => {
             if (currentEstimate) {
                 try {
-                    console.log("Current Estimate:", currentEstimate);
 
                     // Set basic form fields
                     form.setFieldsValue({
@@ -144,7 +141,6 @@ const EditEstimates = ({ idd, onClose }) => {
                                 ? JSON.parse(currentEstimate.items)
                                 : currentEstimate.items;
                             
-                            console.log("Parsed Items:", parsedItems);
 
                             // Convert items object to array if needed
                             const itemsArray = Array.isArray(parsedItems) 
@@ -170,7 +166,6 @@ const EditEstimates = ({ idd, onClose }) => {
                                 discount_amount: Number(item.discount_amount) || 0
                             }));
 
-                            console.log("Formatted Items:", formattedItems);
                             setTableData(formattedItems);
 
                             // Set tax details for each item
@@ -224,7 +219,6 @@ const EditEstimates = ({ idd, onClose }) => {
 
     // Add debug logging
     useEffect(() => {
-        console.log("Current Table Data:", tableData);
     }, [tableData]);
 
     const calculateTotal = (data = tableData, globalDiscountValue, discountType) => {

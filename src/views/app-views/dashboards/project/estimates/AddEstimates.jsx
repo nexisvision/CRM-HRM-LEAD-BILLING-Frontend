@@ -49,7 +49,6 @@ const AddEstimates = ({ onClose }) => {
 
     const subClientData = sub?.find((subClient) => subClient?.id === client);
 
-    // console.log("sdsdfdf",subClientData);
 
     const [discountRate, setDiscountRate] = useState(10);
     const dispatch = useDispatch();

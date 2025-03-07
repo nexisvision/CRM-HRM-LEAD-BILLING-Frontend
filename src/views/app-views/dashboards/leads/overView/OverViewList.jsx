@@ -41,7 +41,6 @@ const OverViewList = () => {
   const alldeaddata = useSelector((state)=>state.Leads.Leads.data)
   const fnddead = alldeaddata?.find((item)=>item?.id === id)
 
-  console.log("fnddead",fnddead)  
 
 
 
@@ -120,14 +119,7 @@ const OverViewList = () => {
       setProo(progressPercentage.toFixed(2));
 
       // Optional: Log details for debugging
-      console.log({
-        startDate: startDate.toLocaleDateString(),
-        endDate: endDate.toLocaleDateString(),
-        currentDate: currentDate.toLocaleDateString(),
-        totalDays: Math.ceil(totalDuration / (1000 * 60 * 60 * 24)),
-        elapsedDays: Math.ceil(elapsedTime / (1000 * 60 * 60 * 24)),
-        progress: `${progressPercentage.toFixed(2)}%`
-      });
+    
 
     } catch (error) {
       console.error("Error calculating progress:", error);
@@ -138,7 +130,6 @@ const OverViewList = () => {
   // Update the selector to properly access client data from Redux store
   const allclient = useSelector((state) => state?.SubClient?.SubClient?.data) || [];
   
-  // Remove console.logs and add proper error handling
   const fndpro = filterdata.find((item) => item.id === id);
   const fndclient = allclient?.find((item) => item?.id === fndpro?.client);
 

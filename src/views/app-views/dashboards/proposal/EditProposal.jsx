@@ -91,7 +91,6 @@ const EditProposal = ({ id, onClose }) => {
     const data = empData.find((item) => item.id === id);
     setSingleEmp(data || null);
 
-    console.log("data", data)
 
     // Update form values when singleEmp is set
     if (data) {
@@ -247,7 +246,6 @@ const EditProposal = ({ id, onClose }) => {
         total: totals.finalTotal,
       };
 
-      console.log('Proposal Data:', proposalData);
       dispatch(edpropos({ id, proposalData }))
         .then(() => {
           // message.success("Proposal updated successfully!");

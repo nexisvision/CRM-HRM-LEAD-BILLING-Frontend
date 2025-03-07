@@ -25,7 +25,6 @@ const ModalForm = ({ visible, onCancel }) => {
   }, [visible]);
   const prevVisible = prevVisibleRef.current;
   useEffect(() => {
-    console.log(visible, prevVisible);
 
     if (!visible && prevVisible) {
       form.resetFields();
@@ -78,7 +77,6 @@ const Demo = () => {
   };
 
   const onFinish = values => {
-    console.log('Finish:', values);
   };
 
   return (

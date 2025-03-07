@@ -31,7 +31,6 @@ const AddPayment = () => {
 
   });
   const onSubmit = (values) => {
-    console.log('Submitted values:', values);
     message.success('Job added successfully!');
     navigate('app/apps/sales/payments');
   };

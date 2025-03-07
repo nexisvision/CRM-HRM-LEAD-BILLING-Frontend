@@ -34,7 +34,6 @@ const LeadMember = () => {
   const fndrewduxxdaa = allproject.Leads.data;
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
 
-  console.log("fnddatamembers",fnddata.lead_members);
   
 
 
@@ -115,7 +114,6 @@ const LeadMember = () => {
       .filter((employee) => employee !== null);
   }, [memberArray, employeeData]);
 
-  console.log("Filtered Employee Data:", userEmployeeData);
 
   const tableColumns = [
     {

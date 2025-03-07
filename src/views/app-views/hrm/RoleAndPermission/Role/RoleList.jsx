@@ -92,10 +92,8 @@ const RoleList = () => {
 
   if (parsedPermissions["extra-hrm-role"] && parsedPermissions["extra-hrm-role"][0]?.permissions) {
     allpermisson = parsedPermissions["extra-hrm-role"][0].permissions;
-    // console.log('Parsed Permissions:', allpermisson);
 
   } else {
-    // console.log('extra-hrm-role is not available');
   }
 
   const canCreateClient = allpermisson?.includes('create');

@@ -13,9 +13,7 @@ const FormDemo = () => {
   const onFinish = async () => {
     try {
       const values = await form.validateFields();
-      console.log('Submit:', values);
     } catch (errInfo) {
-      console.log('Error:', errInfo);
     }
   };
 

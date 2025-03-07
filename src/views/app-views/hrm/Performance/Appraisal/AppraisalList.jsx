@@ -57,10 +57,8 @@ const AppraisalList = () => {
    
       if (parsedPermissions["extra-hrm-performance-appraisal"] && parsedPermissions["extra-hrm-performance-appraisal"][0]?.permissions) {
         allpermisson = parsedPermissions["extra-hrm-performance-appraisal"][0].permissions;
-        // console.log('Parsed Permissions:', allpermisson);
       
       } else {
-        // console.log('extra-hrm-performance-appraisal is not available');
       }
       
       const canCreateClient = allpermisson?.includes('create');

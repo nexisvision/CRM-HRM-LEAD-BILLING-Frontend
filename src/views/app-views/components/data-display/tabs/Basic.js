@@ -1,7 +1,6 @@
 import { Tabs } from 'antd';
 import React from 'react';
 const onChange = (key) => {
-  console.log(key);
 };
 const Basic = () => (
   <Tabs

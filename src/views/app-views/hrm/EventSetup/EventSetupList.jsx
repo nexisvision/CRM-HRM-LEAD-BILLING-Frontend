@@ -36,7 +36,6 @@ const EventSetupList = () => {
 
   const tabledata = useSelector((state) => state.EventSetup);
 
-  console.log("ibu", tabledata);
 
   const handleAddEvent = () => {
     setIsAddModalVisible(true);
@@ -81,7 +80,6 @@ const EventSetupList = () => {
 
   useEffect(() => {
     if (tabledata && tabledata?.events) {
-      console.log("Fetched Events:", tabledata?.events);
       setEvents(tabledata?.events);
     }
   }, [tabledata]);

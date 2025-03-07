@@ -39,11 +39,9 @@ const treeData = [
 
 const Demo = () => {
   const onSelect = (keys, event) => {
-    console.log('Trigger Select', keys, event);
   };
 
   const onExpand = () => {
-    console.log('Trigger Expand');
   };
 
   return (

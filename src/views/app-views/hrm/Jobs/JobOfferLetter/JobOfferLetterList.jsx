@@ -76,13 +76,10 @@ const user = useSelector((state) => state.user.loggedInUser.username);
   const alldatas = useSelector((state) => state.joboffers);
   const fnddata = alldatas.joboffers.data || [];
 
-  console.log('fnddata',fnddata);
 
   const alljob = useSelector((state)=>state?.Jobs?.Jobs?.data);
-  console.log('alljob',alljob);
 
   const jobappliaction = useSelector((state)=>state?.jobapplications?.jobapplications?.data);
-  console.log('jobappliaction',jobappliaction);
 
   const fnddtaa = fnddata.filter((item) => item.created_by === user);
 
@@ -118,10 +115,8 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                        
                           if (parsedPermissions["extra-hrm-jobs-jobonbording"] && parsedPermissions["extra-hrm-jobs-jobonbording"][0]?.permissions) {
                             allpermisson = parsedPermissions["extra-hrm-jobs-jobonbording"][0].permissions;
-                            // console.log('Parsed Permissions:', allpermisson);
                           
                           } else {
-                            // console.log('extra-hrm-jobs-jobonbording is not available');
                           }
                           
                           const canCreateClient = allpermisson?.includes('create');

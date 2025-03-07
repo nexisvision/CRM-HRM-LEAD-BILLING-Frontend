@@ -21,7 +21,6 @@ const EditCalls = ({ visible, onClose, callData, onUpdate }) => {
   }, [visible, callData, form]);
 
   const onSubmit = (values) => {
-    console.log('Updated Call Values:', values);
     message.success('Call updated successfully!');
     onUpdate(values);
     onClose();

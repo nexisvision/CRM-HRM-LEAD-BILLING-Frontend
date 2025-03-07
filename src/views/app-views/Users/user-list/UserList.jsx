@@ -92,10 +92,8 @@ const UserList = () => {
 
   if (parsedPermissions["extra-users-list"] && parsedPermissions["extra-users-list"][0]?.permissions) {
     allpermisson = parsedPermissions["extra-users-list"][0].permissions;
-    //  console.log('Parsed Permissions:', allpermisson);
 
   } else {
-    //  console.log('extra-users-list is not available'); 
   }
 
   const canCreateClient = allpermisson?.includes('create');

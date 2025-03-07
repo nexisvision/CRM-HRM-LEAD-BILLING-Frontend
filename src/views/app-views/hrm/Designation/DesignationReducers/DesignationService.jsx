@@ -66,7 +66,6 @@ const DeleteDes = async (id) => {
 
 const EditDesignation = async (id, values) => {
   const token = localStorage.getItem("auth_token");
-  console.log("idinapi", id);
   try {
     const res = await axios.put(
       `${env.API_ENDPOINT_URL}/designations/${id}`,

@@ -12,7 +12,6 @@ export const AddTickets = createAsyncThunk(
     try {
       const response = await UserService.CreateTicket(userData);
 
-      // console.log("response", userData);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);

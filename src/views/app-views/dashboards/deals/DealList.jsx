@@ -87,10 +87,7 @@ const DealList = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
 
-  // Add console.log to debug data
   useEffect(() => {
-    console.log('TableData:', tabledata);
-    console.log('Users State:', users);
   }, [tabledata, users]);
 
   // Modified useEffect for initial data loading
@@ -109,7 +106,6 @@ const DealList = () => {
     
     try {
       if (!tabledata?.Deals?.data) {
-        console.log('No deals data available');
         setUsers([]);
         setFilteredUsers([]);
         setIsSearching(false);
@@ -222,10 +218,8 @@ const DealList = () => {
                   
                       if (parsedPermissions["dashboards-deal"] && parsedPermissions["dashboards-deal"][0]?.permissions) {
                         allpermisson = parsedPermissions["dashboards-deal"][0].permissions;
-                        console.log('Parsed Permissions:', allpermisson);
                       
                       } else {
-                        // console.log('dashboards-deal is not available');
                       }
                       
                       const canCreateClient = allpermisson?.includes('create');
@@ -481,9 +475,6 @@ const DealList = () => {
 
   // For debugging
   useEffect(() => {
-    console.log('Deals Data:', tabledata?.Deals?.data);
-    console.log('Clients Data:', clientsData);
-    console.log('Mapped Users:', users);
   }, [users]);
 
   const renderGridView = () => {

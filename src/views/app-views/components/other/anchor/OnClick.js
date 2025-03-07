@@ -5,7 +5,6 @@ const { Link } = Anchor;
 
 const handleClick = (e, link) => {
   e.preventDefault();
-  console.log(link);
 };
 
 export class OnClick extends Component {

@@ -70,7 +70,6 @@ export const EditExp = createAsyncThunk(
   "users/EditExp",
   async ({ id, values }, thunkAPI) => {
     try {
-      console.log("idinslice", id);
       const response = await UserService.EditEx(id, values);
       return response; // Return the updated data
     } catch (error) {

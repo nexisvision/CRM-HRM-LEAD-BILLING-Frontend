@@ -49,7 +49,6 @@ const AddEstimates = ({ onClose }) => {
 
     // const subClientData = sub?.find((subClient) => subClient?.id === client);
 
-    // console.log("sdsdfdf",subClientData);
 
     const allleads = useSelector((state) => state.Leads);
     const fndrewduxxdaa = allleads.Leads.data
@@ -58,7 +57,6 @@ const AddEstimates = ({ onClose }) => {
     // Add this to get the lead name
     const leadName = fnddata?.leadTitle || 'N/A';
 
-    console.log("sdsdfdf",fnddata);
 
     const [discountRate, setDiscountRate] = useState(10);
     const dispatch = useDispatch();
