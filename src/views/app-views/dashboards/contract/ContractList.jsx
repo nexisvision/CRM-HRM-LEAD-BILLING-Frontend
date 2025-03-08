@@ -287,45 +287,25 @@ const ContractList = () => {
 
       ///endpermission
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                    <Menu.Item>
-                    <Flex alignItems="center">
-                      <Button
-                        type=""
-                        className=""
-                        icon={<EditOutlined />}
-                        onClick={() => Editfun(elm.id)}
-                        size="small"
-                      >
-                        <span className="">Edit</span>
-                      </Button>
-                    </Flex>
-                  </Menu.Item>
-                    ) : null}
+  const dropdownMenu = (elm) => ({
+    items: [
+      // Conditionally add edit menu item
+      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => Editfun(elm.id)
+      }] : []),
       
-      
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                     <Menu.Item>
-                     <Flex alignItems="center">
-                       <Button
-                         type=""
-                         className=""
-                         icon={<DeleteOutlined />}
-                         onClick={() => deleteUser(elm.id)}
-                         size="small"
-                       >
-                         <span className="">Delete</span>
-                       </Button>
-                     </Flex>
-                   </Menu.Item>
-                    ) : null}
-
-      
-    </Menu>
-  );
+      // Conditionally add delete menu item
+      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(elm.id)
+      }] : [])
+    ]
+  });
   const tableColumns = [
     {
         title: 'Contract Number',

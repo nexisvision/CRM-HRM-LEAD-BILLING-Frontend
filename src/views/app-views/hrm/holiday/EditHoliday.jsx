@@ -71,7 +71,7 @@ const EditHoliday = ({ onClose, idd }) => {
 
   return (
     <div className="add-holiday-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #e8e8e8" }} />
+      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
 
       <Formik
         initialValues={initialValues}

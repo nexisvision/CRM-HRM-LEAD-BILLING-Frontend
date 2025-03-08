@@ -164,7 +164,7 @@ const EditJobOnBording = ({ idd, onClose }) => {
 
   return (
     <div className="add-job-form">
-
+      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

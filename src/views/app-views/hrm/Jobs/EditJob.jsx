@@ -225,7 +225,7 @@ const EditJob = ({ idd, onClose }) => {
 
   return (
     <div className="add-expenses-form">
-
+       <h2 className="mb-3 border-b pb-1 font-medium"></h2>
       <Formik
         innerRef={formikRef}  // Add this line to get Formik reference
         initialValues={{

@@ -88,34 +88,22 @@ const HolidayList = () => {
     setIsEditHolidayModalVisible(false);
   };
 
-  const dropdownMenu = (record) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            onClick={() => openEditHolidayModal(record)}
-            size="small"
-          >
-            <span>Edit</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type="text"
-            icon={<DeleteOutlined />}
-            onClick={() => deleteHoliday(record.id)}
-            size="small"
-          >
-            <span>Delete</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  const dropdownMenu = (record) => ({
+    items: [
+      {
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => openEditHolidayModal(record)
+      },
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteHoliday(record.id)
+      }
+    ]
+  });
 
   const tableColumns = [
     {

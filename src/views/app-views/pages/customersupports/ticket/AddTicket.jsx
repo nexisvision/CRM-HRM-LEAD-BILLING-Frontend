@@ -46,10 +46,6 @@ const AddTicket = ({ onClose }) => {
     }
   });
 
-  // const llogedid = useSelector((state) => state.user.loggedInUser.username || []);
-
-
-  // const fnddatass = fnddata?.filter((item)=>item?.created_by === llogedid);
 
   const initialValues = {
     ticketSubject: "",
@@ -292,9 +288,7 @@ const AddTicket = ({ onClose }) => {
                     <Button icon={<UploadOutlined />} className="bg-white">
                       Select File
                     </Button>
-                    {/* <span className="ml-2 text-gray-500 text-sm">
-                      Supports: JPG, PNG, PDF (Max: 5MB)
-                    </span> */}
+                   
                   </Upload>
                 </div>
               </Col>

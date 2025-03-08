@@ -119,11 +119,6 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
     storage_limit: Yup.string().required('Please enter the storage limit!'),
     currency: Yup.string().required('Please select a currency!'),
     trial: Yup.boolean(),
-    // trialDays: Yup.string().when('trial', {
-    //   is: true,
-    //   then: (schema) => schema.required('Please enter the number of trial days!'),
-    //   otherwise: (schema) => schema.notRequired(),
-    // })
   });
 
   const handleSubmit = (values) => {
@@ -148,6 +143,7 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
 
   return (
     <div>
+      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

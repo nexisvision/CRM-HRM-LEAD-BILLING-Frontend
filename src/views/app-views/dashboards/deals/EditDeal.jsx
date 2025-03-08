@@ -160,6 +160,7 @@ const EditDeal = ({ onClose, id }) => {
 
   return (
     <div className="add-job-form">
+      <h2 className="mb-4 border-b pb-2 font-medium"></h2>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -174,7 +175,6 @@ const EditDeal = ({ onClose, id }) => {
           setFieldTouched,
         }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
-            <h2 className="mb-4 border-b pb-2 font-medium"></h2>
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item">

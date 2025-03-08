@@ -212,46 +212,25 @@ const RevenueList = () => {
     setIdd(idd);
   };
 
-  const dropdownMenu = (row) => (
-    <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <PlusCircleOutlined />
-          <span className="ml-2">Add to remark</span>
-        </Flex>
-      </Menu.Item>
-
-
-      <Menu.Item>
-        <Flex alignItems="center">
-          <TiPinOutline />
-          <span className="ml-2">Pin</span>
-        </Flex>
-      </Menu.Item> */}
+  const dropdownMenu = (row) => ({
+    items: [
+      // Conditionally add edit menu item
+      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => editfun(row.id)
+      }] : []),
       
-
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                           <Menu.Item>
-                           <Flex alignItems="center" onClick={() => editfun(row.id)}>
-                             {<EditOutlined />}
-                             <span className="ml-2">Edit</span>
-                           </Flex>
-                         </Menu.Item>
-                    ) : null}
-      
-      
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                      <Menu.Item>
-                      <Flex alignItems="center" onClick={() => dletefun(row.id)}>
-                        <DeleteOutlined />
-                        <span className="ml-2">Delete</span>
-                      </Flex>
-                    </Menu.Item>
-                    ) : null}
-
-
-    </Menu>
-  );
+      // Conditionally add delete menu item
+      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => dletefun(row.id)
+      }] : [])
+    ]
+  });
 
   const tableColumns = [
     // {

@@ -1,35 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {
   Card,
-  Table,
-  Menu,
-  Row,
-  Col,
-  Tag,
   Input,
-  message,
   Button,
   Modal,
 } from "antd";
 import {
-  EyeOutlined,
-  DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
-  FileExcelOutlined,
-  EditOutlined,
 } from "@ant-design/icons";
-import dayjs from "dayjs";
 import Flex from "components/shared-components/Flex";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import StatisticWidget from "components/shared-components/StatisticWidget";
-// import { DealStatisticData } from '../../dashboards/default/DefaultDashboardData';
-// import AvatarStatus from 'components/shared-components/AvatarStatus';
-import userData from "assets/data/user-list.data.json";
-import OrderListData from "assets/data/order-list.data.json";
-import utils from "utils";
 import AddNotes from "../notes/AddNotes";
 import EditNotes from "../notes/EditNotes";
 import ViewNotes from "./ViewNotes";
@@ -37,14 +17,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { getnotess } from "./notesReducer/notesSlice";
 
 const NotesList = () => {
-  // const [users, setUsers] = useState(userData);
-  // const [list, setList] = useState(OrderListData);
-  // const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  // const [userProfileVisible, setUserProfileVisible] = useState(false);
-  // const [selectedUser, setSelectedUser] = useState(null);
   const [isAddNotesModalVisible, setIsAddNotesModalVisible] = useState(false);
   const [isEditNotesModalVisible, setIsEditNotesModalVisible] = useState(false);
-  //   const [dealStatisticData] = useState(DealStatisticData);
   const [list, setList] = useState([]);
   const [searchText, setSearchText] = useState('');
 
@@ -59,6 +33,8 @@ const NotesList = () => {
 
   const allnotedata = useSelector((state) => state.notes);
   const fnddata = allnotedata.notes?.data;
+
+  console.log("fnddata",fnddata); 
 
   useEffect(() => {
     if (fnddata) {
@@ -155,15 +131,6 @@ const NotesList = () => {
           }}
         />
 
-        {/* <Card>
-          <div>
-              <Personal
-          </div>
-        </Card> */}
-
-        {/* <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} /> */}
-
-        {/* Add Job Modal */}
         <Modal
           title="Add Notes"
           visible={isAddNotesModalVisible}
@@ -185,7 +152,6 @@ const NotesList = () => {
         >
           <EditNotes onClose={closeEditNotesModal} />
         </Modal>
-        {/* // </Card> */}
       </Card>
     </>
   );

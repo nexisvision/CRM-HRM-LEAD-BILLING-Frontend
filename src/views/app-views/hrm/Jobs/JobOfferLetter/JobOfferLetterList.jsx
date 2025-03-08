@@ -283,92 +283,49 @@ const user = useSelector((state) => state.user.loggedInUser.username);
     setEmployeeData(null);
   };
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" className="" icon={<EyeOutlined />} size="small">
-            <span>View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<MailOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span>Send Mail</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<PushpinOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span className="ml-2">Add to Job OnBoard</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-
-<Menu.Item>
-                                    <Flex alignItems="center">
-                                      <Button
-                                        type=""
-                                        className=""
-                                        icon={<EditOutlined />}
-                                        onClick={() => convertemployee(elm.id)}
-                                        size="small"
-                                      >
-                                        <span className="ml-2">Convert To Employee</span>
-                                      </Button>
-                                    </Flex>
-                                  </Menu.Item>
-    
-     
-
-        {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                    <Menu.Item>
-                                    <Flex alignItems="center">
-                                      <Button
-                                        type=""
-                                        className=""
-                                        icon={<EditOutlined />}
-                                        onClick={() => eidtfun(elm.id)}
-                                        size="small"
-                                      >
-                                        <span className="ml-2">Edit</span>
-                                      </Button>
-                                    </Flex>
-                                  </Menu.Item>
-                                ) : null}
-                  
-                  
-                  {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                   <Menu.Item>
-                                   <Flex alignItems="center">
-                                     <Button
-                                       type=""
-                                       className=""
-                                       icon={<DeleteOutlined />}
-                                       onClick={() => deleteUser(elm.id)}
-                                       size="small"
-                                     >
-                                       <span>Delete</span>
-                                     </Button>
-                                   </Flex>
-                                 </Menu.Item>
-                                ) : null}
-    </Menu>
-  );
+  const dropdownMenu = (elm) => ({
+    items: [
+      // View Details, Send Mail, and Pin options are commented out but kept for reference
+      // {
+      //   key: 'view',
+      //   icon: <EyeOutlined />,
+      //   label: 'View Details',
+      //   onClick: () => showUserProfile(elm)
+      // },
+      // {
+      //   key: 'mail',
+      //   icon: <MailOutlined />,
+      //   label: 'Send Mail',
+      //   onClick: () => showUserProfile(elm)
+      // },
+      // {
+      //   key: 'pin',
+      //   icon: <PushpinOutlined />,
+      //   label: 'Pin',
+      //   onClick: () => showUserProfile(elm)
+      // },
+      {
+        key: 'convert',
+        icon: <EditOutlined />,
+        label: 'Convert To Employee',
+        onClick: () => convertemployee(elm.id)
+      },
+      
+      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => eidtfun(elm.id)
+      }] : []),
+      
+      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(elm.id)
+      }] : [])
+    ]
+  });
 
   const tableColumns = [
     {

@@ -220,86 +220,43 @@ const DocumentList = () => {
 
   const jobStatusList = ["active", "blocked"];
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EyeOutlined />}
-            size="small"
-          // onClick={() => viewfun(elm.id)}
-          >
-            <span>View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<MailOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span>Send Mail</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<PushpinOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span className="ml-2">Add to Job OnBoard</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-
-
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button
-              type=""
-              className=""
-              icon={<EditOutlined />}
-              size="small"
-              onClick={() => editfun(elm.id)}
-            >
-              <span>Edit</span>
-            </Button>
-          </Flex>
-        </Menu.Item>
-      ) : null}
-
-
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button
-              type=""
-              className=""
-              icon={<DeleteOutlined />}
-              onClick={() => deleteUser(elm.id)}
-              size="small"
-            >
-              <span>Delete</span>
-            </Button>
-          </Flex>
-        </Menu.Item>
-      ) : null}
-
-
-    </Menu>
-  );
+  const dropdownMenu = (elm) => ({
+    items: [
+      // View Details, Send Mail, and Pin options are commented out but kept for reference
+      // {
+      //   key: 'view',
+      //   icon: <EyeOutlined />,
+      //   label: 'View Details',
+      //   onClick: () => viewfun(elm.id)
+      // },
+      // {
+      //   key: 'mail',
+      //   icon: <MailOutlined />,
+      //   label: 'Send Mail',
+      //   onClick: () => showUserProfile(elm)
+      // },
+      // {
+      //   key: 'pin',
+      //   icon: <PushpinOutlined />,
+      //   label: 'Add to Job OnBoard',
+      //   onClick: () => showUserProfile(elm)
+      // },
+      
+      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => editfun(elm.id)
+      }] : []),
+      
+      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(elm.id)
+      }] : [])
+    ]
+  });
 
   const tableColumns = [
     {
@@ -343,21 +300,7 @@ const DocumentList = () => {
         mobileFlex={false}
       >
         <Flex className="mb-1" mobileFlex={false}>
-          {/* <div className="mr-md-3 mb-3">
-            <Input placeholder="Search" prefix={<SearchOutlined />} onChange={onSearch} />
-          </div>
-          <div className="w-full md:w-48 ">
-            <Select
-              defaultValue="All"
-              className="w-100"
-              style={{ minWidth: 180 }}
-              onChange={handleShowStatus}
-              placeholder="Status"
-            >
-              <Option value="All">All Job </Option>
-              {jobStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
-            </Select>
-          </div> */}
+
         </Flex>
         <Flex gap="7px">
 

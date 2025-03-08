@@ -127,36 +127,22 @@ const AccountList = () => {
     }
   };
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EditOutlined />}
-            onClick={() => eidtfun(elm.id)}
-            size="small"
-          >
-            <span className="ml-2">Edit</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<DeleteOutlined />}
-            onClick={() => deleteUser(elm.id)}
-            size="small"
-          >
-            <span>Delete</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  const dropdownMenu = (elm) => ({
+    items: [
+      {
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => eidtfun(elm.id)
+      },
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(elm.id)
+      }
+    ]
+  });
 
   const tableColumns = [
     {

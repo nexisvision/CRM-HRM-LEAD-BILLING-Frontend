@@ -63,29 +63,27 @@ const AddProposal = ({ onClose }) => {
     (state) => state.Milestone.Milestone
   );
 
-  // const [selectedProject, setSelectedProject] = useState(null);
-  // const [clientOptions, setClientOptions] = useState([]);
+  
 
   const currencies = useSelector((state) => state.currencies?.currencies?.data || []);
   const [discountRate, setDiscountRate] = useState(10);
   const dispatch = useDispatch();
 
-  const Leads = useSelector((state) => state.Leads.Leads.data);
-  // const Deals  = useSelector((state) => state.Deals.Deals.data);
+  const Leads = useSelector((state) => state.Leads?.Leads?.data || []);
+ 
 
-  const allogged = useSelector((state) => state.user.loggedInUser.username);
+  const allogged = useSelector((state) => state.user?.loggedInUser?.username);
 
-  // const fnddeal = Deals.filter((item)=>item?.created_by === allogged);
-  const fndlead = Leads.filter((item) => item?.created_by === allogged);
+ 
+  const fndlead = Array.isArray(Leads) 
+    ? Leads.filter((item) => item?.created_by === allogged)
+    : [];
 
 
   const { taxes } = useSelector((state) => state.tax);
 
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
 
-  // console.log("SubClient Data:", subClientData.username);
-
-  // const { subClients } = useSelector((state) => state.SubClient.SubClient.data);
 
   const [form] = Form.useForm();
   const [totals, setTotals] = useState({
@@ -133,33 +131,18 @@ const AddProposal = ({ onClose }) => {
     dispatch(getAllTaxes());
   }, [dispatch]);
 
-  // Fetch milestones when product changes
-  // useEffect(() => {
-  //     dispatch(Getmins(id));
-  // }, [dispatch]);
-
-
-
   const handleFinish = async (values) => {
     try {
       setLoading(true);
 
-
-      // const totalTax = calculateTotalTax();
-      // const discount = (subTotal * discountRate) / 100;
-      // const totalAmount = subTotal - discount + totalTax;
-
-      // Calculate the actual discount amount
       const subtotal = calculateSubTotal();
       const discountAmount = totals.discount;
 
       // Restructured proposal data to match backend requirements
       const proposalData = {
-        lead_title: values.lead_title,
-        // deal_title: values.deal_title,
+        lead_title: values.lead_title, // deal_title: values.deal_title,
         valid_till: values.valid_till.format("YYYY-MM-DD"),
         currency: values.currency,
-        // calculatedTax: values.calculatedTax, // Changed from calculatedtax to calculatedTax
         description: "", // Add description field
         items: tableData.map((item) => ({
           item: item.item,
@@ -351,16 +334,9 @@ const AddProposal = ({ onClose }) => {
             onFinish={handleFinish}
             validationSchema={validationSchema}
             initialValues={initialValues}
-
-          // initialValues={{
-          //     loginEnabled: true,
-          // }}
-          >
-            {/* <Card className="border-0 mt-2"> */}
+          >  
             <div className="">
               <div className=" p-2">
-                {/*  */}
-
                 <Row gutter={16}>
                   <Col span={12}>
                     <Form.Item
@@ -374,10 +350,11 @@ const AddProposal = ({ onClose }) => {
                       ]}
                     >
                       <Select
-                        placeholder="Select Lead Title"
+                        placeholder={Array.isArray(Leads) ? "Select Lead Title" : "Loading leads..."}
+                        loading={!Array.isArray(Leads)}
                         onChange={(value) => {
-                          // Find the selected lead
-                          const selectedLead = fndlead.find(lead => lead.id === value);
+                          // Find the selected lead with null check
+                          const selectedLead = fndlead?.find(lead => lead.id === value);
                           if (selectedLead) {
                             setSelectedLeadDetails(selectedLead);
 
@@ -409,31 +386,7 @@ const AddProposal = ({ onClose }) => {
                       </Select>
                     </Form.Item>
                   </Col>
-                  {/* <Col span={12}>
-                    <Form.Item
-                      name="deal_title"
-                      label="Deal Title"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please select a Deal Title",
-                        },
-                      ]} // Validation rule
-                    >
-                      <Select placeholder="Select Deal Title">
-                        {Array.isArray(fnddeal) && fnddeal.length > 0 ? (
-                          fnddeal.map((deal) => (
-                            <Option key={deal.id} value={deal.id}>
-                              {deal.dealName}
-                            </Option>
-                          ))
-                        ) : (
-                          <Option disabled>No Deals Available</Option>
-                        )}
-                      </Select>
-                    </Form.Item>
-                  </Col> */}
-
+                 
                   <Col span={12}>
                     <Form.Item
                       name="valid_till"
@@ -480,23 +433,7 @@ const AddProposal = ({ onClose }) => {
                     </Form.Item>
                   </Col>
 
-                  {/* <Col span={12}>
-                    <Form.Item
-                      name="calculatedTax"
-                      label="Calculate Tax"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please select a tax calculation method",
-                        },
-                      ]}
-                    >
-                      <Select placeholder="Select Tax Calculation Method">
-                        <Option value="after">After Discount</Option>
-                        <Option value="before">Before Discount</Option>
-                      </Select>
-                    </Form.Item>
-                  </Col> */}
+                
                   <Col span={24}>
                     <Form.Item label="Description" name="description">
                       <Input.TextArea placeholder="Enter Description" />
@@ -707,16 +644,6 @@ const AddProposal = ({ onClose }) => {
           </Form>
         </div>
       </div>
-      {/* <Modal
-                title="Product Create"
-                visible={isAddProductModalVisible}
-                onCancel={closeAddProductModal}
-                footer={null}
-                width={1000}
-                className='mt-[-70px]'
-            >
-                <AddProduct onClose={closeAddProductModal} />
-            </Modal> */}
     </>
   );
 };

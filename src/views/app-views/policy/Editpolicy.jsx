@@ -50,19 +50,7 @@ const EditpolicyList = ({ idd, onClose }) => {
     }
   }, [fndpolicy]);
 
-  // const onSubmit = async (values) => {
-  //   try {
-  //     dispatch(editpolicys({ idd, values })).then(() => {
-  //       dispatch(getpolicys());
-  //       onClose();
-  //       // message.success("Form submitted successfully");
-  //     });
-  //     // message.success("Policy updated successfully!");
-  //   } catch (error) {
-  //     console.error("Submission error:", error);
-  //     // message.error("An error occurred while updating policy.");
-  //   }
-  // };
+ 
 
   const onSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
@@ -103,7 +91,7 @@ const EditpolicyList = ({ idd, onClose }) => {
   });
   return (
     <div>
-
+      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
 
       <Formik
         initialValues={initialValues}

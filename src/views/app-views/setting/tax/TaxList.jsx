@@ -98,22 +98,22 @@ const delfun = (idd) => {
     });
   };
 
-  const dropdownMenu = (record) => (
-    <Menu>
-      <Menu.Item onClick={() => openEditTaxModal(record)}>
-        <Flex alignItems="center">
-          <EditOutlined />
-          <span className="ml-2">Edit</span>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item onClick={() => delfun(record.id)}>
-        <Flex alignItems="center">
-          <DeleteOutlined />
-          <span className="ml-2">Delete</span>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  const dropdownMenu = (record) => ({
+    items: [
+      {
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => openEditTaxModal(record)
+      },
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => delfun(record.id)
+      }
+    ]
+  });
 
   const tableColumns = [
     {

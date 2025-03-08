@@ -43,7 +43,7 @@ const AddTax = ({ onClose }) => {
 
     return (
         <div className="add-tax-form">
-            {/* <h2 className="mb-4">Create Tax</h2> */}
+          <h2 className="mb-3 border-b pb-1 font-medium"></h2>
 
             <Formik
                 initialValues={initialValues}
@@ -55,7 +55,7 @@ const AddTax = ({ onClose }) => {
                         <Row gutter={16}>
                             <Col span={12}>
                                 <div className="form-item">
-                                    <label className="font-semibold">Gst Name</label>
+                                    <label className="font-semibold">Gst Name <span className="text-red-500">*</span></label>
                                     <Field name="gstName" as={Input} placeholder="Enter GST Name" />
                                     <ErrorMessage
                                         name="gstName"
@@ -67,7 +67,7 @@ const AddTax = ({ onClose }) => {
 
                             <Col span={12}>
                                 <div className="form-item">
-                                    <label className="font-semibold">Gst Percentage</label>
+                                    <label className="font-semibold">Gst Percentage <span className="text-red-500">*</span></label>
                                     <Field name="gstPercentage" as={Input} placeholder="Enter GST Percentage" />
                                     <ErrorMessage
                                         name="gstPercentage"

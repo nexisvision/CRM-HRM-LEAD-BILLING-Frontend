@@ -178,33 +178,22 @@ const DepartmentList = () => {
     setDept(Deptid)
   }
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      <Menu.Item>
-        <Button type="" icon={<PushpinOutlined />} onClick={() => showUserProfile(elm)} size="small">
-          <span>Pin</span>
-        </Button>
-      </Menu.Item>
-    
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                <Menu.Item>
-                                <Button type="" icon={<EditOutlined />} onClick={() => editDept(elm.id)} size="small">
-                                  <span>Edit</span>
-                                </Button>
-                              </Menu.Item>
-                          ) : null}
-            
-            
-            {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                            <Menu.Item>
-                            <Button type="" icon={<DeleteOutlined />} onClick={() => deleteUser(elm.id)} size="small">
-                              <span>Delete</span>
-                            </Button>
-                          </Menu.Item>
-                          ) : null}
-
-    </Menu>
-  );
+  const dropdownMenu = (elm) => ({
+    items: [
+      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => editDept(elm.id)
+      }] : []),
+      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(elm.id)
+      }] : [])
+    ]
+  });
 
   // Update table columns to show branch name
   const tableColumns = [

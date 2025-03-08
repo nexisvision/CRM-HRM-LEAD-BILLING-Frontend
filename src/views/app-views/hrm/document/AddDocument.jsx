@@ -49,32 +49,6 @@ const AddDocument = ({ onClose }) => {
       },
     ]);
   };
-  // const onSubmit = async (values, { resetForm }) => {
-  //   const links = rows.reduce((acc, row, index) => {
-  //     acc[index] = { title: row.title, url: row.link };
-  //     return acc;
-  //   }, {});
-  //   const payload = {
-  //     category: values.category,
-  //     links: links,
-  //   };
-  //   try {
-  //     await dispatch(AddDocu(payload));
-  //     await dispatch(getDocu());
-  //     message.success("Training setup added successfully!");
-  //     resetForm();
-  //     setRows([
-  //       {
-  //         id: Date.now(),
-  //         link: "",
-  //         title: "",
-  //       },
-  //     ]);
-  //     onClose();
-  //   } catch (error) {
-  //     message.error("Failed to add training setup!");
-  //   }
-  // };
 
   const onSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
@@ -111,7 +85,7 @@ const AddDocument = ({ onClose }) => {
 
   return (
     <div className="add-trainingSetup">
-      basi
+      <h2 className="mb-3 border-b pb-1 font-medium"></h2>  
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -147,7 +121,7 @@ const AddDocument = ({ onClose }) => {
                       <Select
                         {...field}
                         placeholder="Select role"
-                        className="w-full mt-1"
+                        className="w-full"
                         onChange={(value, option) => {
                           setFieldValue("role", option.children);
                         }}

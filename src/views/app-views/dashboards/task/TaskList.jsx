@@ -373,34 +373,34 @@ const TaskList = () => {
     setIsViewTaskModalVisible(false);
   };
 
-  const dropdownMenu = (row) => (
-    <Menu onClick={(e) => e.domEvent.stopPropagation()}>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => togglePinTask(row.id)}>
-          <PushpinOutlined style={{ color: pinnedTasks.includes(row.id) ? "#1890ff" : undefined }} />
-          <span className="ml-2">{pinnedTasks.includes(row.id) ? "Unpin" : "Pin"}</span>
-        </Flex>
-      </Menu.Item>
-
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center" onClick={() => editfubn(row.id)}>
-            <EditOutlined />
-            <span className="ml-2">Edit</span>
-          </Flex>
-        </Menu.Item>
-      ) : null}
-
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center" onClick={() => deleytfun(row.id)}>
-            <DeleteOutlined />
-            <span className="ml-2">Delete</span>
-          </Flex>
-        </Menu.Item>
-      ) : null}
-    </Menu>
-  );
+  const dropdownMenu = (row) => ({
+    items: [
+      {
+        key: 'pin',
+        icon: <PushpinOutlined style={{ 
+          color: pinnedTasks.includes(row.id) ? "#1890ff" : undefined 
+        }} />,
+        label: pinnedTasks.includes(row.id) ? "Unpin" : "Pin",
+        onClick: () => togglePinTask(row.id)
+      },
+      
+      // Edit - conditional item
+      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => editfubn(row.id)
+      }] : []),
+      
+      // Delete - conditional item
+      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleytfun(row.id)
+      }] : [])
+    ]
+  });
 
   const tableColumns = [
     {

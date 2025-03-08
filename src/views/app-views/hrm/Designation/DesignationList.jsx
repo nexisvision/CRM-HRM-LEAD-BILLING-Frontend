@@ -186,29 +186,23 @@ const DesignationList = () => {
     setId(id)
   } 
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button type="" icon={<EditOutlined />} onClick={()=>{editfun(elm.id)}} size="small">
-              <span className="">Edit</span>
-            </Button>
-          </Flex>
-        </Menu.Item>
-      ) : null}
+  const dropdownMenu = (elm) => ({
+    items: [
+      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => editfun(elm.id)
+      }] : []),
       
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button type="" icon={<DeleteOutlined />} onClick={() => { deleteUser(elm.id) }} size="small">
-              <span className="">Delete</span>
-            </Button>
-          </Flex>
-        </Menu.Item>
-      ) : null}
-    </Menu>
-  );
+      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(elm.id)
+      }] : [])
+    ]
+  });
 
   const tableColumns = [
     {

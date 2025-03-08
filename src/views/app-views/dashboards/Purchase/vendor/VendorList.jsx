@@ -142,37 +142,22 @@ const VendorList = () => {
  
   
   const jobStatusList = ['active', 'blocked']
-  const dropdownMenu = (record) => (
-    <Menu>
-      
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EditOutlined />}
-            onClick={() => openEditVendorModal(record)}
-            size="small"
-          >
-            <span className="ml-2">Edit</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<DeleteOutlined />}
-            onClick={() => deleteUser(record.id)}
-            size="small"
-          >
-            <span className="">Delete</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  const dropdownMenu = (record) => ({
+    items: [
+      {
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => openEditVendorModal(record)
+      },
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(record.id)
+      }
+    ]
+  });
   const tableColumns = [
     {
       title: 'Name',

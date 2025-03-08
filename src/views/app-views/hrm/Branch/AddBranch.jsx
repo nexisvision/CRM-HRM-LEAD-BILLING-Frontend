@@ -53,7 +53,7 @@ const AddBranch = ({ onClose }) => {
 
   return (
     <div className="add-employee">
-
+ <h2 className="mb-3 border-b pb-1 font-medium"></h2>
 
       <Formik
         initialValues={{

@@ -184,6 +184,7 @@ const AddRole = ({ onClose,resetForm }) => {
 
   return (
     <div className="">
+       <h2 className="mb-3 border-b pb-1 font-medium"></h2>
       
       <Form form={form} onFinish={onFinish} layout="vertical">
         <Form.Item

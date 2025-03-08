@@ -39,25 +39,29 @@ import { useDispatch, useSelector } from "react-redux";
 import { delnotess, getnotess } from "./notesReducer/notesSlice";
 
 function ViewNotes() {
-  const [users, setUsers] = useState(userData);
+  const [users, setUsers] = useState([]);
   const [isEditNotesModalVisible, setIsEditNotesModalVisible] = useState(false);
   const [idd, setIdd] = useState("");
 
   const dispatch = useDispatch();
-
   const alllogeddata = useSelector((state) => state.user);
   const id = alllogeddata.loggedInUser.id;
 
+  // Add loading state
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
+    // Fetch notes when component mounts
     dispatch(getnotess(id));
-  }, []);
+  }, [dispatch, id]);
 
   const allnotedata = useSelector((state) => state.notes);
-  const fnddata = allnotedata.notes.data;
+  const fnddata = allnotedata?.notes?.data || []; // Add fallback empty array
 
   useEffect(() => {
     if (fnddata) {
       setUsers(fnddata);
+      setIsLoading(false);
     }
   }, [fnddata]);
 
@@ -249,16 +253,18 @@ function ViewNotes() {
     <>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mt-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Notifications</h1>
-          {fnddata && fnddata.some((note) => note.notetype === "Personal") ? (
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">Notes</h1>
+          {isLoading ? (
+            <div className="text-center py-12">
+              <p>Loading...</p>
+            </div>
+          ) : fnddata && fnddata.length > 0 ? (
             <div className="grid grid-cols-1 gap-6">
-              {fnddata
-                .filter((note) => note.notetype === "Personal")
-                .map((note) => renderNoteCard(note))}
+              {fnddata.map((note) => renderNoteCard(note))}
             </div>
           ) : (
             <div className="text-center py-12 bg-gray-50 rounded-lg">
-              <p className="text-gray-500 text-lg">No notifications found</p>
+              <p className="text-gray-500 text-lg">No notes found</p>
             </div>
           )}
         </div>

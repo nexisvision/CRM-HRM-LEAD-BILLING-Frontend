@@ -75,7 +75,7 @@ const AddAnnouncement = ({ onClose }) => {
 
   return (
     <div className="add-attendance-form">
-      {/* <h2 className="mb-4 text-center">Add Announcement</h2> */}
+      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
 
 
       <Formik

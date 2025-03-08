@@ -224,31 +224,28 @@ export const InvoiceList = () => {
   useEffect(() => {
     filterInvoices(searchText, dateRange);
   }, [dateRange, invoices]);
-  const dropdownMenu = (row) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => Viewfunc(row.id)}>
-          <EyeOutlined />
-          {/* <EyeOutlined /> */}
-          <span className="ml-2">View Invoice
-          </span>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => Editfunc(row.id)}>
-          <EditOutlined />
-          {/* <EditOutlined /> */}
-          <span className="ml-2">Edit</span>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => handleDelete(row.id)}>
-          <DeleteOutlined />
-          <span className="ml-2">Delete</span>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  const dropdownMenu = (row) => ({
+    items: [
+      {
+        key: 'view',
+        icon: <EyeOutlined />,
+        label: 'View Invoice',
+        onClick: () => Viewfunc(row.id)
+      },
+      {
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => Editfunc(row.id)
+      },
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => handleDelete(row.id)
+      }
+    ]
+  });
   const tableColumns = [
     {
       title: "Invoice Number",

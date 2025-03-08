@@ -3,7 +3,6 @@ import {
   Card,
   Table,
   Menu,
-  Tag,
   Input,
   message,
   Button,
@@ -12,34 +11,19 @@ import {
   Space,
 } from "antd";
 import {
-  EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
   FileExcelOutlined,
   EditOutlined,
 } from "@ant-design/icons";
-import dayjs from "dayjs";
-// import UserView from "../../../Users/user-list/UserView";
 import Flex from "components/shared-components/Flex";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import AvatarStatus from "components/shared-components/AvatarStatus";
-// import Addpolicy from "./Addpolicy";
-// import Editpolicy from "./Editpolicy";
-// import EditJobOfferLetter from "./EditJobOfferLetter";
 import { utils, writeFile } from "xlsx";
 import { useDispatch, useSelector } from "react-redux";
 import AddInquiry from "./AddInquiry";
 import EditInquiry from "./EditInquiry";
 import { deleteinqu, getinqu } from "./inquiryReducer/inquirySlice";
-// import { deletepolicys, getpolicys } from "./policyReducer/policySlice";
-// import {
-//   deletejobapplication,
-//   getjobapplication,
-// } from "./JobapplicationReducer/JobapplicationSlice";
-// import ViewJobApplication from './ViewJobApplication';
 import { debounce } from 'lodash';
 
 const { Option } = Select;
@@ -48,7 +32,6 @@ const InquiryList = () => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
-  // const [viewApplicationVisible, setViewApplicationVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [list, setList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -77,17 +60,6 @@ const InquiryList = () => {
 
   const alldata = useSelector((state) => state.jobapplications);
   const fnddta = alldata.jobapplications.data;
-
-  //   useEffect(() => {
-  //     dispatch(getjobapplication());
-  //   }, []);
-
-  //   useEffect(() => {
-  //     if (fnddta) {
-  //       setUsers(fnddta);
-  //     }
-  //   }, [fnddta]);
-
   const openAddinquiryModal = () => {
     setIsAddinquiryModalVisible(true);
   };
@@ -168,15 +140,6 @@ const InquiryList = () => {
     setSelectedUser(null);
   };
 
-  // const showViewApplication = (userInfo) => {
-  //   setViewApplicationVisible(true);
-  //   setSelectedUser(userInfo);
-  // };
-
-  // const closeViewApplication = () => {
-  //   setViewApplicationVisible(false);
-  //   setSelectedUser(null);
-  // };
 
   const getjobStatus = (status) => {
     if (status === "active") {
@@ -205,44 +168,22 @@ const InquiryList = () => {
     setIdd(idd);
   };
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" className="" icon={<EyeOutlined />} size="small">
-            <span>View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EditOutlined />}
-            onClick={() => eidtfun(elm.id)}
-            size="small"
-          >
-            <span className="ml-2">Edit</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<DeleteOutlined />}
-            onClick={() => deleteUser(elm.id)}
-            size="small"
-          >
-            <span>Delete</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  const dropdownMenu = (elm) => ({
+    items: [
+      {
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => eidtfun(elm.id)
+      },
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(elm.id)
+      }
+    ]
+  });
 
   const tableColumns = [
     {

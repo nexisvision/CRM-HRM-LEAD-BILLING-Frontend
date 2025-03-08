@@ -364,7 +364,6 @@ const AddTask = ({ onClose }) => {
                     </div>
                   </Col>
                 )}
-
                 <Col span={12} className="mt-4">
                   <div className="form-item">
                     <label className="font-semibold ">StartDate <span className="text-red-500">*</span></label>
@@ -372,6 +371,7 @@ const AddTask = ({ onClose }) => {
                       name="startDate"
                       className="w-full mt-1"
                       placeholder="Select startDate"
+                      format="DD-MM-YYYY"
                       onChange={(date) => {
                         setFieldValue("startDate", date);
                         // Clear end date if it's before the new start date
@@ -399,6 +399,7 @@ const AddTask = ({ onClose }) => {
                       placeholder="Select DueDate"
                       onChange={(value) => setFieldValue("dueDate", value)}
                       value={values.dueDate}
+                         format="DD-MM-YYYY"
                       onBlur={() => setFieldTouched("dueDate", true)}
                       disabledDate={(current) => {
                         // Disable dates before start date
@@ -413,39 +414,7 @@ const AddTask = ({ onClose }) => {
                   </div>
                 </Col>
 
-               {/* <Col span={12}>
-         <div className="form-item">
-           <label className="font-semibold">Lead Title</label>
-           <Field name="lead">
-             {({ field, form }) => ( // Destructure form here
-               <Select
-                 className="w-full"
-                 placeholder="Select Lead Title"
-                 onChange={(value) => {
-                   if (value) {
-                     const selectedLead = lead?.find(
-                       (lead) => lead.id === value
-                     );
-                     setSelectedLead(selectedLead);
-                     form.setFieldsValue({
-                       lead: value
-                     });
-                   }
-                 }}
-               >
-                 {Array.isArray(lead) && lead.map((lead) => (
-                   <Option
-                     key={lead.id}
-                     value={lead.id}
-                   >
-                     {lead.leadTitle}
-                   </Option>
-                 ))}
-               </Select>
-             )}
-           </Field>
-         </div>
-       </Col> */}
+
 
                 <Col span={12} className="mt-4">
                   <div className="form-item">

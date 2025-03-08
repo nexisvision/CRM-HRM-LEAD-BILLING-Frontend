@@ -114,17 +114,21 @@ const AddClient = ({ visible, onClose, onCreate }) => {
           password: '',
           loginEnabled: true
         }}
-        // validationSchema={validationSchema}
+        validationSchema={validationSchema}
         onSubmit={handleFinish}
       >
         {({ errors, touched, setFieldValue }) => (
           <Form>
-
+            <div className="mb-4">
+              <h2 className="text-lg font-medium border-b pb-2"></h2>
+            </div>
 
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-group">
-                  <label htmlFor="username" className="font-semibold">Name <span className="text-red-500">*</span></label>
+                  <label htmlFor="username" className="font-semibold">
+                    Name <span className="text-red-500">*</span>
+                  </label>
                   <Field name="username">
                     {({ field }) => (
                       <Input
@@ -143,9 +147,11 @@ const AddClient = ({ visible, onClose, onCreate }) => {
                 </div>
               </Col>
 
-              <Col span={12}  >
+              <Col span={12}>
                 <div className="form-group">
-                  <label htmlFor="email" className="font-semibold">Email Address <span className="text-red-500">*</span></label>
+                  <label htmlFor="email" className="font-semibold">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
                   <Field name="email">
                     {({ field }) => (
                       <Input
@@ -166,7 +172,9 @@ const AddClient = ({ visible, onClose, onCreate }) => {
 
               <Col span={12}>
                 <div className="form-item mt-2">
-                  <label className="font-semibold">Password <span className="text-red-500">*</span></label>
+                  <label className="font-semibold">
+                    Password <span className="text-red-500">*</span>
+                  </label>
                   <div className="relative">
                     <Field
                       name="password"
@@ -175,10 +183,10 @@ const AddClient = ({ visible, onClose, onCreate }) => {
                       className="mt-1 w-full"
                     />
                     <Button
-                      className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:none -translate-y-1/2 flex items-center z-10"
+                      className="absolute right-5 top-1/2 border-0 bg-transparent ring-0 hover:bg-transparent -translate-y-1/2 flex items-center z-10"
                       onClick={() => setFieldValue("password", generatePassword())}
                     >
-                      <ReloadOutlined/>
+                      <ReloadOutlined />
                     </Button>
                   </div>
                   <ErrorMessage
@@ -190,7 +198,7 @@ const AddClient = ({ visible, onClose, onCreate }) => {
               </Col>
             </Row>
 
-            <Row justify="end" gutter={16} style={{ marginTop: '20px' }}>
+            <Row justify="end" gutter={16} className="mt-6">
               <Col>
                 <Button onClick={onClose}>Cancel</Button>
               </Col>
@@ -203,11 +211,12 @@ const AddClient = ({ visible, onClose, onCreate }) => {
           </Form>
         )}
       </Formik>
+
       <Modal
         title="Verify OTP"
-        visible={showOtpModal} // Control visibility based on showOtpModal state
-        onCancel={() => setShowOtpModal(false)} // Close OTP modal
-        footer={null} // Remove footer buttons
+        visible={showOtpModal}
+        onCancel={() => setShowOtpModal(false)}
+        footer={null}
         centered
       >
         <div className="p-4 rounded-lg bg-white">

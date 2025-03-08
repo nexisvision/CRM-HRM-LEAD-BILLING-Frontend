@@ -268,43 +268,32 @@ const ExpensesList = () => {
         setIdd(exid);
     };
 
-    const dropdownMenu = (row) => (
-        <Menu>
-            <Menu.Item>
-                <Flex alignItems="center" onClick={() => {
+    const dropdownMenu = (row) => ({
+        items: [
+            {
+                key: 'view',
+                icon: <EyeOutlined />,
+                label: 'View Details',
+                onClick: () => {
                     setSelectedExpense(row);
                     openviewExpensesModal();
-                }}>
-                    {<EyeOutlined />}
-                    <span className="ml-2">View Details</span>
-                </Flex>
-            </Menu.Item>
-            {/* <Menu.Item>
-                <Flex alignItems="center">
-                    <PlusCircleOutlined />
-                    <span className="ml-2">Add to remark</span>
-                </Flex>
-            </Menu.Item> */}
-            <Menu.Item>
-                <Flex alignItems="center" onClick={() => EditFun(row.id)}>
-                    <EditOutlined />
-                    <span className="ml-2">Edit</span>
-                </Flex>
-            </Menu.Item>
-            {/* <Menu.Item>
-                <Flex alignItems="center">
-                    <TiPinOutline />
-                    <span className="ml-2">Pin</span>
-                </Flex>
-            </Menu.Item> */}
-            <Menu.Item>
-                <Flex alignItems="center" onClick={() => DeleteFun(row.id)}>
-                    <DeleteOutlined />
-                    <span className="ml-2">Delete</span>
-                </Flex>
-            </Menu.Item>
-        </Menu>
-    );
+                }
+            },
+            {
+                key: 'edit',
+                icon: <EditOutlined />,
+                label: 'Edit',
+                onClick: () => EditFun(row.id)
+            },
+            {
+                key: 'delete',
+                icon: <DeleteOutlined />,
+                label: 'Delete',
+                onClick: () => DeleteFun(row.id)
+            }
+        ]
+    });
+
     const tableColumns = [
         {
             title: "ItemName",

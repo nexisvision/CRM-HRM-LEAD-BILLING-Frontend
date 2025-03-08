@@ -325,73 +325,25 @@ const DealList = () => {
     return stage ? stage.stageName : 'N/A';
   };
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EyeOutlined />}
-            onClick={openViewDealModal}
-            size="small"
-          >
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<MailOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span className="">Send Mail</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-     
-     
+  const dropdownMenu = (elm) => ({
+    items: [
+      // Edit button - conditional item
+      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => EditDelas(elm.id)
+      }] : []),
 
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                            <Menu.Item>
-                            <Flex alignItems="center">
-                              <Button
-                                type=""
-                                className=""
-                                icon={<EditOutlined />}
-                                onClick={() => EditDelas(elm.id)}
-                                size="small"
-                              >
-                                <span className="ml-2">Edit</span>
-                              </Button>
-                            </Flex>
-                          </Menu.Item>
-                    ) : null}
-      
-      
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                      <Menu.Item>
-                      <Flex alignItems="center">
-                        <Button
-                          type=""
-                          className=""
-                          icon={<DeleteOutlined />}
-                          onClick={() => deleteUser(elm.id)}
-                          size="small"
-                        >
-                          <span className="">Delete</span>
-                        </Button>
-                      </Flex>
-                    </Menu.Item>
-                    ) : null}
-
-
-    </Menu>
-  );
+      // Delete button - conditional item
+      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(elm.id)
+      }] : [])
+    ]
+  });
 
   const tableColumns = [
     {

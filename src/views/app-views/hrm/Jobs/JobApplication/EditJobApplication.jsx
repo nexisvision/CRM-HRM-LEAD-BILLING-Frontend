@@ -127,7 +127,7 @@ const EditJobApplication = ({ idd, onClose }) => {
   });
   return (
     <div>
-
+      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

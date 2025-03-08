@@ -7,7 +7,6 @@ import {
   Select,
   Row,
   Col,
-  message,
   Upload,
 } from "antd";
 import { Formik, Field, Form as FormikForm, ErrorMessage } from "formik";
@@ -18,7 +17,6 @@ import moment from "moment";
 import dayjs from "dayjs";
 import { useSelector, useDispatch } from "react-redux";
 import { Editicket, getAllTicket } from "./TicketReducer/TicketSlice";
-// import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 const { Option } = Select;
@@ -57,8 +55,7 @@ const EditTicket = ({ idd, onClose }) => {
 
   const alldatat = useSelector((state) => state.Ticket);
   const fndfdata = alldatat.Ticket.data;
-  // const llogedid = useSelector((state) => state.user.loggedInUser.username);
-  // const fnddatass = fnddatas?.filter((item) => item?.created_by === llogedid);
+ 
 
   useEffect(() => {
     dispatch(GetUsers());
@@ -97,11 +94,9 @@ const EditTicket = ({ idd, onClose }) => {
       });
 
       await dispatch(Editicket({ idd, formData })).unwrap();
-      // message.success('Ticket updated successfully!');
       dispatch(getAllTicket());
       onClose();
     } catch (error) {
-      // message.error(error?.message || 'Failed to update ticket');
     } finally {
       setSubmitting(false);
     }

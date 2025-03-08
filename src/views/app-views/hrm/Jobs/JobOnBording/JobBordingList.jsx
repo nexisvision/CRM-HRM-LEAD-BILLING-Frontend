@@ -231,73 +231,25 @@ const JobOnBordingList = () => {
 
   const jobStatusList = ["active", "blocked"];
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EyeOutlined />}
-            onClick={openViewJobOnBordingModal}
-            size="small"
-          >
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-     
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<FilePdfOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span className="ml-2">Download OfferLetter</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-    
+  const dropdownMenu = (elm) => ({
+    items: [
       
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                   <Menu.Item>
-                                   <Flex alignItems="center">
-                                     <Button
-                                       type=""
-                                       className=""
-                                       icon={<EditOutlined />}
-                                       onClick={()=> editfunction(elm.id)}
-                                       size="small"
-                                     >
-                                       <span className="">Edit</span>
-                                     </Button>
-                                   </Flex>
-                                 </Menu.Item>
-                                ) : null}
-                  
-                  
-                  {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                     <Menu.Item>
-                                     <Flex alignItems="center">
-                                       <Button
-                                         type=""
-                                         className=""
-                                         icon={<DeleteOutlined />}
-                                         onClick={() => deleteUser(elm.id)}
-                                         size="small"
-                                       >
-                                         <span className="">Delete</span>
-                                       </Button>
-                                     </Flex>
-                                   </Menu.Item>
-                                ) : null}
-
       
-    </Menu>
-  );
+      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => editfunction(elm.id)
+      }] : []),
+      
+      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(elm.id)
+      }] : [])
+    ]
+  });
 
   const tableColumns = [
     {

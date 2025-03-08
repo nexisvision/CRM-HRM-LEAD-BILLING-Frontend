@@ -174,31 +174,22 @@ const ProductList = () => {
     setIdd(idd);
   };
 
-  const dropdownMenu = (row) => (
-    <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center" onClick={openViewProductModal}>
-          <EyeOutlined />
-          <span className="ml-2">View Details</span>
-        </Flex>
-      </Menu.Item> */}
-
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => editFun(row.id)}>
-          <EditOutlined />
-          {/* <EditOutlined /> */}
-          <span className="ml-2">Edit</span>
-        </Flex>
-      </Menu.Item>
-
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => Deletefun(row.id)}>
-          <DeleteOutlined />
-          <span className="ml-2">Delete</span>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  const dropdownMenu = (row) => ({
+    items: [
+      {
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => editFun(row.id)
+      },
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => Deletefun(row.id)
+      }
+    ]
+  });
 
   const tableColumns = [
     // {

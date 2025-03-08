@@ -269,76 +269,44 @@ const ClientList = () => {
     });
   };
 
-  const dropdownMenu = (user) => (
-    <Menu>
-      {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button
-              type=""
-              icon={<EyeOutlined />}
-              onClick={() => showUserProfile(user)}
-              size="small"
-              style={{ display: "block", marginBottom: "8px" }}
-            >
-              View Details
-            </Button>
-          </Flex>
-        </Menu.Item>
-      )}
-
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button
-              type=""
-              icon={<EditOutlined />}
-              onClick={() => openEditCompanyModal(user.id)}
-              size="small"
-              style={{ display: "block", marginBottom: "8px" }}
-            >
-              Edit
-            </Button>
-          </Flex>
-        </Menu.Item>
-      ) : null}
-
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className="flex items-center gap-2"
-            icon={<MdOutlineEmail />}
-            onClick={() => {
-              setIsEmailVerificationModalVisible(true);
-              setCompnyid(user.id);
-            }}
-            size="small"
-          // style={{ display: "block", marginBottom: "8px" }}
-          >
-            <span>Update Email</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button
-              type=""
-              icon={<DeleteOutlined />}
-              onClick={() => deleteUser(user.id)}
-              size="small"
-            >
-              Delete
-            </Button>
-          </Flex>
-        </Menu.Item>
-      ) : null}
-
-
-    </Menu>
-  );
+  const dropdownMenu = (user) => ({
+    items: [
+      // View Details - conditional item
+      ...(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'view',
+        icon: <EyeOutlined />,
+        label: 'View Details',
+        onClick: () => showUserProfile(user)
+      }] : []),
+      
+      // Edit - conditional item
+      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => openEditCompanyModal(user.id)
+      }] : []),
+      
+      // Update Email - always visible
+      {
+        key: 'email',
+        icon: <MdOutlineEmail />,
+        label: 'Update Email',
+        onClick: () => {
+          setIsEmailVerificationModalVisible(true);
+          setCompnyid(user.id);
+        }
+      },
+      
+      // Delete - conditional item
+      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(user.id)
+      }] : [])
+    ]
+  });
 
   const tableColumns = [
     {

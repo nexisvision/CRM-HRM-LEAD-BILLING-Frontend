@@ -162,59 +162,44 @@ const AnnouncementList = () => {
   };
 
   // Convert dropdownMenu to a regular function
-  const dropdownMenu = (elm) => (
-    <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" className="" icon={<EyeOutlined />} onClick={() => showUserProfile(elm)} size="small">
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" className="" icon={<MailOutlined />} onClick={() => showUserProfile(elm)} size="small">
-            <span className="">Send Mail</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" className="" icon={<PushpinOutlined />} onClick={() => showUserProfile(elm)} size="small">
-            <span className="ml-2">Pin</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-     
-
-      {/* {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                   <Menu.Item>
-                                   <Flex alignItems="center">
-                                     <Button
-                                       type=""
-                                       className=""
-                                       icon={<EditOutlined />}
-                                       onClick={() => EditMeet(elm.id)}
-                                       size="small"
-                                     >
-                                       <span className="">Edit</span>
-                                     </Button>
-                                   </Flex>
-                                 </Menu.Item>
-                                ) : null} */}
-                  
-                  
-                  {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                   <Menu.Item>
-                                   <Flex alignItems="center">
-                                     <Button type="" className="" icon={<DeleteOutlined />} onClick={() => deleteUser(elm.id)} size="small">
-                                       <span className="">Delete</span>
-                                     </Button>
-                                   </Flex>
-                                 </Menu.Item>
-                                ) : null}
-    </Menu>
-  );
+  const dropdownMenu = (elm) => ({
+    items: [
+      // View, Mail, and Pin options are commented out but kept for reference
+      // {
+      //   key: 'view',
+      //   icon: <EyeOutlined />,
+      //   label: 'View Details',
+      //   onClick: () => showUserProfile(elm)
+      // },
+      // {
+      //   key: 'mail',
+      //   icon: <MailOutlined />,
+      //   label: 'Send Mail',
+      //   onClick: () => showUserProfile(elm)
+      // },
+      // {
+      //   key: 'pin',
+      //   icon: <PushpinOutlined />,
+      //   label: 'Pin',
+      //   onClick: () => showUserProfile(elm)
+      // },
+      
+      // Edit option is commented out but kept for reference
+      // ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+      //   key: 'edit',
+      //   icon: <EditOutlined />,
+      //   label: 'Edit',
+      //   onClick: () => EditMeet(elm.id)
+      // }] : []),
+      
+      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(elm.id)
+      }] : [])
+    ]
+  });
 
   const tableColumns = [
     {

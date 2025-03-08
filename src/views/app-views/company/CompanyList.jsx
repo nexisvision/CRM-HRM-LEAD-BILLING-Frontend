@@ -124,82 +124,43 @@ const CompanyList = () => {
       })
   };
 
-  const dropdownMenu = (user) => (
-    <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" className="" icon={<EyeOutlined />} size="small">
-            <span>View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EditOutlined />}
-            onClick={() => {
-              setIsEditCompanyModalVisible(true);
-              setCompnyid(user.id);
-            }}
-            size="small"
-          >
-            <span>Edit</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className="flex items-center gap-2"
-            icon={<MdOutlineEmail />}
-            onClick={() => {
-              setIsEmailVerificationModalVisible(true);
-              setCompnyid(user.id);
-            }}
-            size="small"
-          >
-            <span>Update Email</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<RocketOutlined />}
-            onClick={() => {
-              setIsUpgradePlanModalVisible(true);
-              setCompnyid(user.id);
-            }}
-            size="small"
-          >
-            <span>Upgrade Plans</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<DeleteOutlined />}
-            onClick={() => deleteUser(user.id)}
-            size="small"
-          >
-            <span>Delete</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  const dropdownMenu = (user) => ({
+    items: [
+      {
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => {
+          setIsEditCompanyModalVisible(true);
+          setCompnyid(user.id);
+        }
+      },
+      {
+        key: 'email',
+        icon: <MdOutlineEmail />,
+        label: 'Update Email',
+        onClick: () => {
+          setIsEmailVerificationModalVisible(true);
+          setCompnyid(user.id);
+        }
+      },
+      {
+        key: 'upgrade',
+        icon: <RocketOutlined />,
+        label: 'Upgrade Plans',
+        onClick: () => {
+          setIsUpgradePlanModalVisible(true);
+          setCompnyid(user.id);
+        }
+      },
+      {
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(user.id)
+      }
+    ]
+  });
 
   const onChangeCompanyView = (e) => {
     setView(e.target.value);

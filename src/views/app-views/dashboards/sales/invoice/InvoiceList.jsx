@@ -223,40 +223,30 @@ export const InvoiceList = () => {
     openEditInvoiceModal();
     setIdd(idd);
   };
-  const dropdownMenu = (row) => (
-    <Menu>
-      <Menu.Item>
-        <Flex alignItems="center" onClick={() => Viewfunc(row.id)}>
-          <EyeOutlined />
-          {/* <EyeOutlined /> */}
-          <span className="ml-2">View Invoice</span>
-        </Flex>
-      </Menu.Item>
-     
-      
-
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                      <Menu.Item>
-                      <Flex alignItems="center" onClick={() => editfun(row.id)}>
-                        <EditOutlined />
-                        {/* <EditOutlined /> */}
-                        <span className="ml-2">Edit</span>
-                      </Flex>
-                    </Menu.Item>
-                    ) : null}
-      
-      
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                    <Menu.Item>
-                    <Flex alignItems="center" onClick={() => delfun(row.id)}>
-                      <DeleteOutlined />
-                      <span className="ml-2">Delete</span>
-                    </Flex>
-                  </Menu.Item>
-                    ) : null}
-
-    </Menu>
-  );
+  const dropdownMenu = (row) => ({
+    items: [
+      {
+        key: 'view',
+        icon: <EyeOutlined />,
+        label: 'View Invoice',
+        onClick: () => Viewfunc(row.id)
+      },
+      // Conditionally add edit menu item
+      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => editfun(row.id)
+      }] : []),
+      // Conditionally add delete menu item
+      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => delfun(row.id)
+      }] : [])
+    ]
+  });
   const tableColumns = [
     {
       title: "Invoice Number",

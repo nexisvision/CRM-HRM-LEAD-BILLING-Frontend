@@ -262,106 +262,55 @@ const EmployeeList = () => {
     }
   };
 
-  const dropdownMenu = (elm) => (
-    <Menu>
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) && (
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button
-              type=""
-              className=""
-              icon={<EditOutlined />}
-              onClick={() => {
-                setSelectedEmployeeId(elm.id);
-                setIsEditEmployeeModalVisible(true);
-              }}
-              size="small"
-            >
-              <span className="ml-2">Edit</span>
-            </Button>
-          </Flex>
-        </Menu.Item>
-      )}
-
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className="flex items-center gap-2"
-            icon={<MdOutlineEmail />}
-            onClick={() => {
-              setIsEmailVerificationModalVisible(true);
-              setCompnyid(elm.id);
-            }}
-            size="small"
-          >
-            <span>Update Email</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EyeOutlined />}
-            onClick={() => {
-              setSelectedEmployeeId(elm.id);
-              setIsViewEmployeeModalVisible(true);
-            }}
-            size="small"
-          >
-            <span className="ml-2">View</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EditOutlined />}
-            onClick={() => handleCheckIn(elm.id)}
-            size="small"
-          >
-            <span className="ml-2">Check In</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EditOutlined />}
-            onClick={() => handleCheckOut(elm.id)}
-            size="small"
-          >
-            <span className="ml-2">Check Out</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) && (
-        <Menu.Item>
-          <Flex alignItems="center">
-            <Button
-              type=""
-              className=""
-              icon={<DeleteOutlined />}
-              onClick={() => deleteUser(elm.id)}
-              size="small"
-            >
-              <span className="">Delete</span>
-            </Button>
-          </Flex>
-        </Menu.Item>
-      )}
-    </Menu>
-  );
+  const dropdownMenu = (elm) => ({
+    items: [
+      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => {
+          setSelectedEmployeeId(elm.id);
+          setIsEditEmployeeModalVisible(true);
+        }
+      }] : []),
+      {
+        key: 'email',
+        icon: <MdOutlineEmail />,
+        label: 'Update Email',
+        onClick: () => {
+          setIsEmailVerificationModalVisible(true);
+          setCompnyid(elm.id);
+        }
+      },
+      {
+        key: 'view',
+        icon: <EyeOutlined />,
+        label: 'View',
+        onClick: () => {
+          setSelectedEmployeeId(elm.id);
+          setIsViewEmployeeModalVisible(true);
+        }
+      },
+      {
+        key: 'checkin',
+        icon: <EditOutlined />,
+        label: 'Check In',
+        onClick: () => handleCheckIn(elm.id)
+      },
+      {
+        key: 'checkout',
+        icon: <EditOutlined />,
+        label: 'Check Out',
+        onClick: () => handleCheckOut(elm.id)
+      },
+      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(elm.id)
+      }] : [])
+    ]
+  });
 
   const tableColumns = [
     {

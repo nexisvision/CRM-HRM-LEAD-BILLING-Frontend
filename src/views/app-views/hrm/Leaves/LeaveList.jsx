@@ -233,67 +233,23 @@ const LeaveList = () => {
         throw error; 
     }
   }
-  const dropdownMenu = (elm) => (
-    <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            icon={<EyeOutlined />}
-            onClick={() => ViewData(elm.id)}
-            size="small"
-          >
-            <span>View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
+  const dropdownMenu = (elm) => ({
+    items: [
+      ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'edit',
+        icon: <EditOutlined />,
+        label: 'Edit',
+        onClick: () => editleave(elm.id)
+      }] : []),
       
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            icon={<PushpinOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span className="ml-2">Pin</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-      
-
-       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                    <Menu.Item>
-                                    <Flex alignItems="center">
-                                      <Button
-                                        type=""
-                                        icon={<EditOutlined />}
-                                        onClick={() => editleave(elm.id)}
-                                        size="small"
-                                      >
-                                        <span>Edit</span>
-                                      </Button>
-                                    </Flex>
-                                  </Menu.Item>
-                                ) : null}
-                  
-                  
-                  {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                 <Menu.Item>
-                                 <Flex alignItems="center">
-                                   <Button
-                                     type=""
-                                     icon={<DeleteOutlined />}
-                                     onClick={() => deleteUser(elm.id)}
-                                     size="small"
-                                   >
-                                     <span>Delete</span>
-                                   </Button>
-                                 </Flex>
-                               </Menu.Item>
-                                ) : null}
-    </Menu>
-  );
+      ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
+        key: 'delete',
+        icon: <DeleteOutlined />,
+        label: 'Delete',
+        onClick: () => deleteUser(elm.id)
+      }] : [])
+    ]
+  });
   const tableColumns = [
     {
       title: "created_by",
