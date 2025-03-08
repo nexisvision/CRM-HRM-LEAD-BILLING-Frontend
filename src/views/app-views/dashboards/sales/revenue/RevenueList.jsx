@@ -6,7 +6,6 @@ import {
   Select,
   Input,
   Button,
-  Badge,
   Menu,
   Tag,
   Modal,
@@ -14,21 +13,15 @@ import {
   DatePicker,
 } from "antd";
 import {
-  EyeOutlined,
   FileExcelOutlined,
   SearchOutlined,
-  PlusCircleOutlined,
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import AvatarStatus from "components/shared-components/AvatarStatus";
-import { TiPinOutline } from "react-icons/ti";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-import NumberFormat from "react-number-format";
 import dayjs from "dayjs";
-import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import { utils, writeFile } from "xlsx";
 import AddRevenue from "./AddRevenue";
 import EditRevenue from "./EditRevenue";
@@ -37,32 +30,6 @@ import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 const { Option } = Select;
-const { RangePicker } = DatePicker;
-
-const getRevenueStatus = (status) => {
-  if (status === "Paid") {
-    return "success";
-  }
-  if (status === "Pending") {
-    return "warning";
-  }
-  if (status === "Expired") {
-    return "error";
-  }
-  return "";
-};
-
-// const getShippingStatus = status => {
-// 	if(status === 'Ready') {
-// 		return 'blue'
-// 	}
-// 	if(status === 'Shipped') {
-// 		return 'cyan'
-// 	}
-// 	return ''
-// }
-
-const revenueStatusList = ["Paid", "Pending", "Expired"];
 
 const RevenueList = () => {
   const [list, setList] = useState([]);
@@ -168,24 +135,6 @@ const RevenueList = () => {
 
   const exportToExcel = () => {
     try {
-      // Format the data for Excel
-      // const formattedData = list.map(row => ({
-      //   ID: row.id,
-      //   RelatedID: row.related_id,
-      //   TaskName: row.taskName,
-      //   Category: row.category,
-      //   Project: row.project,
-      //   StartDate: row.startDate,
-      //   DueDate: row.dueDate,
-      //   AssignedTo: JSON.parse(row.assignTo).join(", "), // Assuming assignTo is a JSON string
-      //   Status: row.status,
-      //   Priority: row.priority,
-      //   Description: row.description.replace(/<[^>]+>/g, ''), // Remove HTML tags from description
-      //   CreatedBy: row.created_by,
-      //   CreatedAt: row.createdAt,
-      //   UpdatedAt: row.updatedAt,
-      // }));
-
       // Create a worksheet from the formatted data
       const ws = utils.json_to_sheet(list);
       const wb = utils.book_new(); // Create a new workbook
@@ -233,14 +182,7 @@ const RevenueList = () => {
   });
 
   const tableColumns = [
-    // {
-    //   title: "Date",
-    //   dataIndex: "date",
-    //   render: (_, record) => (
-    //     <span>{dayjs.unix(record.date).format(DATE_FORMAT_DD_MM_YYYY)}</span>
-    //   ),
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "date"),
-    // },
+   
     {
       title: "Amount",
       dataIndex: "amount",
@@ -302,13 +244,6 @@ const RevenueList = () => {
             return descA.localeCompare(descB);
         }
     },
-    // {
-    //   title: "Payment Receipt",
-    //   dataIndex: "paymentreceipt",
-    //   sorter: {
-    //     compare: (a, b) => a.method.length - b.method.length,
-    //   },
-    // },
     {
       title: "Action",
       dataIndex: "actions",
@@ -319,13 +254,6 @@ const RevenueList = () => {
       ),
     },
   ];
-
-  const rowSelection = {
-    onChange: (key, rows) => {
-      setSelectedRows(rows);
-      setSelectedRowKeys(key);
-    },
-  };
 
   const filterRevenues = (text, date, category) => {
     if (!fnddata) return;
@@ -395,13 +323,6 @@ const RevenueList = () => {
         return customerName?.includes(searchText.toLowerCase());
       });
     }
-
-    // Apply status filter
-    // if (selectedStatus !== 'All') {
-    //   filtered = filtered.filter(revenue => 
-    //     revenue.status === selectedStatus
-    //   );
-    // }
 
     // Apply category filter
     if (selectedCategory !== 'All') {
@@ -565,4 +486,3 @@ const RevenueListWithStyles = () => (
 );
 
 export default RevenueListWithStyles;
-/* eslint-disable no-unused-vars */

@@ -1,16 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-} from "recharts";
 import { FaCoins } from "react-icons/fa";
-import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import dayjs from 'dayjs';
 import { TbClockHour3Filled } from "react-icons/tb";
@@ -18,12 +9,12 @@ import { GetProject } from "../project-list/projectReducer/ProjectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { useNavigate, useParams } from 'react-router-dom';
-import { Modal, Tag, Table, Timeline, Progress, Avatar, Menu, Card } from 'antd';
+import { Tag, Table, Progress, Avatar, Menu, Card } from 'antd';
 import { GetTasks } from "../task/TaskReducer/TaskSlice";
 import { Getmins } from "../milestone/minestoneReducer/minestoneSlice";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import utils from "utils";
-import { ClockCircleOutlined, CheckCircleOutlined, LoadingOutlined, UserOutlined, MailOutlined, PhoneOutlined, GlobalOutlined, TeamOutlined, CalendarOutlined } from '@ant-design/icons';
+import { UserOutlined, MailOutlined, PhoneOutlined, GlobalOutlined, TeamOutlined, CalendarOutlined } from '@ant-design/icons';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 
 // Register the chart components
@@ -36,7 +27,6 @@ const OverViewList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const [isTaskModalVisible, setIsTaskModalVisible] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState(null);
 
   // Add currencies selector
   const { currencies } = useSelector((state) => state.currencies);
@@ -48,7 +38,6 @@ const OverViewList = () => {
   const taskData = useSelector((state) => state?.Tasks?.Tasks?.data) || [];
   const milestoneData = useSelector((state) => state.Milestone?.Milestone?.data) || [];
   const allclient = useSelector((state) => state?.SubClient?.SubClient?.data) || [];
-  const logged = useSelector((state) => state.user.loggedInUser);
 
   // Get the current project data based on ID
   const currentProject = useMemo(() => {
@@ -206,54 +195,6 @@ const OverViewList = () => {
   const fndpro = currentProject;
   const fndclient = allclient?.find((item) => item?.id === fndpro?.client);
 
-  // Safe access to client data with fallbacks
-  const Allclientdata = useSelector((state) => state?.SubClient) || {};
-  const dataclient = Allclientdata?.SubClient?.data || [];
-
-  // Safe filtering with existence checks
-  const updatedList = useMemo(() => {
-    if (!currentProject?.client || !dataclient?.length) {
-      return [];
-    }
-    return dataclient.filter((item) => item.id === currentProject.client);
-  }, [currentProject, dataclient]);
-
-  // Prepare chart data with safety checks
-  const hoursData = useMemo(() => {
-    if (!currentProject?.estimatedhours) {
-      return [];
-    }
-    return [{ name: "Planned", value: currentProject.estimatedhours }];
-  }, [currentProject]);
-
-  const budgetData = useMemo(() => {
-    if (!currentProject?.budget) {
-      return [];
-    }
-    return [{ name: "Planned", value: currentProject.budget }];
-  }, [currentProject]);
-
-  // Safe date formatting with fallbacks
-  const formatDate = (date) => {
-    if (!date) return "N/A";
-    try {
-      return new Date(date).toISOString().split("T")[0];
-    } catch {
-      return "N/A";
-    }
-  };
-
-  const dateendd = currentProject?.startDate
-    ? formatDate(currentProject.startDate)
-    : "N/A";
-
-  const datestartt = currentProject?.endDate
-    ? formatDate(currentProject.endDate)
-    : "N/A";
-
-  const progress = 50;
-  const startDate = "Wed 24 Jul 2024";
-  const deadline = "Sun 24 Nov 2024";
 
   // Define status colors mapping with more color options
   const statusColors = {
@@ -322,63 +263,6 @@ const OverViewList = () => {
       return acc;
     }, {});
   }, [taskData]);
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white border shadow-lg p-2 rounded">
-          <p className="text-sm font-semibold">{label}</p>
-          <p className="text-sm text-gray-700">Planned: {payload[0].value}</p>
-        </div>
-      );
-    }
-    return null;
-  };
-
-  // Chart options with hover effects
-  const chartOptions = {
-    plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          padding: 20,
-          usePointStyle: true,
-          generateLabels: (chart) => {
-            const data = chart.data;
-            if (data.labels.length && data.datasets.length) {
-              return data.labels.map((label, index) => ({
-                text: `${label}`,
-                fillStyle: data.datasets[0].backgroundColor[index],
-                strokeStyle: data.datasets[0].backgroundColor[index],
-                pointStyle: 'circle',
-                index: index
-              }));
-            }
-            return [];
-          }
-        }
-      },
-      tooltip: {
-        callbacks: {
-          label: function (context) {
-            const label = context.label || '';
-            const value = context.raw || 0;
-            const total = context.dataset.data.reduce((acc, curr) => acc + curr, 0);
-            const percentage = ((value / total) * 100).toFixed(1);
-            return `${label}: ${value} tasks (${percentage}%)`;
-          }
-        }
-      }
-    },
-    // onClick: (event, elements) => {
-    //   if (elements.length > 0) {
-    //     const index = elements[0].index;
-    //     const status = taskStatusData.labels[index];
-    //     setSelectedStatus(status);
-    //     setIsTaskModalVisible(true);
-    //   }
-    // }
-  };
 
   // Navigate to task details
   const handleTaskClick = (taskId) => {
@@ -518,17 +402,6 @@ const OverViewList = () => {
     }
   ];
 
-  // Add this function to get filtered milestones
-  const getFilteredMilestones = () => {
-    return milestoneData || [];
-  };
-
-  // Add this status color mapping at the top of the component
-  const timelineStatusColors = {
-    'Not Started': '#1890ff',  // Blue
-    'In Progress': '#52c41a',  // Green
-    'Overdue': '#f5222d',     // Red
-  };
 
   // Update the Progress Circle component to show different colors based on status
   const getProgressColor = (progress, isComplete, isOverdue) => {
@@ -875,7 +748,6 @@ const OverViewList = () => {
   const ProjectActivities = ({ milestoneData, taskData }) => {
     const [activeTab, setActiveTab] = useState('milestones');
     const [viewType, setViewType] = useState('card');
-    const [selectedMilestone, setSelectedMilestone] = useState(null);
 
     const renderMilestoneCard = (milestone) => {
       const progress = getMilestoneProgress(milestone);

@@ -4,8 +4,6 @@ import {
     Table,
     Select,
     Input,
-    Row,
-    Col,
     Button,
     Badge,
     Menu,
@@ -18,17 +16,13 @@ import {
     EyeOutlined,
     FileExcelOutlined,
     SearchOutlined,
-    PlusCircleOutlined,
     DeleteOutlined,
     EditOutlined,
     PlusOutlined,
 } from "@ant-design/icons";
-import AvatarStatus from "components/shared-components/AvatarStatus";
-import StatisticWidget from "components/shared-components/StatisticWidget";
 import { TiPinOutline } from "react-icons/ti";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-import NumberFormat from "react-number-format";
 import dayjs from "dayjs";
 import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import { useDispatch, useSelector } from "react-redux";
@@ -44,16 +38,7 @@ import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/cu
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
-const getShippingStatus = (orderStatus) => {
-    if (orderStatus === "Ready") {
-        return "blue";
-    }
-    if (orderStatus === "Shipped") {
-        return "cyan";
-    }
-    return "";
-};
-const expenseStatusList = ["Ready", "Shipped"];
+
 const ExpensesList = () => {
     const dispatch = useDispatch();
     const { id } = useParams();
@@ -217,12 +202,6 @@ const ExpensesList = () => {
         ];
     };
 
-    const handleStatusChange = (value) => {
-        setSelectedStatus(value);
-    };
-
-    const statusOptions = getUniqueStatuses();
-
     const exportToExcel = () => {
         try {
             const formattedData = list.map(row => {
@@ -349,29 +328,7 @@ const ExpensesList = () => {
             },
             sorter: (a, b) => (a.price || 0) - (b.price || 0),
         },
-        {
-            title: "Currency",
-            dataIndex: "currency",
-            render: (currencyId) => {
-                const currency = fnddatass?.find(c => c.id === currencyId);
-                return (
-                    <span>
-                        {currency ? (
-                            <div className="flex items-center">
-                                <span className="mr-2">{currency.currencyIcon}</span>
-                                <span>{currency.currencyName}</span>
-                                <span className="text-gray-400 text-xs ml-1">({currency.currencyCode})</span>
-                            </div>
-                        ) : 'N/A'}
-                    </span>
-                );
-            },
-            sorter: (a, b) => {
-                const currencyA = fnddatass?.find(c => c.id === a.currency)?.currencyName || '';
-                const currencyB = fnddatass?.find(c => c.id === b.currency)?.currencyName || '';
-                return currencyA.localeCompare(currencyB);
-            },
-        },
+       
         {
             title: "Purchase Date",
             dataIndex: "purchase_date",
@@ -484,7 +441,7 @@ const ExpensesList = () => {
                     <EditExpenses onClose={closeEditExpensesModal} idd={idd} />
                 </Modal>
                 <Modal
-                    title="Expenses"
+                    title="Expenses Details"
                     visible={isViewExpensesModalVisible}
                     onCancel={() => {
                         closeViewExpensesModal();

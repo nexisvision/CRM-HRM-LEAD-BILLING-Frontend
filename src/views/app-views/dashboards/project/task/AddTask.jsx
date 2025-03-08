@@ -273,7 +273,7 @@ const AddTask = ({ onClose }) => {
 
   return (
     <div className="add-expenses-form">
-      
+      <h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

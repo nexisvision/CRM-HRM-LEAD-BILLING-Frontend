@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { PrinterOutlined, DownloadOutlined } from '@ant-design/icons';
 import { Card, Table, Button, Select } from 'antd';
 import { invoiceData } from '../../../pages/invoice/invoiceData';
-// import Qr from '../../../../assets/svg/Qr.png';
 import NumberFormat from 'react-number-format';
 import html2pdf from 'html2pdf.js';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,12 +16,10 @@ const InvoiceDetails = ({idd, onClose}) => {
     const [template, setTemplate] = useState('rendertemplate');
 
     const { id } = useParams();
-    // const [idd, setIdd] = useState("");
 
   const { invoices } = useSelector((state) => state.invoice);
-  const invoiceDataa = invoices.find(invoice => invoice.id === idd);
+  const invoiceDataa = invoices.find(invoice => invoice.id === idd)
 
-    
     const handlePrint = () => {
         const printContent = document.getElementById('printable-content');
         const printWindow = window.open('', '_blank');
@@ -158,10 +155,6 @@ const InvoiceDetails = ({idd, onClose}) => {
                         <div className="text-left bg-gray-100 p-3">
                             <p className="text-gray-600">Due Date</p>
                             <p>{invoiceDataa?.dueDate}</p>
-                            {/* <div className="text-left">
-                                <p className="text-gray-600">Payment Status</p>
-                                <p className="text-blue-500">NOT PAID</p>
-                            </div> */}
                         </div>
                     </div>
                 </div>
@@ -195,41 +188,6 @@ const InvoiceDetails = ({idd, onClose}) => {
                             )}
                             key="total"
                         />
-
-{/* 
-<Table dataSource={invoiceData.items} pagination={false} className="mb-5">
-    <Column title="No." dataIndex="key" key="key" />
-    <Column title="Product" dataIndex="description" key="description" />
-    <Column title="Quantity" dataIndex="quantity" key="quantity" />
-    <Column 
-        title="Price"
-        render={(text) => (
-            <NumberFormat
-                displayType={'text'}
-                value={invoiceData.total}
-                prefix={`${invoiceData.currency}: `}
-                thousandSeparator={true}
-            />
-        )}
-        key="price"
-    />
-    <Column
-        title="Total"
-        render={(text) => (
-            <NumberFormat
-                displayType={'text'}
-                value={text.amount.toFixed(2)}
-                prefix={'$'}
-                thousandSeparator={true}
-            />
-        )}
-        key="total"
-    />
-</Table> */}
-
-
-
-
                         
                     </Table>
                     <div className="d-flex justify-content-end">
@@ -262,9 +220,7 @@ const InvoiceDetails = ({idd, onClose}) => {
                 {/* Footer Section */}
                 <div className="grid grid-cols-2 gap-8">
                     <div className="flex gap-4">
-                        <div className='flex'>
-                            {/* <img src={Qr} alt="Image not show" className='w-28 h-28' /> */}
-                        </div>
+                        
                         <div>
                             <h4 className="font-medium mb-2">Payment Info:</h4>
                             <p>Debit Card : 465 ************645</p>
@@ -371,9 +327,7 @@ const InvoiceDetails = ({idd, onClose}) => {
                     </div>
                     <div className="grid grid-cols-2 gap-8">
                         <div className="flex gap-4">
-                            <div className='flex'>
-                                {/* <img src={Qr} alt="Image not show" className='w-28 h-28' /> */}
-                            </div>
+                            
                             <div>
                                 <h4 className="font-medium mb-2">Payment Info:</h4>
                                 <p>Debit Card : 465 ************645</p>
@@ -489,9 +443,7 @@ const InvoiceDetails = ({idd, onClose}) => {
                     </div>
                     <div className="grid grid-cols-2 gap-8">
                         <div className="flex gap-4">
-                            <div className='flex'>
-                                {/* <img src={Qr} alt="Image not show" className='w-28 h-28' /> */}
-                            </div>
+                            
                             <div>
                                 <h4 className="font-medium mb-2">Payment Info:</h4>
                                 <p>Debit Card : 465 ************645</p>
@@ -599,9 +551,6 @@ const InvoiceDetails = ({idd, onClose}) => {
                     </div>
                     <div className="grid grid-cols-2 gap-8">
                         <div className="flex gap-4">
-                            <div className='flex'>
-                                {/* <img src={Qr} alt="Image not show" className='w-28 h-28' /> */}
-                            </div>
                             <div>
                                 <h4 className="font-medium mb-2">Payment Info:</h4>
                                 <p>Debit Card : 465 ************645</p>

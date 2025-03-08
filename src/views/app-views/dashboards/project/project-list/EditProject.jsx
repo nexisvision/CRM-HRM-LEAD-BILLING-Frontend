@@ -24,21 +24,14 @@ import { GetLable, AddLable } from "../../sales/LableReducer/LableSlice";
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { AddUserss, GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
-import { addClient } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice";
-// import { AllLoggedData } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import AddCurrencies from '../../../setting/currencies/AddCurrencies';
 const { Option } = Select;
 
 const EditProject = ({ id, onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
 
   const allloggeduser = useSelector((state) => state.user.loggedInUser.username)
-
-
-  // const allloggeduser = useSelector((state)=>state.user.loggedInUser.username)
-
 
   const { currencies } = useSelector((state) => state.currencies);
 
@@ -60,8 +53,6 @@ const EditProject = ({ id, onClose }) => {
 
   const fnd2 = employeedata?.filter((item) => item?.created_by === allloggeduser)
 
-
-
   const AllLoggeddtaa = useSelector((state) => state.user);
 
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
@@ -77,8 +68,6 @@ const EditProject = ({ id, onClose }) => {
   const [newTag, setNewTag] = useState("");
   const [tags, setTags] = useState([]);
 
-  const Tagsdetail = useSelector((state) => state.Tags);
-  const AllTags = Tagsdetail?.Tags?.data;
   const allempdatass = useSelector((state) => state.currencies);
   const fnddatass = allempdatass?.currencies?.data;
 
@@ -89,14 +78,6 @@ const EditProject = ({ id, onClose }) => {
     }
     return '';
   };
-
-  // const alluserdatas = useSelector((state) => state.Users);
-  // const fnadat = alluserdatas?.Users?.data;
-  // const alluserdatass = useSelector((state) => state.Users);
-  // const fnadatass = alluserdatass?.Users?.data;
-
-  const fnds = fnadat?.filter((item) => item?.created_by === allloggeduser)
-
 
   const projectdata = allempdata.Project.data;
   const [singleEmp, setSingleEmp] = useState(null);

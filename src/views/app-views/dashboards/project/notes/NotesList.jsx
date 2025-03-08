@@ -31,6 +31,7 @@ import {
   PlusOutlined,
   DeleteOutlined,
   UserOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
 import { TiPinOutline } from "react-icons/ti";
 import AvatarStatus from "components/shared-components/AvatarStatus";
@@ -90,6 +91,10 @@ export const NotesList = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+
+  // Get user role and permissions from Redux store
+  const { whorole, permissions } = useSelector((state) => state.auth?.user || {});
+  const canCreateClient = permissions?.some(permission => permission.name === 'create-client');
 
   const handleShowStatus = (value) => {
     if (value !== "All") {
@@ -305,18 +310,6 @@ export const NotesList = () => {
                 loading={isSearching}
               />
             </div>
-            {/* <div className="mb-3">
-							<Select
-								defaultValue="All"
-								className="w-100"
-								style={{ minWidth: 180 }}
-								onChange={handleShowStatus}
-								placeholder="Status"
-							>
-								<Option value="All">All payment </Option>
-								{paymentStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
-							</Select>
-						</div> */}
           </Flex>
           <Flex gap="7px" className="flex">
             <div className="flex gap-4">
@@ -334,83 +327,102 @@ export const NotesList = () => {
       </div>
 
       <Row gutter={[16, 16]}>
-        {list.map((note) => {
-          let employeeName = 'N/A';
-          try {
-            const employeeObj = JSON.parse(note.employees);
-            const employee = employeeData?.find(emp => emp.id === employeeObj?.id);
-            employeeName = employee?.username || 'N/A';
-          } catch (error) {
-            console.error('Error parsing employee data:', error);
-          }
+        {list.length === 0 ? (
+          <Col span={24}>
+            <div className="flex flex-col items-center justify-center p-8 bg-white rounded-lg  border border-gray-100">
+              <h3 className="mt-4 text-lg font-medium text-gray-600">No Data Found</h3>
+             
+              {(whorole === "super-admin" || whorole === "client" || (canCreateClient && whorole !== "super-admin" && whorole !== "client")) && (
+                <Button 
+                  type="primary" 
+                  className="mt-4" 
+                  icon={<PlusOutlined />}
+                  onClick={openAddNotesModal}
+                >
+                  Create New Note
+                </Button>
+              )}
+            </div>
+          </Col>
+        ) : (
+          list.map((note) => {
+            let employeeName = 'N/A';
+            try {
+              const employeeObj = JSON.parse(note.employees);
+              const employee = employeeData?.find(emp => emp.id === employeeObj?.id);
+              employeeName = employee?.username || 'N/A';
+            } catch (error) {
+              console.error('Error parsing employee data:', error);
+            }
 
-          const creator = employeeData?.find(emp => emp.username === note.created_by);
+            const creator = employeeData?.find(emp => emp.username === note.created_by);
 
-          return (
-            <Col xs={24} key={note.id}>
-              <Card 
-                className="ultra-card"
-                bordered={false}
-              >
-                <div className="card-header">
-                  <div className="creator-info">
-                    <Avatar 
-                      size={50}
-                      src={creator?.profile_pic} 
-                      icon={!creator?.profile_pic && <UserOutlined />}
-                      className="creator-avatar"
-                    />
-                    <div className="creator-details">
-                      <Text strong className="creator-name">{note.created_by}</Text>
-                      <Text type="secondary" className="timestamp">
-                        {dayjs(note.createdAt).format('DD MMM YYYY • HH:mm')}
-                      </Text>
+            return (
+              <Col xs={24} key={note.id}>
+                <Card 
+                  className="ultra-card"
+                  bordered={false}
+                >
+                  <div className="card-header">
+                    <div className="creator-info">
+                      <Avatar 
+                        size={50}
+                        src={creator?.profile_pic} 
+                        icon={!creator?.profile_pic && <UserOutlined />}
+                        className="creator-avatar"
+                      />
+                      <div className="creator-details">
+                        <Text strong className="creator-name">{note.created_by}</Text>
+                        <Text type="secondary" className="timestamp">
+                          {dayjs(note.createdAt).format('DD MMM YYYY • HH:mm')}
+                        </Text>
+                      </div>
+                    </div>
+                    <div className="action-buttons">
+                      <Button 
+                        type="text" 
+                        icon={<EditOutlined />} 
+                        onClick={() => editfun(note.id)}
+                      />
+                      <Button 
+                        type="text" 
+                        icon={<DeleteOutlined />} 
+                        onClick={() => DeleteFun(note.id)}
+                      />
                     </div>
                   </div>
-                  <div className="action-buttons">
-                    <Button 
-                      type="text" 
-                      icon={<EditOutlined />} 
-                      onClick={() => editfun(note.id)}
+
+                  <div className="card-content">
+                    <div className="title-section">
+                      <Text strong className="note-title">{note.note_title}</Text>
+                      <Tag color={note.notetype === 'public' ? 'blue' : 'gold'}>
+                        {note.notetype}
+                      </Tag>
+                    </div>
+
+                    <div className="assigned-section">
+                      <Text type="secondary">Assigned to: </Text>
+                      <Tag icon={<UserOutlined />} color="default">
+                        {employeeName}
+                      </Tag>
+                    </div>
+
+                    <div 
+                      className=""
+                      dangerouslySetInnerHTML={{ __html: note.description }}
                     />
-                    <Button 
-                      type="text" 
-                      icon={<DeleteOutlined />} 
-                      onClick={() => DeleteFun(note.id)}
-                    />
+
+                    {note.updatedAt !== note.createdAt && (
+                      <Text type="secondary" className="updated-at">
+                        Last edited {dayjs(note.updatedAt).format('DD MMM YYYY • HH:mm')}
+                      </Text>
+                    )}
                   </div>
-                </div>
-
-                <div className="card-content">
-                  <div className="title-section">
-                    <Text strong className="note-title">{note.note_title}</Text>
-                    <Tag color={note.notetype === 'public' ? 'blue' : 'gold'}>
-                      {note.notetype}
-                    </Tag>
-                  </div>
-
-                  <div className="assigned-section">
-                    <Text type="secondary">Assigned to: </Text>
-                    <Tag icon={<UserOutlined />} color="default">
-                      {employeeName}
-                    </Tag>
-                  </div>
-
-                  <div 
-                    className=""
-                    dangerouslySetInnerHTML={{ __html: note.description }}
-                  />
-
-                  {note.updatedAt !== note.createdAt && (
-                    <Text type="secondary" className="updated-at">
-                      Last edited {dayjs(note.updatedAt).format('DD MMM YYYY • HH:mm')}
-                    </Text>
-                  )}
-                </div>
-              </Card>
-            </Col>
-          );
-        })}
+                </Card>
+              </Col>
+            );
+          })
+        )}
       </Row>
 
       <Modal

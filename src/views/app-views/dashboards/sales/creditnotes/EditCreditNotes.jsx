@@ -9,11 +9,9 @@ import {
   editcreditnote,
   getcreditnote,
 } from "./CustomerReducer/CreditnoteSlice";
-import moment from "moment/moment";
 import dayjs from "dayjs";
 
 const EditCrediteNotes = ({ idd, onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -88,24 +86,6 @@ const EditCrediteNotes = ({ idd, onClose }) => {
                     />
                   </div>
                 </Col>
-
-                {/* <Col span={12}>
-                  <div className="form-item">
-                    <label className="font-semibold  mt-1">Issue Date <span className="text-red-500">*</span></label>
-                    <DatePicker
-                      className="w-full"
-                      format="DD-MM-YYYY"
-                      value={values.date ? moment(values.date) : null} // Convert to moment object
-                      onChange={(date) => setFieldValue("date", date)}
-                      onBlur={() => setFieldTouched("date", true)}
-                    />
-                    <ErrorMessage
-                      name="date"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col> */}
 
                 <Col span={12}>
                   <div className="form-item">

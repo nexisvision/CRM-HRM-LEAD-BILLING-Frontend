@@ -4,14 +4,12 @@ import {
   Button,
   DatePicker,
   Select,
-  message,
   Row,
   Col,
-  Switch,
   Upload,
   Modal,
 } from "antd";
-import { CloudUploadOutlined, PlusOutlined, QuestionCircleOutlined, UploadOutlined } from "@ant-design/icons";
+import {PlusOutlined, QuestionCircleOutlined, UploadOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -25,23 +23,13 @@ import { Getexp } from '../expenses/Expencereducer/ExpenseSlice';
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import AddCurrencies from "views/app-views/setting/currencies/AddCurrencies";
 const { Option } = Select;
-const AddPayment = ({ onClose,setFieldValue }) => {
-  const navigate = useNavigate();
-  const [showReceiptUpload, setShowReceiptUpload] = useState(false);
-
+const AddPayment = ({ onClose}) => {
+ 
   const dispatch = useDispatch();
   const { id } = useParams();
 
-  const [invoices, setInvoices] = useState([]);
-
-
-
-  const user = useSelector((state) => state.user.loggedInUser.username);
-
   const { currencies } = useSelector((state) => state.currencies);
   const curren = currencies?.data || [];
-
-  // const curren = curr?.filter((item) => item.created_by === user);
 
   // Safely access the expense data with optional chaining
   const invoiceData = useSelector((state) => state.invoice?.invoices) || [];
@@ -58,18 +46,13 @@ const AddPayment = ({ onClose,setFieldValue }) => {
   useEffect(() => {
     if (id) {
       dispatch(getcurren());
-    } else {
-      // message.error("Milestone ID is not defined.");
-    }
+    } 
   }, [dispatch, id]);
 
   const allproject = useSelector((state) => state.Project);
   const fndrewduxxdaa = allproject.Project.data
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
 
-
-
-  // const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
@@ -128,23 +111,35 @@ const AddPayment = ({ onClose,setFieldValue }) => {
     remark: "",
     selectedType: null,
   };
-
   const onSubmit = (values, { resetForm }) => {
-    // dispatch(AddPay({ id, values }))
-    //   .then(() => {
-    //     dispatch(Getpay(id));
-    //     // message.success("Milestone added successfully!");
-    //     resetForm();
-    //     onClose();
-    //   })
-    //   .catch((error) => {
-    //     // message.error("Failed to add Leads.");
-    //     console.error("Add API error:", error);
-    //   });
+    const data = {
+      project_name: values.project_name,
+      paidOn: values.paidOn ? values.paidOn.format('YYYY-MM-DD') : '',
+      amount: values.amount || '',
+      currency: values.currency || '',
+      transactionId: values.transactionId || '',
+      paymentMethod: values.paymentMethod || '',
+      exchangeRate: values.exchangeRate || '',
+      bankAccount: values.bankAccount || '',
+      remark: values.remark || ''
+    };
+    // Add reference type based on selection
+    data.invoice = values.selectedType === 'invoice' && values.invoice ? values.invoice : null;
+    data.estimate = values.selectedType === 'estimate' && values.estimate ? values.estimate : null;
+    data.expense = values.selectedType === 'expense' && values.expense ? values.expense : null;
+
+    console.log("Form Data Object:", data);
 
     const formData = new FormData();
-    for (const key in values) {
-      formData.append(key, values[key]);
+
+    // Append all data to FormData
+    Object.keys(data).forEach(key => {
+      formData.append(key, data[key]);
+    });
+
+    // Handle receipt file separately
+    if (values.receipt instanceof File) {
+      formData.append('receipt', values.receipt);
     }
 
     dispatch(AddPay({ id, formData })).then(() => {
@@ -154,11 +149,9 @@ const AddPayment = ({ onClose,setFieldValue }) => {
     });
   };
 
-
-
   return (
     <div className="add-expenses-form">
-
+<h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -318,7 +311,7 @@ const AddPayment = ({ onClose,setFieldValue }) => {
                         >
                           {expenseData && expenseData.map((expense) => (
                             <Option key={expense.id} value={expense.id}>
-                              {expense.item} - {expense.price}
+                              {expense.item} 
                             </Option>
                           ))}
                         </Select>
@@ -493,34 +486,6 @@ const AddPayment = ({ onClose,setFieldValue }) => {
                     />
                   </div>
                 </Col>
-                {/* <Col span={6} className="mt-2">
-                  <div className="form-item">
-                    <label className="font-semibold">Bank Account</label>
-                    <Field name="bankAccount">
-                      {({ field }) => (
-                        <Select
-                          {...field}
-                          placeholder="Select Bank Account"
-                          className="w-full"
-                          onChange={(value) =>
-                            setFieldValue("bankAccount", value)
-                          }
-                          value={values.bankAccount}
-                          onBlur={() => setFieldTouched("bankAccount", true)}
-                          allowClear={false}
-                        >
-                          <Option value="xyz">XYZ</Option>
-                          <Option value="abc">ABC</Option>
-                        </Select>
-                      )}
-                    </Field>
-                    <ErrorMessage
-                      name="bankAccount"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </div>
-                </Col> */}
 
                 <div className="mt-4 w-full">
                   <span className="block  font-semibold ps-1">

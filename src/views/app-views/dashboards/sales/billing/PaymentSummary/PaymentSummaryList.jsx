@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-// import { DealStatisticViewData } from '../../../dashboards/default/DefaultDashboardData';
 import { Card, Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
+import {DeleteOutlined} from '@ant-design/icons';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import userData from '../../../../../../assets/data/user-list.data.json';
@@ -10,16 +9,9 @@ import OrderListData from '../../../../../../assets/data/order-list.data.json';
 
 
 function PaymentSummaryList() {
-    // const [dealStatisticViewData] = useState(DealStatisticViewData);
-
-    const [users, setUsers] = useState(userData);
     const [list, setList] = useState(OrderListData);
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [userProfileVisible, setUserProfileVisible] = useState(false);
-    //   const [customerVisible,setCustomerVisible] = useState(false)
     const [selectedUser, setSelectedUser] = useState(null);
-
-
 
     // Delete user
     const deleteUser = (userId) => {
@@ -27,13 +19,6 @@ function PaymentSummaryList() {
         message.success({ content: `Deleted list ${userId}`, duration: 2 });
     };
 
-    
-
-    // Close user profile
-    const closeUserProfile = () => {
-        setSelectedUser(null);
-        setUserProfileVisible(false);
-    };
 
     const dropdownMenu = (elm) => (
         <Menu>
@@ -53,23 +38,6 @@ function PaymentSummaryList() {
         </Menu>
     );
 
-    const dropdownMenus = (elm) => (
-        <Menu>
-            <Menu.Item>
-                <Flex alignItems="center">
-                    <Button
-                        type=""
-                        className=""
-                        icon={<DeleteOutlined />}
-                        onClick={() => deleteUser(elm.id)}
-                        size="small"
-                    >
-                        <span className="">Delete</span>
-                    </Button>
-                </Flex>
-            </Menu.Item>
-        </Menu>
-    );
 
     const tableColumns = [
         {

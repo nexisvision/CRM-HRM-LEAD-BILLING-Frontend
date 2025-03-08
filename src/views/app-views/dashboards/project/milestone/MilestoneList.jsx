@@ -1,6 +1,5 @@
 import React, { Component, useEffect } from "react";
 import { useState } from "react";
-// import { PrinterOutlined } from '@ant-design/icons';
 import StatisticWidget from "components/shared-components/StatisticWidget";
 import { AnnualStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import {
@@ -19,11 +18,7 @@ import {
   Space,
   Progress,
 } from "antd";
-// import { invoiceData } from '../../../pages/invoice/invoiceData';
-// import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
 import NumberFormat from "react-number-format";
-// import React, {useState} from 'react'
-// import { Card, Table, Select, Input, Button, Badge, Menu, Tag } from 'antd';
 import OrderListData from "../../../../../assets/data/order-list.data.json";
 import {
   EyeOutlined,
@@ -39,15 +34,11 @@ import { TiPinOutline } from "react-icons/ti";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-// import NumberFormat from 'react-number-format';
 import dayjs from "dayjs";
 import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import utils from "utils";
 import AddMilestone from "./AddMilestone";
 import EditMilestone from "./EditMilestone";
-// import AddInvoice from './AddInvoice';
-// import EditInvoice from './EditInvoice';
-// import ViewInvoice from './ViewInvoice';
 
 import { useDispatch, useSelector } from "react-redux";
 import { Deletemins, Getmins } from "./minestoneReducer/minestoneSlice";
@@ -175,7 +166,6 @@ export const MilestoneList = () => {
   const deleetfuc = (userId) => {
     dispatch(Deletemins(userId)).then(() => {
       dispatch(Getmins(id));
-      // message.success("Milestone deleted successfully!");
     });
   };
 
@@ -347,13 +337,6 @@ export const MilestoneList = () => {
       ),
     },
   ];
-
-  const rowSelection = {
-    onChange: (key, rows) => {
-      setSelectedRows(rows);
-      setSelectedRowKeys(key);
-    },
-  };
 
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();

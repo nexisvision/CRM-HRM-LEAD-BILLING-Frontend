@@ -15,7 +15,6 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { PlusOutlined } from "@ant-design/icons";
-import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { AddMins, Getmins } from "./minestoneReducer/minestoneSlice";
 import { AddLable, GetLable } from "./LableReducer/LableSlice";
@@ -68,7 +67,6 @@ const AddMilestone = ({ onClose }) => {
 
   const Tagsdetail = useSelector((state) => state.Lable);
   const AllLoggeddtaa = useSelector((state) => state.user);
-  const AllTags = Tagsdetail?.Lable?.data;
   const onSubmit = (values, { resetForm }) => {
     // Convert the values before sending
     const formattedValues = {
@@ -83,8 +81,6 @@ const AddMilestone = ({ onClose }) => {
     );
 
     if (!selectedTag) {
-      // Call AddLable API only if the selected tag is new
-      const lid = AllLoggeddtaa.loggedInUser.id;
       const newTagPayload = { name: formattedValues.milestone_status.trim() };
       dispatch(AddLable({ id, payload: newTagPayload }))
         .then(() => {
@@ -117,7 +113,6 @@ const AddMilestone = ({ onClose }) => {
   };
   const fetchTags = async () => {
     try {
-      // const lid = AllLoggeddtaa.loggedInUser.id;
       const response = await dispatch(GetLable(id));
       if (response.payload && response.payload.data) {
         const uniqueTags = response.payload.data
@@ -137,31 +132,9 @@ const AddMilestone = ({ onClose }) => {
       message.error("Failed to load tags");
     }
   };
-  const handleAddNewTag = async () => {
-    if (!newTag.trim()) {
-      message.error("Please enter a tag name");
-      return;
-    }
-    try {
-      // const lid = AllLoggeddtaa.loggedInUser.id;
-      const payload = {
-        name: newTag.trim(),
-        labelType: "status",
-      };
-      await dispatch(AddLable({ id, payload }));
-      message.success("Status added successfully");
-      setNewTag("");
-      setIsTagModalVisible(false);
-      // Fetch updated tags
-      await fetchTags();
-    } catch (error) {
-      console.error("Failed to add Status:", error);
-      message.error("Failed to add Status");
-    }
-  };
+  
   const fetchLables = async (lableType, setter) => {
     try {
-      const lid = AllLoggeddtaa.loggedInUser.id;
       const response = await dispatch(GetLable(id));
       if (response.payload && response.payload.data) {
         const filteredLables = response.payload.data
@@ -227,7 +200,7 @@ const AddMilestone = ({ onClose }) => {
   return (
     <div>
       <div className="add-expenses-form">
-
+      <h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
         <div className="p-2">
           <Formik
             initialValues={initialValues}

@@ -19,7 +19,6 @@ import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Addexp, Getexp } from "./Expencereducer/ExpenseSlice";
-// import { empdata } from "../../../hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import AddCurrencies from '../../../setting/currencies/AddCurrencies';
 
@@ -33,19 +32,6 @@ const AddExpenses = ({ onClose }) => {
     const dispatch = useDispatch();
 
     const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
-
-    const user = useSelector((state) => state.user.loggedInUser.username);
-
-    const { currencies } = useSelector((state) => state.currencies);
-
-    const curren = currencies?.data || [];
-
-    // const curren = curr?.filter((item) => item.created_by === user);
-
-
-    // const { data: employee } = useSelector((state) => state.employee.employee);
-
-    // const employeeData = employee?.filter((item) => item.created_by === user);
 
     const allproject = useSelector((state) => state.Project);
     const fndrewduxxdaa = allproject.Project.data
@@ -66,12 +52,6 @@ const AddExpenses = ({ onClose }) => {
         dispatch(getcurren());
     }, [dispatch]);
 
-    // useEffect(() => {
-    //     dispatch(empdata());
-    // }, [dispatch]);
-
-    const [showReceiptUpload, setShowReceiptUpload] = useState(false);
-    // const [uploadModalVisible, setUploadModalVisible] = useState(false);
     const initialValues = {
         item: "",
         currency: getInitialCurrency(),
@@ -133,7 +113,7 @@ const AddExpenses = ({ onClose }) => {
 
     return (
         <div className="add-expenses-form">
-
+  <h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
@@ -252,30 +232,7 @@ const AddExpenses = ({ onClose }) => {
                                     <ErrorMessage name="price" component="div" className="text-red-500 mt-1 text-sm" />
                                 </div>
                             </Col>
-                            {/* <Col span={6} >
-                                <div className="form-item">
-                                    <label className='font-semibold'>ExchangeRate</label>
-                                    <Field name="ExchangeRate" as={Input} placeholder="Enter ExchangeRate" />
-                                    <ErrorMessage name="ExchangeRate" component="div" className="error-message text-red-500 my-1" />
-                                </div>
-                            </Col> */}
-                            {/* <Col span={12} className="mt-4">
-                                <div className="form-item">
-                                    <label className="font-semibold">Price <span className="text-red-500">*</span></label>
-                                    <Field
-                                        className="mt-1"
-                                        name="price"
-                                        type="number"
-                                        as={Input}
-                                        placeholder="Enter price"
-                                    />
-                                    <ErrorMessage
-                                        name="price"
-                                        component="div"
-                                        className="error-message text-red-500 my-1"
-                                    />
-                                </div>
-                            </Col> */}
+                          
                             <Col span={12} className="mt-4">
                                 <div className="form-item">
                                     <label className="font-semibold">Purchase Date <span className="text-red-500">*</span></label>
@@ -294,70 +251,7 @@ const AddExpenses = ({ onClose }) => {
                                     />
                                 </div>
                             </Col>
-                            {/* <Col span={8} className="mt-2">
-                                <div className="form-item">
-                                    <label className="font-semibold">Employee</label>
-                                    <Field name="employee">
-                                        {({ field }) => (
-                                            <Select
-                                                {...field}
-                                                placeholder="Select employee"
-                                                className="w-full"
-                                                onChange={(value) => setFieldValue("employee", value)}
-                                                value={values.employee}
-                                                onBlur={() => setFieldTouched("employee", true)}
-                                                allowClear={false}
-                                            >
-                                                <Option value="xyz">XYZ</Option>
-                                                <Option value="abc">ABC</Option>
-                                            </Select>
-                                        )}
-                                    </Field>
-                                    <ErrorMessage
-                                        name="Employee"
-                                        component="div"
-                                        className="error-message text-red-500 my-1"
-                                    />
-                                </div>
-                            </Col> */}
-                            {/* <Col span={12} className="mt-4">
-                                <div className="form-item">
-                                    <label className="font-semibold mb-2">Employee <span className="text-red-500">*</span></label>
-
-                                    <div className="flex gap-2">
-                                        <Field name="employee">
-                                            {({ field, form }) => (
-                                                <Select
-                                                    {...field}
-                                                    className="w-full mt-1"
-                                                    placeholder="Select Employee"
-                                                    onChange={(value) => {
-                                                        const selectedEmployee =
-                                                            Array.isArray(employeeData) &&
-                                                            employeeData.find((e) => e.id === value);
-                                                        form.setFieldValue(
-                                                            "employee",
-                                                            selectedEmployee?.username || ""
-                                                        );
-                                                    }}
-                                                >
-                                                    {Array.isArray(employeeData) &&
-                                                        employeeData.map((emp) => (
-                                                            <Option key={emp.id} value={emp.id}>
-                                                                {emp.username}
-                                                            </Option>
-                                                        ))}
-                                                </Select>
-                                            )}
-                                        </Field>
-                                    </div>
-                                    <ErrorMessage
-                                        name="employee"
-                                        component="div"
-                                        className="error-message text-red-500 my-1"
-                                    />
-                                </div>
-                            </Col> */}
+                          
                             <Col span={12} className="mt-4">
                                 <div className="form-item">
                                     <label className="font-semibold">Project <span className="text-red-500">*</span></label>

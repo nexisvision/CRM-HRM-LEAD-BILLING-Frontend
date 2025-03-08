@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Table, Spin } from 'antd';
 import { useSelector, useDispatch } from 'react-redux';
-import { getestimateById } from './estimatesReducer/EstimatesSlice';
 import dayjs from 'dayjs';
 import NumberFormat from 'react-number-format';
 
@@ -62,7 +61,6 @@ function ViewEstimates({ estimateId, onClose }) {
                     displayType="text"
                     value={price || 0}
                     prefix='₹'
-                    // prefix={`${estimate?.currency || '₹'} `}
                     thousandSeparator={true}
                     decimalScale={2}
                 />
@@ -94,7 +92,6 @@ function ViewEstimates({ estimateId, onClose }) {
                     displayType="text"
                     value={amount || 0}
                     prefix='₹'
-                    // prefix={`${estimate?.currency || '₹'} `}
                     thousandSeparator={true}
                     decimalScale={2}
                 />
@@ -125,12 +122,6 @@ function ViewEstimates({ estimateId, onClose }) {
                                 <p className="text-lg mb-2">
                                     <strong>Date:</strong> {dayjs(estimate.createdAt).format('DD/MM/YYYY')}
                                 </p>
-                                {/* <p className="text-lg mb-2">
-                                    <strong>Valid Till:</strong> {dayjs(estimate.valid_till).format('DD/MM/YYYY')}
-                                </p>
-                                <p className="text-lg mb-2">
-                                    <strong>Client:</strong> {estimate.client}
-                                </p> */}
                             </div>
                         </div>
                     </div>
@@ -157,7 +148,6 @@ function ViewEstimates({ estimateId, onClose }) {
                                             sum + parseFloat(item.amount || 0), 0
                                         )}
                                         prefix='₹'
-                                        // prefix={`${estimate.currency || '₹'} `}
                                         thousandSeparator={true}
                                         decimalScale={2}
                                     />
@@ -167,7 +157,6 @@ function ViewEstimates({ estimateId, onClose }) {
                                     <NumberFormat
                                         displayType="text"
                                         value={estimate.discount || 0}
-                                        // suffix="%"
                                         prefix='₹'
                                         thousandSeparator={true}
                                         decimalScale={2}
@@ -179,7 +168,6 @@ function ViewEstimates({ estimateId, onClose }) {
                                         displayType="text"
                                         value={estimate.tax || 0}
                                          prefix='₹'
-                                        // prefix={`${estimate.currency || '₹'} `}
                                         thousandSeparator={true}
                                         decimalScale={2}
                                     />
@@ -190,7 +178,6 @@ function ViewEstimates({ estimateId, onClose }) {
                                         displayType="text"
                                         value={estimate.total || 0}
                                          prefix='₹'
-                                        // prefix={`${estimate.currency || '₹'} `}
                                         thousandSeparator={true}
                                         decimalScale={2}
                                     />

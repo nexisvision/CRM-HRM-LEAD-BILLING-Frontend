@@ -6,50 +6,25 @@ import {
   Select,
   Input,
   Button,
-  Badge,
   Menu,
-  Tag,
   Modal,
-  Row,
-  Col,
   message,
 } from "antd";
 import {
-  EyeOutlined,
   FileExcelOutlined,
   SearchOutlined,
-  PlusCircleOutlined,
   DeleteOutlined,
   EditOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-import NumberFormat from "react-number-format";
-import dayjs from "dayjs";
-import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import { utils, writeFile } from "xlsx";
 import AddProduct from "./AddProduct";
 import EditProduct from "./EditProduct";
-import ViewProduct from "./ViewProduct";
-import { PaymentStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { DeleteProdu, GetProdu } from "./ProductReducer/ProductsSlice";
-
-const { Option } = Select;
-
-const getPaymentStatus = (method) => {
-  if (method === "Normal") {
-    return "success";
-  }
-  if (method === "Expired") {
-    return "warning";
-  }
-  return "";
-};
-
-const paymentStatusList = ["Normal", "Expired"];
 
 const ProductList = () => {
   const dispatch = useDispatch();
@@ -59,17 +34,12 @@ const ProductList = () => {
 
   const filtermin = allempdata.Product.data;
   const [list, setList] = useState([]);
-  const [selectedRows, setSelectedRows] = useState([]);
 
   const [idd, setIdd] = useState("");
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddProductModalVisible, setIsAddProductModalVisible] =
     useState(false);
   const [isEditProductModalVisible, setIsEditProductModalVisible] =
     useState(false);
-  const [isViewProductModalVisible, setIsViewProductModalVisible] =
-    useState(false);
-  const [paymentStatisticData] = useState(PaymentStatisticData);
   const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
@@ -102,26 +72,6 @@ const ProductList = () => {
     setIsEditProductModalVisible(false);
   };
 
-  // Open Add Job Modal
-  const openViewProductModal = () => {
-    setIsViewProductModalVisible(true);
-  };
-
-  // Close Add Job Modal
-  const closeViewProductModal = () => {
-    setIsViewProductModalVisible(false);
-  };
-
-  const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "status";
-      const data = utils.filterArray(list, key, value);
-      setList(data);
-    } else {
-      setList(filtermin);
-    }
-  };
-
   const Deletefun = async (exid) => {
     try {
       const response = await dispatch(DeleteProdu(exid));
@@ -131,31 +81,12 @@ const ProductList = () => {
       const updatedData = await dispatch(GetProdu(id));
       setList(list.filter((item) => item.id !== exid));
 
-      // message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error.message || error);
     }
   };
   const exportToExcel = () => {
     try {
-      // Format the data for Excel
-      // const formattedData = list.map(row => ({
-      //   ID: row.id,
-      //   RelatedID: row.related_id,
-      //   TaskName: row.taskName,
-      //   Category: row.category,
-      //   Project: row.project,
-      //   StartDate: row.startDate,
-      //   DueDate: row.dueDate,
-      //   AssignedTo: JSON.parse(row.assignTo).join(", "), // Assuming assignTo is a JSON string
-      //   Status: row.status,
-      //   Priority: row.priority,
-      //   Description: row.description.replace(/<[^>]+>/g, ''), // Remove HTML tags from description
-      //   CreatedBy: row.created_by,
-      //   CreatedAt: row.createdAt,
-      //   UpdatedAt: row.updatedAt,
-      // }));
-
       // Create a worksheet from the formatted data
       const ws = utils.json_to_sheet(list);
       const wb = utils.book_new(); // Create a new workbook
@@ -192,10 +123,6 @@ const ProductList = () => {
   });
 
   const tableColumns = [
-    // {
-    // 	title: 'ID',
-    // 	dataIndex: 'id'
-    // },
     {
       title: "Name",
       dataIndex: "name",
@@ -230,16 +157,6 @@ const ProductList = () => {
       ),
       sorter: (a, b) => a.description.length - b.description.length,
     },
-    // {
-    // 	title: 'Status',
-    // 	dataIndex: 'status',
-    // 	render: (_, record) => (
-    // 			<><Tag color={getPaymentStatus(record.status)}>{record.status}</Tag></>
-    // 		  ),
-    // 	sorter: {
-    // 		compare: (a, b) => a.status.length - b.status.length,
-    // 	},
-    // },
     {
       title: "Action",
       dataIndex: "actions",
@@ -250,13 +167,6 @@ const ProductList = () => {
       ),
     },
   ];
-
-  const rowSelection = {
-    onChange: (key, rows) => {
-      setSelectedRows(rows);
-      setSelectedRowKeys(key);
-    },
-  };
 
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
@@ -310,18 +220,6 @@ const ProductList = () => {
               className="search-input"
             />
           </div>
-          {/* <div className="w-full md:w-48">
-							<Select
-								defaultValue="All"
-								className="w-full"
-								style={{ minWidth: 180 }}
-								onChange={handleShowStatus}
-								placeholder="method"
-							>
-								<Option value="All">All method </Option>
-								{paymentStatusList.map(elm => <Option key={elm} value={elm}>{elm}</Option>)}
-							</Select>
-						</div> */}
         </Flex>
         <Flex gap="7px" className="flex">
           <Button type="primary" className="ml-2" onClick={openAddProductModal}>
@@ -375,17 +273,6 @@ const ProductList = () => {
           className="mt-[-70px]"
         >
           <EditProduct onClose={closeEditProductModal} idd={idd} />
-        </Modal>
-
-        <Modal
-          title="Product Details"
-          visible={isViewProductModalVisible}
-          onCancel={closeViewProductModal}
-          footer={null}
-          width={800}
-          className="mt-[-70px]"
-        >
-          <ViewProduct onClose={closeViewProductModal} />
         </Modal>
      
     </>

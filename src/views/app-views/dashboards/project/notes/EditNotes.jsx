@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from "react";
 import { Input, Button, Select, message, Row, Col } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,7 +7,6 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { EditeNotes, GetNote } from "./NotesReducer/NotesSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 const { Option } = Select;
@@ -18,9 +15,6 @@ const EditNotes = ({ idd, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id } = useParams();
-
-  // const { data: employee } = useSelector((state) => state.employee.employee);
-  // const user = useSelector((state)=>state.user.loggedInUser.username)
 
   const allempdataa = useSelector((state) => state.Users);
   const empData = allempdataa?.Users?.data || [];
@@ -35,16 +29,6 @@ const EditNotes = ({ idd, onClose }) => {
       return emp.client_id === loggedInUser.client_id;
     }
   });
-
-
-  //   const filterdata = useSelector((state)=>state.employee.employee.data)
-
-  //   const loggeduesr = useSelector((state)=>state.user.loggedInUser.username)
-
-  //   const employee = filterdata.filter((item)=>item.created_by === loggeduesr)
-
-  // const employeeData = employee?.filter((item) => item.created_by === loggeduesr);
-
 
   useEffect(() => {
     dispatch(GetUsers());
@@ -95,7 +79,6 @@ const EditNotes = ({ idd, onClose }) => {
         employees: employeesObject
       };
 
-      // console.log("Updating note with values:", { idd, values: payload });
       const result = await dispatch(EditeNotes({ idd, values: payload })).unwrap();
       message.success("Note updated successfully!");
       dispatch(GetNote(id));

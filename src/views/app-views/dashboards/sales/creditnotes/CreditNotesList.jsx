@@ -5,8 +5,6 @@ import {
   Table,
   Select,
   Input,
-  Row,
-  Col,
   Button,
   Badge,
   Menu,
@@ -15,54 +13,32 @@ import {
   message,
   DatePicker,
 } from "antd";
-// import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
-// import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
 import {
   EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
-  MailOutlined,
   PlusOutlined,
-  PushpinOutlined,
-  FileExcelOutlined,
-  CopyOutlined,
   EditOutlined,
-  PlusCircleOutlined,
 } from "@ant-design/icons";
-import AvatarStatus from "components/shared-components/AvatarStatus";
-// import StatisticWidget from 'components/shared-components/StatisticWidget';
-// import {
-// 	AnnualStatisticData,
-// } from '../../../dashboards/default/DefaultDashboardData';
-import { TiPinOutline } from "react-icons/ti";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
 import NumberFormat from "react-number-format";
 import dayjs from "dayjs";
-import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import utils from "utils";
 import AddCrediteNotes from "./AddCrediteNotes";
 import EditCrediteNotes from "./EditCreditNotes";
-import ViewCreditNotes from "./ViewCreditNotes";
 import {
   deletecreditnote,
   getcreditnote,
 } from "./CustomerReducer/CreditnoteSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { getInvoice } from "../invoice/InvoiceReducer/InvoiceSlice";
-import useSelection from "antd/es/table/hooks/useSelection";
-// import  from './AddEstimates';
-// import EditEstimates from './EditEstimates';
-// import ViewEstimates from './ViewEstimates';
 
 const { Option } = Select;
 
 const CreditNotesList = () => {
   const dispatch = useDispatch();
-  // const [annualStatisticData] = useState(AnnualStatisticData);
 
   const [list, setList] = useState([]);
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const alldata = useSelector((state) => state.creditnotes);
   const fnddata = alldata.creditnotes.data;
@@ -208,54 +184,6 @@ const CreditNotesList = () => {
 
   ///endpermission
 
-
-  const dropdownMenu = (row) => (
-    <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<EyeOutlined />}
-            onClick={() => handleView(row.id)}
-            size="small"
-          >
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-
-<Menu.Item>
-          <Flex alignItems="center" onClick={() => handleView(row.id)}>
-            <EyeOutlined />
-            <span className="ml-2">View</span>
-          </Flex>
-        </Menu.Item>
-
-
-      {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center" onClick={() => edtfun(row.id)}>
-            <EditOutlined />
-            <span className="ml-2">Edit</span>
-          </Flex>
-        </Menu.Item>
-      ) : null}
-
-
-      {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
-        <Menu.Item>
-          <Flex alignItems="center" onClick={() => deletefun(row.id)}>
-            <DeleteOutlined />
-            <span className="ml-2">Delete</span>
-          </Flex>
-        </Menu.Item>
-      ) : null}
-
-
-    </Menu>
-  );
-
   const tableColumns = [
     {
       title: "Invoice Number",
@@ -321,16 +249,7 @@ const CreditNotesList = () => {
           return textA.length - textB.length;
         },
       },
-    },
-    // {
-    //   title: "Action",
-    //   dataIndex: "actions",
-    //   render: (_, elm) => (
-    //     <div className="text-center">
-    //       <EllipsisDropdown menu={dropdownMenu(elm)} />
-    //     </div>
-    //   ),
-    // },
+    }
   ];
 
   const filterCreditNotes = (text, date) => {
@@ -474,17 +393,6 @@ const CreditNotesList = () => {
           className="mt-[-70px]"
         >
           <EditCrediteNotes onClose={closeEditCreditNotesModal} idd={idd} />
-        </Modal>
-
-        <Modal
-          title={<h2 className="text-xl font-medium">View Credit Note</h2>}
-          visible={isViewCreditNotesModalVisible}
-          onCancel={closeViewCreditNotesModal}
-          footer={null}
-          width={1000}
-          className="mt-[-70px]"
-        >
-          <ViewCreditNotes creditNoteId={selectedCreditNoteId} onClose={closeViewCreditNotesModal} />
         </Modal>
 
     </>

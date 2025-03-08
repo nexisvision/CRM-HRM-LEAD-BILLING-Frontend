@@ -9,7 +9,6 @@ import {
   Col,
   Modal,
 } from "antd";
-import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -90,24 +89,10 @@ const AddProject = ({ onClose }) => {
   const allloggeduser = useSelector((state) => state.user.loggedInUser.username)
 
 
-  const { currencies } = useSelector((state) => state.currencies);
-
-  const curr = currencies?.data || [];
-
-  // const curren = curr?.filter((item) => item.created_by === allloggeduser);
-
   const alluserdatas = useSelector((state) => state.Users);
   const fnadat = alluserdatas?.Users?.data;
 
   const fnd = fnadat?.filter((item) => item?.created_by === allloggeduser)
-
-
-
-  const Tagsdetail = useSelector((state) => state.Tags);
-  const AllTags = Tagsdetail?.Tags?.data;
-
-  const Allclient = useSelector((state) => state.ClientData);
-  const clientdata = Allclient.ClientData.data;
 
   const AllEmployee = useSelector((state) => state.SubClient);
   const employeedata = AllEmployee.SubClient.data;
@@ -290,7 +275,6 @@ const AddProject = ({ onClose }) => {
           setFieldValue,
           handleSubmit,
           setFieldTouched,
-          resetForm,
         }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
             <h2 className="mb-4 border-b pb-2 font-medium"></h2>
@@ -548,24 +532,6 @@ const AddProject = ({ onClose }) => {
                 </div>
               </Col>
 
-              {/* <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Budget <span className="text-red-500">*</span></label>
-                  <Field
-                    name="budget"
-                    as={Input}
-                    type="number"
-                    className="mt-1"
-                    placeholder="Enter Project Budget"
-                  />
-                  <ErrorMessage
-                    name="budget"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
-
               <Col span={12} className="mt-4">
                 <div className="form-group">
                   <label className="text-gray-600 font-semibold mb-2 block"> Currency <span className="text-red-500">*</span></label>
@@ -663,26 +629,6 @@ const AddProject = ({ onClose }) => {
                   <ErrorMessage name="budget" component="div" className="text-red-500 mt-1 text-sm" />
                 </div>
               </Col>
-
-              {/* <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Estimated Months <span className="text-red-500">*</span></label>
-                  <Field
-                    name="estimatedmonths"
-                    as={Input}
-                    type="text"
-                    className="mt-1"
-                    // type="string"
-                    
-                    placeholder="Enter Estimated Months"
-                  />
-                  <ErrorMessage 
-                    name="estimatedmonths"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
 
               <Col span={12} className="mt-4">
                 <div className="form-item">

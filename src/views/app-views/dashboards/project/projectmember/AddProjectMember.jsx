@@ -1,29 +1,20 @@
 import React, { useEffect, useState } from "react";
 import {
-  Input,
   Button,
-  DatePicker,
   Select,
   message,
   Row,
-  Col,
-  Switch,
-  Upload,
-  Modal,
+  Col
 } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
-import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSelector } from "react-redux";
-// import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { GetUsers } from "views/app-views/Users/UserReducers/UserSlice";
 
 import { useDispatch } from "react-redux";
 import {
-  Editpro,
   GetProject,
 } from "../project-list/projectReducer/ProjectSlice";
 import axios from "axios";
@@ -33,8 +24,6 @@ const AddProjectMember = ({ onClose }) => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
-  const [showReceiptUpload, setShowReceiptUpload] = useState(false);
-  // const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const initialValues = {
     project_members: [],
   };
@@ -100,8 +89,6 @@ const AddProjectMember = ({ onClose }) => {
     }
   };
 
-  // const loggeduserdata = useSelector((state)=>state.user.loggedInUser.username)
-
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
   const loggedInUser = useSelector((state) => state.user.loggedInUser);
@@ -117,17 +104,11 @@ const AddProjectMember = ({ onClose }) => {
   });
 
 
-
-
-  // const fndemp = empData.filter((item)=>item?.created_by === loggeduserdata) || [];
-
   const Allpeoject = useSelector((state) => state.Project);
   const Filterdta = Allpeoject?.Project?.data || [];
 
-  const project = Filterdta.find((item) => item.id === id);
 
   useEffect(() => {
-    // dispatch(empdata());
     dispatch(GetUsers());
 
     dispatch(GetProject());
@@ -191,9 +172,6 @@ const AddProjectMember = ({ onClose }) => {
                 Create
               </Button>
             </div>
-            {/* <Modal
-                          
-                        </Modal> */}
           </Form>
         )}
       </Formik>

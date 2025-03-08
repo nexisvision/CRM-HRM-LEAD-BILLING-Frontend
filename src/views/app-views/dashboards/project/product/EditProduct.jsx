@@ -102,9 +102,6 @@ const EditProduct = ({ idd, onClose }) => {
     }
   };
 
-  // category end
-
-  const { currencies } = useSelector((state) => state.currencies);
   const dispatch = useDispatch();
 
   useEffect(() => {

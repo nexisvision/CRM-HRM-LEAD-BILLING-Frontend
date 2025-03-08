@@ -52,10 +52,6 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
             return 'Pending';
         }
     };
-
-    // Get current payment status
-    const paymentStatus = calculatePaymentStatus();
-
     // Fetch customers on component mount
     useEffect(() => {
         dispatch(Getcus());

@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Form, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, DatePicker, Modal } from 'antd';
-import { DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import { useSelector, useDispatch } from 'react-redux';
 import dayjs from 'dayjs';
 import { getestimateById, updateestimate } from './estimatesReducer/EstimatesSlice';
 import { getcurren } from 'views/app-views/setting/currencies/currenciesSlice/currenciesSlice';
-import * as Yup from 'yup';
-import { GetLeads } from '../../leads/LeadReducers/LeadSlice';
 import { getAllTaxes } from 'views/app-views/setting/tax/taxreducer/taxSlice';
 
 
@@ -26,13 +24,10 @@ const EditEstimates = ({ idd, onClose }) => {
 
     const user = useSelector((state) => state.user.loggedInUser.username);
 
-
     // Get current estimate and currencies from Redux store
     const currentEstimatee = useSelector((state) => state.estimate.estimates || []);
 
-
     const currentEstimate = currentEstimatee.find((item) => item.id === idd);
-
 
     const { currencies } = useSelector((state) => state.currencies);
     const condata = currencies.data || [];
@@ -70,9 +65,6 @@ const EditEstimates = ({ idd, onClose }) => {
         setTableData([...tableData, newRow]);
     };
 
-
-    // console.log("asdasdsfsdfsddas",leadDetails)
-
     const [tableData, setTableData] = useState([
         {
             id: Date.now(),
@@ -85,8 +77,6 @@ const EditEstimates = ({ idd, onClose }) => {
         }
     ]);
 
-    
-
     const [discountType, setDiscountType] = useState('');
     const [discountValue, setDiscountValue] = useState(0);
 
@@ -97,10 +87,7 @@ const EditEstimates = ({ idd, onClose }) => {
         finalTotal: 0,
     });
 
-    const [selectedCurrencyIcon, setSelectedCurrencyIcon] = useState('₹');
     const [invoiceType, setInvoiceType] = useState('standard');
-
-    const [products, setProducts] = useState([]);
 
     // Fetch estimate and currencies data
     useEffect(() => {
@@ -112,10 +99,8 @@ const EditEstimates = ({ idd, onClose }) => {
 
 
     useEffect(() => {
-        // dispatch(GetLeads());
         dispatch(getAllTaxes());
     }, [dispatch]);
-
 
     // Populate form when currentEstimate changes
     useEffect(() => {
@@ -134,10 +119,9 @@ const EditEstimates = ({ idd, onClose }) => {
 
                     // Parse and set items
                     if (currentEstimate.items) {
-                        let parsedItems;
                         try {
                             // Parse items if it's a string
-                            parsedItems = typeof currentEstimate.items === 'string' 
+                            const parsedItems = typeof currentEstimate.items === 'string' 
                                 ? JSON.parse(currentEstimate.items)
                                 : currentEstimate.items;
                             
@@ -168,38 +152,18 @@ const EditEstimates = ({ idd, onClose }) => {
 
                             setTableData(formattedItems);
 
-                            // Set tax details for each item
-                            formattedItems.forEach(item => {
-                                if (item.tax && item.tax_name) {
-                                    setSelectedTaxDetails(prev => ({
-                                        ...prev,
-                                        [item.id]: {
-                                            gstName: item.tax_name,
-                                            gstPercentage: Number(item.tax)
-                                        }
-                                    }));
-                                }
+                            // Set totals using the values from database
+                            setTotals({
+                                subtotal: Number(currentEstimate.subtotal) || 0,
+                                discount: Number(currentEstimate.discount) || 0,
+                                totalTax: Number(currentEstimate.tax) || 0,
+                                finalTotal: Number(currentEstimate.total) || 0
                             });
-
-                            // Calculate and set totals
-                            const subtotal = formattedItems.reduce((sum, item) => 
-                                sum + (Number(item.base_amount) || 0), 0);
-                            
-                            const totalTax = Number(currentEstimate.tax) || 0;
 
                             // Set discount value and type
                             const discountAmount = Number(currentEstimate.discount) || 0;
-                            // If discount is a round number and less than 100, assume it's a percentage
-                            const isPercentage = discountAmount <= 100 && Number.isInteger(discountAmount);
-                            setDiscountType(isPercentage ? 'percentage' : 'fixed');
+                            setDiscountType(discountAmount <= 100 ? 'percentage' : 'fixed');
                             setDiscountValue(discountAmount);
-
-                            setTotals({
-                                subtotal: subtotal,
-                                itemDiscount: discountAmount,
-                                totalTax: totalTax,
-                                finalTotal: Number(currentEstimate.total) || 0
-                            });
 
                         } catch (error) {
                             console.error("Error parsing items:", error);
@@ -215,7 +179,7 @@ const EditEstimates = ({ idd, onClose }) => {
         };
 
         fetchAndSetEstimateData();
-    }, [currentEstimate, form, leadDetails, fnddata]);
+    }, [currentEstimate, form, fnddata]);
 
     // Add debug logging
     useEffect(() => {
@@ -270,14 +234,6 @@ const EditEstimates = ({ idd, onClose }) => {
             totalTax: calculations.totalTax.toFixed(2),
             finalTotal: finalTotal.toFixed(2)
         });
-    };
-
-    const calculateSubTotal = () => {
-        return tableData.reduce((sum, row) => {
-            const quantity = parseFloat(row.quantity) || 0;
-            const price = parseFloat(row.price) || 0;
-            return sum + (quantity * price);
-        }, 0);
     };
 
     // Handle form submission
@@ -362,9 +318,6 @@ const EditEstimates = ({ idd, onClose }) => {
         }
     };
 
-    const itemsArray = Object.values(currentEstimate.items || {});
-
-
     // Handle table data changes
     const handleTableDataChange = (id, field, value) => {
         const updatedData = tableData.map((row) => {
@@ -421,39 +374,10 @@ const EditEstimates = ({ idd, onClose }) => {
                             loginEnabled: true,
                         }}
                     >
-                        {/* <Card className="border-0 mt-2"> */}
                         <div className="">
                             <div className=" p-2">
 
                                 <Row gutter={16}>
-                                    {/* <Col span={12}>
-                                        <Form.Item
-                                            name="lead"
-                                            label="Lead Title"
-                                            rules={[
-                                                {
-                                                    required: true,
-                                                    message: "Please select a Lead Title"
-                                                }
-                                            ]}
-                                        >
-                                            <Select
-                                                className="w-full"
-                                                placeholder="Select Lead Title"
-                                                disabled
-                                                value={leadDetails?.leadTitle || undefined}
-                                            >
-                                                {Array.isArray(lead) && lead.map((lead) => (
-                                                    <Option
-                                                        key={lead.id}
-                                                        value={lead.id}
-                                                    >
-                                                        {lead.leadTitle}
-                                                    </Option>
-                                                ))}
-                                            </Select>
-                                        </Form.Item>
-                                    </Col> */}
 
                                     <Col span={12}>
                                         <Form.Item
@@ -486,17 +410,6 @@ const EditEstimates = ({ idd, onClose }) => {
                                             <Input type="hidden" />
                                         </Form.Item>
                                     </Col>
-
-                                    {/* <Col span={12}>
-                                        <Form.Item
-                                            name="calculatedTax"
-                                            label="Calculate Tax"
-                                            type="number"
-                                            rules={[{ required: true, message: "Please enter the Calculate Tax " }]}
-                                        >
-                                            <Input placeholder="Enter Calculate Tax" />
-                                        </Form.Item>
-                                    </Col> */}
 
                                     <Col span={12}>
                                         <Form.Item

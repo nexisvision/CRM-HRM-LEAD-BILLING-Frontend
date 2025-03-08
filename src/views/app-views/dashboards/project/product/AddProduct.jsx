@@ -13,7 +13,6 @@ import { AddLable, GetLable } from "../../sales/LableReducer/LableSlice";
 const { Option } = Select;
 
 const AddProduct = ({ idd, onClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id } = useParams();
 
@@ -23,8 +22,6 @@ const AddProduct = ({ idd, onClose }) => {
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
   const [fileList, setFileList] = useState([]);
-
-  const { currencies } = useSelector((state) => state?.currencies);
 
   useEffect(() => {
     dispatch(getcurren());

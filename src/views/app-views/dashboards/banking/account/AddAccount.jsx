@@ -80,7 +80,7 @@ const AddAccount = ({ onClose }) => {
     <div className="create-account-form">
       <hr className='border-b border-gray-200 my-2'></hr>
       {/* <h2>Create Job</h2> */}
-
+      <h2 className="mb-2 border-b font-medium"></h2>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

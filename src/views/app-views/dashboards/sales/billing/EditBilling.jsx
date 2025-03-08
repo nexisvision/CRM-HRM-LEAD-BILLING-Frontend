@@ -15,8 +15,6 @@ import Flex from 'components/shared-components/Flex';
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { ErrorMessage, Field } from "formik";
-import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import { addbil, eidtebil, getbil } from "./billing2Reducer/billing2Slice";
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice";
@@ -31,8 +29,6 @@ const { Option } = Select;
 const EditBilling = ({ idd, onClose }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
-  const [newTag, setNewTag] = useState("");
   const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
   const [newStatus, setNewStatus] = useState("");
   const [statuses, setStatuses] = useState([]);
@@ -43,7 +39,6 @@ const EditBilling = ({ idd, onClose }) => {
   const [tags, setTags] = useState([]);
   const AllLoggeddtaa = useSelector((state) => state.user);
   const lid = AllLoggeddtaa.loggedInUser.id;
-  const Tagsdetail = useSelector((state) => state.Lable);
 
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -108,7 +103,6 @@ const EditBilling = ({ idd, onClose }) => {
         note: currentBill.note || ''
       });
 
-      // Set tax and discount states
       // setShowTax(!!currentBill.tax);
       setDiscountType(currentBill.discountType || 'percentage');
       setDiscountValue(currentBill.discountValue || 0);
@@ -487,48 +481,6 @@ const EditBilling = ({ idd, onClose }) => {
     }
   };
 
-  const renderTaxSelector = (row) => {
-    if (!showTax) {
-      return (
-        <input
-          type="text"
-          value="0"
-          disabled
-          className="w-full p-2 border bg-gray-100"
-        />
-      );
-    }
-
-    return (
-      <select
-        value={row.tax ? `${row.tax.gstName}|${row.tax.gstPercentage}` : "0"}
-        onChange={(value) => {
-          if (!value || value === '0') {
-            handleTableDataChange(row.id, "tax", null);
-            return;
-          }
-          const [gstName, gstPercentage] = value.split('|');
-          handleTableDataChange(row.id, "tax", {
-            gstName,
-            gstPercentage: parseFloat(gstPercentage) || 0
-          });
-        }}
-        className="w-full p-2 border rounded"
-      >
-        <option value="0">Select Tax</option>
-        {taxes?.data?.map((tax) => (
-          <option 
-            key={tax.id} 
-            value={`${tax.gstName}|${tax.gstPercentage}`}
-            title={`${tax.gstName}: ${tax.gstPercentage}%`}
-          >
-            {tax.gstName} ({tax.gstPercentage}%)
-          </option>
-        ))}
-      </select>
-    );
-  };
-
   return (
     <div>
       <Form form={form} layout="vertical">
@@ -622,17 +574,6 @@ const EditBilling = ({ idd, onClose }) => {
               </Form.Item>
             </Col>
 
-            {/* <Col span={12}>
-              <Form.Item
-                label="Bill Number"
-                name="billNumber"
-                rules={[
-                  { required: true, message: "Please enter bill number" },
-                ]}
-              >
-                <Input placeholder="Enter Bill Number" />
-              </Form.Item>
-            </Col> */}
 
             <Col span={24}>
               <Form.Item label="Description" name="description">
@@ -753,11 +694,7 @@ const EditBilling = ({ idd, onClose }) => {
                               const value = e.target.value === "" ? 0 : parseFloat(e.target.value);
                               handleTableDataChange(row.id, "price", value);
                             }}
-                            onBlur={(e) => {
-                              if (e.target.value === "") {
-                                handleTableDataChange(row.id, "price", 0);
-                              }
-                            }}
+                           
                             placeholder="0"
                             className="w-full p-2 border rounded-s"
                           />

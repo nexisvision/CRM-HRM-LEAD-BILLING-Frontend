@@ -15,13 +15,11 @@ import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form } from "antd";
 import { AddInvoices, getInvoice } from "./InvoiceReducer/InvoiceSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { ErrorMessage, Field } from "formik";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
-import { useParams } from "react-router-dom";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import { getcurren } from "../../../setting/currencies/currenciesSlice/currenciesSlice";
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
-import { GetProdu, GetAllProdu } from "../../project/product/ProductReducer/ProductsSlice";
+import { GetAllProdu } from "../../project/product/ProductReducer/ProductsSlice";
 import AddCustomer from "../customer/AddCustomer";
 
 const { Option } = Select;
@@ -30,7 +28,6 @@ const AddInvoice = ({ onClose }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
-  const [discountRate, setDiscountRate] = useState(0);
   const [newTag, setNewTag] = useState("");
   const [selectedCurrencyIcon, setSelectedCurrencyIcon] = useState('₹');
 
@@ -39,7 +36,6 @@ const AddInvoice = ({ onClose }) => {
 
   const [tags, setTags] = useState([]);
   const AllLoggeddtaa = useSelector((state) => state.user);
-  const Tagsdetail = useSelector((state) => state.Lable);
 
   const [globalDiscountType, setGlobalDiscountType] = useState('percentage');
   const [globalDiscountValue, setGlobalDiscountValue] = useState(0);
@@ -64,8 +60,6 @@ const AddInvoice = ({ onClose }) => {
   // Add this to get taxes from Redux store
   const { taxes } = useSelector((state) => state.tax);
 
-  // Add this state to track selected tax details
-  const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
 
   // Add loading state
   const [loading, setLoading] = useState(false);
@@ -271,6 +265,13 @@ const AddInvoice = ({ onClose }) => {
             };
         });
 
+        // Calculate final values from totals state
+        const subtotal = parseFloat(totals.subtotal);
+        const itemDiscount = parseFloat(totals.itemDiscount);
+        const globalDiscount = parseFloat(totals.globalDiscount);
+        const totalTax = parseFloat(totals.totalTax);
+        const finalTotal = parseFloat(totals.finalTotal);
+
         const updatedValues = {
             ...formValues,
             issueDate: formValues.issueDate.format('YYYY-MM-DD'),
@@ -278,11 +279,11 @@ const AddInvoice = ({ onClose }) => {
             items: items,
             discountType: globalDiscountType,
             discountValue: parseFloat(globalDiscountValue) || 0,
-            discount: parseFloat(totals.globalDiscount) || 0,
-            itemDiscount: parseFloat(totals.itemDiscount) || 0,
-            tax: parseFloat(totals.totalTax) || 0,
-            subtotal: parseFloat(totals.subtotal) || 0,
-            total: parseFloat(totals.finalTotal) || 0
+            discount: globalDiscount,
+            itemDiscount: itemDiscount,
+            tax: totalTax,
+            subtotal: subtotal,
+            total: finalTotal // This will now store the actual final total
         };
 
         await dispatch(AddInvoices(updatedValues));
@@ -320,32 +321,6 @@ const AddInvoice = ({ onClose }) => {
     } catch (error) {
       console.error("Failed to fetch tags:", error);
       message.error("Failed to load tags");
-    }
-  };
-
-  const handleAddNewTag = async () => {
-    if (!newTag.trim()) {
-      message.error("Please enter a tag name");
-      return;
-    }
-
-    try {
-      const lid = AllLoggeddtaa.loggedInUser.id;
-      const payload = {
-        name: newTag.trim(),
-        labelType: "status",
-      };
-
-      await dispatch(AddLable({ lid, payload }));
-      message.success("Status added successfully");
-      setNewTag("");
-      setIsTagModalVisible(false);
-
-      // Fetch updated tags
-      await fetchTags();
-    } catch (error) {
-      console.error("Failed to add Status:", error);
-      message.error("Failed to add Status");
     }
   };
 

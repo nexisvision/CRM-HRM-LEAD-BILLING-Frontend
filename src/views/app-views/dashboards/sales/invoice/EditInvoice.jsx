@@ -12,10 +12,8 @@ import {
 } from "antd";
 import Flex from 'components/shared-components/Flex';
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment/moment";
 import { editInvoice, getInvoice } from "./InvoiceReducer/InvoiceSlice";
@@ -31,7 +29,6 @@ const { Option } = Select;
 
 const EditInvoice = ({ idd, onClose }) => {
   const dispatch = useDispatch();
-  const [users, setUsers] = useState([]);
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState("");
   const [isTagModalVisible, setIsTagModalVisible] = useState(false);
@@ -50,10 +47,8 @@ const EditInvoice = ({ idd, onClose }) => {
   const customerdata = useSelector((state) => state.customers);
   const fnddatas = customerdata.customers.data;
   const AllLoggeddtaa = useSelector((state) => state.user);
-  const [discountRate, setDiscountRate] = useState(0);
   const [selectedCurrencyIcon, setSelectedCurrencyIcon] = useState('₹');
   const { taxes } = useSelector((state) => state.tax);
-  const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
 
   const [globalDiscountType, setGlobalDiscountType] = useState('percentage');
   const [globalDiscountValue, setGlobalDiscountValue] = useState(0);
@@ -721,20 +716,6 @@ const handleProductChange = (productId) => {
                     />
                   </Col>
 
-                  {/* <Col span={12} className="mt-2">
-                    <label className="font-semibold">Invoice Number</label>
-                    <Field
-                      name="invoicenub"
-                      as={Input}
-                      placeholder="Enter Invoice Number"
-                    />
-                    <ErrorMessage
-                      name="invoicenub"
-                      component="div"
-                      className="error-message text-red-500 my-1"
-                    />
-                  </Col> */}
-
                   <Col span={12} className="mt-4">
                     <div className="form-item">
                       <label className="font-semibold">Category <span className="text-red-500">*</span></label>
@@ -956,35 +937,6 @@ const handleProductChange = (productId) => {
                             />
                           </div>
                           </td>
-                          {/* <td className="px-2 py-2 border-b">
-                            <input
-                              type="text"
-                              value={row.hsn_sac}
-                              onChange={(e) => handleTableDataChange(row.id, "hsn_sac", e.target.value)}
-                              placeholder="HSN/SAC"
-                              className="w-full p-2 border rounded"
-                              readOnly
-                            />
-                          </td>
-                          <td className="px-2 py-2 border-b">
-                            <div className="flex space-x-2">
-                              <Select
-                                value={row.discountType}
-                                onChange={(value) => handleTableDataChange(row.id, "discountType", value)}
-                                style={{ width: '100px' }}
-                              >
-                                <Option value="percentage">Percentage</Option>
-                                <Option value="fixed">Fixed</Option>
-                              </Select>
-                              <Input
-                                type="number"
-                                min="0"
-                                value={row.discountValue}
-                                onChange={(e) => handleTableDataChange(row.id, "discountValue", e.target.value)}
-                                placeholder="0"
-                              />
-                            </div>
-                          </td> */}
                           <td className="px-2 py-2 border-b">
                             <Select
                               value={row.tax?.gstPercentage ? `${row.tax.gstName}|${row.tax.gstPercentage}` : '0'}
@@ -1069,8 +1021,15 @@ const handleProductChange = (productId) => {
                             min="0"
                             value={globalDiscountValue}
                             onChange={(e) => {
-                              setGlobalDiscountValue(e.target.value);
-                              calculateTotal(tableData, e.target.value);
+                              const value = e.target.value;
+                              // If user starts typing and current value is 0, clear it
+                              if (globalDiscountValue === 0 && value !== "") {
+                                setGlobalDiscountValue(parseFloat(value));
+                                calculateTotal(tableData, parseFloat(value), globalDiscountType);
+                              } else {
+                                setGlobalDiscountValue(value === "" ? 0 : parseFloat(value));
+                                calculateTotal(tableData, value === "" ? 0 : parseFloat(value), globalDiscountType);
+                              }
                             }}
                             placeholder="0"
                           />

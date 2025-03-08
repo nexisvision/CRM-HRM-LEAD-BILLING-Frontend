@@ -2,13 +2,11 @@ import React, { useEffect, useState } from "react";
 import {
   Input,
   Button,
-  DatePicker,
   Select,
   message,
   Row,
   Col,
   Modal,
-  Checkbox,
 } from "antd";
 import { useNavigate } from "react-router-dom";
 import { PlusOutlined } from "@ant-design/icons";
@@ -39,8 +37,6 @@ const EditRevenue = ({ idd, onClose }) => {
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
   const AllLoggedData = useSelector((state) => state.user);
-
-  const lid = AllLoggedData.loggedInUser.id;
 
   const allempdatass = useSelector((state) => state.currencies);
   const fnddatass = allempdatass?.currencies?.data;
@@ -356,13 +352,7 @@ const EditRevenue = ({ idd, onClose }) => {
                             className="mt-1"
                             placeholder="Select Account"
                             maxLength={18}
-                            // onChange={(e) => {
-                            //   const value = e.target.value.replace(/\D/g, '');
-                            //   setFieldValue("accountNumber", value);
-                            // }}
                             onBlur={() => setFieldTouched("account", true)}
-
-
                           />
                         )}
                       </Field>

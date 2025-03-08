@@ -24,7 +24,6 @@ import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import { useParams } from "react-router-dom";
 import AddCustomer from "../customer/AddCustomer";
 import AddCurrencies from '../../../setting/currencies/AddCurrencies';
-// import { GetAccounts } from '../accounts/AccountReducer/AccountSlice';
 
 const { Option } = Select;
 
@@ -52,8 +51,6 @@ const AddRevenue = ({ onClose }) => {
     return '';
   };
   const AllLoggedData = useSelector((state) => state.user);
-
-  const lid = AllLoggedData.loggedInUser.id;
 
   const fetchLables = async (lableType, setter) => {
     try {
@@ -150,14 +147,6 @@ const AddRevenue = ({ onClose }) => {
   const customerdata = useSelector((state) => state.customers);
   const fnddata = customerdata.customers.data;
 
-  // Get accounts from Redux store
-  const accountsData = useSelector((state) => state?.accounts?.accounts?.data || []);
-
-  // Fetch accounts when component mounts
-  // useEffect(() => {
-  //   dispatch(GetAccounts());
-  // }, [dispatch]);
-
   // State to manage AddCustomer modal visibility
   const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] = useState(false);
 
@@ -234,7 +223,6 @@ const AddRevenue = ({ onClose }) => {
               setFieldValue,
               handleSubmit,
               setFieldTouched,
-              resetForm,
             }) => (
               <>
                 <Form className="formik-form" onSubmit={handleSubmit}>
@@ -522,23 +510,6 @@ const AddRevenue = ({ onClose }) => {
                       </div>
                     </Col>
 
-                  
-                    {/* <Col span={12}>
-                      <div className="form-item mt-2">
-                        <label className="font-semibold">Reference</label>
-                        <Field
-                          name="reference"
-                          as={Input}
-                          placeholder="Enter Reference"
-                          type="number"
-                        />
-                        <ErrorMessage
-                          name="reference"
-                          component="div"
-                          className="error-message text-red-500 my-1"
-                        />
-                      </div>
-                    </Col> */}
                     <Col span={12} className="mt-3">
                       <div className="form-item">
                         <label className="font-semibold">Payment Receipt <span className="text-red-500">*</span></label>

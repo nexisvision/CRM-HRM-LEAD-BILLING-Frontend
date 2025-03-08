@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, DatePicker, Modal } from 'antd';
+import {  Form, Row, Col, Input, message, Button, Upload, Select, DatePicker } from 'antd';
 import { DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
@@ -21,22 +21,15 @@ const AddEstimates = ({ onClose }) => {
     const [discountType, setDiscountType] = useState('percentage');
     const [loading, setLoading] = useState(false);
     const [discountValue, setDiscountValue] = useState(0);
-    // const [discountRate, setDiscountRate] = useState();
-    // Add loading state for leads
     const [leadsLoading, setLeadsLoading] = useState(true);
 
     const user = useSelector((state) => state.user.loggedInUser.username);
     const { data: Leads, isLoading: isLeadsLoading, error: leadsError } = useSelector((state) => state.Leads.Leads || []);
 
-    const lead = Leads?.filter((item) => item.created_by === user);
     const { currencies } = useSelector((state) => state.currencies);
     const condata = currencies.data || [];
-
-    const currency = condata?.filter((item) => item.created_by === user);
+   
     const { taxes } = useSelector((state) => state.tax);
-    const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
-
-    const [selectedLead, setSelectedLead] = useState(null);
 
     const subClients = useSelector((state) => state.SubClient);
     const sub = subClients?.SubClient?.data;
@@ -48,7 +41,6 @@ const AddEstimates = ({ onClose }) => {
     const client = fnddata?.client;
 
     const subClientData = sub?.find((subClient) => subClient?.id === client);
-
 
     const [discountRate, setDiscountRate] = useState(10);
     const dispatch = useDispatch();
@@ -65,7 +57,7 @@ const AddEstimates = ({ onClose }) => {
             id: Date.now(),
             item: "",
             quantity: 1,
-            price: "",
+            price: "0",
             discount: 0,
             tax: 0,
             amount: "0",
@@ -225,20 +217,6 @@ const AddEstimates = ({ onClose }) => {
         }
     };
 
-    const [rows, setRows] = useState([
-        {
-            id: Date.now(),
-            item: "",
-            quantity: "",
-            price: "",
-            discount: "",
-            tax: "",
-            amount: "0",
-            description: "",
-            isNew: false,
-        },
-    ]);
-
     // Function to handle adding a new row
     const handleAddRow = () => {
         setTableData((prevData) => [
@@ -247,7 +225,7 @@ const AddEstimates = ({ onClose }) => {
                 id: Date.now(), // Unique ID for the new item
                 item: "",
                 quantity: 1,
-                price: "",
+                price: "0",
                 tax: 0,
                 amount: "0",
                 description: "",
@@ -280,7 +258,6 @@ const AddEstimates = ({ onClose }) => {
             return sum + totalAmount;
         }, 0);
     };
-
 
       const calculateTotal = (data = tableData, discountVal = discountValue, type = discountType) => {
         if (!Array.isArray(data)) {
@@ -362,9 +339,8 @@ const AddEstimates = ({ onClose }) => {
                         layout="vertical"
                         onFinish={handleFinish}
                     // initialValues={initialValues}
-
                     >
-                        {/* <Card className="border-0 mt-2"> */}
+                     
                         <div className="">
                             <div className=" p-2">
 
@@ -400,59 +376,6 @@ const AddEstimates = ({ onClose }) => {
                                             <Input type="hidden" />
                                         </Form.Item>
                                     </Col>
-
-                                    {/* <Col span={12}>
-                                        <Form.Item
-                                            name="lead"
-                                            label="Lead Title"
-                                            rules={[
-                                                {
-                                                    required: true,
-                                                    message: "Please select a Lead Title"
-                                                }
-                                            ]}
-                                        >
-                                            <Select
-                                                className="w-full"
-                                                placeholder="Select Lead Title"
-                                                loading={leadsLoading}
-                                                onChange={(value) => {
-                                                    if (value) {
-                                                        const selectedLead = lead?.find(
-                                                            (lead) => lead.id === value
-                                                        );
-                                                        setSelectedLead(selectedLead);
-                                                        form.setFieldsValue({
-                                                            lead: value
-                                                        });
-                                                    }
-                                                }}
-                                            >
-                                                {Array.isArray(lead) && lead.map((lead) => (
-                                                    <Option
-                                                        key={lead.id}
-                                                        value={lead.id}
-                                                    >
-                                                        {lead.leadTitle}
-                                                    </Option>
-                                                ))}
-                                            </Select>
-                                        </Form.Item>
-                                    </Col> */}
-
-                                    {/* <Col span={12}>
-                                        <Form.Item
-                                            name="calculatedTax"
-                                            label="Calculate Tax"
-                                            rules={[{ required: true, message: "Please enter the Calculate Tax" }]}
-                                        >
-                                            <Input
-                                                type="number"
-                                                placeholder="Enter Calculate Tax"
-                                                min={0}
-                                            />
-                                        </Form.Item>
-                                    </Col> */}
 
                                     <Col span={12}>
                                         <Form.Item
@@ -500,16 +423,6 @@ const AddEstimates = ({ onClose }) => {
                                             />
                                         </Form.Item>
                                     </Col>
-
-                                    {/* <Col span={12}>
-                                        <Form.Item
-                                            name="quotationNumber"
-                                            label="Quotation Number"
-                                            rules={[{ required: true, message: "Please enter quotation number" }]}
-                                        >
-                                            <Input placeholder="Auto-generated"  />
-                                        </Form.Item>
-                                    </Col> */}
 
                                     <Col span={12}>
                                         <Form.Item
@@ -578,7 +491,8 @@ const AddEstimates = ({ onClose }) => {
                             <Input
                                 type="number"
                                 value={row.price}
-                                onChange={(e) => handleTableDataChange(row.id, 'price', e.target.value)}
+                                onChange={(e) =>{ const value = e.target.value;
+                                    handleTableDataChange(row.id, "price", value === "" ? 0 : parseFloat(value));}}
                                 placeholder="Price"
                                 className="w-full p-2 border rounded"
                                 min="0"

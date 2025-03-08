@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Menu, Row, Col, Tag, Input, message, Button, Upload, Select, DatePicker, Modal } from 'antd';
-import { EyeOutlined, DeleteOutlined, CloudUploadOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, FilterOutlined, EditOutlined, LinkOutlined, SearchOutlined } from '@ant-design/icons';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Form, Row, Col, Input, message, Button, Select, DatePicker } from 'antd';
+import { DeleteOutlined, PlusOutlined} from '@ant-design/icons';
+import { useParams } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
-import OrderListData from 'assets/data/order-list.data.json';
 import Flex from 'components/shared-components/Flex';
 import { Getmins } from '../../../dashboards/project/milestone/minestoneReducer/minestoneSlice';
 import { useSelector, useDispatch } from 'react-redux';
-// import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { createInvoice, getAllInvoices } from '../../../dashboards/project/invoice/invoicereducer/InvoiceSlice';
 import * as Yup from 'yup';
 import { getcurren } from 'views/app-views/setting/currencies/currenciesSlice/currenciesSlice';
@@ -30,18 +28,11 @@ const AddInvoice = ({ onClose }) => {
     const [discountType, setDiscountType] = useState('percentage');
     const [discountValue, setDiscountValue] = useState(0);
 
-
-    // const [selectedProject, setSelectedProject] = useState(null);
-    // const [clientOptions, setClientOptions] = useState([]);
-
-
     const user = useSelector((state) => state.user.loggedInUser.username);
 
     const currenciesState = useSelector((state) => state.currencies);
 
     const curren = currenciesState?.currencies?.data || [];
-
-    // const curren = curr?.filter((item) => item.created_by === user);
 
     const [currenciesList, setCurrenciesList] = useState([]);
     const [discountRate, setDiscountRate] = useState(0);
@@ -51,12 +42,9 @@ const AddInvoice = ({ onClose }) => {
     const subClientsss = useSelector((state) => state.SubClient);
 const sub = subClientsss?.SubClient?.data;
 
-
-
     const allproject = useSelector((state) => state.Project);
     const fndrewduxxdaa = allproject.Project.data
     const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
-
     
     const client = fnddata?.client;
 
@@ -77,19 +65,16 @@ const sub = subClientsss?.SubClient?.data;
         finalTotal: 0,
     });
 
-    // Add new state for row-level discount types
-    const [rowDiscountTypes, setRowDiscountTypes] = useState({});
-
     // Modify the table data state initialization to include discount type
     const [tableData, setTableData] = useState([
         {
             id: Date.now(),
             item: "",
             quantity: 1,
-            price: "",
+            price: "0",
             tax: 0,
             discountType: "percentage",
-            discount: "",
+            discount: "0",
             amount: "0",
             description: "",
         }
@@ -314,10 +299,10 @@ const sub = subClientsss?.SubClient?.data;
                 id: Date.now(),
                 item: "",
                 quantity: 1,
-                price: "",
+                price: "0",
                 tax: 0,
                 discountType: "percentage",
-                discount: "",
+                discount: "0",
                 amount: "0",
                 description: "",
                 hsn_sac: ""
@@ -523,15 +508,10 @@ const sub = subClientsss?.SubClient?.data;
                                 prefix={selectedCurrencyIcon}
                                 type="number"
                                 min="0"
-                                value={row.price === 0 ? "" : row.price}
+                                value={row.price}
                                 onChange={(e) => {
                                     const value = e.target.value;
-                                    // Clear the "0" when user starts typing
-                                    if (row.price === 0 && value !== "") {
-                                        handleTableDataChange(row.id, "price", value.replace(/^0+/, ''));
-                                    } else {
-                                        handleTableDataChange(row.id, "price", value || 0);
-                                    }
+                                    handleTableDataChange(row.id, "price", value === "" ? 0 : parseFloat(value));
                                 }}
                                 placeholder="0"
                                 className="w-full p-2 border rounded-s"
@@ -551,15 +531,10 @@ const sub = subClientsss?.SubClient?.data;
                                     type="number"
                                     min="0"
                                     max={row.discountType === "percentage" ? 100 : undefined}
-                                    value={row.discount === 0 ? "" : row.discount}
+                                    value={row.discount}
                                     onChange={(e) => {
                                         const value = e.target.value;
-                                        // Clear the "0" when user starts typing
-                                        if (row.discount === 0 && value !== "") {
-                                            handleTableDataChange(row.id, "discount", value.replace(/^0+/, ''));
-                                        } else {
-                                            handleTableDataChange(row.id, "discount", value || 0);
-                                        }
+                                        handleTableDataChange(row.id, "discount", value === "" ? 0 : parseFloat(value));
                                     }}
                                     prefix={row.discountType === "fixed" ? selectedCurrencyIcon : ""}
                                     suffix={row.discountType === "percentage" ? "%" : ""}
@@ -599,7 +574,6 @@ const sub = subClientsss?.SubClient?.data;
                                 className="w-[100px]"
                                 allowClear
                             >
-                                <Option value="0">0</Option>
                                 {taxes && taxes.data && taxes.data.map(tax => (
                                     <Option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
                                         {tax.gstName} ({tax.gstPercentage}%)
@@ -675,18 +649,12 @@ const sub = subClientsss?.SubClient?.data;
                             </Select>
                             <Input
                                 type="number"
-                                value={discountValue === 0 ? "" : discountValue}
+                                value={discountValue}
                                 onChange={(e) => {
                                     const value = e.target.value;
-                                    // Clear the "0" when user starts typing
-                                    if (discountValue === 0 && value !== "") {
-                                        const newValue = value.replace(/^0+/, '');
-                                        setDiscountValue(newValue);
-                                        handleDiscountChange(newValue);
-                                    } else {
-                                        setDiscountValue(value || 0);
-                                        handleDiscountChange(value || 0);
-                                    }
+                                    const newValue = value === "" ? 0 : parseFloat(value);
+                                    setDiscountValue(newValue);
+                                    handleDiscountChange(newValue);
                                 }}
                                 style={{ width: 120 }}
                                 min={0}
@@ -833,9 +801,7 @@ const sub = subClientsss?.SubClient?.data;
                                 </Row>
                             </div>
                         </div>
-                        {/* </Card> */}
-
-                        {/* <Card> */}
+                       
                         <div>
                             
                             <div className="overflow-x-auto">
@@ -924,38 +890,6 @@ const sub = subClientsss?.SubClient?.data;
                             {renderSummarySection()}
                         </div>
 
-                        {/* <div className='mt-4'>
-                            <Checkbox onChange={handleCheckboxChange}>
-                                I Have Received Payment
-                            </Checkbox>
-
-                            {showFields && (
-                                <div style={{ marginTop: '20px' }}>
-                                    <Row gutter={16}>
-                                        <Col span={12}>
-                                            <label>Payment Gateway</label>
-                                            <Select placeholder="Select an option" className="w-full">
-                                                <Option value="--">--</Option>
-                                                <Option value="offline">Offline Payment</Option>
-                                                <Option value="online">Online Payment</Option>
-                                            </Select>
-                                        </Col>
-                                        <Col span={12}>
-                                            <label>Transaction ID</label>
-                                            <Input placeholder="Enter Transaction ID" />
-                                        </Col>
-
-                                    </Row>
-                                </div>
-                            )}
-                        </div> */}
-
-                        {/* </Card> */}
-
-                        {/* <div className="form-buttons text-right">
-                        <Button type="default" className="mr-2" onClick={() => navigate('/app/dashboards/project/list')}>Cancel</Button>
-                        <Button type="primary" htmlType="submit">Create</Button>
-                    </div> */}
                         <Form.Item>
                             <Row justify="end" gutter={16} className='mt-4'>
                                 <Col>
@@ -971,16 +905,7 @@ const sub = subClientsss?.SubClient?.data;
                     </Form>
                 </div>
             </div>
-            {/* <Modal
-                title="Product Create"
-                visible={isAddProductModalVisible}
-                onCancel={closeAddProductModal}
-                footer={null}
-                width={1000}
-                className='mt-[-70px]'
-            >
-                <AddProduct onClose={closeAddProductModal} />
-            </Modal> */}
+
         </>
     );
 };

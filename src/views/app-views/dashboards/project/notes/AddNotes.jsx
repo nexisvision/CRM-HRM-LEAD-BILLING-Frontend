@@ -15,13 +15,6 @@ const { Option } = Select;
 const AddNotes = ({ onClose }) => {
   const dispatch = useDispatch();
   const { id } = useParams();
-
-  // const employeeData = useSelector((state) => 
-  //   (state.employee?.employee?.data || []).filter((employee) => employee.employeeId)
-  // );
-
-
-
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
   const loggedInUser = useSelector((state) => state.user.loggedInUser);
@@ -36,29 +29,11 @@ const AddNotes = ({ onClose }) => {
     }
   });
 
-
-  // const user = useSelector((state) => state.user.loggedInUser.username);
-
-  // const { data: employee } = useSelector((state) => state.employee.employee);
-
-  // const employeeData = employee?.filter((item) => item.created_by === user) || [];
-
   const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(GetUsers());
   }, []);
-
-  // const { data: employee } = useSelector((state) => state.employee.employee);
-
-  // const filterdata = useSelector((state)=>state.employee.employee.data)
-
-  // const loggeduesr = useSelector((state)=>state.user.loggedInUser.username)
-
-  // const employee = filterdata.filter((item)=>item.created_by === loggeduesr)
-
-
-
 
   const initialValues = {
     note_title: "",
@@ -71,7 +46,6 @@ const AddNotes = ({ onClose }) => {
     note_title: Yup.string().required("Please enter Note Title."),
     notetype: Yup.string().required("Please select Note Type."),
     description: Yup.string().optional("Please enter Description."),
-    // employees: Yup.string().required("Please select Employee."),
   });
 
   const onSubmit = async (values, { resetForm }) => {
@@ -81,11 +55,8 @@ const AddNotes = ({ onClose }) => {
 
       values.employees = employeeObject;
 
-     
-
       dispatch(AddNote({ id, values }))
         .then(() => {
-          // message.success("Note added successfully!");
           dispatch(GetNote(id))
           resetForm();
           onClose();
@@ -98,8 +69,8 @@ const AddNotes = ({ onClose }) => {
   };
 
   return (
-    <div className="add-expenses-form">
-
+    <div className="add-notes-form">
+ <h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -124,7 +95,6 @@ const AddNotes = ({ onClose }) => {
                   />
                 </div>
               </Col>
-
 
               <Col span={12}>
                 <div className="form-item">

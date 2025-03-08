@@ -1,33 +1,18 @@
 import React, { useState, useEffect } from "react";
 import {
-  Card,
   Form,
-  Menu,
   Row,
   Col,
-  Tag,
   Input,
   message,
   Button,
-  Upload,
   Select,
-  DatePicker,
-
-  Modal,
+  DatePicker
 } from "antd";
 import { ErrorMessage } from "formik";
 import {
-  EyeOutlined,
   DeleteOutlined,
-  CloudUploadOutlined,
-  MailOutlined,
-  PlusOutlined,
-  PushpinOutlined,
-  FileExcelOutlined,
-  FilterOutlined,
-  EditOutlined,
-  LinkOutlined,
-  SearchOutlined,
+  PlusOutlined
 } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
@@ -40,9 +25,7 @@ import {
   getInvoiceById,
 } from "../../../dashboards/project/invoice/invoicereducer/InvoiceSlice";
 import { useSelector, useDispatch } from "react-redux";
-// import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { createInvoice } from "../../../dashboards/project/invoice/invoicereducer/InvoiceSlice";
-import * as Yup from "yup";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { GetProdu } from '../product/ProductReducer/ProductsSlice';
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice"
@@ -51,7 +34,7 @@ import dayjs from "dayjs";
 
 const { Option } = Select;
 
-const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
+const EditInvoice = ({ idd, onClose}) => {
   const { id } = useParams();
   const [discountType, setDiscountType] = useState('percentage');
   const [discountValue, setDiscountValue] = useState(0);
@@ -77,13 +60,9 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
 
   const client = fnddata?.client;
 
-  const user = useSelector((state) => state.user.loggedInUser.username);
-
   const currenciesState = useSelector((state) => state.currencies);
 
   const curren = currenciesState?.currencies?.data || [];
-
-  // const curren = curr?.filter((item) => item.created_by === user);
 
   const subClientData = sub?.find((subClient) => subClient?.id === client);
 
@@ -92,7 +71,6 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
 
   const { taxes } = useSelector((state) => state.tax);
 
-  const { currencies } = useSelector((state) => state.currencies);
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [totals, setTotals] = useState({
@@ -114,9 +92,9 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
       id: Date.now(),
       item: "",
       quantity: 1,
-      price: "",
-      discountType: "percentage", // Add default discount type
-      discount: 0, // Add default discount value
+      price: "0",
+      discountType: "percentage", 
+      discount: 0, 
       tax: 0,
       amount: "0",
       description: "",
@@ -252,7 +230,6 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
     const setInvoiceData = async () => {
         if (currentInvoice) {
             try {
-
                 // Set basic form fields
                 form.setFieldsValue({
                     invoiceNumber: currentInvoice.invoiceNumber,
@@ -288,7 +265,6 @@ const EditInvoice = ({ idd, onClose,setFieldValue,values }) => {
                                 discount: Number(item.discount_percentage) || 0
                             };
                         });
-
 
                         // Set table data
                         setTableData(formattedItems);
@@ -408,19 +384,6 @@ useEffect(() => {
     }
   };
 
-  const [rows, setRows] = useState([
-    {
-      id: Date.now(),
-      item: "",
-      quantity: "",
-      price: "",
-      discount: "",
-      tax: "",
-      amount: "0",
-      description: "",
-      isNew: false,
-    },
-  ]);
 
   // Function to handle adding a new row
   const handleAddRow = () => {
@@ -430,7 +393,7 @@ useEffect(() => {
         id: Date.now(),
         item: "",
         quantity: 1,
-        price: "",
+        price: "0",
         tax: 0,
         discountType: "percentage",
         discount: 0,
@@ -634,53 +597,6 @@ useEffect(() => {
     setTableData(updatedData);
     calculateTotal(updatedData, discountValue);
 };
-
-  // Modified currency selection handler
-  const handleCurrencyChange = (currencyId) => {
-    const selectedCurrency = curren?.find(c => c.id === currencyId);
-    if (selectedCurrency) {
-      setSelectedCurrencyIcon(selectedCurrency.currencyIcon || '₹');
-      setSelectedCurrencyDetails({
-        currencyCode: selectedCurrency.currencyCode,
-        currencyIcon: selectedCurrency.currencyIcon,
-        id: selectedCurrency.id
-      });
-    }
-  };
-
-
-  // Modify the currency form item
-  const renderCurrencySelect = () => (
-    <Form.Item
-      name="currency"
-      label="Currency"
-      rules={[{ required: true, message: "Please select currency" }]}
-    >
-      <Select
-        className="w-full"
-        placeholder="Select Currency"
-        onChange={(value) => {
-          const selectedCurrency = curren?.find(c => c.id === value);
-          if (selectedCurrency) {
-            setSelectedCurrencyIcon(selectedCurrency.currencyIcon || '₹');
-            setSelectedCurrencyDetails({
-              currencyCode: selectedCurrency.currencyCode,
-              currencyIcon: selectedCurrency.currencyIcon,
-              id: selectedCurrency.id
-            });
-            form.setFieldsValue({ currency: value });
-          }
-        }}
-      >
-        {curren?.map((currency) => (
-          <Option key={currency.id} value={currency.id}>
-            {currency.currencyCode} ({currency.currencyIcon})
-          </Option>
-        ))}
-      </Select>
-    </Form.Item>
-  );
-
   // Modify the table to show currency icons in all price/amount fields
   const renderTableRows = () => (
     <tbody>
@@ -1080,22 +996,7 @@ useEffect(() => {
                 </div>
               </div>
               {renderSummarySection()}
-              {/* <div className="mt-4">
-                <span className="block mb-2">Add File</span>
-                <Col span={24}>
-                  <Upload
-                    action="http://localhost:5500/api/users/upload-cv"
-                    listType="picture"
-                    accept=".pdf"
-                    maxCount={1}
-                    showUploadList={{ showRemoveIcon: true }}
-                    className="border-2  justify-center items-center p-10 block"
-                  >
-                    <CloudUploadOutlined className="text-4xl" />
-                    <span className="text-xl">Choose File</span>
-                  </Upload>
-                </Col>
-              </div> */}
+              
             </div>
 
             <Form.Item className="mt-4">

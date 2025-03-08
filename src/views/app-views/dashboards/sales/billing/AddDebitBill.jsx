@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal, Select, DatePicker } from 'antd';
-// import { Card, Table,  Badge, Menu, Tag,Modal } from 'antd';
+import { Row, Col, Tag, Input, message, Button, Modal, Select, DatePicker } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import 'react-quill/dist/quill.snow.css';
 import ReactQuill from 'react-quill';

@@ -7,7 +7,6 @@ import {
   message,
   Row,
   Col,
-  Upload,
   Modal
 } from "antd";
 import { PlusOutlined } from '@ant-design/icons';
@@ -16,9 +15,8 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-// import { empdata } from "../../../hrm/Employee/EmployeeReducers/EmployeeSlice";
 import { EditExp, Getexp } from "./Expencereducer/ExpenseSlice";
-import dayjs from "dayjs"; // Import dayjs for date handling
+import dayjs from "dayjs";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import AddCurrencies from '../../../setting/currencies/AddCurrencies';
 
@@ -33,14 +31,10 @@ const EditExpenses = ({ idd, onClose }) => {
 
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
-  // const { data: employee } = useSelector((state) => state.employee.employee);
-  const { currencies } = useSelector((state) => state.currencies);
-
   const allproject = useSelector((state) => state.Project);
   const fndrewduxxdaa = allproject.Project.data;
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
 
-  // const currencies = useSelector((state) => state.currencies.currencies);
 
   useEffect(() => {
     dispatch(getcurren());
@@ -57,14 +51,12 @@ const EditExpenses = ({ idd, onClose }) => {
     return '';
   };
 
-
   const [initialValues, setInitialValues] = useState({
     item: "",
     currency: getInitialCurrency(),
     ExchangeRate: "",
     price: "",
     purchase_date: null,
-    // employee: "",
     project: "",
     ExpenseCategory: "",
     PurchasedFrom: "",
@@ -80,9 +72,6 @@ const EditExpenses = ({ idd, onClose }) => {
     }
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   dispatch(empdata());
-  // }, [dispatch]);
 
   useEffect(() => {
     if (Expensedata.length > 0 && idd) {
@@ -99,15 +88,13 @@ const EditExpenses = ({ idd, onClose }) => {
           item: expdata.item || "",
           currency: expdata.currency || "",
           ExchangeRate: expdata.ExchangeRate || "",
-          price: expdata.price ? expdata.price.toString() : "", // Convert to string for input
+          price: expdata.price ? expdata.price.toString() : "", 
           purchase_date: purchaseDate,
-          // employee: expdata.employee || "",
           project: fnddata?.id || "",
           ExpenseCategory: expdata.ExpenseCategory || "",
           PurchasedFrom: expdata.PurchasedFrom || "",
           BankAccount: expdata.BankAccount || "",
-          description: expdata.description || "", // Fixed property name
-
+          description: expdata.description || "", 
           bill: expdata.bill || "",
         });
       } else {
@@ -147,9 +134,9 @@ const EditExpenses = ({ idd, onClose }) => {
 
   return (
     <div className="Edit-expenses-form">
-
+      <h2 className="border-b pb-[-10px] mb-[10px] font-medium"></h2>
       <Formik
-        enableReinitialize // Add this to handle initialValues updates
+        enableReinitialize 
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={onSubmit}
@@ -267,23 +254,7 @@ const EditExpenses = ({ idd, onClose }) => {
                   <ErrorMessage name="price" component="div" className="text-red-500 mt-1 text-sm" />
                 </div>
               </Col>
-              {/* <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold">Price <span className="text-red-500">*</span></label>
-                  <Field
-                    name="price"
-                    type="number"
-                    as={Input}
-                    placeholder="Enter price"
-                    className="mt-1"
-                  />
-                  <ErrorMessage
-                    name="price"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
+             
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">PurchaseDate <span className="text-red-500">*</span></label>
@@ -301,44 +272,7 @@ const EditExpenses = ({ idd, onClose }) => {
                   />
                 </div>
               </Col>
-              {/* <Col span={12} className="mt-4">
-                <div className="form-item">
-                  <label className="font-semibold mb-2">Employee <span className="text-red-500">*</span></label>
-                  <div className="flex gap-2">
-
-                    <Field name="employee">
-                      {({ field, form }) => (
-                        <Select
-                          {...field}
-                          className="w-full mt-1"
-                          placeholder="Select Employee"
-                          onChange={(value) => {
-                            const selectedEmployee =
-                              Array.isArray(employee) &&
-                              employee.find((e) => e.id === value);
-                            form.setFieldValue(
-                              "employee",
-                              selectedEmployee?.username || ""
-                            );
-                          }}
-                        >
-                          {Array.isArray(employee) &&
-                            employee.map((emp) => (
-                              <Option key={emp.id} value={emp.id}>
-                                {emp.username}
-                              </Option>
-                            ))}
-                        </Select>
-                      )}
-                    </Field>
-                  </div>
-                  <ErrorMessage
-                    name="employee"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
+             
               <Col span={12} className="mt-4">
                 <div className="form-item">
                   <label className="font-semibold">Project <span className="text-red-500">*</span></label>

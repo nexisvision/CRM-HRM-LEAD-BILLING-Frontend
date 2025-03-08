@@ -29,7 +29,6 @@ const { Option } = Select;
 const AddBilling = ({ onClose }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
   const [newTag, setNewTag] = useState("");
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [newCategory, setNewCategory] = useState("");
@@ -40,12 +39,9 @@ const AddBilling = ({ onClose }) => {
 
   const [tags, setTags] = useState([]);
   const AllLoggeddtaa = useSelector((state) => state.user);
-  const Tagsdetail = useSelector((state) => state.Lable);
   const { taxes } = useSelector((state) => state.tax);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-
-  const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
 
    // Get products directly from Redux store
    const productsData = useSelector((state) => state.Product.Product);
@@ -84,7 +80,6 @@ const AddBilling = ({ onClose }) => {
   }, []);
 
   const customerdata = useSelector((state) => state.customers);
-  const fnddata = customerdata.customers.data;
 
   const handleAddRow = () => {
     setTableData([
@@ -124,7 +119,6 @@ const AddBilling = ({ onClose }) => {
         }
       } catch (error) {
         console.error("Error fetching products:", error);
-        // message.error("Failed to load products");
       }
     };
 
@@ -164,20 +158,6 @@ const AddBilling = ({ onClose }) => {
       }
     }
   };
-
-  const calculateAmount = (row) => {
-    const quantity = parseFloat(row.quantity) || 0;
-    const price = parseFloat(row.price) || 0;
-    const tax = showTax ? (parseFloat(row.tax) || 0) : 0;
-    
-    const baseAmount = quantity * price;
-    const taxAmount = (baseAmount * tax) / 100;
-    const totalAmount = baseAmount + taxAmount;
-    
-    return totalAmount.toFixed(2);
-  };
-
-  const lid = AllLoggeddtaa.loggedInUser.id;
 
   const handleTableDataChange = (id, field, value) => {
     const updatedData = tableData.map((row) => {
@@ -563,8 +543,8 @@ const AddBilling = ({ onClose }) => {
             </Col>
 
             <Col span={24}>
-              <Form.Item label="discription" name="discription">
-                <Input.TextArea placeholder="Enter discription" />
+              <Form.Item label="Description" name="discription">
+                <Input.TextArea placeholder="Enter Description" />
               </Form.Item>
             </Col>
 
@@ -688,22 +668,17 @@ const AddBilling = ({ onClose }) => {
                           <input
                             type="number"
                             min="0"
-                            value={row.price}
+                            value={row.price || 0}
                             onChange={(e) => {
                               const value = e.target.value;
-                              handleTableDataChange(row.id, "price", value === "" ? 0 : parseFloat(value));
-                            }}
-                            onFocus={(e) => {
-                              if (parseFloat(e.target.value) === 0) {
-                                e.target.value = "";
+                              // If user starts typing and current value is "0", clear it
+                              if (row.price === "0" && value !== "") {
+                                handleTableDataChange(row.id, "price", value.replace(/^0+/, ''));
+                              } else {
+                                handleTableDataChange(row.id, "price", value || "0");
                               }
                             }}
-                            // onBlur={(e) => {
-                            //   if (e.target.value === "") {
-                            //     handleTableDataChange(row.id, "price", 0);
-                            //   }
-                            // }}
-                            // placeholder="Price *"
+                            placeholder="0"
                             className="w-full p-2 border rounded-s"
                             required
                           />

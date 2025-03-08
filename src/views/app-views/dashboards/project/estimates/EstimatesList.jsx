@@ -1,17 +1,11 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import { Card, Table, Select, Input, Row, Col, Button, Badge, Menu, Tag, Modal, message } from 'antd';
-// import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
-// import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, PlusCircleOutlined } from '@ant-design/icons';
-import AvatarStatus from 'components/shared-components/AvatarStatus';
-import StatisticWidget from 'components/shared-components/StatisticWidget';
-import { TiPinOutline } from "react-icons/ti";
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import Flex from 'components/shared-components/Flex'
 import NumberFormat from 'react-number-format';
 import dayjs from 'dayjs';
-import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant';
 import { deleteestimate, getallestimate } from "../estimates/estimatesReducer/EstimatesSlice"
 import utils from 'utils';
 import { useSelector, useDispatch } from 'react-redux';
@@ -21,24 +15,10 @@ import EditEstimates from './EditEstimates';
 import ViewEstimates from './ViewEstimates';
 import { GetLeads } from '../../leads/LeadReducers/LeadSlice'
 
-const { Option } = Select
-
-const getShippingStatus = orderStatus => {
-	if (orderStatus === 'Ready') {
-		return 'blue'
-	}
-	if (orderStatus === 'Shipped') {
-		return 'cyan'
-	}
-	return ''
-}
-
-const orderStatusList = ['Ready', 'Shipped']
-
 const EstimatesList = () => {
     const [idd, setIdd] = useState("");
 
-	const { estimates, loading, error } = useSelector((state) => state.estimate);
+	const { estimates } = useSelector((state) => state.estimate);
 	const leadsState = useSelector((state) => state.Lead?.Lead) || {};  // Safely access Lead state
 	const leads = leadsState?.data || [];  // Safely access leads data
 
@@ -91,16 +71,6 @@ const EstimatesList = () => {
 		setIsViewEstimatesModalVisible(false);
 	};
 
-	const handleShowStatus = value => {
-		if (value !== 'All') {
-			const key = 'orderStatus'
-			const data = utils.filterArray(estimates, key, value)
-			setList(data)
-		} else {
-			setList(estimates)
-		}
-	}
-
 	const EditFun = (exid) => {
         openEditEstimatesModal();
         setIdd(exid);
@@ -132,13 +102,7 @@ const EstimatesList = () => {
 					</Button>
 				</Flex>
 			</Menu.Item>
-			{/* <Menu.Item>
-				<Flex alignItems="center">
-					<PlusCircleOutlined />
-					<span className="ml-2">Add to remark</span>
-				</Flex>
-			</Menu.Item> */}
-
+			
 			<Menu.Item>
 				<Flex alignItems="center">
 					<Button
@@ -152,17 +116,9 @@ const EstimatesList = () => {
 					</Button>
 				</Flex>
 			</Menu.Item>
-			{/* <Menu.Item>
-				<Flex alignItems="center">
-					<TiPinOutline />
-					<span className="ml-2">Pin</span>
-				</Flex>
-			</Menu.Item> */}
+		
 			<Menu.Item>
-				{/* <Flex alignItems="center" onClick={()=> delfun(row.id)}>
-					<DeleteOutlined />
-					<span className="ml-2">Delete</span>
-				</Flex> */}
+				
 				<Flex alignItems="center">
 					<Button
 						type=""
@@ -221,12 +177,6 @@ const EstimatesList = () => {
 				return leadNameA.localeCompare(leadNameB);
 			},
 		},
-		// {
-		// 	title: 'Tax',
-		// 	dataIndex: 'tax',
-		// 	render: (_, record) => <span>{record.tax}</span>,
-		// 	sorter: (a, b) => utils.antdTableSorter(a, b, 'tax')
-		// },
 		
 		{
 			title: 'Currency',
@@ -234,13 +184,7 @@ const EstimatesList = () => {
 			key: 'currency',
 			sorter: (a, b) => utils.antdTableSorter(a, b, 'currency')
 		},
-		// {
-		// 	title: 'Project',
-		// 	dataIndex: 'project',
-		// 	key: 'project',
-		// 	sorter: (a, b) => utils.antdTableSorter(a, b, 'project')
-		// },
-		
+
 		{
 			title: 'Amount',
 			dataIndex: 'total',
@@ -256,14 +200,6 @@ const EstimatesList = () => {
 			),
 			sorter: (a, b) => utils.antdTableSorter(a, b, 'total')
 		},
-		// {
-		// 	title: 'Status',
-		// 	dataIndex: 'orderStatus',
-		// 	render: (_, record) => (
-		// 		<><Tag color={getShippingStatus(record.orderStatus)}>{record.orderStatus}</Tag></>
-		// 	),
-		// 	sorter: (a, b) => utils.antdTableSorter(a, b, 'orderStatus')
-		// },
 		
 		{
 			title: 'Action',
@@ -275,13 +211,6 @@ const EstimatesList = () => {
 			)
 		}
 	];
-
-	const rowSelection = {
-		onChange: (key, rows) => {
-			setSelectedRows(rows)
-			setSelectedRowKeys(key)
-		}
-	};
 
 	const onSearch = (e) => {
 		const value = e.target.value.toLowerCase();
@@ -330,11 +259,6 @@ const EstimatesList = () => {
 						<div className="mr-0 md:mr-3 mb-3 md:mb-0 w-full md:w-48 me-2">
 							<Input placeholder="Search by estimate #, client, lead..." prefix={<SearchOutlined />} onChange={onSearch} value={searchText} allowClear className="search-input" />
 						</div>
-						{/* <div className="w-full md:w-48 ">
-							<Col span={12}>
-        
-        </Col>
-						</div> */}
 					</Flex>
 
 					<Flex gap="7px" className="flex">

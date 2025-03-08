@@ -6,19 +6,12 @@ import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import userData from '../../../../../../assets/data/user-list.data.json';
 import OrderListData from '../../../../../../assets/data/order-list.data.json';
-// import ViewEditInvoice from './ViewEditInvoice';
-// import ViewEditInvoice from '../ViewEditInvoice';
 
 
 function DebitSummaryList() {
-    // const [dealStatisticViewData] = useState(DealStatisticViewData);
 
     const [users, setUsers] = useState(userData);
     const [list, setList] = useState(OrderListData);
-    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-    const [userProfileVisible, setUserProfileVisible] = useState(false);
-    //   const [customerVisible,setCustomerVisible] = useState(false)
-    const [selectedUser, setSelectedUser] = useState(null);
     const [isEditInvoiceModalVisible, setIsEditInvoiceModalVisible] = useState(false);
 
 
@@ -27,12 +20,6 @@ function DebitSummaryList() {
     const openEditInvoiceModal = () => {
         setIsEditInvoiceModalVisible(true);
     };
-
-    // Close Add Job Modal
-    const closeEditInvoiceModal = () => {
-        setIsEditInvoiceModalVisible(false);
-    };
-
 
     // Delete user
     const deleteUser = (userId) => {
@@ -122,16 +109,6 @@ function DebitSummaryList() {
                     />
                 </div>
                 
-                {/* <Modal
-                    title=""
-                    visible={isEditInvoiceModalVisible}
-                    onCancel={closeEditInvoiceModal}
-                    footer={null}
-                    width={500}
-                    className='mt-[-70px]'
-                >
-                    <ViewEditInvoice onClose={closeEditInvoiceModal} />
-                </Modal> */}
             </Card>
         </>
     )

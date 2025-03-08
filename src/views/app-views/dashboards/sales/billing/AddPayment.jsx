@@ -1,18 +1,16 @@
 import React, { useEffect } from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { Input, Button, DatePicker, Select, Upload, Row, Col, Card, message } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { Input, Button, DatePicker, Select, Row, Col, Card, message } from 'antd';
 import * as Yup from 'yup';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { createPayment } from './paymentReducer/PaymentSlice';
-import { getAccounts, getAllAccounts } from '../../banking/account/AccountReducer/AccountSlice';
+import { getAccounts } from '../../banking/account/AccountReducer/AccountSlice';
 import dayjs from 'dayjs';
 
 const { Option } = Select;
 
 const AddPayment = ({ onClose, billNumber }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   
   // Get billing data
@@ -26,8 +24,6 @@ const AddPayment = ({ onClose, billNumber }) => {
   useEffect(() => {
     dispatch(getAccounts());
   }, []);
-
-
   
   const initialValues = {
     billNumber: billNumber || '',
@@ -50,7 +46,6 @@ const AddPayment = ({ onClose, billNumber }) => {
       .typeError('Amount must be a number')
       .required('Amount is required')
       .min(0, 'Amount must be greater than or equal to 0'),
-      // .max(finalTotal, `Amount cannot exceed ${finalTotal}`),
     account: Yup.string()
       .required('Account is required'),
     paymentMode: Yup.string()  // Add validation for payment mode
@@ -63,8 +58,6 @@ const AddPayment = ({ onClose, billNumber }) => {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      // Find the selected account
-      const selectedAccount = accounts.find(acc => acc.id === values.account);
       
       const paymentData = {
         bill: currentBill.id,
@@ -90,15 +83,6 @@ const AddPayment = ({ onClose, billNumber }) => {
     }
   };
 
-  // Helper function to convert file to base64
-  const convertFileToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
-  };
 
   return (
     <div className="add-payment-form p-4">

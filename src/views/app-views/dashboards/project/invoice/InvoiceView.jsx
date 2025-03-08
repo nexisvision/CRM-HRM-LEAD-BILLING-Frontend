@@ -2,21 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { PrinterOutlined, DownloadOutlined, CloseOutlined } from '@ant-design/icons';
 import { Card, Table, Button, Select } from 'antd';
 import dayjs from 'dayjs';
-// import { invoiceData } from '../../../pages/invoice/invoiceData'; // Remove this as we fetch data from Redux
 import { getAllInvoices } from "../invoice/invoicereducer/InvoiceSlice";
 import NumberFormat from 'react-number-format';
 import html2pdf from 'html2pdf.js';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllUsers } from "views/auth-views/auth-reducers/UserSlice"
 import { ClientData } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice"
-import signatureimg from '../../../../../assets/svg/signatureimg1.png';
-// import { SubClient } from "views/app-views/Users/client-list/CompanyReducers/CompanySlice"
 import { getsignaturesss } from 'views/app-views/setting/esignature/EsignatureReducers/EsignatureSlice';
 import { getgeneralsettings } from '../../../setting/general/generalReducer/generalSlice';
 
 import { useParams } from 'react-router-dom';
 
-const { Column } = Table;
 const { Option } = Select;
 
 const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
@@ -26,19 +21,16 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     const { id } = useParams(); // Get project ID from route
     const { invoices, loading, error } = useSelector((state) => state.invoice);
     const invoiceDataa = invoices.find(invoice => invoice.id === idd);
-    // const invoiceDataa = Array.isArray(invoices) ? invoices.find(invoice => invoice.id === idd) : null;
 
     const [parsedInvoice, setParsedInvoice] = useState({ items: [] });
 
     const [generalSettings, setGeneralSettings] = useState(null);
 
 
-
     const allloggeduser = useSelector((state) => state.user.loggedInUser)
 
     // Get the client data for the selected ID
     const allclient = useSelector((state) => state.SubClient.SubClient.data);
-
 
     const [selectedSignature, setSelectedSignature] = useState(null);
     const [selectedSignatureName, setSelectedSignatureName] = useState(null);
@@ -52,7 +44,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     const clientDataa = allclient.find((SubClient) => SubClient.id === invoiceDataa?.client);
 
     const generalSettingsData = useSelector((state) => state.generalsetting.generalsetting.data);
-
 
      useEffect(() => {
         dispatch(getgeneralsettings());
@@ -172,14 +163,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
         </div>
     );
 
-    //error handleing
-    useEffect(() => {
-        if (error) {
-            console.error("Error fetching invoices: ", error)
-        }
-    }, [error])
-
-
     if (loading) {
         return <div>Loading invoices...</div>;
     }
@@ -297,7 +280,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     const subtotal = calculateSubtotal(parsedInvoice.items);
     const totalDiscount = calculateTotalDiscount(subtotal, parsedInvoice.discount);
     const totalTax = calculateTotalTax(subtotal - totalDiscount); // Apply tax after discount
-    const finalTotal = calculateFinalTotal(subtotal, totalTax, totalDiscount);
 
     const renderModernTemplate = () => {
         return (
@@ -322,10 +304,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
 
                 {/* Company & Invoice Details */}
                 <div className="flex justify-end mb-8">
-                    {/* <div>
-                        <h2 className="font-bold text-lg mb-1">Dreamguys Technologies PVT Ltd</h2>
-                        <p className="text-gray-600">Address: 15 Hodges Mews,High Wycomb HP123JL,United Kingdom</p>
-                    </div> */}
+                   
                     <div>
                         <div className='flex items-center'>
                             <span className=" me-2 font-weight-semibold ">Invoice Num:</span>
@@ -482,7 +461,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                         <NumberFormat
                                             displayType="text"
                                             value={calculateSubtotal()}
-                                            // prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
@@ -495,7 +473,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                         <NumberFormat
                                             displayType="text"
                                             value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
-                                            // prefix="₹"
                                             thousandSeparator={true}
                                         />
                                     </p>
@@ -513,7 +490,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                     <NumberFormat
                                         displayType="text"
                                         value={parsedInvoice.total}
-                                        // prefix="₹"
                                         thousandSeparator={true}
                                     />
                                 </h2>
@@ -526,7 +502,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                 <div className="grid grid-cols-2 gap-8">
                     <div className="flex gap-4">
                         <div className='flex'>
-                            {/* <img src={Qr} alt="Image not show" className='w-28 h-28' /> */}
                         </div>
                         <div>
                             <h4 className="font-weight-semibold text-lg mb-2">Payment Info:</h4>
@@ -551,14 +526,13 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 <p className='font-weight-semibold'>Bank Name : </p>
                                 <p>{clientDataa?.bankname || 'N/A'}</p>
                             </div>
-                            {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
 
                         </div>
                     </div>
                     <div>
                     <div className="flex justify-end items-center">
                             <div className=" rounded-lg p-8">
-                                {/* ... existing content ... */}
+                               
                                 {renderSignatureSection()}
                             </div>
                     </div>
@@ -700,7 +674,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                     <NumberFormat
                                         displayType="text"
                                         value={Math.round(record.price * 100) / 100}
-                                        // prefix="$"
                                         thousandSeparator={true}
                                     />
                                 )}
@@ -736,7 +709,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                     <NumberFormat
                                         displayType="text"
                                         value={Math.round((record.final_amount || 0))}
-                                        // prefix="$"
                                         thousandSeparator={true}
                                     />
                                 )}
@@ -755,7 +727,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                         <NumberFormat
                                             displayType="text"
                                             value={calculateSubtotal()}
-                                            // prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
@@ -768,7 +739,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                         <NumberFormat
                                             displayType="text"
                                             value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
-                                            // prefix="₹"
                                             thousandSeparator={true}
                                         />
                                     </p>
@@ -786,7 +756,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                     <NumberFormat
                                         displayType="text"
                                         value={parsedInvoice.total}
-                                        // prefix="₹"
                                         thousandSeparator={true}
                                     />
                                 </h2>
@@ -799,7 +768,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                 <div className="grid grid-cols-2 gap-8">
                     <div className="flex gap-4">
                         <div className='flex'>
-                            {/* <img src={Qr} alt="Image not show" className='w-28 h-28' /> */}
                         </div>
                         <div>
                             <h4 className="font-weight-semibold text-lg mb-2">Payment Info:</h4>
@@ -824,14 +792,12 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 <p className='font-weight-semibold'>Bank Name : </p>
                                 <p>{clientDataa?.bankname || 'N/A'}</p>
                             </div>
-                            {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
 
                         </div>
                     </div>
                     <div>
                     <div className="flex justify-end items-center">
                             <div className=" rounded-lg p-8">
-                                {/* ... existing content ... */}
                                 {renderSignatureSection()}
                             </div>
                     </div>
@@ -963,7 +929,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                     <NumberFormat
                                         displayType="text"
                                         value={Math.round(record.price * 100) / 100}
-                                        // prefix="$"
                                         thousandSeparator={true}
                                     />
                                 )}
@@ -999,9 +964,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 render={(record) => (
                                     <NumberFormat
                                         displayType="text"
-                                        // value={Math.round((record.price - (record.price * (record.discount || 0)) / 100) * record.quantity * 100) / 100}
                                         value={Math.round((record.final_amount))}
-                                        // prefix="$"
                                         thousandSeparator={true}
                                     />
                                 )}
@@ -1019,7 +982,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                         <NumberFormat
                                             displayType="text"
                                             value={calculateSubtotal()}
-                                            // prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
@@ -1032,7 +994,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                         <NumberFormat
                                             displayType="text"
                                             value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
-                                            // prefix="₹"
                                             thousandSeparator={true}
                                         />
                                     </p>
@@ -1050,7 +1011,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                     <NumberFormat
                                         displayType="text"
                                         value={parsedInvoice.total}
-                                        // prefix="₹"
                                         thousandSeparator={true}
                                     />
                                 </h2>
@@ -1062,7 +1022,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                 <div className="grid grid-cols-2 gap-8">
                     <div className="flex gap-4">
                         <div className='flex'>
-                            {/* <img src={Qr} alt="Image not show" className='w-28 h-28' /> */}
                         </div>
                         <div>
                             <h4 className="font-weight-semibold text-lg mb-2">Payment Info:</h4>
@@ -1087,14 +1046,12 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 <p className='font-weight-semibold'>Bank Name : </p>
                                 <p>{clientDataa?.bankname || 'N/A'}</p>
                             </div>
-                            {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
 
                         </div>
                     </div>
                     <div>
                     <div className="flex justify-end items-center">
                             <div className=" rounded-lg p-8">
-                                {/* ... existing content ... */}
                                 {renderSignatureSection()}
                             </div>
                     </div>
@@ -1225,7 +1182,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                     <NumberFormat
                                         displayType="text"
                                         value={Math.round(record.price * 100) / 100}
-                                        // prefix="$"
                                         thousandSeparator={true}
                                     />
                                 )}
@@ -1261,9 +1217,7 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 render={(record) => (
                                     <NumberFormat
                                         displayType="text"
-                                        // value={Math.round((record.price - (record.price * (record.discount || 0)) / 100) * record.quantity * 100) / 100}
                                         value={Math.round((record.final_amount))}
-                                        // prefix="$"
                                         thousandSeparator={true}
                                     />
                                 )}
@@ -1281,7 +1235,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                         <NumberFormat
                                             displayType="text"
                                             value={calculateSubtotal()}
-                                            // prefix="$"
                                             thousandSeparator={true}
                                         />
                                     </p>
@@ -1294,7 +1247,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                         <NumberFormat
                                             displayType="text"
                                             value={Object.values(parsedInvoice.items).reduce((sum, item) => sum + (item.discount_amount || 0), 0)}
-                                            // prefix="₹"
                                             thousandSeparator={true}
                                         />
                                     </p>
@@ -1312,7 +1264,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                     <NumberFormat
                                         displayType="text"
                                         value={parsedInvoice.total}
-                                        // prefix="₹"
                                         thousandSeparator={true}
                                     />
                                 </h2>
@@ -1320,12 +1271,10 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                         </div>
                     )}
                     </div>
-                    {/* </div> */}
                 </div>
                 <div className="grid grid-cols-2 gap-8">
                     <div className="flex gap-4">
                         <div className='flex'>
-                            {/* <img src={Qr} alt="Image not show" className='w-28 h-28' /> */}
                         </div>
                         <div>
                             <h4 className="font-weight-semibold text-lg mb-2">Payment Info:</h4>
@@ -1350,14 +1299,12 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
                                 <p className='font-weight-semibold'>Bank Name : </p>
                                 <p>{clientDataa?.bankname || 'N/A'}</p>
                             </div>
-                            {/* <p className="text-sm text-gray-500 mt-1">Scan to View Receipt</p> */}
 
                         </div>
                     </div>
                     <div>
                     <div className="flex justify-end items-center">
                             <div className=" rounded-lg p-8">
-                                {/* ... existing content ... */}
                                 {renderSignatureSection()}
                             </div>
                     </div>

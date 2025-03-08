@@ -8,31 +8,21 @@ import {
   Button,
   Badge,
   Menu,
-  Tag,
-  Modal,
-  Row,
-  Col,
-  message,
+  Modal
 } from "antd";
 import {
   EyeOutlined,
   FileExcelOutlined,
   SearchOutlined,
-  PlusCircleOutlined,
   DeleteOutlined,
-  EditOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import AvatarStatus from "components/shared-components/AvatarStatus";
-import { TiPinOutline } from "react-icons/ti";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
 import NumberFormat from "react-number-format";
 import dayjs from "dayjs";
-import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import utils from "utils";
 import AddPayment from "./AddPayment";
-// import EditPayment from './EditPayment';
 import ViewPayment from "./ViewPayment";
 import { deletePay, Getpay } from "./PaymentReducer/paymentSlice";
 import { useParams } from "react-router-dom";
@@ -41,19 +31,6 @@ import { useDispatch } from "react-redux";
 import { GetProject } from '../project-list/projectReducer/ProjectSlice';
 import { getAllInvoices } from '../invoice/invoicereducer/InvoiceSlice';
 
-const { Option } = Select;
-
-const getPaymentStatus = (method) => {
-  if (method === "Normal") {
-    return "success";
-  }
-  if (method === "Expired") {
-    return "warning";
-  }
-  return "";
-};
-
-const paymentStatusList = ["Normal", "Expired"];
 
 const PaymentList = () => {
   const [list, setList] = useState([]);
@@ -95,16 +72,6 @@ const PaymentList = () => {
   };
 
   // Open Add Job Modal
-  const openEditPaymentModal = () => {
-    setIsEditPaymentModalVisible(true);
-  };
-
-  // Close Add Job Modal
-  const closeEditPaymentModal = () => {
-    setIsEditPaymentModalVisible(false);
-  };
-
-  // Open Add Job Modal
   const openViewPaymentModal = () => {
     setIsViewPaymentModalVisible(true);
   };
@@ -114,16 +81,7 @@ const PaymentList = () => {
     setIsViewPaymentModalVisible(false);
   };
 
-  const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "status";
-      const data = utils.filterArray(list, value);
-    } else {
-      setList(list);
-    }
-  };
-
-  useEffect(() => {
+ useEffect(() => {
     // Fetch payments, projects and invoices data
     dispatch(Getpay(id));
     dispatch(GetProject());
@@ -160,10 +118,7 @@ const PaymentList = () => {
       if (response.error) {
         throw new Error(response.error.message);
       }
-      const updatedData = await dispatch(Getpay(id));
       setList(list.filter((item) => item.id !== exid));
-
-      // message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error.message || error);
     }
@@ -243,31 +198,11 @@ const PaymentList = () => {
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "amount"),
     },
-    // {
-    //   title: "Paid On",
-    //   dataIndex: "paidOn",
-    //   render: (_, record) => (
-    //     <span>{dayjs.unix(record.paidOn).format(DATE_FORMAT_DD_MM_YYYY)}</span>
-    //   ),
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "paidOn"),
-    // },
     {
       title: "Payment Method",
       dataIndex: "paymentMethod",
       sorter: (a, b) => utils.antdTableSorter(a, b, "paymentMethod"),
     },
-    // {
-    //   title: "Status",
-    //   dataIndex: "status",
-    //   render: (_, record) => (
-    //     <>
-    //       <Tag color={getPaymentStatus(record.status)}>{record.status}</Tag>
-    //     </>
-    //   ),
-    //   sorter: {
-    //     compare: (a, b) => a.status.length - b.status.length,
-    //   },
-    // },
     {
       title: "Action",
       dataIndex: "actions",
@@ -349,22 +284,6 @@ const PaymentList = () => {
               className="search-input"
             />
           </div>
-          {/* <div className="w-full md:w-48">
-            <Select
-              defaultValue="All"
-              className="w-full"
-              style={{ minWidth: 180 }}
-              onChange={handleShowStatus}
-              placeholder="method"
-            >
-              <Option value="All">All method </Option>
-              {paymentStatusList.map((elm) => (
-                <Option key={elm} value={elm}>
-                  {elm}
-                </Option>
-              ))}
-            </Select>
-          </div> */}
         </Flex>
         <Flex gap="7px" className="flex">
           <Button type="primary" className="ml-2" onClick={openAddPaymentModal}>
@@ -390,7 +309,6 @@ const PaymentList = () => {
             }}
           />
         </div>
-      {/* </Card> */}
       </Card>
      
         <Modal
@@ -403,18 +321,6 @@ const PaymentList = () => {
         >
           <AddPayment onClose={closeAddPaymentModal} />
         </Modal>
-
-        {/* <Modal
-					title="Edit Payment"
-					visible={isEditPaymentModalVisible}
-					onCancel={closeEditPaymentModal}
-					footer={null}
-					width={800}
-					className='mt-[-70px]'
-
-				>
-					<EditPayment onClose={closeEditPaymentModal} />
-				</Modal> */}
 
         <Modal
           title="View Payment"

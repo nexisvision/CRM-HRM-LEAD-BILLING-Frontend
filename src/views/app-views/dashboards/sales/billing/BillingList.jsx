@@ -1,7 +1,5 @@
 import React, { Component, useEffect } from "react";
 import { useState } from "react";
-// import { PrinterOutlined } from '@ant-design/icons';
-import StatisticWidget from "components/shared-components/StatisticWidget";
 import { AnnualStatisticData } from "../../../dashboards/default/DefaultDashboardData";
 import {
   Row,
@@ -18,11 +16,6 @@ import {
   message,
   DatePicker,
 } from "antd";
-// import { invoiceData } from '../../../pages/invoice/invoiceData';
-// import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
-import NumberFormat from "react-number-format";
-// import React, {useState} from 'react'
-// import { Card, Table, Select, Input, Button, Badge, Menu, Tag } from 'antd';
 import OrderListData from "../../../../../assets/data/order-list.data.json";
 import {
   EyeOutlined,
@@ -33,13 +26,9 @@ import {
   PlusOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import { TiPinOutline } from "react-icons/ti";
-import AvatarStatus from "components/shared-components/AvatarStatus";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-// import NumberFormat from 'react-number-format';
 import dayjs from "dayjs";
-import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import { utils, writeFile } from "xlsx";
 import AddBilling from "./AddBilling";
 import EditBilling from "./EditBilling";
@@ -48,44 +37,12 @@ import { getInvoice } from "../invoice/InvoiceReducer/InvoiceSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import { deltebil, getbil } from "./billing2Reducer/billing2Slice";
-import { delpropos } from "../../proposal/proposalReducers/proposalSlice";
-// import AddInvoice from './AddInvoice';
-// import EditInvoice from './EditInvoice';
-// import ViewInvoice from './ViewInvoice';
 
-const { Column } = Table;
 
 const { Option } = Select;
 
-const getPaymentStatus = (status) => {
-  if (status === "Paid") {
-    return "success";
-  }
-  if (status === "Pending") {
-    return "warning";
-  }
-  if (status === "Expired") {
-    return "error";
-  }
-  return "";
-};
-
-const getShippingStatus = (status) => {
-  if (status === "Ready") {
-    return "blue";
-  }
-  if (status === "Shipped") {
-    return "cyan";
-  }
-  return "";
-};
-
-const paymentStatusList = ["Paid", "Pending", "Expired"];
-
 export const BillingList = () => {
-  const [annualStatisticData] = useState(AnnualStatisticData);
   const [list, setList] = useState(OrderListData);
-  const [selectedRows, setSelectedRows] = useState([]);
   const [isAddBillingModalVisible, setIsAddBillingModalVisible] =
     useState(false);
   const [isEditBillingModalVisible, setIsEditBillingModalVisible] =
@@ -93,8 +50,6 @@ export const BillingList = () => {
   const [isViewBillingModalVisible, setIsViewBillingModalVisible] =
     useState(false);
   const dispatch = useDispatch();
-
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
   const AllLoggeddtaa = useSelector((state) => state.user);
   const lid = AllLoggeddtaa.loggedInUser.id;
@@ -109,22 +64,10 @@ export const BillingList = () => {
   const [searchText, setSearchText] = useState('');
   const [selectedDate, setSelectedDate] = useState(null);
 
-  const handleShowStatus = (value) => {
-    if (value !== "All") {
-      const key = "paymentStatus";
-      const data = utils.filterArray(OrderListData, key, value);
-      setList(data);
-    } else {
-      setList(OrderListData);
-    }
-  };
   useEffect(() => {
     dispatch(getbil(lid));
   }, []);
 
-  // useEffect(() => {
-  //   dispatch(getAllBillings(lid));
-  // }, []);
 
   useEffect(() => {
     if (fnddata) {
@@ -180,24 +123,6 @@ export const BillingList = () => {
   };
   const exportToExcel = () => {
     try {
-      // Format the data for Excel
-      // const formattedData = list.map(row => ({
-      //   ID: row.id,
-      //   RelatedID: row.related_id,
-      //   TaskName: row.taskName,
-      //   Category: row.category,
-      //   Project: row.project,
-      //   StartDate: row.startDate,
-      //   DueDate: row.dueDate,
-      //   AssignedTo: JSON.parse(row.assignTo).join(", "), // Assuming assignTo is a JSON string
-      //   Status: row.status,
-      //   Priority: row.priority,
-      //   Description: row.description.replace(/<[^>]+>/g, ''), // Remove HTML tags from description
-      //   CreatedBy: row.created_by,
-      //   CreatedAt: row.createdAt,
-      //   UpdatedAt: row.updatedAt,
-      // }));
-
       // Create a worksheet from the formatted data
       const ws = utils.json_to_sheet(list);
       const wb = utils.book_new(); // Create a new workbook

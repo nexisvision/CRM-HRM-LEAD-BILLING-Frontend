@@ -30,33 +30,18 @@ import {
   PlusOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import { TiPinOutline } from "react-icons/ti";
-import AvatarStatus from "components/shared-components/AvatarStatus";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-// import NumberFormat from 'react-number-format';
 import dayjs from "dayjs";
-import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import utils from "utils";
 import AddInvoice from "./AddInvoice";
 import EditInvoice from "./EditInvoice";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
-// import ViewInvoice from "./ViewInvoice";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteInvoice, getInvoice } from "./InvoiceReducer/InvoiceSlice";
-const { Column } = Table;
-const { Option } = Select;
+
 const { RangePicker } = DatePicker;
-const getPaymentStatus = (status) => {
-  if (status === "Paid") {
-    return "success";
-  }
-  if (status === "Pending") {
-    return "warning";
-  }
-  return "";
-};
-const paymentStatusList = ["paid", "pending"];
+
 export const InvoiceList = () => {
   const [list, setList] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -66,7 +51,6 @@ export const InvoiceList = () => {
     useState(false);
   const [isViewInvoiceModalVisible, setIsViewInvoiceModalVisible] =
     useState(false);
-      const [ViewInvoiceModalVisible, setViewInvoiceModalVisible] = useState(false);
   const [idd, setIdd] = useState("");
   const [selectedInvoiceData, setSelectedInvoiceData] = useState(null);
   const alldata = useSelector((state) => state.salesInvoices);
@@ -312,34 +296,6 @@ export const InvoiceList = () => {
       render: (_, record) => <span>{record.total}</span>,
       sorter: (a, b) => utils.antdTableSorter(a, b, "total"),
     },
-    // {
-    //   title: "Due Amount",
-    //   dataIndex: "dueamount",
-    //   render: (_, record) => (
-    //     <span className="font-weight-semibold">
-    //       <NumberFormat
-    //         displayType={"text"}
-    //         value={(Math.round(record.amount * 100) / 100).toFixed(2)}
-    //         prefix={"$"}
-    //         thousandSeparator={true}
-    //       />
-    //     </span>
-    //   ),
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "dueamount"),
-    // },
-    // {
-    //   title: "status",
-    //   dataIndex: "paymentStatus",
-    //   render: (_, record) => (
-    //     <>
-    //       <Tag color={getPaymentStatus(record.paymentStatus)}>
-    //         {record.paymentStatus}
-    //       </Tag>
-    //     </>
-    //     // <><Badge status={getPaymentStatus(record.paymentStatus)}  className='me-2'/><span>{record.paymentStatus}</span></>
-    //   ),
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "paymentStatus"),
-    // },
     {
       title: "Action",
       dataIndex: "actions",
@@ -357,14 +313,6 @@ export const InvoiceList = () => {
     },
   };
 
-  // total() {
-  //    let total = 0;
-  //    invoiceData.forEach((elm) => {
-  //        total += elm.price;
-  //    })
-  //    return total
-  // }
-  // render() {
   return (
     <div className="container">
       <Card>
@@ -451,16 +399,7 @@ export const InvoiceList = () => {
         >
           <EditInvoice onClose={closeEditInvoiceModal} idd={idd} />
         </Modal>
-        {/* <Modal
-          title="Invoice"
-          visible={isViewInvoiceModalVisible}
-          onCancel={closeViewInvoiceModal}
-          footer={null}
-          width={1000}
-          className="mt-[-70px]"
-        >
-          <ViewInvoice onClose={closeViewInvoiceModal} />
-        </Modal> */}
+        
         <Modal
           visible={isViewInvoiceModalVisible}
           onCancel={closeViewInvoiceModal}

@@ -55,9 +55,7 @@ const ProjectMember = () => {
     }
   };
 
-
-  const project = projectData[0]; // Accessing the first project as an example
-
+  
 
   const userField = fnddata?.project_members; // The 'user' field in the project
   let userArray = [];
@@ -118,14 +116,11 @@ const ProjectMember = () => {
 
   const handleDelete = async (userId) => {
     try {
-      // await dispatch(DeletePro2(userId)).unwrap();
-      // const updatedData = await dispatch(GetProject());
 
       await DeletePro2(userId);
 
       await dispatch(GetProject()).unwrap();
 
-      // setUsers(users.filter((item) => item.id !== userId));
       message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error);
