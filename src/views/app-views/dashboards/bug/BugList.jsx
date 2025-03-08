@@ -171,13 +171,7 @@ const orderStatusList = ['Low', 'Medium','High']
   );
 
   const tableColumns = [
-    // {
-    //   title: 'Name',
-    //   dataIndex: 'name',
-    //   sorter: {
-    //     compare: (a, b) => a.branch.length - b.branch.length,
-    //   },
-    // },
+   
     {
         title: 'Name',
         dataIndex: 'name',
@@ -203,21 +197,13 @@ const orderStatusList = ['Low', 'Medium','High']
     {
       title: 'End Date',
       dataIndex: 'enddate',
-    //   render: (status) => (
-    //     <Tag className="text-capitalize" color={status === 'active' ? 'cyan' : 'red'}>
-    //       {status}
-    //     </Tag>
-    //   ),
+   
     sorter: (a, b) => dayjs(a.enddate).unix() - dayjs(b.enddate).unix(),
     },
     {
         title: 'Created By',
         dataIndex: 'createdBy',
-        // render: (_, record) => (
-        //     <div className="d-flex">
-        //         <AvatarStatus size={30} src={record.image} name={record.name}/>
-        //     </div>
-        // ),
+        
         sorter: {
             compare: (a, b) => a.title.length - b.title.length,
           },
@@ -247,18 +233,7 @@ const orderStatusList = ['Low', 'Medium','High']
 
   return (
     <Card bodyStyle={{ padding: '-3px' }}>
-      {/* <Row gutter={16}>
-        {dealStatisticData.map((elm, i) => (
-          <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-            <StatisticWidget
-              title={elm.title}
-              value={elm.value}
-              status={elm.status}
-              subtitle={elm.subtitle}
-            />
-          </Col>
-        ))}
-      </Row> */}
+    
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="mr-md-3 mb-3">

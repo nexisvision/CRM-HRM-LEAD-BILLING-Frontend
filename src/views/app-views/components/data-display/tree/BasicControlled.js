@@ -79,7 +79,6 @@ const Demo = () => {
   const [autoExpandParent, setAutoExpandParent] = useState(true);
 
   const onExpand = expandedKeys => {
-    // or, you can remove all expanded children keys.
 
     setExpandedKeys(expandedKeys);
     setAutoExpandParent(false);

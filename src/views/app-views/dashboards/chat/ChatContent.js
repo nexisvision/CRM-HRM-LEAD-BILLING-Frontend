@@ -1101,7 +1101,6 @@ export default function ChatContent({ selectedUser }) {
     );
   };
 
-  // Add click outside handler for emoji picker
   useEffect(() => {
     function handleClickOutside(event) {
       if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
@@ -1113,7 +1112,6 @@ export default function ChatContent({ selectedUser }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Handle emoji selection
   const onEmojiClick = (emojiObject) => {
     const cursor = messageInput.length;
     const text = messageInput.slice(0, cursor) + emojiObject.emoji + messageInput.slice(cursor);
@@ -1121,7 +1119,6 @@ export default function ChatContent({ selectedUser }) {
     setShowEmojiPicker(false);
   };
 
-  // Add effect to listen for upload progress
   useEffect(() => {
     if (!socket) return;
 
@@ -1142,8 +1139,6 @@ export default function ChatContent({ selectedUser }) {
 
     socket.on('upload_error', ({ message }) => {
       console.error('Upload error:', message);
-      // Optionally show error to user
-      // toast.error(message);
       setIsLoading(false);
     });
 
@@ -1152,7 +1147,6 @@ export default function ChatContent({ selectedUser }) {
     };
   }, [socket]);
 
-  // Add click outside handler for file selector
   useEffect(() => {
     function handleClickOutside(event) {
       if (fileSelectorRef.current && !fileSelectorRef.current.contains(event.target)) {
@@ -1201,7 +1195,6 @@ export default function ChatContent({ selectedUser }) {
           />
         )}
 
-        {/* Optional: Add group actions menu */}
         {selectedUser.isGroup && (
           <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
             <BsThreeDotsVertical className="w-5 h-5" />
@@ -1209,12 +1202,11 @@ export default function ChatContent({ selectedUser }) {
         )}
       </div>
 
-      {/* Messages Container - Update z-index */}
       <div className="flex-1 relative z-0">
         <div
           className="absolute inset-0 overflow-y-auto custom-scrollbar p-6 space-y-4 bg-[#F8FAFF]"
           style={{
-            height: '100%' // This will fill the remaining space automatically
+            height: '100%'
           }}
         >
           {Object.entries(groupMessagesByDate(messages)).map(([date, dateMessages]) => (

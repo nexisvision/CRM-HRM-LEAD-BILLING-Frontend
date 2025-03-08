@@ -33,13 +33,7 @@ const EditCalls = ({ visible, onClose, callData, onUpdate }) => {
   };
 
   return (
-    // <Modal
-    //   title="Edit Call"
-    //   visible={visible}
-    //   onCancel={onCancel}
-    //   footer={null}
-    //   width={800}
-    // >
+    
     <Form layout="vertical" form={form} onFinish={onSubmit}>
 
 
@@ -109,7 +103,6 @@ const EditCalls = ({ visible, onClose, callData, onUpdate }) => {
         </Button>
       </div>
     </Form>
-    // </Modal> 
   );
 };
 

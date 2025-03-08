@@ -219,22 +219,7 @@ const ExpensesList = () => {
 			),
 			sorter: (a, b) => utils.antdTableSorter(a, b, 'orderStatus')
 		},
-		// {
-		// 	title: 'Payment status',
-		// 	dataIndex: 'paymentStatus',
-		// 	render: (_, record) => (
-		// 		<><Badge status={getPaymentStatus(record.paymentStatus)} /><span>{record.paymentStatus}</span></>
-		// 	),
-		// 	sorter: (a, b) => utils.antdTableSorter(a, b, 'paymentStatus')
-		// },
-
-		// {
-		// 	title: 'Payment Method',
-		// 	dataIndex: 'method',
-		// 	sorter: {
-		// 		compare: (a, b) => a.method.length - b.method.length,
-		// 	},
-		// },
+		
 		{
 			title: 'Action',
 			dataIndex: 'actions',

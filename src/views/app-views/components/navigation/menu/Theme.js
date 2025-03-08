@@ -36,7 +36,6 @@ const Theme = () => {
     setTheme(value ? 'dark' : 'light');
   };
   const onClick = (e) => {
-    console.log('click ', e);
     setCurrent(e.key);
   };
   return (

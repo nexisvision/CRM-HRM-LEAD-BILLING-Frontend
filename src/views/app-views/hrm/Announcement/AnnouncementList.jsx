@@ -72,17 +72,13 @@ const AnnouncementList = () => {
   };
 
   const deleteUser = (userId) => {
-    // setUsers(prevUsers => prevUsers.filter(item => item.id !== userId));
-    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
           dispatch(DeleteAnn( userId ))
                 .then(() => {
                   dispatch(GetAnn());
-                  // message.success('announcement Deleted successfully!');
                   setUsers(prevUsers => prevUsers.filter(item => item.id !== userId));
                   navigate('/app/hrm/announcement');
                 })
                 .catch((error) => {
-                  // message.error('Failed to update department.');
                   console.error('Edit API error:', error);
                 });
   };

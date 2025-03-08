@@ -41,7 +41,6 @@ class UserRemoteSelect extends React.Component {
       .then(response => response.json())
       .then(body => {
         if (fetchId !== this.lastFetchId) {
-          // for fetch callback order
           return;
         }
         const data = body.results.map(user => ({

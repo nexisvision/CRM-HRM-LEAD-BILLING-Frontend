@@ -23,27 +23,7 @@ const { Option } = Select;
 
 const AddEventSetUp = ({ onSuccess }) => {
   const dispatch = useDispatch();
-  // const [form] = Form.useForm();
-
-  // const onSubmit = async (values) => {
-  //   const formattedData = {
-  //     id: Date.now(),
-  //     branch: values.branch,
-  //     title: values.title,
-  //     department: values.department,
-  //     employee: values.employee,
-  //     startDate: values.eventstartdate.format('YYYY-MM-DD'),
-  //     endDate: values.eventenddate.format('YYYY-MM-DD'),
-  //     description: values.description
-  //   };
-
-  //   try {
-  //     await dispatch(addNewEvent(formattedData)).unwrap();
-  //     message.success('Event scheduled successfully!');
-  //   } catch (error) {
-  //     message.error('Failed to schedule event');
-  //   }
-  // };
+  
 
   const onSubmit = async (values, { resetForm }) => {
     try {

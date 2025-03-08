@@ -59,17 +59,13 @@ const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) =>
   const [emails, setEmail] = useState("");
   const [isEmailVerificationModalVisible, setIsEmailVerificationModalVisible] = useState(false);
 
-  // Get subscribed plans data from Redux store
   const subscribedPlans = useSelector((state) => state.subplan?.subplan?.data || []);
 
-  // Check if company has an active subscription
   const hasActiveSubscription = subscribedPlans.some(
     plan => plan.client_id === company.id && plan.status !== 'inactive'
   );
 
   const showUserProfile = (idd) => {
-    // setUserProfileVisible(true);
-    // setSelectedUser(userInfo);
     setIdd(idd);
     navigate("/app/users/client-list", {
       state: {
@@ -133,7 +129,6 @@ const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) =>
     }
   };
 
-  // Define menu items
   const items = [
     {
       key: 'login',
@@ -168,7 +163,6 @@ const CompanyCard = ({ company, onEdit, onDelete, onUpgrade, onEmailUpdate }) =>
     }
   ];
 
-  // Update the getStatusStyles function with refined colors
   const getStatusStyles = (isActive) => ({
     active: {
       background: '#dcfce7', // Light mint green

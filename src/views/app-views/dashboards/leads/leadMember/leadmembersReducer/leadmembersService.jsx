@@ -18,7 +18,6 @@ const EstimateService = {
     }
   },
 
-  // Create new estimate
   createEstimate: async (id, estimateData) => {
     const token = localStorage.getItem('auth_token');
     try {

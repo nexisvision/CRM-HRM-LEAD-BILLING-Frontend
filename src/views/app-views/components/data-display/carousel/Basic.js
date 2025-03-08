@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Carousel } from "antd";
 
 function onChange(a, b, c) {
-  console.log(a, b, c);
 }
 
 export class Basic extends Component {

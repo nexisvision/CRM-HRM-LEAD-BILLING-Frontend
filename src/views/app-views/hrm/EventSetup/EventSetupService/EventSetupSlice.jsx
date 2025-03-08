@@ -50,29 +50,6 @@ export const UpdateEventsetUp = createAsyncThunk(
   }
 );
 
-// export const UpdateEventsetUp = createAsyncThunk(
-//     'events/updateEventsetUp',
-//     async ({ id, data }, { rejectWithValue }) => {
-//       try {
-//         const response = await EventService.editEvent(id, data);
-//         return response;
-//       } catch (error) {
-//         return rejectWithValue(error.response?.data?.message || 'Failed to update event');
-//       }
-//     }
-//   );
-
-// export const deleteEventData = createAsyncThunk(
-//   'events/deleteEvent',
-//   async (id, { rejectWithValue }) => {
-//     try {
-//       const response = await EventService.deleteEvent(id);
-//       return { id, ...response.data };
-//     } catch (error) {
-//       return rejectWithValue(error.response?.data?.message || 'Failed to delete event');
-//     }
-//   }
-// );
 
 export const deleteEventData = createAsyncThunk(
   'events/deleteEvent',
@@ -85,21 +62,6 @@ export const deleteEventData = createAsyncThunk(
       }
   }
 );
-
-// export const deleteEventData = createAsyncThunk(
-//   'events/deleteEvent',
-//   async (id, { rejectWithValue }) => {
-//     try {
-//       const response = await EventService.deleteEvent(id);
-//       if (response.success === false) {
-//         return rejectWithValue(response.message);
-//       }
-//       return id;
-//     } catch (error) {
-//       return rejectWithValue(error.message || 'Failed to delete event');
-//     }
-//   }
-// );
 
 
 

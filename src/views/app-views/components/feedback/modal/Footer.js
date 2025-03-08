@@ -6,11 +6,9 @@ const Footer = () => {
     setOpen(true);
   };
   const handleOk = (e) => {
-    console.log(e);
     setOpen(false);
   };
   const handleCancel = (e) => {
-    console.log(e);
     setOpen(false);
   };
   return (

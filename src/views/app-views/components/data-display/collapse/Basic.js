@@ -4,7 +4,6 @@ import { Collapse } from "antd";
 const { Panel } = Collapse;
 
 function callback(key) {
-  console.log(key);
 }
 
 const text = `

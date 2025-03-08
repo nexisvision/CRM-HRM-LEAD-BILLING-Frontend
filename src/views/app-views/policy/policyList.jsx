@@ -74,15 +74,7 @@ const PolicyList = () => {
   const alldata = useSelector((state) => state.jobapplications);
   const fnddta = alldata.jobapplications.data;
 
-  //   useEffect(() => {
-  //     dispatch(getjobapplication());
-  //   }, []);
 
-  //   useEffect(() => {
-  //     if (fnddta) {
-  //       setUsers(fnddta);
-  //     }
-  //   }, [fnddta]);
 
   const openAddpolicyModal = () => {
     setIsAddpolicyModalVisible(true);
@@ -163,15 +155,7 @@ const PolicyList = () => {
     }
   };
 
-  // const showViewApplication = (userInfo) => {
-  //   setViewApplicationVisible(true);
-  //   setSelectedUser(userInfo);
-  // };
 
-  // const closeViewApplication = () => {
-  //   setViewApplicationVisible(false);
-  //   setSelectedUser(null);
-  // };
 
   const getjobStatus = (status) => {
     if (status === "active") {

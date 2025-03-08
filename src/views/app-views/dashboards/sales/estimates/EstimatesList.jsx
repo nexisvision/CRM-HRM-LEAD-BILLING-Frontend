@@ -45,16 +45,6 @@ import EditEstimates from "./EditEstimates";
 import ViewEstimates from "./ViewEstimates";
 import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 const { Option } = Select;
-// const getShippingStatus = (orderStatus) => {
-//   if (orderStatus === "Ready") {
-//     return "blue";
-//   }
-//   if (orderStatus === "Shipped") {
-//     return "cyan";
-//   }
-//   return "";
-// };
-// const orderStatusList = ["Ready", "Shipped"];
 const EstimatesList = () => {
   const { salesquotations, loading, error } = useSelector((state) => state.estimate);
   const [list, setList] = useState([]);
@@ -78,15 +68,10 @@ const EstimatesList = () => {
   const customerData = useSelector((state) => state.customers);
   const fnddataCustomers = customerData.customers.data;
 
-
-  // Fetch estimate when component mounts
   useEffect(() => {
     dispatch(getallquotations());
     dispatch(Getcus()); // Fetch customer data
   }, []);
-  // useEffect(() => {
-  //   setList(salesquotations); // Update list when estimates change
-  // }, [salesquotations]);
 
   const allsdata = useSelector((state)=>state.salesquotation.salesquotations)
 
@@ -299,12 +284,7 @@ const EstimatesList = () => {
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "created_by"),
     },
-    // {
-    //   title: "Client",
-    //   dataIndex: "client",
-    //   key: "client",
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "client"),
-    // },
+   
     {
       title: "Customer",
       dataIndex: "customer",
@@ -319,31 +299,14 @@ const EstimatesList = () => {
         return customerA.localeCompare(customerB);
       },
     },
-    // {
-    //   title: "Currency",
-    //   dataIndex: "currency",
-    //   key: "currency",
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "currency"),
-    // },
+   
     {
       title: "Category",
       dataIndex: "category",
       key: "category",
       sorter: (a, b) => utils.antdTableSorter(a, b, "category"),
     },
-    // {
-    //   title: "Project",
-    //   dataIndex: "project",
-    //   key: "project",
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "project"),
-    // },
-    // {
-    //  title: 'Company Name',
-    //  dataIndex: 'company',
-    //  sorter: {
-    //      compare: (a, b) => a.company.length - b.company.length,
-    //  },
-    // },
+   
     {
       title: "Amount",
       dataIndex: "total",
@@ -359,18 +322,7 @@ const EstimatesList = () => {
       ),
       sorter: (a, b) => utils.antdTableSorter(a, b, "total"),
     },
-    // {
-    //   title: "Status",
-    //   dataIndex: "status",
-    //   render: (_, record) => (
-    //     <>
-    //       <Tag color={getShippingStatus(record.status)}>
-    //         {record.orderStatus}
-    //       </Tag>
-    //     </>
-    //   ),
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "status"),
-    // },
+    
     {
       title: "Action",
       dataIndex: "actions",
@@ -382,15 +334,6 @@ const EstimatesList = () => {
     },
   ];
  
-  // const onSearch = (e) => {
-  //   const value = e.currentTarget.value;
-  //   const searchArray = e.currentTarget.value ? list : OrderListData;
-  //   const data = utils.wildCardSearch(searchArray, value);
-  //   setList(data);
-  //   setSelectedRowKeys([]);
-  // };
-
-  // Ensure filteredData is always an array
   const safeFilteredData = React.useMemo(() => {
     if (!Array.isArray(filteredData)) {
       console.warn('filteredData is not an array:', filteredData);
@@ -399,7 +342,6 @@ const EstimatesList = () => {
     return filteredData;
   }, [filteredData]);
 
-  // Add category change handler
   const handleCategoryChange = (value) => {
     setSelectedCategory(value);
     
@@ -414,7 +356,6 @@ const EstimatesList = () => {
     setFilteredData(filtered);
   };
 
-  // Update getFilteredEstimates to include both search and category filters
   const getFilteredEstimates = () => {
     if (!filteredData) return [];
     

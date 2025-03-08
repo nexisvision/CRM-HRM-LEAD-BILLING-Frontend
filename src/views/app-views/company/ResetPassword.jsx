@@ -94,7 +94,6 @@ const ResetPassword = ({ onClose }) => {
                 type="primary"
                 htmlType="submit"
                 loading={isSubmitting}
-                // size="large"
                 className="mr-2"
               >
                 Reset Password

@@ -45,7 +45,6 @@ const AddTransfer = ({ onClose }) => {
 
     const onSubmit = async (values, { setSubmitting, resetForm }) => {
         try {
-            // Add your API call here
             dispatch(addaccountsss(values))
                 .then(() => {
                     onClose();

@@ -184,7 +184,6 @@ const EstimatesList = () => {
 			key: 'currency',
 			sorter: (a, b) => utils.antdTableSorter(a, b, 'currency')
 		},
-
 		{
 			title: 'Amount',
 			dataIndex: 'total',

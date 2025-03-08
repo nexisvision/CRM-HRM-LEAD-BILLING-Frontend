@@ -82,13 +82,6 @@ const AddContract = ({ onClose }) => {
     fetchLables("contracttype", setContractTypes);
   }, []);
 
-  // const getInitialCountry = () => {
-  //   if (countries?.length > 0) {
-  //     const country = countries.find(c => c.countryCode === 'IN');
-  //     return country?.id || countries[0]?.id;
-  //   }
-  //   return '';
-  // };
 
   const initialValues = {
     subject: "",
@@ -215,10 +208,8 @@ const AddContract = ({ onClose }) => {
     }
   };
 
-  // Create a ref to store setFieldValue function
   const setFieldValueRef = React.useRef(null);
 
-  // Update the handleAddNewLable function
   const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
     if (!newValue.trim()) {
       message.error(`Please enter a ${lableType} name.`);
@@ -236,7 +227,6 @@ const AddContract = ({ onClose }) => {
       setter("");
       modalSetter(false);
       
-      // Fetch updated labels and set the new value
       await fetchLables(lableType, setContractTypes);
       if (setFieldValueRef.current) {
         setFieldValueRef.current("type", newValue.trim());
@@ -273,7 +263,6 @@ const AddContract = ({ onClose }) => {
         onSubmit={onSubmit}
       >
         {({ handleSubmit, setFieldValue, values,setFieldTouched }) => {
-          // Store setFieldValue in ref when Formik renders
           setFieldValueRef.current = setFieldValue;
 
           return (
@@ -313,7 +302,6 @@ const AddContract = ({ onClose }) => {
                               backgroundColor: '#f8fafc',
                             }}
                             placeholder={<span className="text-gray-400">+91</span>}
-                            // defaultValue={getInitialPhoneCode()}
                             onChange={(value) => {
                               if (value === 'add_new') {
                                 setIsAddPhoneCodeModalVisible(true);
@@ -363,13 +351,7 @@ const AddContract = ({ onClose }) => {
                             type="number"
                             placeholder="Enter phone number"
                             onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                            // prefix={
-                            //   values.phoneCode && (
-                            //     <span className="text-gray-600 font-medium mr-1">
-                            //       {values.phoneCode}
-                            //     </span>
-                            //   )
-                            // }
+                            
                           />
                         )}
                       </Field>

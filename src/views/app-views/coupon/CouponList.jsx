@@ -5,7 +5,6 @@ import dayjs from 'dayjs';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import StatisticWidget from 'components/shared-components/StatisticWidget';
-// import { DealStatisticData } from '../../dashboards/default/DefaultDashboardData';
 import AvatarStatus from 'components/shared-components/AvatarStatus';
 import AddCoupon from './AddCoupon';
 import userData from 'assets/data/user-list.data.json';
@@ -21,29 +20,23 @@ const CouponList = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddCouponModalVisible, setIsAddCouponModalVisible] = useState(false);
   const [isEditCouponModalVisible, setIsEditCouponModalVisible] = useState(false);
-//   const [dealStatisticData] = useState(DealStatisticData);
 
-  // Open Add Job Modal
   const openAddCouponModal = () => {
     setIsAddCouponModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeAddCouponModal = () => {
     setIsAddCouponModalVisible(false);
   };
 
-   // Open Add Job Modal
    const openEditCouponModal = () => {
     setIsEditCouponModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeEditCouponModal = () => {
     setIsEditCouponModalVisible(false);
   };
 
-  // Search functionality
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     const searchArray = value ? list : OrderListData;
@@ -52,19 +45,16 @@ const CouponList = () => {
     setSelectedRowKeys([]);
   };
 
-  // Delete user
   const deleteUser = (userId) => {
     setUsers(users.filter((item) => item.id !== userId));
     message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
 
-  // Show user profile
   const showUserProfile = (userInfo) => {
     setSelectedUser(userInfo);
     setUserProfileVisible(true);
   };
 
-  // Close user profile
   const closeUserProfile = () => {
     setSelectedUser(null);
     setUserProfileVisible(false);

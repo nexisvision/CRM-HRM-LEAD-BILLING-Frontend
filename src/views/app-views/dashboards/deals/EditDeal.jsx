@@ -260,13 +260,7 @@ const EditDeal = ({ onClose, id }) => {
                           type="number"
                           placeholder="Enter phone number"
                           onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                          // prefix={
-                          //   values.phoneCode && (
-                          //     <span className="text-gray-600 font-medium mr-1">
-                          //       {values.phoneCode}
-                          //     </span>
-                          //   )
-                          // }
+                         
                         />
                       )}
                     </Field>
@@ -420,9 +414,7 @@ const EditDeal = ({ onClose, id }) => {
                           placeholder="Select Lead Title"
                           value={field.value || ""} // Ensure the select value is controlled by Formik
                           onChange={(value) => {
-                            // Find the selected lead from the Leads array
                             const selectedLead = Array.isArray(Leads) && Leads.find((e) => e.id === value);
-                            // Update Formik's field value with the selected lead's title
                             form.setFieldValue("leadTitle", selectedLead?.leadTitle || "");
                           }}
                         >

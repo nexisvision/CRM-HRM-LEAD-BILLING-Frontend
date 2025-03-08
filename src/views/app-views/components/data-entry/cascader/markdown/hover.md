@@ -55,7 +55,6 @@ function onChange(value) {
   console.log(value);
 }
 
-// Just show the latest item.
 function displayRender(label) {
   return label[label.length - 1];
 }

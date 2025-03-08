@@ -65,9 +65,6 @@ const CompanyList = () => {
     email: "",
   });
 
-  // New state for editing company card modal
-  // const [isEditCompanyCardModalVisible, setIsEditCompanyCardModalVisible] = useState(false);
-
   const tableData = useSelector((state) => state.ClientData);
 
 
@@ -99,8 +96,6 @@ const CompanyList = () => {
 
   const handleEmailVerification = async (email) => {
     try {
-      // Add your email verification logic here
-      // await dispatch(sendVerificationEmail(email));
       message.success('Verification email sent successfully');
     } catch (error) {
       message.error('Failed to send verification email');
@@ -167,18 +162,6 @@ const CompanyList = () => {
   };
 
   const tableColumns = [
-
-    // {
-    //       title: "profilePic",
-    //       dataIndex: 'profilePic',
-    //       render: (_, record) => (
-    //         <AvatarStatus
-    //           src={record.profilePic}
-    //           name={record.username || record.firstName}
-    //           size={40}
-    //         />
-    //       ),
-    //     },
 
     {
       title: "profilePic",

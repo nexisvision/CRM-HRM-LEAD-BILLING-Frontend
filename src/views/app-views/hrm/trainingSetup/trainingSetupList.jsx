@@ -157,15 +157,6 @@ const TrainingSetupList = () => {
                                 ///endpermission
 
 
-  // const showViewApplication = (userInfo) => {
-  //   setViewApplicationVisible(true);
-  //   setSelectedUser(userInfo);
-  // };
-
-  // const closeViewApplication = () => {
-  //   setViewApplicationVisible(false);
-  //   setSelectedUser(null);
-  // };
 
   const getjobStatus = (status) => {
     if (status === "active") {

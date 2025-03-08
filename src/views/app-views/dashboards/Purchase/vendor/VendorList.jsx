@@ -31,7 +31,6 @@ const VendorList = () => {
   const [isEditAccountModalVisible, setIsEditAccountModalVisible] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  // const [isViewJobModalVisible, setIsViewJobModalVisible] = useState(false);
   const [annualStatisticData] = useState(AnnualStatisticData);
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [accountType, setAccountType] = useState('All');

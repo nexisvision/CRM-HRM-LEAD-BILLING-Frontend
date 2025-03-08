@@ -27,10 +27,8 @@ export class Simple extends Component {
 
   render() {
     return (
-      // Important! Always set the container height explicitly
       <div style={{ height: '300px', width: '100%' }}>
         <GoogleMapReact
-          // bootstrapURLKeys={{key: API_KEY}} // set if you need stats etc ...
           defaultCenter={this.props.center}
           defaultZoom={this.props.zoom}
         >

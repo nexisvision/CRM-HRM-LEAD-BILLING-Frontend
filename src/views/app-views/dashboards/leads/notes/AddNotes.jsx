@@ -15,9 +15,6 @@ const AddNotes = ({ onClose }) => {
   const dispatch = useDispatch();
   const { id } = useParams();
 
-  // const employeeData = useSelector((state) => 
-  //   (state.employee?.employee?.data || []).filter((employee) => employee.employeeId)
-  // );
 
   const user = useSelector((state) => state.user.loggedInUser.username);
 
@@ -31,16 +28,10 @@ const AddNotes = ({ onClose }) => {
     dispatch(empdata());
   }, []);
 
-  // const { data: employee } = useSelector((state) => state.employee.employee);
 
   const filterdata = useSelector((state) => state.employee.employee.data)
 
   const loggeduesr = useSelector((state) => state.user.loggedInUser.username)
-
-  // const employee = filterdata.filter((item)=>item.created_by === loggeduesr)
-
-
-
 
   const initialValues = {
     note_title: "",

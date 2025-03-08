@@ -42,7 +42,6 @@ const options = [
 ];
 
 function onChange(value, selectedOptions) {
-  console.log(value, selectedOptions);
 }
 
 function filter(inputValue, path) {

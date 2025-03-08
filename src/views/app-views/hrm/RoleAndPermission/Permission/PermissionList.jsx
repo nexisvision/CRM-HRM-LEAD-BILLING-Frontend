@@ -115,22 +115,7 @@ export class PermissionList extends Component {
 
 
     const tableColumns = [
-    //   {
-    //     title: 'User',
-    //     dataIndex: 'name',
-    //     render: (_, record) => (
-    //       <div className="d-flex">
-    //         <AvatarStatus src={record.img} name={record.name} subTitle={record.email} />
-    //       </div>
-    //     ),
-    //     sorter: {
-    //       compare: (a, b) => {
-    //         a = a.name.toLowerCase();
-    //         b = b.name.toLowerCase();
-    //         return a > b ? -1 : b > a ? 1 : 0;
-    //       },
-    //     },
-    //   },
+   
       {
         title: 'Permission',
         dataIndex: 'permission',
@@ -138,24 +123,7 @@ export class PermissionList extends Component {
           compare: (a, b) => a.permission.length - b.permission.length,
         },
       },
-    //   {
-    //     title: 'Last online',
-    //     dataIndex: 'lastOnline',
-    //     render: (date) => <span>{dayjs.unix(date).format("MM/DD/YYYY")}</span>,
-    //     sorter: (a, b) => dayjs(a.lastOnline).unix() - dayjs(b.lastOnline).unix(),
-    //   },
-    //   {
-    //     title: 'Status',
-    //     dataIndex: 'status',
-    //     render: (status) => (
-    //       <Tag className="text-capitalize" color={status === 'active' ? 'cyan' : 'red'}>
-    //         {status}
-    //       </Tag>
-    //     ),
-    //     sorter: {
-    //       compare: (a, b) => a.status.length - b.status.length,
-    //     },
-    //   },
+    
       {
         title: 'Action',
         dataIndex: 'actions',
@@ -165,26 +133,7 @@ export class PermissionList extends Component {
             </div>
         )
     },
-    //   {
-    //     title: 'Action',
-    //     dataIndex: 'actions',
-    //     render: (_, elm) => (
-    //       <div className="text-right d-flex justify-content-center">
-    //         <Tooltip title="View">
-    //           <Button
-    //             type="primary"
-    //             className="mr-2"
-    //             icon={<EyeOutlined />}
-    //             onClick={() => this.showUserProfile(elm)}
-    //             size="small"
-    //           />
-    //         </Tooltip>
-    //         <Tooltip title="Delete">
-    //           <Button danger icon={<DeleteOutlined />} onClick={() => this.deleteUser(elm.id)} size="small" />
-    //         </Tooltip>
-    //       </div>
-    //     ),
-    //   },
+    
     ];
 
     return (

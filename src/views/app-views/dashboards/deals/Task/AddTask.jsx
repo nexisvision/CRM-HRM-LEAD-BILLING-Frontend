@@ -5,16 +5,8 @@ const { Option } = Select;
 
 const AddTask = ({ visible, onCancel, onCreate }) => {
   return (
-    // <Modal
-    //   title=""
-    //   visible={visible}
-    //   onCancel={onCancel}
-    //   footer={null}
-    //   width={600}
-    // >
+    
     <form className="space-y-6">
-      {/* Task Name Input */}
-
 
       <div>
         <label className="block font-medium mb-1">
@@ -23,7 +15,6 @@ const AddTask = ({ visible, onCancel, onCreate }) => {
         <Input placeholder="Enter Name" />
       </div>
 
-      {/* Date and Time Pickers */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block font-medium mb-1">
@@ -39,7 +30,6 @@ const AddTask = ({ visible, onCancel, onCreate }) => {
         </div>
       </div>
 
-      {/* Priority and Status Dropdowns */}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block font-medium mb-1">
@@ -63,7 +53,6 @@ const AddTask = ({ visible, onCancel, onCreate }) => {
         </div>
       </div>
 
-      {/* Footer Buttons */}
       <div className="flex justify-end space-x-4">
         <Button onClick={onCancel} className="bg-gray-300 text-gray-700">
           Cancel
@@ -71,7 +60,6 @@ const AddTask = ({ visible, onCancel, onCreate }) => {
         <Button
           type="primary"
           onClick={onCreate}
-        // className="bg-green-500 text-white"
         >
           Create
         </Button>

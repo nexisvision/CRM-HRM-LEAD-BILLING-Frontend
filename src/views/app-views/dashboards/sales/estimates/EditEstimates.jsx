@@ -249,55 +249,6 @@ const EditEstimates = ({ onClose, idd, setInitialValues }) => {
     }
 };
 
-    // const handleFinish = async (values) => {
-    //     try {
-    //         setLoading(true);
-    //         const items = {};
-    //         // Calculate totals
-    //         // const subTotal = calculateSubTotal();
-    //         // const totalTax = calculateTotalTax();
-    //         // const discount = calculateDiscount();
-    //         // const finalTotal = subTotal - discount + totalTax;
-
-    //         // Format items data similar to AddEstimates
-    //         const itemsObject = tableData.reduce((acc, item, index) => {
-    //             acc[`item_${index + 1}`] = {
-    //                 item: item.item,
-    //                 discount: Number(totals.discount),
-    //                 quantity: parseFloat(item.quantity) || 0,
-    //                 price: parseFloat(item.price) || 0,
-    //                 tax_name: selectedTaxDetails[item.id]?.
-    //       gstName || '',
-    //                 tax: parseFloat(item.tax) || 0,
-    //                 amount: parseFloat(item.amount) || 0,
-    //                 description: item.description || ''
-    //             };
-    //             return acc;
-    //         }, {});
-
-    //         const subtotal = calculateSubTotal();
-    //         const discountAmount = (subtotal * discountRate) / 100;
-
-    //         const updatedValues = {
-    //             ...values,
-    //             issueDate: values.issueDate.format("YYYY-MM-DD"),
-    //             items: itemsObject,
-    //             discount: discountAmount, // Store the calculated discount amount
-    //             discountRate: discountRate ,
-    //             tax: totals.totalTax, 
-    //             total: totals.finalTotal
-    //         };
-
-    //         await dispatch(updatequotation({ id: idd, values: updatedValues })).unwrap();
-    //         message.success("Estimate updated successfully!");
-    //         dispatch(getallquotations());
-    //         onClose();
-    //     } catch (error) {
-    //         message.error("Failed to update estimate: " + (error.message || "Unknown error"));
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
 
     const [rows, setRows] = useState([
         {

@@ -10,7 +10,6 @@ function ViewEstimates({ quotationId, onClose }) {
     
     // Get data from Redux store
     const { currentQuotation, loading } = useSelector((state) => state.salesquotation);
-    console.log('Current Quotation:', currentQuotation); // Debug log
     
     const [tableData, setTableData] = useState([]);
 
@@ -21,14 +20,11 @@ function ViewEstimates({ quotationId, onClose }) {
         }
     }, [dispatch, quotationId]);
 
-    // Process items data when currentQuotation changes
     useEffect(() => {
         if (currentQuotation?.items) {
             try {
-                // Parse the items string to object
                 const itemsObj = JSON.parse(currentQuotation.items);
 
-                // Convert items object to array
                 const itemsArray = Object.entries(itemsObj).map(([key, item]) => ({
                     key,
                     ...item

@@ -41,7 +41,6 @@ const options = [
 
 function handleAreaClick(e, label, option) {
   e.stopPropagation();
-  console.log("clicked", label, option);
 }
 
 const displayRender = (labels, selectedOptions) =>

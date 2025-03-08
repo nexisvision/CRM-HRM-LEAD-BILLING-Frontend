@@ -46,19 +46,16 @@ const MonthlyRevenueCard = () => {
     dispatch(ClientData());
   }, [dispatch]);
 
-  // Handle year change
   const handleYearChange = (year) => {
     setSelectedYear(year);
   };
 
   useEffect(() => {
     if (subclients && subclients.length > 0) {
-      // Get all months of selected year
       const monthsInYear = [...Array(12)].map((_, i) => {
         return moment().year(selectedYear).month(i).format('MMM YYYY');
       });
 
-      // Filter and count subclients for selected year
       const monthlyCounts = monthsInYear.map(monthYear => {
         return subclients.filter(client => 
           moment(client.createdAt).format('YYYY') === selectedYear.toString() &&
@@ -66,11 +63,9 @@ const MonthlyRevenueCard = () => {
         ).length;
       });
 
-      // Calculate total subclients for selected year
       const total = monthlyCounts.reduce((sum, count) => sum + count, 0);
       setTotalSubclients(total);
 
-      // Calculate growth percentage (current month vs previous month)
       const currentMonth = moment().month();
       const currentMonthCount = monthlyCounts[currentMonth];
       const previousMonthCount = monthlyCounts[currentMonth - 1] || 0;
@@ -80,7 +75,6 @@ const MonthlyRevenueCard = () => {
         : 0;
       setGrowthPercentage(growth.toFixed(1));
 
-      // Update chart data
       setChartData(monthlyCounts);
     }
   }, [subclients, selectedYear]);
@@ -185,7 +179,6 @@ const MonthlyRevenueCard = () => {
     }
   };
 
-  // Generate year options (e.g., last 5 years)
   const yearOptions = [];
   const currentYear = moment().year();
   for (let i = 0; i < 5; i++) {
@@ -324,7 +317,6 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
     dispatch(getallcountries());
   }, [dispatch]);
 
-    // Update the ticketStatusColors definition
     const ticketStatusColors = {
       'Low': '#22c55e',    // Green for low priority
       'Medium': '#f97316',  // Orange for medium priority
@@ -332,7 +324,6 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
       'Unknown': '#94a3b8'  // Gray for unknown/undefined priority
     };
     
-    // Calculate ticket status data
     const calculateTicketStatusData = () => {
       if (!fnddataticket || !Array.isArray(fnddataticket)) {
         return {
@@ -342,20 +333,16 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
         };
       }
   
-      // Count tickets by priority and ensure correct color mapping
       const statusCounts = fnddataticket.reduce((acc, ticket) => {
-        // Convert priority to proper case to match our color mapping
         const priority = (ticket.priority || 'Unknown').charAt(0).toUpperCase() + 
                         (ticket.priority || 'Unknown').slice(1).toLowerCase();
         acc[priority] = (acc[priority] || 0) + 1;
         return acc;
       }, {});
 
-      // Create arrays for chart data
       const sessionLabels = Object.keys(statusCounts);
       const sessionData = Object.values(statusCounts);
       
-      // Create combined data for legend with correct colors
       const conbinedSessionData = sessionLabels.map((label) => ({
         label: label,
         data: statusCounts[label],
@@ -384,10 +371,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
 
 
   const tableColumns = [
-    // {
-    //   title: "created_by",
-    //   dataIndex: "created_by",
-    // },
+   
     {
       title: "Plan Name",
       dataIndex: "plan_id",

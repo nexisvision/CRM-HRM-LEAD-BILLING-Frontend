@@ -153,19 +153,6 @@ const currenciesSlice = createSlice({
             })
 
 
-            // .addCase(GetPlan.pending, (state) => {
-            //     state.isLoading = true;
-            // })
-            // .addCase(GetPlan.fulfilled, (state, action) => {
-            //     state.isLoading = false;
-            //     state.Plan = action?.payload;
-            //     toast.success(action.payload?.data?.message);
-            // })
-            // .addCase(GetPlan.rejected, (state, action) => {
-            //     state.isLoading = false;
-            //     toast.error(action.payload?.message);
-            // })
-
             .addCase(getcurren.pending, (state, action) => {
                         state.isLoading = true;
                     })

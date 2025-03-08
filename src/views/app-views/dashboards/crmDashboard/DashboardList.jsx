@@ -134,11 +134,7 @@ const DashboardList = () => {
         {
             title: "Contract Value",
             dataIndex: "value",
-            // render: (_, record) => (
-            //     <div className="d-flex">
-            //         <AvatarStatus size={30} src={record.image} name={record.name}/>
-            //     </div>
-            // ),
+           
             sorter: {
                 compare: (a, b) => a.value.length - b.value.length,
             },

@@ -30,7 +30,6 @@ export const addAccount = createAsyncThunk(
     }
   );
   
-  // Async thunk for getting all users
   export const getAllAccounts = createAsyncThunk(
     "users/getAllAccounts",
     async (thunkAPI) => {
@@ -43,10 +42,6 @@ export const addAccount = createAsyncThunk(
     }
   );
   
-  // Async thunk for getting user by id
- 
-  
-  // Async thunk for deleting a user
   export const deleteAccount = createAsyncThunk(
     "users/deleteAccount",
     async (userId, thunkAPI) => {

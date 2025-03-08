@@ -3,7 +3,6 @@ import { Button, Menu, Dropdown } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 
 function handleMenuClick(e) {
-  console.log('click', e);
 }
 
 const menu = (

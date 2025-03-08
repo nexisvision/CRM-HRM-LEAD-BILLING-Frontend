@@ -218,7 +218,7 @@ export const LoginForm = props => {
 
 		checkAndAutoLogin();
 		
-		const intervalId = setInterval(checkAndAutoLogin, 1000); // Check every second
+		const intervalId = setInterval(checkAndAutoLogin, 1000); 
 		
 		setTimeout(() => {
 			clearInterval(intervalId);
@@ -237,12 +237,10 @@ export const LoginForm = props => {
 				}
 			})
 			.catch((error) => {
-				// message.error("Login failed. Please try again.");
 				
 				console.error('Login failed:', error);
 			})
 			.finally(() => {
-				// hideLoading();
 			});
 	};
 

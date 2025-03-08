@@ -12,11 +12,9 @@ const EmailsList = () => {
     setIsAddEmailsModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeAddEmailsModal = () => {
     setIsAddEmailsModalVisible(false);
   };
-  // Sample data for emails
   const emailData = [
     {
       id: 1,
@@ -32,10 +30,8 @@ const EmailsList = () => {
       extra={
         <Button
           type="primary"
-          // shape="circle"
           onClick={openAddEmailsModal}
           icon={<PlusOutlined />}
-        // style={{ backgroundColor: '#39d039', borderColor: '#39d039' }}
         />
       }
       style={{ borderRadius: '10px', overflow: 'hidden' }}

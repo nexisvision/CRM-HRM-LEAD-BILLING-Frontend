@@ -87,19 +87,6 @@ export const getMilestoneDetails = createAsyncThunk(
   }
 );
 
-// export const fetchInvoiceStats = createAsyncThunk(
-//   'invoice/fetchInvoiceStats',
-//   async (_, { rejectWithValue }) => {
-//     try {
-//       const response = await InvoiceService.getInvoiceStats();
-//       return response;
-//     } catch (error) {
-//       return rejectWithValue(error.response?.data || 'Failed to fetch invoice statistics');
-//     }
-//   }
-// );
-
-// Slice
 const invoiceSlice = createSlice({
   name: "invoice",
   initialState: {
@@ -227,19 +214,7 @@ const invoiceSlice = createSlice({
         message.error(action.payload?.message);
       });
 
-    // Fetch statistics
-    //   .addCase(fetchInvoiceStats.pending, (state) => {
-    //     state.loading = true;
-    //     state.error = null;
-    //   })
-    //   .addCase(fetchInvoiceStats.fulfilled, (state, action) => {
-    //     state.loading = false;
-    //     state.statistics = action.payload;
-    //   })
-    //   .addCase(fetchInvoiceStats.rejected, (state, action) => {
-    //     state.loading = false;
-    //     state.error = action.payload;
-    //   });
+  
   },
 });
 

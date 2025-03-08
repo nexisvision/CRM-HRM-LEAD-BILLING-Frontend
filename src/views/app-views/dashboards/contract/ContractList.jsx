@@ -29,7 +29,6 @@ import UserView from "../../Users/user-list/UserView";
 import Flex from "components/shared-components/Flex";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import StatisticWidget from "components/shared-components/StatisticWidget";
-// import { DealStatisticData } from '../../dashboards/default/DefaultDashboardData';
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddContract from "./AddContract";
 import ViewContract from "./ViewContract";
@@ -55,23 +54,19 @@ const ContractList = () => {
   const [idd, setIdd] = useState("");
   const dispatch = useDispatch();
 
-  // Move these selectors to the top of the component
   const tabledata = useSelector((state) => state.Contract);
   const clientData = useSelector((state) => state.SubClient?.SubClient?.data);
   const projectData = useSelector((state) => state.Project?.Project?.data);
 
-  // First useEffect to fetch initial data
   useEffect(() => {
     dispatch(GetProject());
     dispatch(ClientData());
   }, [dispatch]);
 
-  // Second useEffect to fetch contract data
   useEffect(() => {
     dispatch(ContaractData());
   }, [dispatch]);
 
-  // Third useEffect to process the data once we have everything
   useEffect(() => {
     if (tabledata?.Contract?.data) {
       const contractsWithNames = tabledata.Contract.data.map(contract => ({
@@ -91,13 +86,10 @@ const ContractList = () => {
   const [isEditContractModalVisible, setIsEditContractModalVisible] =
     useState(false);
     const navigate = useNavigate();
-  //   const [dealStatisticData] = useState(DealStatisticData);
-  // Open Add Job Modal
 
   const openAddContractModal = () => {
     setIsAddContractModalVisible(true);
   };
-  // Close Add Job Modal
   const closeAddContractModal = () => {
     setIsAddContractModalVisible(false);
   };
@@ -107,10 +99,6 @@ const ContractList = () => {
       state: { user: selectedUser },
     }); // Pass user data as state if needed
   };
-  // const openViewContractModal = () => {
-  //   setIsViewContractModalVisible(true);
-  // };
-  // Close Add Job Modal
   const closeViewContractModal = () => {
     setIsViewContractModalVisible(false);
   };
@@ -206,30 +194,11 @@ const ContractList = () => {
   };
   const exportToExcel = () => {
     try {
-      // Format the data for Excel
-      // const formattedData = list.map(row => ({
-      //   ID: row.id,
-      //   RelatedID: row.related_id,
-      //   TaskName: row.taskName,
-      //   Category: row.category,
-      //   Project: row.project,
-      //   StartDate: row.startDate,
-      //   DueDate: row.dueDate,
-      //   AssignedTo: JSON.parse(row.assignTo).join(", "), // Assuming assignTo is a JSON string
-      //   Status: row.status,
-      //   Priority: row.priority,
-      //   Description: row.description.replace(/<[^>]+>/g, ''), // Remove HTML tags from description
-      //   CreatedBy: row.created_by,
-      //   CreatedAt: row.createdAt,
-      //   UpdatedAt: row.updatedAt,
-      // }));
 
-      // Create a worksheet from the formatted data
       const ws = utils.json_to_sheet(list);
       const wb = utils.book_new(); // Create a new workbook
       utils.book_append_sheet(wb, ws, "Contract"); // Append the worksheet to the workbook
 
-      // Write the workbook to a file
       writeFile(wb, "ContractData.xlsx");
       message.success("Data exported successfully!");
     } catch (error) {
@@ -238,24 +207,15 @@ const ContractList = () => {
     }
   };
 
-  // Show user profile
   const showUserProfile = (userInfo) => {
     setSelectedUser(userInfo);
     setUserProfileVisible(true);
   };
-  // Close user profile
   const closeUserProfile = () => {
     setSelectedUser(null);
     setUserProfileVisible(false);
   };
 
-  //// permission
-
-
-
-
-  
-    
       const roleId = useSelector((state) => state.user.loggedInUser.role_id);
       const roles = useSelector((state) => state.role?.role?.data);
       const roleData = roles?.find(role => role.id === roleId);

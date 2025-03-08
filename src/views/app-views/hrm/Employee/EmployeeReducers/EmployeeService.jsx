@@ -83,25 +83,6 @@ const EditEmp = async (idd, updatedFormValues) => {
   }
 };
 
-// const getAllUsers = async () => {
-//     const res = await axios.get(`${baseUrl}users/all`, getToken());
-//     return res.data
-// }
-
-// const getUserById = async (data) => {
-//     const res = await axios.get(`${baseUrl}users/${data}`, getToken());
-//     return res.data
-// }
-
-// const deleteUser = async (data) => {
-//     const res = await axios.delete(`${baseUrl}users/${data}`, getToken());
-//     return res.data
-// }
-
-// const updateUser = async (data) => {
-//     const res = await axios.put(`${baseUrl}users/${data?.id}`, data?.data, getToken());
-//     return res.data
-// }
 
 const UserService = {
   // addUser,

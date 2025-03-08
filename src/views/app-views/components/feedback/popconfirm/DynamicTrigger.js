@@ -26,12 +26,10 @@ export class DynamicTrigger extends Component {
       this.setState({ visible });
       return;
     }
-    // Determining condition before show the popconfirm.
-    console.log(this.state.condition);
     if (this.state.condition) {
-      this.confirm(); // next step
+      this.confirm(); 
     } else {
-      this.setState({ visible }); // show the popconfirm
+      this.setState({ visible });
     }
   };
 

@@ -393,7 +393,6 @@ const CalendarApp = () => {
   );
 };
 
-// Update the styles section with these new styles
 const styles = `
   .custom-calendar {
     width: 100%;

@@ -2,9 +2,6 @@ import React, { useState } from 'react';
 // import { DealStatisticViewData } from '../../../dashboards/default/DefaultDashboardData';
 import { Card, Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, CopyOutlined, EditOutlined, LinkOutlined, FileExcelOutlined } from '@ant-design/icons';
-// import UserView from '../../../Users/user-list/UserView';
-// import Flex from 'components/shared-components/Flex';
-// import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import userData from 'assets/data/user-list.data.json';
 import AvatarStatus from 'components/shared-components/AvatarStatus';
 import Flex from 'components/shared-components/Flex';
@@ -15,7 +12,6 @@ import utils from 'utils';
 
 
 function TableViewList() {
-    // const [dealStatisticViewData] = useState(DealStatisticViewData);
     const [list, setList] = useState(OrderListData);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [users, setUsers] = useState(userData);
@@ -125,17 +121,7 @@ function TableViewList() {
             },
         },
 
-        // {
-        //     title: 'Action',
-        //     dataIndex: 'actions',
-        //     render: (_, elm) => (
-        //         <div className="text-center">
-        //             <Button onClick={openViewProjectReportModal} className='bg-orange-400 text-white px-3 '>
-        //                 <EyeOutlined />
-        //             </Button>
-        //         </div>
-        //     ),
-        // },
+      
     ];
 
 

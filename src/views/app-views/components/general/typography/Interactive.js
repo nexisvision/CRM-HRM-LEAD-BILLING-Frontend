@@ -9,7 +9,6 @@ class Interactive extends React.Component {
   };
 
   onChange = str => {
-    console.log("Content change:", str);
     this.setState({ str });
   };
 

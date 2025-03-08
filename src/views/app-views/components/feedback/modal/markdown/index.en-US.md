@@ -102,7 +102,6 @@ modal.update({
   content: 'Updated content',
 });
 
-// on 4.8.0 or above, you can pass a function to update modal
 modal.update(prevConfig => ({
   ...prevConfig,
   title: `${prevConfig.title} (New)`,
@@ -118,7 +117,6 @@ modal.destroy();
 ```jsx
 import { browserHistory } from 'react-router';
 
-// router change
 browserHistory.listen(() => {
   Modal.destroyAll();
 });
@@ -133,7 +131,6 @@ const [modal, contextHolder] = Modal.useModal();
 
 React.useEffect(() => {
   modal.confirm({
-    // ...
   });
 }, []);
 
@@ -155,7 +152,6 @@ When you need context info (like ConfigProvider context), you can use `Modal.use
 ```tsx
 const [modal, contextHolder] = Modal.useModal();
 
-// then call modal.confirm instead of Modal.confirm
 
 return (
   <Context1.Provider value="Ant">

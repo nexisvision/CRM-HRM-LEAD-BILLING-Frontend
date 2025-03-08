@@ -46,7 +46,6 @@ class LazyOptions extends React.Component {
     const targetOption = selectedOptions[selectedOptions.length - 1];
     targetOption.loading = true;
 
-    // load options lazily
     setTimeout(() => {
       targetOption.loading = false;
       targetOption.children = [

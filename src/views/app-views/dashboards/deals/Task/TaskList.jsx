@@ -19,29 +19,22 @@ const TaskList = () => {
   const [isAddTaskModalVisible, setIsAddTaskModalVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
 
-  // Open Add Task Modal
   const openAddTaskModal = () => {
     setIsAddTaskModalVisible(true);
   };
 
-  // Close Add Task Modal
   const closeAddTaskModal = () => {
     setIsAddTaskModalVisible(false);
   };
 
-  // Open Edit Task Modal
   const openEditTaskModal = () => {
-    // setSelectedTask(task);   
     setIsEditTaskModalVisible(true);
   };
 
-  // Close Edit Task Modal
   const closeEditTaskModal = () => {
-    // setSelectedTask(null);
     setIsEditTaskModalVisible(false);
   };
 
-  // Delete Task
   const deleteTask = (taskId) => {
     setTasks(tasks.filter((task) => task.id !== taskId));
   };
@@ -106,17 +99,7 @@ const TaskList = () => {
         rowKey="id"
         pagination={false}
       />
-      {/* Add Task Modal */}
-      {/* <Modal
-        title=""
-        visible={isAddTaskModalVisible}
-        onCancel={closeAddTaskModal}
-        footer={null}
-      >
-
-        <AddTask  onCancel={closeAddTaskModal} />
-        {/* Add Task Form */}
-      {/* </Modal> */}
+     
 
       <Modal
         title="Add Task"
@@ -129,7 +112,6 @@ const TaskList = () => {
       </Modal>
 
 
-      {/* Edit Task Modal */}
       <Modal
         title="Edit Task"
         visible={isEditTaskModalVisible}
@@ -139,7 +121,6 @@ const TaskList = () => {
       >
 
         <EditTask onClose={closeEditTaskModal} />
-        {/* Edit Task Form */}
       </Modal>
     </Card>
   );

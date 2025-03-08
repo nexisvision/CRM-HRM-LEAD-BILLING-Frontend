@@ -2,7 +2,6 @@ import React from "react";
 import { Pagination } from "antd";
 
 function onShowSizeChange(current, pageSize) {
-  console.log(current, pageSize);
 }
 
 class Changer extends React.Component {

@@ -67,13 +67,7 @@ const EditProposal = ({ id, onClose }) => {
   const fndlead = Leads.filter((item) => item?.created_by === allogged);
 
 
-  // Add state for selected lead details
   const [selectedLeadDetails, setSelectedLeadDetails] = useState(null);
-
-
-  // console.log("SubClient Data:", subClientData.username);
-
-  // const { subClients } = useSelector((state) => state.SubClient.SubClient.data); 
 
   const [form] = Form.useForm();
   const [totals, setTotals] = useState({

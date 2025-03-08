@@ -12,7 +12,6 @@ import { PatternLines } from "@visx/pattern";
 const geoUrl =
   "https://raw.githubusercontent.com/zcreativelabs/react-simple-maps/v1/topojson-maps/world-110m.json";
 
-// https://www.worldatlas.com/articles/top-coffee-producing-countries.html
 const highlighted = [
   "BRA",
   "VNM",

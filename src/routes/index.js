@@ -9,11 +9,6 @@ import { useSelector } from 'react-redux';
 
 const Routes = () => {
 
-	// const alldata = useSelector((state)=>state.user.loggedInUser.username);
-	// if(alldata){
-
-	// }
-
 	return (
 		<RouterRoutes>
 			<Route path="/" element={<ProtectedRoute />}>

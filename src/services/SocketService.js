@@ -8,7 +8,6 @@ class SocketService {
     connect() {
         try {
             if (!this.socket) {
-                // Use the same port as your backend server
                 const SOCKET_URL = process.env.REACT_APP_API_URL || 'http://localhost:5353';
 
                 this.socket = io(SOCKET_URL, {
@@ -20,7 +19,6 @@ class SocketService {
                     timeout: 10000
                 });
 
-                // Add connection event handlers
                 this.socket.on('connect', () => {
                     console.log('Connected to socket server');
                 });

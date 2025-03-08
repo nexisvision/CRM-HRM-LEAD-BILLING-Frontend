@@ -14,14 +14,11 @@ const Chat = () => {
 	useEffect(() => {
 		const socket = socketService.connect();
 
-		// Get group chats data
 		socket.emit('get_group_chats', { userId: loggedInUser.id });
 
-		// Listen for group chats data
 		socket.emit('group_chats_received', (groups) => {
 			setGroupChats(groups);
 
-			// If there was a selected group chat, restore it
 			const savedChatId = localStorage.getItem('selectedChatUser');
 			if (savedChatId) {
 				const savedGroup = groups.find(g => g.id.toString() === savedChatId);
@@ -31,7 +28,6 @@ const Chat = () => {
 			}
 		});
 
-		// Listen for group updates
 		socket.on('group_chat_updated', (updatedGroup) => {
 			setGroupChats(prev =>
 				prev.map(group =>
@@ -39,7 +35,6 @@ const Chat = () => {
 				)
 			);
 
-			// Update selected user if it's the current group
 			if (selectedUser?.id === updatedGroup.id) {
 				setSelectedUser({ ...updatedGroup, isGroup: true });
 			}
@@ -51,7 +46,6 @@ const Chat = () => {
 		};
 	}, [loggedInUser.id]);
 
-	// Handle user/group selection
 	const handleSelectUser = (userOrGroup) => {
 		const isGroup = userOrGroup.isGroup;
 		const updatedSelection = isGroup
@@ -64,7 +58,6 @@ const Chat = () => {
 
 	return (
 		<div className="flex h-[calc(100vh-180px)]">
-			{/* Sidebar - Add z-index */}
 			<div className="w-[380px] flex-shrink-0 border-r border-gray-200 bg-white z-20 relative">
 				<ChatMenu
 					onSelectUser={handleSelectUser}

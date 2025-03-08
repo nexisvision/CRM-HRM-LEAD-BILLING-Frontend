@@ -137,25 +137,7 @@ const ProductList = () => {
   };
   const exportToExcel = () => {
     try {
-      // Format the data for Excel
-      // const formattedData = list.map(row => ({
-      //   ID: row.id,
-      //   RelatedID: row.related_id,
-      //   TaskName: row.taskName,
-      //   Category: row.category,
-      //   Project: row.project,
-      //   StartDate: row.startDate,
-      //   DueDate: row.dueDate,
-      //   AssignedTo: JSON.parse(row.assignTo).join(", "), // Assuming assignTo is a JSON string
-      //   Status: row.status,
-      //   Priority: row.priority,
-      //   Description: row.description.replace(/<[^>]+>/g, ''), // Remove HTML tags from description
-      //   CreatedBy: row.created_by,
-      //   CreatedAt: row.createdAt,
-      //   UpdatedAt: row.updatedAt,
-      // }));
-
-      // Create a worksheet from the formatted data
+      
       const ws = utils.json_to_sheet(list);
       const wb = utils.book_new(); // Create a new workbook
       utils.book_append_sheet(wb, ws, "Product"); // Append the worksheet to the workbook
@@ -200,10 +182,7 @@ const ProductList = () => {
   );
 
   const tableColumns = [
-    // {
-    // 	title: 'ID',
-    // 	dataIndex: 'id'
-    // },
+  
     {
       title: "Name",
       dataIndex: "name",
@@ -233,16 +212,7 @@ const ProductList = () => {
       ),
       sorter: (a, b) => a.description.length - b.description.length,
     },
-    // {
-    // 	title: 'Status',
-    // 	dataIndex: 'status',
-    // 	render: (_, record) => (
-    // 			<><Tag color={getPaymentStatus(record.status)}>{record.status}</Tag></>
-    // 		  ),
-    // 	sorter: {
-    // 		compare: (a, b) => a.status.length - b.status.length,
-    // 	},
-    // },
+   
     {
       title: "Action",
       dataIndex: "actions",
@@ -320,12 +290,7 @@ const ProductList = () => {
             dataSource={list}
             rowKey="id"
             scroll={{ x: 1200 }}
-          // rowSelection={{
-          // 	selectedRowKeys: selectedRowKeys,
-          // 	type: 'checkbox',
-          // 	preserveSelectedRowKeys: false,
-          // 	...rowSelection,
-          // }}
+         
           />
         </div>
       </Card>

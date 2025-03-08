@@ -10,7 +10,6 @@ export const fetchGeneralSettings = createAsyncThunk(
   }
 );
 
-// Async thunk for updating general settings
 export const updateGeneralSettings = createAsyncThunk(
   'generalSettings/updateGeneralSettings',
   async (data) => {
@@ -29,7 +28,6 @@ const generalSettingsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch general settings
       .addCase(fetchGeneralSettings.pending, (state) => {
         state.loading = true;
       })

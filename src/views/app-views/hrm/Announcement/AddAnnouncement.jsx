@@ -25,10 +25,8 @@ const AddAnnouncement = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Get branches from Redux store
   const branches = useSelector((state) => state.Branch?.Branch?.data || []);
 
-  // Fetch branches when component mounts
   useEffect(() => {
     dispatch(getBranch());
   }, [dispatch]);

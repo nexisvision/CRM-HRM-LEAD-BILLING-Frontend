@@ -264,15 +264,7 @@ export const SubscribedUserPlansList = () => {
     setSelectedRowKeys([]);
   };
 
-  // total() {
-  // 	let total = 0;
-  // 	invoiceData.forEach((elm) => {
-  // 		total += elm.price;
-  // 	})
-  // 	return total
-  // }
 
-  // render() {
 
   return (
     <div className="container">

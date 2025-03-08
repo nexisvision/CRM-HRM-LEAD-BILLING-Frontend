@@ -27,7 +27,6 @@ ReactDOM.render(<Alert message="After version 4.20.0, we provide a simpler usage
 ```
 
 ```jsx
-// works when >=4.20.0, recommended ✅
 const items = [
   { label: 'item 1', key: 'item-1' }, // remember to pass the key prop
   { label: 'item 2', key: 'item-2' }, // which is required
@@ -39,7 +38,6 @@ const items = [
 ];
 return <Menu items={items} />;
 
-// works when <4.20.0, deprecated when >=4.20.0 🙅🏻‍♀️
 <Menu>
   <Menu.Item>item 1</Menu.Item>
   <Menu.Item>item 2</Menu.Item>

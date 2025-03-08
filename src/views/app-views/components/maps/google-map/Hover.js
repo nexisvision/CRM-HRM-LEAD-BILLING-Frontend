@@ -13,7 +13,6 @@ export class Hover extends Component {
 		return (
 			<div style={{ height: '300px', width: '100%' }}>
 				<GoogleMap
-					// bootstrapURLKeys={{key: API_KEY}} // set if you need stats etc ...
 					center={[59.938043, 30.337157]}
 					zoom={8}
 					hoverDistance={20}

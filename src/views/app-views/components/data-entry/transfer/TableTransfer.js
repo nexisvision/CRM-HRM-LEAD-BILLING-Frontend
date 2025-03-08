@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Transfer, Switch, Table, Tag } from "antd";
 import difference from "lodash/difference";
 
-// Customize Table Transfer
 const TableTransfer = ({ leftColumns, rightColumns, ...restProps }) => (
   <Transfer {...restProps} showSelectAll={false}>
     {({

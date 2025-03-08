@@ -37,7 +37,6 @@ const AddProjectReport = () => {
 
 
     const onSubmit = (values) => {
-        console.log('Submitted values:', values);
         message.success('Project added successfully!');
         navigate('/app/apps/project');
     };

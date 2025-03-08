@@ -154,7 +154,6 @@ const EditProject = ({ id, onClose }) => {
       const clientObj = fnd2.find(client => client.id === singleEmp.client);
       if (clientObj) {
         // No need to update the client ID as it's already correct
-        console.log("Found client:", clientObj.firstName || clientObj.username);
       }
     }
   }, [fnd2, singleEmp]);

@@ -12,7 +12,6 @@ const { Option } = Select;
 const AddExpenses = () => {
     const navigate = useNavigate();
     const [showReceiptUpload, setShowReceiptUpload] = useState(false);
-    // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
     const initialValues = {
         client: '',
@@ -35,7 +34,6 @@ const AddExpenses = () => {
     });
 
     const onSubmit = (values, { resetForm }) => {
-        console.log('Submitted values:', values);
         message.success('Expenses added successfully!');
         resetForm();
         navigate('/apps/sales/expenses');

@@ -174,10 +174,6 @@ useEffect(() => {
   } 
 
    const deleteAppraisals = (userId) => {
-      // setUsers(users.filter(item => item.id !== userId));
-      // dispatch(DeleteDes(userId));
-      // dispatch(getDes())
-      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
 
         dispatch(deleteAppraisal( userId )) 
                   .then(() => {

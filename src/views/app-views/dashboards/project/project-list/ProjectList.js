@@ -226,18 +226,11 @@ const ProjectList = () => {
 				.map(memberId => {
 					const user = allUsers.find(user => user.id === memberId);
 					if (!user) {
-						console.log(`Member not found for ID: ${memberId}`);
 						return null;
 					}
 					return user;
 				})
 				.filter(Boolean); // Remove null entries
-
-			console.log(`Project ${item.project_name || item.name} members:`, {
-				raw: item.project_members,
-				parsed: projectMembers,
-				details: memberDetails
-			});
 
 			return {
 				...item,

@@ -27,7 +27,6 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
   const allplandata = useSelector((state) => state.Plan);
   const fnsfdtaf = allplandata.Plan;
 
-  // Fetch plan data when component is mounted
   useEffect(() => {
     dispatch(GetPlan());
   }, [dispatch]);
@@ -69,10 +68,8 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
           endDate = endDate.add(value, 'years');
           break;
         default:
-          // console.error('Unsupported duration unit:', unit);
       }
     } else {
-      // console.error('Invalid duration format:', duration);
     }
     
     return endDate;
@@ -84,7 +81,6 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
 
       const selectedPlan = fnsfdtaf.find(plan => plan.id === values.plan_id);
       
-      // Convert the date values to strings in YYYY-MM-DD format using moment
       const payload = {
         ...values,
         start_date: moment(values.start_date).format("YYYY-MM-DD"),
@@ -92,13 +88,11 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
         client_id: comnyid,
       };
 
-      // Dispatch the action with the full payload
       dispatch(addassignplan(payload)).then(() => {
         dispatch(getsubplandata());
         onClose();
       });
     } catch (error) {
-      // message.error("Failed to create upgrade plan: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -139,7 +133,6 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                               const selectedPlan = fnsfdtaf.find(plan => plan.id === value);
                               form.setFieldValue("plan_id", value);
                               
-                              // If start date is selected, automatically calculate end date
                               if (selectedPlan && form.values.start_date) {
                                 const startDate = moment(form.values.start_date);
                                 const endDate = calculateEndDate(startDate, selectedPlan.duration);
@@ -181,7 +174,6 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                           const date = e.target.value;
                           setFieldValue("start_date", date);
                           
-                          // If plan is selected, automatically calculate end date
                           if (date && values.plan_id) {
                             const selectedPlan = fnsfdtaf.find(plan => plan.id === values.plan_id);
                             if (selectedPlan) {
@@ -231,7 +223,6 @@ const AddUpgradePlan = ({ comnyid, onClose }) => {
                         }
                         onBlur={handleBlur}
                         value={values.status}
-                        // className="mt-1"
                         placeholder="Select status"
                       >
                         <Option value="active">Active</Option>

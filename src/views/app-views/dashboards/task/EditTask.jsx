@@ -136,13 +136,7 @@ const EditTask = ({ onClose, idd, projectId }) => {
   }, [dispatch, idd, id]);
 
   useEffect(() => {
-    console.log("Current task data state:", {
-      loading,
-      taskadata,
-      fndatatask,
-      idd,
-      projectId
-    });
+   
   }, [loading, taskadata, fndatatask, idd, projectId]);
 
   const validationSchema = Yup.object({

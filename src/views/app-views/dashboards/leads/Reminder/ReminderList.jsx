@@ -38,19 +38,7 @@ const ReminderList = () => {
             render: (text) => new Date(text).toLocaleString(),
             sorter: (a, b) => new Date(a.start_date) - new Date(b.start_date),
         },
-        // {
-        //     title: 'Users',
-        //     dataIndex: 'users',
-        //     key: 'users',
-        //     render: (text) => {
-        //         try {
-        //             const usersObj = JSON.parse(text);
-        //             return usersObj.users.join(', ');
-        //         } catch (e) {
-        //             return '';
-        //         }
-        //     },
-        // },
+       
         {
             title: 'Created By',
             dataIndex: 'created_by',

@@ -68,7 +68,6 @@ const AddDeal = ({ onClose,setFieldValue }) => {
     dispatch(getallcountries());
   }, [dispatch]);
 
-  // category start
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
@@ -124,7 +123,6 @@ const AddDeal = ({ onClose,setFieldValue }) => {
       setter(""); // Reset input field
       modalSetter(false); // Close modal
 
-      // Fetch updated categories and update the form field
       const response = await dispatch(GetLable(lid));
       if (response.payload && response.payload.data) {
         const filteredCategories = response.payload.data
@@ -140,7 +138,6 @@ const AddDeal = ({ onClose,setFieldValue }) => {
     }
   };
 
-  // category end
 
   const [isAddCurrencyModalVisible, setIsAddCurrencyModalVisible] = useState(false);
 
@@ -194,12 +191,10 @@ const AddDeal = ({ onClose,setFieldValue }) => {
     dispatch(AddDeals(values))
       .then(() => {
         dispatch(GetDeals());
-        // message.success("Deal added successfully!");
         resetForm();
         onClose();
       })
       .catch((error) => {
-        // message.error("Failed to add Deal.");
         console.error("Add API error:", error);
       });
   };
@@ -417,7 +412,6 @@ const AddDeal = ({ onClose,setFieldValue }) => {
                           {...field}
                           className="price-input"
                           style={{
-                            // height: '40px',
                             borderTopLeftRadius: 0,
                             borderBottomLeftRadius: 0,
                             borderLeft: '1px solid #d9d9d9',

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Transfer, Tree } from 'antd';
 
-// Customize Table Transfer
 const isChecked = (selectedKeys, eventKey) => selectedKeys.indexOf(eventKey) !== -1;
 
 const generateTree = (treeNodes = [], checkedKeys = []) =>

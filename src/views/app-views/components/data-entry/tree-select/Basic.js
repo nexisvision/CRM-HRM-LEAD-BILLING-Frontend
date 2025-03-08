@@ -9,7 +9,6 @@ export class Basic extends Component {
   };
 
   onChange = value => {
-    console.log(value);
     this.setState({ value });
   };
 

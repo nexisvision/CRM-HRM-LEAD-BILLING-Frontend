@@ -20,14 +20,12 @@ export class Lazy extends Component {
   };
 
   onChange = (value, selectedOptions) => {
-    console.log(value, selectedOptions);
   };
 
   loadData = selectedOptions => {
     const targetOption = selectedOptions[selectedOptions.length - 1];
     targetOption.loading = true;
 
-    // load options lazily
     setTimeout(() => {
       targetOption.loading = false;
       targetOption.children = [

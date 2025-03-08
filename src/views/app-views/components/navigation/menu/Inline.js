@@ -29,7 +29,6 @@ const items = [
 ];
 const Inline = () => {
   const onClick = (e) => {
-    console.log('click ', e);
   };
   return (
     <Menu

@@ -17,7 +17,6 @@ const SourcesList = () => {
     setIsAddSourcesModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeAddSourcesModal = () => {
     setIsAddSourcesModalVisible(false);
   };
@@ -49,7 +48,6 @@ const SourcesList = () => {
           type="text"
           icon={<DeleteOutlined />}
           danger
-          //   style={{ background: '#ffefef', color: '#ff4d4f', borderRadius: '5px' }}
           onClick={() => deleteUser(record.id)}
         />
       ),

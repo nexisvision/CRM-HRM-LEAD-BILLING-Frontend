@@ -39,7 +39,6 @@ const ViewInvoice = ({idd}) => {
 
 const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
- // Add this selector to get general settings data
  const generalSettingsData = useSelector((state) => state.generalsetting.generalsetting.data);
 
 

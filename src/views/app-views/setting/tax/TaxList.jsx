@@ -72,23 +72,7 @@ const TaxList = () => {
     setFilteredTaxes(filtered);
   };
 
-//   const handleDeleteTax = (record) => {
-//     Modal.confirm({
-//       title: 'Delete Tax',
-//       content: `Are you sure you want to delete ${record.gstName}?`,
-//       okText: 'Yes',
-//       okType: 'danger',
-//       cancelText: 'No',
-//       onOk: async () => {
-//         try {
-//           await dispatch(deleteTax(record._id || record.id)).unwrap();
-//           dispatch(getAllTaxes());
-//         } catch (error) {
-//           message.error('Failed to delete tax');
-//         }
-//       },
-//     });
-// };
+
 
 const delfun = (idd) => {
     dispatch(deleteTax(idd)).then(() => {

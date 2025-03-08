@@ -311,7 +311,6 @@ export default class SearchBox extends React.Component {
     this.searchBox.addListener('places_changed', this.onPlacesChanged);
   }
   componentWillUnmount() {
-    // https://developers.google.com/maps/documentation/javascript/events#removing
     google.maps.event.clearInstanceListeners(this.searchBox);
   }
 }

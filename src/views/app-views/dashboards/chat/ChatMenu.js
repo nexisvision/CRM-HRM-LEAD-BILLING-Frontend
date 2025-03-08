@@ -35,10 +35,8 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 		const newSocket = socketService.connect();
 		setSocket(newSocket);
 
-		// Connect and emit user_connected
 		newSocket.emit('user_connected', loggedInUser.id);
 
-		// If there's a selected user, mark messages as read
 		if (selectedUserId) {
 			newSocket.emit('mark_messages_read', {
 				sender_id: selectedUserId,
@@ -52,11 +50,9 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 			setUsersStatus(new Map(Object.entries(userStatus)));
 		});
 
-		// Get conversations to check unread messages and last message
 		newSocket.emit('get_conversations', { userId: loggedInUser.id });
 
 		newSocket.on('conversations_received', (data) => {
-			// Handle both direct messages and groups
 			const messages = {};
 			const groupsList = [];
 
@@ -76,11 +72,9 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 			setGroups(groupsList);
 		});
 
-		// Listen for new messages
 		newSocket.on('receive_message', (data) => {
 			const { user_id, message } = data;
 
-			// Update last messages
 			setLastMessages(prev => ({
 				...prev,
 				[user_id]: {
@@ -90,7 +84,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 				}
 			}));
 
-			// Update unread count if message is from other user and chat is not open
 			if (message.sender_id !== loggedInUser.id && message.sender_id !== selectedUserId) {
 				setUnreadCounts(prev => ({
 					...prev,
@@ -99,7 +92,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 			}
 		});
 
-		// Listen for read status updates
 		newSocket.on('message_status_updated', ({ user_id, status }) => {
 			if (status === 'read') {
 				setUnreadCounts(prev => ({
@@ -109,12 +101,10 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 			}
 		});
 
-		// Listen for typing status
 		const typingTimeouts = new Map();
 
 		newSocket.on('user_typing', ({ userId, isTyping }) => {
 
-			// Clear existing timeout
 			if (typingTimeouts.has(userId)) {
 				clearTimeout(typingTimeouts.get(userId));
 				typingTimeouts.delete(userId);
@@ -127,7 +117,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 					return newMap;
 				});
 
-				// Set new timeout
 				const timeout = setTimeout(() => {
 					setTypingUsers(prev => {
 						const newMap = new Map(prev);
@@ -155,7 +144,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 		});
 
 		return () => {
-			// Clear all timeouts
 			typingTimeouts.forEach(timeout => clearTimeout(timeout));
 			newSocket.off('users_status');
 			newSocket.off('conversations_received');
@@ -167,16 +155,13 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 		};
 	}, [dispatch, loggedInUser.id, selectedUserId]);
 
-	// Add this effect to handle chat selection
 	useEffect(() => {
 		if (selectedUserId) {
-			// Clear unread count when chat is opened
 			setUnreadCounts(prev => ({
 				...prev,
 				[selectedUserId]: 0
 			}));
 
-			// Emit read status for the selected chat
 			const newSocket = socketService.connect();
 			newSocket.emit('mark_messages_read', {
 				sender_id: selectedUserId,
@@ -189,7 +174,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 		return usersStatus.get(userId)?.isOnline || false;
 	};
 
-	// Get role name from role_id
 	const getRoleName = (roleId) => {
 		const role = roles.find(role => role.id === roleId);
 		return role?.role_name || 'User';
@@ -220,12 +204,10 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 			);
 		});
 
-	// Get count of online users excluding logged in user
 	const getOnlineUsersCount = () => {
 		return Array.from(usersStatus.values()).filter(status => status.isOnline).length - 1; // Exclude current user
 	};
 
-	// Format last message time
 	const formatMessageTime = (timestamp) => {
 		if (!timestamp) return '';
 
@@ -243,9 +225,7 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 		}
 	};
 
-	// Update the getMessagePreview function
 	const getMessagePreview = (userId, unreadCount) => {
-		// Show typing status if user is typing
 		if (typingUsers.has(userId)) {
 			return (
 				<div className="flex items-center">
@@ -264,7 +244,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 		const lastMessage = lastMessages[userId];
 		if (!lastMessage) return <span className="text-gray-400 text-sm">No messages yet</span>;
 
-		// If there are multiple unread messages and chat is not open
 		if (unreadCount > 1 && userId !== selectedUserId) {
 			return (
 				<div className="flex items-center space-x-2">
@@ -275,7 +254,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 			);
 		}
 
-		// For single message preview
 		return (
 			<div className="flex items-center space-x-1 truncate">
 				{lastMessage.sender_id === loggedInUser.id && (
@@ -286,23 +264,19 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 		);
 	};
 
-	// Add this sorting function
 	const sortUsersByLastMessage = (users, lastMessages) => {
 		return [...users].sort((a, b) => {
 			const lastMessageA = lastMessages[a.id];
 			const lastMessageB = lastMessages[b.id];
 
-			// If no messages, put them at the bottom
 			if (!lastMessageA && !lastMessageB) return 0;
 			if (!lastMessageA) return 1;
 			if (!lastMessageB) return -1;
 
-			// Sort by timestamp in descending order (newest first)
 			return new Date(lastMessageB.timestamp) - new Date(lastMessageA.timestamp);
 		});
 	};
 
-	// Simplified CreateGroupModal component
 	const CreateGroupModal = ({ isOpen, onClose, onCreateGroup }) => {
 		const [groupName, setGroupName] = useState('');
 		const [selectedMembers, setSelectedMembers] = useState([]);
@@ -315,7 +289,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 					name: groupName,
 					members: selectedMembers
 				});
-				// Reset form
 				setGroupName('');
 				setSelectedMembers([]);
 				onClose();
@@ -391,7 +364,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 		);
 	};
 
-	// Simplified group creation handler
 	const handleCreateGroup = (data) => {
 		if (!socket) return;
 
@@ -404,7 +376,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 		setShowCreateGroup(false);
 	};
 
-	// Add Options Menu component
 	const OptionsMenu = ({ onCreateGroup, onClose }) => {
 		return (
 			<div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
@@ -424,7 +395,6 @@ export default function ChatMenu({ onSelectUser, selectedUserId }) {
 		);
 	};
 
-	// Add click outside handler
 	useEffect(() => {
 		function handleClickOutside(event) {
 			if (optionsMenuRef.current && !optionsMenuRef.current.contains(event.target)) {

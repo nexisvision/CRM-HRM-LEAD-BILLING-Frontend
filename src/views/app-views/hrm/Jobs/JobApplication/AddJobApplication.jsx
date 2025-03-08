@@ -48,9 +48,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
       dispatch(Addjobapplication(values)).then(() => {
         dispatch(getjobapplication());
         onClose();
-        // message.success("Form submitted successfully");
       });
-      // message.success("Job application added successfully!");
     } catch (error) {
       console.error("Submission error:", error);
       message.error("An error occurred while submitting the job application.");
@@ -246,13 +244,6 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                           type="number"
                           placeholder="Enter phone number"
                           onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                          // prefix={
-                          //   values.phoneCode && (
-                          //     <span className="text-gray-600 font-medium mr-1">
-                          //       {values.phoneCode}
-                          //     </span>
-                          //   )
-                          // }
                         />
                       )}
                     </Field>

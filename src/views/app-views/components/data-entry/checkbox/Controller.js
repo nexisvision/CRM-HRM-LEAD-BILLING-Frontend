@@ -16,7 +16,6 @@ export class Controller extends Component {
   };
 
   onChange = e => {
-    console.log("checked = ", e.target.checked);
     this.setState({
       checked: e.target.checked
     });

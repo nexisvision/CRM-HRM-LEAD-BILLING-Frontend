@@ -17,11 +17,9 @@ export class Event extends Component {
 	}
 
 	onChange = (props) => {
-		console.log('onChange works!', props)
 	}
 
 	onClick = (value) => {
-		console.log('onClick works!', value)
 		const {lat, lng} = value;
 		this.setState({
 			center: [lat, lng]
@@ -29,11 +27,9 @@ export class Event extends Component {
 	}
 
 	onChildMouseEnter = (key , childProps ) => {
-		console.log('onChildMouseEnter works!', key, childProps)
 	}
 
 	onChildMouseLeave = (key , childProps ) => {
-		console.log('onChildMouseLeave works!', key, childProps)
 	}
 
 	render() {
@@ -50,7 +46,6 @@ export class Event extends Component {
 		return (
 			<div style={{ height: '500px', width: '100%' }}>
 				<GoogleMap
-					// bootstrapURLKeys={{key: API_KEY}} // set if you need stats etc ...
 					center={this.state.center}
 					zoom={this.state.zoom}
 					hoverDistance={20}

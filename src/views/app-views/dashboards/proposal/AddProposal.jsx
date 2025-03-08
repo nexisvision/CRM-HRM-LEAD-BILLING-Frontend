@@ -79,11 +79,9 @@ const AddProposal = ({ onClose }) => {
     ? Leads.filter((item) => item?.created_by === allogged)
     : [];
 
-
   const { taxes } = useSelector((state) => state.tax);
 
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
-
 
   const [form] = Form.useForm();
   const [totals, setTotals] = useState({
@@ -105,13 +103,10 @@ const AddProposal = ({ onClose }) => {
     },
   ]);
 
-  // Add state for selected currency icon
   const [selectedCurrencyIcon, setSelectedCurrencyIcon] = useState('₹');
 
-  // Add state for selected lead details
   const [selectedLeadDetails, setSelectedLeadDetails] = useState(null);
 
-  // Fetch currencies
   useEffect(() => {
     const fetchCurrencies = async () => {
       try {
@@ -162,19 +157,15 @@ const AddProposal = ({ onClose }) => {
         total: totals.finalTotal,
       };
 
-      // Dispatch create proposal action
       dispatch(addpropos(proposalData))
         .then(() => {
-          // message.success("Proposal added successfully!");
           dispatch(getpropos());
           onClose();
         })
         .catch((error) => {
-          // message.error("Failed to add proposal. Please try again.");
           console.error("Error during proposal submission:", error);
         });
     } catch (error) {
-      // message.error("Failed to create proposal: " + error.message);
     } finally {
       setLoading(false);
     }

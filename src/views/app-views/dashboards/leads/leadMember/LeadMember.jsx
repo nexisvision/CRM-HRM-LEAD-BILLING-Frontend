@@ -36,32 +36,6 @@ const LeadMember = () => {
 
   
 
-
-  // const DeletePro2 = async (payload) => {
-  //   const token = localStorage.getItem("auth_token");
-
-  //   const payload2 = {
-  //     lead_members: [payload],
-  //   };
-
-  //   try {
-  //     const res = await axios.delete(
-  //       `${env.API_ENDPOINT_URL}/leads/membersdel/${id}`,
-  //       { lead_members: payload2 },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       }
-  //     );
-  //     // dispatch(empdata());
-  //     return res.data;
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //     throw error;
-  //   }
-  // };
-
   
   const DeletePro2 = async (payload) => {
     const token = localStorage.getItem("auth_token");
@@ -82,7 +56,6 @@ const LeadMember = () => {
       );
       dispatch(GetLeads());
       dispatch(empdata());
-      // dispatch(empdata());
       return res.data;
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -153,14 +126,11 @@ const LeadMember = () => {
 
   const handleDelete = async (userId) => {
     try {
-      // await dispatch(DeletePro2(userId)).unwrap();
-      // const updatedData = await dispatch(GetProject());
 
       await DeletePro2(userId);
 
       await dispatch(GetLeads  ()).unwrap();
 
-      // setUsers(users.filter((item) => item.id !== userId));
       message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error);

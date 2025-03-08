@@ -2,9 +2,7 @@ import React, { Component } from "react";
 import { Button, notification } from "antd";
 
 const close = () => {
-  console.log(
-    "Notification was closed. Either the close button was clicked or duration time elapsed."
-  );
+  
 };
 
 const openNotification = () => {

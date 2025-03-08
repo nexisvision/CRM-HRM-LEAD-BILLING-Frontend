@@ -46,7 +46,6 @@ const items = [
   ]),
 ];
 
-// submenu keys of first level
 const rootSubmenuKeys = ['sub1', 'sub2', 'sub4'];
 const SideCurrent = () => {
   const [openKeys, setOpenKeys] = useState(['sub1']);

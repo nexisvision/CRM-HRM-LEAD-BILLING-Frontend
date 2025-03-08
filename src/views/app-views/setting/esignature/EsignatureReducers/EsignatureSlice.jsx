@@ -135,21 +135,6 @@ const EsignatureSlice = createSlice({
         message.error(action.payload?.message);
       })
 
-      // //update
-      // .addCase(editpolicys.pending, (state) => {
-      //   state.isLoading = false;
-      //   state.error = null;
-      // })
-      // .addCase(editpolicys.fulfilled, (state, action) => {
-      //   state.isLoading = false;
-      //   state.editItem = action.payload; // Update the state with the updated employee data
-      //   // message.success(action.payload?.message);
-      // })
-
-      // .addCase(editpolicys.rejected, (state, action) => {
-      //   state.isLoading = false;
-      //   // message.error(action.payload?.message);
-      // });
 
   },
 });

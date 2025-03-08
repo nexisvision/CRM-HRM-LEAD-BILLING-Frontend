@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Calendar } from "antd";
 
 function onPanelChange(value, mode) {
-  console.log(value, mode);
 }
 
 export class Card extends Component {

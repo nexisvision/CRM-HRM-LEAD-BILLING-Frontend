@@ -44,7 +44,6 @@ export class RowSelectionAndOperation extends Component {
   };
 
   onSelectChange = selectedRowKeys => {
-    console.log("selectedRowKeys changed: ", selectedRowKeys);
     this.setState({ selectedRowKeys });
   };
 

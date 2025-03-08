@@ -11,7 +11,6 @@ import ColorPicker from 'components/shared-components/ColorPicker';
 
 export default const Demo = () =>  (
 	const onColorChange = (value) => {
-		console.log('Selected color: ', value)
 	}
 
 	return (

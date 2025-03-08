@@ -20,7 +20,6 @@ export class UploadManually extends Component {
       uploading: true,
     });
 
-    // You can use any AJAX library you like
     reqwest({
       url: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
       method: 'post',

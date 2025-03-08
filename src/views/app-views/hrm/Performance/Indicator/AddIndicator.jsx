@@ -12,7 +12,7 @@ const { Option } = Select;
 
 
 const AddIndicator = ({ onClose }) => {
-  const [form] = Form.useForm(); // Ensure this is called at the top
+  const [form] = Form.useForm(); 
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loggedInUser.username);

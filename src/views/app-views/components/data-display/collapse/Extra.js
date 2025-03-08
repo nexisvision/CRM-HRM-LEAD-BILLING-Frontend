@@ -6,7 +6,6 @@ const { Panel } = Collapse;
 const { Option } = Select;
 
 function callback(key) {
-  console.log(key);
 }
 
 const text = `
@@ -18,7 +17,6 @@ const text = `
 const genExtra = () => (
   <SettingOutlined
     onClick={event => {
-      // If you don't want click extra trigger collapse, you can prevent this:
       event.stopPropagation();
     }}
   />

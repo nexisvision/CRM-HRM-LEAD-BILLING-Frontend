@@ -1,13 +1,6 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
-// const baseUrl = import.meta.env.VITE_BASE_URL;
-// import { getToken } from "../../../configs/axiosConfig"
 
-
-// const addUser = async (data) => {
-//     const res = await axios.post(`${baseUrl}users/add`, data, getToken());
-//     return res
-// };
 
 const userLoginapi = async (data) => {
     const res = await axios.post(`${env.API_ENDPOINT_URL}/auth/login`, data);
@@ -84,24 +77,6 @@ const resetpass = async (payload) => {
 };
 
 
-
-// const getAllUsers = async () => {
-//     const res = await axios.get(`${baseUrl}users/all`, getToken());
-//     return res.data
-// }
-
-
-
-
-// const getUserById = async (data) => {
-//     const res = await axios.get(`${baseUrl}users/${data}`, getToken());
-//     return res.data
-// }
-
-// const deleteUser = async (data) => {
-//     const res = await axios.delete(`${baseUrl}users/${data}`, getToken());
-//     return res.data
-// }
 
 const updatesuperadmin = async (id ,data) => {
   const token = localStorage.getItem("auth_token");

@@ -290,10 +290,7 @@ const ProposalList = () => {
     openEditProposalModal();
     setId(id);
   };
-  //   const viewfun = (idd) => {
-  //     openviewTrainingSetupModal();
-  //     setIdd(idd);
-  //   };
+ 
 
   const jobStatusList = ["active", "blocked"];
 
@@ -327,17 +324,7 @@ const ProposalList = () => {
           : '',
       sorter: (a, b) => a.lead_title.length - b.lead_title.length,
     },
-    // {
-    //   title: "Deal title",
-    //   dataIndex: "deal_title",
-    //   sorter: (a, b) => a.deal_title.length - b.deal_title.length,
-    // },
-    // {
-    //   title: "calculatedTax",
-    //   dataIndex: "calculatedTax",
-    //   sorter: (a, b) => a.calculatedTax.length - b.calculatedTax.length,
-    // },
-
+   
 
     {
       title: "Tax",

@@ -46,7 +46,6 @@ export class Tabs extends Component {
   };
 
   onTabChange = (key, type) => {
-    console.log(key, type);
     this.setState({ [type]: key });
   };
 

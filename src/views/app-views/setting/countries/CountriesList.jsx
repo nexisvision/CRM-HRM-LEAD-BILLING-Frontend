@@ -40,10 +40,6 @@ export const CountriesList = () => {
 
     const loggedIndata = useSelector((state)=>state.user.loggedInUser.username)
 
-    // const countries = filterdata?.filter((item)=>item?.created_by === loggedIndata)
-
-     // Get countries data from Redux store
-    //  const { countries, isLoading } = useSelector((state) => state.countries);
 
      useEffect(() => {
         if(countries){
@@ -159,22 +155,9 @@ export const CountriesList = () => {
             dataIndex: 'phoneCode',
             sorter: (a, b) => utils.antdTableSorter(a, b, 'phoneCode')
         },
-        // {
-        //     title: 'Action',
-        //     dataIndex: 'actions',
-        //     render: (_, elm) => (
-        //         <div className="text-center">
-        //             <EllipsisDropdown menu={dropdownMenu(elm)} />
-        //         </div>
-        //     )
-        // }
+        
     ];
-    // const onSearch = e => {
-    //     const value = e.currentTarget.value;
-    //     const data = utils.wildCardSearch(countries, value);
-    //     // setCountries(data);     
-    //     setSelectedRowKeys([]);
-    // }
+   
     return (
         <div className="container">
             <Card>

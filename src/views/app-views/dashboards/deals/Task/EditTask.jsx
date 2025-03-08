@@ -14,7 +14,6 @@ const EditTask = ({ visible, onCancel, onUpdate, taskData }) => {
   });
 
   useEffect(() => {
-    // Populate form data when taskData is provided
     if (taskData) {
       setFormData({
         name: taskData.name || '',
@@ -31,7 +30,6 @@ const EditTask = ({ visible, onCancel, onUpdate, taskData }) => {
   };
 
   const handleSubmit = () => {
-    // Pass updated data to the onUpdate callback
     onUpdate({
       ...formData,
       date: formData.date?.format('DD-MM-YYYY'),
@@ -40,15 +38,8 @@ const EditTask = ({ visible, onCancel, onUpdate, taskData }) => {
   };
 
   return (
-    // <Modal
-    //   title="Edit Task"
-    //   visible={visible}
-    //   onCancel={onCancel}
-    //   footer={null}
-    //   width={600}
-    // >
+   
       <form className="space-y-6">
-        {/* Task Name Input */}
         <div>
           <label className="block font-medium mb-1">
             Name <span className="text-red-500">*</span>
@@ -60,7 +51,6 @@ const EditTask = ({ visible, onCancel, onUpdate, taskData }) => {
           />
         </div>
 
-        {/* Date and Time Pickers */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block font-medium mb-1">
@@ -86,7 +76,6 @@ const EditTask = ({ visible, onCancel, onUpdate, taskData }) => {
           </div>
         </div>
 
-        {/* Priority and Status Dropdowns */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block font-medium mb-1">

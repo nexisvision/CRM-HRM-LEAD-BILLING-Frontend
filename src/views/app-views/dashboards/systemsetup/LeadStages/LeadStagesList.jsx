@@ -22,9 +22,7 @@ const LeadStagesList = () => {
   const allfdata = useSelector((state) => state.StagesLeadsDeals);
   const fnddata = allfdata?.StagesLeadsDeals?.data || [];
 
-  // const fnddata = user && Array.isArray(fnddataa) 
-  //   ? fnddataa.filter((item) => item?.created_by === user)
-  //   : [];
+
 
   const Allpipline = useSelector((state) => state.Piplines);
   const filterpipline = Allpipline?.Piplines?.data || [];

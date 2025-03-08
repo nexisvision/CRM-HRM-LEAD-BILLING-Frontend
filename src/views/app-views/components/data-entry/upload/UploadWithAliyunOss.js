@@ -23,8 +23,6 @@ class AliyunOSSUpload extends React.Component {
     }
   };
 
-  // Mock get OSS api
-  // https://help.aliyun.com/document_detail/31988.html
   mockGetOSSData = () => ({
     dir: 'user-dir/',
     expire: '1577811661',
@@ -36,7 +34,6 @@ class AliyunOSSUpload extends React.Component {
 
   onChange = ({ fileList }) => {
     const { onChange } = this.props;
-    console.log('Aliyun OSS:', fileList);
     if (onChange) {
       onChange([...fileList]);
     }

@@ -14,14 +14,7 @@ import Flex from 'components/shared-components/Flex'
 import dayjs from 'dayjs';
 import { DATE_FORMAT_DD_MM_YYYY } from 'constants/DateConstant'
 import utils from 'utils'   
-// import AddInvoice from './AddInvoice';
-// import EditInvoice from './EditInvoice';
-// import ViewInvoice from './ViewInvoice';
-// import userData from '../../../assets/data/user-list.data.json';
-// import ViewSubscribedUserPlans from './ViewSubscribedUserPlans';
-// import EditSubscribedUserPlans from './EditSubscribedUserPlans';
 
-// import userData from '../../../../../assets/data/user-list.data.json';
 
 
 const { Column } = Table;
@@ -31,7 +24,6 @@ const { Option } = Select
 
 export const PlanRequestList = () => {
     const [users, setUsers] = useState([]);
-    // const [list, setList] = useState(OrderListData)
     const [selectedRows, setSelectedRows] = useState([])
     const [isAddSubscribedUserPlansModalVisible, setIsAddSubscribedUserPlansModalVisible] = useState(false);
     const [isEditSubscribedUserPlansModalVisible, setIsEditSubscribedUserPlansModalVisible] = useState(false);
@@ -208,12 +200,7 @@ const handleStatusChange = (checked, userId) => {
                             <Input placeholder="Search" prefix={<SearchOutlined />} onChange={e => onSearch(e)} />
                         </div>
                     </Flex>
-                    {/* <Flex gap="7px" className="flex">
-                        <Button type="primary" className="flex items-center" onClick={openAddSubscribedUserPlansModal}>
-                            <PlusOutlined />
-                            <span className="ml-2">New</span>
-                        </Button>
-                    </Flex> */}
+                   
                 </Flex>
                 <div className="table-responsive">
                     <Table
@@ -221,45 +208,11 @@ const handleStatusChange = (checked, userId) => {
                         dataSource={users}
                         rowKey='id'
                         scroll={{ x: 1200 }}
-                    // rowSelection={{
-                    // 	selectedRowKeys: selectedRowKeys,
-                    // 	type: 'checkbox',
-                    // 	preserveSelectedRowKeys: false,
-                    // 	...rowSelection,
-                    // }}
+                    
                     />
                 </div>
 
-                {/* <Modal
-					title="SubscribedUserPlans Create"
-					visible={isAddSubscribedUserPlansModalVisible}
-					onCancel={closeAddSubscribedUserPlansModal}
-					footer={null}
-					width={1000}
-					className='mt-[-70px]'
-				>
-					<AddInvoice onClose={closeAddSubscribedUserPlansModal} />
-				</Modal> */}
-                {/* <Modal
-					title="Edit Subscribed Plans"
-					visible={isEditSubscribedUserPlansModalVisible}
-					onCancel={closeEditSubscribedUserPlansModal}
-					footer={null}
-					width={700}
-					className='mt-[-70px]'
-				>
-				    <EditSubscribedUserPlans onClose={closeEditSubscribedUserPlansModal} />
-				</Modal>
-                <Modal
-                    title="Subscribed Plans Details"
-                    visible={isViewSubscribedUserPlansModalVisible}
-                    onCancel={closeViewSubscribedUserPlansModal}
-                    footer={null}
-                    width={700}
-                    className='mt-[-70px]'
-                >
-                    <ViewSubscribedUserPlans onClose={closeViewSubscribedUserPlansModal} />
-                </Modal> */}
+               
             </Card>
         </div>
     );

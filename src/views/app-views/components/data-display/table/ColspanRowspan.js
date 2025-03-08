@@ -1,7 +1,5 @@
 import { Table } from 'antd';
 import React from 'react';
-// In the fifth row, other columns are merged into first column
-// by setting it's colSpan to be 0
 const sharedOnCell = (_, index) => {
   if (index === 4) {
     return {
@@ -34,7 +32,6 @@ const columns = [
           rowSpan: 2,
         };
       }
-      // These two are merged into above cell
       if (index === 3) {
         return {
           rowSpan: 0,

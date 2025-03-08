@@ -46,25 +46,7 @@ const AddTask = ({ onClose }) => {
   const loggedUserData = allloggeduserdata?.loggedInUser || {};
   const id = loggedUserData?.id;
 
-  // const loggedusername = useSelector((state) => state.user?.loggedInUser?.username);
 
-  // const fndassine = Array.isArray(empData) && loggedusername
-  //   ? empData.filter((item) => item?.created_by === loggedusername)
-  //   : [];
-
-
-
-  // const allloggeduserdata = useSelector((state) => state.user || {});
-  // const loggedUserData = allloggeduserdata?.loggedInUser || {};
-  // const loggedusername = loggedUserData?.username || '';
-  // const id = loggedUserData?.id;
-
-  // const allempdata = useSelector((state) => state.employee || {});
-  // const empData = allempdata?.employee?.data || [];
-
-  // const fndassine = empData.filter((item) => item.created_by === loggedusername) || [];
-
-  // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
   const initialValues = {
     taskName: "",

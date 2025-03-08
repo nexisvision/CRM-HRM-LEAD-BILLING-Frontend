@@ -17,11 +17,7 @@ import {
   Typography,
   Avatar,
 } from "antd";
-// import { invoiceData } from '../../../pages/invoice/invoiceData';
-// import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
 import NumberFormat from "react-number-format";
-// import React, {useState} from 'react'
-// import { Card, Table, Select, Input, Button, Badge, Menu, Tag } from 'antd';
 import {
   EyeOutlined,
   FileExcelOutlined,

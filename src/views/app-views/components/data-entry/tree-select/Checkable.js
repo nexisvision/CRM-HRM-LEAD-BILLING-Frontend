@@ -46,7 +46,6 @@ export class Checkable extends Component {
   };
 
   onChange = value => {
-    console.log("onChange ", value);
     this.setState({ value });
   };
 

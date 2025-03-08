@@ -17,7 +17,6 @@ const UsersList = () => {
     setIsAddUsersModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeAddUsersModal = () => {
     setIsAddUsersModalVisible(false);
   };

@@ -234,15 +234,12 @@ class UserTable extends Table<User> {}
 
 <UserTable columns={columns} dataSource={data} />
 
-// Use JSX style API
 class NameColumn extends Table.Column<User> {}
 
 <UserTable dataSource={data}>
   <NameColumn key="name" title="Name" dataIndex="name" />
 </UserTable>
 
-// after TypeScript 2.9 can write like this
-// https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-9.html#generic-type-arguments-in-jsx-elements
 <Table<User> columns={columns} dataSource={data} />
 <Table<User> dataSource={data}>
   <Table.Column<User> key="name" title="Name" dataIndex="name" />
@@ -258,9 +255,7 @@ According to the [React documentation](https://facebook.github.io/react/docs/lis
 If `dataSource[i].key` is not provided, then you should specify the primary key of dataSource value via `rowKey`, as shown below. If not, warnings like the one above will show in browser console.
 
 ```jsx
-// primary key is uid
 return <Table rowKey="uid" />;
-// or
 return <Table rowKey={record => record.uid} />;
 ```
 

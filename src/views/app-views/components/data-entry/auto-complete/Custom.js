@@ -25,11 +25,9 @@ const Complete = () => {
   };
 
   const handleKeyPress = ev => {
-    console.log('handleKeyPress', ev);
   };
 
   const onSelect = value => {
-    console.log('onSelect', value);
   };
 
   return (

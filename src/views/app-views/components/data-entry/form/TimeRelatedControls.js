@@ -41,7 +41,6 @@ const rangeConfig = {
 
 const TimeRelatedForm = () => {
   const onFinish = fieldsValue => {
-    // Should format date value before submit.
     const rangeValue = fieldsValue['range-picker'];
     const rangeTimeValue = fieldsValue['range-time-picker'];
     const values = {

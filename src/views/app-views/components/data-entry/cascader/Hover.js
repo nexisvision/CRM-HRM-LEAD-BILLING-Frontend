@@ -39,7 +39,6 @@ const options = [
 function onChange(value) {
 }
 
-// Just show the latest item.
 function displayRender(label) {
   return label[label.length - 1];
 }

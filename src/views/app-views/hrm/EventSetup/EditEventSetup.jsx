@@ -73,11 +73,7 @@ const EditEventSetUp = ({ initialEventData, onCancel, id, onSuccess }) => {
           return moment(value).isAfter(moment(StartTime));
         }
       ),
-    // employee: Yup.string().required('Please select a employee.'),
-    // title: Yup.string().required('Please enter a title.'),
-    // eventstartdate: Yup.date().nullable().required(' Event Start Date is required.'),
-    // eventenddate: Yup.date().nullable().required('End Date is required.'),
-    // description: Yup.string().required('Please enter a description.'),
+   
   });
 
   useEffect(() => {

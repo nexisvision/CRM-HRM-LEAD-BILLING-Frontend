@@ -114,34 +114,26 @@ const Page = ({ popupPlacement }) => {
     </Select>
   );
 
-  // ==== Cascader ====
   const cascaderFilter = (inputValue, path) =>
     path.some((option) => option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1);
   const onCascaderChange = (value) => {
   };
-  // ==== End Cascader ====
 
-  // ==== Modal ====
   const showModal = () => {
     setModalOpen(true);
   };
   const handleOk = (e) => {
-    console.log(e);
     setModalOpen(false);
   };
   const handleCancel = (e) => {
-    console.log(e);
     setModalOpen(false);
   };
 
-  // ==== End Modal ====
 
   const onStepsChange = (newCurrentStep) => {
-    console.log('onChange:', newCurrentStep);
     setCurrentStep(newCurrentStep);
   };
 
-  // ==== Badge ====
 
   const increaseBadge = () => {
     setBadgeCount(badgeCount + 1);
@@ -156,7 +148,6 @@ const Page = ({ popupPlacement }) => {
   const onChangeBadge = (checked) => {
     setShowBadge(checked);
   };
-  // ==== End Badge ====
 
   return (
     <div className="direction-components">

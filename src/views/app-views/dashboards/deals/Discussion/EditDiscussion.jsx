@@ -8,9 +8,7 @@ const EditDiscussion = () => {
   const { id } = useParams(); // Assuming you use a route like '/edit-discussion/:id'
 
   useEffect(() => {
-    // Mocked fetch discussion data by ID
     const fetchDiscussion = async () => {
-      // Replace with API call to fetch discussion data
       const discussionData = {
         message: 'Existing discussion message',
       };
@@ -23,7 +21,6 @@ const EditDiscussion = () => {
     form
       .validateFields()
       .then((values) => {
-        // Replace this with your API update logic
         message.success(`Discussion updated successfully!`);
         navigate('/discussions'); // Redirect to discussions page
       })

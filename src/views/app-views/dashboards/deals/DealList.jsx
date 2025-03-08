@@ -59,7 +59,6 @@ const DealList = () => {
 
   const navigate = useNavigate();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
-  // const [viewDealVisible, setViewDealVisible] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -80,7 +79,6 @@ const DealList = () => {
 
   const user = useSelector((state) => state.user.loggedInUser.username);
 
-  // Add new state for stages
   const [stagesList, setStagesList] = useState([]);
 
   const [searchValue, setSearchValue] = useState("");
@@ -90,7 +88,6 @@ const DealList = () => {
   useEffect(() => {
   }, [tabledata, users]);
 
-  // Modified useEffect for initial data loading
   useEffect(() => {
     if (tabledata?.Deals?.data) {
       const filteredDeals = tabledata.Deals.data.filter(deal => deal.created_by === user);
@@ -99,7 +96,6 @@ const DealList = () => {
     }
   }, [tabledata, user]);
 
-  // Modified debounced search function to include date filtering
   const debouncedSearch = debounce((value, date) => {
     setIsSearching(true);
     const searchValue = value.toLowerCase();
@@ -120,7 +116,6 @@ const DealList = () => {
           (deal.project?.toString().toLowerCase().includes(searchValue))
         );
         
-        // Add date filtering
         let matchesDate = true;
         if (date) {
           const dealDate = dayjs(deal.closedDate).startOf('day');
@@ -140,14 +135,12 @@ const DealList = () => {
     }
   }, 300);
 
-  // Simplified onSearch function
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     setSearchValue(value);
     debouncedSearch(value, selectedDate);
   };
 
-  // Add date change handler
   const handleDateChange = (date) => {
     setSelectedDate(date);
     debouncedSearch(searchValue, date);
@@ -157,15 +150,12 @@ const DealList = () => {
     dispatch(GetPip())
   },[dispatch])
 
-  // Get stages data from redux store
   const stagesData = useSelector((state) => state.StagesLeadsDeals);
 
-  // Open Add Job Modal
   const openAddDealModal = () => {
     setIsAddDealModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeAddDealModal = () => {
     setIsAddDealModalVisible(false);
   };
@@ -174,7 +164,6 @@ const DealList = () => {
     setIsEditDealModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeEditDealModal = () => {
     setIsEditDealModalVisible(false);
   };
@@ -190,7 +179,6 @@ const DealList = () => {
       const wb = utils.book_new(); // Create a new workbook
       utils.book_append_sheet(wb, ws, "Deal"); // Append the worksheet to the workbook
 
-      // Write the workbook to a file
       writeFile(wb, "DealData.xlsx");
       message.success("Data exported successfully!");
     } catch (error) {
@@ -198,9 +186,6 @@ const DealList = () => {
       message.error("Failed to export data. Please try again.");
     }
   };
-
-  //// permission
-            
                       const roleId = useSelector((state) => state.user.loggedInUser.role_id);
                       const roles = useSelector((state) => state.role?.role?.data);
                       const roleData = roles?.find(role => role.id === roleId);
@@ -227,31 +212,9 @@ const DealList = () => {
                       const canDeleteClient = allpermisson?.includes('delete');
                       const canViewClient = allpermisson?.includes('view');
             
-                      ///endpermission
-
-
-
-  // const openViewDealModal = () => {
-  //   setIsViewDealModalVisible(true);
-  // };
-
-  // Close Add Job Modal
   const closeViewDealModal = () => {
     setIsViewDealModalVisible(false);
   };
-
-  // Update the search functionality
-  // const onSearch = (e) => {
-  //   const searchValue = e.currentTarget.value.toLowerCase();
-  //   if (tabledata && tabledata.Deals && tabledata.Deals.data) {
-  //     const filteredDeals = tabledata.Deals.data.filter(deal => 
-  //       deal.created_by === user && 
-  //       deal.dealName.toLowerCase().includes(searchValue)
-  //     );
-  //     setUsers(filteredDeals);
-  //   }
-  // };
-
   const deleteUser = async (userId) => {
     try {
       await dispatch(DeleteDeals(userId));
@@ -260,13 +223,11 @@ const DealList = () => {
 
       setUsers(users.filter((item) => item.id !== userId));
 
-      // message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error);
     }
   };
 
-  // Show user profile
   const showUserProfile = (userInfo) => {
     setSelectedUser(userInfo);
     setUserProfileVisible(true);
@@ -284,17 +245,9 @@ const DealList = () => {
     dispatch(getstages());
   }, [dispatch]);
 
-  // useEffect(() => {
-  //   if (tabledata && tabledata.Deals && tabledata.Deals.data) {
-  //     setUsers(tabledata.Deals.data);
-  //   }
-  // }, [tabledata]);
-
-
 
   useEffect(() => {
     if (tabledata && tabledata.Deals && tabledata.Deals.data) {
-      // Filter leads by created_by matching the logged-in user's username
       const filteredDeals = tabledata.Deals.data.filter(deal => deal.created_by === user);
       setUsers(filteredDeals);
     }
@@ -319,7 +272,6 @@ const DealList = () => {
     setIdd(id);
   };
 
-  // Function to get stage name by ID
   const getStageName = (stageId) => {
     const stage = stagesList.find(stage => stage.id === stageId);
     return stage ? stage.stageName : 'N/A';
@@ -425,7 +377,6 @@ const DealList = () => {
     },
   ];
 
-  // For debugging
   useEffect(() => {
   }, [users]);
 
@@ -474,18 +425,7 @@ const DealList = () => {
 
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
-      {/* <Row gutter={16}>
-        {dealStatisticData.map((elm, i) => (
-          <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-            <StatisticWidget
-              title={elm.title}
-              value={elm.value}
-              status={elm.status}
-              subtitle={elm.subtitle}
-            />
-          </Col>
-        ))}
-      </Row> */}
+      
       <Flex
         alignItems="center"
         justifyContent="space-between"
@@ -546,9 +486,7 @@ const DealList = () => {
               >
                 Export All
               </Button>
-          {/* <Button type="primary" icon={<FileAddOutlined />} block>
-            Import All
-          </Button> */}
+         
         </Flex>
       </Flex>
 
@@ -579,9 +517,6 @@ const DealList = () => {
         visible={userProfileVisible}
         close={closeUserProfile}
       />
-      {/* <ViewDeal visible={viewDealVisible} close={closeViewDeal} /> */}
-
-      {/* Add Job Modal */}
       <Modal
         title="Add Deal"
         visible={isAddDealModalVisible}
