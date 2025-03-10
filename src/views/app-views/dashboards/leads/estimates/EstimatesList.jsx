@@ -127,12 +127,7 @@ const EstimatesList = () => {
 					</Button>
 				</Flex>
 			</Menu.Item>
-			{/* <Menu.Item>
-				<Flex alignItems="center">
-					<PlusCircleOutlined />
-					<span className="ml-2">Add to remark</span>
-				</Flex>
-			</Menu.Item> */}
+			
 
 			<Menu.Item>
 				<Flex alignItems="center">
@@ -147,17 +142,7 @@ const EstimatesList = () => {
 					</Button>
 				</Flex>
 			</Menu.Item>
-			{/* <Menu.Item>
-				<Flex alignItems="center">
-					<TiPinOutline />
-					<span className="ml-2">Pin</span>
-				</Flex>
-			</Menu.Item> */}
 			<Menu.Item>
-				{/* <Flex alignItems="center" onClick={()=> delfun(row.id)}>
-					<DeleteOutlined />
-					<span className="ml-2">Delete</span>
-				</Flex> */}
 				<Flex alignItems="center">
 					<Button
 						type=""
@@ -219,12 +204,7 @@ const EstimatesList = () => {
 			key: 'currency',
 			sorter: (a, b) => utils.antdTableSorter(a, b, 'currency')
 		},
-		// {
-		// 	title: 'Project',
-		// 	dataIndex: 'project',
-		// 	key: 'project',
-		// 	sorter: (a, b) => utils.antdTableSorter(a, b, 'project')
-		// },
+		
 		
 		{
 			title: 'Amount',
@@ -241,14 +221,7 @@ const EstimatesList = () => {
 			),
 			sorter: (a, b) => utils.antdTableSorter(a, b, 'total')
 		},
-		// {
-		// 	title: 'Status',
-		// 	dataIndex: 'orderStatus',
-		// 	render: (_, record) => (
-		// 		<><Tag color={getShippingStatus(record.orderStatus)}>{record.orderStatus}</Tag></>
-		// 	),
-		// 	sorter: (a, b) => utils.antdTableSorter(a, b, 'orderStatus')
-		// },
+		
 		
 		{
 			title: 'Action',
@@ -300,11 +273,6 @@ const EstimatesList = () => {
 								onChange={onSearch}
 							/>
 						</div>
-						{/* <div className="w-full md:w-48 ">
-							<Col span={12}>
-        
-        </Col>
-						</div> */}
 					</Flex>
 
 					<Flex gap="7px" className="flex">

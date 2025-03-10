@@ -1,31 +1,12 @@
 import React, { Component, useEffect, useState } from "react";
 import Flex from "components/shared-components/Flex";
 import {
-  Row,
-  Card,
-  Col,
   Table,
   Select,
-  Input,
-  Button,
-  
-  Modal,
-  Menu,
- 
   message,
 } from "antd";
 import OrderListData from "assets/data/order-list.data.json";
-
-import { TiPinOutline } from "react-icons/ti";
-import AvatarStatus from "components/shared-components/AvatarStatus";
-import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
-import dayjs from "dayjs";
-import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import utils from "utils";
-// import EditTicket from "./EditTicket";
-// import AddTicket from "./AddTicket";
-// import ViewTicket from "./ViewTicket";
-// import { DeleteTicket, getAllTicket } from "./TicketReducer/TicketSlice";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { ClientData } from "views/app-views/company/CompanyReducers/CompanySlice";
@@ -121,20 +102,9 @@ useEffect(()=>{
 
  
 
-  // useEffect(() => {
-  //   dispatch(getAllTicket());
-  // }, [dispatch]);
-
-  // useEffect(() => {
-  //   if (fnddata) {
-  //     setList(fnddata);
-  //   }
-  // }, [fnddata]);
 
   const deletfun = (userId) => {
-    // dispatch(DeleteTicket(userId));
-    // dispatch(getAllTicket());
-    // dispatch(getAllTicket());
+   
     setList(list.filter((item) => item.id !== userId));
     message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };

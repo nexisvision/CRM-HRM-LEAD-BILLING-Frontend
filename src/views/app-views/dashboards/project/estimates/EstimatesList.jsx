@@ -84,55 +84,33 @@ const EstimatesList = () => {
 			})
 	}
 
-	const dropdownMenu = row => (
-		<Menu>
-			<Menu.Item>
-				<Flex alignItems="center">
-					<Button
-						type=""
-						className=""
-						icon={<EyeOutlined />}
-						onClick={() => {
-							setSelectedEstimateId(row.id);
-							openviewEstimatesModal();
-						}}
-						size="small"
-					>
-						<span className="">View Details</span>
-					</Button>
-				</Flex>
-			</Menu.Item>
-			
-			<Menu.Item>
-				<Flex alignItems="center">
-					<Button
-						type=""
-						className=""
-						icon={<EditOutlined />}
-						onClick={() => EditFun(row.id)}
-						size="small"
-					>
-						<span className="">Edit</span>
-					</Button>
-				</Flex>
-			</Menu.Item>
-		
-			<Menu.Item>
-				
-				<Flex alignItems="center">
-					<Button
-						type=""
-						className=""
-						icon={<DeleteOutlined />}
-						onClick={()=> delfun(row.id)}
-						size="small"
-					>
-						<span className="">Delete</span>
-					</Button>
-				</Flex>
-			</Menu.Item>
-		</Menu>
-	);
+	const dropdownMenu = row => ({
+
+		items: [
+            {
+                key: 'view',
+                icon: <EyeOutlined />,
+                label: 'View Details',
+				onClick: () => {
+					setSelectedEstimateId(row.id);
+					openviewEstimatesModal();
+				}
+            },
+            {
+                key: 'edit',
+                icon: <EditOutlined />,
+                label: 'Edit',
+                onClick: () => EditFun(row.id)	
+            },
+            {
+                key: 'delete',
+                icon: <DeleteOutlined />,
+                label: 'Delete',
+                onClick: () => delfun(row.id)
+            }
+        ]
+	});
+	
 
 	const tableColumns = [
 		{

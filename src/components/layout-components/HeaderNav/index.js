@@ -156,9 +156,17 @@ export const HeaderNav = props => {
 						</div>
 					)}
 					{isMobile ? (
+						<>
+						<div className="menu-trigger" onClick={onToggle}>
+						<MenuFoldOutlined />
+					</div>
 						<div className="menu-trigger" onClick={onSearchActive}>
+							
 							<SearchOutlined />
+							
 						</div>
+						
+					</>
 					) : (
 						<div className="search-section">
 							<SearchInput mode={navMode} isMobile={isMobile} />
@@ -169,6 +177,7 @@ export const HeaderNav = props => {
 				<RightSection>
 					<div className="notification-trigger">
 						<NavNotification mode={navMode} />
+						
 					</div>
 					<div className="profile-section">
 						<NavProfile mode={navMode} />
