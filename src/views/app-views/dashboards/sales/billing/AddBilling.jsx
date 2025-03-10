@@ -134,27 +134,35 @@ const AddBilling = ({ onClose }) => {
 
   // Product selection handler
   const handleProductChange = (productId) => {
-    
     if (productId) {
-      const selectedProd = products.find(p => p.id === productId);
+      const selectedProd = productsData?.data?.find(p => p.id === productId);
       
       if (selectedProd) {
+        // Always update the current row instead of checking for empty
         const updatedData = tableData.map((row, index) => {
-          if (index === tableData.length - 1 && !row.item) {
+          if (index === tableData.length - 1) { // Update the last row regardless of content
+            const price = parseFloat(selectedProd.price) || 0;
+            const quantity = 1;
+            const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) : 0;
+            const baseAmount = price * quantity;
+            const taxAmount = showTax ? (baseAmount * taxPercentage) / 100 : 0;
+            const totalAmount = baseAmount + taxAmount;
+
             return {
               ...row,
               item: selectedProd.name,
-              discription: selectedProd.discription || "",
-              price: selectedProd.price || 0,
-              hsn_sac: selectedProd.hsn_sac || "",
+              quantity: quantity,
+              price: price,
+              amount: totalAmount,
+              description: selectedProd.description || ""
             };
           }
           return row;
         });
 
         setTableData(updatedData);
-        setSelectedProduct(productId);
         calculateTotal(updatedData);
+        setSelectedProduct(productId);
       }
     }
   };
@@ -168,15 +176,13 @@ const AddBilling = ({ onClose }) => {
         if (field === 'quantity' || field === 'price' || field === 'tax') {
           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
           const price = parseFloat(field === 'price' ? value : row.price) || 0;
-          const tax = field === 'tax' ? 
+          const taxPercentage = field === 'tax' ? 
             (value ? parseFloat(value.gstPercentage) : 0) : 
             (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
           
           const baseAmount = quantity * price;
-          const taxAmount = (baseAmount * tax) / 100;
-          const totalAmount = baseAmount + taxAmount;
-          
-          updatedRow.amount = totalAmount.toFixed(2);
+          const taxAmount = showTax ? (baseAmount * taxPercentage) / 100 : 0;
+          updatedRow.amount = baseAmount + taxAmount;
         }
         
         return updatedRow;
@@ -185,7 +191,7 @@ const AddBilling = ({ onClose }) => {
     });
   
     setTableData(updatedData);
-    calculateTotal(updatedData, discountValue, discountType);
+    calculateTotal(updatedData);
   };
 
   const calculateTotal = (data = tableData, discountVal = discountValue, type = discountType) => {

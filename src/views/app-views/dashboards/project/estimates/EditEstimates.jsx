@@ -240,56 +240,54 @@ const EditEstimates = ({ idd, onClose }) => {
     const handleFinish = async (values) => {
         try {
             setLoading(true);
-            
+
+            // Calculate subtotal from table data
+            const subtotal = tableData.reduce((sum, row) => {
+                const quantity = parseFloat(row.quantity) || 0;
+                const price = parseFloat(row.price) || 0;
+                const baseAmount = quantity * price;
+                const tax = row.tax ? parseFloat(row.tax.gstPercentage) : 0;
+                const taxAmount = (baseAmount * tax) / 100;
+                const totalAmount = baseAmount + taxAmount;
+                return sum + totalAmount;
+            }, 0);
+
+            // Format items like in AddEstimates
             const formattedItems = {};
             tableData.forEach((item, index) => {
+                const itemKey = `item_${index + 1}`;
                 const quantity = parseFloat(item.quantity) || 0;
                 const price = parseFloat(item.price) || 0;
+                const taxPercentage = item.tax?.gstPercentage || 0;
                 const baseAmount = quantity * price;
-                
-                // Calculate item discount
-                let itemDiscountAmount = 0;
-                const discountValue = parseFloat(item.discountValue) || 0;
-                if (item.discountType === 'percentage') {
-                    itemDiscountAmount = (baseAmount * discountValue) / 100;
-                } else {
-                    itemDiscountAmount = Math.min(discountValue, baseAmount);
-                }
+                const taxAmount = (baseAmount * taxPercentage) / 100;
+                const itemTotal = baseAmount + taxAmount;
 
-                // Calculate tax
-                const amountAfterDiscount = baseAmount - itemDiscountAmount;
-                const taxPercentage = item.tax ? parseFloat(item.tax.gstPercentage) || 0 : 0;
-                const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
-                
-                formattedItems[`item_${index + 1}`] = {
-                    item: item.item,
-                    description: item.description || '',
+                formattedItems[itemKey] = {
+                    id: (index + 1).toString(),
+                    item: item.item || '',
                     quantity: quantity,
                     price: price,
                     tax_name: item.tax?.gstName || '',
-                    tax_percentage: taxPercentage,
-                    tax_amount: taxAmount,
-                    discount_type: item.discountType,
-                    discount_percentage: item.discountType === 'percentage' ? discountValue : 0,
-                    discount_amount: itemDiscountAmount,
-                    base_amount: baseAmount,
-                    amount_after_discount: amountAfterDiscount,
-                    final_amount: amountAfterDiscount + taxAmount,
-                    hsn_sac: item.hsn_sac || ''
+                    tax: taxPercentage,
+                    base_amount: baseAmount.toFixed(2),
+                    discount_percentage: item.discountType === 'percentage' ? 
+                    discountValue : 0,
+                    tax_amount: taxAmount.toFixed(2),
+                    amount: itemTotal.toFixed(2),
+                    // discount: parseFloat(discount_percentage) || 0
                 };
             });
 
             const estimateData = {
+                ...values,
                 id: idd,
-                valid_till: values.valid_till.format('YYYY-MM-DD'),
-                currency: values.currency,
-                client: values.client,
-                invoiceType: invoiceType,
+                subtotal: subtotal.toFixed(2),
+                items: formattedItems,
                 discount: parseFloat(totals.globalDiscount),
                 discountType: discountType,
                 discountValue: parseFloat(discountValue),
                 calculatedTax: parseFloat(values.calculatedTax) || 0,
-                items: formattedItems,
                 tax: parseFloat(totals.totalTax),
                 total: parseFloat(totals.finalTotal),
                 related_id: id
@@ -300,9 +298,10 @@ const EditEstimates = ({ idd, onClose }) => {
                 data: estimateData
             })).unwrap();
 
+            message.success('Estimate updated successfully');
             onClose();
         } catch (error) {
-            message.error('Failed to update estimate: ' + (error.message || 'Unknown error'));
+            message.error('Failed to update estimate');
         } finally {
             setLoading(false);
         }

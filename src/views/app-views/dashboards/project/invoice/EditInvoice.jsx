@@ -342,20 +342,37 @@ useEffect(() => {
       setLoading(true);
 
       // Format items for database storage
-      const itemsForDb = tableData.map(item => ({
-        item: item.item,
-        quantity: Number(item.quantity),
-        price: Number(item.price),
-        tax_name: item.tax_name,
-        tax_percentage: Number(item.tax),
-        tax_amount: Number(item.tax_amount),
-        discount_percentage: Number(item.discount),
-        discount_amount: Number(item.discount_amount),
-        base_amount: Number(item.base_amount),
-        final_amount: Number(item.amount),
-        description: item.description,
-        hsn_sac: item.hsn_sac
-      }));
+      const itemsForDb = tableData.map(item => {
+        const baseAmount = Number(item.quantity) * Number(item.price);
+        
+        // Get tax details from the item
+        const taxPercentage = item.tax ? Number(item.tax.gstPercentage) : 0;
+        const taxName = item.tax ? item.tax.gstName : '';
+        
+        // Calculate amounts after tax
+        const amountAfterDiscount = baseAmount - (Number(item.discount_amount) || 0);
+        const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
+
+        return {
+          item: item.item,
+          quantity: Number(item.quantity),
+          price: Number(item.price),
+          tax_name: taxName,
+          tax_percentage: taxPercentage,
+          tax_amount: taxAmount,
+          discount_percentage: Number(item.discount),
+          discount_amount: Number(item.discount_amount),
+          base_amount: baseAmount,
+          final_amount: Number(item.amount),
+          description: item.description,
+          hsn_sac: item.hsn_sac,
+          // subtotal: baseAmount 
+        };
+      });
+
+      // Calculate total subtotal and tax
+      const totalSubtotal = itemsForDb.reduce((sum, item) => sum + item.base_amount, 0);
+      const totalTax = itemsForDb.reduce((sum, item) => sum + item.tax_amount, 0);
 
       const invoiceData = {
         ...values,
@@ -364,10 +381,11 @@ useEffect(() => {
         project: fnddata?.project_name,
         client: fnddata?.client,
         items: itemsForDb,
+        subtotal: totalSubtotal,
         discount: discountRate,
         global_discount_amount: totals.globalDiscount,
         total_item_discount: totals.itemDiscount,
-        tax: totals.totalTax,
+        tax: totalTax, // Store total tax amount
         total: totals.finalTotal
       };
 
@@ -757,7 +775,7 @@ useEffect(() => {
                     </tr>
 
                     {parseFloat(totals.globalDiscount) > 0 && (
-                        <tr className="flex justify-between px-2 py-2 border-x-2">
+                        <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
                             <td className="font-medium">Discount Amount</td>
                             <td className="font-medium px-4 py-2 text-red-500">
                                 -{selectedCurrencyIcon} {totals.globalDiscount}

@@ -266,7 +266,7 @@ const AddInvoice = ({ onClose }) => {
         });
 
         // Calculate final values from totals state
-        const subtotal = parseFloat(totals.subtotal);
+        const subtotal = Object.values(items).reduce((sum, item) => sum + item.final_amount, 0);
         const itemDiscount = parseFloat(totals.itemDiscount);
         const globalDiscount = parseFloat(totals.globalDiscount);
         const totalTax = parseFloat(totals.totalTax);
@@ -357,7 +357,7 @@ const AddInvoice = ({ onClose }) => {
         
         if (selectedProd) {
             const updatedData = tableData.map((row, index) => {
-                if (index === tableData.length - 1 && !row.item) {
+                if (index === tableData.length - 1) {
                     // Calculate initial amount based on product price and default quantity
                     const quantity = 1;
                     const price = selectedProd.price || 0;

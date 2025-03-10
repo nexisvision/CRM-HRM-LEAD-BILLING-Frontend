@@ -15,6 +15,8 @@ import Flex from 'components/shared-components/Flex';
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { Form } from "antd";
 import { useDispatch, useSelector } from "react-redux";
+import { ErrorMessage, Field } from "formik";
+import { Getcus } from "../customer/CustomerReducer/CustomerSlice";
 import { AddLable, GetLable } from "../LableReducer/LableSlice";
 import { addbil, eidtebil, getbil } from "./billing2Reducer/billing2Slice";
 import { getAllTaxes } from "../../../setting/tax/taxreducer/taxSlice";
@@ -29,6 +31,8 @@ const { Option } = Select;
 const EditBilling = ({ idd, onClose }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
+  const [isTagModalVisible, setIsTagModalVisible] = useState(false);
+  const [newTag, setNewTag] = useState("");
   const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
   const [newStatus, setNewStatus] = useState("");
   const [statuses, setStatuses] = useState([]);
@@ -39,12 +43,13 @@ const EditBilling = ({ idd, onClose }) => {
   const [tags, setTags] = useState([]);
   const AllLoggeddtaa = useSelector((state) => state.user);
   const lid = AllLoggeddtaa.loggedInUser.id;
+  const Tagsdetail = useSelector((state) => state.Lable);
 
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const [showTax, setShowTax] = useState(false);
-  const [discountType, setDiscountType] = useState('percentage');
+  const [discountType, setDiscountType] = useState('fixed');
   const [discountValue, setDiscountValue] = useState(0);
     // Get products directly from Redux store
     const productsData = useSelector((state) => state.Product.Product);
@@ -84,68 +89,47 @@ const EditBilling = ({ idd, onClose }) => {
     fetchLables("status", setStatuses);
   }, []);
 
- useEffect(() => {
+
   const currentBill = fnsdatas?.find((item) => item.id === idd);
+
+
+ useEffect(() => {
   
   if (currentBill) {
     try {
-
-      // Parse the description JSON string
-      const descriptionData = JSON.parse(currentBill.discription || '{}');
-      const items = descriptionData.items || [];
-
+      // Parse items from JSON string
+      const parsedItems = JSON.parse(currentBill.items || '[]');
+      
       // Set basic form fields
       form.setFieldsValue({
         vendor: currentBill.vendor || '',
         billDate: currentBill.billDate ? moment(currentBill.billDate) : null,
         status: currentBill.status || '',
         billNumber: currentBill.billNumber || '',
-        note: currentBill.note || ''
+        note: currentBill.note || '',
+        description: JSON.parse(currentBill.discription || '""') // Parse description JSON
       });
 
-      // setShowTax(!!currentBill.tax);
-      setDiscountType(currentBill.discountType || 'percentage');
-      setDiscountValue(currentBill.discountValue || 0);
+      // Set tax and discount states
+      setShowTax(currentBill.tax > 0);
+      setDiscountValue(currentBill.discount || 0);
 
-      // Format items data
-      if (items.length > 0) {
-        const formattedItems = items.map(item => ({
+      // Format items data for table
+      if (parsedItems.length > 0) {
+        const formattedItems = parsedItems.map(item => ({
           id: Date.now() + Math.random(),
-          item: item.name || '',
-          quantity: Number(item.quantity) || 1,
-          price: Number(item.unitPrice) || 0,
-          tax: showTax ? (Number(item.tax) || 0) : 0,
-          tax_name: item.tax_name || '',
-          amount: calculateAmount({
-            quantity: Number(item.quantity) || 1,
-            price: Number(item.unitPrice) || 0,
-            tax: Number(item.tax) || 0
-          }),
-          description: descriptionData.service || ''
+          item: item.item || '', // Changed from item.name to item.item
+          quantity: Number(item.quantity) || 0,
+          price: Number(item.price) || 0, // Changed from item.unitPrice to item.price
+          tax: item.tax_percentage > 0 ? { // Changed tax structure
+            gstName: item.tax_name || '',
+            gstPercentage: Number(item.tax_percentage)
+          } : null,
+          amount: Number(item.amount) || 0,
+          description: item.discription || '' // Changed from description to discription
         }));
 
         setTableData(formattedItems);
-
-        // Set tax details if available
-        if (showTax) {
-          formattedItems.forEach(item => {
-            if (item.tax && taxes?.data) {
-              const selectedTax = taxes.data.find(t => t.gstPercentage === parseFloat(item.tax));
-              if (selectedTax) {
-                setSelectedTaxDetails(prev => ({
-                  ...prev,
-                  [item.id]: {
-                    gstName: selectedTax.gstName,
-                    gstPercentage: selectedTax.gstPercentage
-                  }
-                }));
-              }
-            }
-          });
-        }
-
-        // Calculate totals
-        calculateTotal(formattedItems, currentBill.discountValue || 0, currentBill.discountType || 'percentage');
       } else {
         // Set default empty row if no items
         setTableData([{
@@ -153,27 +137,26 @@ const EditBilling = ({ idd, onClose }) => {
           item: '',
           quantity: 1,
           price: 0,
-          tax: 0,
-          amount: '0.00',
-          description: '',
-          tax_name: ''
+          tax: null,
+          amount: 0,
+          description: ''
         }]);
-
-        // Reset totals
-        setTotals({
-          subtotal: '0.00',
-          discount: '0.00',
-          totalTax: '0.00',
-          finalTotal: '0.00'
-        });
       }
+
+      // Set totals
+      setTotals({
+        subtotal: currentBill.subtotal.toFixed(2),
+        discount: currentBill.discount.toFixed(2),
+        totalTax: currentBill.tax.toFixed(2),
+        finalTotal: currentBill.total.toFixed(2)
+      });
 
     } catch (error) {
       console.error('Error setting bill data:', error);
       message.error('Error loading bill data');
     }
   }
-}, [fnsdatas, idd, form, taxes, showTax]);
+}, [fnsdatas, idd, form]);
 
   useEffect(() => {
     dispatch(getAllTaxes());
@@ -204,121 +187,112 @@ const EditBilling = ({ idd, onClose }) => {
     }
   }, [productsData]);
 
-  // Product selection handler
-  const handleProductChange = (productId) => {
-    
-    if (productId) {
-      const selectedProd = products.find(p => p.id === productId);
-      
-      if (selectedProd) {
-        const updatedData = tableData.map((row, index) => {
-          if (index === tableData.length - 1 && !row.item) {
-            return {
-              ...row,
-              item: selectedProd.name,
-              description: selectedProd.description || "",
-              price: selectedProd.price || 0,
-              hsn_sac: selectedProd.hsn_sac || "",
-            };
-          }
-          return row;
-        });
-
-        setTableData(updatedData);
-        setSelectedProduct(productId);
-        calculateTotal(updatedData);
-      }
-    }
-  };
-
-  const calculateAmount = (row) => {
-    const quantity = Number(row.quantity) || 0;
-    const price = Number(row.price) || 0;
-    const tax = showTax ? (Number(row.tax) || 0) : 0;
-    
+  // Helper function to calculate individual row amount
+  const calculateRowAmount = (quantity, price, tax = 0) => {
     const baseAmount = quantity * price;
-    const taxAmount = (baseAmount * tax) / 100;
-    
-    return (baseAmount + taxAmount).toFixed(2);
+    const taxAmount = showTax ? (baseAmount * tax) / 100 : 0;
+    return baseAmount + taxAmount;
   };
 
-  const calculateTotal = (data = tableData, discountVal = discountValue, type = discountType) => {
-    if (!Array.isArray(data)) {
-      console.error('Invalid data passed to calculateTotal');
-      return;
-    }
-
+  // Function to calculate all totals
+  const calculateTotal = (data = tableData) => {
+    // Calculate subtotal as sum of all item amounts
     const subtotal = data.reduce((sum, row) => {
-      const quantity = parseFloat(row.quantity) || 0;
-      const price = parseFloat(row.price) || 0;
-      const tax = row.tax ? parseFloat(row.tax.gstPercentage) : 0;
-      
-      const baseAmount = quantity * price;
-      const taxAmount = (baseAmount * tax) / 100;
-      const totalAmount = baseAmount + taxAmount;
-      
-      return sum + totalAmount;
+      const amount = parseFloat(row.amount) || 0;
+      return sum + amount;
     }, 0);
 
+    // Calculate total tax
+    const totalTax = data.reduce((sum, row) => {
+      if (!showTax) return sum;
+      const quantity = parseFloat(row.quantity) || 0;
+      const price = parseFloat(row.price) || 0;
+      const baseAmount = quantity * price;
+      const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) : 0;
+      return sum + ((baseAmount * taxPercentage) / 100);
+    }, 0);
+
+    // Calculate discount
     let discountAmount = 0;
-    if (type === 'percentage') {
-      discountAmount = (subtotal * (parseFloat(discountVal) || 0)) / 100;
+    if (discountType === 'percentage') {
+      discountAmount = (subtotal * (parseFloat(discountValue) || 0)) / 100;
     } else {
-      discountAmount = parseFloat(discountVal) || 0;
+      discountAmount = parseFloat(discountValue) || 0;
     }
 
-    const totalTax = data.reduce((sum, row) => {
-      const quantity = parseFloat(row.quantity) || 0;
-      const price = parseFloat(row.price) || 0;
-      const tax = row.tax ? parseFloat(row.tax.gstPercentage) : 0;
-      const baseAmount = quantity * price;
-      const taxAmount = (baseAmount * tax) / 100;
-      return sum + taxAmount;
-    }, 0);
-
-    const finalTotal = Math.max(0, subtotal - discountAmount);
+    // Calculate final total
+    const finalTotal = subtotal - discountAmount;
 
     setTotals({
       subtotal: subtotal.toFixed(2),
-      discount: discountAmount.toFixed(2),
       totalTax: totalTax.toFixed(2),
+      discount: discountAmount.toFixed(2),
       finalTotal: finalTotal.toFixed(2)
     });
 
     return {
       subtotal,
-      discount: discountAmount,
       totalTax,
+      discount: discountAmount,
       finalTotal
     };
   };
 
+  // Update product selection handler
+  const handleProductChange = (productId) => {
+    if (productId) {
+      const selectedProd = productsData?.data?.find(p => p.id === productId);
+      
+      if (selectedProd) {
+        const price = parseFloat(selectedProd.price) || 0;
+        const quantity = 1;
+        const taxPercentage = selectedProd.tax || 0;
+        const amount = calculateRowAmount(quantity, price, taxPercentage);
+
+        const newRow = {
+          id: Date.now(),
+          item: selectedProd.name,
+          quantity: quantity,
+          price: price,
+          tax: showTax ? {
+            gstName: selectedProd.tax_name || '',
+            gstPercentage: taxPercentage
+          } : null,
+          amount: amount,
+          description: selectedProd.description || ''
+        };
+
+        const updatedData = [...tableData, newRow];
+        setTableData(updatedData);
+        calculateTotal(updatedData);
+        setSelectedProduct(null);
+      }
+    }
+  };
+
+  // Update table data change handler
   const handleTableDataChange = (id, field, value) => {
-    const updatedData = tableData.map((row) => {
+    const updatedData = tableData.map(row => {
       if (row.id === id) {
         const updatedRow = { ...row, [field]: value };
         
         if (field === 'quantity' || field === 'price' || field === 'tax') {
           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
           const price = parseFloat(field === 'price' ? value : row.price) || 0;
-          const tax = field === 'tax' ? 
+          const taxPercentage = field === 'tax' ? 
             (value ? parseFloat(value.gstPercentage) : 0) : 
             (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
           
-          const baseAmount = quantity * price;
-          const taxAmount = (baseAmount * tax) / 100;
-          const totalAmount = baseAmount + taxAmount;
-          
-          updatedRow.amount = totalAmount.toFixed(2);
+          updatedRow.amount = calculateRowAmount(quantity, price, taxPercentage);
         }
         
         return updatedRow;
       }
       return row;
     });
-  
+
     setTableData(updatedData);
-    calculateTotal(updatedData, discountValue, discountType);
+    calculateTotal(updatedData);
   };
 
   const handleAddRow = () => {
@@ -346,49 +320,50 @@ const EditBilling = ({ idd, onClose }) => {
     form
       .validateFields()
       .then((values) => {
-        const totals = calculateTotal();
+        // Validate items
+        const hasInvalidItems = tableData.some(row => 
+          !row.item || 
+          !row.quantity || 
+          row.quantity <= 0 || 
+          !row.price || 
+          row.price <= 0
+        );
 
-        // Prepare items data with all necessary details
-        const items = tableData.map(row => {
-          // Find the selected tax details for this row
-          const taxDetails = taxes?.data?.find(t => t.gstPercentage === parseFloat(row.tax));
-          
-          return {
-            name: row.item,
-            quantity: parseFloat(row.quantity) || 0,
-            unitPrice: parseFloat(row.price) || 0,
-            tax: showTax ? parseFloat(row.tax) || 0 : 0,
-            tax_name: showTax ? (taxDetails?.gstName || row.tax_name || '') : '', // Use tax name from details or row
-            amount: parseFloat(row.amount) || 0,
-            description: row.description || ""
-          };
-        });
+        if (hasInvalidItems) {
+          message.error('Please fill in all required item fields (Item, Quantity, and Price)');
+          return;
+        }
 
-        // Create description object
-        const descriptionObject = {
-          items: items,
-          service: tableData.map(item => item.description).filter(Boolean).join(", "),
-          product: tableData.map(item => item.item).filter(Boolean).join(", ")
-        };
+        // Format items to match database structure
+        const formattedItems = tableData.map(row => ({
+          item: row.item,
+          tax_name: showTax ? row.tax?.gstName || '' : '',
+          tax_percentage: showTax ? parseFloat(row.tax?.gstPercentage) || 0 : 0,
+          quantity: parseFloat(row.quantity) || 0,
+          price: parseFloat(row.price) || 0,
+          amount: parseFloat(row.amount) || 0,
+          discription: row.description || ""
+        }));
 
+        // Create invoice data matching database model
         const invoiceData = {
+          id: idd,
+          related_id: currentBill.related_id,
+          billNumber: values.billNumber,
           vendor: values.vendor,
           billDate: values.billDate?.format("YYYY-MM-DD"),
-          discription: descriptionObject,
+          discription: JSON.stringify(values.description || ""),
+          subtotal: parseFloat(totals.subtotal),
+          items: formattedItems, // Send as array, not JSON string
           status: values.status,
-          billNumber: values.billNumber,
-          discountType: discountType,
-          discountValue: parseFloat(discountValue) || 0,
-          tax: showTax ? parseFloat(totals.totalTax) || 0 : 0,
-          total: parseFloat(totals.finalTotal) || 0,
+          bill_status: "draft",
+          discount: parseFloat(totals.discount),
+          tax: showTax ? parseFloat(totals.totalTax) : 0,
+          total: parseFloat(totals.finalTotal),
           note: values.note || "",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          user_id: lid,
-          subtotal: parseFloat(totals.subtotal) || 0,
-          total_tax: parseFloat(totals.totalTax) || 0,
-          total_discount: parseFloat(totals.discount) || 0,
-          items_data: items
+          client_id: currentBill.client_id,
+          updated_by: AllLoggeddtaa.loggedInUser.username || null,
+          updatedAt: new Date().toISOString()
         };
 
         dispatch(eidtebil({ idd, invoiceData }))
@@ -479,6 +454,48 @@ const EditBilling = ({ idd, onClose }) => {
       console.error("Failed to add status:", error);
       message.error("Failed to add status");
     }
+  };
+
+  const renderTaxSelector = (row) => {
+    if (!showTax) {
+      return (
+        <input
+          type="text"
+          value="0"
+          disabled
+          className="w-full p-2 border bg-gray-100"
+        />
+      );
+    }
+
+    return (
+      <select
+        value={row.tax ? `${row.tax.gstName}|${row.tax.gstPercentage}` : "0"}
+        onChange={(value) => {
+          if (!value || value === '0') {
+            handleTableDataChange(row.id, "tax", null);
+            return;
+          }
+          const [gstName, gstPercentage] = value.split('|');
+          handleTableDataChange(row.id, "tax", {
+            gstName,
+            gstPercentage: parseFloat(gstPercentage) || 0
+          });
+        }}
+        className="w-full p-2 border rounded"
+      >
+        <option value="0">Select Tax</option>
+        {taxes?.data?.map((tax) => (
+          <option 
+            key={tax.id} 
+            value={`${tax.gstName}|${tax.gstPercentage}`}
+            title={`${tax.gstName}: ${tax.gstPercentage}%`}
+          >
+            {tax.gstName} ({tax.gstPercentage}%)
+          </option>
+        ))}
+      </select>
+    );
   };
 
   return (
@@ -574,6 +591,17 @@ const EditBilling = ({ idd, onClose }) => {
               </Form.Item>
             </Col>
 
+            {/* <Col span={12}>
+              <Form.Item
+                label="Bill Number"
+                name="billNumber"
+                rules={[
+                  { required: true, message: "Please enter bill number" },
+                ]}
+              >
+                <Input placeholder="Enter Bill Number" />
+              </Form.Item>
+            </Col> */}
 
             <Col span={24}>
               <Form.Item label="Description" name="description">
@@ -598,7 +626,7 @@ const EditBilling = ({ idd, onClose }) => {
                     const updatedData = tableData.map(row => ({
                       ...row,
                       tax: 0,
-                      amount: calculateAmount({ ...row, tax: 0 })
+                      amount: calculateRowAmount({ ...row, tax: 0 })
                     }));
                     setTableData(updatedData);
                     calculateTotal(updatedData, discountValue, discountType);
@@ -694,7 +722,11 @@ const EditBilling = ({ idd, onClose }) => {
                               const value = e.target.value === "" ? 0 : parseFloat(e.target.value);
                               handleTableDataChange(row.id, "price", value);
                             }}
-                           
+                            onBlur={(e) => {
+                              if (e.target.value === "") {
+                                handleTableDataChange(row.id, "price", 0);
+                              }
+                            }}
                             placeholder="0"
                             className="w-full p-2 border rounded-s"
                           />
@@ -804,10 +836,12 @@ const EditBilling = ({ idd, onClose }) => {
                   </td>
                 </tr>
 
-                <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
-                  <td className="font-medium">Total Tax</td>
-                  <td className="font-medium px-4 py-2">₹{totals.totalTax}</td>
-                </tr>
+                {showTax && (
+                  <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
+                    <td className="font-medium">Total Tax</td>
+                    <td className="font-medium px-4 py-2">₹{totals.totalTax}</td>
+                  </tr>
+                )}
 
                 <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
                   <td className="font-bold text-lg">Total Amount</td>
@@ -857,3 +891,4 @@ const EditBilling = ({ idd, onClose }) => {
 };
 
 export default EditBilling;
+

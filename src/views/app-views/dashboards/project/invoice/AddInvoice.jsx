@@ -221,8 +221,9 @@ const sub = subClientsss?.SubClient?.data;
                     base_amount: baseAmount,
                     amount_after_discount: amountAfterDiscount,
                     final_amount: finalAmount,
-                    description: item.description  ||  "",
-                    hsn_sac: item.hsn_sac || ""
+                    description: item.description || "",
+                    hsn_sac: item.hsn_sac || "",
+                    subtotal: finalAmount
                 };
             });
 

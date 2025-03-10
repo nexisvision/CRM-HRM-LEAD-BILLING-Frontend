@@ -132,7 +132,7 @@ const handleProductChange = (productId) => {
     
     if (selectedProd) {
       const updatedData = tableData.map((row, index) => {
-        if (index === tableData.length - 1 && !row.item) {
+        if (index === tableData.length - 1 ) {
           return {
             ...row,
             item: selectedProd.name,
@@ -483,6 +483,7 @@ const handleProductChange = (productId) => {
       };
       return acc;
     }, {});
+    const subtotal = Object.values(itemsForDatabase).reduce((sum, item) => sum + item. final_amount, 0);
 
     const prepareInvoiceData = () => ({
       customer: values.customer,
@@ -491,10 +492,11 @@ const handleProductChange = (productId) => {
       category: values.category,
       items: itemsForDatabase,
       discountType: globalDiscountType,
-      discountValue: globalDiscountValue,
+      discountValue: globalDiscountType === 'percentage' ? parseFloat(globalDiscountValue) || 0 : 0, // Store percentage value only
       discount: parseFloat(totals.globalDiscount),
       tax: parseFloat(totals.totalTax),
       total: parseFloat(totals.finalTotal),
+      subtotal: subtotal, 
       status: "pending",
       invoiceType: values.invoiceType,
     });
@@ -527,12 +529,12 @@ const handleProductChange = (productId) => {
       const invoiceData = prepareInvoiceData();
       dispatch(editInvoice({ idd, values: invoiceData }))
         .then(() => {
-          dispatch(getInvoice());
-          onClose();
+            dispatch(getInvoice());
+            onClose();
         })
         .catch((error) => {
-          console.error("Failed to edit invoice:", error);
-          message.error("Failed to update invoice. Please try again.");
+            console.error("Failed to edit invoice:", error);
+            message.error("Failed to update invoice. Please try again.");
         });
     }
   };

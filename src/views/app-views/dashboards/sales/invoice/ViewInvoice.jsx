@@ -438,7 +438,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Discount : </span>
-                                        {`${parsedInvoice.discount || 0}%`}
+                                        {`₹${parsedInvoice.discount || 0}`}
                                     </p>
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Total Discount Amount: </span>
@@ -636,7 +636,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Discount : </span>
-                                        {`${parsedInvoice.discount || 0}%`}
+                                        {`₹${parsedInvoice.discount || 0}`}
                                     </p>
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Total Discount Amount: </span>
@@ -843,7 +843,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Discount : </span>
-                                        {`${parsedInvoice.discount || 0}%`}
+                                            {`₹${parsedInvoice.discount || 0}`}
                                     </p>
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Total Discount Amount: </span>
@@ -1049,7 +1049,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Discount : </span>
-                                        {`${parsedInvoice.discount || 0}%`}
+                                        {`₹${parsedInvoice.discount || 0}`}
                                     </p>
                                     <p className="mb-2">
                                         <span className="font-weight-semibold">Total Discount Amount: </span>

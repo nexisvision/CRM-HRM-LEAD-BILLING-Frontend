@@ -47,8 +47,8 @@ function ProductSummaryList({ billingId }) {
                         vendor: selectedBilling.vendor,
                         product: item.item,
                         quantity: item.quantity,
-                        unitPrice: item.price,
-                        tax: item.tax_percentage,
+                        unitPrice: item.unitPrice,
+                        tax: item.tax,
                         tax_name: item.tax_name,
                         amount: item.amount,
                         description: item.description || ''
