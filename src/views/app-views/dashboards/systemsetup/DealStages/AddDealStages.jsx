@@ -25,7 +25,6 @@ import {
   EditOutlined,
   LinkOutlined,
 } from "@ant-design/icons";
-// import { Card, Table,  Badge, Menu, Tag,Modal } from 'antd';
 import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -55,13 +54,9 @@ const AddDealStages = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // const loggeduser = useSelector((state) => state.user.loggedInUser.username);
 
   const allpipline = useSelector((state) => state.Piplines);
   const fndpip = allpipline.Piplines.data;
-
-
-  // const fndpip = fndpipp.filter((item)=>item.created_by === loggeduser)
 
 
   useEffect(() => {

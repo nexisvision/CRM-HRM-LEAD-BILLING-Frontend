@@ -2,8 +2,7 @@ import {
   DashboardOutlined, 
   AppstoreOutlined,
   FileTextOutlined,
-  // SettingOutlined,
-  // DollarOutlined,
+
   TrophyOutlined,
   MoneyCollectOutlined,
   AntDesignOutlined,
@@ -28,7 +27,6 @@ import {
   ScheduleOutlined,
   CheckSquareOutlined,
   GlobalOutlined ,
-  // SolutionOutlined,
   BankOutlined,
   BranchesOutlined, 
   DeploymentUnitOutlined,
@@ -71,9 +69,6 @@ import { AiOutlineDollar, AiOutlineBarChart  } from "react-icons/ai";
 import { Spin } from 'antd';
 import { APP_PREFIX_PATH, AUTH_PREFIX_PATH } from 'configs/AppConfig'
 import style from 'react-syntax-highlighter/dist/esm/styles/hljs/a11y-dark';
-
-
-
 
 const extraNavvTree = [
   {
@@ -374,9 +369,6 @@ const extraNavvTree = [
     ]
 
       export { extraNavvTree };
-  // }
-// ]
-
 
 const extraNavvvTree = [
   {
@@ -411,14 +403,7 @@ const extraNavvvTree = [
         breadcrumb: true,
         submenu: []
       },
-      // {
-      //   key: 'superadmin-planrequest',
-      //   path: `${APP_PREFIX_PATH}/superadmin/planrequest`,
-      //   title: 'Plan Request',
-      //   icon: PullRequestOutlined ,
-      //   breadcrumb: true,
-      //   submenu: []
-      // },
+   
       {
         key: 'superadmin-subscribeduserplans',
         path: `${APP_PREFIX_PATH}/superadmin/subscribeduserplans`,
@@ -525,31 +510,7 @@ const dashBoardNavTree = [{
   breadcrumb: true,
   isGroupTitle: true,
   submenu: [
-    // {
-    //   key: 'dashboards-default',
-    //   path: `${APP_PREFIX_PATH}/dashboards/default`,  
-    //   title: 'Contacts',
-    //   icon: DashboardOutlined,
-    //   breadcrumb: true,
-    //   submenu: []
-    // },
-    // {
-    //   key: 'dashboards-analytic',
-    //   path: `${APP_PREFIX_PATH}/dashboards/analytic`,
-    //   title: 'sidenav.dashboard.analytic',
-    //   icon: DotChartOutlined,
-    //   breadcrumb: true,
-    //   submenu: []
-    // },
-    // {
-    //   key: 'dashboards-crm',
-    //   path: `${APP_PREFIX_PATH}/dashboards/crm`,
-    //   title: 'Dashboard',
-    //   icon: HomeOutlined ,
-    //   breadcrumb: false,
-    //   submenu: []
-
-    // },
+    
     {
       key: 'extra-pages-profile',
       path: `${APP_PREFIX_PATH}/pages/profile`,
@@ -620,14 +581,7 @@ const dashBoardNavTree = [{
                 breadcrumb: true,
                 submenu: []
               },
-              // {
-              //   key: 'dashboards-sales-estimates',
-              //   path: `${APP_PREFIX_PATH}/dashboards/sales/estimates`,
-              //   title: 'Estimates',
-              //   icon: RiseOutlined,
-              //   breadcrumb: true,
-              //   submenu: []
-              // },
+            
              
               {
                 key: 'dashboards-sales-creditnotes',
@@ -700,23 +654,7 @@ const dashBoardNavTree = [{
               },
             ]
           },
-          // {
-          //   key: 'dashboards-project-scrumboard',
-          //   path: `${APP_PREFIX_PATH}/dashboards/project/scrumboard`,
-         
-          //   title: 'Leads',
-          //   icon: RiseOutlined,
-          //   breadcrumb: false,
-          //   submenu: []
-          // },
-          // {
-          //   key: 'dashboards-leadcards',
-          //   path: `${APP_PREFIX_PATH}/dashboards/leadcards`,
-          //   title: 'Lead Cards',
-          //   icon: RiseOutlined,
-          //   breadcrumb: true,
-          //   submenu: []
-          // },
+       
          
           {
             key: 'dashboards-lead',
@@ -793,28 +731,7 @@ const dashBoardNavTree = [{
             submenu: []
           },
       
-         
-          // {
-          //   key: 'extra-pages',
-          //   path: `${APP_PREFIX_PATH}/pages`,
-          //   title: 'sidenav.pages',
-          //   icon: FileTextOutlined,
-          //   breadcrumb: true,
-          //   submenu: [
-              
-          //     {
-          //       key: 'extra-pages-invoice',
-          //       path: `${APP_PREFIX_PATH}/pages/invoice`,
-          //       title: 'sidenav.pages.invoice',
-          //       icon: FileDoneOutlined,
-          //       breadcrumb: true,
-          //       submenu: []
-          //     },
-              
-
-            
-          //   ]
-          // },
+   
           { 
             key: 'extra-users',
             path: `${APP_PREFIX_PATH}/users`,
@@ -860,7 +777,6 @@ const dashBoardNavTree = [{
           }
           
         
-    // 
   ]
 }]
 
@@ -870,13 +786,9 @@ export { dashBoardNavTree };
 
 const navigationConfig = [
   ...dashBoardNavTree,
-  // ...appsNavTree,
-  // ...extraNavTree,
   ...extraNavvTree,
   ...extraNavvvTree,
-  // ...componentsNavTree,
 
-  // ...docsNavTree
 ]
 
 export default navigationConfig;

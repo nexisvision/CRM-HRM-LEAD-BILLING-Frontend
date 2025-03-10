@@ -29,7 +29,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
 
     const allloggeduser = useSelector((state) => state.user.loggedInUser)
 
-    // Get the client data for the selected ID
     const allclient = useSelector((state) => state.SubClient.SubClient.data);
 
     const [selectedSignature, setSelectedSignature] = useState(null);
@@ -37,7 +36,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     const [showSelector, setShowSelector] = useState(true);
     const [isSignatureConfirmed, setIsSignatureConfirmed] = useState(false);
     
-    // Get signatures from Redux store
     const signatures = useSelector((state) => state?.esignature?.esignature?.data);
 
 
@@ -49,7 +47,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
         dispatch(getgeneralsettings());
     }, [dispatch]);
 
-    // UseEffect to fetch client data
     useEffect(() => {
         dispatch(ClientData()); // Fetch all client data when the component mounts
     }, [dispatch]);
@@ -60,7 +57,6 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     }, [dispatch, id]);
 
 
-     // Update useEffect to set general settings
      useEffect(() => {
         if (generalSettingsData && generalSettingsData.length > 0) {
             setGeneralSettings(generalSettingsData[0]);
@@ -176,11 +172,9 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     }
 
     const handlePrint = () => {
-        // Store the current body content
         const originalContent = document.body.innerHTML;
         const printContent = document.getElementById('printable-content');
     
-        // Create a style element for print-specific CSS
         const printStyles = `
             @media print {
                 body * {
@@ -215,15 +209,12 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
             }
         `;
     
-        // Add print styles
         const styleSheet = document.createElement('style');
         styleSheet.innerHTML = printStyles;
         document.head.appendChild(styleSheet);
     
-        // Print the specific content
         window.print();
     
-        // Remove the print styles
         document.head.removeChild(styleSheet);
     };
 
@@ -250,14 +241,12 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
     };
 
 
-    // Update the calculateTotalDiscount function
     const calculateTotalDiscount = (subtotal, discountPercentage) => {
         if (!subtotal || !discountPercentage) return 0;
         return (subtotal * discountPercentage) / 100;
     };
 
 
-    // Function to calculate subtotal (before tax and discount)
     const calculateSubtotal = () => {
         if (!parsedInvoice?.items) return 0;
         return Object.values(parsedInvoice.items).reduce((sum, item) =>
@@ -265,14 +254,12 @@ const InvoiceView = ({ idd, onClose, email, invoiceData }) => {
         );
     };
 
-    // Update the calculateTotalTax function to use tax from database
     const calculateTotalTax = (subtotal) => {
         if (!parsedInvoice) return 0;
         const taxRate = invoiceData.tax ?? 0;
         return (subtotal * taxRate) / 100;
     };
 
-    // Function to calculate final total (subtotal + total tax - total discount)
     const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
         return subtotal - totalDiscount + totalTax;
     };

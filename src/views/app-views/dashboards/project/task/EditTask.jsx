@@ -43,7 +43,6 @@ const EditTask = ({ idd, onClose }) => {
   const [newPriority, setNewPriority] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [newStatus, setNewStatus] = useState("");
-  // const [priorites, setTags] = useState([]);
 
   const [priorities, setPriorities] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -51,8 +50,6 @@ const EditTask = ({ idd, onClose }) => {
 
 
   const CustomInput = ({ field, form, ...props }) => <Input {...field} {...props} />;
-
-  // const [uploadModalVisible, setUploadModalVisible] = useState(false);
 
   const [initialValues, setInitialValues] = useState({
     taskTitle: "",
@@ -126,7 +123,6 @@ const EditTask = ({ idd, onClose }) => {
           description: milestone.description || "",
           status: milestone.status || "",
           priority: milestone.priority || "",
-          // addfile: milestone.addfile || ""
         };
 
         setInitialValues(updatedValues);
@@ -155,7 +151,6 @@ const EditTask = ({ idd, onClose }) => {
     }
   };
 
-  // Call fetchLabels for each labelType on mount
   useEffect(() => {
     fetchLables("priority", setPriorities);
     fetchLables("category", setCategories);
@@ -194,7 +189,6 @@ const EditTask = ({ idd, onClose }) => {
 
   const onSubmit = (values, { resetForm }) => {
 
-    // Prepare the data for submission
     const formData = {
       taskName: values.taskTitle,
       category: values.category,
@@ -205,17 +199,14 @@ const EditTask = ({ idd, onClose }) => {
       description: values.description,
       status: values.status,
       priority: values.priority,
-      // addfile: values.addfile
     };
 
-    // Append all form values
     Object.keys(values).forEach(key => {
       if (key !== 'Add File') {
         formData.append(key, values[key]);
       }
     });
 
-    // Append the file if exists
     if (fileList[0]?.originFileObj) {
       formData.append('Add File', fileList[0].originFileObj);
     }

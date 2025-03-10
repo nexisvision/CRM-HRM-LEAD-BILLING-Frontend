@@ -23,7 +23,6 @@ const ReminderList = () => {
       }
     },[allreminders])
 
-    // Table columns configuration
     const columns = [
         {
             title: 'Description',
@@ -56,14 +55,7 @@ const ReminderList = () => {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    {/* <Button 
-                        type="primary" 
-                        icon={<EditOutlined />}
-                        onClick={() => handleEdit(record)}
-                        size="small"
-                    >
-                        Edit
-                    </Button> */}
+                    
                     <Button 
                         type="primary" 
                         danger 
@@ -78,11 +70,9 @@ const ReminderList = () => {
         },
     ];
 
-    // Handle edit action
     const handleEdit = (record) => {
     };
 
-    // Handle delete action
     const handleDelete = (id) => {
         dispatch(deletessreinderss(id))
           .then(()=>{

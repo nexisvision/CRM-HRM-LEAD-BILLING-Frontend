@@ -19,7 +19,6 @@ import {
   getAttendances,
 } from "./AttendanceReducer/AttendanceSlice";
 import moment from "moment-timezone";
-// import moment from "moment";
 
 
 const { Option } = Select;
@@ -41,7 +40,6 @@ const AddAttendance = ({ onClose }) => {
     dispatch(empdata());
   }, [dispatch]);
 
-  // Validation Schema using Yup
   const validationSchema = Yup.object().shape({
     employee: Yup.string().required("Employee is required"),
     date: Yup.date().required("Start Date is required"),
@@ -128,7 +126,6 @@ const AddAttendance = ({ onClose }) => {
                 </div>
               </Col>
 
-              {/* Start Date and Start Time */}
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">Start Date <span className="text-red-500">*</span></label>
@@ -166,7 +163,6 @@ const AddAttendance = ({ onClose }) => {
                 </div>
               </Col>
 
-              {/* End Time */}
               <Col span={12}>
                 <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">End Time <span className="text-red-500">*</span></label>
@@ -208,49 +204,7 @@ const AddAttendance = ({ onClose }) => {
                 </div>
               </Col>
 
-              {/* Late Field */}
-              {/* <Col span={12}>
-                <div style={{ marginBottom: "16px" }}>
-                  <label className="font-semibold">Late <span className="text-red-500">*</span></label>
-                  <Field
-                    as={Input}
-                    name="late"
-                    placeholder="Enter Late Time"
-                    className="w-full mt-1"
-                    onChange={(e) => setFieldValue("late", e.target.value)}
-                  />
-                  {errors.late && touched.late && (
-                    <div style={{ color: "red", fontSize: "12px" }}>
-                      {errors.late}
-                    </div>
-                  )}
-                </div>
-              </Col>
-
-              {/* Half Day Dropdown */}
-              {/* <Col span={12}>
-                <div style={{ marginBottom: "16px" }}>
-                  <label className="font-semibold">Half Day <span className="text-red-500">*</span></label>
-                  <Field
-                    as={Select}
-                    name="halfDay"
-                    placeholder="Select Yes or No"
-                    style={{ width: "100%" }}
-                    className="w-full mt-1"
-                    onChange={(value) => setFieldValue("halfDay", value)}
-                  >
-                    <Option value="yes">Yes</Option>
-                    <Option value="no">No</Option>
-                  </Field>
-                  {errors.halfDay && touched.halfDay && (
-                    <div style={{ color: "red", fontSize: "12px" }}>
-                      {errors.halfDay}
-                    </div>
-                  )}
-                </div>
-              </Col> */}
-
-              {/* Comment Field */}
+             
               <Col span={24}>
                 <div style={{ marginBottom: "16px" }}>
                   <label className="font-semibold">Comment <span className="text-red-500">*</span>  </label>
@@ -266,7 +220,6 @@ const AddAttendance = ({ onClose }) => {
               </Col>
             </Row>
 
-            {/* Submit Button */}
             <div className="text-right">
               <Button type="primary" htmlType="submit">
                 Add Attendance

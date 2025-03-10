@@ -3,7 +3,6 @@ import { Form, Input, Button, DatePicker, Select, message, Row, Col, Rate } from
 import { useNavigate } from 'react-router-dom';
 import { ErrorMessage, Formik } from 'formik';
 import { PlusOutlined } from "@ant-design/icons";
-// import { getAppraisals } from './AppraisalReducers/AppraisalSlice';
 import { addAppraisals,getAppraisals } from './AppraisalReducers/AppraisalSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -47,12 +46,10 @@ const AddAppraisal = ({ onClose }) => {
     dispatch(addAppraisals(values)) // Fixed naming
       .then(() => {
         dispatch(getAppraisals());
-        // message.success('Appraisal added successfully!');
         onClose(); // Optional if provided
         navigate('/app/hrm/performance/appraisal');
       })
       .catch((error) => {
-        // message.error('Failed to add appraisal.');
         console.error('Add API error:', error);
       });
   };

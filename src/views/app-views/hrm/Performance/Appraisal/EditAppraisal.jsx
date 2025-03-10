@@ -29,12 +29,10 @@ const EditAppraisal = ({ id , onClose }) => {
   const [singleEmp, setSingleEmp] = useState(null);
 
   useEffect(() => {
-    // Find the specific indicator data by ID
     const empData = alldept?.Appraisals?.data || [];
     const data = empData.find((item) => item.id === id);
     setSingleEmp(data || null);
 
-    // Update form values when singleEmp is set
     if (data) {
       form.setFieldsValue({
         branch: data.branch,
@@ -49,7 +47,6 @@ const EditAppraisal = ({ id , onClose }) => {
     }
   }, [id, alldept, form]);
 
-  // Dispatch initial data
   useEffect(() => {
     dispatch(getBranch());
     dispatch(empdata());
@@ -63,12 +60,10 @@ const EditAppraisal = ({ id , onClose }) => {
         dispatch(editAppraisal({ id, values }))
           .then(() => {
             dispatch(getAppraisals());
-            // message.success('Appraisal updated successfully!');
             onClose();
             navigate('/app/hrm/performance/appraisal');
           })
           .catch((error) => {
-            // message.error('Failed to update appraisal.');
             console.error('Edit API error:', error);
           });
   };
@@ -83,9 +78,6 @@ const EditAppraisal = ({ id , onClose }) => {
     <div className="add-appraisal">
       
       <Formik
-        // initialValues={{ branch: '', employee: '', businessProcess: '', oralCommunication: '', 
-        //   leadership: '', overallRating: '', allocatingResources: '', projectManagement: '' }}
-       
       >
         {({ values, setFieldValue }) => (
           <Form 
@@ -97,7 +89,6 @@ const EditAppraisal = ({ id , onClose }) => {
           >
             <h2 className="mb-3 border-b pb-1 font-medium"></h2>
             <Row gutter={16}>
-              {/* Branch Dropdown */}
               <Col span={12}>
                           <Form.Item
                             name="branch"
@@ -114,24 +105,6 @@ const EditAppraisal = ({ id , onClose }) => {
                             </Select>
                           </Form.Item>
                         </Col>
-              {/* Employee Dropdown */}
-              {/* <Col span={12}>
-                          <Form.Item
-                          disabled
-                            name="employee"
-                            label="Employee"
-                            rules={[{ required: true, message: 'Please select a employee' }]}
-                          >
-                            <Select placeholder="Select Employee">
-                              {employeeData.map((emp) => (
-                                <Option key={emp.id} value={emp.id}>
-                                  {emp.username}
-                                </Option>
-                              ))}
-                            </Select>
-                          </Form.Item>
-                        </Col> */}
-
               <Col span={12}>
                 <Form.Item
                   name="employee"
@@ -161,23 +134,6 @@ const EditAppraisal = ({ id , onClose }) => {
                 </Form.Item>
               </Col>
 
-              {/* Select Month */}
-              {/* <Col span={12}>
-                <Form.Item
-                  name="month"
-                  label="Select Month"
-                  rules={[{ required: true, message: 'Month is required' }]}
-                >
-                  <DatePicker picker="month" style={{ width: '100%' }} />
-                </Form.Item>
-              </Col>
-              {/* Award Dropdown */}
-              
-              {/* <Col span={24}>
-                <Form.Item name="remarks" label="Remarks">
-                  <TextArea rows={4} placeholder="Enter remark" />
-                </Form.Item>
-              </Col> */} 
             </Row>
             <Row gutter={16}>
                       <Col span={12}>

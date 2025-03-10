@@ -18,11 +18,9 @@ import {
 } from '@ant-design/icons';
 
 const ViewExpenss = ({ data }) => {
-    // Get projects and clients from Redux store
     const allProjects = useSelector((state) => state.Project?.Project?.data || []);
     const allClients = useSelector((state) => state.SubClient?.SubClient?.data || []);
 
-    // Find project name and client username
     const projectDetails = allProjects.find(project => project.id === data?.project);
     const clientDetails = allClients.find(client => client.client_id === data?.client_id);
 

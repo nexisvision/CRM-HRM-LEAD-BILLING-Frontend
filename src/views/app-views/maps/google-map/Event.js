@@ -47,7 +47,6 @@ export class Event extends Component {
 		return (
 			<div style={{ height: '500px', width: '100%' }}>
 				<GoogleMap
-					// bootstrapURLKeys={{key: API_KEY}} // set if you need stats etc ...
 					center={this.state.center}
 					zoom={this.state.zoom}
 					hoverDistance={20}

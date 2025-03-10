@@ -233,7 +233,6 @@ const DealList = () => {
     setUserProfileVisible(true);
   };
 
-  // Close user profile
   const closeUserProfile = () => {
     setSelectedUser(null);
     setUserProfileVisible(false);
@@ -279,7 +278,6 @@ const DealList = () => {
 
   const dropdownMenu = (elm) => ({
     items: [
-      // Edit button - conditional item
       ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'edit',
         icon: <EditOutlined />,
@@ -287,7 +285,6 @@ const DealList = () => {
         onClick: () => EditDelas(elm.id)
       }] : []),
 
-      // Delete button - conditional item
       ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'delete',
         icon: <DeleteOutlined />,

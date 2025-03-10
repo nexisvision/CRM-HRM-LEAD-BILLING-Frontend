@@ -21,16 +21,13 @@ const Files = () => {
 
   const handleDownload = (file) => {
     message.success(`Downloading ${file.name}`);
-    // Logic for downloading the file (optional)
   };
 
   return (
-    // <div style={{ padding: 20 }}>
     <Card>    
         <h1 className='mb-3 font-bold text-lg'>Files</h1>
       <Upload.Dragger
         multiple={false}
-        // className='mt-6'
         beforeUpload={() => false} // Prevent automatic upload
         onChange={handleUpload}
         showUploadList={false}

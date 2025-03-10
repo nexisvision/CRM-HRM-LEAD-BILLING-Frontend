@@ -14,15 +14,12 @@ function ViewEstimates({ estimateId, onClose }) {
     
     const [tableData, setTableData] = useState([]);
 
-    // Process items data when estimate changes
     useEffect(() => {
         if (estimate?.items) {
             try {
-                // Parse the items string to object if needed
                 const itemsObj = typeof estimate.items === 'string' ? 
                     JSON.parse(estimate.items) : estimate.items;
 
-                // Convert items object to array
                 const itemsArray = Object.entries(itemsObj).map(([key, item]) => ({
                     key,
                     ...item

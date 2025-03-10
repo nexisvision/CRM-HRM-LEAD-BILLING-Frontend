@@ -20,13 +20,7 @@ const AddCalls = ({ visible, onClose }) => {
   };
 
   return (
-    // <Modal
-    //   title="Add Call"
-    //   visible={visible}
-    //   onCancel={onCancel}
-    //   footer={null}
-    //   width={800}
-    // >
+  
     <Form layout="vertical" form={form} onFinish={onSubmit}>
 
 

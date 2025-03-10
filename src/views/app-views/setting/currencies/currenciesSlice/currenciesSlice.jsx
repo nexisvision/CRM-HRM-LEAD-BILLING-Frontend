@@ -33,7 +33,6 @@ export const getcurren = createAsyncThunk(
     }
 );
 
-// Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
     "users/getAllUsers",
     async (thunkAPI) => {

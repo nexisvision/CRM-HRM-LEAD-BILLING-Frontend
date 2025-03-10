@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// import { DealStatisticViewData } from '../../../dashboards/default/DefaultDashboardData';
 import { Card, Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
 import Flex from 'components/shared-components/Flex';
@@ -10,26 +9,17 @@ import OrderListData from '../../../../../../assets/data/order-list.data.json';
 
 
 function ReceiptSummaryList() {
-    // const [dealStatisticViewData] = useState(DealStatisticViewData);
 
     const [users, setUsers] = useState(userData);
     const [list, setList] = useState(OrderListData);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [userProfileVisible, setUserProfileVisible] = useState(false);
-    //   const [customerVisible,setCustomerVisible] = useState(false)
     const [selectedUser, setSelectedUser] = useState(null);
 
-
-
-    // Delete user
     const deleteUser = (userId) => {
         setList(list.filter((item) => item.id !== userId));
         message.success({ content: `Deleted list ${userId}`, duration: 2 });
     };
-
-    
-
-    // Close user profile
     const closeUserProfile = () => {
         setSelectedUser(null);
         setUserProfileVisible(false);

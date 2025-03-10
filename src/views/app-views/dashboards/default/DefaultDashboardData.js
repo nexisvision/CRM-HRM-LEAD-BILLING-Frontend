@@ -58,25 +58,21 @@ export const DealStatisticData = [
 		title: 'Total Deals',
 		value:'$2,45444', 
 		status: 11.4
-		// subtitle: `Compare to last year (2019)`
 	},
 	{
 		title: 'This Month Total Deals',
 		value:'$6,982', 
 		status: 8.2
-		// subtitle: `Compare to last year (2019)`
 	},
 	{
 		title: 'This Week Total Deals',
 		value:'$8,310', 
 		status: 0.7
-		// subtitle: `Compare to last year (2019)`
 	},
 	{
 		title: 'Last 30 Days Total Deals',
 		value:'$9', 
 		status: 0.9
-		// subtitle: `Compare to last year (2019)`
 	}
 ]
 

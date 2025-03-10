@@ -23,7 +23,7 @@ const EditProducts = ({ userData, onUpdate }) => {
         message.success(`User "${values.user}" updated successfully!`);
         setIsModalVisible(false);
         form.resetFields();
-        onUpdate(values); // Pass updated data back to parent component
+        onUpdate(values);
       })
       .catch((error) => {
         console.error('Validation failed:', error);

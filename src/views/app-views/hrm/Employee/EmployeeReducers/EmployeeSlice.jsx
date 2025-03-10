@@ -86,8 +86,6 @@ export const updateEmp = createAsyncThunk(
 
 
 
-// Async thunk for updating a user
-
 const initialUser = () => {
     const item = window.localStorage.getItem("USER");
     return item ? JSON.parse(item) : null;
@@ -171,12 +169,10 @@ const EmployeeSlice = createSlice({
             })
             .addCase(deleteEmp.fulfilled, (state, action) => {
                 state.isLoading = false;
-                // message.success(action.payload?.message);
             })
 
             .addCase(deleteEmp.rejected, (state, action) => {
                 state.isLoading = false;
-                // message.error(action.payload?.message);
             })
             //update
 
@@ -187,13 +183,11 @@ const EmployeeSlice = createSlice({
               .addCase(updateEmp.fulfilled, (state, action) => {
                 state.isLoading = false;
                 state.editItem = action.payload; // Update the state with the updated employee data
-                // message.success(action.payload?.message);
               })
 
               .addCase(updateEmp.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-                // message.error(action.payload?.message);
               });
 
     },

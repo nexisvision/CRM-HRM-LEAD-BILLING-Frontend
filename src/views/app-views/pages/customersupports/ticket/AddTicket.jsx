@@ -27,7 +27,6 @@ const AddTicket = ({ onClose }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // dispatch(empdata());
     dispatch(GetUsers());
   }, []);
 
@@ -82,12 +81,10 @@ const AddTicket = ({ onClose }) => {
       });
 
       await dispatch(AddTickets(formData)).unwrap();
-      // message.success('Ticket created successfully!');
       dispatch(getAllTicket());
       onClose();
       resetForm();
     } catch (error) {
-      // message.error(error?.message || 'Failed to create ticket');
     } finally {
       setSubmitting(false);
     }

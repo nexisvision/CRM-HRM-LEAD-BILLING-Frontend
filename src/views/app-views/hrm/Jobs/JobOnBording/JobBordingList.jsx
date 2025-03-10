@@ -141,17 +141,14 @@ const JobOnBordingList = () => {
     return filtered;
   };
 
-  // Add handler for date changes
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
 
-  // Add search button handler
   const handleSearch = () => {
     message.success('Search completed');
   };
 
-   //// permission
                                     
                       const roleId = useSelector((state) => state.user.loggedInUser.role_id);
                       const roles = useSelector((state) => state.role?.role?.data);
@@ -178,16 +175,13 @@ const JobOnBordingList = () => {
                       const canDeleteClient = allpermisson?.includes('delete');
                       const canViewClient = allpermisson?.includes('view');
                    
-                      ///endpermission
 
 
 
-  // Delete user
   const deleteUser = (userId) => {
     dispatch(deleteJobonBoarding(userId)).then(() => {
       dispatch(getJobonBoarding());
       setUsers(users.filter((item) => item.id !== userId));
-      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
     });
   };
 

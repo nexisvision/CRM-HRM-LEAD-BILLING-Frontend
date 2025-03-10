@@ -44,7 +44,6 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -83,7 +82,6 @@ export const editloans = createAsyncThunk(
   }
 );
 
-// Async thunk for updating a user
 
 const initialUser = () => {
   const item = window.localStorage.getItem("USER");

@@ -134,15 +134,7 @@ export const CurrenciesList = () => {
             dataIndex: 'currencyCode',
             sorter: (a, b) => utils.antdTableSorter(a, b, 'currencyCode')
         },
-        // {
-        //     title: 'Action',
-        //     dataIndex: 'actions',
-        //     render: (_, elm) => (
-        //         <div className="text-center">
-        //             <EllipsisDropdown menu={dropdownMenu(elm)} />
-        //         </div>
-        //     )
-        // }
+     
     ];
 
     return (

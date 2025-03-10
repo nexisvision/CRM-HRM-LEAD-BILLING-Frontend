@@ -74,7 +74,6 @@ const AddJobOnBoarding = ({ onClose }) => {
       setter(""); // Reset input field
       modalSetter(false); // Close modal
 
-      // Fetch updated statuses and update the form field
       const response = await dispatch(GetLable(lid));
       if (response.payload && response.payload.data) {
         const filteredStatuses = response.payload.data
@@ -90,9 +89,6 @@ const AddJobOnBoarding = ({ onClose }) => {
     }
   };
 
-  // status end
-
-  // Submit the form data
   const onSubmit = async (values, { resetForm }) => {
     try {
       const data = {
@@ -111,12 +107,10 @@ const AddJobOnBoarding = ({ onClose }) => {
 
       dispatch(AddJobonBoarding(data)).then(() => {
         dispatch(getJobonBoarding());
-        // message.success("Job Boarding added successfully!");
         resetForm();
         onClose();
       });
     } catch (error) {
-      // message.error("Failed to add job boarding. Please try again.");
       console.error(error);
     }
   };

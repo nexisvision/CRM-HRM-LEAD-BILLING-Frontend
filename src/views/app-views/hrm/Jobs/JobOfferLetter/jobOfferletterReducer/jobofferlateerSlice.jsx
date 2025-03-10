@@ -18,8 +18,6 @@ export const Addjobofferss = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
-
 export const getjobofferss = createAsyncThunk(
   "emp/getjobofferss",
   async (thunkAPI) => {
@@ -165,11 +163,9 @@ const jobofferlateerSlice = createSlice({
       })
       .addCase(deletejobofferss.fulfilled, (state, action) => {
         state.isLoading = false;
-        // message.success(action.payload?.message);
       })
       .addCase(deletejobofferss.rejected, (state, action) => {
         state.isLoading = false;
-        // message.error(action.payload?.message);
       })
       //update
       .addCase(editjobofferss.pending, (state) => {
@@ -179,14 +175,10 @@ const jobofferlateerSlice = createSlice({
       .addCase(editjobofferss.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload; 
-        // message.success(action.payload?.message);
-        // Update the state with the updated employee data
       })
       .addCase(editjobofferss.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-        // message.error(action.payload?.message);
-
       });
   },
 });

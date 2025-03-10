@@ -1,12 +1,5 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
-// const baseUrl = import.meta.env.VITE_BASE_URL;
-// import { getToken } from "../../../configs/axiosConfig"
-
-// const addUser = async (data) => {
-//     const res = await axios.post(`${baseUrl}users/add`, data, getToken());
-//     return res
-// };
 
 const vendordata = async () => {
   const token = localStorage.getItem("auth_token");
@@ -36,7 +29,6 @@ const vendordataadd = async (payload) => {
         },
       }
     );
-    //    dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -83,25 +75,6 @@ const vendordataedit = async (idd, values) => {
   }
 };
 
-// const getAllUsers = async () => {
-//     const res = await axios.get(`${baseUrl}users/all`, getToken());
-//     return res.data
-// }
-
-// const getUserById = async (data) => {
-//     const res = await axios.get(`${baseUrl}users/${data}`, getToken());
-//     return res.data
-// }
-
-// const deleteUser = async (data) => {
-//     const res = await axios.delete(`${baseUrl}users/${data}`, getToken());
-//     return res.data
-// }
-
-// const updateUser = async (data) => {
-//     const res = await axios.put(`${baseUrl}users/${data?.id}`, data?.data, getToken());
-//     return res.data
-// }
 
 const UserService = {
   // addUser,
@@ -109,10 +82,7 @@ const UserService = {
   vendordataadd,
   vendordatadlete,
   vendordataedit,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+
 };
 
 export default UserService;

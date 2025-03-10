@@ -210,11 +210,9 @@ const CompanySlice = createSlice({
       })
       .addCase(addClient.fulfilled, (state, action) => {
         state.isLoading = false;
-        // message.success(action.payload?.message);
       })
       .addCase(addClient.rejected, (state, action) => {
         state.isLoading = false;
-        // message.error(action.payload?.message);
       })
 
       .addCase(ClientData.pending, (state) => {

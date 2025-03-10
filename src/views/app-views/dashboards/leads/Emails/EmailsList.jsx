@@ -12,11 +12,9 @@ const EmailsList = () => {
     setIsAddEmailsModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeAddEmailsModal = () => {
     setIsAddEmailsModalVisible(false);
   };
-  // Sample data for emails
   const emailData = [
     {
       id: 1,

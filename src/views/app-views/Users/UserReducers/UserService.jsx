@@ -1,13 +1,7 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
 import { useDispatch, useSelector } from "react-redux";
-// const baseUrl = import.meta.env.VITE_BASE_URL;
-// import { getToken } from "../../../configs/axiosConfig"
 
-// const addUser = async (data) => {
-//     const res = await axios.post(`${baseUrl}users/add`, data, getToken());
-//     return res
-// };
 
 const GetUsers = async () => {
   const token = localStorage.getItem("auth_token");

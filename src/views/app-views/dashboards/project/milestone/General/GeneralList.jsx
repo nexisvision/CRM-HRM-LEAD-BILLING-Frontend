@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-// import FileList from "../File/FileList";
-// import SubTaskList from "../SubTask/SubTaskList";
-// import CommentList from "../Comment/CommentList";
-// import TimeSheetList from "../TimeSheet/TimeSheetList";
-// import NotesList from "../Notes/NotesList";
+
 
 const GeneralList = () => {
 

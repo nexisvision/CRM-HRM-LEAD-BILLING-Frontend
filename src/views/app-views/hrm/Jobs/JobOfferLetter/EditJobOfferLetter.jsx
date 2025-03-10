@@ -76,17 +76,14 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
     try {
       const formData = new FormData();
 
-      // Format dates
       const formattedValues = {
         ...values,
         offer_expiry: values.offer_expiry ? dayjs(values.offer_expiry).format('YYYY-MM-DD') : null,
         expected_joining_date: values.expected_joining_date ? dayjs(values.expected_joining_date).format('YYYY-MM-DD') : null,
       };
 
-      // Append all form values to FormData
       Object.keys(formattedValues).forEach(key => {
         if (key === 'file' && formattedValues[key]) {
-          // Validate file type and size before appending
           const file = formattedValues[key];
           const isValidFileType = ['image/jpeg', 'image/png', 'application/pdf'].includes(file.type);
           const isValidFileSize = file.size / 1024 / 1024 < 5;
@@ -236,23 +233,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                 </div>
               </Col>
 
-              {/* <Col span={12}>
-                <div className="form-item mt-2">
-                  <label >Offer Expire On</label>
-                  <DatePicker
-                    className="w-full mt-2"
-                    format="DD-MM-YYYY"
-                    value={values.offer_expiry}
-                    onChange={(date) => setFieldValue("offer_expiry", date)}
-                    onBlur={() => setFieldTouched("offer_expiry", true)}
-                  />
-                  <ErrorMessage
-                    name="offer_expiry"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
+             
               <Col span={12} className='mt-3'>
                 <div className="form-item">
                   <label className='font-semibold'>Offer Expire On <span className="text-red-500">*</span></label>
@@ -263,7 +244,6 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                     onChange={(date) => setFieldValue('offer_expiry', date)}
                     onBlur={() => setFieldTouched("offer_expiry", true)}
                     disabledDate={(current) => {
-                      // Can't select days before today
                       return current && current < dayjs().startOf('day');
                     }}
                     placeholder="Select expiry date"
@@ -274,30 +254,6 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                   <ErrorMessage name="offer_expiry" component="div" className="error-message text-red-500 my-1" />
                 </div>
               </Col>
-
-              {/* <Col span={12}>
-                <div className="form-item mt-2">
-                  <label >Expected Joining Date</label>
-                 
-                  <DatePicker
-                    className="w-full mt-2"
-                    format="DD-MM-YYYY"
-                    value={values.expected_joining_date}
-                    onChange={(date) =>
-                      setFieldValue("expected_joining_date", date)
-                    }
-                    onBlur={() =>
-                      setFieldTouched("expected_joining_date", true)
-                    }
-                  />
-                  <ErrorMessage
-                    name="expected_joining_date"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
-
               <Col span={12} className="mt-3">
                 <div className="form-item">
                   <label className="font-semibold">Expected Joining Date <span className="text-red-500">*</span></label>
@@ -308,7 +264,6 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                     onChange={(date) => setFieldValue("expected_joining_date", date)}
                     onBlur={() => setFieldTouched("expected_joining_date", true)}
                     disabledDate={(current) => {
-                      // Can't select days before offer expiry date
                       const offerExpiryDate = values.offer_expiry ? dayjs(values.offer_expiry) : null;
                       return current && (
                         current < dayjs().startOf('day') || 
@@ -408,9 +363,7 @@ const EditJobOfferLetter = ({ idd, onClose }) => {
                     <Button icon={<UploadOutlined />} className="bg-white">
                       Select File
                     </Button>
-                    {/* <span className="ml-2 text-gray-500 text-sm">
-                      Supports: JPG, PNG, PDF (Max: 5MB)
-                    </span> */}
+                   
                   </Upload>
                 </div>
               </Col>

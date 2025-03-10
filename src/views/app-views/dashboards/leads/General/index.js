@@ -10,7 +10,6 @@ import {
   MailOutlined,
   FolderOutlined,
 } from '@ant-design/icons';
-// import { AiOutlineMail } from "react-icons/ai";
 
 const General = () => {
   return (

@@ -12,16 +12,13 @@ const BillingDetailsList = ({ billingId }) => {
     const [isEditBillingModalVisible, setIsEditBillingModalVisible] = useState(false);
     const [isAddPaymentModalVisible, setIsAddPaymentModalVisible] = useState(false);
 
-    // Get billing data from Redux store
     const allBillingData = useSelector((state) => state?.salesbilling?.salesbilling?.data || []);
     const currentBill = allBillingData.find(bill => bill.id === billingId);
 
-    // Close Add Job Modal
     const closeEditBillingModal = () => {
         setIsEditBillingModalVisible(false);
     };
 
-    // Close Add Payment Modal
     const closeAddPaymentModal = () => {
         setIsAddPaymentModalVisible(false);
     };
@@ -34,11 +31,8 @@ const BillingDetailsList = ({ billingId }) => {
         <>
             <div className="bg-white rounded-md p-6">
                 <div className="w-full">
-                    {/* Progress Steps Section */}
                     <div className="flex flex-col space-y-8">
-                        {/* Status Timeline */}
                         <div className="flex flex-col md:flex-row items-center justify-between space-y-8 md:space-y-0 w-full">
-                            {/* Create Bill Stage */}
                             <div className="flex flex-col items-center text-center md:w-1/3">
                                 <div className="text-green-500 mb-2 text-3xl">
                                     <PlusOutlined />
@@ -48,13 +42,8 @@ const BillingDetailsList = ({ billingId }) => {
                                     <ClockCircleOutlined className="mr-1" />
                                     Created on 05-01-2024
                                 </p>
-                               
                             </div>
-
-                            {/* Connector Line */}
                             <div className="hidden md:block lg:block w-0 h-0 md:w-56 md:h-0.5 bg-gray-300"></div>
-
-                            {/* Send Bill Stage */}
                             <div className="flex flex-col items-center text-center md:w-1/3">
                                 <div className="text-orange-500 mb-2 text-3xl mt-2">
                                     <MailOutlined />
@@ -65,11 +54,7 @@ const BillingDetailsList = ({ billingId }) => {
                                     Sent on 05-01-2024
                                 </p>
                             </div>
-
-                            {/* Connector Line */}
                             <div className="hidden md:block lg:block w-0 h-0 md:w-56 md:h-0.5 bg-gray-300"></div>
-
-                            {/* Get Paid Stage */}
                             <div className="flex flex-col items-center text-center md:w-1/3">
                                 <div className="text-cyan-500 mb-2 text-3xl">
                                     <BsCurrencyDollar />

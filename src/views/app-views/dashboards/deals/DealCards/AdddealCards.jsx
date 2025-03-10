@@ -116,7 +116,6 @@ const AddDealCards = ({ onClose }) => {
     leadStage: Yup.string().required("Lead Stage is required"),
     email: Yup.string().required("Email is required"),
     assigned: Yup.string().required("Assigned is required"),
-    // Details section
     notes: Yup.string().when("details", {
       is: true,
       then: Yup.string().required("Notes are required"),
@@ -131,7 +130,6 @@ const AddDealCards = ({ onClose }) => {
     }),
     lastContacted: Yup.date().nullable(),
 
-    // Info section
     totalBudget: Yup.string().when("info", {
       is: true,
       then: Yup.string().required("Total Budget is required"),

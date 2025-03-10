@@ -87,7 +87,6 @@ const CreditNotesList = () => {
 
   useEffect(() => {
     if (creditNotesData && invoicesData) {
-      // Combine credit notes with their corresponding invoice numbers
       const combinedData = creditNotesData.map(creditNote => {
         const matchingInvoice = invoicesData.find(invoice => invoice.id === creditNote.invoice);
         return {
@@ -139,13 +138,9 @@ const CreditNotesList = () => {
 
   const stripHtmlTags = (html) => {
     if (!html) return '';
-    // First, decode any HTML entities
     const decoded = html.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-    // Create a temporary element
     const temp = document.createElement('div');
-    // Set the HTML content
     temp.innerHTML = decoded;
-    // Get the text content
     return temp.textContent || temp.innerText || '';
   };
 
@@ -153,8 +148,6 @@ const CreditNotesList = () => {
     openEditCreditNotesModal();
     setIdd(idd);
   };
-
-  //// permission
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);

@@ -25,18 +25,12 @@ const AddCurrencies = ({ onClose }) => {
     try {
       await dispatch(addcurren(values)).unwrap();
       await dispatch(getcurren());
-      // notification.success({
-      //   message: 'Success',
-      //   description: 'Currency added successfully.',
-      // });
+     
       message.success('Currency added successfully.');
       resetForm();
       onClose();
     } catch (error) {
-      // notification.error({
-      //   message: 'Error',
-      //   description: error.message || 'Failed to add currency.',
-      // });
+    
       message.error('Failed to add currency.');
     } finally {
       setSubmitting(false);

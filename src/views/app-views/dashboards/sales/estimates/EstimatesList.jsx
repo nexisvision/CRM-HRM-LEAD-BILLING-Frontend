@@ -14,8 +14,6 @@ import {
   Modal,
   message
 } from "antd";
-// import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
-// import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
 import {
   EyeOutlined,
   DeleteOutlined,
@@ -80,27 +78,22 @@ const EstimatesList = () => {
     setFilteredData(allsdata);
   }, [allsdata]);
 
-  // Add useEffect to get unique categories
   useEffect(() => {
     if (allsdata && allsdata.length > 0) {
-      // Extract unique categories from data
       const uniqueCategories = [...new Set(allsdata.map(item => item.category))].filter(Boolean);
       setCategoryOptions(['All', ...uniqueCategories]);
     }
   }, [allsdata]);
 
-  // Search function
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
     
-    // If no data or empty search, show all data
     if (!value || !allsdata) {
       setFilteredData(allsdata);
       return;
     }
     
-    // Filter the data based on Quotation Number
     const filtered = allsdata.filter(estimate => 
       estimate.salesQuotationNumber?.toString().toLowerCase().includes(value)
     );
@@ -108,7 +101,6 @@ const EstimatesList = () => {
     setFilteredData(filtered);
   };
 
-  // Open Add Job Modal
   const openAddEstimatesModal = () => {
     setIsAddEstimatesModalVisible(true);
   };
@@ -136,7 +128,6 @@ const EstimatesList = () => {
     setIdd(id);
     
 };
-  // Update the exportToExcel function to use filteredData instead of list
   const exportToExcel = () => {
     try {
       const ws = utils.json_to_sheet(filteredData);
@@ -160,9 +151,6 @@ const EstimatesList = () => {
     }
 
   };
-
-
-    //// permission
       
                 const roleId = useSelector((state) => state.user.loggedInUser.role_id);
                 const roles = useSelector((state) => state.role?.role?.data);
@@ -190,8 +178,6 @@ const EstimatesList = () => {
                 const canDeleteClient = allpermisson?.includes('delete');
                 const canViewClient = allpermisson?.includes('view');
       
-                ///endpermission
-
 
   const dropdownMenu = (row) => (
     <Menu>
@@ -206,21 +192,6 @@ const EstimatesList = () => {
             </Flex>
         </Menu.Item>
         ) : null}
-        {/* <Menu.Item>
-            <Flex alignItems="center">
-                <PlusCircleOutlined />
-                <span className="ml-2">Add to remark</span>
-            </Flex>
-        </Menu.Item>
-       
-        <Menu.Item>
-            <Flex alignItems="center">
-                <TiPinOutline />
-                <span className="ml-2">Pin</span>
-            </Flex>
-        </Menu.Item> */}
-       
-
         
         {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
            <Menu.Item onClick={() => EditFun(row.id)}>
@@ -252,7 +223,6 @@ const EstimatesList = () => {
         <span
           className="cursor-pointer hover:underline"
           onClick={() => {
-            // Check if user has view permission
             if (whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) {
               setSelectedQuotationId(record.id);
               openviewEstimatesModal();
@@ -289,7 +259,6 @@ const EstimatesList = () => {
       title: "Customer",
       dataIndex: "customer",
       render: (_, record) => {
-        // Find the customer from customers data
         const customerData = fnddataCustomers?.find(cust => cust.id === record.customer);
         return <span>{customerData?.name || "Unknown Customer"}</span>;
       },
@@ -361,14 +330,12 @@ const EstimatesList = () => {
     
     let filtered = filteredData;
 
-    // Apply search filter
     if (searchText) {
       filtered = filtered.filter(item => 
         item.salesQuotationNumber?.toString().toLowerCase().includes(searchText.toLowerCase())
       );
     }
 
-    // Apply category filter
     if (selectedCategory !== 'All') {
       filtered = filtered.filter(item => 
         item.category === selectedCategory
@@ -381,18 +348,7 @@ const EstimatesList = () => {
   return (
     <>
       <Card>
-        {/* <Row gutter={16}>
-          {annualStatisticData.map((elm, i) => (
-            <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-              <StatisticWidget
-                title={elm.title}
-                value={elm.value}
-                status={elm.status}
-                subtitle={elm.subtitle}
-              />
-            </Col>
-          ))}
-        </Row> */}
+       
         <Flex
           alignItems="center"
           justifyContent="space-between"
@@ -413,25 +369,7 @@ const EstimatesList = () => {
                 className="search-input"
               />
             </div>
-            {/* <div className="w-full md:w-48">
-              <Col span={12} className="w-full">
-                <Select
-                  defaultValue="All"
-                  className="w-full"
-                  onChange={(value) =>
-                    setFilteredData(
-                      allsdata.filter(
-                        (item) => value === "All" || item.orderStatus === value
-                      )
-                    )
-                  }
-                >
-                  <Option value="All">All</Option>
-                  <Option value="Ready">Ready</Option>
-                  <Option value="Shipped">Shipped</Option>
-                </Select>
-              </Col>
-            </div> */}
+           
             <div className="mb-3">
               <Select
                 defaultValue="All"

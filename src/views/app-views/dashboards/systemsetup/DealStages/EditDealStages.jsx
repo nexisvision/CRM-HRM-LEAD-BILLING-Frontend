@@ -160,10 +160,10 @@ const EditDealStages = ({ idd, onClose }) => {
                             {...field}
                             className="w-full mt-1"
                             placeholder="Select Pipeline"
-                            value={values.pipeline} // Controlled by Formik
+                            value={values.pipeline} 
                             onChange={(value) =>
                               setFieldValue("pipeline", value)
-                            } // Ensure user can select
+                            }
                             onBlur={() => setFieldTouched("pipeline", true)}
                             dropdownRender={menu => (
                               <>

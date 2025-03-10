@@ -127,7 +127,6 @@ const TrainingSetupList = () => {
     }
   }, [fnddata]);
 
-  //// permission
                                               
                                 const roleId = useSelector((state) => state.user.loggedInUser.role_id);
                                 const roles = useSelector((state) => state.role?.role?.data);
@@ -154,8 +153,6 @@ const TrainingSetupList = () => {
                                 const canDeleteClient = allpermisson?.includes('delete');
                                 const canViewClient = allpermisson?.includes('view');
                              
-                                ///endpermission
-
 
 
   const getjobStatus = (status) => {
@@ -198,20 +195,6 @@ const TrainingSetupList = () => {
         onClick: () => viewfun(elm.id)
       },
 
-      // Send Mail and Add to Job OnBoard options are commented out but kept for reference
-      // {
-      //   key: 'mail',
-      //   icon: <MailOutlined />,
-      //   label: 'Send Mail',
-      //   onClick: () => showUserProfile(elm)
-      // },
-      // {
-      //   key: 'pin',
-      //   icon: <PushpinOutlined />,
-      //   label: 'Add to Job OnBoard',
-      //   onClick: () => showUserProfile(elm)
-      // },
-
       ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'edit',
         icon: <EditOutlined />,
@@ -234,11 +217,7 @@ const TrainingSetupList = () => {
       dataIndex: "category",
       sorter: (a, b) => a.category.length - b.category.length,
     },
-    // {
-    //   title: "Links",
-    //   dataIndex: "links",
-    //   sorter: (a, b) => a.links.length - b.links.length,
-    // },
+
     {
       title: "Action",
       dataIndex: "actions",
@@ -277,7 +256,7 @@ const TrainingSetupList = () => {
           <Button
             type="primary"
             icon={<FileExcelOutlined />}
-            onClick={exportToExcel} // Call export function when the button is clicked
+            onClick={exportToExcel} 
             block
           >
             Export All

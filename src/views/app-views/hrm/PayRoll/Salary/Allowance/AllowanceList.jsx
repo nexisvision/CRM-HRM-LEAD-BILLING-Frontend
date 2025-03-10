@@ -47,17 +47,14 @@ const AllowanceList = ({ id, onClose }) => {
     }
   }, [fndcdata,fnddatasss]);
 
-  // Open Add Salary Modal
   const openModal = () => {
     setIsModalVisible(true);
   };
 
-  // Close Add Salary Modal
   const closeModal = () => {
     setIsModalVisible(false);
   };
 
-  // Search functionality
   const onSearch = (e) => {
     const value = e.currentTarget.value.toLowerCase();
     const filteredData = utils.wildCardSearch(employeeSalaryData, value);
@@ -65,7 +62,6 @@ const AllowanceList = ({ id, onClose }) => {
     setSelectedRowKeys([]);
   };
 
-  // Delete a salary entry
   const deleteSalaryEntry = (id) => {
     dispatch(deleteallowan(id)).then(() => {
       dispatch(getallowan());
@@ -74,14 +70,9 @@ const AllowanceList = ({ id, onClose }) => {
     });
   };
 
-  // Dropdown menu for action options
   const dropdownMenu = (record) => (
     <Menu>
-      {/* <Menu.Item>
-        <Button type="text" icon={<EyeOutlined />} size="small">
-          View Details
-        </Button>
-      </Menu.Item> */}
+
       <Menu.Item>
         <Button
           type="text"
@@ -95,13 +86,8 @@ const AllowanceList = ({ id, onClose }) => {
     </Menu>
   );
 
-  // Table columns
   const tableColumns = [
-    // {
-    //   title: "Employee Name",
-    //   dataIndex: "employeename",
-    //   sorter: (a, b) => a.name.localeCompare(b.name),
-    // },
+   
     {
       title: "Allowance Option",
       dataIndex: "allowanceOption",
@@ -155,9 +141,7 @@ const AllowanceList = ({ id, onClose }) => {
           <Button type="primary" onClick={openModal}>
             <PlusOutlined />
           </Button>
-          {/* <Button type="primary" icon={<FileExcelOutlined />} block>
-            Export All
-          </Button> */}
+         
         </Flex>
       </Flex>
       <div className="table-responsive mt-3">

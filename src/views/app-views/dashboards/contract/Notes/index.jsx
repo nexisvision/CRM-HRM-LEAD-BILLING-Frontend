@@ -61,18 +61,13 @@ const Notes = () => {
         />
         <Button
           type="primary"
-        //   style={{
-           
-        //     borderColor: "#40c057",
-        //     height: "auto",
-        //   }}
+       
           onClick={handleAddNote}
         >
           Add
         </Button>
       </div>
 
-      {/* Notes List */}
       <div>
         {notes.map((note) => (
           <div

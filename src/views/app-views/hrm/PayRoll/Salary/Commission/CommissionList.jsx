@@ -95,13 +95,8 @@ const CommissionList = ({ id, onClose }) => {
     </Menu>
   );
 
-  // Table columns
   const tableColumns = [
-    // {
-    //   title: "Employee Name",
-    //   dataIndex: "employeename",
-    //   sorter: (a, b) => a.name.localeCompare(b.name),
-    // },
+    
 
     {
       title: "Title",
@@ -151,9 +146,7 @@ const CommissionList = ({ id, onClose }) => {
           <Button type="primary" onClick={openModal}>
             <PlusOutlined />
           </Button>
-          {/* <Button type="primary" icon={<FileExcelOutlined />} block>
-            Export All
-          </Button> */}
+        
         </Flex>
       </Flex>
       <div className="table-responsive mt-3">

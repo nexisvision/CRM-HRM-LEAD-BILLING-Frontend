@@ -95,7 +95,6 @@ const NotificationPage = () => {
     }
   }, [fnddata]);
 
-  // Priority badge color helper
   const getPriorityColor = (priority) => {
     const colors = {
       high: '#ff4d4f',
@@ -105,7 +104,6 @@ const NotificationPage = () => {
     return colors[priority] || colors.medium;
   };
 
-  // Enhanced icon styling with gradients
   const getTypeIcon = (type) => {
     const iconStyles = {
       normal: {
@@ -163,7 +161,6 @@ const NotificationPage = () => {
   const handleNotificationClick = (notification) => {
     setNoti(notification);
 
-    // Parse assignTo to include only user data
     let assignToObject = {
       assignedUsers: []
     };
@@ -185,7 +182,6 @@ const NotificationPage = () => {
       notification: notification
     };
 
-    // Check notification type and show appropriate modal
     if (notification.title === "New Plan") {
       setSelectedPlan(notification);
       setIsViewPlanModalVisible(true);
@@ -435,7 +431,6 @@ const NotificationPage = () => {
   );
 };
 
-// Updated styles with optimized spacing
 const styles = `
   .custom-tabs .ant-tabs-nav {
     margin-bottom: 12px !important;

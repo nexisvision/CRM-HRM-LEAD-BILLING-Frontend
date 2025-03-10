@@ -44,11 +44,9 @@ function ActivityList() {
   const timestamp = "2025-01-03T11:02:10.000Z";
   const date = new Date(timestamp);
 
-  // Format as "YYYY-MM-DD HH:mm:ss"
   const formattedDate = date.toISOString().split("T")[0]; // Extract "YYYY-MM-DD"
   const formattedTime = date.toTimeString().split(" ")[0]; // Extract "HH:mm:ss"
 
-  // Combine date and time with a space
   const displayTime = `${formattedDate}     ${formattedTime}`;
 
 

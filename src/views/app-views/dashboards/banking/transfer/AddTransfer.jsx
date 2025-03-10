@@ -110,7 +110,6 @@ const AddTransfer = ({ onClose }) => {
                                                 {...field}
                                                 onChange={(value) => {
                                                     setFieldValue('fromAccount', value);
-                                                    // If selected bank is same as toAccount, clear toAccount
                                                     if (value === values.toAccount) {
                                                         setFieldValue('toAccount', '');
                                                     }

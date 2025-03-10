@@ -32,7 +32,6 @@ export const getJobonBoarding = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -58,7 +57,7 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
+// Asyc thunk for deleting a user
 export const deleteJobonBoarding = createAsyncThunk(
   "users/deleteJobonBoardingeet",
   async (userId, thunkAPI) => {

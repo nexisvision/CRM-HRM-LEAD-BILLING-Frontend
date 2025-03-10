@@ -12,16 +12,3 @@ const FirebaseConfig = {
 export default FirebaseConfig
 
 
-
-// const FirebaseConfig = {
-//   apiKey: 'AIzaSyAOWoRQGoegkmwnCca7B2GG5GUG_ZP1lcM',
-//   authDomain: '',
-//   databaseURL: '',
-//   projectId: '',
-//   storageBucket: '',
-//   messagingSenderId: '',
-//   appId: '',
-//   measurementId: ''
-// };
-
-// export default FirebaseConfig

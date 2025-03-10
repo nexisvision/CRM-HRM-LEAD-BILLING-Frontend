@@ -17,7 +17,6 @@ export const AddDocu = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
 
 export const getDocu = createAsyncThunk("emp/getDocu", async (thunkAPI) => {
   try {
@@ -28,7 +27,6 @@ export const getDocu = createAsyncThunk("emp/getDocu", async (thunkAPI) => {
   }
 });
 
-// Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -41,7 +39,6 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -54,7 +51,6 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
 export const deleteDocu = createAsyncThunk(
   "users/deleteDocu",
   async (userId, thunkAPI) => {
@@ -80,7 +76,6 @@ export const editDocu = createAsyncThunk(
   }
 );
 
-// Async thunk for updating a user
 
 const initialUser = () => {
   const item = window.localStorage.getItem("USER");

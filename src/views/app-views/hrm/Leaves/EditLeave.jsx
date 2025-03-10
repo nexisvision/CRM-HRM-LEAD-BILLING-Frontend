@@ -10,7 +10,6 @@ import { EditLeave as EditLeaveAction, GetLeave } from "./LeaveReducer/LeaveSlic
 
 const { Option } = Select;
 
-// Validation Schema
 const LeaveSchema = Yup.object().shape({
   employeeId: Yup.string().required("Employee is required"),
   leaveType: Yup.string().required("Leave type is required"),
@@ -67,7 +66,6 @@ const EditLeave = ({ editid, onClose }) => {
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const id = editid;
-      // Format the values to ISO date strings
       const formattedValues = {
         ...values,
         startDate: moment(values.startDate).format('YYYY-MM-DD'),
@@ -98,7 +96,6 @@ const EditLeave = ({ editid, onClose }) => {
         {({ errors, touched, setFieldValue, values, isSubmitting }) => (
           <Form className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Employee Selection */}
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Employee <span className="text-red-500">*</span>
@@ -120,7 +117,6 @@ const EditLeave = ({ editid, onClose }) => {
                 )}
               </div>
 
-              {/* Leave Type */}
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Leave Type <span className="text-red-500">*</span>
@@ -140,7 +136,6 @@ const EditLeave = ({ editid, onClose }) => {
                 )}
               </div>
 
-              {/* Date Pickers */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Start Date <span className="text-red-500">*</span>
@@ -173,7 +168,6 @@ const EditLeave = ({ editid, onClose }) => {
                 )}
               </div>
 
-              {/* Reason and Remark */}
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Reason <span className="text-red-500">*</span>
@@ -205,7 +199,6 @@ const EditLeave = ({ editid, onClose }) => {
               </div>
             </div>
 
-            {/* Buttons */}
             <div className="flex justify-end space-x-4 mt-6">
               <Button
                 type="default"

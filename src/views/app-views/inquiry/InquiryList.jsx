@@ -114,7 +114,6 @@ const InquiryList = () => {
     setIsSearching(false);
   }, 300); // 300ms delay
 
-  // Modified onSearch function
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     setSearchValue(value);
@@ -235,21 +234,7 @@ const InquiryList = () => {
       dataIndex: "subject",
       sorter: (a, b) => a.subject.length - b.subject.length,
     },
-    // {
-    //   title: "Phone",
-    //   dataIndex: "phone",
-    //   sorter: (a, b) => a.phone.length - b.phone.length,
-    // },
-    // {
-    //     title: "Subject",
-    //     dataIndex: "subject",
-    //     sorter: (a, b) => a.subject.length - b.subject.length,
-    //   },
-    //   {
-    //     title: "Message",
-    //     dataIndex: "message",
-    //     sorter: (a, b) => a.message.length - b.message.length,
-    //   },
+
     {
       title: "Action",
       dataIndex: "actions",

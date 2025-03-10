@@ -21,25 +21,18 @@ import {
   EditOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-// import UserView from '../../../Users/user-list/UserView';
 import Flex from "components/shared-components/Flex";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import AddDocument from "./AddDocument";
 import EditDocument from "./EditDocument";
-// import userData from "assets/data/user-list.data.json";
-// import AddDocument from "./AddDocument";
-// import EditTrainingSetup from "./EditTrainingSetup";
 import userData from "../../../../assets/data/user-list.data.json";
 import OrderListData from "../../../../assets/data/order-list.data.json";
 import { utils, writeFile } from "xlsx";
-// import { Deletetrainng, GetallTrainng } from "./TrainingReducer/TrainingSlice";
 import useSelection from "antd/es/table/hooks/useSelection";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { deleteDocu, getDocu } from "./DocumentReducers/documentSlice";
-// import ViewTrainingSetup from "./ViewTrainingSetup";
-// import ViewJobApplication from './ViewJobApplication';
 
 const { Option } = Select;
 
@@ -47,7 +40,6 @@ const DocumentList = () => {
   const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
   const [userProfileVisible, setUserProfileVisible] = useState(false);
-  // const [viewApplicationVisible, setViewApplicationVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [list, setList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -55,8 +47,6 @@ const DocumentList = () => {
     useState(false);
   const [isEditTrainingSetupModalVisible, setIsEditTrainingSetupModalVisible] =
     useState(false);
-  //   const [isViewTrainingSetupModalVisible, setIsViewTrainingSetupModalVisible] =
-  //     useState(false);
 
   const [idd, setIdd] = useState("");
 
@@ -92,13 +82,6 @@ const DocumentList = () => {
     setIsEditTrainingSetupModalVisible(false);
   };
 
-  //   const openviewTrainingSetupModal = () => {
-  //     setIsViewTrainingSetupModalVisible(true);
-  //   };
-
-  //   const closeViewTrainingSetupModal = () => {
-  //     setIsViewTrainingSetupModalVisible(false);
-  //   };
 
   const exportToExcel = () => {
     try {
@@ -139,7 +122,6 @@ const DocumentList = () => {
     setSelectedUser(null);
   };
 
-  //// permission
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
@@ -166,12 +148,6 @@ const DocumentList = () => {
   const canDeleteClient = allpermisson?.includes('delete');
   const canViewClient = allpermisson?.includes('view');
 
-  ///endpermission
-
-
-  //   useEffect(() => {
-  //     dispatch(GetallTrainng());
-  //   }, []);
 
   useEffect(() => {
     if (fnddata) {
@@ -179,15 +155,6 @@ const DocumentList = () => {
     }
   }, [fnddata]);
 
-  // const showViewApplication = (userInfo) => {
-  //   setViewApplicationVisible(true);
-  //   setSelectedUser(userInfo);
-  // };
-
-  // const closeViewApplication = () => {
-  //   setViewApplicationVisible(false);
-  //   setSelectedUser(null);
-  // };
 
   const getjobStatus = (status) => {
     if (status === "active") {
@@ -213,34 +180,11 @@ const DocumentList = () => {
     openEditTrainingSetupModal();
     setIdd(idd);
   };
-  //   const viewfun = (idd) => {
-  //     openviewTrainingSetupModal();
-  //     setIdd(idd);
-  //   };
 
   const jobStatusList = ["active", "blocked"];
 
   const dropdownMenu = (elm) => ({
     items: [
-      // View Details, Send Mail, and Pin options are commented out but kept for reference
-      // {
-      //   key: 'view',
-      //   icon: <EyeOutlined />,
-      //   label: 'View Details',
-      //   onClick: () => viewfun(elm.id)
-      // },
-      // {
-      //   key: 'mail',
-      //   icon: <MailOutlined />,
-      //   label: 'Send Mail',
-      //   onClick: () => showUserProfile(elm)
-      // },
-      // {
-      //   key: 'pin',
-      //   icon: <PushpinOutlined />,
-      //   label: 'Add to Job OnBoard',
-      //   onClick: () => showUserProfile(elm)
-      // },
       
       ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'edit',
@@ -264,22 +208,12 @@ const DocumentList = () => {
       dataIndex: "name",
       sorter: (a, b) => a.name.length - b.name.length,
     },
-    // {
-    //   title: "role",
-    //   dataIndex: "role",
-    //   sorter: (a, b) => a.role.length - b.role.length,
-    // },
     {
       title: "description",
       dataIndex: "description",
       sorter: (a, b) => a.description.length - b.description.length,
       render: (text) => <div dangerouslySetInnerHTML={{ __html: text }} /> // Render HTML content
     },
-    //   {
-    //     title: "files",
-    //     dataIndex: "files",
-    //     sorter: (a, b) => a.files.length - b.files.length,
-    //   },
 
     {
       title: "Action",
@@ -340,9 +274,6 @@ const DocumentList = () => {
 
 
       </div>
-      {/* <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} /> */}
-
-      {/* <ViewJobApplication data={selectedUser} visible={viewApplicationVisible} close={closeViewApplication} />  */}
 
       <Modal
         title="Add Document"
@@ -366,16 +297,7 @@ const DocumentList = () => {
         <EditDocument onClose={closeEditTrainingSetupModal} idd={idd} />
       </Modal>
 
-      {/* <Modal
-        title="Edit Training Setup"
-        visible={isViewTrainingSetupModalVisible}
-        onCancel={closeViewTrainingSetupModal}
-        footer={null}
-        width={1000}
-        className="mt-[-70px]"
-      >
-        <ViewTrainingSetup onClose={closeViewTrainingSetupModal} idd={idd} />
-      </Modal> */}
+     
     </Card>
   );
 };

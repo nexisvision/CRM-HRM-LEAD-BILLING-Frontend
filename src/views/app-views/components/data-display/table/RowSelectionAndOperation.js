@@ -28,13 +28,12 @@ for (let i = 0; i < 46; i++) {
 
 export class RowSelectionAndOperation extends Component {
   state = {
-    selectedRowKeys: [], // Check here to configure the default column
+    selectedRowKeys: [], 
     loading: false
   };
 
   start = () => {
     this.setState({ loading: true });
-    // ajax request after empty completing
     setTimeout(() => {
       this.setState({
         selectedRowKeys: [],

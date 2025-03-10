@@ -137,7 +137,6 @@ export const HeaderNav = props => {
 
 	const handleHeaderClick = (e) => {
 		if (!e.target.closest('.nav-profile')) {
-			// Close any open menus if needed
 		}
 	};
 

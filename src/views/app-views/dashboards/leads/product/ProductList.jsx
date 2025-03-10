@@ -81,32 +81,26 @@ const ProductList = () => {
     }
   }, [filtermin]);
 
-  // Open Add Job Modal
   const openAddProductModal = () => {
     setIsAddProductModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeAddProductModal = () => {
     setIsAddProductModalVisible(false);
   };
 
-  // Open Add Job Modal
   const openEditProductModal = () => {
     setIsEditProductModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeEditProductModal = () => {
     setIsEditProductModalVisible(false);
   };
 
-  // Open Add Job Modal
   const openViewProductModal = () => {
     setIsViewProductModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeViewProductModal = () => {
     setIsViewProductModalVisible(false);
   };
@@ -130,7 +124,6 @@ const ProductList = () => {
       const updatedData = await dispatch(GetProdu(id));
       setList(list.filter((item) => item.id !== exid));
 
-      // message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error.message || error);
     }
@@ -142,7 +135,6 @@ const ProductList = () => {
       const wb = utils.book_new(); // Create a new workbook
       utils.book_append_sheet(wb, ws, "Product"); // Append the worksheet to the workbook
 
-      // Write the workbook to a file
       writeFile(wb, "ProductData.xlsx");
       message.success("Data exported successfully!");
     } catch (error) {

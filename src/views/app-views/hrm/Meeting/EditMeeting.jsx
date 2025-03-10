@@ -94,7 +94,6 @@ const EditMeeting = ({ editData, meetid, onClose }) => {
   useEffect(() => {
     if (dataM) {
       try {
-        // Parse the employee JSON string to array
         const employeeIds = JSON.parse(dataM.employee);
 
         setInitialValues({

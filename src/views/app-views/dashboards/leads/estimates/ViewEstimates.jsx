@@ -8,22 +8,18 @@ import NumberFormat from 'react-number-format';
 function ViewEstimates({ estimateId, onClose }) {
     const dispatch = useDispatch();
     
-    // Get data from Redux store
     const estimate = useSelector((state) => 
         state.estimate.estimates.find(est => est.id === estimateId)
     );
     
     const [tableData, setTableData] = useState([]);
 
-    // Process items data when estimate changes
     useEffect(() => {
         if (estimate?.items) {
             try {
-                // Parse the items string to object if needed
                 const itemsObj = typeof estimate.items === 'string' ? 
                     JSON.parse(estimate.items) : estimate.items;
 
-                // Convert items object to array
                 const itemsArray = Object.entries(itemsObj).map(([key, item]) => ({
                     key,
                     ...item

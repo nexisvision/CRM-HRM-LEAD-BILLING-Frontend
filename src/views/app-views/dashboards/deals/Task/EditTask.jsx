@@ -123,7 +123,6 @@ const EditTask = ({ visible, onCancel, onUpdate, taskData }) => {
           </Button>
         </div>
       </form>
-    // </Modal>
   );
 };
 

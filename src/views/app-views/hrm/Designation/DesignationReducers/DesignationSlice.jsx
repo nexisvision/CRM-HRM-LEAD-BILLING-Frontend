@@ -17,8 +17,6 @@ export const AddDes = createAsyncThunk(
     }
 );
 
-// Async thunk for user login
-
 
 export const getDes = createAsyncThunk(
     "emp/getEmp",

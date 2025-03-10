@@ -73,10 +73,8 @@ export const scrumboardSlice = createSlice({
       addNewBoard: (state, action) => {
         const { boardTitle, currentColumns, currentOrdered } = action.payload;
         
-        // Add new empty board
         state.columns[boardTitle] = [];
         
-        // Create new columns object with the new board
         const newColumns = {};
         const newOrdered = [...currentOrdered, boardTitle];
         
@@ -84,14 +82,10 @@ export const scrumboardSlice = createSlice({
           newColumns[boardName] = currentColumns[boardName] || [];
         });
         
-        // Update state
         state.columns = newColumns;
         state.ordered = Object.keys(newColumns);
         state.modal = false;
       },
-  
-      // Optional: Add these if you need them separately
-
   
       updateCurrentListId: (state, action) => {
         state.currentListId = action.payload;
@@ -156,7 +150,6 @@ export const {
   resetForm
 } = scrumboardSlice.actions;
 
-// Export selectors
 export const selectScrumboard = (state) => state.scrumboard;
 export const selectColumns = (state) => state.scrumboard.columns;
 export const selectOrdered = (state) => state.scrumboard.ordered;

@@ -82,12 +82,10 @@ const AddRole = ({ onClose,resetForm }) => {
 
   const permissions = ['view', 'create', 'update', 'delete'];
 
-  // Handle module tab click
   const handleModuleClick = (moduleName) => {
     setActiveTab(moduleName);
   };
 
-  // Handle select all for entire module
   const handleSelectAllModule = (checked) => {
     const newPermissions = { ...modulePermissions };
     subModules[activeTab].forEach(submodule => {
@@ -98,15 +96,12 @@ const AddRole = ({ onClose,resetForm }) => {
     });
     setModulePermissions(newPermissions);
   };
-  // Check if all permissions in the current module are selected
   const isAllModuleSelected = () => {
     return subModules[activeTab].every(submodule =>
       permissions.every(perm => modulePermissions[submodule]?.[perm])
     );
   };
 
-
-  // Handle select all permissions for a submodule
   const handleSelectAllSubmodule = (submodule) => {
     setModulePermissions(prev => {
       const currentPermissions = prev[submodule] || {};
@@ -124,7 +119,6 @@ const AddRole = ({ onClose,resetForm }) => {
     });
   };
 
-  // Handle individual permission toggle
   const handlePermissionToggle = (submodule, permission) => {
     setModulePermissions(prev => ({
       ...prev,
@@ -137,7 +131,6 @@ const AddRole = ({ onClose,resetForm }) => {
 
   };
 
-  // Check if all permissions are selected for a submodule
   const isAllSelected = (submodule) => {
     return permissions.every(perm => modulePermissions[submodule]?.[perm]);
   };
@@ -148,20 +141,18 @@ const AddRole = ({ onClose,resetForm }) => {
   const onFinish = (values) => {
     const payload = {
         role_name: values.role_name,
-        permissions: {} // Initialize permissions as an empty object
+        permissions: {} 
     };
 
-    // Format permissions for API
     Object.entries(modulePermissions).forEach(([submoduleKey, perms]) => {
         const selectedPermissions = Object.entries(perms)
             .filter(([perm, isSelected]) => isSelected)
             .map(([perm]) => perm.toLowerCase());
 
         if (selectedPermissions.length > 0) {
-            // Use the submodule key as the module name in the permissions object
-            const moduleName = submoduleKey.toLowerCase(); // Convert to lowercase for consistency
+            const moduleName = submoduleKey.toLowerCase(); 
             if (!payload.permissions[moduleName]) {
-                payload.permissions[moduleName] = []; // Initialize if it doesn't exist
+                payload.permissions[moduleName] = []; 
             }
             payload.permissions[moduleName].push({
                 key: submoduleKey,

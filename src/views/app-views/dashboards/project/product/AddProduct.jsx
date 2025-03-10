@@ -78,7 +78,6 @@ const AddProduct = ({ idd, onClose }) => {
             );
           
           setCategories(filteredLabels);
-          // Set the newly created category as the selected value
           if (setFieldValue) {
             setFieldValue("category", newCategory.trim());
           }
@@ -129,14 +128,12 @@ const AddProduct = ({ idd, onClose }) => {
 
     const formData = new FormData();
     
-    // Append all form values except image
     Object.keys(values).forEach(key => {
       if (key !== 'image') {
         formData.append(key, values[key]);
       }
     });
 
-    // Append the file if exists
     if (fileList[0]?.originFileObj) {
       formData.append('image', fileList[0].originFileObj);
     }
@@ -149,7 +146,6 @@ const AddProduct = ({ idd, onClose }) => {
     });
   };
 
-  // Handle file upload changes
   const handleFileChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
 };

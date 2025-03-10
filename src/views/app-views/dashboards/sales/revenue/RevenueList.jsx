@@ -71,22 +71,17 @@ const RevenueList = () => {
     }
   }, [fnddata]);
 
-  // Open Add Job Modal
   const openAddRevenueModal = () => {
     setIsAddRevenueModalVisible(true);
   };
-
-  // Close Add Job Modal
   const closeAddRevenueModal = () => {
     setIsAddRevenueModalVisible(false);
   };
 
-  // Open Add Job Modal
   const openEditRevenueModal = () => {
     setIsEditRevenueModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeEditRevenueModal = () => {
     setIsEditRevenueModalVisible(false);
   };
@@ -101,7 +96,6 @@ const RevenueList = () => {
     }
   };
 
-   //// permission
     
               const roleId = useSelector((state) => state.user.loggedInUser.role_id);
               const roles = useSelector((state) => state.role?.role?.data);
@@ -129,18 +123,13 @@ const RevenueList = () => {
               const canDeleteClient = allpermisson?.includes('delete');
               const canViewClient = allpermisson?.includes('view');
     
-              ///endpermission
-
-
 
   const exportToExcel = () => {
     try {
-      // Create a worksheet from the formatted data
       const ws = utils.json_to_sheet(list);
       const wb = utils.book_new(); // Create a new workbook
       utils.book_append_sheet(wb, ws, "Revenue"); // Append the worksheet to the workbook
 
-      // Write the workbook to a file
       writeFile(wb, "RevenueData.xlsx");
       message.success("Data exported successfully!");
     } catch (error) {
@@ -163,7 +152,6 @@ const RevenueList = () => {
 
   const dropdownMenu = (row) => ({
     items: [
-      // Conditionally add edit menu item
       ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'edit',
         icon: <EditOutlined />,
@@ -171,7 +159,6 @@ const RevenueList = () => {
         onClick: () => editfun(row.id)
       }] : []),
       
-      // Conditionally add delete menu item
       ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'delete',
         icon: <DeleteOutlined />,
@@ -197,7 +184,6 @@ const RevenueList = () => {
       title: "Customer",
       dataIndex: "customer",
       render: (_, record) => {
-        // Find the customer from customers data
         const customerData = fnddataCustomers?.find(cust => cust.id === record.customer);
         return <span>{customerData?.name || "Unknown Customer"}</span>;
       },
@@ -260,7 +246,6 @@ const RevenueList = () => {
 
     let filtered = [...fnddata];
 
-    // Apply text search filter
     if (text) {
       filtered = filtered.filter(revenue => {
         const customerName = fnddataCustomers?.find(cust => 
@@ -272,7 +257,6 @@ const RevenueList = () => {
       });
     }
 
-    // Apply date filter
     if (date) {
       const selectedDate = dayjs(date).startOf('day');
       filtered = filtered.filter(revenue => {
@@ -282,7 +266,6 @@ const RevenueList = () => {
       });
     }
 
-    // Apply category filter
     if (category !== 'All') {
       filtered = filtered.filter(revenue => 
         revenue.category === category
@@ -313,7 +296,6 @@ const RevenueList = () => {
     
     let filtered = list;
 
-    // Apply search filter
     if (searchText) {
       filtered = filtered.filter(revenue => {
         const customerName = fnddataCustomers?.find(cust => 
@@ -324,7 +306,6 @@ const RevenueList = () => {
       });
     }
 
-    // Apply category filter
     if (selectedCategory !== 'All') {
       filtered = filtered.filter(revenue => 
         revenue.category === selectedCategory
@@ -399,7 +380,7 @@ const RevenueList = () => {
             <Button
                 type="primary"
                 icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
+                onClick={exportToExcel} 
                 block
               >
                 Export All
@@ -452,7 +433,6 @@ const RevenueList = () => {
   );
 };
 
-// Add styles
 const styles = `
   .search-input {
     transition: all 0.3s;

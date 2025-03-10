@@ -197,7 +197,6 @@ const AddProject = ({ onClose }) => {
     }
   };
 
-  // Call fetchLabels for each labelType on mount
   useEffect(() => {
     fetchLables("tag", setTags);
     fetchLables("category", setCategories);
@@ -243,7 +242,6 @@ const AddProject = ({ onClose }) => {
           }
         }
 
-        // Reset input and close modal
         setter("");
         modalSetter(false);
       } else {
@@ -345,11 +343,9 @@ const AddProject = ({ onClose }) => {
                     value={values.startDate}
                     onChange={(date) => {
                       setFieldValue("startDate", date);
-                      // If end date is before new start date, clear it
                       if (values.endDate && date && values.endDate.isBefore(date)) {
                         setFieldValue("endDate", null);
                       }
-                      // Calculate duration if both dates are set
                       if (date && values.endDate) {
                         const startDate = date;
                         const endDate = values.endDate;
@@ -385,12 +381,10 @@ const AddProject = ({ onClose }) => {
                     format="DD-MM-YYYY"
                     value={values.endDate}
                     disabledDate={(current) => {
-                      // Disable dates before start date
                       return values.startDate ? current && current < values.startDate.startOf('day') : false;
                     }}
                     onChange={(date) => {
                       setFieldValue("endDate", date);
-                      // Calculate duration if both dates are set
                       if (values.startDate && date) {
                         const startDate = values.startDate;
                         const endDate = date;

@@ -37,7 +37,6 @@ const EditCustomer = ({ idd, onClose }) => {
     return "+91";
   };
 
-  // State to hold initial values
   const [initialValues, setInitialValues] = useState({
     name: "",
     contact: "",
@@ -65,15 +64,12 @@ const EditCustomer = ({ idd, onClose }) => {
     shipping_zipcode: "",
   });
 
-  // Fetch customer data
   useEffect(() => {
     dispatch(Getcus());
   }, [dispatch]);
 
-  // Update initialValues when finddata is available
   useEffect(() => {
     if (finddata) {
-      // Parse JSON strings for billing and shipping addresses
       const billingAddress = JSON.parse(finddata.billing_address || "{}");
       const shippingAddress = JSON.parse(finddata.shipping_address || "{}");
 
@@ -277,7 +273,6 @@ const EditCustomer = ({ idd, onClose }) => {
                             placeholder="Enter phone number"
                             onChange={(e) => handlePhoneNumberChange(e, setFieldValue, 'contact')}
                             onKeyPress={(e) => {
-                              // Allow only number keys
                               const charCode = e.which ? e.which : e.keyCode;
                               if (charCode < 48 || charCode > 57) {
                                 e.preventDefault();

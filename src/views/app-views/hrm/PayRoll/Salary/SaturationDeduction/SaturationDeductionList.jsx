@@ -50,17 +50,14 @@ const SaturationDeductionList = ({ id, onClose }) => {
     }
   }, [fnddata,fnddatasss]);
 
-  // Open Add Salary Modal
   const openModal = () => {
     setIsModalVisible(true);
   };
 
-  // Close Add Salary Modal
   const closeModal = () => {
     setIsModalVisible(false);
   };
 
-  // Search functionality
   const onSearch = (e) => {
     const value = e.currentTarget.value.toLowerCase();
     const filteredData = utils.wildCardSearch(employeeSalaryData, value);
@@ -68,7 +65,6 @@ const SaturationDeductionList = ({ id, onClose }) => {
     setSelectedRowKeys([]);
   };
 
-  // Delete a salary entry
   const deleteSalaryEntry = (id) => {
     dispatch(deltededucati(id)).then(() => {
       dispatch(getdeducati());
@@ -77,14 +73,9 @@ const SaturationDeductionList = ({ id, onClose }) => {
     });
   };
 
-  // Dropdown menu for action options
   const dropdownMenu = (record) => (
     <Menu>
-      {/* <Menu.Item>
-        <Button type="text" icon={<EyeOutlined />} size="small">
-          View Details
-        </Button>
-      </Menu.Item> */}
+      
       <Menu.Item>
         <Button
           type="text"
@@ -98,13 +89,8 @@ const SaturationDeductionList = ({ id, onClose }) => {
     </Menu>
   );
 
-  // Table columns
   const tableColumns = [
-    // {
-    //   title: "Employee",
-    //   dataIndex: "name",
-    //   sorter: (a, b) => a.name.localeCompare(b.name),
-    // },
+
 
     {
       title: "Deduction Option",
@@ -159,9 +145,7 @@ const SaturationDeductionList = ({ id, onClose }) => {
           <Button type="primary" onClick={openModal}>
             <PlusOutlined />
           </Button>
-          {/* <Button type="primary" icon={<FileExcelOutlined />} block>
-            Export All
-          </Button> */}
+       
         </Flex>
       </Flex>
       <div className="table-responsive mt-3">

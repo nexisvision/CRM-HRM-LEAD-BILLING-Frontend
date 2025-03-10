@@ -83,7 +83,6 @@ export const editovertimess = createAsyncThunk(
   }
 );
 
-// Async thunk for updating a user
 
 const initialUser = () => {
   const item = window.localStorage.getItem("USER");

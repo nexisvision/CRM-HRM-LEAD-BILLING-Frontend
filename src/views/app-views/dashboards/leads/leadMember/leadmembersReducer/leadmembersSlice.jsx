@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import EstimateService from './EstimatesService';
 import { message } from 'antd';
 
-// Create estimate
 export const createestimate = createAsyncThunk(
   'estimate/createEstimate',
   async ({ id, estimateData }, { rejectWithValue }) => {
@@ -15,7 +14,6 @@ export const createestimate = createAsyncThunk(
   }
 );    
 
-// Fetch all estimates
 export const getallestimate = createAsyncThunk(
   'estimate/getAllEstimate',
   async (id, { rejectWithValue }) => {
@@ -28,7 +26,6 @@ export const getallestimate = createAsyncThunk(
   }
 );
 
-// Fetch single invoice
 export const getestimateById = createAsyncThunk(
   "estimate/getEstimateById",
   async (id, { rejectWithValue }) => {
@@ -41,7 +38,6 @@ export const getestimateById = createAsyncThunk(
   }
 );
 
-// Update estimate
 export const updateestimate = createAsyncThunk(
   'estimate/updateEstimate',
   async ({ idd, data }, { rejectWithValue }) => {
@@ -54,7 +50,6 @@ export const updateestimate = createAsyncThunk(
   }
 );
 
-// Delete invoice thunk
 export const deleteestimate = createAsyncThunk(
   "estimate/deleteEstimate",
   async (id, { rejectWithValue }) => {
@@ -93,7 +88,6 @@ const estimateSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Create estimate
       .addCase(createestimate.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -110,7 +104,6 @@ const estimateSlice = createSlice({
         message.error(action.payload?.message);
       })
 
-      // Get all estimates
       .addCase(getallestimate.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -124,7 +117,6 @@ const estimateSlice = createSlice({
         state.error = action.payload;
       })
 
-       // Fetch single invoice
        .addCase(getestimateById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -138,7 +130,6 @@ const estimateSlice = createSlice({
         state.error = action.payload;
       })
 
-       // Update estimate
        .addCase(updateestimate.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -146,7 +137,6 @@ const estimateSlice = createSlice({
       .addCase(updateestimate.fulfilled, (state, action) => {
         state.loading = false;
         state.success = true;
-        // Update the estimate in the list
         const index = state.estimates.findIndex(
           (estimate) => estimate._id === action.payload.data._id
         );
@@ -163,7 +153,6 @@ const estimateSlice = createSlice({
 
       })
       
-      // Delete estimate
         .addCase(deleteestimate.pending, (state) => {
         state.loading = true;
         state.error = null;

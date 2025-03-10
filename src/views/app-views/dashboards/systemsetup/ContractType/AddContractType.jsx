@@ -28,9 +28,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 
 const AddContractType = ({ onClose }) => {
-  // const [users, setUsers] = useState(userData);
 
-  // const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const allloggeddata = useSelector((state) => state.user);
@@ -41,7 +39,6 @@ const AddContractType = ({ onClose }) => {
 
 
   const onSubmit = (values, { resetForm }) => {
-    // Add static labelType to payload
     const payload = {
       ...values,
       lableType: "contract",

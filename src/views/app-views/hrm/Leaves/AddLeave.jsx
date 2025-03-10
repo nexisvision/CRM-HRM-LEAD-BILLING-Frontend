@@ -58,11 +58,9 @@ const AddLeave = ({ onClose }) => {
     try {
       await dispatch(CreateL(values)).unwrap();
       dispatch(GetLeave());
-      // message.success("Leave added successfully!");
       resetForm();
       onClose();
     } catch (error) {
-      // message.error(error?.message || "Failed to add leave");
     } finally {
       setSubmitting(false);
     }
@@ -84,7 +82,6 @@ const AddLeave = ({ onClose }) => {
             className="space-y-6"
           >
             <Row gutter={[16, 16]}>
-              {/* Employee Selection */}
               <Col span={24}>
                 <div className="space-y-2">
                   <label 
@@ -118,7 +115,6 @@ const AddLeave = ({ onClose }) => {
                 </div>
               </Col>
 
-              {/* Leave Type */}
               <Col span={24}>
                 <div className="space-y-2">
                   <label 
@@ -150,7 +146,6 @@ const AddLeave = ({ onClose }) => {
                 </div>
               </Col>
 
-              {/* Date Range */}
               <Col span={12}>
                 <div className="space-y-2">
                   <label 
@@ -168,7 +163,6 @@ const AddLeave = ({ onClose }) => {
                         format="DD-MM-YYYY"
                         onChange={(date) => {
                           setFieldValue("startDate", date);
-                          // Clear end date if it's before the new start date
                           if (values.endDate && date && values.endDate.isBefore(date)) {
                             setFieldValue("endDate", null);
                           }
@@ -201,7 +195,6 @@ const AddLeave = ({ onClose }) => {
                         format="DD-MM-YYYY"
                         onChange={(date) => setFieldValue("endDate", date)}
                         disabledDate={(current) => {
-                          // Disable dates before start date
                           return values.startDate ? current && current < values.startDate.startOf('day') : false;
                         }}
                       />
@@ -215,7 +208,6 @@ const AddLeave = ({ onClose }) => {
                 </div>
               </Col>
 
-              {/* Reason */}
               <Col span={24}>
                 <div className="space-y-2">
                   <label 
@@ -243,7 +235,6 @@ const AddLeave = ({ onClose }) => {
                 </div>
               </Col>
 
-              {/* Remark */}
               <Col span={24}>
                 <div className="space-y-2">
                   <label 
@@ -272,7 +263,6 @@ const AddLeave = ({ onClose }) => {
               </Col>
             </Row>
 
-            {/* Form Actions */}
             <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
               <Button 
                 onClick={onClose}

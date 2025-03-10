@@ -29,19 +29,13 @@ import {
 } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
-// import { getallcurrencies } from '../../../setting/currencies/currenciesreducer/currenciesSlice';
 import OrderListData from "assets/data/order-list.data.json";
 import Flex from "components/shared-components/Flex";
-// import { Getmins } from '../../../dashboards/project/milestone/minestoneReducer/minestoneSlice';
 import { useSelector, useDispatch } from "react-redux";
-// import { Formik, Form, Field, ErrorMessage } from 'formik';
-// import { createInvoice } from '../../../dashboards/project/invoice/invoicereducer/InvoiceSlice';
 import * as Yup from "yup";
 
 import { GetLeads } from "../leads/LeadReducers/LeadSlice";
-// import { GetDeals } from "../deals/DealReducers/DealSlice";
 import { addpropos, getpropos } from "./proposalReducers/proposalSlice";
-// import {  } from "./proposalReducers/proposalSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
 import { getAllTaxes } from "views/app-views/setting/tax/taxreducer/taxSlice";
 import ReactQuill from "react-quill";
@@ -344,12 +338,10 @@ const AddProposal = ({ onClose }) => {
                         placeholder={Array.isArray(Leads) ? "Select Lead Title" : "Loading leads..."}
                         loading={!Array.isArray(Leads)}
                         onChange={(value) => {
-                          // Find the selected lead with null check
                           const selectedLead = fndlead?.find(lead => lead.id === value);
                           if (selectedLead) {
                             setSelectedLeadDetails(selectedLead);
 
-                            // Create new table data with lead details
                             const newTableData = [{
                               id: Date.now(),
                               item: selectedLead.leadTitle || '',
@@ -563,7 +555,6 @@ const AddProposal = ({ onClose }) => {
                             value={discountType}
                             onChange={(value) => {
                               setDiscountType(value);
-                              // Clear discount value when changing type
                               setDiscountValue('');
                               calculateTotal(tableData, 0, value);
                             }}

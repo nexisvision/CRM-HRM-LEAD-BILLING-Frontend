@@ -105,12 +105,6 @@ export const TicketList = () => {
     setIsViewTicketModalVisible(false);
   };
 
- 
-
-  // useEffect(() => {
-  //   dispatch(getAllTicket());
-  // }, [dispatch]);
-
   useEffect(() => {
     if (fnddata) {
       setList(fnddata);
@@ -118,9 +112,6 @@ export const TicketList = () => {
   }, [fnddata]);
 
   const deletfun = (userId) => {
-    // dispatch(DeleteTicket(userId));
-    // dispatch(getAllTicket());
-    // dispatch(getAllTicket());
     setList(list.filter((item) => item.id !== userId));
     message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };

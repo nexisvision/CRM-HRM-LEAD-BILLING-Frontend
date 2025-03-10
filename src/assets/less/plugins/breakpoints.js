@@ -1,8 +1,5 @@
 let gridBreakpoints = {}
 
-//
-// Helper Functions
-//
 
 function lookupVariable(context, variableName) {
 	const { frames, importantScope } = context
@@ -20,13 +17,10 @@ function lookupVariable(context, variableName) {
 	})
 }
 
-// @TODO: [@calvinjuarez] unify this function between files, maybe even canonize it as a
-// `Ruleset`/`DetachedRuleset` method at some point.
 function rulesetToMap(context, { ruleset: { rules } } = { ruleset: { rules: [] } }) {
 	const map = {}
 
 	rules.forEach(rule => {
-		// Not exactly sure how to handle other types (or if they should be handled at all).
 		if (! (rule instanceof tree.Declaration))
 			return
 
@@ -48,7 +42,6 @@ function getBreakpoints(context, breakpoints) {
 
 	const rulesetMap = rulesetToMap(context, breakpoints)
 
-	// Since values in the map will be instances of `Anonymous`, convert them to `Dimension`s.
 	for (const key in rulesetMap) {
 		const value = rulesetMap[key].value
 		const number = parseFloat(value, 10)
@@ -60,9 +53,6 @@ function getBreakpoints(context, breakpoints) {
 	return rulesetMap
 }
 
-//
-// Less Functions
-//
 
 functions.add('breakpoint-next', function ({ value: breakpointName }, breakpoints) {
 	const breakpointsMap  = getBreakpoints(this.context, breakpoints)
@@ -72,7 +62,6 @@ functions.add('breakpoint-next', function ({ value: breakpointName }, breakpoint
 	if (breakpointIndex === -1)
 		return new tree.Quoted('"')
 
-	// Next breakpoint is null for the last breakpoint.
 	if ((breakpointIndex + 1) === breakpointNames.length)
 		return new tree.Quoted('"')
 
@@ -87,7 +76,6 @@ functions.add('breakpoint-min', function ({ value: breakpointName }, breakpoints
 	if (breakpointIndex === -1)
 		return new tree.Quoted('"')
 
-	// Minumum breakpoint width is null for the first breakpoint.
 	if (breakpointIndex === 0)
 		return new tree.Quoted('"')
 
@@ -102,7 +90,6 @@ functions.add('breakpoint-max', function ({ value: breakpointName }, breakpoints
 	if (breakpointIndex === -1)
 		return new tree.Quoted('"')
 
-	// Maximum breakpoint width is null for the last breakpoint.
 	if ((breakpointIndex + 1) === breakpointNames.length)
 		return new tree.Quoted('"')
 
@@ -119,7 +106,6 @@ functions.add('breakpoint-infix', function ({ value: breakpointName }, breakpoin
 	if (breakpointIndex === -1)
 		return new tree.Quoted('"')
 
-	// Breakpoint infix is null the first breakpoint.
 	if (breakpointIndex === 0)
 		return new tree.Quoted('"')
 

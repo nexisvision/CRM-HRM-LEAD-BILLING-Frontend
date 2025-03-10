@@ -18,8 +18,6 @@ import {
   Avatar,
   Tooltip,
 } from "antd";
-// import OrderListData from "../../../../assets/data/order-list.data.json";
-// import OrderListData from "assets/data/order-list.data.json"
 import {
   EyeOutlined,
   FileExcelOutlined,
@@ -32,9 +30,6 @@ import {
 } from "@ant-design/icons";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import StatisticWidget from "components/shared-components/StatisticWidget";
-// import {
-// 	AnnualStatisticData,
-// } from '../../../dashboards/default/DefaultDashboardData';
 import { TiPinOutline } from "react-icons/ti";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
@@ -58,13 +53,9 @@ const orderStatusList = ["Normal", "Expired"];
 
 const stripHtmlTags = (html) => {
   if (!html) return '';
-  // First, decode any HTML entities
   const decoded = html.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-  // Create a temporary element
   const temp = document.createElement('div');
-  // Set the HTML content
   temp.innerHTML = decoded;
-  // Get the text content
   return temp.textContent || temp.innerText || '';
 };
 
@@ -78,7 +69,6 @@ const UserAvatarGroup = ({ users, maxCount = 3 }) => {
     return name.substring(0, 2).toUpperCase();
   };
 
-  // Professional color palette with lighter shades
   const colors = [
     { bg: '#E3F2FD', text: '#1976D2' }, // Light Blue
     { bg: '#F3E5F5', text: '#7B1FA2' }, // Light Purple
@@ -142,7 +132,6 @@ const UserAvatarGroup = ({ users, maxCount = 3 }) => {
 };
 
 const TaskList = () => {
-  // const [annualStatisticData] = useState(AnnualStatisticData);
 
   const [list, setList] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
@@ -199,12 +188,9 @@ const TaskList = () => {
   }, [fnddata]);
 
   useEffect(() => {
-    // Load pinned tasks from local storage on component mount
     const storedPinnedTasks = JSON.parse(localStorage.getItem("pinnedTasks")) || [];
     setPinnedTasks(storedPinnedTasks);
   }, []);
-
-  //// permission
 
   const whorole = userRole?.role_name;
 
@@ -228,26 +214,16 @@ const TaskList = () => {
   const canDeleteClient = allpermisson?.includes('delete');
   const canViewClient = allpermisson?.includes('view');
 
-  ///endpermission
-
-
-
-  // Open Add Job Modal
   const openAddTaskModal = () => {
     setIsAddTaskModalVisible(true);
   };
-
-  // Close Add Job Modal
   const closeAddTaskModal = () => {
     setIsAddTaskModalVisible(false);
   };
-
-  // Open Add Job Modal
   const openEditTaskModal = () => {
     setIsEditTaskModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeEditTaskModal = () => {
     setIsEditTaskModalVisible(false);
   };
@@ -256,7 +232,6 @@ const TaskList = () => {
     navigate("/app/dashboards/project/task/viewtask");
   };
 
-  // Get unique statuses from task data
   const getUniqueStatuses = () => {
     if (!fnddata) return ['All'];
 
@@ -264,7 +239,6 @@ const TaskList = () => {
     return ['All', ...statuses];
   };
 
-  // Add function to get unique priorities
   const getUniquePriorities = () => {
     if (!fnddata) return ['All'];
 
@@ -272,25 +246,16 @@ const TaskList = () => {
     return ['All', ...priorities];
   };
 
-  // Modify handleShowStatus to handle both status and priority
   const handleShowStatus = (value) => {
     setSelectedStatus(value);
     applyFilters(value, selectedPriority);
   };
 
-  // Add priority change handler
-  // const handlePriorityChange = (value) => {
-  //   setSelectedPriority(value);
-  //   applyFilters(selectedStatus, value);
-  // };
-
-  // Add combined filter function
   const applyFilters = (status, priority) => {
     if (!fnddata) return;
 
     let filteredData = [...fnddata];
 
-    // Apply search filter
     if (searchValue) {
       filteredData = filteredData.filter(task =>
         task.taskName?.toString().toLowerCase().includes(searchValue.toLowerCase()) ||
@@ -299,17 +264,14 @@ const TaskList = () => {
       );
     }
 
-    // Apply status filter
     if (status !== 'All') {
       filteredData = filteredData.filter(task => task.status === status);
     }
 
-    // Apply priority filter
     if (priority !== 'All') {
       filteredData = filteredData.filter(task => task.priority === priority);
     }
 
-    // Apply date range filter
     if (dateRange && dateRange[0] && dateRange[1]) {
       const rangeStart = dayjs(dateRange[0]).startOf('day');
       const rangeEnd = dayjs(dateRange[1]).endOf('day');
@@ -354,20 +316,17 @@ const TaskList = () => {
     );
   };
 
-  // Filter tasks based on pinned status
   const getPinnedTasks = () => list.filter((task) => pinnedTasks.includes(task.id));
   const getUnpinnedTasks = () => list.filter((task) => !pinnedTasks.includes(task.id));
 
   const [isViewTaskModalVisible, setIsViewTaskModalVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
 
-  // Open View Task Modal
   const openViewTaskModal = (task) => {
     setSelectedTask(task);
     setIsViewTaskModalVisible(true);
   };
 
-  // Close View Task Modal
   const closeViewTaskModal = () => {
     setSelectedTask(null);
     setIsViewTaskModalVisible(false);
@@ -384,7 +343,6 @@ const TaskList = () => {
         onClick: () => togglePinTask(row.id)
       },
       
-      // Edit - conditional item
       ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'edit',
         icon: <EditOutlined />,
@@ -392,7 +350,6 @@ const TaskList = () => {
         onClick: () => editfubn(row.id)
       }] : []),
       
-      // Delete - conditional item
       ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'delete',
         icon: <DeleteOutlined />,
@@ -660,7 +617,6 @@ const TaskList = () => {
     },
   };
 
-  // Modify debouncedSearch to include priority
   const debouncedSearch = debounce((value, dates, status, priority, data, setList) => {
     setIsSearching(true);
 
@@ -673,13 +629,11 @@ const TaskList = () => {
     }
 
     const filteredData = fnddata.filter(task => {
-      // Text search filter for multiple fields
       const matchesSearch = !searchValue || (
         task.taskName?.toString().toLowerCase().includes(searchValue) ||
         stripHtmlTags(task.description)?.toLowerCase().includes(searchValue) ||
         task.priority?.toString().toLowerCase().includes(searchValue) ||
         task.status?.toString().toLowerCase().includes(searchValue) ||
-        // Search in assignees
         (task.assignTo && (() => {
           try {
             const assignees = Array.isArray(task.assignTo)
@@ -701,13 +655,10 @@ const TaskList = () => {
         })())
       );
 
-      // Status filter
       const matchesStatus = status === 'All' || task.status === status;
 
-      // Priority filter
       const matchesPriority = priority === 'All' || task.priority === priority;
 
-      // Date range filter
       let matchesDateRange = true;
       if (dates && dates[0] && dates[1]) {
         const taskStartDate = task.startDate ? dayjs(task.startDate) : null;
@@ -726,14 +677,11 @@ const TaskList = () => {
     setIsSearching(false);
   }, 300);
 
-  // Modify onSearch to include priority
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     setSearchValue(value);
     debouncedSearch(value, dateRange, selectedStatus, selectedPriority, fnddata, setList);
   };
-
-  // Modify handleDateRangeChange to include priority
   const handleDateRangeChange = (dates) => {
     setDateRange(dates);
     debouncedSearch(searchValue, dates, selectedStatus, selectedPriority, fnddata, setList);
@@ -755,7 +703,6 @@ const TaskList = () => {
         return;
       }
 
-      // Parse assignTo field properly
       let assignToObject = {
         assignedUsers: []
       };
@@ -799,7 +746,6 @@ const TaskList = () => {
         return;
       }
 
-      // Parse assignTo field properly
       let assignToObject = {
         assignedUsers: []
       };
@@ -835,7 +781,6 @@ const TaskList = () => {
     }
   };
 
-  // Add row className function
   const getRowClassName = (record) => {
     return pinnedTasks.includes(record.id) ? 'pinned-row' : '';
   };
@@ -843,21 +788,6 @@ const TaskList = () => {
   return (
     <>
       <Card>
-        {/* <Row gutter={16}>
-					{
-						annualStatisticData.map((elm, i) => (
-							<Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-
-								<StatisticWidget
-									title={elm.title}
-									value={elm.value}
-									status={elm.status}
-									subtitle={elm.subtitle}
-								/>
-							</Col>
-						))
-					}
-				</Row> */}
         <Flex
           alignItems="center"
           justifyContent="space-between"
@@ -941,7 +871,7 @@ const TaskList = () => {
             <Button
               type="primary"
               icon={<FileExcelOutlined />}
-              onClick={exportToExcel} // Call export function when the button is clicked
+              onClick={exportToExcel} 
               block
             >
               Export All
@@ -949,7 +879,6 @@ const TaskList = () => {
           </Flex>
         </Flex>
 
-        {/* Main Tasks Table */}
         <div className="table-responsive">
           {(whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) && (
             <Table
@@ -970,14 +899,12 @@ const TaskList = () => {
               rowClassName={getRowClassName}
               onRow={(record) => ({
                 onClick: (e) => {
-                  // Check if click is on an interactive element
                   const isInteractiveElement = e.target.closest('.interactive-cell') ||
                     e.target.closest('.ant-select') ||
                     e.target.closest('.pin-button') ||
                     e.target.closest('.ant-dropdown-trigger') ||
                     e.target.closest('.ant-checkbox-wrapper');
 
-                  // Only open view modal if not clicking on interactive elements
                   if (!isInteractiveElement) {
                     openViewTaskModal(record);
                   }

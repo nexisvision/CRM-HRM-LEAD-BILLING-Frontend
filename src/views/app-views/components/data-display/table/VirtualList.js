@@ -97,7 +97,7 @@ function VirtualTable(props) {
       />
     </ResizeObserver>
   );
-} // Usage
+} 
 
 const columns = [
   {

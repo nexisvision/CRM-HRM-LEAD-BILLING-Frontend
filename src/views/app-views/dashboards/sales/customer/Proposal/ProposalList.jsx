@@ -79,22 +79,10 @@ function ProposalList() {
       setUserProfileVisible(true);
    };
 
-   //   const showCustomerView = (userInfo) => {
-   //     setSelectedUser(userInfo);
-   //     setCustomerVisible(true);
-   //   };
-
-   // Close user profile
    const closeUserProfile = () => {
       setSelectedUser(null);
       setUserProfileVisible(false);
    };
-
-
-   //   const closeCustomerView = () => {
-   //     setSelectedUser(null);
-   //     setCustomerVisible(false);
-   //   };
 
    const getProposalStatus = status => {
       if(status === 'Normal') {

@@ -360,7 +360,6 @@ const CompanyList = () => {
         visible={isEditCompanyModalVisible}
         onCancel={() => setIsEditCompanyModalVisible(false)}
         width={900}
-        // className="1200px"
         footer={null}
       >
         <EditCompany

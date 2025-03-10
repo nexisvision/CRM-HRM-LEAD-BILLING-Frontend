@@ -75,41 +75,33 @@ export const BillingList = () => {
     }
   }, [fnddata]);
 
-  // Add useEffect to get unique statuses from database data
   useEffect(() => {
     if (fnddata && fnddata.length > 0) {
-      // Get unique statuses from the billing data
       const uniqueStatuses = [...new Set(fnddata.map(bill => bill.status))].filter(Boolean);
       setStatusOptions(['All', ...uniqueStatuses]);
     }
   }, [fnddata]);
 
-  // Open Add Job Modal
   const openAddBillingModal = () => {
     setIsAddBillingModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeAddBillingModal = () => {
     setIsAddBillingModalVisible(false);
   };
 
-  // Open Add Job Modal
   const openEditBillingModal = () => {
     setIsEditBillingModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeEditBillingModal = () => {
     setIsEditBillingModalVisible(false);
   };
 
-  // Open Add Job Modal
   const openViewBillingModal = () => {
     setIsViewBillingModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeViewBillingModal = () => {
     setIsViewBillingModalVisible(false);
   };
@@ -123,12 +115,10 @@ export const BillingList = () => {
   };
   const exportToExcel = () => {
     try {
-      // Create a worksheet from the formatted data
       const ws = utils.json_to_sheet(list);
       const wb = utils.book_new(); // Create a new workbook
       utils.book_append_sheet(wb, ws, "Billing"); // Append the worksheet to the workbook
 
-      // Write the workbook to a file
       writeFile(wb, "BillingData.xlsx");
       message.success("Data exported successfully!");
     } catch (error) {
@@ -142,8 +132,6 @@ export const BillingList = () => {
     setIdd(idd);
   };
 
-   //// permission
-  
             const roleId = useSelector((state) => state.user.loggedInUser.role_id);
             const roles = useSelector((state) => state.role?.role?.data);
             const roleData = roles?.find(role => role.id === roleId);
@@ -170,9 +158,6 @@ export const BillingList = () => {
             const canDeleteClient = allpermisson?.includes('delete');
             const canViewClient = allpermisson?.includes('view');
   
-            ///endpermission
-
-
 
   const dropdownMenu = (row) => ({
     items: [
@@ -186,7 +171,6 @@ export const BillingList = () => {
         }
       },
       
-      // Edit - conditional item
       ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'edit',
         icon: <EditOutlined />,
@@ -194,7 +178,6 @@ export const BillingList = () => {
         onClick: () => editfun(row.id)
       }] : []),
       
-      // Delete - conditional item
       ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'delete',
         icon: <DeleteOutlined />,
@@ -272,14 +255,12 @@ export const BillingList = () => {
 
     let filtered = [...fnddata];
 
-    // Apply text search filter
     if (text) {
       filtered = filtered.filter(bill => 
         bill.billNumber?.toLowerCase().includes(text.toLowerCase())
       );
     }
 
-    // Apply date filter
     if (date) {
       const selectedDate = dayjs(date).startOf('day');
       filtered = filtered.filter(bill => {
@@ -289,7 +270,6 @@ export const BillingList = () => {
       });
     }
 
-    // Apply status filter
     if (status && status !== 'All') {
       filtered = filtered.filter(bill => 
         bill.status === status

@@ -18,7 +18,6 @@ export const AddNote = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
 
 export const GetNote = createAsyncThunk("emp/GetNote", async (id, thunkAPI) => {
   try {
@@ -29,7 +28,6 @@ export const GetNote = createAsyncThunk("emp/GetNote", async (id, thunkAPI) => {
   }
 });
 
-// Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -42,7 +40,6 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -55,7 +52,6 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
 export const DeleteNotes = createAsyncThunk(
   "users/DeleteNotes",
   async (userId, thunkAPI) => {
@@ -81,7 +77,6 @@ export const EditeNotes = createAsyncThunk(
   }
 );
 
-// Async thunk for updating a user
 
 const initialUser = () => {
   const item = window.localStorage.getItem("USER");
@@ -138,11 +133,9 @@ const NotesSlice = createSlice({
       })
       .addCase(AddNote.fulfilled, (state, action) => {
         state.isLoading = false;
-        // message.success(action.payload?.message);
       })
       .addCase(AddNote.rejected, (state, action) => {
         state.isLoading = false;
-        // message.error(action.payload?.message);
       })
 
       .addCase(GetNote.pending, (state) => {
@@ -164,11 +157,9 @@ const NotesSlice = createSlice({
       })
       .addCase(DeleteNotes.fulfilled, (state, action) => {
         state.isLoading = false;
-        // message.success(action.payload?.message);
       })
       .addCase(DeleteNotes.rejected, (state, action) => {
         state.isLoading = false;
-        // message.error(action.payload?.message);
       })
       //update
       .addCase(EditeNotes.pending, (state) => {
@@ -178,12 +169,10 @@ const NotesSlice = createSlice({
       .addCase(EditeNotes.fulfilled, (state, action) => {
         state.isLoading = false;
         state.editItem = action.payload;
-        // message.success(action.payload?.message);
       })
       .addCase(EditeNotes.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-        // message.error(action.payload?.message);
       });
   },
 });

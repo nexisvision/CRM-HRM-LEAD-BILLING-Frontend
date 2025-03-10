@@ -83,7 +83,6 @@ const EditContract = ({ id, onClose }) => {
     description: "",
     phone: "",
     phoneCode: getInitialCountry(),
-    // contract_number: "",
     currency: getInitialCurrency(),
     address: "",
     city: "",
@@ -91,7 +90,6 @@ const EditContract = ({ id, onClose }) => {
     state: "",
     zipcode: "",
     notes: "",
-    // options: [],
   });
   const validationSchema = Yup.object({
     subject: Yup.string().required("Please enter a Subject Name."),
@@ -121,11 +119,9 @@ const EditContract = ({ id, onClose }) => {
     dispatch(Editcon({ id, values }))
       .then(() => {
         dispatch(ContaractData());
-        // message.success("Project added successfully!");
         onClose();
       })
       .catch((error) => {
-        // message.error("Failed to update employee.");
         console.error("Edit API error:", error);
       });
   };
@@ -215,7 +211,6 @@ const EditContract = ({ id, onClose }) => {
         notes: filcon.notes || "",
       });
 
-      // Set filtered projects based on the initial client
       const associatedProjects = filPro.filter(
         (project) => project.client === filcon.client
       );
@@ -288,7 +283,6 @@ const EditContract = ({ id, onClose }) => {
                             backgroundColor: '#f8fafc',
                           }}
                           placeholder={<span className="text-gray-400">+91</span>}
-                          // defaultValue={getInitialPhoneCode()}
                           onChange={(value) => {
                             if (value === 'add_new') {
                               setIsAddPhoneCodeModalVisible(true);
@@ -338,13 +332,7 @@ const EditContract = ({ id, onClose }) => {
                           type="number"
                           placeholder="Enter phone number"
                           onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                          // prefix={
-                          //   values.phoneCode && (
-                          //     <span className="text-gray-600 font-medium mr-1">
-                          //       {values.phoneCode}
-                          //     </span>
-                          //   )
-                          // }
+                          
                         />
                       )}
                     </Field>

@@ -110,7 +110,6 @@ const EditTask = ({ onClose, idd, projectId }) => {
           task_reporter: taskData.task_reporter || "",
         });
 
-        // If there are files, set them in the fileList state
         if (taskData.task_file) {
           setFileList([
             {
@@ -157,14 +156,12 @@ const EditTask = ({ onClose, idd, projectId }) => {
         return;
       }
 
-      // Convert assignTo array to object with array values
       const assignToObject = {
         assignedUsers: Array.isArray(values.assignTo)
           ? values.assignTo.filter(id => id && id.trim() !== '')
           : []
       };
 
-      // Create payload with assignTo as object
       const payload = {
         ...values,
         assignTo: assignToObject
@@ -329,7 +326,6 @@ const EditTask = ({ onClose, idd, projectId }) => {
                       </Select>
                     )}
                   </Field>
-                  {/* Display selected users as tags */}
                   
                   <ErrorMessage
                     name="assignTo"

@@ -202,7 +202,6 @@ const ReminderList = () => {
                         type="primary" 
                         htmlType="submit" 
                         loading={isSubmitting}
-                        // disabled={isSubmitting || Object.keys(errors).length > 0}
                       >
                         Save
                       </Button>

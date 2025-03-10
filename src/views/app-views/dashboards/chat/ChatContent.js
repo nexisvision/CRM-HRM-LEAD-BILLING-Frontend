@@ -11,23 +11,19 @@ import { Toaster } from 'react-hot-toast';
 
 dayjs.extend(relativeTime);
 
-// Add this component for group header
 const GroupHeader = ({ group }) => {
   const loggedInUser = useSelector((state) => state.user.loggedInUser);
   const allUserData = useSelector((state) => state.Users);
   const users = allUserData.Users?.data || [];
 
-  // Format member names to show first 3 members and total count
   const formatMemberNames = (members) => {
     if (!members || members.length === 0) return 'No members';
 
-    // Get full user objects by matching member IDs with users data
     const memberUsers = members.map(memberId => {
       const user = users.find(u => u.id === memberId);
       return user || { id: memberId };
     });
 
-    // Remove the current user from the display list
     const otherMembers = memberUsers.filter(member => member.id !== loggedInUser.id);
 
     const formatName = member => {
@@ -86,7 +82,6 @@ const GroupHeader = ({ group }) => {
   );
 };
 
-// Add this component for user header
 const UserHeader = ({ user, isTyping, userStatus, getRoleBadgeColor, getRoleName, formatLastSeen }) => {
   return (
     <div className="flex items-center">
@@ -139,7 +134,6 @@ const UserHeader = ({ user, isTyping, userStatus, getRoleBadgeColor, getRoleName
   );
 };
 
-// Update the FilePreview component to receive uploadProgress as a prop
 const FilePreview = ({ file, onRemove, uploadProgress = {} }) => {
   const getFileIcon = (type) => {
     if (type.startsWith('image/')) return <FaImage className="w-5 h-5" />;
@@ -188,7 +182,6 @@ const FilePreview = ({ file, onRemove, uploadProgress = {} }) => {
   );
 };
 
-// Add FileTypeSelector component
 const FileTypeSelector = ({ onSelect }) => {
   return (
     <div className="absolute bottom-full mb-2 left-0 bg-white rounded-lg shadow-lg border border-gray-200 p-2 w-48">
@@ -217,11 +210,9 @@ const FileTypeSelector = ({ onSelect }) => {
   );
 };
 
-// Update the FileContextMenu component
 const FileContextMenu = ({ x, y, onDownload, onDelete, isOwnMessage, file }) => {
   const menuRef = useRef(null);
 
-  // Add effect to handle click outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -269,7 +260,6 @@ const FileContextMenu = ({ x, y, onDownload, onDelete, isOwnMessage, file }) => 
   );
 };
 
-// Keep downloadFile as a standalone utility function
 const downloadFile = async (url, filename) => {
   try {
     const response = await fetch(url);
@@ -293,14 +283,12 @@ const downloadFile = async (url, filename) => {
   }
 };
 
-// Add ImagePreviewModal component at the top of the file
 const ImagePreviewModal = ({ image, onClose }) => {
   if (!image) return null;
 
   return (
     <div className="fixed inset-0 z-[70] bg-black/80 flex items-center justify-center p-4">
       <div className="relative max-w-[90vw] max-h-[90vh]">
-        {/* Close button */}
         <button
           onClick={onClose}
           className="absolute -top-4 -right-4 p-2 text-white hover:text-gray-300 z-[71]"
@@ -308,14 +296,12 @@ const ImagePreviewModal = ({ image, onClose }) => {
           <BsX className="w-6 h-6" />
         </button>
 
-        {/* Image */}
         <img
           src={image.url}
           alt={image.name}
           className="max-w-full max-h-[90vh] object-contain"
         />
 
-        {/* Image info */}
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-black/50 text-white">
           <p className="text-sm truncate">{image.name}</p>
         </div>
@@ -324,7 +310,6 @@ const ImagePreviewModal = ({ image, onClose }) => {
   );
 };
 
-// Add this helper function to get file type summary
 const getFileTypeSummary = (attachments) => {
   if (!attachments || attachments.length === 0) return '';
 
@@ -379,34 +364,26 @@ export default function ChatContent({ selectedUser }) {
     const newSocket = socketService.connect();
     setSocket(newSocket);
 
-    // Clear messages when changing users
     setMessages([]);
-    // Reset typing status when changing users
     setIsTyping(false);
 
-    // Join room and mark messages as read immediately
     newSocket.emit('user_connected', loggedInUser.id);
 
-    // Get existing conversations with correct status
     newSocket.emit('get_conversations', { userId: loggedInUser.id });
 
-    // Mark messages as read immediately when opening chat
     newSocket.emit('mark_messages_read', {
       sender_id: selectedUser.id,
       receiver_id: loggedInUser.id
     });
 
-    // Save last opened chat
     localStorage.setItem('selectedChatUser', selectedUser.id.toString());
 
-    // Listen for typing status only from the other user
     newSocket.on('user_typing', ({ userId, isTyping: typing }) => {
       if (userId === selectedUser.id) { // Only show typing for the selected user
         setIsTyping(typing);
       }
     });
 
-    // Listen for received conversations
     newSocket.on('conversations_received', (conversations) => {
       if (conversations && conversations[selectedUser.id]) {
         const uniqueMessages = conversations[selectedUser.id]
@@ -414,11 +391,9 @@ export default function ChatContent({ selectedUser }) {
             index === self.findIndex((m) => m.timestamp === message.timestamp)
           )
           .map(msg => {
-            // Set correct initial status
             if (msg.sender_id === loggedInUser.id) {
               return { ...msg, status: msg.status || 'sent' };
             }
-            // Mark all received messages as read
             if (msg.sender_id === selectedUser.id) {
               return { ...msg, status: 'read' };
             }
@@ -429,7 +404,6 @@ export default function ChatContent({ selectedUser }) {
       }
     });
 
-    // Listen for new messages
     newSocket.on('receive_message', ({ user_id, message }) => {
       if (user_id === selectedUser.id || message.sender_id === selectedUser.id) {
         setMessages(prev => {
@@ -443,16 +417,13 @@ export default function ChatContent({ selectedUser }) {
           return [...prev, message];
         });
 
-        // Clear selected files and progress after successful upload
         setSelectedFiles([]);
         setUploadProgress({});
       }
     });
 
-    // Listen for message status updates
     newSocket.on('message_status_updated', ({ message_timestamp, status, sender_id }) => {
       setMessages(prev => prev.map(msg => {
-        // Only update status for messages from the logged-in user
         if (msg.timestamp === message_timestamp && msg.sender_id === loggedInUser.id) {
           return { ...msg, status };
         }
@@ -460,7 +431,6 @@ export default function ChatContent({ selectedUser }) {
       }));
     });
 
-    // Listen for deleted messages
     newSocket.on('message_deleted', ({ message_timestamp, conversations }) => {
       if (conversations[selectedUser.id]) {
         setMessages(conversations[selectedUser.id]);
@@ -486,7 +456,6 @@ export default function ChatContent({ selectedUser }) {
       ));
     });
 
-    // Mark messages as read when opening chat
     if (selectedUser.id) {
       newSocket.emit('mark_messages_read', {
         sender_id: selectedUser.id,
@@ -509,7 +478,6 @@ export default function ChatContent({ selectedUser }) {
     };
   }, [selectedUser?.id, loggedInUser.id]);
 
-  // Update the file input and its handler
   const handleFileTypeSelect = (type) => {
     const acceptTypes = {
       image: UPLOAD_CONFIG.ALLOWED_FILE_TYPES.IMAGE.join(','),
@@ -517,23 +485,19 @@ export default function ChatContent({ selectedUser }) {
       document: UPLOAD_CONFIG.ALLOWED_FILE_TYPES.DOCUMENT.join(',')
     };
 
-    // Set file size limit based on type
     const maxSize = type === 'video' ? 100 * 1024 * 1024 : 25 * 1024 * 1024; // 100MB for videos, 25MB for others
 
     fileInputRef.current.accept = acceptTypes[type];
-    // Store current file type for validation
     fileInputRef.current.dataset.fileType = type;
     fileInputRef.current.click();
     setShowFileSelector(false);
   };
 
-  // Update handleFileSelect to handle large files
   const handleFileSelect = async (e) => {
     const files = Array.from(e.target.files);
     const fileType = e.target.dataset.fileType;
 
     if (files.length > 0) {
-      // Validate file types and sizes
       const invalidFiles = files.filter(file => {
         const acceptedTypes = UPLOAD_CONFIG.ALLOWED_FILE_TYPES[fileType.toUpperCase()];
         const maxSize = fileType === 'video' ? 100 * 1024 * 1024 : 25 * 1024 * 1024;
@@ -553,7 +517,6 @@ export default function ChatContent({ selectedUser }) {
 
       if (invalidFiles.length > 0) {
         console.error('Invalid files detected');
-        // Optionally show error to user
         return;
       }
 
@@ -562,7 +525,6 @@ export default function ChatContent({ selectedUser }) {
     }
   };
 
-  // Update handleSendMessage to handle large files
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if ((!messageInput.trim() && selectedFiles.length === 0) || isLoading) return;
@@ -571,7 +533,6 @@ export default function ChatContent({ selectedUser }) {
 
     try {
       if (editingMessage) {
-        // Handle message editing
         socket.emit('edit_message', {
           sender_id: loggedInUser.id,
           receiver_id: selectedUser.id,
@@ -581,13 +542,11 @@ export default function ChatContent({ selectedUser }) {
         setEditingMessage(null);
       } else {
         if (selectedFiles.length > 0) {
-          // Add file type summary to message
           const fileSummary = getFileTypeSummary(selectedFiles);
           const messageText = messageInput.trim()
             ? `${messageInput}\n${fileSummary}`
             : fileSummary;
 
-          // Process files in chunks if needed
           const processedFiles = await Promise.all(selectedFiles.map(async file => {
             return new Promise((resolve) => {
               const reader = new FileReader();
@@ -604,7 +563,6 @@ export default function ChatContent({ selectedUser }) {
             });
           }));
 
-          // Send files through socket service
           await socketService.sendFiles({
             files: processedFiles,
             sender_id: loggedInUser.id,
@@ -612,11 +570,9 @@ export default function ChatContent({ selectedUser }) {
             message: messageText
           });
 
-          // Clear files and reset progress
           setSelectedFiles([]);
           setUploadProgress({});
         } else {
-          // Handle text message
           socket.emit('send_message', {
             sender_id: loggedInUser.id,
             receiver_id: selectedUser.id,
@@ -642,7 +598,6 @@ export default function ChatContent({ selectedUser }) {
   const handleTyping = () => {
     if (!socket) return;
 
-    // Only emit if we weren't already typing
     if (!isTyping) {
       socket.emit('typing', {
         sender_id: loggedInUser.id,
@@ -651,12 +606,10 @@ export default function ChatContent({ selectedUser }) {
       });
     }
 
-    // Clear existing timeout
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
 
-    // Set new timeout
     typingTimeoutRef.current = setTimeout(() => {
       socket.emit('typing', {
         sender_id: loggedInUser.id,
@@ -666,7 +619,6 @@ export default function ChatContent({ selectedUser }) {
     }, 1500);
   };
 
-  // Add cleanup for typing timeout
   useEffect(() => {
     return () => {
       if (typingTimeoutRef.current) {
@@ -706,7 +658,6 @@ export default function ChatContent({ selectedUser }) {
     }
   };
 
-  // Format message timestamp
   const formatMessageTime = (timestamp) => {
     const messageDate = dayjs(timestamp);
     const today = dayjs();
@@ -720,7 +671,6 @@ export default function ChatContent({ selectedUser }) {
     }
   };
 
-  // Group messages by date
   const groupMessagesByDate = (messages) => {
     const groups = {};
 
@@ -735,7 +685,6 @@ export default function ChatContent({ selectedUser }) {
     return groups;
   };
 
-  // Format last seen time
   const formatLastSeen = (timestamp) => {
     if (!timestamp) return 'Inactive';
 
@@ -748,7 +697,6 @@ export default function ChatContent({ selectedUser }) {
     return `Last seen ${lastSeen.format('DD MMM YYYY [at] HH:mm')}`;
   };
 
-  // Update the MessageContextMenu component
   const MessageContextMenu = ({ onEdit, onDelete, onCopy, isOwnMessage }) => {
     return (
       <div className="absolute -top-10 right-0 flex items-center gap-2 bg-white rounded-full shadow-lg py-1.5 px-2 border border-gray-200 z-[9999]">
@@ -781,27 +729,22 @@ export default function ChatContent({ selectedUser }) {
     );
   };
 
-  // Update the MessageItem component
   const MessageItem = ({ message, socket, loggedInUser, selectedUser }) => {
     const isOwnMessage = message.sender_id === loggedInUser.id;
     const [showOptions, setShowOptions] = useState(false);
     const [activeFileMenu, setActiveFileMenu] = useState(null);
 
-    // Add ref for context menu
     const contextMenuRef = useRef(null);
 
-    // Update handleContextMenu
     const handleContextMenu = (e) => {
       e.preventDefault();
       e.stopPropagation();
-      // Close any other open context menus first
       document.dispatchEvent(new CustomEvent('closeContextMenus'));
       if (isOwnMessage) {
         setShowOptions(true);
       }
     };
 
-    // Add event listener for closing context menus
     useEffect(() => {
       const closeMenus = () => {
         setShowOptions(false);
@@ -812,11 +755,9 @@ export default function ChatContent({ selectedUser }) {
       return () => document.removeEventListener('closeContextMenus', closeMenus);
     }, []);
 
-    // Update handleFileContextMenu
     const handleFileContextMenu = (e, file) => {
       e.preventDefault();
       e.stopPropagation();
-      // Close any other open context menus first
       document.dispatchEvent(new CustomEvent('closeContextMenus'));
       setActiveFileMenu({
         file,
@@ -825,7 +766,6 @@ export default function ChatContent({ selectedUser }) {
       });
     };
 
-    // Add click outside handler
     useEffect(() => {
       const handleClickOutside = (e) => {
         if (contextMenuRef.current && !contextMenuRef.current.contains(e.target)) {
@@ -845,7 +785,6 @@ export default function ChatContent({ selectedUser }) {
     };
 
     const handleDelete = () => {
-      // Emit delete event directly without showing modal
       if (socket) {
         socket.emit('delete_message', {
           sender_id: loggedInUser.id,
@@ -1023,13 +962,11 @@ export default function ChatContent({ selectedUser }) {
             );
           })}
 
-          {/* Image Preview Modal */}
           <ImagePreviewModal
             image={previewImage}
             onClose={() => setPreviewImage(null)}
           />
 
-          {/* File Context Menu */}
           {activeFileMenu && (
             <div className="file-context-menu">
               <FileContextMenu
@@ -1053,7 +990,6 @@ export default function ChatContent({ selectedUser }) {
         ref={contextMenuRef}
       >
         <div className="relative max-w-[70%] group message-options">
-          {/* Context Menu */}
           {showOptions && (
             <MessageContextMenu
               onEdit={handleEdit}
@@ -1063,7 +999,6 @@ export default function ChatContent({ selectedUser }) {
             />
           )}
 
-          {/* Message content */}
           <div className={`px-4 py-2.5 shadow-sm ${isOwnMessage
             ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-t-2xl rounded-l-2xl'
             : 'bg-white text-gray-800 rounded-t-2xl rounded-r-2xl'
@@ -1073,7 +1008,6 @@ export default function ChatContent({ selectedUser }) {
                 {message.message}
               </p>
             )}
-            {/* Add file type summary before attachments */}
             {message.attachments && message.attachments.length > 0 && (
               <div className={`text-sm ${isOwnMessage ? 'text-blue-100' : 'text-gray-500'} mt-1 mb-2`}>
                 <div className="flex items-center gap-1">
@@ -1085,7 +1019,6 @@ export default function ChatContent({ selectedUser }) {
             {renderAttachments(message.attachments)}
           </div>
 
-          {/* Message status and time */}
           <div className={`mt-1 flex items-center space-x-2 px-2 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
             <div className="flex items-center space-x-1 text-xs text-gray-500">
               <span>{formatMessageTime(message.timestamp)}</span>

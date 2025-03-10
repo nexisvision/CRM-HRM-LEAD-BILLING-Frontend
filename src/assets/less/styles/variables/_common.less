@@ -3,11 +3,8 @@
 @theme: light;
 @rtl-enable: true;
 
-// Background color for `<body>`
 @body-background:    #fafafb;
-// Base background color for most components
 @component-background: @white;
-// Popover background color
 @border-color-split: #ededed;
 @popover-background: @component-background;
 @popover-customize-border-color: @border-color-split;
@@ -111,34 +108,23 @@
 @border-width-base: 1px; // width of the border for a component
 @border-style-base: solid; // style of a components border
 
-// Media queries breakpoints
-// @screen-xs and @screen-xs-min is not used in Grid
-// smallest break point is @screen-md
 @screen-xs: 480px;
 @screen-xs-min: @screen-xs;
-// 👆 Extra small screen / phone
-
-// 👇 Small screen / tablet
 @screen-sm: 576px;
 @screen-sm-min: @screen-sm;
 
-// Medium screen / desktop
 @screen-md: 768px;
 @screen-md-min: @screen-md;
 
-// Large screen / wide desktop
 @screen-lg: 992px;
 @screen-lg-min: @screen-lg;
 
-// Extra large screen / full hd
 @screen-xl: 1400px;
 @screen-xl-min: @screen-xl;
 
-// Extra extra large screen / large desktop
 @screen-xxl: 1600px;
 @screen-xxl-min: @screen-xxl;
 
-// provide a maximum
 @screen-xs-max: (@screen-sm-min - 1px);
 @screen-sm-max: (@screen-md-min - 1px);
 @screen-md-max: (@screen-lg-min - 1px);

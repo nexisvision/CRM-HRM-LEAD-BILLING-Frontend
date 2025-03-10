@@ -65,7 +65,6 @@ const AddTask = ({ visible, onCancel, onCreate }) => {
         </Button>
       </div>
     </form>
-    // </Modal>
   );
 };
 

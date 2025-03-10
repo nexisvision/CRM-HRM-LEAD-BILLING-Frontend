@@ -18,7 +18,6 @@ export const AddPay = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
 
 export const Getpay = createAsyncThunk("emp/Getpay", async (id, thunkAPI) => {
   try {
@@ -29,7 +28,6 @@ export const Getpay = createAsyncThunk("emp/Getpay", async (id, thunkAPI) => {
   }
 });
 
-// Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {

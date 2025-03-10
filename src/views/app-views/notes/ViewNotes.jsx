@@ -47,11 +47,9 @@ function ViewNotes() {
   const alllogeddata = useSelector((state) => state.user);
   const id = alllogeddata.loggedInUser.id;
 
-  // Add loading state
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch notes when component mounts
     dispatch(getnotess(id));
   }, [dispatch, id]);
 
@@ -65,12 +63,10 @@ function ViewNotes() {
     }
   }, [fnddata]);
 
-  // Open Add Job Modal
   const openEditNotesModal = () => {
     setIsEditNotesModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeEditNotesModal = () => {
     setIsEditNotesModalVisible(false);
   };
@@ -96,12 +92,10 @@ function ViewNotes() {
       </Menu.Item>
     </Menu>
   );
-  // Delete user
   const deleteUser = (userId) => {
     dispatch(delnotess(userId)).then(() => {
       dispatch(getnotess(id));
       setUsers(users.filter((item) => item.id !== userId));
-      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
     });
   };
 
@@ -114,7 +108,6 @@ function ViewNotes() {
         data-type={note.notetype}
         data-priority={note.priority}
       >
-        {/* Action Buttons - Always visible */}
         <div className="absolute top-4 right-4 flex gap-2">
           <Button 
             type="text" 
@@ -131,7 +124,6 @@ function ViewNotes() {
         </div>
 
         <div className="relative">
-          {/* Priority & Type Indicator */}
           <div className="absolute top-0 right-0 mt-2 mr-2 flex items-center gap-2">
             {note.priority === "High" && (
               <Tooltip title="High Priority">

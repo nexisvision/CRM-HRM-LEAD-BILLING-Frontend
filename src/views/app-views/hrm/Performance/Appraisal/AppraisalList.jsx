@@ -38,7 +38,6 @@ const AppraisalList = () => {
  const employeeDaata = useSelector((state) => state.employee?.employee?.data || []);
 
  const employeeDataa = employeeDaata.filter(item => item.created_by === user);
-  //// permission
                     
       const roleId = useSelector((state) => state.user.loggedInUser.role_id);
       const roles = useSelector((state) => state.role?.role?.data);
@@ -66,7 +65,6 @@ const AppraisalList = () => {
       const canDeleteClient = allpermisson?.includes('delete');
       const canViewClient = allpermisson?.includes('view');
    
-      ///endpermission
 
   const openAddAppraisalModal = () => {
     setIsAddAppraisalModalVisible(true);
@@ -136,13 +134,8 @@ useEffect(() => {
   };
 
   
-  // useEffect(() => {
-  //     dispatch(empdata());  
-  //   }, [dispatch]);
-
   const deleteUser = (userId) => {
     setUsers(users.filter(item => item.id !== userId));
-    // message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
 
   const showUserProfile = (userInfo) => {

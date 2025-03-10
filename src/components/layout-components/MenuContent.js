@@ -76,9 +76,7 @@ const SideNavContent = (props) => {
 	const isSuperAdmin = roleData?.role_name === 'client';
  
 	const isSuper = roleData?.role_name === 'super-admin';
-	// Filter navigation items based on permissions
 	const menuItems = useMemo(() => {
-		// Parse permissions if it's a string
 		const parsedPermissions = typeof roleData?.permissions === 'string' 
 			? JSON.parse(roleData?.permissions) 
 			: roleData?.permissions;
@@ -90,7 +88,6 @@ const SideNavContent = (props) => {
 		}
 
 		if (isSuperAdmin) {
-			// Show both dashboard and extra navigation items for super admin
 			return getSideNavMenuItem([...dashBoardNavTree, ...extraNavvTree]);
 		}
 
@@ -100,14 +97,11 @@ const SideNavContent = (props) => {
 			return [];
 		}
 
-		// Function to check if a nav item is allowed based on permissions
 		const isNavItemAllowed = (navItem) => {
-			// For group titles (like 'HRM'), always allow
 			if (navItem.isGroupTitle) {
 				return true;
 			}
 
-			// Check permissions in each section
 			for (const section in parsedPermissions) {
 				const sectionPerms = parsedPermissions[section];
 				if (Array.isArray(sectionPerms)) {
@@ -120,10 +114,8 @@ const SideNavContent = (props) => {
 			return false;
 		};
 
-		// Recursively filter navigation items
 		const filterNavItems = (items) => {
 			return items.reduce((acc, item) => {
-				// Always include parent items that have allowed children
 				if (item.submenu && item.submenu.length > 0) {
 					const filteredSubmenu = filterNavItems(item.submenu);
 					if (filteredSubmenu.length > 0 || isNavItemAllowed(item)) {
@@ -142,20 +134,16 @@ const SideNavContent = (props) => {
 		const filteredNavigation = filterNavItems(navigationConfig);
 		
 		const relevantNavigation = filteredNavigation.filter(navItem => {
-			// Check if the navItem key starts with 'extra-hrm' or 'dashboards'
 			return navItem.key.startsWith('extra-hrm') || navItem.key.startsWith('dashboards') || 
 				navItem.submenu.some(sub => sub.key.startsWith('extra-hrm') || sub.key.startsWith('dashboards'));
 		});
 	
-		// Create an array of titles for the relevant navigation items
 		const relevantTitles = relevantNavigation.map(navItem => navItem.title);
 	
-		// Include titles from submenus that start with 'extra-hrm' and check permissions
 		relevantNavigation.forEach(navItem => {
 			if (navItem.submenu) {
 				navItem.submenu.forEach(sub => {
 					if (sub.key.startsWith('extra-hrm') || sub.key.startsWith('dashboards')) {
-						// Check if the user has permission for this submenu item
 						const hasPermission = roleData?.permissions?.[sub.key]?.some(permission => permission.permissions.includes('view'));
 						if (hasPermission) {
 							relevantTitles.push(sub.title);
@@ -188,26 +176,6 @@ const SideNavContent = (props) => {
 	);
 };
 
-
-
-// const SideNavContent = (props) => {
-
-// 	const { routeInfo, hideGroupTitle, sideNavTheme = SIDE_NAV_LIGHT } = props;
-
-// 	const menuItems = useMemo(() => getSideNavMenuItem(navigationConfig), []);
-
-// 	return (
-// 		<Menu
-// 			mode="inline"
-// 			theme={sideNavTheme === SIDE_NAV_LIGHT ? "light" : "dark"}
-// 			style={{ height: "100%", borderInlineEnd: 0 }}
-// 			defaultSelectedKeys={[routeInfo?.key]}
-// 			defaultOpenKeys={setDefaultOpen(routeInfo?.key)}
-// 			className={hideGroupTitle ? "hide-group-title" : ""}
-// 			items={menuItems}
-// 		/>
-// 	);
-// };
 
 const TopNavContent = () => {
 

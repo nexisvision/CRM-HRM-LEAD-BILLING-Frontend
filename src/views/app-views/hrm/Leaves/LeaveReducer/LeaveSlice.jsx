@@ -17,9 +17,6 @@ export const CreateL = createAsyncThunk(
     }
 );
 
-// Async thunk for user login
-
-
 export const GetLeave = createAsyncThunk(
     "leave/getLeave",
     async (thunkAPI) => {
@@ -33,7 +30,6 @@ export const GetLeave = createAsyncThunk(
 );
 
 
-// Async thunk for deleting a user
 export const DeleteLea = createAsyncThunk(
     "users/deleteUser",
     async (userId, thunkAPI) => {
@@ -57,11 +53,6 @@ export const EditLeave = createAsyncThunk(
     }
   );
 
-
-
-
-
-// Async thunk for updating a user
 
 const initialUser = () => {
     const item = window.localStorage.getItem("USER");

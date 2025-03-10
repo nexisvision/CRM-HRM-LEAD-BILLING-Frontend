@@ -11,7 +11,6 @@ const ViewTrainingSetup = ({ idd, onClose }) => {
 
   const milestone = Expensedata.find((item) => item.id === idd);
 
-  // Parse the links JSON string
   const parsedLinks = milestone?.links ? JSON.parse(milestone.links) : {};
   const linksArray = Object.values(parsedLinks);
 
@@ -25,32 +24,25 @@ const ViewTrainingSetup = ({ idd, onClose }) => {
     setIsPlaying(newPlayingState);
   };
 
-  // Function to convert YouTube URL to embed URL
   const getEmbedUrl = (url) => {
     try {
-      // Handle different YouTube URL formats
       let videoId = "";
 
-      // Regular YouTube URL (https://www.youtube.com/watch?v=VIDEO_ID)
       if (url.includes("youtube.com/watch")) {
         const urlParams = new URLSearchParams(new URL(url).search);
         videoId = urlParams.get("v");
       }
-      // Shortened YouTube URL (https://youtu.be/VIDEO_ID)
       else if (url.includes("youtu.be")) {
         videoId = url.split("youtu.be/")[1]?.split("?")[0];
       }
-      // Already an embed URL
       else if (url.includes("youtube.com/embed")) {
         return url;
       }
 
-      // If we found a video ID, return the embed URL
       if (videoId) {
         return `https://www.youtube.com/embed/${videoId}`;
       }
 
-      // If not a YouTube URL, return the original URL
       return url;
     } catch (error) {
       console.error("Error parsing YouTube URL:", error);

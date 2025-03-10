@@ -8,12 +8,10 @@ import NumberFormat from 'react-number-format';
 function ViewEstimates({ quotationId, onClose }) {
     const dispatch = useDispatch();
     
-    // Get data from Redux store
     const { currentQuotation, loading } = useSelector((state) => state.salesquotation);
     
     const [tableData, setTableData] = useState([]);
 
-    // Fetch quotation data when component mounts
     useEffect(() => {
         if (quotationId) {
             dispatch(getquotationsById(quotationId));

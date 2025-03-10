@@ -19,21 +19,17 @@ const ESignaturePage = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingSignature, setEditingSignature] = useState(null);
 
-  // Handle start drawing
   const handleBeginStroke = () => {
     setIsDrawing(true);
     setHasDrawing(true);
   };
 
-  // Handle end drawing and save to history
   const handleEndStroke = () => {
     if (isDrawing) {
       const currentData = sigPadRef.current.toData();
       if (currentData && currentData.length > 0) {
-        // Save only the last stroke to undo stack
         const lastStroke = currentData[currentData.length - 1];
         setUndoStack(prev => [...prev, lastStroke]);
-        // Clear redo stack when new stroke is added
         setRedoStack([]);
       }
       setIsDrawing(false);
@@ -48,7 +44,6 @@ const ESignaturePage = () => {
 
   useEffect(() => {
     if (alldatass) {
-      // Transform the API data to match table structure
       const formattedData = alldatass.map((item, index) => ({
         key: index + 1,
         id: item.id,
@@ -98,14 +93,7 @@ const ESignaturePage = () => {
       width: '200px',
       render: (_, record) => (
         <div className="flex gap-2">
-          {/* <Button
-            type="primary"
-            icon={<EditOutlined />}
-            className="flex items-center bg-blue-500"
-            onClick={() => handleEdit(record)}
-          >
-            Edit
-          </Button> */}
+         
           <Popconfirm
             title="Delete Signature"
             description="Are you sure you want to delete this signature?"
@@ -276,8 +264,7 @@ const ESignaturePage = () => {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
-          // Note: Don't set Content-Type when sending FormData
-          // browser will automatically set the correct boundary
+       
         },
         body: formData,
       });
@@ -335,10 +322,7 @@ const ESignaturePage = () => {
      
     });
     
-    // notification.success({
-    //   message: 'Success',
-    //   description: 'Signature deleted successfully!',
-    // });
+ 
   };
 
   // Modified save button text based on mode

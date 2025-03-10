@@ -12,7 +12,6 @@ import {
   GetallTrainng,
 } from "./TrainingReducer/TrainingSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
-// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 
 const EditTrainingSetup = ({ idd, onClose }) => {
   const [form] = Form.useForm();

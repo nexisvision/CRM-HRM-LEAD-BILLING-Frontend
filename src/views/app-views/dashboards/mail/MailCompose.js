@@ -173,7 +173,6 @@ const MailCompose = () => {
 		setPlaceholders(templates[templateName].placeholders);
 		setCurrentTemplate(templates[templateName].emailMessage || '');
 		
-		// Update the message with default placeholder values
 		const updatedMessage = replacePlaceholders(
 			templates[templateName].emailMessage || '',
 			templates[templateName].placeholders
@@ -185,7 +184,6 @@ const MailCompose = () => {
 		});
 	};
 
-	// Update this function to handle placeholder changes
 	const handlePlaceholderChange = (key, value) => {
 		const newPlaceholders = {
 			...placeholders,
@@ -193,7 +191,6 @@ const MailCompose = () => {
 		};
 		setPlaceholders(newPlaceholders);
 
-		// Update email message with new placeholder values
 		if (currentTemplate) {
 			const updatedMessage = replacePlaceholders(currentTemplate, newPlaceholders);
 			setEmailMessage(updatedMessage);
@@ -203,7 +200,6 @@ const MailCompose = () => {
 		}
 	};
 
-	// Replace placeholders in template with actual values
 	const replacePlaceholders = (template, data) => {
 		let message = template;
 		Object.entries(data).forEach(([key, value]) => {
@@ -221,7 +217,6 @@ const MailCompose = () => {
 				finalMessage = replacePlaceholders(emailMessage, placeholders);
 			}
 
-			// Format the payload exactly as required
 			const emailData = {
 				to: values.to, // Now values.to is already a string
 				subject: values.subject,
@@ -248,7 +243,6 @@ const MailCompose = () => {
 		<Card className="mail-compose">
 			<Form form={form} onFinish={onFinish} layout="vertical">
 				<Row gutter={16}>
-					{/* Template Selection */}
 					<Col span={24}>
 						<Form.Item label="Select Template">
 							<Select
@@ -265,7 +259,6 @@ const MailCompose = () => {
 						</Form.Item>
 					</Col>
 
-					{/* Placeholders Display */}
 					{Object.keys(placeholders).length > 0 && (
 						<Col span={24}>
 							<Card title="Template Placeholders" size="small" className="mb-4">
@@ -289,7 +282,6 @@ const MailCompose = () => {
 						</Col>
 					)}
 
-					{/* Email Form Fields */}
 					<Col span={24}>
 						<Form.Item
 							name="to"

@@ -20,12 +20,9 @@ import OrderListData from "assets/data/order-list.data.json";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-// import { GetLeads, LeadsAdd } from "./LeadReducers/LeadSlice";
 import { GetLeads } from "../LeadReducers/LeadSlice";
 import { LeadsAdd } from "../LeadReducers/LeadSlice";
-// import { getallcurrencies } from "../../setting/currencies/currenciesreducer/currenciesSlice";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
-// import { getstages } from "../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { getstages } from "../../systemsetup/LeadStages/LeadsReducer/LeadsstageSlice";
 import { GetLable } from "../../project/milestone/LableReducer/LableSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
@@ -42,7 +39,6 @@ const AddLeadCards = ({ onClose }) => {
   const { currencies } = useSelector((state) => state.currencies);
   const currenciesData = currencies?.data || [];
   const { data: employee } = useSelector((state) => state.employee.employee);
-  // const { data: Lable } = useSelector((state) => state.Lable.Lable);
   const alltagdata = useSelector((state) => state.Lable);
   const datas = alltagdata.Lable.data || [];
   const user = useSelector((state) => state.user.loggedInUser);
@@ -120,7 +116,6 @@ const AddLeadCards = ({ onClose }) => {
     leadStage: Yup.string().required("Lead Stage is required"),
     email: Yup.string().required("Email is required"),
     assigned: Yup.string().required("Assigned is required"),
-    // Details section
     notes: Yup.string().when("details", {
       is: true,
       then: Yup.string().required("Notes are required"),
@@ -135,7 +130,6 @@ const AddLeadCards = ({ onClose }) => {
     }),
     lastContacted: Yup.date().nullable(),
 
-    // Info section
     totalBudget: Yup.string().when("info", {
       is: true,
       then: Yup.string().required("Total Budget is required"),
@@ -536,7 +530,6 @@ const AddLeadCards = ({ onClose }) => {
                         name="source" 
                         placeholder="Select Source"
                         className="w-full mt-1"
-                        // loading={loading}
                         onChange={(value) => console.log("Selected:", value)}
                       >
                         {datas.map((source) => (

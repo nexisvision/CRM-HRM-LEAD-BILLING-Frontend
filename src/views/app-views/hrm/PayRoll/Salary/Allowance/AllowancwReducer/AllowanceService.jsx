@@ -86,15 +86,11 @@ const editallo = async (meetid, values) => {
 
 
 const UserService = {
-  // addUser,
   getallo,
   addallo,
   deleteallo,
   editallo,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+ 
 };
 
 export default UserService;

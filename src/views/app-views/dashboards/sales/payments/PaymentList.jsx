@@ -43,32 +43,26 @@ const PaymentList = () => {
 	const [isViewPaymentModalVisible, setIsViewPaymentModalVisible] = useState(false);
 	const [paymentStatisticData] = useState(PaymentStatisticData);
 
-	// Open Add Job Modal
 	const openAddPaymentModal = () => {
 		setIsAddPaymentModalVisible(true);
 	};
 
-	// Close Add Job Modal
 	const closeAddPaymentModal = () => {
 		setIsAddPaymentModalVisible(false);
 	};
 
-	// Open Add Job Modal
 	const openEditPaymentModal = () => {
 		setIsEditPaymentModalVisible(true);
 	};
 
-	// Close Add Job Modal
 	const closeEditPaymentModal = () => {
 		setIsEditPaymentModalVisible(false);
 	};
 
-	// Open Add Job Modal
 	const openViewPaymentModal = () => {
 		setIsViewPaymentModalVisible(true);
 	};
 
-	// Close Add Job Modal
 	const closeViewPaymentModal = () => {
 		setIsViewPaymentModalVisible(false);
 	};

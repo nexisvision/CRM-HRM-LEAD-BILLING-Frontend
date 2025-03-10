@@ -105,7 +105,6 @@ const eventSlice = createSlice({
         state.error = action.payload;
         state.success = false;
       })
-      // Create Event
 
       .addCase(createEventData.fulfilled, (state, action) => {
         state.events.push(action.payload); // Add the newly created event to the state
@@ -113,22 +112,7 @@ const eventSlice = createSlice({
       .addCase(createEventData.rejected, (state, action) => {
         state.error = action.payload;
       })
-      // .addCase(createEventData.pending, (state) => {
-      //   state.loading = true;
-      //   state.error = null;
-      // })
-      // .addCase(createEventData.fulfilled, (state, action) => {
-      //   state.loading = false;
-      //   state.events.push(action.payload);
-      //   state.success = true;
-      //   state.message = 'Event scheduled successfully!';
-      // })
-      // .addCase(createEventData.rejected, (state, action) => {
-      //   state.loading = false;
-      //   state.error = action.payload;
-      //   state.success = false;
-      // })
-      // get event by id
+     
       .addCase(getEventById.pending, (state) => {
         state.loading = true;
       })
@@ -141,7 +125,6 @@ const eventSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Edit Event
       .addCase(UpdateEventsetUp.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -150,23 +133,19 @@ const eventSlice = createSlice({
         state.loading = false;
 
         state.events = state.events.findIndex(event => event._id === action.payload._id);// Ensure `action.payload.user` exists
-        // state.token = action.payload.token;
       })
       .addCase(UpdateEventsetUp.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
         state.success = false;
       })
-      // Delete Event
       .addCase(deleteEventData.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(deleteEventData.fulfilled, (state, action) => {
         state.loading = false;
-        // state.token = action.payload.token;
         state.events = state.events.filter((event) => event.id !== action.meta.arg);
-        // state.events = state.events.filter((event) => event._id !== action.payload);
         state.success = true;
         state.message = 'Event deleted successfully';
       })

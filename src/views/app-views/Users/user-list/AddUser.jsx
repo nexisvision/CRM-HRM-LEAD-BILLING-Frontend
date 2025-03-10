@@ -44,12 +44,8 @@ const AddUser = ({ visible, onClose }) => {
   const allRoles = useSelector((state) => state.role);
   const filterdata = allRoles.role?.data || [];
 
-  // Find the role of logged in user
   const userRole = filterdata.find(role => role.id === loggedInUser?.role_id);
 
-  // const filterdata = roleData.filter((role) => role.created_by == loggedInUser?.username);
-
-  // Filter roles based on user's role
   const filteredRoles = filterdata.filter(role => {
     if (userRole?.role_name === 'client') {
       // If user is client, match roles with user's ID as client_id

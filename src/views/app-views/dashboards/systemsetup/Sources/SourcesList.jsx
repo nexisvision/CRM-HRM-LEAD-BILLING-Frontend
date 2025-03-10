@@ -164,14 +164,6 @@ const SourcesList = () => {
     },
   ];
 
-  // const onSearch = (e) => {
-  //   const value = e.currentTarget.value;
-  //   const searchArray = e.currentTarget.value ? list : OrderListData;
-  //   const data = utils.wildCardSearch(searchArray, value);
-  //   setList(data);
-  //   setSelectedRowKeys([]);
-  // };
-
   return (
     <>
       <div className="flex justify-between items-center mb-4">
@@ -204,25 +196,14 @@ const SourcesList = () => {
           >
 
           </Flex>
-          {/* <Flex gap="7px" className="flex">
-						<Button type="primary" className="ml-2" onClick={openAddPaymentModal}>
-							<PlusOutlined />
-							<span className="ml-2">New</span>
-						</Button>
-					</Flex> */}
+         
         </Flex>
         <div className="table-responsive">
           <Table
             columns={tableColumns}
             dataSource={list}
             rowKey="id"
-          // scroll={{x:1000}}
-          // rowSelection={{
-          // 	selectedRowKeys: selectedRowKeys,
-          // 	type: 'checkbox',
-          // 	preserveSelectedRowKeys: false,
-          // 	...rowSelection,
-          // }}
+      
           />
         </div>
       </Card>
@@ -252,8 +233,3 @@ const SourcesList = () => {
 };
 
 export default SourcesList;
-
-// GetLable,
-// AddLable,
-// Deletemins,
-// EditMin,

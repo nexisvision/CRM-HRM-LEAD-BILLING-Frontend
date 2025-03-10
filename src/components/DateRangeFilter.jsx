@@ -163,10 +163,8 @@ const DateRangeFilter = ({ onDateRangeChange }) => {
       const popupRect = popupRef.current.getBoundingClientRect();
       const isSpaceBelow = window.innerHeight - buttonRect.bottom > popupRect.height;
       if (!isSpaceBelow) {
-        // If space below is not enough, place it above the button
         popupRef.current.style.top = `${buttonRect.top - popupRect.height - 10}px`;
       } else {
-        // Otherwise, place it below the button
         popupRef.current.style.top = `${buttonRect.bottom + 10}px`;
       }
     }

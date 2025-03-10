@@ -17,7 +17,6 @@ const { Option } = Select;
 const AddCrediteNotes = ({ onClose }) => {
   const dispatch = useDispatch();
   
-  // Get invoices data
   const invoicesData = useSelector((state) => state.salesInvoices.salesInvoices.data);
 
   useEffect(() => {
@@ -39,13 +38,12 @@ const AddCrediteNotes = ({ onClose }) => {
   ]);
 
   const onSubmit = (values, { resetForm }) => {
-    // Find the matching invoice
     const selectedInvoice = invoicesData.find(invoice => invoice.id === values.invoice);
     
     const submitData = {
       ...values,
       salesInvoiceNumber: selectedInvoice ? selectedInvoice.salesInvoiceNumber : null,
-      invoice: values.invoice // This is the invoice ID
+      invoice: values.invoice 
     };
 
     dispatch(Addcreditnote(submitData))
@@ -76,18 +74,14 @@ const AddCrediteNotes = ({ onClose }) => {
     description: Yup.string().required("Please enter a description."),
   });
 
-  // Add this function to handle invoice selection
   const handleInvoiceSelect = (invoiceId, setFieldValue) => {
     if (invoiceId) {
       const selectedInvoice = invoicesData.find(invoice => invoice.id === invoiceId);
       if (selectedInvoice) {
-        // Set the invoice field
         setFieldValue("invoice", invoiceId);
-        // Set the amount field with the invoice's total amount
         setFieldValue("amount", selectedInvoice.total || selectedInvoice.amount || 0);
       }
     } else {
-      // Clear both fields if no invoice is selected
       setFieldValue("invoice", "");
       setFieldValue("amount", "");
     }

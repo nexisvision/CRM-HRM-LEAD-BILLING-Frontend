@@ -9,7 +9,6 @@ import { getBranch } from "../Branch/BranchReducer/BranchSlice";
 import AddBranch from "../Branch/AddBranch";
 
 const { Option } = Select;
-// Validation Schema using Yup
 const validationSchema = Yup.object().shape({
   department_name: Yup.string()
     .required("Department Name is required")
@@ -38,13 +37,10 @@ const AddDepartment = ({ onClose }) => {
       .then(() => {
         dispatch(getDept());
 
-        // message.success("Department added successfully!");
         resetForm();
         onClose();
-        // navigate("/app/hrm/department");
       })
       .catch((error) => {
-        // message.error("Failed to add department.");
         console.error("Add API error:", error);
       });
   };

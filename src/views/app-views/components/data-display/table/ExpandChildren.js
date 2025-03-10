@@ -86,7 +86,6 @@ const data = [
   }
 ];
 
-// rowSelection objects indicates the need for row selection
 const rowSelection = {
   onChange: (selectedRowKeys, selectedRows) => {
     console.log(

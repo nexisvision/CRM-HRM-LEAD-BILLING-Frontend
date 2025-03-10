@@ -21,7 +21,6 @@ const ResetPassword = ({ onClose }) => {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      // Logic for resetting the password goes here
       resetForm();
     } catch (error) {
     } finally {
@@ -31,7 +30,6 @@ const ResetPassword = ({ onClose }) => {
 
   return (
     <div className=" bg-white max-w-2xl mx-auto">
-      {/* <h1 className="text-2xl font-bold mb-6">Reset Password</h1> */}
       
       <Formik
         initialValues={initialValues}

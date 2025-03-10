@@ -33,19 +33,16 @@ const AddCompany = ({ onClose }) => {
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let password = "";
     
-    // Generate 6 characters
     for (let i = 0; i < length; i++) {
       password += charset[Math.floor(Math.random() * charset.length)];
     }
 
-    // Ensure at least one number
     const randomNum = Math.floor(Math.random() * 10).toString();
     password = password.slice(0, 7) + randomNum;
     
     return password;
   };
 
-  // Submit handler for OTP
   const otpapi = async (otp) => {
     try {
       const res = await axios.post(
@@ -84,7 +81,6 @@ const AddCompany = ({ onClose }) => {
     }
   };
 
-  // Form submit handler
   const onSubmit = async (values, { resetForm, setSubmitting }) => {
     setIsSubmitting(true);
     try {
@@ -104,14 +100,12 @@ const AddCompany = ({ onClose }) => {
     }
   };
 
-  // Initial form values without default password
   const initialValues = {
     username: "",
     password: "", // Empty password initially
     email: "",
   };
 
-  // Validation schema using Yup
   const validationSchema = Yup.object({
     username: Yup.string().required("Please enter a username."),
     password: Yup.string()

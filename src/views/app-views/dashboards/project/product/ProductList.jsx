@@ -87,12 +87,10 @@ const ProductList = () => {
   };
   const exportToExcel = () => {
     try {
-      // Create a worksheet from the formatted data
       const ws = utils.json_to_sheet(list);
       const wb = utils.book_new(); // Create a new workbook
       utils.book_append_sheet(wb, ws, "Product"); // Append the worksheet to the workbook
 
-      // Write the workbook to a file
       writeFile(wb, "ProductData.xlsx");
       message.success("Data exported successfully!");
     } catch (error) {
@@ -172,13 +170,11 @@ const ProductList = () => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
     
-    // If search value is empty, show all data
     if (!value) {
       setList(filtermin);
       return;
     }
     
-    // Filter the data based on product name
     const filtered = filtermin.filter(product => 
       product.name?.toLowerCase().includes(value)
     );

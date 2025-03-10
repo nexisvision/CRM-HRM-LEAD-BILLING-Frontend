@@ -161,12 +161,6 @@ export const DefaultDashboard = () => {
 
   const dispatch = useDispatch()
 
-
-
-// const setdata = () =>{
-//   const data = localStorage.getItem("USER");
-//   dispatch(useradata())
-// }
   
   useEffect(() => {
     dispatch(roledata()); 

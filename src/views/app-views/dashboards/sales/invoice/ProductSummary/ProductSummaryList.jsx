@@ -11,13 +11,11 @@ function ProductSummaryList() {
             <Card className='border-0'>
 
                 <div className="p-2">
-                    {/* Heading */}
                     <h1 className="text-sm font-medium mb-1">Product Summary</h1>
                     <p className="text-xs text-gray-500 mb-2">
                         All items here cannot be deleted.
                     </p>
 
-                    {/* Table */}
                     <div className="overflow-x-auto">
                         <table className="w-full border border-gray-300 bg-white text-center text-xs">
                             <thead className="bg-gray-100">
@@ -38,7 +36,6 @@ function ProductSummaryList() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {/* Row 1 */}
                                 <tr>
                                     <td className="px-4 py-2">1</td>
                                     <td className="px-4 py-2">Refrigerator</td>
@@ -54,7 +51,6 @@ function ProductSummaryList() {
                                     </td>
                                     <td className="px-4 py-2">USD 103.500,00</td>
                                 </tr>
-                                {/* Total Row */}
                                 <tr className="bg-gray-100 font-semibold">
                                     <td className="px-4 py-2 text-center" colSpan="3">
                                         Total
@@ -69,7 +65,6 @@ function ProductSummaryList() {
                         </table>
                     </div>
 
-                    {/* Summary Details */}
                     <div className="mt-3 flex flex-col items-end space-y-2 text-xs">
                         <div className="flex justify-between w-full sm:w-1/3 border-b pb-2">
                             <span className="text-gray-700">Sub Total</span>

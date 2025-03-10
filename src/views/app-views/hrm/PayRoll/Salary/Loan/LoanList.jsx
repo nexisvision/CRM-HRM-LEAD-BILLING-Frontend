@@ -46,17 +46,14 @@ const LoanList = ({ id, onClose }) => {
     }
   }, [fnsdata,fnddatasss]);
 
-  // Open Add Salary Modal
   const openModal = () => {
     setIsModalVisible(true);
   };
 
-  // Close Add Salary Modal
   const closeModal = () => {
     setIsModalVisible(false);
   };
 
-  // Search functionality
   const onSearch = (e) => {
     const value = e.currentTarget.value.toLowerCase();
     const filteredData = utils.wildCardSearch(employeeSalaryData, value);
@@ -64,7 +61,6 @@ const LoanList = ({ id, onClose }) => {
     setSelectedRowKeys([]);
   };
 
-  // Delete a salary entry
   const deleteSalaryEntry = (id) => {
     dispatch(deleteloans(id)).then(() => {
       dispatch(getloans());
@@ -73,14 +69,9 @@ const LoanList = ({ id, onClose }) => {
     });
   };
 
-  // Dropdown menu for action options
   const dropdownMenu = (record) => (
     <Menu>
-      {/* <Menu.Item>
-        <Button type="text" icon={<EyeOutlined />} size="small">
-          View Details
-        </Button>
-      </Menu.Item> */}
+      
       <Menu.Item>
         <Button
           type="text"

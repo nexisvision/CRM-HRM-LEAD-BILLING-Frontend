@@ -26,7 +26,6 @@ const EditEstimates = ({ idd, onClose }) => {
     const user = useSelector((state) => state.user.loggedInUser.username);
 
 
-    // Get current estimate and currencies from Redux store
     const currentEstimatee = useSelector((state) => state.estimate.estimates || []);
 
 
@@ -38,24 +37,11 @@ const EditEstimates = ({ idd, onClose }) => {
 
     const { taxes } = useSelector((state) => state.tax);
 
-    // const subClients = useSelector((state) => state.SubClient);
-    // const sub = subClients?.SubClient?.data;
-
-    // const allproject = useSelector((state) => state.Project);
-    // const fndrewduxxdaa = allproject.Project.data
-    // const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
-
-    // const client = fnddata?.client;
-
-    // const subClientData = sub?.find((subClient) => subClient?.id === client);
-
-
     const { data: Leads, isLoading: isLeadsLoading, error: leadsError } = useSelector((state) => state.Leads.Leads || []);
 
     const allleads = useSelector((state) => state.Leads);
     const fndrewduxxdaa = allleads.Leads.data
     const fnddata = fndrewduxxdaa?.find((lead) => lead?.id === id);
- // Get leads data and find the selected lead
  const allLeads = useSelector((state) => state.Leads);
  const leadsData = allLeads.Leads.data || [];
  const selectedLead = leadsData?.find((lead) => lead?.id === id);
@@ -67,7 +53,7 @@ const EditEstimates = ({ idd, onClose }) => {
 
     const handleAddRow = () => {
         const newRow = {
-            id: Date.now(), // Unique ID for the new row
+            id: Date.now(), 
             item: "",
             quantity: 1,
             price: "",
@@ -103,7 +89,6 @@ const EditEstimates = ({ idd, onClose }) => {
         finalTotal: 0,
     });
 
-    // Fetch estimate and currencies data
     useEffect(() => {
         dispatch(getcurren());
         if (id) {
@@ -118,39 +103,31 @@ const EditEstimates = ({ idd, onClose }) => {
     }, [dispatch]);
 
 
-    // Populate form when currentEstimate changes
     useEffect(() => {
         const fetchAndSetEstimateData = async () => {
             if (currentEstimate) {
                 try {
 
-                    // Set basic form fields
                     form.setFieldsValue({
                         valid_till: dayjs(currentEstimate.valid_till),
                         currency: currentEstimate.currency,
                         leadTitle: leadTitle,
                         lead: id,
-                        // client: currentEstimate.client,
                         calculatedTax: currentEstimate.calculatedTax,
-                        // projectName: fnddata?.project_name
                     });
 
-                    // Parse and set items
                     if (currentEstimate.items) {
                         let parsedItems;
                         try {
-                            // Parse items if it's a string
                             parsedItems = typeof currentEstimate.items === 'string' 
                                 ? JSON.parse(currentEstimate.items)
                                 : currentEstimate.items;
                             
 
-                            // Convert items object to array if needed
                             const itemsArray = Array.isArray(parsedItems) 
                                 ? parsedItems 
                                 : Object.values(parsedItems);
 
-                            // Format items for table
                             const formattedItems = itemsArray.map(item => ({
                                 id: Date.now() + Math.random(),
                                 item: item.item || '',
@@ -168,7 +145,6 @@ const EditEstimates = ({ idd, onClose }) => {
 
                             setTableData(formattedItems);
 
-                            // Set tax details for each item
                             formattedItems.forEach(item => {
                                 if (item.tax && item.tax_name) {
                                     setSelectedTaxDetails(prev => ({
@@ -181,7 +157,6 @@ const EditEstimates = ({ idd, onClose }) => {
                                 }
                             });
 
-                            // Calculate and set totals
                             const subtotal = formattedItems.reduce((sum, item) => 
                                 sum + (Number(item.base_amount) || 0), 0);
                             
@@ -195,7 +170,6 @@ const EditEstimates = ({ idd, onClose }) => {
                                 finalTotal: Number(currentEstimate.total) || 0
                             });
 
-                            // Set discount rate
                             setDiscountRate(Number(currentEstimate.discountRate) || 0);
 
                         } catch (error) {
@@ -214,7 +188,6 @@ const EditEstimates = ({ idd, onClose }) => {
         fetchAndSetEstimateData();
     }, [currentEstimate, form, leadDetails,leadTitle,id]);
 
-    // Add debug logging
     useEffect(() => {
     }, [tableData]);
 
@@ -224,15 +197,12 @@ const EditEstimates = ({ idd, onClose }) => {
             return;
         }
 
-        // Calculate subtotal (sum of all item amounts)
         const subtotal = data.reduce((sum, row) => {
             return sum + (parseFloat(row.amount) || 0);
         }, 0);
 
-        // Calculate discount amount
         const discountAmount = (subtotal * (parseFloat(discount) || 0)) / 100;
 
-        // Calculate total tax (for display purposes)
         const totalTax = data.reduce((sum, row) => {
             const quantity = parseFloat(row.quantity) || 0;
             const price = parseFloat(row.price) || 0;
@@ -242,7 +212,6 @@ const EditEstimates = ({ idd, onClose }) => {
             return sum + taxAmount;
         }, 0);
 
-        // Calculate final total: subtotal - discount
         const finalTotal = subtotal - discountAmount;
 
         setTotals({
@@ -268,12 +237,10 @@ const EditEstimates = ({ idd, onClose }) => {
         }, 0);
     };
 
-    // Handle form submission
     const handleFinish = async (values) => {
         try {
             setLoading(true);
 
-            // Convert items array to object with numeric keys
             const formattedItems = tableData.reduce((acc, item, index) => {
                 acc[index] = {
                     id: item.id,
@@ -313,7 +280,6 @@ const EditEstimates = ({ idd, onClose }) => {
 
             message.success('Estimate updated successfully');
             onClose();
-            // navigate("/app/dashboards/project/list");
         } catch (error) {
             message.error('Failed to update estimate: ' + (error.message || 'Unknown error'));
         } finally {
@@ -334,7 +300,6 @@ const EditEstimates = ({ idd, onClose }) => {
     const itemsArray = Object.values(currentEstimate.items || {});
 
 
-    // Handle table data changes
     const handleTableDataChange = (id, field, value) => {
         const updatedData = tableData.map((row) => {
             if (row.id === id) {
@@ -352,7 +317,6 @@ const EditEstimates = ({ idd, onClose }) => {
                         }));
                     }
                 }
-                // Calculate amount if quantity, price, or tax changes
                 if (field === 'quantity' || field === 'price' || field === 'tax') {
                     const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
                     const price = parseFloat(field === 'price' ? value : row.price) || 0;
@@ -387,7 +351,6 @@ const EditEstimates = ({ idd, onClose }) => {
                             loginEnabled: true,
                         }}
                     >
-                        {/* <Card className="border-0 mt-2"> */}
                         <div className="">
                             <div className=" p-2">
 
@@ -412,37 +375,7 @@ const EditEstimates = ({ idd, onClose }) => {
                                         </Form.Item>
                                     </Col>
 
-                                    {/* <Col span={12}>
-                                        <Form.Item
-                                            name="client"
-                                            label="Client Name"
-                                            initialValue={subClientData?.username}
-                                            rules={[{ required: true, message: "Please enter the client name" }]}
-                                        >
-                                            <Input placeholder="Enter client name" disabled />
-                                        </Form.Item>
-                                       
-                                        <Form.Item name="client" initialValue={fnddata?.client} hidden>
-                                            <Input type="hidden" />
-                                        </Form.Item>
-                                    </Col> */}
-
-                                    {/* <Col span={12}>
-                                      
-                                        <Form.Item
-                                            name="projectName"
-                                            label="Project Name"
-                                            initialValue={fnddata?.project_name}
-                                            rules={[{ required: true, message: "Please enter the project name" }]}
-                                        >
-                                            <Input placeholder="Enter project name" disabled />
-                                        </Form.Item>
-
-                                       
-                                        <Form.Item name="project" initialValue={fnddata?.id} hidden>
-                                            <Input type="hidden" />
-                                        </Form.Item>
-                                    </Col> */}
+                                  
 
                                     <Col span={12}>
                                         <Form.Item

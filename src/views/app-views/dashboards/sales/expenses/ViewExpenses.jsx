@@ -4,7 +4,6 @@ import { Modal, Row, Col, Typography, Button } from 'antd';
 const { Title, Text } = Typography;
 
 const ViewExpenses = ({ visible, onClose, expenseData }) => {
-  // Sample data (replace `expenseData` with props or API data)
   const data = expenseData || {
     date: '05-15-2024',
     client: 'Dellon Inc',

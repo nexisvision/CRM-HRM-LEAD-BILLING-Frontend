@@ -31,7 +31,6 @@ const AddPayment = ({ onClose}) => {
   const { currencies } = useSelector((state) => state.currencies);
   const curren = currencies?.data || [];
 
-  // Safely access the expense data with optional chaining
   const invoiceData = useSelector((state) => state.invoice?.invoices) || [];
   const estimateData = useSelector((state) => state.estimate?.estimates) || [];
   const expenseState = useSelector((state) => state.Expense);
@@ -123,7 +122,6 @@ const AddPayment = ({ onClose}) => {
       bankAccount: values.bankAccount || '',
       remark: values.remark || ''
     };
-    // Add reference type based on selection
     data.invoice = values.selectedType === 'invoice' && values.invoice ? values.invoice : null;
     data.estimate = values.selectedType === 'estimate' && values.estimate ? values.estimate : null;
     data.expense = values.selectedType === 'expense' && values.expense ? values.expense : null;
@@ -132,12 +130,10 @@ const AddPayment = ({ onClose}) => {
 
     const formData = new FormData();
 
-    // Append all data to FormData
     Object.keys(data).forEach(key => {
       formData.append(key, data[key]);
     });
 
-    // Handle receipt file separately
     if (values.receipt instanceof File) {
       formData.append('receipt', values.receipt);
     }

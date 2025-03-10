@@ -12,7 +12,6 @@ import dayjs from 'dayjs';
 
 const { Option } = Select;
 
-// Update validation schema to include branch
 const validationSchema = Yup.object().shape({
   title: Yup.string().required('title is required'),
   description: Yup.string().required('description is required'),
@@ -36,13 +35,11 @@ const AddAnnouncement = ({ onClose }) => {
   const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
 
   const handleSubmit = (values, { resetForm }) => {
-    // Ensure we have valid date and time values
     if (!values.date || !values.time) {
       message.error('Date and time are required');
       return;
     }
 
-    // Convert date to ISO string for proper date object handling on backend
     const dateObj = values.date.toDate();
     const formattedTime = values.time.format('HH:mm:ss');
 
@@ -52,7 +49,7 @@ const AddAnnouncement = ({ onClose }) => {
       date: dateObj,
       time: formattedTime,
       branch: {
-        branches: values.branch  // Changed from 'branch' to 'branches' to match backend schema
+        branches: values.branch  
       }
     };
 
@@ -107,7 +104,6 @@ const AddAnnouncement = ({ onClose }) => {
               </Col>
 
               <Col span={12}>
-                {/* Branch Field */}
                 <div>
                   <label className="font-semibold">Branch <span className="text-red-500">*</span></label>
                   <Field
@@ -200,21 +196,6 @@ const AddAnnouncement = ({ onClose }) => {
                 </div>
               </Col>
 
-              {/* <Col span={12}>
-              
-                <div style={{ marginBottom: '16px' }}>
-                  <label className="font-semibold">Description <span className="text-red-500">*</span></label>
-                  <Field
-                    as={Input}
-                    name="description"
-                    placeholder="Enter description"
-                    className="w-full mt-1"
-                  />
-                  {errors.description && touched.description && (
-                    <div style={{ color: 'red', fontSize: '12px' }}>{errors.description}</div>
-                  )}
-                </div>
-              </Col> */}
             </Row>
 
             <div className="text-right mt-3">
@@ -233,7 +214,6 @@ const AddAnnouncement = ({ onClose }) => {
         )}
       </Formik>
 
-      {/* Add Branch Modal */}
       <Modal
         title="Add Branch"
         visible={isAddBranchModalVisible}

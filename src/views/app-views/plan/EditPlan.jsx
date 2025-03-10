@@ -11,11 +11,9 @@ import * as Yup from 'yup';
 const { Option } = Select;
 
 const EditPlan = ({ planData, onUpdate, id, onClose }) => {
-  // Get the plan data from the store using id
   const allPlans = useSelector((state) => state.Plan.Plan || []);
   const currentPlan = allPlans.find(plan => plan.id === id) || {};
 
-  // Initialize states with current plan data
   const [isTrialEnabled, setIsTrialEnabled] = useState(currentPlan?.trial || false);
   const [durationType, setDurationType] = useState(() => {
     if (currentPlan?.duration?.toLowerCase().includes('month')) return 'Monthly';
@@ -24,7 +22,6 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
     return null;
   });
 
-  // Parse duration value
   const getDurationValue = () => {
     if (!currentPlan?.duration) return null;
     const match = currentPlan.duration.match(/(\d+)/);
@@ -39,7 +36,6 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
     return durationType === 'Yearly' ? getDurationValue() : null;
   });
 
-  // Set initial values from current plan
   const initialValues = {
     name: currentPlan?.name || '',
     price: currentPlan?.price || '',
@@ -54,7 +50,6 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
     trial_period: currentPlan?.trial_period || '',
   };
 
-  // Update duration field when type or value changes
   useEffect(() => {
     if (formikRef.current) {
       const { setFieldValue } = formikRef.current;
@@ -77,15 +72,12 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
   const alldept = useSelector((state) => state.Plan);
   const alldept2 = alldept.Plan.data;
 
-  // Add formik ref to access formik methods
   const formikRef = React.useRef();
 
-  // Move the currency initialization to component level
   useEffect(() => {
     dispatch(getcurren());
   }, [dispatch]);
 
-  // Add another useEffect for currency initialization
   useEffect(() => {
     if (formikRef.current && fnddatass?.length > 0) {
       const { values, setFieldValue } = formikRef.current;
@@ -131,12 +123,10 @@ const EditPlan = ({ planData, onUpdate, id, onClose }) => {
     dispatch(Editplan({ id, values: submitValues }))
       .then(() => {
         dispatch(GetPlan());
-        // message.success("Plan details updated successfully!");
         onClose();
         navigate('/app/superadmin/plan');
       })
       .catch((error) => {
-        // message.error('Failed to update plan.');
         console.error('Edit API error:', error);
       });
   };

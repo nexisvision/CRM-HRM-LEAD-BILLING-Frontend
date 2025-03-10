@@ -64,7 +64,6 @@ const DebitnoteList = () => {
     const applyFilters = () => {
         let filtered = [...list];
 
-        // Search text filter
         if (searchText) {
             filtered = filtered.filter(item => 
                 item.billNumber?.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -72,7 +71,6 @@ const DebitnoteList = () => {
             );
         }
 
-        // Date filter
         if (selectedDate) {
             const selectedDay = dayjs(selectedDate).startOf('day');
             filtered = filtered.filter(item => {
@@ -169,7 +167,6 @@ const DebitnoteList = () => {
                     columns={tableColumns}
                     dataSource={filteredList}
                     rowKey="id"
-                    // loading={loading}
                     scroll={{ x: 1200 }}
                 />
             </div>

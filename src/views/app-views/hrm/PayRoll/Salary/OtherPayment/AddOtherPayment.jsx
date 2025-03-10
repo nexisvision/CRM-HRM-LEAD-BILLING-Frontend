@@ -3,7 +3,6 @@ import { Input, Button, Col, Select, message } from "antd";
 import { ErrorMessage, Field, Formik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "views/app-views/hrm/Employee/EmployeeReducers/EmployeeSlice";
-// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 import { Option } from "antd/es/mentions";
 import {
   addotherpay,

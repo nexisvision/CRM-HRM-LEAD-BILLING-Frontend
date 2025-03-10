@@ -8,7 +8,6 @@ import * as Yup from 'yup';
 import { getcurren } from '../setting/currencies/currenciesSlice/currenciesSlice';
 import { PlusOutlined } from '@ant-design/icons';
 import AddCurrencies from '../setting/currencies/AddCurrencies';
-// import { getallcurrencies } from '../setting/currencies/currenciesreducer/currenciesSlice';
 const { Option } = Select;
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Please enter the plan name!'),
@@ -24,7 +23,6 @@ const validationSchema = Yup.object().shape({
         return /^\d*\.?\d{0,2}$/.test(value.toString());
       }
     ),
-  // duration: Yup.string().required('Please select a duration!'),
   max_users: Yup.string().required('Please enter the maximum users!'),
   max_customers: Yup.string().required('Please enter the maximum customers!'),
   max_vendors: Yup.string().required('Please enter the maximum vendors!'),
@@ -503,7 +501,6 @@ const AddPlan = ({ onClose }) => {
         }}
       </Formik>
 
-      {/* Add Currency Modal */}
       <Modal
         title="Add New Currency"
         visible={isAddCurrencyModalVisible}
@@ -519,7 +516,6 @@ const AddPlan = ({ onClose }) => {
         />
       </Modal>
 
-      {/* Custom render for selected value */}
       <style jsx>{`
         .currency-select .ant-select-selection-item {
           display: flex !important;

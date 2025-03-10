@@ -105,11 +105,9 @@ const ContractList = () => {
   const openEditContractModal = () => {
     setIsEditContractModalVisible(true);
   };
-  // Close Add Job Modal
   const closeEditContractModal = () => {
     setIsEditContractModalVisible(false);
   };
-  // Search functionality
   const [searchText, setSearchText] = useState('');
   const [dateRange, setDateRange] = useState(null);
 
@@ -131,13 +129,11 @@ const ContractList = () => {
     setUsers(filtered);
   };
 
-  // Add filter function
   const getFilteredContracts = () => {
     if (!users) return [];
     
     let filtered = users;
 
-    // Apply search filter
     if (searchText) {
       filtered = filtered.filter(contract => {
         const clientName = clientData?.find(client => 
@@ -148,7 +144,6 @@ const ContractList = () => {
       });
     }
 
-    // Apply date range filter
     if (dateRange && dateRange.length === 2) {
       filtered = filtered.filter(contract => {
         const contractStartDate = dayjs(contract.startDate);
@@ -156,7 +151,6 @@ const ContractList = () => {
         const filterStartDate = dayjs(dateRange[0]);
         const filterEndDate = dayjs(dateRange[1]);
 
-        // Contract's date range should overlap with the selected date range
         return (
           (contractStartDate.isAfter(filterStartDate) || contractStartDate.isSame(filterStartDate)) &&
           (contractEndDate.isBefore(filterEndDate) || contractEndDate.isSame(filterEndDate))
@@ -167,13 +161,6 @@ const ContractList = () => {
     return filtered;
   };
 
-  // Delete user
-  // const deleteUser = (userId) => {
-  //   dispatch(DeleteCon(userId));
-
-  //   message.success({ content: `Deleted user ${userId}`, duration: 2 });
-  // };
-
   const deleteUser = async (userId) => {
     try {
       await dispatch(DeleteCon(userId));
@@ -182,7 +169,6 @@ const ContractList = () => {
 
       setUsers(users.filter((item) => item.id !== userId));
 
-      // message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error);
     }
@@ -245,11 +231,9 @@ const ContractList = () => {
 
 
 
-      ///endpermission
 
   const dropdownMenu = (elm) => ({
     items: [
-      // Conditionally add edit menu item
       ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'edit',
         icon: <EditOutlined />,
@@ -257,7 +241,6 @@ const ContractList = () => {
         onClick: () => Editfun(elm.id)
       }] : []),
       
-      // Conditionally add delete menu item
       ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'delete',
         icon: <DeleteOutlined />,

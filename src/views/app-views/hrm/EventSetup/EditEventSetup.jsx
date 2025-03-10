@@ -23,7 +23,6 @@ const { Option } = Select;
 
 const EditEventSetUp = ({ initialEventData, onCancel, id, onSuccess }) => {
   const dispatch = useDispatch();
-  // const { id } = useParams();
 
   const onSubmit = async (values, { setSubmitting }) => {
     try {

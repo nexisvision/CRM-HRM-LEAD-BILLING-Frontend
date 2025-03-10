@@ -65,12 +65,10 @@ const AddEstimates = ({ onClose }) => {
         }
     ]);
 
-    // Add this useEffect to fetch taxes when component mounts
     useEffect(() => {
         dispatch(getAllTaxes());
     }, [dispatch]);
 
-    // Fetch currencies
     useEffect(() => {
         const fetchCurrencies = async () => {
             try {
@@ -84,7 +82,6 @@ const AddEstimates = ({ onClose }) => {
         fetchCurrencies();
     }, [dispatch]);
 
-    // Modify the useEffect to handle loading and errors
     useEffect(() => {
         const fetchLeads = async () => {
             try {
@@ -115,21 +112,17 @@ const AddEstimates = ({ onClose }) => {
     };
 
 
-     // Modify the discount input handler
     const handleDiscountChange = (value) => {
-        // Ensure value is a number and default to 0 if empty or invalid
         const numValue = value === '' ? 0 : parseFloat(value) || 0;
         setDiscountValue(numValue);
         calculateTotal(tableData, numValue);
     };
-    // Add a new state to track the selected currency
     const [selectedCurrency, setSelectedCurrency] = useState({ code: '₹', icon: '₹' }); // Default to rupees
 
     const handleFinish = async (values) => {
         try {
             setLoading(true);
 
-            // Validate required fields
             const requiredFields = {
                 valid_till: values.valid_till,
                 currency: values.currency,
@@ -144,12 +137,10 @@ const AddEstimates = ({ onClose }) => {
                 throw new Error(`Please fill in the following required fields: ${missingFields.join(', ')}`);
             }
 
-            // Validate table data
             if (!tableData || tableData.length === 0 || !tableData[0].item) {
                 throw new Error('Please add at least one item to the estimate');
             }
 
-            // Calculate totals
             const subtotal = calculateSubTotal();
             const discountAmount = (subtotal * discountRate) / 100;
             const totalTax = tableData.reduce((sum, item) => {
@@ -163,7 +154,6 @@ const AddEstimates = ({ onClose }) => {
 
             const finalTotal = subtotal - discountAmount;
             
-            // Format items for the database
             const formattedItems = {};
             tableData.forEach((item, index) => {
                 const itemKey = `item_${index + 1}`;
@@ -217,7 +207,6 @@ const AddEstimates = ({ onClose }) => {
         }
     };
 
-    // Function to handle adding a new row
     const handleAddRow = () => {
         setTableData((prevData) => [
             ...prevData,
@@ -246,7 +235,6 @@ const AddEstimates = ({ onClose }) => {
 
     const navigate = useNavigate();
 
-    // Calculate subtotal (sum of all row amounts before discount)
     const calculateSubTotal = () => {
         return tableData.reduce((sum, row) => {
             const quantity = parseFloat(row.quantity) || 0;
@@ -265,13 +253,11 @@ const AddEstimates = ({ onClose }) => {
             return;
         }
     
-        // Calculate subtotal (sum of all item total amounts including their taxes)
         const subtotal = data.reduce((sum, row) => {
             const amount = parseFloat(row.amount) || 0;
             return sum + amount;
         }, 0);
     
-        // Calculate discount amount based on type
         let discountAmount = 0;
         if (type === 'percentage') {
             discountAmount = (subtotal * (parseFloat(discountVal) || 0)) / 100;
@@ -279,7 +265,6 @@ const AddEstimates = ({ onClose }) => {
             discountAmount = parseFloat(discountVal) || 0;
         }
     
-        // Calculate total tax (sum of all item tax amounts)
         const totalTax = data.reduce((sum, row) => {
             const quantity = parseFloat(row.quantity) || 0;
             const price = parseFloat(row.price) || 0;
@@ -289,7 +274,6 @@ const AddEstimates = ({ onClose }) => {
             return sum + taxAmount;
         }, 0);
     
-        // Calculate final total: subtotal - discount
         const finalTotal = subtotal - discountAmount;
     
         setTotals({
@@ -305,7 +289,6 @@ const AddEstimates = ({ onClose }) => {
           if (row.id === id) {
             const updatedRow = { ...row, [field]: value };
             
-            // Calculate amount if quantity, price, or tax changes
             if (field === 'quantity' || field === 'price' || field === 'tax') {
               const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
               const price = parseFloat(field === 'price' ? value : row.price) || 0;

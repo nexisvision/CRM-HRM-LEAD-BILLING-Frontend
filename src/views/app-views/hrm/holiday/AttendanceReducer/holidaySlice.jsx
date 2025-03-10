@@ -17,7 +17,6 @@ export const addsholidayss = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
 
 export const getsholidayss = createAsyncThunk(
   "emp/getsholidayss",
@@ -31,10 +30,6 @@ export const getsholidayss = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
-
-
-// Async thunk for getting user by id
 export const getAttendanceById = createAsyncThunk(
   "users/getAttendanceById",
   async (userId, thunkAPI) => {
@@ -47,7 +42,6 @@ export const getAttendanceById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
 export const deltsholidayss = createAsyncThunk(
   "users/deltsholidayss",
   async (userId, thunkAPI) => {

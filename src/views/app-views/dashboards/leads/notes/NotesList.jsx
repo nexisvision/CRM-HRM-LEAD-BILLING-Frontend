@@ -32,7 +32,6 @@ import { TiPinOutline } from "react-icons/ti";
 import AvatarStatus from "components/shared-components/AvatarStatus";
 import EllipsisDropdown from "components/shared-components/EllipsisDropdown";
 import Flex from "components/shared-components/Flex";
-// import NumberFormat from 'react-number-format';
 import dayjs from "dayjs";
 import { DATE_FORMAT_DD_MM_YYYY } from "constants/DateConstant";
 import utils from "utils";
@@ -102,7 +101,6 @@ export const NotesList = () => {
   const allempdata = useSelector((state) => state.Notes);
   const filtermin = allempdata.Notes.data;
 
-  // Add employee data from Redux store
   const employeeData = useSelector((state) => state.employee?.employee?.data || []);
 
   useEffect(() => {
@@ -136,17 +134,14 @@ export const NotesList = () => {
     setIdd(nid);
   };
 
-  // Open Add Job Modal
   const openAddNotesModal = () => {
     setAddNotesModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeAddNotesModal = () => {
     setAddNotesModalVisible(false);
   };
 
-  // Open Add Job Modal
   const openEditNotesModal = () => {
     setEditNotesModalVisible(true);
   };
@@ -171,16 +166,10 @@ export const NotesList = () => {
       <Menu.Item>
         <Flex alignItems="center" onClick={() => editfun(row.id)}>
           <EditOutlined />
-          {/* <EditOutlined /> */}
           <span className="ml-2">Edit</span>
         </Flex>
       </Menu.Item>
-      {/* <Menu.Item>
-        <Flex alignItems="center" onClick={openViewNotesModal}>
-          <EyeOutlined />
-          <span className="ml-2">View</span>
-        </Flex>
-      </Menu.Item> */}
+   
       <Menu.Item>
         <Flex alignItems="center" onClick={() => DeleteFun(row.id)}>
           <DeleteOutlined />

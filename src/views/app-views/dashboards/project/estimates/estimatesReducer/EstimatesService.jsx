@@ -38,7 +38,6 @@ const EstimateService = {
     }
   },
 
-  // Get single estimate by ID
   getEstimateById: async (id) => {
     const token = localStorage.getItem("auth_token");
     try {

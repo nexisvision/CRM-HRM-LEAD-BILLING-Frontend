@@ -11,7 +11,6 @@ import { getcurren } from "../setting/currencies/currenciesSlice/currenciesSlice
 import { getRoles } from "../hrm/RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice";
 import moment from "moment";
 import { getsubplandata } from "../subscribeduserplans/subplanReducer/subplanSlice";
-// import { getallcurrencies } from "../setting/currencies/currenciesreducer/currenciesSlice";
 
 const { Title, Text } = Typography;
 
@@ -81,9 +80,7 @@ const PlanList = () => {
       await dispatch(DeleteP(planId)).then(() => {
         dispatch(GetPlan());
       });
-      // message.success({ content: 'Plan deleted successfully', duration: 2 });
     } catch (error) {
-      // message.error({ content: 'Failed to delete plan', duration: 2 });
       console.error('Error deleting plan:', error);
     }
   };
@@ -423,7 +420,6 @@ const PlanList = () => {
   const calculateEndDate = (startDate, duration) => {
     if (!duration) return null;
 
-    // Parse the duration string (e.g., "4 Months", "1 Year", "Lifetime")
     const [amount, unit] = duration.split(' ');
 
     if (unit.toLowerCase() === 'lifetime') {

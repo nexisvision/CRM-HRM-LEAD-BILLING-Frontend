@@ -2,7 +2,6 @@ import axios from 'axios';
 import { env } from 'configs/EnvironmentConfig';
 
 const EstimateService = {
-  // Get all estimates
   getaddleadmembers: async (id) => {
     const token = localStorage.getItem('auth_token');
     try {
@@ -37,7 +36,6 @@ const EstimateService = {
     }
   },
 
-  // Get single estimate by ID
   getEstimateById: async (id) => {
     const token = localStorage.getItem("auth_token");
     try {
@@ -55,7 +53,6 @@ const EstimateService = {
     }
   },
 
-  // Update estimate
   updateEstimate: async (idd, data) => {
     const token = localStorage.getItem('auth_token');
     try {
@@ -75,7 +72,6 @@ const EstimateService = {
     }
   },
 
-   // .deleteEstimate
 
  deleteEstimate: async (id) => {
   const token = localStorage.getItem("auth_token");

@@ -22,7 +22,6 @@ const { Option } = Select;
 
 const EditProposal = ({ id, onClose }) => {
 
-  // const { id } = useParams();
   const [discountType, setDiscountType] = useState('percentage');
   const [loading, setLoading] = useState(false);
   const [discountValue, setDiscountValue] = useState(0);
@@ -30,17 +29,12 @@ const EditProposal = ({ id, onClose }) => {
   const [list, setList] = useState(OrderListData)
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedMilestone, setSelectedMilestone] = useState(null);
-  // const [showFields, setShowFields] = useState(false);
-  // const { data: milestones } = useSelector((state) => state.Milestone.Milestone);
   const [singleEmp, setSingleEmp] = useState(null);
 
   const { taxes } = useSelector((state) => state.tax);
 
   const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
 
-
-  // const [selectedProject, setSelectedProject] = useState(null);
-  // const [clientOptions, setClientOptions] = useState([]);
 
   const loggeduser = useSelector((state) => state.user.loggedInUser.username);
   const currencies = useSelector((state) => state.currencies?.currencies?.data || []);
@@ -80,21 +74,16 @@ const EditProposal = ({ id, onClose }) => {
 
 
   useEffect(() => {
-    // Find the specific indicator data by ID
     const empData = alldept?.proposal?.data || [];
     const data = empData.find((item) => item.id === id);
     setSingleEmp(data || null);
 
 
-    // Update form values when singleEmp is set
     if (data) {
       form.setFieldsValue({
         lead_title: data.lead_title,
-        // deal_title: data.deal_title,
-        // valid_till: data.valid_till,
         description: data.description,
         currency: data.currency,
-        // calculatedTax: data.calculatedTax,
         items: data.items,
         discount: data.discount,
         tax: data.tax,
@@ -144,17 +133,13 @@ const EditProposal = ({ id, onClose }) => {
     const setProposalData = async () => {
       if (data) {
         try {
-          // Set basic form fields
           form.setFieldsValue({
             lead_title: data.lead_title,
-            // deal_title: data.deal_title,
             valid_till: dayjs(data.valid_till),
             currency: data.currency,
             description: data.description,
-            // calculatedTax: data.calculatedTax,
           });
 
-          // Parse items from JSON string
           if (data.items) {
             const parsedItems = JSON.parse(data.items);
             const formattedItems = Array.isArray(parsedItems) ? parsedItems : [parsedItems];
@@ -417,13 +402,8 @@ const EditProposal = ({ id, onClose }) => {
             onFinish={handleFinish}
             validationSchema={validationSchema}
 
-          // initialValues={initialValues}
-
-          // initialValues={{
-          //     loginEnabled: true,
-          // }}
+    
           >
-            {/* <Card className="border-0 mt-2"> */}
             <div className="">
               <div className=" p-2">
 
@@ -479,31 +459,7 @@ const EditProposal = ({ id, onClose }) => {
                       </Select>
                     </Form.Item>
                   </Col>
-                  {/* <Col span={12}>
-                    <Form.Item
-                      name="deal_title"
-                      label="Deal Title"
-                      rules={[
-                        {
-                          required: true,
-                          message: "Please select a Deal Title",
-                        },
-                      ]} // Validation rule
-                    >
-                      <Select placeholder="Select Deal Title">
-                        Populate dropdown options from Deals 
-                        {Array.isArray(Deals) && Deals.length > 0 ? (
-                          Deals.map((deal) => (
-                            <Option key={deal.id} value={deal.id}>
-                              {deal.dealName}
-                            </Option>
-                          ))
-                        ) : (
-                          <Option disabled>No Deals Available</Option>
-                        )}
-                      </Select>
-                    </Form.Item>
-                  </Col> */}
+               
 
                   <Col span={12}>
                     <Form.Item
@@ -546,18 +502,7 @@ const EditProposal = ({ id, onClose }) => {
                     </Form.Item>
                   </Col>
 
-                  {/* <Col span={12}>
-                    <Form.Item
-                      name="calculatedtax"
-                      label="Calculate Tax"
-                      rules={[{ required: true, message: "Please select a tax calculation method" }]}
-                    >
-                      <Select placeholder="Select Tax Calculation Method">
-                        <Option value="after">After Discount</Option>
-                        <Option value="before">Before Discount</Option>
-                      </Select>
-                    </Form.Item>
-                  </Col> */}
+           
                   <Col span={24}>
                     <Form.Item label="Description" name="description">
                       <Input.TextArea placeholder="Enter Description" />
@@ -751,16 +696,7 @@ const EditProposal = ({ id, onClose }) => {
           </Form>
         </div>
       </div>
-      {/* <Modal
-                title="Product Create"
-                visible={isAddProductModalVisible}
-                onCancel={closeAddProductModal}
-                footer={null}
-                width={1000}
-                className='mt-[-70px]'
-            >
-                <AddProduct onClose={closeAddProductModal} />
-            </Modal> */}
+   
     </>
   );
 };

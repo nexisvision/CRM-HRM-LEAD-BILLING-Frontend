@@ -17,7 +17,6 @@ const AddHoliday = ({ onClose }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.loggedInUser.username);
 
-  // Validation Schema using Yup
   const validationSchema = Yup.object().shape({
     holiday_name: Yup.string().required("Holiday name is required"),
     start_date: Yup.date().required("Start Date is required"),
@@ -27,13 +26,11 @@ const AddHoliday = ({ onClose }) => {
   });
 
   const handleSubmit = (values, { resetForm, setFieldValue }) => {
-    // Check if dates are valid before formatting
     if (!values.start_date || !values.end_date) {
       message.error("Please select both start and end dates");
       return;
     }
 
-    // Convert the selected dates to the correct format
     const startDate = moment(values.start_date).format("YYYY-MM-DD");
     const endDate = moment(values.end_date).format("YYYY-MM-DD");
 
@@ -49,7 +46,6 @@ const AddHoliday = ({ onClose }) => {
       created_by: user
     };
 
-    // Validate that end date is not before start date
     if (moment(endDate).isBefore(startDate)) {
       message.error("End date cannot be before start date");
       return;
@@ -59,7 +55,6 @@ const AddHoliday = ({ onClose }) => {
       .then(() => {
         dispatch(getsholidayss());
         message.success("Holiday added successfully!");
-        // Reset form and explicitly clear DatePicker values
         resetForm();
         setFieldValue("start_date", null);
         setFieldValue("end_date", null);
@@ -116,7 +111,6 @@ const AddHoliday = ({ onClose }) => {
                     format="YYYY-MM-DD"
                     onChange={(date) => {
                       setFieldValue("start_date", date ? date.format("YYYY-MM-DD") : null);
-                      // Reset end date when start date changes
                       if (values.end_date && date && moment(date).isAfter(values.end_date)) {
                         setFieldValue("end_date", null);
                       }
@@ -141,7 +135,6 @@ const AddHoliday = ({ onClose }) => {
                     value={values.end_date ? moment(values.end_date) : null}
                     onChange={(date) => setFieldValue("end_date", date ? date.format("YYYY-MM-DD") : null)}
                     disabledDate={(current) => {
-                      // Can't select days before start date
                       return values.start_date ? current && current.isBefore(moment(values.start_date), 'day') : false;
                     }}
                   />

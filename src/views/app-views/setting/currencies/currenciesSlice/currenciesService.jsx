@@ -86,15 +86,11 @@ const editcurr = async (id, values) => {
 
 
 const UserService = {
-  // addUser,
   getcurr,
   addcurr,
   delcurr,
   editcurr,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+
 };
 
 export default UserService;

@@ -51,30 +51,21 @@ export const CountriesList = () => {
         dispatch(getRoles());
     }, [dispatch]);
 
-    // Check if user is super-admin
     const isSuperAdmin = () => {
         const userRole = roles?.find(role => role.id === userData?.role_id);
         return userRole?.role_name === 'super-admin';
     };
   
-    // Open Add Job Modal
     const openAddCountriesModal = () => {
         setIsAddCountriesModalVisible(true);
     };
-    // Close Add Job Modal
-    // const closeAddCountriesModal = () => {
-    //     setIsAddCountriesModalVisible(false);
-    // };
-    // Open Add Job Modal
+
     const openEditCountriesModal = (country) => {
         setIsEditCountriesModalVisible(true);
         setSelectedCountry(country);
         setIdd(country.id)
     };
-    // Close Add Job Modal
-    // const closeEditCountriesModal = () => {
-    //     setIsEditCountriesModalVisible(false);
-    // };
+
     const handleModalClose = () => {
         setIsAddCountriesModalVisible(false);
         setIsEditCountriesModalVisible(false);

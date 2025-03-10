@@ -36,7 +36,6 @@ const CreateJob = async (payload) => {
         },
       }
     );
-    //    dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -83,15 +82,10 @@ const Editjobdata = async (idd, transformedValues) => {
 
 
 const UserService = {
-  // addUser,
   Getjobs,
   CreateJob,
   DeleteJob,
   Editjobdata,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
 };
 
 export default UserService;

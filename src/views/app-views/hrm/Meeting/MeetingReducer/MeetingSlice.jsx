@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
-// Async thunk for adding user
 export const AddMeet = createAsyncThunk(
   "users/addUser",
   async (userData, thunkAPI) => {
@@ -17,8 +16,6 @@ export const AddMeet = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
-
 export const MeetData = createAsyncThunk(
   "emp/getmeet",
   async (loginData, thunkAPI) => {
@@ -30,8 +27,6 @@ export const MeetData = createAsyncThunk(
     }
   }
 );
-
-// Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -44,7 +39,6 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -57,7 +51,6 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
 export const deleteM = createAsyncThunk(
   "users/deleteMeet",
   async (userId, thunkAPI) => {
@@ -82,8 +75,6 @@ export const EditMeet = createAsyncThunk(
     }
   }
 );
-
-// Async thunk for updating a user
 
 const initialUser = () => {
   const item = window.localStorage.getItem("USER");

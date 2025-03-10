@@ -2,13 +2,9 @@ import React, { useState } from 'react';
 import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-// import UserView from '../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-// import StatisticWidget from 'components/shared-components/StatisticWidget';
-// import { DealStatisticData } from '../../dashboards/default/DefaultDashboardData';
 import AvatarStatus from 'components/shared-components/AvatarStatus';
-// import AddContract from './AddContract';
 import userData from 'assets/data/user-list.data.json';
 import OrderListData from 'assets/data/order-list.data.json';
 

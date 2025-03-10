@@ -94,7 +94,6 @@ const user = useSelector((state) => state.user.loggedInUser.username);
     status: Yup.string().required("Please select a status."),
     applied_source: Yup.string().required("Please enter the applied source."),
     cover_letter: Yup.string().required("Please enter a cover letter."),
-    // cv: Yup.mixed().required("Please upload a CV."),
   });
   return (
     <div>
@@ -118,7 +117,6 @@ const user = useSelector((state) => state.user.loggedInUser.username);
 
               <Col span={12}>
                 <div className="form-item">
-               {/* <hr className="border-b-2 border-gray-300"></hr> */}
                   <label className="font-semibold">job <span className="text-red-500">*</span></label>
                   <Field name="job">
                     {({ field }) => (
@@ -164,7 +162,6 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                   />
                 </div>
               </Col>
-              {/* Email */}
               <Col span={12}>
                 <div className="form-item mt-2">
                   <label className="font-semibold">Email <span className="text-red-500">*</span></label>
@@ -176,7 +173,6 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                   />
                 </div>
               </Col>
-              {/* Phone */}
               <Col span={12}>
                 <div className="form-group">
                   <label className="text-gray-600 font-semibold mb-2 block">Phone <span className="text-red-500">*</span></label>
@@ -368,35 +364,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                   />
                 </div>
               </Col>
-              {/* CV Upload */}
-              {/* <Col span={12}>
-                <div className="form-item mt-2">
-                  <label className="font-semibold">Upload CV </label>
-                  <Field name="cv">
-                    {({ field, form }) => (
-                      <Upload
-                        className="w-full mt-1"
-                        action="http://localhost:5500/api/users/upload-cv"
-                        accept=".pdf"
-                        maxCount={1}
-                        showUploadList={{ showRemoveIcon: true }}
-                        onChange={({ file }) => {
-                          form.setFieldValue('cv', file);
-                        }}
-                      >
-                        <Button icon={<UploadOutlined />}>Upload</Button>
-                      </Upload>
-                    )}
-                  </Field>
-                  <ErrorMessage
-                    name="cv"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
-
-              {/* Cover Letter */}
+             
               <Col span={24}>
                 <div className="form-item mt-2">
                   <label className="font-semibold">Cover Letter <span className="text-red-500">*</span> </label>

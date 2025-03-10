@@ -20,13 +20,11 @@ function ViewPayment({ data }) {
     const [projectName, setProjectName] = useState('--');
     const [clientName, setClientName] = useState('--');
 
-    // Get projects and invoices from Redux store
     const projectsData = useSelector((state) => state.Project.Project.data || []);
     const invoicesData = useSelector((state) => state.invoice.invoices || []);
     const allClients = useSelector((state) => state.SubClient?.SubClient?.data || []);
 
     useEffect(() => {
-        // Find project name
         if (data?.project_name && projectsData) {
             const project = projectsData.find(p => p.id === data.project_name);
             if (project) {
@@ -34,7 +32,6 @@ function ViewPayment({ data }) {
             }
         }
 
-        // Find invoice number
         if (data?.invoice && invoicesData) {
             const invoice = invoicesData.find(i => i.id === data.invoice);
             if (invoice) {
@@ -42,7 +39,6 @@ function ViewPayment({ data }) {
             }
         }
 
-        // Find client name - using client_id for matching
         if (data?.client_id && allClients) {
             const client = allClients.find(c => c.client_id === data.client_id);
             if (client) {

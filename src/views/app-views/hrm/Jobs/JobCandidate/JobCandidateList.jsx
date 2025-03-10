@@ -172,7 +172,6 @@ const JobCandidateList = () => {
     setUserProfileVisible(false);
   };
 
-   //// permission
                                     
                       const roleId = useSelector((state) => state.user.loggedInUser.role_id);
                       const roles = useSelector((state) => state.role?.role?.data);
@@ -199,7 +198,6 @@ const JobCandidateList = () => {
                       const canDeleteClient = allpermisson?.includes('delete');
                       const canViewClient = allpermisson?.includes('view');
                    
-                      ///endpermission
 
   const dropdownMenu = (elm) => (
     <Menu>

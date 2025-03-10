@@ -1,4 +1,3 @@
-//SHURSTI
 import React, { useEffect, useState } from "react";
 import { Input, Button, Select, DatePicker, message, Row, Col, Modal } from "antd";
 import { useNavigate } from "react-router-dom";
@@ -83,7 +82,7 @@ const AddDeal = ({ onClose,setFieldValue }) => {
 
       if (response.payload && response.payload.data) {
         const uniqueCategories = response.payload.data
-          .filter((label) => label && label.name) // Filter out invalid labels
+          .filter((label) => label && label.name) 
           .map((label) => ({
             id: label.id,
             name: label.name.trim(),
@@ -91,7 +90,7 @@ const AddDeal = ({ onClose,setFieldValue }) => {
           .filter(
             (label, index, self) =>
               index === self.findIndex((t) => t.name === label.name)
-          ); // Remove duplicates
+          ); 
 
         setCategories(uniqueCategories);
       }
@@ -257,7 +256,6 @@ const AddDeal = ({ onClose,setFieldValue }) => {
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
 
-            {/* <h2 className="mb-4 border-b pb-2 font-medium">Add Deal</h2> */}
             <Row gutter={16}>
               <Col span={12}>
                 <div className="form-item mt-3">
@@ -503,11 +501,9 @@ const AddDeal = ({ onClose,setFieldValue }) => {
                           placeholder="Select Lead Title"
                           value={field.value || ""} // Ensure the select value is controlled by Formik
                           onChange={(value) => {
-                            // Find the selected lead from the Leads array
                             const selectedLead =
                               Array.isArray(Leads) &&
                               Leads.find((e) => e.id === value);
-                            // Update Formik's field value with the selected lead's title
                             form.setFieldValue(
                               "leadTitle",
                               selectedLead?.leadTitle || ""

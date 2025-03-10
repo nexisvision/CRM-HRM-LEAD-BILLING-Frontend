@@ -10,7 +10,6 @@ import moment from 'moment';
 const { Option } = Select;
 
 const EditPaySlip = () => {
-  // const [form] = Form.useForm();
   const navigate = useNavigate();
   const { id } = useParams(); // Assuming the route includes an ID, e.g., /edit-payslip/:id
 
@@ -82,9 +81,6 @@ const EditPaySlip = () => {
       >
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <Form
-            // layout="vertical"
-            // form={form}
-            // name="add-job"
             className="formik-form" onSubmit={handleSubmit}
           >
             <Row gutter={16}>

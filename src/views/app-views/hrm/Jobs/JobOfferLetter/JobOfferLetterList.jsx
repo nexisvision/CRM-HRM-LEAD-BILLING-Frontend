@@ -37,11 +37,6 @@ import {
 import { getjobapplication } from "../JobApplication/JobapplicationReducer/JobapplicationSlice";
 import { GetJobdata } from "../JobReducer/JobSlice";
 import AddEmployee from "../../Employee/AddEmployee";
-// import {
-//   deletejobapplication,
-//   getjobapplication,
-// } from "./JobapplicationReducer/JobapplicationSlice";
-// import ViewJobApplication from './ViewJobApplication';
 
 const { Option } = Select;
 
@@ -49,7 +44,6 @@ const JobOfferLetterList = () => {
   const dispatch = useDispatch();
   const [users, setUsers] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
-  // const [viewApplicationVisible, setViewApplicationVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [list, setList] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -62,7 +56,6 @@ const JobOfferLetterList = () => {
   const [isAddEmployeeModalVisible, setIsAddEmployeeModalVisible] = useState(false);
   const [employeeData, setEmployeeData] = useState(null);
 
-  // Replace the two date state variables with a single dateRange
   const [dateRange, setDateRange] = useState(null);
 
   useEffect(() => {
@@ -97,7 +90,6 @@ const user = useSelector((state) => state.user.loggedInUser.username);
   const alldata = useSelector((state) => state.jobapplications);
   const fnddta = alldata.jobapplications.data;
 
-   //// permission
                                         
                           const roleId = useSelector((state) => state.user.loggedInUser.role_id);
                           const roles = useSelector((state) => state.role?.role?.data);
@@ -124,19 +116,6 @@ const user = useSelector((state) => state.user.loggedInUser.username);
                           const canDeleteClient = allpermisson?.includes('delete');
                           const canViewClient = allpermisson?.includes('view');
                        
-                          ///endpermission
-
-
-
-  //   useEffect(() => {
-  //     dispatch(getjobapplication());
-  //   }, []);
-
-  //   useEffect(() => {
-  //     if (fnddta) {
-  //       setUsers(fnddta);
-  //     }
-  //   }, [fnddta]);
 
   const openAddJobOfferLetterModal = () => {
     setIsAddJobOfferLetterModalVisible(true);
@@ -173,7 +152,6 @@ const user = useSelector((state) => state.user.loggedInUser.username);
       });
     }
 
-    // Date range filter
     if (dateRange && dateRange[0] && dateRange[1]) {
       const startDate = dayjs(dateRange[0]).format('YYYY-MM-DD');
       const endDate = dayjs(dateRange[1]).format('YYYY-MM-DD');
@@ -198,7 +176,6 @@ const user = useSelector((state) => state.user.loggedInUser.username);
       dispatch(getjobofferss());
       const updatedUsers = users.filter((item) => item.id !== userId);
       setUsers(updatedUsers);
-      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
     });
   };
 
@@ -276,25 +253,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
 
   const dropdownMenu = (elm) => ({
     items: [
-      // View Details, Send Mail, and Pin options are commented out but kept for reference
-      // {
-      //   key: 'view',
-      //   icon: <EyeOutlined />,
-      //   label: 'View Details',
-      //   onClick: () => showUserProfile(elm)
-      // },
-      // {
-      //   key: 'mail',
-      //   icon: <MailOutlined />,
-      //   label: 'Send Mail',
-      //   onClick: () => showUserProfile(elm)
-      // },
-      // {
-      //   key: 'pin',
-      //   icon: <PushpinOutlined />,
-      //   label: 'Pin',
-      //   onClick: () => showUserProfile(elm)
-      // },
+     
       {
         key: 'convert',
         icon: <EditOutlined />,
@@ -323,7 +282,6 @@ const user = useSelector((state) => state.user.loggedInUser.username);
       title: "Job",
       dataIndex: "job_applicant",
       render: (_, record) => {
-        // Find the job from alljob array that matches the job_applicant ID
         const job = alljob?.find(job => job.id === record.job_applicant);
         return job ? job.title : record.job_applicant;
       },
@@ -337,7 +295,6 @@ const user = useSelector((state) => state.user.loggedInUser.username);
       title: "Job Applicant",
       dataIndex: "job",
       render: (_, record) => {
-        // Find the job application from jobappliaction array that matches the job ID
         const application = jobappliaction?.find(app => app.id === record.job);
         return application ? application.name : record.job;
       },
@@ -381,7 +338,6 @@ const user = useSelector((state) => state.user.loggedInUser.username);
     },
   ];
 
-  // Replace the two date handlers with a single range handler
   const handleDateRangeChange = (dates) => {
     setDateRange(dates);
   };
@@ -468,7 +424,6 @@ const user = useSelector((state) => state.user.loggedInUser.username);
         close={closeUserProfile}
       />
 
-      {/* <ViewJobApplication data={selectedUser} visible={viewApplicationVisible} close={closeViewApplication} /> */}
       <Modal
         title="Add Job Offer Letter"
         visible={isAddJobOfferLetterModalVisible}
@@ -501,16 +456,7 @@ const user = useSelector((state) => state.user.loggedInUser.username);
       >
         <AddEmployee onClose={closeAddEmployeeModal} initialData={employeeData} />
       </Modal>
-      {/* <Modal
-        title=""
-        visible={viewApplicationVisible}
-        onCancel={closeViewApplication}
-        footer={null}
-        width={1200}
-        className='mt-[-70px]'
-      >
-        <ViewJobApplication onClose={closeViewApplication} />
-      </Modal> */}
+      
     </Card>
   );
 };

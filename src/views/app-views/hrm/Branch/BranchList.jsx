@@ -25,7 +25,6 @@ import { utils, writeFile } from "xlsx";
 import { useDispatch, useSelector } from "react-redux";
 import { deleteBranch, getBranch } from "./BranchReducer/BranchSlice";
 import { GetUsers } from '../../Users/UserReducers/UserSlice';
-// import { DeleteDept, getDept } from './DepartmentReducers/DepartmentSlice';
 
 const BranchList = () => {
   const [users, setUsers] = useState([]);
@@ -60,7 +59,6 @@ const BranchList = () => {
 
   useEffect(() => {
     if (tabledata && tabledata.Branch && tabledata.Branch.data) {
-      // Simply set the data without filtering
       const branchData = Array.isArray(tabledata.Branch.data) 
         ? tabledata.Branch.data 
         : [];
@@ -80,7 +78,6 @@ const BranchList = () => {
       });
   }, [dispatch]);
 
-   //// permission
                             
               const roleId = useSelector((state) => state.user.loggedInUser.role_id);
               const roles = useSelector((state) => state.role?.role?.data);
@@ -107,9 +104,6 @@ const BranchList = () => {
               const canDeleteClient = allpermisson?.includes('delete');
               const canViewClient = allpermisson?.includes('view');
            
-              ///endpermission
-
-  // const navigate = useNavigate();
 
   const openAddBranchModal = () => {
     setIsAddBranchModalVisible(true);
@@ -150,15 +144,10 @@ const BranchList = () => {
     });
   };
 
-  //   useEffect(()=>{
-  //     dispatch(getDept())
-  //   },[dispatch]);
-
   const deleteUser = (userId) => {
     dispatch(deleteBranch(userId))
       .then(() => {
         dispatch(getBranch());
-        // message.success("Branch Deleted successfully!");
         setUsers(users.filter((item) => item.id !== userId));
       })
       .catch((error) => {

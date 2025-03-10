@@ -18,7 +18,6 @@ import ReactQuill from "react-quill";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
-// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 import {
   AddLable,
   AddLablee,
@@ -107,11 +106,9 @@ const AddJob = ({ onClose }) => {
     status: Yup.string().required("Please enter Status."),
     expectedSalary: Yup.string().required("Please enter Expect Salary."),
 
-    // files: Yup.string().required('Please enter Files.'),
   });
 
   const onSubmit = (values, { resetForm }) => {
-    // Check if all required fields are filled
     const requiredFields = [
       'title',
       'category',
@@ -136,7 +133,6 @@ const AddJob = ({ onClose }) => {
       return;
     }
 
-    // Transforming skills and interviewRounds into the desired object structure
     const transformedValues = {
       ...values,
       skills: { Skills: values.skillss }, // Send as object
@@ -145,7 +141,6 @@ const AddJob = ({ onClose }) => {
       endDate: values.endDate ? values.endDate.format('YYYY-MM-DDTHH:mm:ss.SSS[Z]') : null,
     };
 
-    // Remove the skillss field as we've transformed it to skills
     delete transformedValues.skillss;
 
     dispatch(AddJobs(transformedValues)).then(() => {
@@ -216,7 +211,6 @@ const AddJob = ({ onClose }) => {
       setter(""); // Reset input field
       modalSetter(false); // Close modal
 
-      // Fetch updated labels and update the form field
       const response = await dispatch(GetLablee(lid));
       if (response.payload && response.payload.data) {
         const filteredLabels = response.payload.data
@@ -317,7 +311,6 @@ const AddJob = ({ onClose }) => {
                           <div style={{ padding: 8, borderTop: "1px solid #e8e8e8" }}>
                             <Button
                               type="link"
-                              // icon={<PlusOutlined />}
                               className="w-full"
                               onClick={() => setIsJobSkillModalVisible(true)}
                             >
@@ -394,7 +387,6 @@ const AddJob = ({ onClose }) => {
                       value={values.startDate}
                       onChange={(date) => {
                         setFieldValue("startDate", date);
-                        // Clear end date if it's before the new start date
                         if (values.endDate && date && values.endDate.isBefore(date)) {
                           setFieldValue("endDate", null);
                         }
@@ -420,7 +412,6 @@ const AddJob = ({ onClose }) => {
                       onChange={(date) => setFieldValue("endDate", date)}
                       onBlur={() => setFieldTouched("endDate", true)}
                       disabledDate={(current) => {
-                        // Disable dates before start date
                         return values.startDate ? current && current < values.startDate.startOf('day') : false;
                       }}
                     />

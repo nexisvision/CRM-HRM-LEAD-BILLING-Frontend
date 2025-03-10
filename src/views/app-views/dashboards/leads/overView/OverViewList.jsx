@@ -22,7 +22,6 @@ import { Modal } from 'antd';
 import { GetTasks } from "../../project/task/TaskReducer/TaskSlice";
 import { GetLeads } from "../LeadReducers/LeadSlice";
 
-// Register the chart components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const OverViewList = () => {
@@ -41,21 +40,14 @@ const OverViewList = () => {
   const alldeaddata = useSelector((state)=>state.Leads.Leads.data)
   const fnddead = alldeaddata?.find((item)=>item?.id === id)
 
-
-
-
-  // Safe access to Redux state with multiple fallback checks
   const allempdata = useSelector((state) => state?.Project) || {};
   const filterdata = allempdata?.Project?.data || [];
 
-  // Fetch data immediately when component mounts
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Load client data first
         await dispatch(ClientData());
-        // Then load project and task data
         await Promise.all([
           dispatch(GetProject()),
           dispatch(GetTasks(id))
@@ -70,7 +62,6 @@ const OverViewList = () => {
   }, [dispatch, id]);
 
 
-  // Calculate progress based on date range
   useEffect(() => {
     if (!filterdata || !Array.isArray(filterdata) || filterdata.length === 0) {
       setProo("0");
@@ -88,37 +79,28 @@ const OverViewList = () => {
       const endDate = new Date(projectData.endDate);
       const currentDate = new Date();
 
-      // Validate dates
       if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
         setProo("0");
         return;
       }
 
-      // Calculate total project duration in milliseconds
       const totalDuration = endDate.getTime() - startDate.getTime();
 
-      // Calculate elapsed time in milliseconds
       const elapsedTime = currentDate.getTime() - startDate.getTime();
 
-      // Calculate progress percentage
       let progressPercentage;
 
       if (currentDate < startDate) {
-        // Project hasn't started yet
         progressPercentage = 0;
       } else if (currentDate > endDate) {
-        // Project has passed end date
         progressPercentage = 100;
       } else {
-        // Project is in progress
         progressPercentage = (elapsedTime / totalDuration) * 100;
       }
 
-      // Round to 2 decimal places and ensure it's between 0 and 100
       progressPercentage = Math.min(Math.max(progressPercentage, 0), 100);
       setProo(progressPercentage.toFixed(2));
 
-      // Optional: Log details for debugging
     
 
     } catch (error) {
@@ -127,17 +109,14 @@ const OverViewList = () => {
     }
   }, [filterdata]);
 
-  // Update the selector to properly access client data from Redux store
   const allclient = useSelector((state) => state?.SubClient?.SubClient?.data) || [];
   
   const fndpro = filterdata.find((item) => item.id === id);
   const fndclient = allclient?.find((item) => item?.id === fndpro?.client);
 
-  // Safe access to client data with fallbacks
   const Allclientdata = useSelector((state) => state?.SubClient) || {};
   const dataclient = Allclientdata?.SubClient?.data || [];
 
-  // Safe filtering with existence checks
   const updatedList = useMemo(() => {
     if (!filterdata?.length || !filterdata[0]?.client || !dataclient?.length) {
       return [];
@@ -145,7 +124,6 @@ const OverViewList = () => {
     return dataclient.filter((item) => item.id === filterdata[0].client);
   }, [filterdata, dataclient]);
 
-  // Prepare chart data with safety checks
   const hoursData = useMemo(() => {
     if (!filterdata?.length || !filterdata[0]?.estimatedhours) {
       return [];
@@ -160,7 +138,6 @@ const OverViewList = () => {
     return [{ name: "Planned", value: filterdata[0].budget }];
   }, [filterdata]);
 
-  // Safe date formatting with fallbacks
   const formatDate = (date) => {
     if (!date) return "N/A";
     try {
@@ -176,7 +153,6 @@ const OverViewList = () => {
     ? formatDate(filterdata[0].startDate)
     : "N/A";
 
-  // const subclient = useSelector((state)=>state.SubClient.SubClient.data)
 
   const datestartt = filterdata?.[0]?.endDate
     ? formatDate(filterdata[0].endDate)
@@ -188,7 +164,6 @@ const OverViewList = () => {
 
   const taskData = useSelector((state) => state?.Tasks?.Tasks?.data) || [];
 
-  // Define status colors mapping with more color options
   const statusColors = {
     'To Do': '#FF6B6B',        // Red
     'In Progress': '#36A2EB',  // Blue
@@ -207,12 +182,10 @@ const OverViewList = () => {
     'Pending': '#F1C40F'       // Gold
   };
 
-  // Function to get color for unknown status
   const getStatusColor = (status) => {
     return statusColors[status] || generateRandomColor(status);
   };
 
-  // Generate consistent random color for unknown status
   const generateRandomColor = (seed) => {
     let hash = 0;
     for (let i = 0; i < seed.length; i++) {
@@ -222,7 +195,6 @@ const OverViewList = () => {
     return color;
   };
 
-  // Prepare data for pie chart with dynamic colors
   const taskStatusData = useMemo(() => {
     const statusCounts = taskData.reduce((acc, task) => {
       const status = task.status || 'No Status';
@@ -244,7 +216,6 @@ const OverViewList = () => {
     };
   }, [taskData]);
 
-  // Group tasks by status
   const tasksByStatus = useMemo(() => {
     return taskData.reduce((acc, task) => {
       const status = task.status || 'No Status';
@@ -268,7 +239,6 @@ const OverViewList = () => {
     return null;
   };
 
-  // Chart options with hover effects
   const chartOptions = {
     plugins: {
       legend: {
@@ -303,25 +273,15 @@ const OverViewList = () => {
         }
       }
     },
-    // onClick: (event, elements) => {
-    //   if (elements.length > 0) {
-    //     const index = elements[0].index;
-    //     const status = taskStatusData.labels[index];
-    //     setSelectedStatus(status);
-    //     setIsTaskModalVisible(true);
-    //   }
-    // }
+
   };
 
-  // Navigate to task details
   const handleTaskClick = (taskId) => {
     navigate(`/app/dashboards/project/task/${taskId}`);
     setIsTaskModalVisible(false);
   };
 
-  // Update the clientInfo memo with better error handling
   const clientInfo = useMemo(() => {
-    // Wait for both project and client data to be available
     if (!fndpro || !allclient) {
       return {
         username: 'Loading...',
@@ -329,7 +289,6 @@ const OverViewList = () => {
       };
     }
 
-    // Find the client using the project's client ID
     const client = allclient.find(item => item.id === fndpro.client);
     
     if (!client) {
@@ -462,7 +421,6 @@ const OverViewList = () => {
             {fndclient ? (
               <div className="flex items-center gap-4">
                 <div className="mt-6">
-                  {/* Profile Picture with error handling */}
                   <div className="w-16 h-16 rounded-full overflow-hidden">
                     <img 
                       src={fndclient?.profilePic || 'https://via.placeholder.com/64'} 
@@ -493,7 +451,6 @@ const OverViewList = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-6">
-          {/* Task */}
 
           <div className="bg-white rounded-lg shadow p-6 w-full h-full flex flex-col items-center justify-center">
             <h2 className="text-xl font-semibold mb-4">Tasks Status</h2>
@@ -586,7 +543,6 @@ const OverViewList = () => {
 
 
         <div className="bg-white p-6 rounded-lg shadow grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Hours Logged Chart */}
           <div className="w-full">
             <h2 className="text-xl font-semibold mb-4">Hours Logged</h2>
             <div className="h-64">
@@ -605,7 +561,6 @@ const OverViewList = () => {
             </div>
           </div>
 
-          {/* Project Budget Chart */}
           <div className="w-full">
             <h2 className="text-xl font-semibold mb-4">Lead Budget</h2>
             <div className="h-64">

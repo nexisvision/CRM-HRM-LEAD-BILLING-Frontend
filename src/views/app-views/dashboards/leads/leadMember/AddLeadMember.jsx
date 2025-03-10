@@ -34,7 +34,6 @@ const AddLeadMember = ({ onClose }) => {
 
   const dispatch = useDispatch();
   const [showReceiptUpload, setShowReceiptUpload] = useState(false);
-  // const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const initialValues = {
     lead_members: [],
   };
@@ -66,15 +65,12 @@ const AddLeadMember = ({ onClose }) => {
       return res.data;
     } catch (error) {
       if (error.response) {
-        // Server responded with a status code out of the range of 2xx
         console.error("Error response:", error.response.data);
         console.error("Status code:", error.response.status);
         console.error("Headers:", error.response.headers);
       } else if (error.request) {
-        // Request was made, but no response was received
         console.error("Error request:", error.request);
       } else {
-        // Something happened in setting up the request
         console.error("Error message:", error.message);
       }
       throw error;
@@ -133,9 +129,7 @@ const AddLeadMember = ({ onClose }) => {
             <Row gutter={16}>
               <Col span={24} className="mt-2">
                 <div className="form-item">
-                  {/* <label className="font-semibold text-[12] text-dark-gray-500 ">
-                    Add Project Member
-                  </label> */}
+                
                   <Field name="lead_members">
                     {({ field }) => (
                       <Select
@@ -181,9 +175,7 @@ const AddLeadMember = ({ onClose }) => {
                 Create
               </Button>
             </div>
-            {/* <Modal
-                          
-                        </Modal> */}
+
           </Form>
         )}
       </Formik>

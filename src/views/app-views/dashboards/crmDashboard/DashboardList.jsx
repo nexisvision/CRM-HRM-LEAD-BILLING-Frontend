@@ -29,23 +29,19 @@ const DashboardList = () => {
     const [list, setList] = useState(OrderListData);
     const dispatch = useDispatch();
 
-    // Move these selectors to the top of the component
     const tabledata = useSelector((state) => state.Contract);
     const clientData = useSelector((state) => state.SubClient?.SubClient?.data);
     const projectData = useSelector((state) => state.Project?.Project?.data);
 
-    // First useEffect to fetch initial data
     useEffect(() => {
         dispatch(GetProject());
         dispatch(ClientData());
     }, [dispatch]);
 
-    // Second useEffect to fetch contract data
     useEffect(() => {
         dispatch(ContaractData());
     }, [dispatch]);
 
-    // Third useEffect to process the data once we have everything
     useEffect(() => {
         if (tabledata?.Contract?.data) {
             const contractsWithNames = tabledata.Contract.data.map(contract => ({
@@ -57,7 +53,6 @@ const DashboardList = () => {
         }
     }, [tabledata, clientData, projectData]);
 
-    //// permission
 
     const roleId = useSelector((state) => state.user.loggedInUser.role_id);
     const roles = useSelector((state) => state.role?.role?.data);

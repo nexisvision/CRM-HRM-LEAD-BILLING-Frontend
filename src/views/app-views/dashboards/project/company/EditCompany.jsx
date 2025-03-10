@@ -48,7 +48,6 @@ const handleSubmit = async (values, { setSubmitting }) => {
   try {
     const formData = new FormData();
     
-    // Add all form fields to formData
     Object.keys(values).forEach(key => {
       if (values[key] !== undefined && values[key] !== null) {
         if (key === 'profilePic') {

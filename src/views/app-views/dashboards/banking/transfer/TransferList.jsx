@@ -69,7 +69,6 @@ const TransferList = () => {
       setList(filteredData);
     }
   };
-  // Search functionality
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     const searchArray = list;
@@ -84,7 +83,6 @@ const TransferList = () => {
     setList(data);
     setSelectedRowKeys([]);
   };
-  // Delete user
   const deleteUser = (userId) => {
     dispatch(transferdeltess(userId))
       .then(()=>{
@@ -97,8 +95,6 @@ const TransferList = () => {
 
   const alltransferdata = useSelector((state)=>state?.transfer?.transfer?.data);
 
-  // const fnsadadata = alltransferdata?.filter((item)=>item?.created_by === loggeddata)
-
 
   useEffect(()=>{
     if(alltransferdata){
@@ -106,7 +102,6 @@ const TransferList = () => {
     }
 },[alltransferdata])
 
-  // Show user profile
   const showUserProfile = (userInfo) => {
     setSelectedUser(userInfo);
     setUserProfileVisible(true);
@@ -130,13 +125,10 @@ const TransferList = () => {
   
   const jobStatusList = ['active', 'blocked']
 
-  // Add this helper function at the top of your component
   const stripHtmlTags = (html) => {
     if (!html) return '';
-    // Create a temporary div element
     const temp = document.createElement('div');
     temp.innerHTML = html;
-    // Return the text content only
     return temp.textContent || temp.innerText || '';
   };
 
@@ -196,17 +188,14 @@ const TransferList = () => {
     },
    
   ];
-  // Open Add Account Modal
   const openAddAccountModal = () => {
     setIsAddAccountModalVisible(true);
   };
 
-  // Close Add Account Modal
   const closeAddAccountModal = () => {
     setIsAddAccountModalVisible(false);
   };
 
-  // Add these handler functions
   const openEditAccountModal = (account) => {
     setSelectedAccount(account);
     setIsEditAccountModalVisible(true);
@@ -216,7 +205,6 @@ const TransferList = () => {
     setIsEditAccountModalVisible(false);
   };
 
-  // Helper function to get tag color based on account type
   const getAccountTypeColor = type => {
     switch (type?.toLowerCase()) {
       case 'salary':
@@ -331,7 +319,6 @@ const TransferList = () => {
         footer={null}
         width={1000}
         className='mt-[-70px]'
-        // height={1000}
       >
         <EditTransfer 
           onClose={closeEditTransferModal} 

@@ -29,7 +29,6 @@ const AddLeads = async (payload) => {
         },
       }
     );
-    //    dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -46,7 +45,6 @@ const DeleteLeads = async (id) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    //   dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -75,15 +73,11 @@ const EditLeads = async (id, formData) => {
 
 
 const UserService = {
-  // addUser,
   GetLeads,
   AddLeads,
   DeleteLeads,
   EditLeads,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+
 };
 
 export default UserService;

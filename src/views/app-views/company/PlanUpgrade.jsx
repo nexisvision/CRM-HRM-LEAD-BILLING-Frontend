@@ -62,20 +62,6 @@ const PlanUpgrade = () => {
 
   return (
     <>
-      {/* Uncomment the button to test modal */}
-      {/* <Button type="primary" onClick={showModal}>
-        Upgrade Plan
-      </Button> */}
-
-      {/* Uncomment to use modal */}
-      {/* <Modal
-        title="Upgrade Plan"
-        visible={isModalVisible}
-        onCancel={handleCancel}
-        footer={null}
-        centered
-      > */}
-
 
       <List
         dataSource={initialPlans}
@@ -108,7 +94,6 @@ const PlanUpgrade = () => {
             ) : (
               <Button
                 icon={<ShoppingCartOutlined />}
-                //   shape="circle"
                 onClick={(e) => {
                   e.stopPropagation(); // Prevent List.Item click
                   setSelectedPlan(plan.id); // Set the selected plan
@@ -119,7 +104,6 @@ const PlanUpgrade = () => {
           </List.Item>
         )}
       />
-      {/* </Modal> */}
     </>
   );
 };

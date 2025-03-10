@@ -11,7 +11,6 @@ const AddPermission = () => {
   const onFinish = (values) => {
     message.success('Permission added successfully!');
     navigate('app/hrm/permission')
-    // Navigate or perform additional actions here
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -23,7 +22,6 @@ const AddPermission = () => {
 
   return (
     <div className="add-employee">
-      {/* <h2 className="mb-4">Add New Permission</h2> */}
       <Form
         layout="vertical"
         form={form}

@@ -123,36 +123,6 @@ const InvoiceService = {
     }
   },
 
-  // Get invoice statistics
-  //   getInvoiceStats: async () => {
-  //     const token = localStorage.getItem('auth_token');
-  //     try {
-  //       const response = await axios.get(`${API_BASE_URL}/invoices/statistics`, {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       });
-  //       return response.data;
-  //     } catch (error) {
-  //       throw error;
-  //     }
-  //   },
-
-  // Generate invoice PDF
-  //   generateInvoicePDF: async (id) => {
-  //     const token = localStorage.getItem('auth_token');
-  //     try {
-  //       const response = await axios.get(`${API_BASE_URL}/invoices/${id}/pdf`, {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //         responseType: 'blob',
-  //       });
-  //       return response.data;
-  //     } catch (error) {
-  //       throw error;
-  //     }
-  //   },
 };
 
 export default InvoiceService;

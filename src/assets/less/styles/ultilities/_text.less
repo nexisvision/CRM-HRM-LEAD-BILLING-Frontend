@@ -1,9 +1,6 @@
 .text-monospace {
     font-family: @code-family !important;
 }
-
-// Alignment
-
 .text-justify {
     text-align: justify !important;
 }
@@ -90,13 +87,9 @@
     }
 }
 
-// Transformation
-
 .text-lowercase  { text-transform: lowercase !important; }
 .text-uppercase  { text-transform: uppercase !important; }
 .text-capitalize { text-transform: capitalize !important; }
-
-// Weight and italics
 
 .font-weight-light    { font-weight: @font-weight-light !important; }
 .font-weight-lighter  { font-weight: @font-weight-lighter !important; }
@@ -105,8 +98,6 @@
 .font-weight-bold     { font-weight: @font-weight-bold !important; }
 .font-weight-bolder   { font-weight: @font-weight-bolder !important; }
 .font-italic          { font-style: italic !important; }
-
-// Contextual colors
 
 .text-white { color: @white !important; }
 
@@ -120,8 +111,6 @@ each(@theme-colors, #(@value, @color) {
 .text-black-50 { color: fade(@black, 50%) !important; }
 .text-white-50 { color: fade(@white, 50%) !important; }
 
-// Misc
-
 .text-hide {
 	#text-hide();
 }
@@ -133,11 +122,7 @@ each(@theme-colors, #(@value, @color) {
 	overflow-wrap: break-word !important;
 }
 
-// Reset
-
 .text-reset { color: inherit !important; }
-
-// Font sizes
 
 .font-size-xxl {
     font-size: @heading-1-size !important;

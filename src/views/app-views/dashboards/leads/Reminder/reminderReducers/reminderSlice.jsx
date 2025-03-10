@@ -158,9 +158,6 @@ const LeadSlice = createSlice({
         toast.error(action.payload?.message);
       })
 
-      //getall
-      
-      //delete
       .addCase(deletessreinderss.pending, (state) => {
         state.isLoading = true;
       })
@@ -173,7 +170,6 @@ const LeadSlice = createSlice({
         message.error(action.payload?.response?.data?.message);
       })
 
-      //update
       .addCase(LeadsEdit.pending, (state) => {
         state.isLoading = false;
         state.error = null;

@@ -48,7 +48,6 @@ const UsersList = () => {
           type="text"
           icon={<DeleteOutlined />}
           danger
-          //   style={{ background: '#ffefef', color: '#ff4d4f', borderRadius: '5px' }}
           onClick={() => deleteUser(record.id)}
         />
       ),

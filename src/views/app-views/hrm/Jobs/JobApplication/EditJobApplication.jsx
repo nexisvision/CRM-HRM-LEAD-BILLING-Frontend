@@ -65,7 +65,6 @@ const EditJobApplication = ({ idd, onClose }) => {
   const onSubmit = async (values, { resetForm }) => {
     try {
       const formData = new FormData();
-      // Append all values to formData
       for (const key in values) {
         formData.append(key, values[key]);
       }

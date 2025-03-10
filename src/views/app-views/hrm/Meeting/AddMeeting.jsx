@@ -280,7 +280,6 @@ const AddMeeting = ({ onClose }) => {
                   </div>
                 </Col>
 
-                {/* Meeting Time Field */}
                 <Col span={12} className="mt-3">
                   <div className="form-item">
                     <label className="font-semibold">Start Time <span className="text-red-500">*</span></label>

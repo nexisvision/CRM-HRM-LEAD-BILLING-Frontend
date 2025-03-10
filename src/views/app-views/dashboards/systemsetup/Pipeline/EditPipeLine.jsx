@@ -60,7 +60,6 @@ const EditPipeLine = ({ idd, onClose }) => {
     }
   }, [idd, Expensedata]);
 
-  // Submit handler
   const onSubmit = (values, { setSubmitting }) => {
     dispatch(Editpipl({ idd, values }));
     dispatch(GetPip(values));
@@ -74,7 +73,6 @@ const EditPipeLine = ({ idd, onClose }) => {
     pipeline_name: "",
   });
 
-  // Validation Schema
   const validationSchema = Yup.object({
     pipeline_name: Yup.string().required("Please enter pipeline name."),
   });

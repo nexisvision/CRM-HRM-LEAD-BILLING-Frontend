@@ -53,13 +53,11 @@ const AddSalary = ({ onClose }) => {
     dispatch(getcurren());
   }, []);
 
-  // status start
   const AllLoggedData = useSelector((state) => state.user);
 
   const lid = AllLoggedData.loggedInUser.id;
 
   const onSubmit = (values, { resetForm }) => {
-    // Convert netSalary to string
     const payload = {
       ...values,
       netSalary: values.netSalary.toString(),
@@ -69,9 +67,7 @@ const AddSalary = ({ onClose }) => {
       dispatch(getSalaryss());
       onClose();
       resetForm();
-      // message.success("salary added successfully");
     });
-    // message.success("Job added successfully!");
   };
 
   const initialValues = {

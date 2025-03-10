@@ -44,7 +44,6 @@ const EditLead = ({ id, onClose }) => {
   const [newStatus, setNewStatus] = useState("");
   const [newSource, setNewSource] = useState("");
 
-  // Selectors
   const currenciesState = useSelector((state) => state.currencies);
   const currencies = currenciesState?.currencies?.data || [];
   const countries = useSelector((state) => state.countries.countries || []);
@@ -63,7 +62,6 @@ const EditLead = ({ id, onClose }) => {
     return emp.client_id === loggedInUser.client_id;
   });
 
-  // Fetch labels callback
   const fetchLables = useCallback(async (lableType, setter) => {
     try {
       const lid = loggedInUser.id;
@@ -80,7 +78,6 @@ const EditLead = ({ id, onClose }) => {
     }
   }, [dispatch, loggedInUser.id]);
 
-  // Initial data fetch
   useEffect(() => {
     const fetchInitialData = async () => {
       await dispatch(GetUsers());
@@ -92,7 +89,6 @@ const EditLead = ({ id, onClose }) => {
     fetchInitialData();
   }, [dispatch]);
 
-  // Fetch labels effect
   useEffect(() => {
     if (loggedInUser?.id) {
       const fetchAllLabels = async () => {

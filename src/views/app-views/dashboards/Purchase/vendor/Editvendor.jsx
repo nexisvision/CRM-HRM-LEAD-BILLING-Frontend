@@ -7,7 +7,6 @@ import { vendordataedata, vendordataeditt } from './vendorReducers/vendorSlice';
 import { PlusOutlined } from '@ant-design/icons';
 import AddCountries from "views/app-views/setting/countries/AddCountries";
 import { getallcountries } from 'views/app-views/setting/countries/countriesreducer/countriesSlice';
-// Import your vendor actions here
 
 const { Option } = Select;
 
@@ -59,7 +58,6 @@ const EditVendor = ({ onClose, vendorData, idd }) => {
   const handleSubmit = async (values, { setSubmitting }) => {
     setLoading(true);
     try {
-      // Add your update API call here
       const response = await dispatch(vendordataeditt({ idd, values }));
       if (response.error) {
         throw new Error(response.error.message);

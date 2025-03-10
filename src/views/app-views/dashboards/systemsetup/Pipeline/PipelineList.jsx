@@ -6,19 +6,15 @@ import {
   EditOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-// import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import Flex from "components/shared-components/Flex";
 import utils from "utils";
-// import { PaymentStatisticData } from '../../../dashboards/default/DefaultDashboardData';
 import AddPipeLine from "./AddPipeLine";
 import EditPipeLine from "./EditPipeLine";
 import { useDispatch, useSelector } from "react-redux";
 import { Deletepip, GetPip } from "./PiplineReducer/piplineSlice";
 
-// const { Option } = Select;
 
 const PipelineList = () => {
-  //   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [isAddPipeLineModalVisible, setIsAddPipeLineModalVisible] =
@@ -33,26 +29,20 @@ const PipelineList = () => {
 
   const logged = useSelector((state)=>state.user.loggedInUser.username)
 
-  // const fnddatas = Filterpipline.filter((item)=>item.created_by === logged)
-
   const dispatch = useDispatch();
 
-  // Open Add Pipeline Modal
   const openAddPipeLineModal = () => {
     setIsAddPipeLineModalVisible(true);
   };
 
-  // Close Add Pipeline Modal
   const closeAddPipeLineModal = () => {
     setIsAddPipeLineModalVisible(false);
   };
 
-  // Open Edit Pipeline Modal
   const openEditPipeLineModal = () => {
     setIsEditPipeLineModalVisible(true);
   };
 
-  // Close Edit Pipeline Modal
   const closeEditPipeLineModal = () => {
     setIsEditPipeLineModalVisible(false);
   };
@@ -69,8 +59,6 @@ const PipelineList = () => {
     });
   };
 
-   //// permission
-                                              
    const roleId = useSelector((state) => state.user.loggedInUser.role_id);
    const roles = useSelector((state) => state.role?.role?.data);
    const roleData = roles?.find(role => role.id === roleId);
@@ -95,8 +83,6 @@ const PipelineList = () => {
    const canEditClient = allpermisson?.includes('edit');
    const canDeleteClient = allpermisson?.includes('delete');
    const canViewClient = allpermisson?.includes('view');
-
-   ///endpermission
 
   const tableColumns = [
     {
@@ -130,7 +116,7 @@ const PipelineList = () => {
     const value = e.currentTarget.value.toLowerCase();
     
     if (!value) {
-      setFilteredData(fnddatas); // Reset to original data when search is empty
+      setFilteredData(fnddatas); 
       return;
     }
 

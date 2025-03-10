@@ -1,18 +1,3 @@
-// import React from 'react'
-// import { FileOutlined } from '@ant-design/icons';
-// const FileList = () => {
-//     return (
-//         <div className='flex items-center justify-center'>
-//             <div className=''>
-//                 <span ><FileOutlined className='flex justify-center text-lg'/></span>
-//                 <p className='mt-3'>- No file uploaded. -</p>
-//             </div>
-//         </div>
-//     )
-// }
-
-// export default FileList
-
 import React, { useState } from 'react';
 import { IoAddCircleOutline } from "react-icons/io5";
 import { FileOutlined } from '@ant-design/icons';
@@ -30,14 +15,11 @@ function FileList() {
     const file = event.target.files[0];
     setSelectedFile(file);
     
-    // Create FormData object to send file
     const formData = new FormData();
     formData.append('lead_files', file);
     
     try {
-      // Dispatch file upload action and wait for it to complete
       await dispatch(fileadd({ id, values: formData }));
-      // Reset the file input and state after successful upload
       setSelectedFile(null);
       event.target.value = ''; // Reset the file input
     } catch (error) {
@@ -48,7 +30,6 @@ function FileList() {
   const allprojectdata = useSelector((state)=>state.Project.Project.data);
   const fnddata = allprojectdata.find((item)=>item.id === id);
   
-  // Parse the files JSON string
   const projectFiles = fnddata?.files ? JSON.parse(fnddata.files) : [];
 
   return (

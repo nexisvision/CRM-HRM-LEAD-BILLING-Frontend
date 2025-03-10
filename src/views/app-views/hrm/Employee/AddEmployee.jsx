@@ -83,12 +83,10 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
     const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let password = "";
 
-    // Generate 6 characters
     for (let i = 0; i < length; i++) {
       password += charset[Math.floor(Math.random() * charset.length)];
     }
 
-    // Ensure at least one number
     const randomNum = Math.floor(Math.random() * 10).toString();
     password = password.slice(0, 7) + randomNum;
 
@@ -142,7 +140,6 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
         setShowOtpModal(false);
         dispatch(empdata());
 
-        // Debugging: Log formValues to ensure it's populated
 
         const payloadss = {
           ...formValues2,
@@ -168,7 +165,6 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
   const onSubmit = async (values, { resetForm, setSubmitting }) => {
     try {
       setFormValues2(values);
-      // Store employeeId in formValues  
       const updatedFormValues = { ...values };
 
       const response = await dispatch(addEmp(updatedFormValues));
@@ -182,7 +178,6 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
         updatedFormValues.employeeId = response.payload.data.employeeId;
         setFormValues(updatedFormValues); // Set formValues here
         
-        // Only reset form and close modal after successful employee creation
         if (!response.payload?.data?.sessionToken) {
           resetForm();
           onClose();
@@ -396,7 +391,6 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                             backgroundColor: '#f8fafc',
                           }}
                           placeholder={<span className="text-gray-400">+91</span>}
-                          // defaultValue={getInitialPhoneCode()}
                           onChange={(value) => {
                             if (value === 'add_new') {
                               setIsAddPhoneCodeModalVisible(true);
@@ -446,13 +440,7 @@ const AddEmployee = ({ onClose, setSub, initialData = {} }) => {
                           type="number"
                           placeholder="Enter phone number"
                           onChange={(e) => handlePhoneNumberChange(e, setFieldValue)}
-                          // prefix={
-                          //   values.phoneCode && (
-                          //     <span className="text-gray-600 font-medium mr-1">
-                          //       {values.phoneCode}
-                          //     </span>
-                          //   )
-                          // }
+                          
                         />
                       )}
                     </Field>

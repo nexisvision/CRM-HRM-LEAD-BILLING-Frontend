@@ -10,7 +10,6 @@ import AddBranch from "../Branch/AddBranch";
 
 const { Option } = Select;
 
-// Validation Schema using Yup
 const validationSchema = Yup.object().shape({
   department_name: Yup.string()
     .required("Department Name is required")
@@ -50,12 +49,10 @@ const EditDepartment = ({ comnyid, onClose }) => {
     dispatch(EditDept({ comnyid, values }))
       .then(() => {
         dispatch(getDept());
-        // message.success("Department updated successfully!");
         onClose();
         navigate("/app/hrm/department");
       })
       .catch((error) => {
-        // message.error("Failed to update department.");
         console.error("Edit API error:", error);
       });
   };

@@ -66,7 +66,6 @@ const OvertimeList = ({ id, onClose }) => {
     setSelectedRowKeys([]);
   };
 
-  // Delete a salary entry
   const deleteSalaryEntry = (id) => {
     dispatch(deleteovertimess(id)).then(() => {
       dispatch(getovertimess());
@@ -75,7 +74,6 @@ const OvertimeList = ({ id, onClose }) => {
     });
   };
 
-  // Dropdown menu for action options
   const dropdownMenu = (record) => (
     <Menu>
       <Menu.Item>

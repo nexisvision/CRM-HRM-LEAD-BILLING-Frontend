@@ -48,30 +48,26 @@ const AddPipeLine = ({ onClose }) => {
 
   const navigate = useNavigate();
 
-  // Submit handler
   const onSubmit = (values, { setSubmitting, resetForm }) => {
     dispatch(AddPip(values));
     dispatch(GetPip());
     dispatch(GetPip());
     resetForm();
     onClose();
-    // message.success("Pipeline added successfully!");
-    onClose(); // Close modal after submission
-    setSubmitting(false); // Reset submitting state
+    onClose();
+    setSubmitting(false); 
   };
 
   const initialValues = {
     pipeline_name: "",
   };
 
-  // Validation Schema
   const validationSchema = Yup.object({
     pipeline_name: Yup.string().required("Please enter pipeline name."),
   });
 
   return (
     <div>
-      {/* <h2 className="mb-1 border-b font-medium">Add Pipeline</h2> */}
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

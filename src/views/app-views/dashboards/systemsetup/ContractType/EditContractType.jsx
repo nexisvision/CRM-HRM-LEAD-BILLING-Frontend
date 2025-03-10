@@ -64,7 +64,6 @@ const EditContractType = ({ idd, onClose }) => {
   const fnddata = datas.find((Item) => Item.id === idd);
 
   const onSubmit = (values, { resetForm }) => {
-    // Add static labelType to payload
     const payload = {
       ...values,
       labelType: "source",

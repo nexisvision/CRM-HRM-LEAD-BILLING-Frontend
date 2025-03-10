@@ -47,8 +47,6 @@ const LeaveList = () => {
 
   const user = useSelector((state) => state.user.loggedInUser.username);
   const tabledata = useSelector((state) => state.Leave);
-  // State to toggle Add Employee Modal
-  // Open Add Employee Modal
 
   const openAddLeaveModal = () => {
     setIsAddLeaveModalVisible(true);
@@ -115,8 +113,6 @@ const LeaveList = () => {
   const handleSearch = () => {
     message.success('Search completed');
   };
-
-   //// permission
                               
                 const roleId = useSelector((state) => state.user.loggedInUser.role_id);
                 const roles = useSelector((state) => state.role?.role?.data);
@@ -143,8 +139,6 @@ const LeaveList = () => {
                 const canDeleteClient = allpermisson?.includes('delete');
                 const canViewClient = allpermisson?.includes('view');
              
-                ///endpermission
-
   const deleteUser = async (userId) => {
     try {
       await dispatch(DeleteLea(userId));
@@ -153,9 +147,7 @@ const LeaveList = () => {
 
       setUsers(users.filter((item) => item.id !== userId));
 
-      // message.success({ content: "Deleted leave successfully", duration: 2 });
     } catch (error) {
-      // message.error({ content: 'Failed to delete leave', duration: 2 });
       console.error("Error deleting user:", error);
     }
   };
@@ -196,7 +188,6 @@ const LeaveList = () => {
 
   useEffect(() => {
     if (tabledata && tabledata.Leave && tabledata.Leave.data) {
-      // const filteredData = tabledata.Leave.data.filter(item => item.created_by === user);
       const filteredData = tabledata.Leave.data;  
       setUsers(filteredData);
     }
@@ -267,11 +258,6 @@ const LeaveList = () => {
       dataIndex: "leaveType",
       sorter: (a, b) => a.leavetype.length - b.leavetype.length,
     },
-    // {
-    //   title: "Applied On",
-    //   dataIndex: "appliedon",
-    //   sorter: (a, b) => dayjs(a.appliedon).unix() - dayjs(b.appliedon).unix(),
-    // },
     {
       title: "Start Date",
       dataIndex: "startDate",
@@ -295,29 +281,13 @@ const LeaveList = () => {
       sorter: (a, b) => utils.antdTableSorter(a, b, "endDate"),
     },
 
-    // {
-    //   title: "Total Days",
-    //   dataIndex: "totaldays",
-    //   sorter: (a, b) => a.totaldays - b.totaldays,
-    // },
+  
     {
       title: "Leave Reason",
       dataIndex: "reason",
       sorter: (a, b) => a.leavereason.length - b.leavereason.length,
     },
-    // {
-    //   title: "Status",
-    //   dataIndex: "status",
-    //   render: (status) => (
-    //     <Tag
-    //       className="text-capitalize"
-    //       color={status === "active" ? "cyan" : "red"}
-    //     >
-    //       {status}
-    //     </Tag>
-    //   ),
-    //   sorter: (a, b) => a.status.length - b.status.length,
-    // },
+ 
     {
       title: "Approval Actions",
       dataIndex: "approval",
@@ -350,7 +320,6 @@ const LeaveList = () => {
           });
         };
 
-        // Check if the leave has been approved or rejected
         const isActionTaken = record.status === "approved" || record.status === "rejected";
 
         return (
@@ -388,7 +357,6 @@ const LeaveList = () => {
     },
   ];
 
-  // Add date range change handler
   const handleDateRangeChange = (dates) => {
     setDateRange(dates);
   };
@@ -468,7 +436,6 @@ const LeaveList = () => {
         visible={userProfileVisible}
         close={closeUserProfile}
       />
-      {/* Add Employee Modal */}
       <Modal
         title="Add Leave"
         visible={isAddLeaveModalVisible}
@@ -478,7 +445,6 @@ const LeaveList = () => {
       >
         <AddLeave onClose={closeAddLeaveModal} />
       </Modal>
-      {/* Add Employee Modal */}
       <Modal
         title="Edit Leave"
         visible={isEditLeaveModalVisible}
@@ -489,7 +455,6 @@ const LeaveList = () => {
         <EditLeave onClose={closeEditLeaveModal} editid={editid} />
       </Modal>
 
-      {/* Add Employee Modal */}
       <Modal
         title="Leave"
         visible={isViewLeaveModalVisible}

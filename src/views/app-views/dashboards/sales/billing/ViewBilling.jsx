@@ -16,11 +16,9 @@ function ViewBilling({ billingId }) {
     const [isDownloading, setIsDownloading] = useState(false);
     const [billStatus, setBillStatus] = useState(null);
 
-    // Modal functions
     const openAddBillingModal = () => setIsAddBillingModalVisible(true);
     const closeAddBillingModal = () => setIsAddBillingModalVisible(false);
 
-    // Function to handle bill resend
     const handleResendBill = async () => {
         try {
             setIsResending(true);
@@ -53,7 +51,6 @@ function ViewBilling({ billingId }) {
         }
     };
 
-    // Confirmation modal before resending
     const showResendConfirmation = () => {
         Modal.confirm({
             title: 'Resend Bill',
@@ -68,12 +65,10 @@ function ViewBilling({ billingId }) {
         });
     };
 
-    // Function to handle PDF download of billing information and product summary
     const handleDownloadPDF = async () => {
         try {
             setIsDownloading(true);
             
-            // Get the container with both sections
             const element = document.getElementById('download-sections');
             
             if (!element) {
@@ -115,7 +110,6 @@ function ViewBilling({ billingId }) {
             <div className='bg-gray-50 ml-[-51px] mr-[-24px] mt-[-52px] mb-[-30px] rounded-t-lg rounded-b-lg p-10'>
                 <h2 className="mb-6 border-b pb-[30px] font-medium"></h2>
 
-                {/* Only show BillingDetails if bill is not paid */}
                 {billStatus !== 'paid' && (
                     <div className='p-10 pt-3 pb-3'>
                         <BillingDetailsList billingId={billingId} />
@@ -136,16 +130,8 @@ function ViewBilling({ billingId }) {
                     </div>
                 </Card>
 
-                {/* <div className='px-10 pb-3'>
-                    <PaymentSummaryList />
-                </div> */}
-
-                {/* <div className='px-10 pb-3'>
-                    <DebitSummaryList />
-                </div> */}
             </div>
 
-            {/* Add Billing Modal */}
             <Modal
                 title="Create Debit Note"
                 visible={isAddBillingModalVisible}

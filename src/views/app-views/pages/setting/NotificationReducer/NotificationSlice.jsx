@@ -17,7 +17,6 @@ export const AddTickets = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
 
 export const GetAllNotifications = createAsyncThunk(
   "emp/getn",

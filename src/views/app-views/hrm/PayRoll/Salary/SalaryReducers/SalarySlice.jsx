@@ -3,12 +3,10 @@ import UserService from "./SalaryService";
 import { toast } from "react-toastify";
 import { message } from "antd";
 
-// Fix the editSalaryss action to match your API expectations
 export const editSalaryss = createAsyncThunk(
   "users/editSalaryss",
   async (payload, thunkAPI) => {
     try {
-      // Ensure all fields are included in the payload
       const salaryData = {
         id: payload.id,
         employeeId: payload.employeeId,
@@ -31,7 +29,6 @@ export const editSalaryss = createAsyncThunk(
   }
 );
 
-// Keep your existing actions but update the error handling
 export const AddSalaryss = createAsyncThunk(
   "users/AddSalaryss",
   async (userData, thunkAPI) => {

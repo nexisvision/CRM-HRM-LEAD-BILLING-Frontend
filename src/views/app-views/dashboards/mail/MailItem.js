@@ -100,24 +100,7 @@ const MailItem = () => {
 
 
 	const getCurrentCategory = () => {
-		// const { category } = params;
-		// if (labels.includes(category)) {
-		// 	return MailData.inbox.filter(elm => elm.label === category);
-		// }
-		// switch (category) {
-		// 	case 'inbox':
-		// 		return MailData.inbox
-		// 	case 'sent':
-		// 		return MailData.sent
-		// 	case 'draft':
-		// 		return MailData.draft
-		// 	case 'starred':
-		// 		return MailData.inbox.filter(elm => elm.starred)
-		// 	case 'deleted':
-		// 		return MailData.deleted
-		// 	default:
-		// 		break;
-		// }
+		
 	}
 
 	const rowSelection = {

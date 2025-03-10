@@ -49,7 +49,6 @@ const AddDebitnote = ({ onClose }) => {
     const selectedBill = salesbilling?.data?.find(bill => bill.id === value);
     if (selectedBill) {
       setSelectedBillAmount(selectedBill.total);
-      // Set the amount field to the selected bill's total amount
       setFieldValue('amount', selectedBill.total);
     }
   };

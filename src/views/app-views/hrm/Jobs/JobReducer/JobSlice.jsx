@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
-// Async thunk for adding user
 
 export const AddJobs = createAsyncThunk(
   "users/addUser",
@@ -18,7 +17,6 @@ export const AddJobs = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
 
 export const GetJobdata = createAsyncThunk(
   "emp/getmeet",
@@ -32,7 +30,6 @@ export const GetJobdata = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -45,7 +42,6 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -58,7 +54,6 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
 export const Deletejobs = createAsyncThunk(
   "users/Deletejobseet",
   async (userId, thunkAPI) => {
@@ -133,17 +128,14 @@ const JobSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      //add
       .addCase(AddJobs.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(AddJobs.fulfilled, (state, action) => {
         state.isLoading = false;
-        // message.success(action.payload?.message);
       })
       .addCase(AddJobs.rejected, (state, action) => {
         state.isLoading = false;
-        // message.error(action.payload?.message);
       })
 
       .addCase(GetJobdata.pending, (state) => {
@@ -165,26 +157,21 @@ const JobSlice = createSlice({
       })
       .addCase(Deletejobs.fulfilled, (state, action) => {
         state.isLoading = false;
-        // message.success(action.payload?.message);
       })
       .addCase(Deletejobs.rejected, (state, action) => {
         state.isLoading = false;
-        // message.error(action.payload?.message);
       })
-      //update
       .addCase(EditJobs.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
       .addCase(EditJobs.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; // Update the state with the updated employee data
-        // message.success(action.payload?.message);
+        state.editItem = action.payload; 
       })
       .addCase(EditJobs.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-        // message.error(action.payload?.message);
       });
   },
 });

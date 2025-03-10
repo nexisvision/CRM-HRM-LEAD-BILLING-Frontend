@@ -32,7 +32,6 @@ const UserAvatarGroup = ({ users, maxCount = 3 }) => {
 		return name.substring(0, 2).toUpperCase();
 	};
 
-	// Professional color palette with lighter shades
 	const colors = [
 		{ bg: '#E3F2FD', text: '#1976D2' }, // Light Blue
 		{ bg: '#F3E5F5', text: '#7B1FA2' }, // Light Purple
@@ -124,7 +123,6 @@ const ProjectList = () => {
 	const [clientid, setClientId] = useState("");
 	const [idd, setIdd] = useState("");
 
-	// Add new state variables for tag and status modals
 	const [isTagModalVisible, setIsTagModalVisible] = useState(false);
 	const [isStatusModalVisible, setIsStatusModalVisible] = useState(false);
 	const [newTag, setNewTag] = useState("");
@@ -142,11 +140,9 @@ const ProjectList = () => {
 	const [statuses, setStatuses] = useState([]);
 	const AllLoggedData = useSelector((state) => state.user);
 
-	// Add currency state from Redux
 	const { currencies } = useSelector((state) => state.currencies);
 	const currencyData = currencies?.data || [];
 
-	// Get Users data from Redux store
 	const alluserdatas = useSelector((state) => state.Users);
 	const allUsers = alluserdatas?.Users?.data || [];
 
@@ -186,7 +182,6 @@ const ProjectList = () => {
 			let filesArray = [];
 
 			try {
-				// Parse project members with improved error handling
 				if (item.project_members) {
 					if (typeof item.project_members === 'string') {
 						try {
@@ -203,7 +198,6 @@ const ProjectList = () => {
 					}
 				}
 
-				// Parse files
 				if (item.files) {
 					try {
 						filesArray = JSON.parse(item.files) || [];
@@ -216,11 +210,9 @@ const ProjectList = () => {
 				console.error("Error processing item data:", error);
 			}
 
-			// Get currency details
 			const currencyDetails = currencyData.find(c => c.id === item.currency) || {};
 			const currencyIcon = currencyDetails.currencyIcon || '₹';
 
-			// Get member details with improved error handling
 			const memberDetails = projectMembers
 				.filter(memberId => memberId) // Filter out null/undefined members
 				.map(memberId => {
@@ -278,15 +270,12 @@ const ProjectList = () => {
 		fetchLables();
 	}, [dispatch, AllLoggedData.loggedInUser.id]);
 
-	// Open Add Project Modal
 	const openAddProjectModal = () => setIsAddProjectModalVisible(true);
 	const closeAddProjectModal = () => setIsAddProjectModalVisible(false);
 
-	// Open Edit Project Modal
 	const openEditProjectModal = () => setIsEditProjectModalVisible(true);
 	const closeEditProjectModal = () => setIsEditProjectModalVisible(false);
 
-	// Delete Project
 	const deleteItem = (id) => {
 		dispatch(DeletePro(id)); // Assuming DeletePro is a redux action
 		const updatedList = list.filter((item) => item.id !== id); // Update the list after deletion
@@ -299,14 +288,10 @@ const ProjectList = () => {
 		setIdd(id)
 	};
 
-	// Change Project View
 	const onChangeProjectView = (e) => {
 		setView(e.target.value);
 	};
 
-
-
-	// Generate Action Menu for Dropdown
 	const dropdownMenu = (id) => (
 		<Menu>
 
@@ -324,7 +309,6 @@ const ProjectList = () => {
 		</Menu>
 	);
 
-	// Get employee data from Redux store
 	const allEmployeeData = useSelector((state) => state.employee);
 	const empData = allEmployeeData?.employee?.data || [];
 
@@ -340,7 +324,6 @@ const ProjectList = () => {
 					className="cursor-pointer hover:text-blue-600"
 				>
 					<h4 className="mb-0">{name}</h4>
-					{/* <span className="text-gray-500">{record.project_category}</span> */}
 				</div>
 			),
 		},
@@ -504,11 +487,9 @@ const ProjectList = () => {
 			const project = list.find(p => p.id === projectId);
 			if (!project) return;
 
-			// Get the original project data to preserve all fields
 			const originalProject = properdata.find(p => p.id === projectId);
 			if (!originalProject) return;
 
-			// Prepare project_members in the correct format
 			let members = [];
 			try {
 				if (typeof originalProject.project_members === 'string') {
@@ -547,11 +528,9 @@ const ProjectList = () => {
 			const project = list.find(p => p.id === projectId);
 			if (!project) return;
 
-			// Get the original project data to preserve all fields
 			const originalProject = properdata.find(p => p.id === projectId);
 			if (!originalProject) return;
 
-			// Prepare project_members in the correct format
 			let members = [];
 			try {
 				if (typeof originalProject.project_members === 'string') {
@@ -567,7 +546,6 @@ const ProjectList = () => {
 				members = [];
 			}
 
-			// Create updated project data with all original fields
 			const updatedProject = {
 				...originalProject,
 				tag: newTag,
@@ -619,13 +597,11 @@ const ProjectList = () => {
 				lableType,
 			};
 
-			// Add the new label
 			const response = await dispatch(AddLable({ lid, payload }));
 
 			if (response.payload && response.payload.success) {
 				message.success(`${lableType} added successfully.`);
 
-				// Fetch updated labels
 				const labelsResponse = await dispatch(GetLable(lid));
 				if (labelsResponse.payload && labelsResponse.payload.data) {
 					const filteredLables = labelsResponse.payload.data
@@ -639,7 +615,6 @@ const ProjectList = () => {
 					}
 				}
 
-				// Reset input and close modal
 				setter("");
 				modalSetter(false);
 			} else {

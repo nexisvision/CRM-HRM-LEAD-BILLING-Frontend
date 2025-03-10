@@ -111,14 +111,12 @@ const AddTask = ({ onClose }) => {
 
   const onSubmit = async (values, { resetForm }) => {
     try {
-      // Convert assignTo array to object with array values
       const assignToObject = {
         assignedUsers: Array.isArray(values.assignTo)
           ? values.assignTo.filter(id => id && id.trim() !== '')
           : []
       };
 
-      // Create payload with assignTo as object
       const payload = {
         ...values,
         assignTo: assignToObject
@@ -177,7 +175,6 @@ const AddTask = ({ onClose }) => {
                     placeholder="Select startDate"
                     onChange={(date) => {
                       setFieldValue("startDate", date);
-                      // Clear end date if it's before the new start date
                       if (values.dueDate && date && values.dueDate.isBefore(date)) {
                         setFieldValue("dueDate", null);
                       }
@@ -204,7 +201,6 @@ const AddTask = ({ onClose }) => {
                     value={values.dueDate}
                     onBlur={() => setFieldTouched("dueDate", true)}
                     disabledDate={(current) => {
-                      // Disable dates before start date
                       return values.startDate ? current && current < values.startDate.startOf('day') : false;
                     }}
                   />

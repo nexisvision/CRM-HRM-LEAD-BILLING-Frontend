@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
-// Async thunk for adding user
 export const AddDept = createAsyncThunk(
     "users/addUser",
     async (userData, thunkAPI) => {
@@ -17,7 +16,6 @@ export const AddDept = createAsyncThunk(
     }
 );
 
-// Async thunk for user login
 
 
 export const getDept = createAsyncThunk(
@@ -33,7 +31,6 @@ export const getDept = createAsyncThunk(
 );
 
 
-// Async thunk for deleting a user
 export const DeleteDept = createAsyncThunk(
     "users/deleteUser",
     async (userId, thunkAPI) => {
@@ -50,18 +47,13 @@ export const EditDept = createAsyncThunk(
     async ({ comnyid, values }, thunkAPI) => {
       try {
         const response = await UserService.EditDept(comnyid, values);
-        return response; // Return the updated data
+        return response; 
       } catch (error) {
         return thunkAPI.rejectWithValue(error.response?.data || "Error updating employee");
       }
     }
   );
 
-
-
-
-
-// Async thunk for updating a user
 
 const initialUser = () => {
     const item = window.localStorage.getItem("USER");

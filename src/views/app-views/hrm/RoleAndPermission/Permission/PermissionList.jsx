@@ -22,12 +22,10 @@ export class PermissionList extends Component {
     isAddEmployeeModalVisible: false, // State to toggle Add Employee Modal
   };
 
-  // Open Add Employee Modal
   openAddPermissionModal = () => {
     this.setState({ isAddPermissionModalVisible: true });
   };
 
-  // Close Add Employee Modal
   closeAddPermissionModal = () => {
     this.setState({ isAddPermissionModalVisible: false });
   };

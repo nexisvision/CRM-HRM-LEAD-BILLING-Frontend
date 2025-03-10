@@ -85,15 +85,12 @@ const EditProject = ({ id, onClose }) => {
   const Allclient = useSelector((state) => state.ClientData);
   const clientdata = Allclient.ClientData.data;
 
-  // Add a state to store client data
   const [selectedClientName, setSelectedClientName] = useState("");
 
-  // Update useEffect for setting initial data
   useEffect(() => {
     if (id && projectdata.length > 0) {
       const project = projectdata.find((item) => item.id === id);
       if (project) {
-        // Parse project_members if it's a string
         let members = [];
         if (project.project_members) {
           try {
@@ -108,11 +105,9 @@ const EditProject = ({ id, onClose }) => {
           }
         }
 
-        // Convert dates to moment objects
         const startDate = project.startDate ? moment(project.startDate) : null;
         const endDate = project.endDate ? moment(project.endDate) : null;
 
-        // Calculate estimated months based on start and end dates
         let estimatedmonths = project.estimatedmonths;
         if (startDate && endDate) {
           const daysDiff = endDate.diff(startDate, 'days');
@@ -125,10 +120,8 @@ const EditProject = ({ id, onClose }) => {
           }
         }
 
-        // Get client ID from either client or client_id field
         const clientId = project.client || project.client_id;
 
-        // Find client name from clientdata
         if (clientdata && clientdata.length > 0) {
           const clientInfo = clientdata.find(c => c.id === clientId);
           if (clientInfo) {
@@ -150,10 +143,8 @@ const EditProject = ({ id, onClose }) => {
 
   useEffect(() => {
     if (fnd2 && fnd2.length > 0 && singleEmp?.client) {
-      // Find the client object that matches the ID
       const clientObj = fnd2.find(client => client.id === singleEmp.client);
       if (clientObj) {
-        // No need to update the client ID as it's already correct
       }
     }
   }, [fnd2, singleEmp]);
@@ -278,7 +269,6 @@ const EditProject = ({ id, onClose }) => {
           }
         }
 
-        // Reset input and close modal
         setter("");
         modalSetter(false);
       } else {

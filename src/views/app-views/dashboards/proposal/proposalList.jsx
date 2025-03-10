@@ -39,7 +39,6 @@ import { delpropos, getpropos } from "./proposalReducers/proposalSlice";
 import { GetLeads } from "../leads/LeadReducers/LeadSlice";
 import { GetDeals } from "../deals/DealReducers/DealSlice";
 import { getcurren } from "views/app-views/setting/currencies/currenciesSlice/currenciesSlice";
-// import { getallcurrencies } from "views/app-views/setting/currencies/currenciesreducer/currenciesSlice";
 
 const { Option } = Select;
 
@@ -55,14 +54,10 @@ const ProposalList = () => {
     useState(false);
   const [isEditProposalModalVisible, setIsEditProposalModalVisible] =
     useState(false);
-  //   const [isViewTrainingSetupModalVisible, setIsViewTrainingSetupModalVisible] =
-  //     useState(false);
 
   const [id, setId] = useState("");
   const { data: Leads } = useSelector((state) => state.Leads.Leads);
   const { data: Deals } = useSelector((state) => state.Deals.Deals);
-  // const { data: Currencies } = useSelector((state) => state.currencies.currencies);
-
 
   const user = useSelector((state) => state.user.loggedInUser.username);
 
@@ -104,22 +99,11 @@ const ProposalList = () => {
     setIsEditProposalModalVisible(false);
   };
 
-  //   const openviewTrainingSetupModal = () => {
-  //     setIsViewTrainingSetupModalVisible(true);
-  //   };
-
-  //   const closeViewTrainingSetupModal = () => {
-  //     setIsViewTrainingSetupModalVisible(false);
-  //   };
-
-
 
   useEffect(() => {
     if (fnddatas) {
-      // Filter proposals by created_by matching the logged-in user's username
       const filteredProposals = fnddatas.filter(proposal => proposal.created_by === user);
       
-      // Enrich filtered proposals with lead and deal titles
       const enrichedData = filteredProposals.map((proposal) => {
         const lead = Leads?.find((l) => l.id === proposal.lead_title); // Match lead by ID
         const deal = Deals?.find((d) => d.id === proposal.deal_title);
@@ -167,12 +151,10 @@ const ProposalList = () => {
 
 
 
-  // Add new state for search value
   const [searchValue, setSearchValue] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
 
-  // Modified debounced search function to include date filtering
   const debouncedSearch = debounce((value, date, data, setUsers) => {
     setIsSearching(true);
     
@@ -184,7 +166,6 @@ const ProposalList = () => {
       return;
     }
 
-    // Filter the data based on search value and date
     const filteredData = fnddatas.filter(proposal => {
       const lead = Leads?.find((l) => l.id === proposal.lead_title);
       const matchesSearch = !searchValue || (
@@ -192,7 +173,6 @@ const ProposalList = () => {
         proposal.deal_title?.toString().toLowerCase().includes(searchValue)
       );
 
-      // Add date filtering
       let matchesDate = true;
       if (date) {
         const proposalDate = dayjs(proposal.valid_till).startOf('day');
@@ -203,7 +183,6 @@ const ProposalList = () => {
       return matchesSearch && matchesDate && proposal.created_by === user;
     });
 
-    // Enrich the filtered data with lead and deal titles
     const enrichedData = filteredData.map((proposal) => {
       const lead = Leads?.find((l) => l.id === proposal.lead_title);
       const deal = Deals?.find((d) => d.id === proposal.deal_title);
@@ -219,14 +198,12 @@ const ProposalList = () => {
     setIsSearching(false);
   }, 300);
 
-  // Modified onSearch function
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     setSearchValue(value);
     debouncedSearch(value, selectedDate, fnddatas, setUsers);
   };
 
-  // Add date change handler
   const handleDateChange = (date) => {
     setSelectedDate(date);
     debouncedSearch(searchValue, date, fnddatas, setUsers);
@@ -236,7 +213,6 @@ const ProposalList = () => {
     dispatch(delpropos(userId)).then(() => {
       dispatch(getpropos());
       setUsers(users.filter((item) => item.id !== userId));
-      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
     });
   };
 
@@ -296,7 +272,6 @@ const ProposalList = () => {
 
   const dropdownMenu = (elm) => ({
     items: [
-      // Edit button - conditional item
       ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'edit',
         icon: <EditOutlined />,
@@ -304,7 +279,6 @@ const ProposalList = () => {
         onClick: () => editfun(elm.id)
       }] : []),
 
-      // Delete button - conditional item
       ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'delete',
         icon: <DeleteOutlined />,
@@ -343,12 +317,6 @@ const ProposalList = () => {
       sorter: (a, b) => a.valid_till.length - b.valid_till.length,
     },
    
-    // {
-    //   title: "created_by ",
-    //   dataIndex: "created_by",
-    //   sorter: (a, b) => a.created_by.length - b.created_by.length,
-    // },
-
     {
       title: "Action",
       dataIndex: "actions",

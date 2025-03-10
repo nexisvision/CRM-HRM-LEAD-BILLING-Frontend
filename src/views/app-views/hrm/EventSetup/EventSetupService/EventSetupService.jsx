@@ -22,14 +22,6 @@ const fetchEvents = async () => {
 const createEvent = async (payload) => {
   const token = localStorage.getItem("auth_token");
   
-  // Format the payload to match backend expectations
-//   const formattedPayload = {
-//     EventTitle: payload.title,
-//     EventManager: payload.employee,
-//     EventDate: payload.startDate,
-//     EventTime: payload.startTime
-//   };
-
   try {
     const res = await axios.post(
       `${env.API_ENDPOINT_URL}/events/`,

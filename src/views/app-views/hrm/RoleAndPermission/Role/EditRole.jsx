@@ -100,15 +100,12 @@ const EditRole = ({ id, onClose }) => {
             });
 
             const rolePermissions = role.permissions;
-            // Set initial module permissions based on the existing role permissions
             const initialPermissions = {};
             
-            // Iterate over the keys of role.permissions
             Object?.keys(rolePermissions)?.forEach(moduleKey => {
                 const subModules = rolePermissions[moduleKey]; // Get the submodules for the current module key
                 if (Array?.isArray(subModules)) { // Ensure it's an array
                     subModules?.forEach(subModule => {
-                        // Check if subModule has a key and permissions
                         if (subModule?.key && subModule?.permissions) {
                             initialPermissions[subModule?.key] = {};
                             subModule?.permissions?.forEach(permission => {
@@ -140,12 +137,10 @@ const EditRole = ({ id, onClose }) => {
     }
   }, [singleEmp]);
 
-  // Handle module tab click
   const handleModuleClick = (moduleName) => {
     setActiveTab(moduleName);
   };
 
-  // Handle select all for entire module
   const handleSelectAllModule = (checked) => {
     const newPermissions = { ...modulePermissions };
     subModules[activeTab].forEach(submodule => {
@@ -156,7 +151,6 @@ const EditRole = ({ id, onClose }) => {
     });
     setModulePermissions(newPermissions);
   };
-  // Check if all permissions in the current module are selected
   const isAllModuleSelected = () => {
     return subModules[activeTab].every(submodule =>
       permissions.every(perm => modulePermissions[submodule]?.[perm])
@@ -164,7 +158,6 @@ const EditRole = ({ id, onClose }) => {
   };
 
 
-  // Handle select all permissions for a submodule
   const handleSelectAllSubmodule = (submodule) => {
     setModulePermissions(prev => {
       const currentPermissions = prev[submodule] || {};
@@ -182,7 +175,6 @@ const EditRole = ({ id, onClose }) => {
     });
   };
 
-  // Handle individual permission toggle
   const handlePermissionToggle = (submodule, permission) => {
     setModulePermissions(prev => ({
       ...prev,

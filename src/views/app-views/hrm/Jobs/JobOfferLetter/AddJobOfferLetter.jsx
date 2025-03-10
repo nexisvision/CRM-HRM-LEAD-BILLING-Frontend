@@ -73,17 +73,14 @@ const AddJobOfferLetter = ({ onClose }) => {
     try {
       const formData = new FormData();
       
-      // Format dates
       const formattedValues = {
         ...values,
         offer_expiry: values.offer_expiry ? moment(values.offer_expiry).format('YYYY-MM-DD') : null,
         expected_joining_date: values.expected_joining_date ? moment(values.expected_joining_date).format('YYYY-MM-DD') : null,
       };
 
-      // Append all form values to FormData
       Object.keys(formattedValues).forEach(key => {
         if (key === 'file' && formattedValues[key]) {
-          // Validate file type and size before appending
           const file = formattedValues[key];
           const isValidFileType = ['image/jpeg', 'image/png', 'application/pdf'].includes(file.type);
           const isValidFileSize = file.size / 1024 / 1024 < 5;
@@ -199,23 +196,6 @@ const AddJobOfferLetter = ({ onClose }) => {
                 </div>
               </Col>
 
-              {/* <Col span={12}>
-                <div className="form-item mt-2">
-                  <label className="font-semibold">Offer Expire On</label>
-                  <DatePicker
-                    className="w-full mt-2"
-                    format="YYYY-MM-DD"
-                    value={values.offer_expiry ? moment(values.offer_expiry) : null}
-                    onChange={(date) => setFieldValue("offer_expiry", date)}
-                    onBlur={() => setFieldTouched("offer_expiry", true)}
-                  />
-                  <ErrorMessage
-                    name="offer_expiry"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
 
               <Col span={12} className='mt-3'>
                 <div className="form-item">
@@ -226,7 +206,6 @@ const AddJobOfferLetter = ({ onClose }) => {
                     value={values.offer_expiry}
                     onChange={(date) => {
                       setFieldValue('offer_expiry', date);
-                      // Clear expected joining date if it's before the new offer expiry date
                       if (values.expected_joining_date && date && values.expected_joining_date.isBefore(date)) {
                         setFieldValue('expected_joining_date', null);
                       }
@@ -247,7 +226,6 @@ const AddJobOfferLetter = ({ onClose }) => {
                     onChange={(date) => setFieldValue('expected_joining_date', date)}
                     onBlur={() => setFieldTouched("expected_joining_date", true)}
                     disabledDate={(current) => {
-                      // Disable dates before offer expiry date
                       return values.offer_expiry ? current && current < values.offer_expiry.startOf('day') : false;
                     }}
                   />
@@ -255,23 +233,6 @@ const AddJobOfferLetter = ({ onClose }) => {
                 </div>
               </Col>
 
-              {/* <Col span={12}>
-                <div className="form-item mt-2">
-                  <label className="font-semibold">Expected Joining Date</label>
-                  <DatePicker
-                    className="w-full mt-2"
-                    format="YYYY-MM-DD"
-                    value={values.expected_joining_date ? moment(values.expected_joining_date) : null}
-                    onChange={(date) => setFieldValue("expected_joining_date", date)}
-                    onBlur={() => setFieldTouched("expected_joining_date", true)}
-                  />
-                  <ErrorMessage
-                    name="expected_joining_date"
-                    component="div"
-                    className="error-message text-red-500 my-1"
-                  />
-                </div>
-              </Col> */}
 
               <Col span={12}>
                 <div className="form-item mt-3">

@@ -9,7 +9,6 @@ import { getBranch } from "../Branch/BranchReducer/BranchSlice";
 import AddBranch from "../Branch/AddBranch";
 import { Option } from "antd/es/mentions";
 
-// Validation Schema using Yup
 const validationSchema = Yup.object().shape({
   designation_name: Yup.string()
     .required("Designation Name is required")
@@ -41,12 +40,10 @@ const EditDesignation = ({ id, onClose }) => {
 
   const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
 
-  // Function to open AddBranch modal
   const openAddBranchModal = () => {
     setIsAddBranchModalVisible(true);
   };
 
-  // Function to close AddBranch modal
   const closeAddBranchModal = () => {
     setIsAddBranchModalVisible(false);
   };
@@ -60,12 +57,10 @@ const EditDesignation = ({ id, onClose }) => {
     dispatch(EditDes({ id, values }))
       .then(() => {
         dispatch(getDes());
-        // message.success("Designation updated successfully!");
         onClose();
         navigate("/app/hrm/designation");
       })
       .catch((error) => {
-        // message.error("Failed to update designation.");
         console.error("Edit API error:", error);
       });
   };

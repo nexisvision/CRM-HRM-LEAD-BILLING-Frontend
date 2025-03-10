@@ -57,7 +57,6 @@ const ChartWidget = ({title, series, width, height, xAxis, customOptions, card, 
 
 	useEffect(() => {
 		setLegendOffset()
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [])
 	
 	const extraRef = useRef(null);

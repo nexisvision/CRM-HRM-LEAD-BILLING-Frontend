@@ -2,16 +2,11 @@ import React, { useState } from 'react';
 import { Card, Table, Menu, Row, Col, Tag,Select, Input, message, Button, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-// import UserView from '../../Users/user-list/UserView';
 import Flex from 'components/shared-components/Flex';
 import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
-// import StatisticWidget from 'components/shared-components/StatisticWidget';
-// import { DealStatisticData } from '../../dashboards/default/DefaultDashboardData';
 import AvatarStatus from 'components/shared-components/AvatarStatus';
-// import AddContract from './AddContract';
 import userData from '../../../../assets/data/user-list.data.json';
 import OrderListData from '../../../../assets/data/order-list.data.json';
-// import { IoCopyOutline } from "react-icons/io5";
 import utils from 'utils';
 import AddProjectReport from "./AddProjectReport";
 import ViewProjectReport from './ViewProjectReport';
@@ -27,7 +22,6 @@ const ProjectReportList = () => {
   const [isAddProjectReportModalVisible, setIsAddProjectReportModalVisible] = useState(false);
   const [isEditProjectReportModalVisible, setIsEditProjectReportModalVisible] = useState(false);
 
-  //   const [dealStatisticData] = useState(DealStatisticData);
 
   // Open Add Job Modal
   const openAddProjectReportModal = () => {
@@ -44,15 +38,11 @@ const ProjectReportList = () => {
     setIsEditProjectReportModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeEditProjectReportModal = () => {
     setIsEditProjectReportModalVisible(false);
   };
 
   const [isViewProjectReportModalVisible, setIsViewProjecReportModalVisible] = useState(false);
-	// const [isEditProjectModalVisible, setIsEditProjectModalVisible] = useState(false);
-
-	// Open Add Project Modal
 	const openViewProjectReportModal = () => setIsViewProjecReportModalVisible(true);
 	const closeViewProjectReportModal = () => setIsViewProjecReportModalVisible(false);
   const dropdownMenu = (elm) => (
@@ -83,19 +73,7 @@ const ProjectReportList = () => {
           </Button>
         </Flex>
       </Menu.Item>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button
-            type=""
-            className=""
-            icon={<PushpinOutlined />}
-            onClick={() => showUserProfile(elm)}
-            size="small"
-          >
-            <span className="ml-2">Pin</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
+   
       <Menu.Item>
         <Flex alignItems="center">
           <Button

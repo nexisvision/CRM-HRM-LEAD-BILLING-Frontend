@@ -197,10 +197,8 @@ export const NavProfile = ({ mode }) => {
 
 	const handleSubmit = async (values, { setSubmitting }) => {
 		try {
-			// Create FormData object to properly handle file upload
 			const formData = new FormData();
 			
-			// Append basic fields
 			formData.append('id', loggedInUser?.id);
 			formData.append('firstName', values.firstName);
 			formData.append('lastName', values.lastName);
@@ -209,7 +207,6 @@ export const NavProfile = ({ mode }) => {
 				formData.append('password', values.password);
 			}
 
-			// Append profile picture if exists
 			if (fileList[0]?.originFileObj) {
 				formData.append('profilePic', fileList[0].originFileObj);
 			}
@@ -269,7 +266,6 @@ export const NavProfile = ({ mode }) => {
 				return false;
 			}
 
-			// Store the actual file object
 			setFileList([{
 				originFileObj: file,
 				uid: '-1',

@@ -112,7 +112,7 @@ const AddEstimates = ({ onClose }) => {
       tax: totals.totalTax,
       discountType: discountType,
       discountValue: parseFloat(discountValue) || 0,
-      discount: parseFloat(totals.discount) || 0, // Changed from discountAmount to discount
+      discount: parseFloat(totals.discount) || 0, 
       discountAmount: parseFloat(totals.discount) || 0
     };
     
@@ -127,7 +127,6 @@ const AddEstimates = ({ onClose }) => {
     }
   };
 
-  // Function to handle adding a new row
   const handleAddRow = () => {
     const newRow = {
       id: Date.now(),
@@ -141,7 +140,6 @@ const AddEstimates = ({ onClose }) => {
     setTableData([...tableData, newRow]);
   };
 
-  // Function to handle deleting a row
   const handleDeleteRow = (id) => {
     if (tableData.length > 1) {
       const updatedData = tableData.filter(row => row.id !== id);
@@ -154,7 +152,6 @@ const AddEstimates = ({ onClose }) => {
 
   const navigate = useNavigate();
 
-  // Calculate subtotal (sum of all row amounts before discount)
   const calculateSubTotal = () => {
     return tableData.reduce((sum, row) => {
       const quantity = parseFloat(row.quantity) || 0;
@@ -169,17 +166,14 @@ const AddEstimates = ({ onClose }) => {
       return;
     }
 
-    // Calculate subtotal (sum of all item amounts)
     const subtotal = data.reduce((sum, row) => {
       return sum + (parseFloat(row.amount) || 0);
     }, 0);
 
-    // Calculate discount amount based on type
     const discountAmount = type === 'percentage' 
       ? (subtotal * (parseFloat(discountVal) || 0)) / 100
       : parseFloat(discountVal) || 0;
 
-    // Calculate total tax
     const totalTax = data.reduce((sum, row) => {
       const quantity = parseFloat(row.quantity) || 0;
       const price = parseFloat(row.price) || 0;
@@ -189,7 +183,6 @@ const AddEstimates = ({ onClose }) => {
       return sum + taxAmount;
     }, 0);
 
-    // Calculate final total
     const finalTotal = subtotal - discountAmount + totalTax;
 
     setTotals({
@@ -207,7 +200,6 @@ const AddEstimates = ({ onClose }) => {
     };
   };
 
-  // Function to handle table data changes
   const handleTableDataChange = (id, field, value) => {
     const updatedData = tableData.map((row) => {
       if (row.id === id) {
@@ -225,7 +217,6 @@ const AddEstimates = ({ onClose }) => {
             }));
           }
         }
-        // Calculate amount if quantity, price, or tax changes
         if (field === 'quantity' || field === 'price' || field === 'tax') {
           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
           const price = parseFloat(field === 'price' ? value : row.price) || 0;
@@ -256,7 +247,7 @@ const AddEstimates = ({ onClose }) => {
 
       if (response.payload && response.payload.data) {
         const uniqueTags = response.payload.data
-          .filter((label) => label && label.name) // Filter out invalid labels
+          .filter((label) => label && label.name) 
           .map((label) => ({
             id: label.id,
             name: label.name.trim(),
@@ -264,7 +255,7 @@ const AddEstimates = ({ onClose }) => {
           .filter(
             (label, index, self) =>
               index === self.findIndex((t) => t.name === label.name)
-          ); // Remove duplicates
+          ); 
 
         setTags(uniqueTags);
       }
@@ -293,7 +284,6 @@ const AddEstimates = ({ onClose }) => {
       setNewTag("");
       setIsTagModalVisible(false);
 
-      // Fetch updated tags
       await fetchTags();
     } catch (error) {
       console.error("Failed to add Status:", error);
@@ -315,7 +305,6 @@ const AddEstimates = ({ onClose }) => {
               loginEnabled: true,
             }}
           >
-            {/* <Card className="border-0 mt-2"> */}
             <div className="">
               <div className=" p-2">
                 <Row gutter={16}>

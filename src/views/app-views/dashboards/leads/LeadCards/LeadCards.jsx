@@ -38,7 +38,6 @@ const DraggableItem = ({ lead, id }) => {
     cursor: "move",
   };
 
-  // Calculate days since creation
   const daysSinceCreation = () => {
     const createdDate = new Date(lead.createdAt);
     const today = new Date();
@@ -47,7 +46,6 @@ const DraggableItem = ({ lead, id }) => {
     return diffDays;
   };
 
-  // Get progress color based on days
   const getProgressColor = (days) => {
     if (days <= 7) return "#52c41a";
     if (days <= 14) return "#faad14";
@@ -282,12 +280,10 @@ const LeadCards = () => {
     setLeadData(updatedLeadData);
   };
 
-  // Handle showing the add lead form
   const handleAddLeadCardsClick = () => {
     setIsAddLeadCardsVisible(true);
   };
 
-  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewLead((prev) => ({
@@ -300,7 +296,6 @@ const LeadCards = () => {
   const handleAddLeadCardsSubmit = () => {
     dispatch(AddLeadCards(newLead));
     setIsAddLeadCardsVisible(false); // Close the form after submission
-    // setNewLead({leadtitle:"", firstName: "", lastName: "",telephone:"", leadstage: "",  emailadress: "",leadvalue:"",currency:"",assigned:"",status:"" }); // Reset form fields
   };
 
   const handlePipelineChange = (value) => {

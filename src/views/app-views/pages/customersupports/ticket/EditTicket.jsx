@@ -77,12 +77,10 @@ const EditTicket = ({ idd, onClose }) => {
     try {
       const formData = new FormData();
       
-      // Handle file upload
       if (values.file) {
         formData.append('file', values.file);
       }
 
-      // Add other form values
       Object.keys(values).forEach(key => {
         if (key !== 'file' && values[key] !== null) {
           if (key === 'endDate') {

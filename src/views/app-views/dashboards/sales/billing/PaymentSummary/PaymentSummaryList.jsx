@@ -13,7 +13,6 @@ function PaymentSummaryList() {
     const [userProfileVisible, setUserProfileVisible] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
 
-    // Delete user
     const deleteUser = (userId) => {
         setList(list.filter((item) => item.id !== userId));
         message.success({ content: `Deleted list ${userId}`, duration: 2 });

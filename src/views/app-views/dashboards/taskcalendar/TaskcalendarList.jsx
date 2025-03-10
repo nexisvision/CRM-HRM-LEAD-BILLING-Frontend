@@ -53,7 +53,6 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
 
   const dispatch = useDispatch();
 
-  //// permission
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
@@ -80,10 +79,6 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
   const canEditClient = allpermisson?.includes('edit');
   const canDeleteClient = allpermisson?.includes('delete');
   const canViewClient = allpermisson?.includes('view');
-
-  ///endpermission
-
-
 
   useEffect(() => {
     dispatch(GetTaskdata());
@@ -148,7 +143,6 @@ const SidebarTasks = ({ tasks, onDeleteTask }) => {
 const CustomCalendar = ({ taskData, onDeleteTask, onDateSelect }) => {
   const [currentDate, setCurrentDate] = useState(moment());
 
-  // Generate calendar data
   const generateCalendarDays = () => {
     const firstDay = moment(currentDate).startOf('month');
     const lastDay = moment(currentDate).endOf('month');

@@ -18,7 +18,6 @@ export const AddBranchs = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
 
 export const getBranch = createAsyncThunk(
   "emp/getBranch",

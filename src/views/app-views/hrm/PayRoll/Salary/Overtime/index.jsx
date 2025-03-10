@@ -1,7 +1,6 @@
 import React from 'react';
 
 import OvertimeList from './OvertimeList';
-// import AddOtherPayment from './AddOtherPayment';
 
 const Overtime = ({ id, onClose }) => (
 

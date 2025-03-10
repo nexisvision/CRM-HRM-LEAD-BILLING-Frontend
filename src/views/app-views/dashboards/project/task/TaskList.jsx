@@ -17,11 +17,7 @@ import {
   message,
   DatePicker,
 } from "antd";
-// import { invoiceData } from '../../../pages/invoice/invoiceData';
-// import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
 import NumberFormat from "react-number-format";
-// import React, {useState} from 'react'
-// import { Card, Table, Select, Input, Button, Badge, Menu, Tag } from 'antd';
 import {
   EyeOutlined,
   FileExcelOutlined,
@@ -103,42 +99,32 @@ export const TaskList = () => {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedPriority, setSelectedPriority] = useState('all');
   const [searchText, setSearchText] = useState('');
-  // const [statusFilter, setStatusFilter] = useState('all');
-
-  // Add these new state variables if not already present
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Add new state for date range
   const [dateRange, setDateRange] = useState(null);
 
-  // Open Add Job Modal
   const openAddTaskModal = () => {
     setIsAddTaskModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeAddTaskModal = () => {
     setIsAddTaskModalVisible(false);
   };
 
-  // Open Add Job Modal
   const openEditTaskModal = () => {
     setIsEditTaskModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeEditTaskModal = () => {
     setIsEditTaskModalVisible(false);
   };
 
-  // Open Add Job Modal
   const openViewTaskModal = () => {
     navigate("/app/dashboards/project/task/TaskView", {
       state: { user: selectedUser },
     }); // Pass user data as state if needed
   };
-  // Close Add Job Modal
   const closeViewTaskModal = () => {
     setIsViewTaskModalVisible(false);
   };
@@ -157,7 +143,6 @@ export const TaskList = () => {
     }
   };
 
-  // Modify the existing useEffect to handle initial data loading
   useEffect(() => {
     const loadInitialData = async () => {
       setLoading(true);
@@ -188,7 +173,6 @@ export const TaskList = () => {
           try {
             let assignToIds = [];
             
-            // Handle different possible formats of assignTo data
             if (typeof task.assignTo === 'string') {
               try {
                 const parsed = JSON.parse(task.assignTo);
@@ -208,7 +192,7 @@ export const TaskList = () => {
                   const employee = employees.find(emp => emp.id === empId);
                   return employee?.firstName || 'Unknown';
                 })
-                .filter(name => name); // Remove any undefined/null values
+                .filter(name => name);
               
               assignToNames = employeeNames.length > 0 ? employeeNames.join(', ') : 'Not Assigned';
             }
@@ -242,7 +226,6 @@ export const TaskList = () => {
       const updatedData = await dispatch(GetTasks(id));
       setList(list.filter((item) => item.id !== idd));
 
-      // message.success({ content: "Deleted user successfully", duration: 2 });
     } catch (error) {
       console.error("Error deleting user:", error.message || error);
     }
@@ -257,10 +240,9 @@ export const TaskList = () => {
   const togglePinTask = (taskId) => {
     setPinnedTasks((prevPinned) => {
       const newPinned = prevPinned.includes(taskId)
-        ? prevPinned.filter((id) => id !== taskId) // Unpin the task
-        : [...prevPinned, taskId]; // Pin the task
+        ? prevPinned.filter((id) => id !== taskId) 
+        : [...prevPinned, taskId]; 
 
-      // Save the updated pinned tasks to local storage
       localStorage.setItem("pinnedTasks", JSON.stringify(newPinned));
       return newPinned;
     });
@@ -268,29 +250,9 @@ export const TaskList = () => {
 
   const dropdownMenu = (row) => (
     <Menu>
-
-{/* <Menu.Item>
-        <Flex alignItems="center" onClick={() => togglePinTask(row.id)}>
-          {pinnedTasks.includes(row.id) ? (
-            <PushpinOutlined style={{ color: "gold" }} />
-          ) : (
-            <PushpinOutlined />
-          )}
-          <span className="ml-2">{pinnedTasks.includes(row.id) ? "Unpin" : "Pin"}</span>
-        </Flex>
-      </Menu.Item> */}
-      {/* <Menu.Item>
-        <Flex alignItems="center" onClick={openViewTaskModal}>
-          <EyeOutlined />
-          <span className="ml-2">View Details</span>
-        </Flex>
-      </Menu.Item> */}
-     
-
       <Menu.Item>
         <Flex alignItems="center" onClick={() => EditTaskfun(row.id)}>
           <EditOutlined />
-          {/* <EditOutlined /> */}
           <span className="ml-2">Edit</span>
         </Flex>
       </Menu.Item>
@@ -305,23 +267,7 @@ export const TaskList = () => {
   );
 
   const tableColumns = [
-    // {
-    //   title: "Code",
-    //   dataIndex: "id",
-    // },
-    // {
-    //   title: "Pinned",
-    //   dataIndex: "pinned",
-    //   render: (text, record) => (
-    //     <span>
-    //       {pinnedTasks.includes(record.id) ? (
-    //         <PushpinOutlined style={{ color: "gold" }} />
-    //       ) : (
-    //         <PushpinOutlined />
-    //       )}
-    //     </span>
-    //   ),
-    // },
+    
     {
       title: "Task",
       dataIndex: "taskName",
@@ -329,13 +275,7 @@ export const TaskList = () => {
         compare: (a, b) => a.task.length - b.task.length,
       },
     },
-    // {
-    //   title: "Completed On",
-    //   dataIndex: "taskDate",
-    //   sorter: {
-    //     compare: (a, b) => a.completedon.length - b.completedon.length,
-    //   },
-    // },
+   
     {
       title: "Priority",
       dataIndex: "priority",
@@ -355,16 +295,7 @@ export const TaskList = () => {
       render: (date) => dayjs(date).format("DD/MM/YYYY"),
       sorter: (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
     },
-    // {
-    //   title: "Estimated Time",
-    //   dataIndex: "estimatedtime",
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "estimatedtime"),
-    // },
-    // {
-    //   title: "projectName ",
-    //   dataIndex: "projectName",
-    //   sorter: (a, b) => utils.antdTableSorter(a, b, "hourslogged"),
-    // },
+    
     {
       title: "Assigned To",
       dataIndex: "assignTo",
@@ -410,20 +341,16 @@ export const TaskList = () => {
     },
   };
 
-  // Handle date range change
   const handleDateRangeChange = (dates) => {
     setDateRange(dates);
-    handleFilters(dates); // Pass the dates directly to handleFilters
+    handleFilters(dates); 
   };
 
-  // Get unique priorities from task data
   const getUniquePriorities = () => {
     if (!fnddata) return [];
     
-    // Get all unique priorities from the data
     const priorities = [...new Set(fnddata.map(item => item.priority))];
     
-    // Create priority options array with 'All Priority' as first option
     return [
       { value: 'all', label: 'All Priority' },
       ...priorities.map(priority => ({
@@ -433,21 +360,17 @@ export const TaskList = () => {
     ];
   };
 
-  // Get priority options
   const priorityOptions = getUniquePriorities();
 
-  // Handle priority change
   const handlePriorityChange = (value) => {
     setSelectedPriority(value);
   };
 
-  // Update the filter function to handle priority
   const handleFilters = async (dates = dateRange) => {
     setLoading(true);
     try {
       let filtered = [...fnddata];
 
-      // Apply search text filter
       if (searchText) {
         filtered = filtered.filter(item => 
           item.taskName?.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -455,17 +378,14 @@ export const TaskList = () => {
         );
       }
 
-      // Apply status filter
       if (selectedStatus && selectedStatus !== 'all') {
         filtered = filtered.filter(item => item.status === selectedStatus);
       }
 
-      // Apply priority filter
       if (selectedPriority && selectedPriority !== 'all') {
         filtered = filtered.filter(item => item.priority === selectedPriority);
       }
 
-      // Apply date range filter
       if (dates && dates[0] && dates[1]) {
         const startRange = dayjs(dates[0]).startOf('day');
         const endRange = dayjs(dates[1]).endOf('day');
@@ -490,36 +410,29 @@ export const TaskList = () => {
     setLoading(false);
   };
 
-  // Update useEffect to include selectedPriority
   useEffect(() => {
     if (fnddata) {
       handleFilters();
     }
   }, [searchText, selectedStatus, selectedPriority, fnddata]);
 
-  // Update the getFilteredTasks function
   const getFilteredTasks = () => {
     return filteredData;
   };
 
-  // Replace your existing onSearch with this
   const onSearch = (e) => {
     setSearchText(e.currentTarget.value);
   };
 
-  // Add this handler for status filter
   const handleStatusFilter = (value) => {
     setStatusFilter(value);
   };
 
-  // Get unique statuses from task data
   const getUniqueStatuses = () => {
     if (!fnddata) return [];
     
-    // Get all unique statuses from the data
     const statuses = [...new Set(fnddata.map(item => item.status))];
     
-    // Create status options array with 'All Status' as first option
     return [
       { value: 'all', label: 'All Status' },
       ...statuses.map(status => ({
@@ -529,10 +442,8 @@ export const TaskList = () => {
     ];
   };
 
-  // Get status options
   const statusOptions = getUniqueStatuses();
 
-  // Handle status change
   const handleStatusChange = (value) => {
     setSelectedStatus(value);
   };
@@ -600,15 +511,7 @@ export const TaskList = () => {
                 value={dateRange}
               />
             </div>
-            {/* <div className="mr-0 md:mr-3 mt-7 md:mb-0">
-              <Button 
-                type="primary" 
-                onClick={handleFilters}
-                icon={<SearchOutlined />}
-              >
-                Search
-              </Button>
-            </div> */}
+        
           </Flex>
           <Flex gap="7px" className="flex">
             <Button

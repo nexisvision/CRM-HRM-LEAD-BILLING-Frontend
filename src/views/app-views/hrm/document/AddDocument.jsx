@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
 import { AddDocu, getDocu } from "./DocumentReducers/documentSlice";
 import { getRoles } from '../RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice';
-// import { AddTrainng, GetallTrainng } from "./TrainingReducer/TrainingSlice";
 const { Option } = Select;
 const AddDocument = ({ onClose }) => {
   const [form] = Form.useForm();
@@ -54,10 +53,8 @@ const AddDocument = ({ onClose }) => {
     try {
       const formData = new FormData();
 
-      // Only append non-null values
       Object.keys(values).forEach(key => {
         if (key === 'file') {
-          // Only append file if it exists
           if (values[key]) {
             formData.append(key, values[key]);
           }
@@ -66,7 +63,6 @@ const AddDocument = ({ onClose }) => {
         }
       });
 
-      // Add required fields validation
       if (!values.name || !values.role || !values.description) {
         throw new Error('Please fill in all required fields');
       }

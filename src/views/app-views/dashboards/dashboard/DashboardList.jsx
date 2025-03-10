@@ -480,14 +480,12 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
   const calculateRegionDistribution = () => {
     if (!fnddataclint || !Array.isArray(fnddataclint)) return [];
     
-    // Count companies by state
     const stateCount = fnddataclint.reduce((acc, company) => {
       const state = company.state || 'Unknown';
       acc[state] = (acc[state] || 0) + 1;
       return acc;
     }, {});
 
-    // Calculate percentages
     const total = Object.values(stateCount).reduce((a, b) => a + b, 0);
     const distribution = Object.entries(stateCount).map(([state, count]) => ({
       state,
@@ -495,7 +493,6 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
       count
     }));
 
-    // Sort by percentage in descending order
     return distribution.sort((a, b) => b.percentage - a.percentage);
   };
 
@@ -507,10 +504,6 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
       return total + price;
     }, 0);
   };
-
-  
-
-  // Calculate plan sales statistics
   const calculatePlanStats = () => {
     if (!plans.length || !subscriptions.length) return {
       totalSales: 0,
@@ -844,12 +837,7 @@ const planPrices = fnddataplan?.map((plan) => parseFloat(plan.price)) || [];
             dataSource={users}
             rowKey="id"
             scroll={{ x: 1200 }}
-            // rowSelection={{
-            // 	selectedRowKeys: selectedRowKeys,
-            // 	type: 'checkbox',
-            // 	preserveSelectedRowKeys: false,
-            // 	...rowSelection,
-            // }}
+         
           />
         </div>
       </div>

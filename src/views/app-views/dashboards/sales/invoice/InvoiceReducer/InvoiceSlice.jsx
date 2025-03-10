@@ -18,7 +18,6 @@ export const AddInvoices = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
 
 export const getInvoice = createAsyncThunk(
   "emp/getInvoice",
@@ -119,7 +118,6 @@ const RoleAndPermissionSlice = createSlice({
         state.isLoading = false;
         if (action.payload?.data) {
           state.salesInvoices = state.salesInvoices || [];
-          // state.salesInvoices.push(action.payload.data);
         }
         state.success = true;
         message.success(action.payload?.message);
@@ -136,7 +134,6 @@ const RoleAndPermissionSlice = createSlice({
       .addCase(getInvoice.fulfilled, (state, action) => {
         state.isLoading = false;
         state.salesInvoices = action.payload;
-        // message.success(action.payload?.message);
       })
       .addCase(getInvoice.rejected, (state, action) => {
         state.isLoading = false;
@@ -150,7 +147,6 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(deleteInvoice.fulfilled, (state, action) => {
         state.isLoading = false;
-        // toast.success(action.payload.message);
         message.success(action.payload?.message);
       })
       .addCase(deleteInvoice.rejected, (state, action) => {
@@ -164,7 +160,7 @@ const RoleAndPermissionSlice = createSlice({
       })
       .addCase(editInvoice.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; // Update the state with the updated employee data
+        state.editItem = action.payload;
         message.success(action.payload?.message);
       })
       .addCase(editInvoice.rejected, (state, action) => {

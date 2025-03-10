@@ -14,45 +14,35 @@ const AddDesignation = ({ onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Get the logged-in user
   const user = useSelector((state) => state.user.loggedInUser.username);
 
-  // Get branch data from Redux store
   const branchData = useSelector((state) => state.Branch);
   const allBranches = branchData.Branch.data || [];
 
-  // Filter branches for the current user
   const userBranches = allBranches.filter((item) => item.created_by === user);
 
-  // Fetch branch data when component mounts
   useEffect(() => {
     dispatch(getBranch());
   }, [dispatch]);
 
   const [isAddBranchModalVisible, setIsAddBranchModalVisible] = useState(false);
 
-  // Function to open AddBranch modal
   const openAddBranchModal = () => {
     setIsAddBranchModalVisible(true);
   };
 
-  // Function to close AddBranch modal
   const closeAddBranchModal = () => {
     setIsAddBranchModalVisible(false);
   };
 
-  // Handle form submission
   const handleSubmit = (values, { resetForm }) => {
     dispatch(AddDes(values))
       .then(() => {
         dispatch(getDes());
-        // message.success("Designation added successfully!");
         resetForm();
         onClose();
-        // navigate("/app/hrm/designation");
       })
       .catch((error) => {
-        // message.error("Failed to add designation.");
         console.error("Add API error:", error);
       });
   };
@@ -151,7 +141,6 @@ const AddDesignation = ({ onClose }) => {
         )}
       </Formik>
 
-      {/* Add Branch Modal */}
       <Modal
         title="Add Branch"
         visible={isAddBranchModalVisible}

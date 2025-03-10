@@ -188,7 +188,6 @@ const MeetingList = () => {
 
   useEffect(() => {
     if (filteredData) {
-      // Filter meetings by created_by matching the logged-in user's username
       setSelectedUser(filteredData[0]);
     }
   }, [tabledata]);
@@ -300,12 +299,10 @@ const MeetingList = () => {
     },
   ];
 
-  // Add date change handler
   const handleDateChange = (date) => {
     setSelectedDate(date);
   };
 
-  // Add status change handler
   const handleStatusChange = (value) => {
     setSelectedStatus(value);
   };
@@ -424,7 +421,6 @@ const MeetingList = () => {
   );
 };
 
-// Add styles
 const styles = `
   .search-input {
     transition: all 0.3s;

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// import { DealStatisticViewData } from '../../../dashboards/default/DefaultDashboardData';
 import { Card, Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -36,10 +35,8 @@ function ProductSummaryList({ billingId }) {
 
             if (selectedBilling) {
                 try {
-                    // Parse items array from string
                     const itemsArray = JSON.parse(selectedBilling.items || '[]');
                     
-                    // Transform items to table format
                     const transformedItems = itemsArray.map((item, index) => ({
                         id: index,
                         billNumber: selectedBilling.billNumber,
@@ -56,7 +53,6 @@ function ProductSummaryList({ billingId }) {
 
                     setBillingData(transformedItems);
                     
-                    // Get current payments and debit notes
                     const currentBillingPayments = payments.filter(
                         payment => payment.bill === billingId
                     );
@@ -64,7 +60,6 @@ function ProductSummaryList({ billingId }) {
                         note => note.bill === billingId
                     );
 
-                    // Calculate total paid amount
                     const totalPaidAmount = currentBillingPayments.reduce(
                         (sum, payment) => {
                             const paymentAmount = typeof payment.amount === 'number' ? payment.amount : parseFloat(payment.amount || '0');
@@ -73,7 +68,6 @@ function ProductSummaryList({ billingId }) {
                         0
                     );
 
-                    // Calculate total debit note amount
                     const totalDebitNoteAmount = currentBillingDebitNotes.reduce(
                         (sum, note) => {
                             const noteAmount = parseFloat(note.amount || '0');
@@ -82,14 +76,11 @@ function ProductSummaryList({ billingId }) {
                         0
                     );
 
-                    // Get the total from billing
                     const billingTotal = selectedBilling.total || 0;
 
-                    // Calculate remaining amount
                     const remainingAmount = Math.max(0, billingTotal - totalPaidAmount - totalDebitNoteAmount);
 
                    
-
                     setTotals(prev => ({
                         ...prev,
                         discount: selectedBilling.discount || 0,
@@ -124,11 +115,7 @@ function ProductSummaryList({ billingId }) {
             key: "billDate",
             render: (date) => dayjs(date).format('DD/MM/YYYY')
         },
-        // {
-        //     title: "Vendor",
-        //     dataIndex: "vendor",
-        //     key: "vendor"
-        // },
+        
         {
             title: "Product",
             dataIndex: "product",

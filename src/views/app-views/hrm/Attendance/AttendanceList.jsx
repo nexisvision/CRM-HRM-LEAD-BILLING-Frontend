@@ -62,11 +62,9 @@ const AttendanceList = () => {
 
   const tabledata = useSelector((state) => state.attendance);
   const fnddat = tabledata.Attendances.data || [];
-  // const fndattendancedata = fnddat.filter((item) => item.created_by === user);
 
 
   const employeeData = useSelector((state) => state.employee?.employee?.data || []);
-  // const fndemployeeData = employeeData.filter((item) => item.created_by === user);
   
   const leaveData = useSelector((state) => state.Leave?.Leave?.data || []);
   const fndleavedata = leaveData.filter((item) => item.created_by === user);
@@ -90,7 +88,7 @@ const AttendanceList = () => {
 
       for (let i = 1; i <= daysInMonth; i++) {
         const date = selectedMonth.date(i);
-        if (date.day() !== 0) { // Exclude Sundays
+        if (date.day() !== 0) { 
           totalWorkingDays++;
         }
       }
@@ -102,7 +100,6 @@ const AttendanceList = () => {
           if (attendanceDate.isSame(selectedMonth, 'month')) {
             const day = attendanceDate.date();
       
-            // Ensure employeeAttendanceMap[attendance.employee] exists
             if (!employeeAttendanceMap[attendance.employee]) {
               employeeAttendanceMap[attendance.employee] = {
                 attendanceByDay: {},
@@ -158,7 +155,6 @@ const AttendanceList = () => {
         totalWorkingDays,
       }));
 
-      // Only set users if the data has changed
       if (JSON.stringify(users) !== JSON.stringify(aggregatedData)) {
         setUsers(aggregatedData);
       }
@@ -184,8 +180,6 @@ const AttendanceList = () => {
     setIsAddAttendanceModalVisible(false);
   };
 
-   //// permission
-                                                  
                                     const roleId = useSelector((state) => state.user.loggedInUser.role_id);
                                     const roles = useSelector((state) => state.role?.role?.data);
                                     const roleData = roles?.find(role => role.id === roleId);
@@ -211,8 +205,6 @@ const AttendanceList = () => {
                                     const canDeleteClient = allpermisson?.includes('delete');
                                     const canViewClient = allpermisson?.includes('view');
                                  
-                                    ///endpermission
-
 
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
@@ -291,23 +283,6 @@ const AttendanceList = () => {
 
     
 
-      {/* {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                <Menu.Item>
-                                <Flex alignItems="center">
-                                  <Button
-                                    type=""
-                                    icon={<EditOutlined />}
-                                    onClick={() => {
-                                      editfun(elm.id);
-                                    }}
-                                    size="small"
-                                  >
-                                    Edit
-                                  </Button>
-                                </Flex>
-                              </Menu.Item>
-                                ) : null} */}
-                  
                   
                   {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                       <Menu.Item>

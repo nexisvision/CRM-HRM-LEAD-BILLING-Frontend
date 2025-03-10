@@ -34,7 +34,6 @@ const AnnouncementList = () => {
 
 
 
-  // Convert class methods to regular functions
   const openAddAnnouncementModal = () => {
     setIsAddAnnouncementModalVisible(true);
   };
@@ -111,7 +110,6 @@ const AnnouncementList = () => {
       dispatch(GetAnn())
     },[dispatch]);
 
-     //// permission
                                     
                       const roleId = useSelector((state) => state.user.loggedInUser.role_id);
                       const roles = useSelector((state) => state.role?.role?.data);
@@ -138,7 +136,6 @@ const AnnouncementList = () => {
                       const canDeleteClient = allpermisson?.includes('delete');
                       const canViewClient = allpermisson?.includes('view');
                    
-                      ///endpermission
 
   
       useEffect(() => {
@@ -149,7 +146,6 @@ const AnnouncementList = () => {
         }
       }, [tabledata]);
 
-  // Function to strip HTML tags from text
   const stripHtmlTags = (html) => {
     if (!html) return '';
     const tmp = document.createElement('div');
@@ -157,37 +153,8 @@ const AnnouncementList = () => {
     return tmp.textContent || tmp.innerText || '';
   };
 
-  // Convert dropdownMenu to a regular function
   const dropdownMenu = (elm) => ({
     items: [
-      // View, Mail, and Pin options are commented out but kept for reference
-      // {
-      //   key: 'view',
-      //   icon: <EyeOutlined />,
-      //   label: 'View Details',
-      //   onClick: () => showUserProfile(elm)
-      // },
-      // {
-      //   key: 'mail',
-      //   icon: <MailOutlined />,
-      //   label: 'Send Mail',
-      //   onClick: () => showUserProfile(elm)
-      // },
-      // {
-      //   key: 'pin',
-      //   icon: <PushpinOutlined />,
-      //   label: 'Pin',
-      //   onClick: () => showUserProfile(elm)
-      // },
-      
-      // Edit option is commented out but kept for reference
-      // ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
-      //   key: 'edit',
-      //   icon: <EditOutlined />,
-      //   label: 'Edit',
-      //   onClick: () => EditMeet(elm.id)
-      // }] : []),
-      
       ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'delete',
         icon: <DeleteOutlined />,
@@ -234,7 +201,6 @@ const AnnouncementList = () => {
       <Flex alignItems="center" justifyContent="space-between" mobileFlex={false}>
         <Flex className="mb-1" mobileFlex={false}>
           <div className="search-container mr-md-3 mb-3 flex gap-3">
-            {/* <Input.Group compact className="search-group"> */}
               <Input
                 placeholder="Search announcement title"
                 prefix={<SearchOutlined />}
@@ -250,7 +216,6 @@ const AnnouncementList = () => {
                 className="date-search-input"
                 format="DD-MM-YYYY"
               />
-            {/* </Input.Group> */}
           </div>
         </Flex>
         <Flex gap="7px">

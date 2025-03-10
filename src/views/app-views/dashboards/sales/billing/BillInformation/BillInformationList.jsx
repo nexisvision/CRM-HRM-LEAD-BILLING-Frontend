@@ -7,44 +7,37 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
     const dispatch = useDispatch();
     const [customerData, setCustomerData] = useState(null);
     
-    // Get data from Redux store
     const billingData = useSelector((state) => state?.salesbilling?.salesbilling?.data || []);
     const customers = useSelector((state) => state?.customers?.customers?.data);
     const loggedInUser = useSelector((state) => state?.user?.loggedInUser);
     const payments = useSelector((state) => state?.payment?.payment || []); // Get payments data
 
-    // Find the selected bill using billingId
     const selectedBill = Array.isArray(billingData) 
         ? billingData.find(bill => bill.id === billingId)
         : null;
 
-    // Notify parent component about bill status
     useEffect(() => {
         if (selectedBill?.bill_status) {
             onStatusUpdate(selectedBill.bill_status.toLowerCase());
         }
     }, [selectedBill, onStatusUpdate]);
 
-    // Calculate payment status
     const calculatePaymentStatus = () => {
         if (!selectedBill || !payments) return 'Pending';
 
-        // Get all payments for this bill
         const billPayments = payments.filter(
             payment => payment.bill === selectedBill.id
         );
 
-        // Calculate total paid amount
         const totalPaid = billPayments.reduce(
             (sum, payment) => sum + parseFloat(payment.amount), 
             0
         );
 
-        // Compare with bill total
         const billTotal = parseFloat(selectedBill.updated_total);
         
         if (totalPaid >= billTotal) {
-            onStatusUpdate('paid'); // Notify parent when payment status is paid
+            onStatusUpdate('paid'); 
             return 'Paid';
         } else if (totalPaid > 0) {
             return 'Partially Paid';
@@ -52,12 +45,10 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
             return 'Pending';
         }
     };
-    // Fetch customers on component mount
     useEffect(() => {
         dispatch(Getcus());
     }, [dispatch]);
 
-    // Find and set customer data when billing data and customers are available
     useEffect(() => {
         if (selectedBill && customers && customers.length > 0) {
             const foundCustomer = customers.find(
@@ -70,7 +61,6 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
         }
     }, [selectedBill, customers]);
 
-    // Parse billing address safely
     const billingAddress = React.useMemo(() => {
         if (!customerData?.billing_address) return {};
         try {
@@ -85,7 +75,6 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
 
     const cleanStreet = billingAddress?.street ? billingAddress.street.replace(/<\/?p>/g, '') : '';
 
-    // Function to get status badge style
     const getStatusBadgeStyle = (status) => {
         switch (status?.toLowerCase()) {
             case 'paid':
@@ -99,7 +88,6 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
         }
     };
 
-    // Function to format status text
     const formatStatusText = (status) => {
         if (!status) return 'N/A';
         return status
@@ -112,7 +100,6 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
     return (
         <div className="">
             <div className="p-4">
-                {/* Header with Bill Number and Status */}
                 <div className="flex justify-between items-center border-b pb-4 mb-4">
                     <div>
                         <h2 className="text-xl font-bold text-gray-800">Bill</h2>
@@ -124,9 +111,7 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
                     </div>
                 </div>
 
-                {/* Billing and Shipping Details */}
                 <div className="grid grid-cols-3 gap-20">
-                    {/* Billed By */}
                     <div>
                         <address>
                             <p>
@@ -161,7 +146,6 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
                         </address>
                     </div>
 
-                    {/* Shipped To */}
                     <div>
                         <span className="font-weight-semibold text-dark font-size-md">Shipping To:</span><br />
                         <address>
@@ -194,7 +178,6 @@ const BillInformationList = ({ billingId, onStatusUpdate }) => {
                         </address>
                     </div>
 
-                    {/* QR Code */}
                     <div className='flex justify-end'>
                         <img src={Qr} alt="QR Code" className='w-28 h-28' />
                     </div>

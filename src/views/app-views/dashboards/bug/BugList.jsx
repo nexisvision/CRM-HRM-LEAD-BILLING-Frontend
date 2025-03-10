@@ -26,29 +26,22 @@ const BugList = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isAddBugModalVisible, setIsAddBugModalVisible] = useState(false);
   const [isEditBlogModalVisible, setIsEditBlogModalVisible] = useState(false);
-//   const [dealStatisticData] = useState(DealStatisticData); 
-
-  // Open Add Job Modal
   const openAddBugModal = () => {
     setIsAddBugModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeAddBugModal = () => {
     setIsAddBugModalVisible(false);
   };
 
-   // Open Edit Bug Modal
    const openEditBugModal = () => {
     setIsEditBlogModalVisible(true);
   };
 
-  // Close Edit Bug Modal
   const closeEditContractModal = () => {
     setIsEditBlogModalVisible(false);
   };
 
-  // Search functionality
   const onSearch = (e) => {
     const value = e.currentTarget.value;
     const searchArray = value ? list : OrderListData;
@@ -57,19 +50,16 @@ const BugList = () => {
     setSelectedRowKeys([]);
   };
 
-  // Delete user
   const deleteUser = (userId) => {
     setUsers(users.filter((item) => item.id !== userId));
     message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };
 
-  // Show user profile
   const showUserProfile = (userInfo) => {
     setSelectedUser(userInfo);
     setUserProfileVisible(true);
   };
 
-  // Close user profile
   const closeUserProfile = () => {
     setSelectedUser(null);
     setUserProfileVisible(false);

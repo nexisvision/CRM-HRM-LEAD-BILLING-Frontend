@@ -80,7 +80,6 @@ const EditDeal = ({ onClose, id }) => {
   const tabledata = useSelector((state) => state?.SubClient);
   const clientdata = tabledata?.SubClient?.data;
   useEffect(() => {
-    // Check if the deal data exists for the given `id`
     const dealData = datac.find((item) => item.id === id);
     if (dealData) {
       setInitialValues({
@@ -115,11 +114,9 @@ const EditDeal = ({ onClose, id }) => {
     dispatch(EditDeals({ id, values }))
       .then(() => {
         dispatch(GetDeals());
-        // message.success("Deal updated successfully!");
         onClose();
       })
       .catch((error) => {
-        // message.error("Failed to update Employee.");
         console.error("Edit API error:", error);
       });
   };
@@ -164,7 +161,7 @@ const EditDeal = ({ onClose, id }) => {
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        enableReinitialize={true} // Allow Formik to reset the initialValues when they change
+        enableReinitialize={true} 
         onSubmit={onSubmit}
       >
         {({
@@ -210,7 +207,6 @@ const EditDeal = ({ onClose, id }) => {
                             backgroundColor: '#f8fafc',
                           }}
                           placeholder={<span className="text-gray-400">+91</span>}
-                          // defaultValue={getInitialPhoneCode()}
                           onChange={(value) => {
                             if (value === 'add_new') {
                               setIsAddPhoneCodeModalVisible(true);

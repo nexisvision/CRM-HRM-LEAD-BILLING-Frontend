@@ -92,7 +92,6 @@ const EditJobOnBording = ({ idd, onClose }) => {
     }
   };
 
-  // status end
 
   useEffect(() => {
     if (fnd) {
@@ -110,7 +109,6 @@ const EditJobOnBording = ({ idd, onClose }) => {
     }
   }, [fnd]);
 
-  // Submit the form data
   const onSubmit = async (values, { resetForm }) => {
     try {
       const data = {

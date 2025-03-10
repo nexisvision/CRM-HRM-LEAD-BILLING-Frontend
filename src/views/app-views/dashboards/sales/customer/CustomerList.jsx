@@ -52,7 +52,6 @@ const CustomerList = () => {
 
   const [idd, setIdd] = useState("");
 
-  // Fetch customers when component mounts
   useEffect(() => {
     dispatch(Getcus());
   }, [dispatch]);
@@ -62,16 +61,11 @@ const CustomerList = () => {
   const fnddata = alldata?.customers?.data || []; 
   const loggid = useSelector((state)=>state.user.loggedInUser);
 
-  // const filterdata = fnddata.filter((item) => item?.created_by === loggid.username);
-
-  // Update users state whenever customer data changes
   useEffect(() => {
     if (loggid && fnddata.length > 0) {
       setUsers(fnddata);
     }
   }, [fnddata]);
-  
-    //// permission
   
         const roleId = useSelector((state) => state.user.loggedInUser.role_id);
         const roles = useSelector((state) => state.role?.role?.data);
@@ -126,12 +120,10 @@ const CustomerList = () => {
     setIsViewCustomerModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeViewCustomerModal = () => {
     setIsViewCustomerModalVisible(false);
   };
 
-  // Update search functionality to use users instead of list
   const onSearch = (e) => {
     const value = e.currentTarget.value.toLowerCase();
     if (!value) {
@@ -146,7 +138,6 @@ const CustomerList = () => {
     setUsers(filteredUsers);
   };
 
-  // Delete user function update
   const deleteUser = (userId) => {
     dispatch(delcus(userId))
       .then(() => {
@@ -158,7 +149,6 @@ const CustomerList = () => {
       });
   };
 
-  // Update export function to use users instead of list
   const exportToExcel = () => {
     try {
       const ws = utils.json_to_sheet(users);
@@ -172,13 +162,11 @@ const CustomerList = () => {
     }
   };
 
-  // Show user profile
   const showUserProfile = (userInfo) => {
     setSelectedUser(userInfo);
     setUserProfileVisible(true);
   };
 
-  // Close user profile
   const closeUserProfile = () => {
     setSelectedUser(null);
     setUserProfileVisible(false);
@@ -191,7 +179,6 @@ const CustomerList = () => {
 
   const dropdownMenu = (elm) => ({
     items: [
-      // Edit - conditional item
       ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'edit',
         icon: <EditOutlined />,
@@ -199,7 +186,6 @@ const CustomerList = () => {
         onClick: () => editfun(elm.id)
       }] : []),
       
-      // Delete - conditional item
       ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'delete',
         icon: <DeleteOutlined />,
@@ -300,7 +286,6 @@ const CustomerList = () => {
             dataSource={users}
             rowKey="id"
             scroll={{ x: 1200 }}
-            // loading={!users.length} // Add loading state
           />
         ) : null}
       </div>

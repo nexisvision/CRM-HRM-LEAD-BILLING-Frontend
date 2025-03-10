@@ -83,45 +83,6 @@ const ScrumboardWrapper = props => {
     dispatch(updateModal(false));
   };
 
-//   const onModalSubmit = (values, mode) => {
-//     if(mode === modalModeTypes(0)) {
-//       const newColumns = { ...columns };
-//       let newCard = createCardObject();
-//       newCard.name = values.cardTitle || 'Untitled Card';
-//       newColumns[currentListId].push(newCard);
-      
-//       dispatch(updateColumns(newColumns));
-//       dispatch(updateModal(false));
-//       dispatch(updateCurrentListId(''));
-//     }
-
-//     if(mode === modalModeTypes(1)) {
-//       const newColumns = { ...columns };
-//       const updatedCards = newColumns[currentListId].map(elm => 
-//         values.id === elm.id ? values : elm
-//       );
-//       newColumns[currentListId] = updatedCards;
-      
-//       dispatch(updateColumns(newColumns));
-//       dispatch(updateModal(false));
-//     }
-
-//     if(mode === modalModeTypes(2)) {
-//       const boardTitle = values.boardTitle || 'Untitled Board';
-//       const newColumns = { ...columns };
-//       newColumns[boardTitle] = [];
-      
-//       const newOrdered = [...ordered, boardTitle];
-//       const finalColumns = {};
-//       newOrdered.forEach(elm => {
-//         finalColumns[elm] = newColumns[elm];
-//       });
-
-//       dispatch(updateColumns(finalColumns));
-//       dispatch(updateOrdered(Object.keys(finalColumns)));
-//       dispatch(updateModal(false));
-//     }
-//   };
 
 const onModalSubmit = (values, mode) => {
 	    const data = { ...columns };

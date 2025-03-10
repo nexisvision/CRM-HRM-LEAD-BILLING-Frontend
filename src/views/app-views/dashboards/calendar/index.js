@@ -14,7 +14,6 @@ const badgeColors = [
 const CustomCalendar = ({ eventData, onDeleteEvent, onDateSelect }) => {
   const [currentDate, setCurrentDate] = useState(moment());
 
-  // Generate calendar data
   const generateCalendarDays = () => {
     const firstDay = moment(currentDate).startOf('month');
     const lastDay = moment(currentDate).endOf('month');
@@ -179,7 +178,6 @@ const CalendarApp = () => {
     setModalVisible(true);
   };
 
-  //// permission
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
@@ -206,18 +204,15 @@ const CalendarApp = () => {
   const canDeleteClient = allpermisson?.includes('delete');
   const canViewClient = allpermisson?.includes('view');
 
-  ///endpermission
 
   const cellRender = (value) => {
     const currentDate = value.format('YYYY-MM-DD');
 
-    // Filter events for the selected day
     const listData = fndata.filter((event) => {
       const eventStart = moment(event.startDate);
       return eventStart.format('YYYY-MM-DD') === currentDate;
     });
 
-    // If no events for this date, return null
     if (listData.length === 0) return null;
 
     return (
@@ -239,7 +234,6 @@ const CalendarApp = () => {
     );
   };
 
-  // Add this function to handle start time changes
   const handleStartTimeChange = (time) => {
     form.setFieldsValue({ end: null }); // Reset end time when start time changes
     form.validateFields(['end']); // Revalidate end time

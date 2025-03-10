@@ -112,7 +112,6 @@ const DepartmentList = () => {
     return filtered;
   };
 
-  // Handle branch change
   const handleBranchChange = (value) => {
     setSelectedBranch(value);
   };
@@ -122,7 +121,6 @@ const DepartmentList = () => {
     dispatch(getBranch()); // Add this to fetch branch data
   }, [dispatch]);
 
-  // Function to get branch name by ID
   const getBranchNameById = (branchId) => {
     const branch = branchData.find(branch => branch.id === branchId);
     return branch ? branch.branchName : 'N/A';
@@ -139,12 +137,10 @@ const DepartmentList = () => {
     dispatch(DeleteDept( userId ))
       .then(() => {
         dispatch(getDept());
-        // message.success('Department Deleted successfully!');
         setUsers(users.filter(item => item.id !== userId));
         navigate('/app/hrm/department');
       })
       .catch((error) => {
-        // message.error('Failed to delete department.');
         console.error('Edit API error:', error);
       });
   };
@@ -195,7 +191,6 @@ const DepartmentList = () => {
     ]
   });
 
-  // Update table columns to show branch name
   const tableColumns = [
     {
       title: 'Department',

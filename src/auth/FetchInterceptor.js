@@ -12,10 +12,8 @@ const service = axios.create({
 	timeout: 60000
 })
 
-// Config
 const TOKEN_PAYLOAD_KEY = 'authorization'
 
-// API Request interceptor
 service.interceptors.request.use(config => {
 	const jwtToken = localStorage.getItem(AUTH_TOKEN) || null;
 
@@ -25,14 +23,12 @@ service.interceptors.request.use(config => {
 
 	return config
 }, error => {
-	// Do something with request error here
 	notification.error({
 		message: 'Error'
 	})
 	Promise.reject(error)
 })
 
-// API respone interceptor
 service.interceptors.response.use((response) => {
 	return response.data
 }, (error) => {
@@ -41,7 +37,6 @@ service.interceptors.response.use((response) => {
 		message: ''
 	}
 
-	// Remove token and redirect 
 	if (unauthorizedCode.includes(error.response.status)) {
 		notificationParam.message = 'Authentication Fail'
 		notificationParam.description = 'Please login again'

@@ -28,7 +28,6 @@ import ViewPlanModal from 'views/app-views/plan/ViewPlanModal';
 
 dayjs.extend(relativeTime);
 
-// Add these styles at the top of your file
 const notificationStyles = `
   .nav-notification {
     .ant-popover-inner {
@@ -102,7 +101,6 @@ const notificationStyles = `
   }
 `;
 
-// Enhanced icon helper with colors
 const getIcon = (type) => {
   const iconMap = {
     mail: { icon: <MailOutlined />, color: '#1890ff', bg: '#e6f7ff' },
@@ -119,7 +117,6 @@ const getIcon = (type) => {
   return iconMap[type] || iconMap.default;
 };
 
-// Time formatter helper
 const formatTime = (timestamp) => {
   const date = dayjs(timestamp);
   const now = dayjs();
@@ -133,7 +130,6 @@ const formatTime = (timestamp) => {
   }
 };
 
-// Update the renderNotificationItem function
 const renderNotificationItem = (item, handleNotificationClick, getNotificationIcon, formatTime) => {
   const iconConfig = getNotificationIcon(item);
   const isNew = dayjs().diff(dayjs(item.createdAt), 'hour') < 6; // Consider "new" if less than 6 hours old
@@ -186,16 +182,13 @@ const renderNotificationItem = (item, handleNotificationClick, getNotificationIc
 };
 
 const getNotificationBody = (notifications, handleNotificationClick, getNotificationIcon, formatTime) => {
-  // Separate notifications and reminders
   const reminders = notifications.filter(n => n.notification_type === 'reminder');
   const normalNotifications = notifications.filter(n => n.notification_type === 'normal');
 
   if (notifications?.length === 0) {
     return (
       <div className="empty-notification py-6 px-4">
-        {/* Professional Empty State */}
         <div className="flex flex-col items-center">
-          {/* Inbox Icon with Decorative Ring */}
           <div className="relative mb-4">
             <div className="absolute inset-0 bg-blue-50 rounded-full animate-pulse"
               style={{ transform: 'scale(1.2)' }}
@@ -210,14 +203,12 @@ const getNotificationBody = (notifications, handleNotificationClick, getNotifica
             </div>
           </div>
 
-          {/* Check Mark Badge */}
           <div className="absolute mt-[-10px] ml-[40px]">
             <div className="bg-green-500 rounded-full p-1">
               <CheckCircleFilled className="text-white" style={{ fontSize: '16px' }} />
             </div>
           </div>
 
-          {/* Main Content */}
           <div className="text-center mt-4">
             <h4 className="text-lg font-semibold text-gray-800 mb-2">
               Inbox Zero Hero! 🏆
@@ -227,10 +218,8 @@ const getNotificationBody = (notifications, handleNotificationClick, getNotifica
             </p>
           </div>
 
-          {/* Decorative Line */}
           <div className="w-16 h-[2px] bg-gradient-to-r from-transparent via-blue-400 to-transparent mb-4" />
 
-          {/* Status Indicator */}
           <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-full">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
             <span className="text-xs text-gray-600 font-medium">
@@ -239,7 +228,6 @@ const getNotificationBody = (notifications, handleNotificationClick, getNotifica
           </div>
         </div>
 
-        {/* Bottom Pattern */}
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-50 via-blue-100 to-blue-50" />
       </div>
     );
@@ -247,7 +235,6 @@ const getNotificationBody = (notifications, handleNotificationClick, getNotifica
 
   return (
     <>
-      {/* Normal Notifications Section */}
       {normalNotifications.length > 0 && (
         <div className="notification-section">
           <div className="px-4 py-2 bg-gray-50 border-b border-gray-100">
@@ -264,7 +251,6 @@ const getNotificationBody = (notifications, handleNotificationClick, getNotifica
         </div>
       )}
 
-      {/* Reminders Section */}
       {reminders.length > 0 && (
         <div className="reminder-section">
           <div className="px-4 py-2 bg-gray-50 border-b border-gray-100">
@@ -308,7 +294,6 @@ const NavNotification = ({ mode }) => {
     }
   }, [fnddatra]);
 
-  // Helper function to determine notification icon and colors
   const getNotificationIcon = (notification) => {
     const types = {
       plan: {
@@ -343,7 +328,6 @@ const NavNotification = ({ mode }) => {
     return types[type];
   };
 
-  // Time formatter
   const formatTime = (timestamp) => {
     const now = dayjs();
     const time = dayjs(timestamp);
@@ -364,12 +348,10 @@ const NavNotification = ({ mode }) => {
     }
   };
 
-  // Handle notification click
   const handleNotificationClick = (notification) => {
     setIsPopupVisible(false);
     setNoti(notification);
 
-    // Parse assignTo to include only user data
     let assignToObject = {
       assignedUsers: []
     };
@@ -391,7 +373,6 @@ const NavNotification = ({ mode }) => {
       notification: notification
     };
 
-    // Check notification type and show appropriate modal
     if (notification.title === "New Plan") {
       setSelectedPlan(notification);
       setIsViewPlanModalVisible(true);
@@ -417,7 +398,6 @@ const NavNotification = ({ mode }) => {
       return (
         <div className="py-6 px-4 text-center">
           <div className="flex flex-col items-center">
-            {/* Simple Clock Icon with Bounce */}
             <div className="relative mb-3 animate-bounce">
               <ClockCircleOutlined
                 className="text-[28px]"
@@ -428,7 +408,6 @@ const NavNotification = ({ mode }) => {
               />
             </div>
 
-            {/* Short & Sweet Message */}
             <h4 className="text-base font-medium text-gray-700">
               No Reminders Yet! 🎉
             </h4>
@@ -442,7 +421,6 @@ const NavNotification = ({ mode }) => {
       );
     }
 
-    // Original notification empty state remains unchanged
     return (
       <div className="py-8 px-4 text-center">
         <div className="flex flex-col items-center">
@@ -481,7 +459,6 @@ const NavNotification = ({ mode }) => {
     );
   };
 
-  // Update the tabItems definition in NavNotification component
   const tabItems = [
     {
       key: 'notifications',

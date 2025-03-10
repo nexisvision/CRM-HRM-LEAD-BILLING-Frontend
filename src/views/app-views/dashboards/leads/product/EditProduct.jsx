@@ -33,7 +33,6 @@ const EditProduct = ({ idd, onClose }) => {
   const { id } = useParams();
   const [showReceiptUpload, setShowReceiptUpload] = useState(false);
 
-  // category start
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
@@ -57,7 +56,7 @@ const EditProduct = ({ idd, onClose }) => {
           .filter(
             (label, index, self) =>
               index === self.findIndex((t) => t.name === label.name)
-          ); // Remove duplicates
+          ); 
 
         setCategories(uniqueCategories);
       }
@@ -89,7 +88,6 @@ const EditProduct = ({ idd, onClose }) => {
       setNewCategory("");
       setIsCategoryModalVisible(false);
 
-      // Fetch updated categories
       await fetchLables();
     } catch (error) {
       console.error("Failed to add Category:", error);
@@ -97,7 +95,6 @@ const EditProduct = ({ idd, onClose }) => {
     }
   };
 
-  // category end
 
   const { currencies } = useSelector((state) => state.currencies);
   const dispatch = useDispatch();
@@ -106,7 +103,6 @@ const EditProduct = ({ idd, onClose }) => {
     dispatch(getcurren());
   }, [dispatch]);
 
-  // Declare state for initial values
   const [initialValues, setInitialValues] = useState({
     name: "",
     price: "",
@@ -140,7 +136,6 @@ const EditProduct = ({ idd, onClose }) => {
     }
   }, [idd, milestones]);
 
-  // Define validation schema
   const validationSchema = Yup.object({
     name: Yup.string().required("Please enter Name."),
     price: Yup.number().required("Please enter Price."),

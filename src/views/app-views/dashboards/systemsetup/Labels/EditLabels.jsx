@@ -25,7 +25,6 @@ import {
   EditOutlined,
   LinkOutlined,
 } from "@ant-design/icons";
-// import { Card, Table,  Badge, Menu, Tag,Modal } from 'antd';
 import { useNavigate } from "react-router-dom";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
@@ -131,7 +130,7 @@ const EditLabels = ({ idd, onClose }) => {
                         value={values.stageName} // Controlled by Formik
                         onChange={(e) =>
                           setFieldValue("stageName", e.target.value)
-                        } // Ensure user can edit
+                        } 
                       />
                       <ErrorMessage
                         name="stageName"
@@ -154,7 +153,7 @@ const EditLabels = ({ idd, onClose }) => {
                             value={values.pipeline} // Controlled by Formik
                             onChange={(value) =>
                               setFieldValue("pipeline", value)
-                            } // Ensure user can select
+                            } 
                             onBlur={() => setFieldTouched("pipeline", true)}
                           >
                             {fndpips && fndpips.length > 0 ? (
@@ -180,7 +179,6 @@ const EditLabels = ({ idd, onClose }) => {
                   </Col>
                 </Row>
 
-                {/* Form Buttons */}
                 <div className="form-buttons text-right mt-3">
                   <Button type="default" className="mr-2" onClick={onClose}>
                     Cancel

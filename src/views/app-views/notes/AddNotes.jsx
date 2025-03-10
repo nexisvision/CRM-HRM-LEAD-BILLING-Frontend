@@ -9,7 +9,6 @@ import { addnotess, getnotess } from "./notesReducer/notesSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { empdata } from "../hrm/Employee/EmployeeReducers/EmployeeSlice";
 const { Option } = Select;
-// Validation Schema
 const validationSchema = Yup.object().shape({
   title: Yup.string().required("Title is required"),
   description: Yup.string().required("Description is required"),

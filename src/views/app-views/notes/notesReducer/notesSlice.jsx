@@ -4,7 +4,6 @@ import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 import { message } from "antd";
 
-// Async thunk for adding user
 
 export const addnotess = createAsyncThunk(
   "users/addnotess",
@@ -18,7 +17,6 @@ export const addnotess = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
 
 export const getnotess = createAsyncThunk(
   "emp/getnotess",
@@ -32,7 +30,6 @@ export const getnotess = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
 export const delnotess = createAsyncThunk(
   "users/delnotess",
   async (userId, thunkAPI) => {
@@ -49,7 +46,7 @@ export const editnotess = createAsyncThunk(
   async ({ idd, formData }, thunkAPI) => {
     try {
       const response = await UserService.editelnote(idd, formData);
-      return response; // Return the updated data
+      return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(
         error.response?.data || "Error updating employee"
@@ -134,7 +131,6 @@ const NotesSlice = createSlice({
       })
 
      
-      //delete
       .addCase(delnotess.pending, (state) => {
         state.isLoading = true;
       })
@@ -153,7 +149,7 @@ const NotesSlice = createSlice({
       })
       .addCase(editnotess.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; // Update the state with the updated employee data
+        state.editItem = action.payload; 
         message.success(action.payload?.message);
       })
       .addCase(editnotess.rejected, (state, action) => {

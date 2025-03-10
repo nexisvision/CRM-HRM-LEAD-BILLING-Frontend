@@ -11,7 +11,6 @@ import AddBranch from '../Branch/AddBranch';
 
 const { Option } = Select;
 
-// Update validation schema to include branch
 const validationSchema = Yup.object().shape({
   title: Yup.string().required('title is required'),
   description: Yup.string().required('description is required'),
@@ -24,10 +23,8 @@ const EditAnnouncement = ({ onClose, announcementData }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Get branches from Redux store
   const branches = useSelector((state) => state.Branch?.Branch?.data || []);
 
-  // Fetch branches when component mounts
   useEffect(() => {
     dispatch(getBranch());
   }, [dispatch]);
@@ -73,7 +70,6 @@ const EditAnnouncement = ({ onClose, announcementData }) => {
           <FormikForm onSubmit={handleSubmit}>
             <Row gutter={16}>
               <Col span={12}>
-                {/* title Field */}
                 <div>
                   <label className="font-semibold">Title <span className="text-red-500">*</span></label>
                   <Field
@@ -89,7 +85,6 @@ const EditAnnouncement = ({ onClose, announcementData }) => {
               </Col>
 
               <Col span={12}>
-                {/* Branch Field */}
                 <div>
                   <label className="font-semibold">Branch <span className="text-red-500">*</span></label>
                   <Field
@@ -201,7 +196,6 @@ const EditAnnouncement = ({ onClose, announcementData }) => {
         )}
       </Formik>
 
-      {/* Add Branch Modal */}
       <Modal
         title="Add Branch"
         visible={isAddBranchModalVisible}

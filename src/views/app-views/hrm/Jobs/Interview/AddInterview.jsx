@@ -12,11 +12,9 @@ const AddInterviewModal = ({ open, onCancel, onAddInterview, initialDate }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
 
-  // Get jobs and job applications from Redux store
   const jobsData = useSelector((state) => state.Jobs.Jobs.data) || [];
   const jobApplications = useSelector((state) => state.jobapplications.jobapplications.data) || [];
 
-  // Fetch jobs and job applications when component mounts
   useEffect(() => {
     dispatch(GetJobdata());
     dispatch(getjobapplication());
@@ -45,7 +43,6 @@ const AddInterviewModal = ({ open, onCancel, onAddInterview, initialDate }) => {
         onCancel(); // Close the modal
       });
     } catch (error) {
-      // console.error('Failed to add interview:', error);
     }
   };
 

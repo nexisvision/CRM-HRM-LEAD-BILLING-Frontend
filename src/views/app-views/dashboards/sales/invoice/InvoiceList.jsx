@@ -15,12 +15,8 @@ import {
   Tag,
   DatePicker,
 } from "antd";
-// import { invoiceData } from '../../../pages/invoice/invoiceData';
-// import { Row, Col, Avatar, Dropdown, Menu, Tag } from 'antd';
 import NumberFormat from "react-number-format";
 import ViewInvoice from "./ViewInvoice";
-// import React, {useState} from 'react'
-// import { Card, Table, Select, Input, Button, Badge, Menu, Tag } from 'antd';
 import {
   EyeOutlined,
   FileExcelOutlined,
@@ -64,7 +60,7 @@ export const InvoiceList = () => {
 
   useEffect(() => {
     dispatch(getInvoice());
-    dispatch(Getcus()); // Fetch customer data
+    dispatch(Getcus());
   }, []);
   useEffect(() => {
     dispatch(getInvoice());
@@ -82,14 +78,12 @@ export const InvoiceList = () => {
 
     let filtered = [...fnddata];
 
-    // Apply text search filter
     if (text) {
       filtered = filtered.filter(invoice => 
         invoice.salesInvoiceNumber?.toLowerCase().includes(text.toLowerCase())
       );
     }
 
-    // Apply date range filter
     if (dates && dates[0] && dates[1]) {
       const startDate = dayjs(dates[0]).startOf('day');
       const endDate = dayjs(dates[1]).endOf('day');
@@ -111,7 +105,6 @@ export const InvoiceList = () => {
   const handleDateRangeChange = (dates) => {
     setDateRange(dates);
     if (dates === null) {
-      // If dates are cleared, reset to original list with only text filter
       filterInvoices(searchText, null);
     } else {
       filterInvoices(searchText, dates);
@@ -133,8 +126,6 @@ export const InvoiceList = () => {
       setList(fnddata);
     }
   };
-
-   //// permission
 
           const roleId = useSelector((state) => state.user.loggedInUser.role_id);
           const roles = useSelector((state) => state.role?.role?.data);
@@ -162,10 +153,6 @@ export const InvoiceList = () => {
           const canDeleteClient = allpermisson?.includes('delete');
           const canViewClient = allpermisson?.includes('view');
 
-          ///endpermission
-
-
-  // Open Add Job Modal
   const openAddInvoiceModal = () => {
     setIsAddInvoiceModalVisible(true);
   };
@@ -215,14 +202,12 @@ export const InvoiceList = () => {
         label: 'View Invoice',
         onClick: () => Viewfunc(row.id)
       },
-      // Conditionally add edit menu item
       ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'edit',
         icon: <EditOutlined />,
         label: 'Edit',
         onClick: () => editfun(row.id)
       }] : []),
-      // Conditionally add delete menu item
       ...(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'delete',
         icon: <DeleteOutlined />,
@@ -239,7 +224,6 @@ export const InvoiceList = () => {
         <span
           className="cursor-pointer hover:underline"
           onClick={() => {
-            // Check if user has view permission
             if (whorole === "super-admin" || whorole === "client" || (canViewClient && whorole !== "super-admin" && whorole !== "client")) {
               Viewfunc(record.id);
             }
@@ -254,7 +238,6 @@ export const InvoiceList = () => {
       title: "Customer",
       dataIndex: "customer",
       render: (_, record) => {
-        // Find the customer from customers data
         const customerData = fnddataCustomers?.find(cust => cust.id === record.customer);
         return <span>{customerData?.name || "Unknown Customer"}</span>;
       },

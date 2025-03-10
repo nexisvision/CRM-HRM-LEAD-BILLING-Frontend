@@ -74,7 +74,6 @@ const RoleList = () => {
     }
   }, [filteredData]);
 
-  //// permission
 
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
@@ -101,9 +100,6 @@ const RoleList = () => {
   const canDeleteClient = allpermisson?.includes('delete');
   const canViewClient = allpermisson?.includes('view');
 
-  ///endpermission
-
-
 
   const editfun = (id) => {
     openEditRoleModal();
@@ -124,24 +120,6 @@ const RoleList = () => {
 
   const dropdownMenu = (elm) => (
     <Menu>
-      {/* {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
-                                <Menu.Item>
-                                <Flex alignItems="center">
-                                  <Button
-                                    type=""
-                                    icon={<EditOutlined />}
-                                    onClick={() => {
-                                      editfun(elm.id);
-                                    }}
-                                    size="small"
-                                  >
-                                    Edit
-                                  </Button>
-                                </Flex>
-                              </Menu.Item>
-                                ) : null} */}
-
-
       {(whorole === "super-admin" || whorole === "client" || (canDeleteClient && whorole !== "super-admin" && whorole !== "client")) ? (
         <Menu.Item>
           <Flex alignItems="center">

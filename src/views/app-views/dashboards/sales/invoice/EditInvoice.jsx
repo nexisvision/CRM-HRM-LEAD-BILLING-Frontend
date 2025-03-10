@@ -78,10 +78,8 @@ const EditInvoice = ({ idd, onClose }) => {
     invoiceType: "standard",
   });
 
-  // Get currencies from the store
   const currencies = useSelector((state) => state.currencies.currencies.data);
 
-  // Get products directly from Redux store
   const productsData = useSelector((state) => state.Product.Product);
 
   const [totals, setTotals] = useState({
@@ -101,14 +99,12 @@ const EditInvoice = ({ idd, onClose }) => {
     fetchTags();
   }, []);
 
-  // Update local state when Redux store changes
   useEffect(() => {
     if (productsData?.data) {
       setProducts(productsData.data);
     }
   }, [productsData]);
 
-   // Fetch products when component mounts
    useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -124,7 +120,6 @@ const EditInvoice = ({ idd, onClose }) => {
 
     fetchProducts();
   }, [dispatch]);
-// Product selection handler
 const handleProductChange = (productId) => {
   
   if (productId) {
@@ -193,11 +188,9 @@ const handleProductChange = (productId) => {
 
             setInvoiceType(fnd.invoiceType || 'standard');
 
-            // Set global discount type and value
             const savedDiscountType = fnd.discountType || 'percentage';
             setGlobalDiscountType(savedDiscountType);
             
-            // Set the correct discount value based on type
             if (savedDiscountType === 'percentage') {
                 setGlobalDiscountValue(parseFloat(fnd.discountValue) || 0);
             } else {
@@ -209,13 +202,11 @@ const handleProductChange = (productId) => {
                 const price = parseFloat(item.price) || 0;
                 const baseAmount = quantity * price;
                 
-                // Get the correct discount value based on type
                 const savedItemDiscountType = item.discount_type || 'percentage';
                 const discountValue = savedItemDiscountType === 'percentage' 
                     ? parseFloat(item.discount_percentage) || 0 
                     : parseFloat(item.discount_value) || 0;
 
-                // Calculate item discount
                 let itemDiscountAmount = 0;
                 if (savedItemDiscountType === 'percentage') {
                     itemDiscountAmount = (baseAmount * discountValue) / 100;
@@ -269,8 +260,6 @@ const handleProductChange = (productId) => {
     }
   }, [fnd]);
 
-  // const [rows, setRows] = useState(initialValues.items);
-
   const handleAddRow = () => {
     setTableData([
       ...tableData,
@@ -304,7 +293,6 @@ const handleProductChange = (productId) => {
         if (row.id === id) {
             const updatedRow = { ...row };
             
-            // Handle empty values for numeric fields
             if (field === 'price' || field === 'discountValue') {
                 updatedRow[field] = value === '' ? '0' : value;
             } else if (field === 'quantity') {
@@ -313,12 +301,10 @@ const handleProductChange = (productId) => {
                 updatedRow[field] = value;
             }
             
-            // Calculate amounts
             const quantity = parseFloat(updatedRow.quantity) || 0;
             const price = parseFloat(updatedRow.price) || 0;
             const baseAmount = quantity * price;
             
-            // Calculate item discount
             let itemDiscountAmount = 0;
             const discountValue = parseFloat(updatedRow.discountValue) || 0;
             if (updatedRow.discountType === 'percentage') {
@@ -327,12 +313,10 @@ const handleProductChange = (productId) => {
                 itemDiscountAmount = Math.min(discountValue, baseAmount);
             }
             
-            // Calculate tax
             const amountAfterDiscount = baseAmount - itemDiscountAmount;
             const taxPercentage = updatedRow.tax ? parseFloat(updatedRow.tax.gstPercentage) || 0 : 0;
             const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
             
-            // Update final amount
             updatedRow.amount = (amountAfterDiscount + taxAmount).toFixed(2);
             
             return updatedRow;
@@ -345,13 +329,11 @@ const handleProductChange = (productId) => {
   };
 
   const calculateTotal = (data, globalDiscountValue, discountType) => {
-    // Calculate item-level totals
     const calculations = data.reduce((acc, row) => {
         const quantity = parseFloat(row.quantity) || 0;
         const price = parseFloat(row.price) || 0;
         const baseAmount = quantity * price;
         
-        // Calculate item discount
         let itemDiscountAmount = 0;
         const discountValue = parseFloat(row.discountValue) || 0;
         if (row.discountType === 'percentage') {
@@ -360,7 +342,6 @@ const handleProductChange = (productId) => {
             itemDiscountAmount = Math.min(discountValue, baseAmount);
         }
 
-        // Calculate tax based on invoice type
         const amountAfterDiscount = baseAmount - itemDiscountAmount;
         let taxAmount = 0;
         const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
@@ -380,7 +361,6 @@ const handleProductChange = (productId) => {
                 break;
         }
 
-        // Additional charges for commercial invoices
         const additionalCharges = invoiceType === 'commercial' ? baseAmount * 0.02 : 0;
 
         return {
@@ -398,7 +378,6 @@ const handleProductChange = (productId) => {
         subtotal: 0
     });
 
-    // Calculate global discount
     let globalDiscountAmount = 0;
     if (invoiceType !== 'proforma' && globalDiscountValue) {
         if (discountType === 'percentage') {
@@ -408,10 +387,8 @@ const handleProductChange = (productId) => {
         }
     }
 
-    // Calculate final total
     const finalTotal = Math.max(0, calculations.subtotal - globalDiscountAmount);
 
-    // Update totals state
     setTotals({
         subtotal: calculations.subtotal.toFixed(2),
         itemDiscount: calculations.totalItemDiscount.toFixed(2),
@@ -441,7 +418,6 @@ const handleProductChange = (productId) => {
       setNewTag("");
       setIsTagModalVisible(false);
 
-      // Fetch updated tags
       await fetchTags();
     } catch (error) {
       console.error("Failed to add Status:", error);
@@ -451,13 +427,11 @@ const handleProductChange = (productId) => {
 
   const onSubmit = (values) => {
     const itemsForDatabase = tableData.reduce((acc, item, index) => {
-      // Ensure quantity is at least 1
       const quantity = Math.max(parseFloat(item.quantity) || 1, 1);
       const price = parseFloat(item.price) || 0;
       const itemDiscountValue = parseFloat(item.discountValue) || 0;
       const taxPercentage = item.tax ? parseFloat(item.tax.gstPercentage) || 0 : 0;
 
-      // Calculate amounts
       const baseAmount = quantity * price;
       const itemDiscountAmount = item.discountType === 'percentage'
           ? (baseAmount * itemDiscountValue) / 100
@@ -514,7 +488,6 @@ const handleProductChange = (productId) => {
             .then(() => {
               dispatch(getInvoice());
               onClose();
-              // message.success("Invoice updated successfully!");
             })
             .catch((error) => {
               console.error("Failed to edit invoice:", error);
@@ -572,7 +545,7 @@ const handleProductChange = (productId) => {
     }
 
     try {
-      const lid = AllLoggeddtaa.loggedInUser.id;
+      const lid = AllLoggeddtaa.loggedInUser.id;  
       const payload = {
         name: newValue.trim(),
         lableType,
@@ -583,7 +556,6 @@ const handleProductChange = (productId) => {
       if (response.payload && response.payload.success) {
         message.success(`${lableType} added successfully.`);
         
-        // Refresh the labels immediately after adding
         const labelsResponse = await dispatch(GetLable(lid));
         if (labelsResponse.payload && labelsResponse.payload.data) {
           const filteredLables = labelsResponse.payload.data
@@ -591,13 +563,11 @@ const handleProductChange = (productId) => {
             .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
           
           setCategories(filteredLables);
-          // Update form field value using Formik's setFieldValue
           if (setFieldValue) {
             setFieldValue("category", newValue.trim());
           }
         }
         
-        // Reset input and close modal
         setter("");
         modalSetter(false);
       } else {
@@ -889,7 +859,6 @@ const handleProductChange = (productId) => {
                             value={row.price}
                             onChange={(e) => {
                               const value = e.target.value;
-                              // If user starts typing and current value is "0", clear it
                               if (row.price === "0" && value !== "") {
                                 handleTableDataChange(row.id, "price", value.replace(/^0+/, ''));
                               } else {
@@ -926,7 +895,6 @@ const handleProductChange = (productId) => {
                               value={row.discountValue}
                               onChange={(e) => {
                                 const value = e.target.value;
-                                // If user starts typing and current value is "0", clear it
                                 if (row.discountValue === "0" && value !== "") {
                                   handleTableDataChange(row.id, "discountValue", value.replace(/^0+/, ''));
                                 } else {
@@ -1024,7 +992,6 @@ const handleProductChange = (productId) => {
                             value={globalDiscountValue}
                             onChange={(e) => {
                               const value = e.target.value;
-                              // If user starts typing and current value is 0, clear it
                               if (globalDiscountValue === 0 && value !== "") {
                                 setGlobalDiscountValue(parseFloat(value));
                                 calculateTotal(tableData, parseFloat(value), globalDiscountType);

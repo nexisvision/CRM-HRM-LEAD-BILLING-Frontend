@@ -35,7 +35,6 @@ const EditProduct = ({ idd, onClose }) => {
 
   const CustomInput = ({ field, form, ...props }) => <Input {...field} {...props} />;
 
-  // category start
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
@@ -94,7 +93,6 @@ const EditProduct = ({ idd, onClose }) => {
       setNewCategory("");
       setIsCategoryModalVisible(false);
 
-      // Fetch updated categories
       await fetchLables();
     } catch (error) {
       console.error("Failed to add Category:", error);
@@ -108,12 +106,10 @@ const EditProduct = ({ idd, onClose }) => {
     dispatch(getcurren());
   }, [dispatch]);
 
-  // Handle file upload changes
   const handleFileChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
   };
 
-  // Declare state for initial values
   const [initialValues, setInitialValues] = useState({
     name: "",
     price: "",
@@ -131,7 +127,6 @@ const EditProduct = ({ idd, onClose }) => {
       const milestone = milestones.find((item) => item.id === idd);
 
       if (milestone) {
-        // Set initial values only when milestone is found
         setInitialValues({
           id: milestone.id,
           name: milestone.name || "",
@@ -147,7 +142,6 @@ const EditProduct = ({ idd, onClose }) => {
     }
   }, [idd, milestones]);
 
-  // Define validation schema
   const validationSchema = Yup.object({
     name: Yup.string().required("Please enter Name."),
     price: Yup.number().required("Please enter Price."),
@@ -165,14 +159,12 @@ const EditProduct = ({ idd, onClose }) => {
 
     const formData = new FormData();
 
-    // Append all form values except image
     Object.keys(values).forEach(key => {
       if (key !== 'image') {
         formData.append(key, values[key]);
       }
     });
 
-    // Append the file if exists
     if (fileList[0]?.originFileObj) {
       formData.append('image', fileList[0].originFileObj);
     }

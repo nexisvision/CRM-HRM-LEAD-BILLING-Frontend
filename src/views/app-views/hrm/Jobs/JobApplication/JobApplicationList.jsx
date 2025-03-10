@@ -36,7 +36,6 @@ import {
   deletejobapplication,
   getjobapplication,
 } from "./JobapplicationReducer/JobapplicationSlice";
-// import ViewJobApplication from './ViewJobApplication';
 
 const { Option } = Select;
 
@@ -45,7 +44,6 @@ const JobApplicationList = () => {
   const [users, setUsers] = useState([]);
   const [list, setList] = useState([]);
   const [userProfileVisible, setUserProfileVisible] = useState(false);
-  // const [viewApplicationVisible, setViewApplicationVisible] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [isAddJobApplicationModalVisible, setIsAddJobApplicationModalVisible] =
@@ -75,7 +73,6 @@ const JobApplicationList = () => {
   useEffect(() => {
     if (fnddta) {
       setUsers(fnddtaa);
-      // Extract unique statuses from the data
       const statuses = ['All', ...new Set(fnddtaa.map(item => item.status).filter(Boolean))];
       setUniqueStatuses(statuses);
     }
@@ -107,7 +104,6 @@ const JobApplicationList = () => {
     
     let filtered = [...users];
 
-    // Text search filter
     if (searchText) {
       filtered = filtered.filter(application => {
         return (
@@ -118,7 +114,6 @@ const JobApplicationList = () => {
       });
     }
 
-    // Status filter
     if (selectedStatus && selectedStatus !== 'All') {
       filtered = filtered.filter(application => 
         application.status?.toLowerCase() === selectedStatus.toLowerCase()
@@ -132,7 +127,6 @@ const JobApplicationList = () => {
     message.success('Search completed');
   };
 
-   //// permission
                                       
                         const roleId = useSelector((state) => state.user.loggedInUser.role_id);
                         const roles = useSelector((state) => state.role?.role?.data);
@@ -159,10 +153,6 @@ const JobApplicationList = () => {
                         const canDeleteClient = allpermisson?.includes('delete');
                         const canViewClient = allpermisson?.includes('view');
                      
-                        ///endpermission
-
-
-
   const exportToExcel = () => {
     try {
       const ws = utils.json_to_sheet(users); // Convert JSON data to a sheet
@@ -181,7 +171,6 @@ const JobApplicationList = () => {
       dispatch(getjobapplication());
       const updatedUsers = users.filter((item) => item.id !== userId);
       setUsers(updatedUsers);
-      // message.success({ content: `Deleted user ${userId}`, duration: 2 });
     });
   };
 
@@ -194,16 +183,6 @@ const JobApplicationList = () => {
     setUserProfileVisible(false);
     setSelectedUser(null);
   };
-
-  // const showViewApplication = (userInfo) => {
-  //   setViewApplicationVisible(true);
-  //   setSelectedUser(userInfo);
-  // };
-
-  // const closeViewApplication = () => {
-  //   setViewApplicationVisible(false);
-  //   setSelectedUser(null);
-  // };
 
   const getjobStatus = (status) => {
     if (status === "active") {
@@ -234,25 +213,6 @@ const JobApplicationList = () => {
 
   const dropdownMenu = (elm) => ({
     items: [
-      // View Details, Send Mail, and Pin options are commented out but kept for reference
-      // {
-      //   key: 'view',
-      //   icon: <EyeOutlined />,
-      //   label: 'View Details',
-      //   onClick: () => showUserProfile(elm)
-      // },
-      // {
-      //   key: 'mail',
-      //   icon: <MailOutlined />,
-      //   label: 'Send Mail',
-      //   onClick: () => showUserProfile(elm)
-      // },
-      // {
-      //   key: 'pin',
-      //   icon: <PushpinOutlined />,
-      //   label: 'Pin',
-      //   onClick: () => showUserProfile(elm)
-      // },
       
       ...(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client") ? [{
         key: 'edit',
@@ -295,11 +255,7 @@ const JobApplicationList = () => {
       dataIndex: "location",
       sorter: (a, b) => a.leavetype.length - b.leavetype.length,
     },
-    // {
-    //   title: "job",
-    //   dataIndex: "job",
-    //   sorter: (a, b) => a.leavetype.length - b.leavetype.length,
-    // },
+
     {
       title: "current_location",
       dataIndex: "current_location",

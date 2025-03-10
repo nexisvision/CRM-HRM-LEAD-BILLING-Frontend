@@ -1,7 +1,6 @@
 import React from 'react';
 
 import OtherPaymentList from './OtherPaymentList';
-// import AddOtherPayment from './AddOtherPayment';
 
 const OtherPayment = ({ id, onClose }) => (
 

@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from "react-redux";
 import ReactQuill from "react-quill";
 import { AddDocu, editDocu, getDocu } from "./DocumentReducers/documentSlice";
 import { getRoles } from '../RoleAndPermission/RoleAndPermissionReducers/RoleAndPermissionSlice';
-// import { AddTrainng, GetallTrainng } from "./TrainingReducer/TrainingSlice";
 const { Option } = Select;
 const EditDocument = ({ idd, onClose }) => {
   const [form] = Form.useForm();

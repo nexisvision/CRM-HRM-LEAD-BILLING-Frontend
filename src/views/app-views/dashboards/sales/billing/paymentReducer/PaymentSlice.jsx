@@ -4,7 +4,6 @@ import { message } from "antd";
 import PaymentService from "./PaymentService";
 
 
-// Get all debit notes
 export const getAllPayment = createAsyncThunk(
   "payment/getAllPayment",
   async (_, thunkAPI) => {
@@ -17,7 +16,6 @@ export const getAllPayment = createAsyncThunk(
   }
 );
 
-// Create debit note
 export const createPayment = createAsyncThunk(
   "payment/createPayment",
   async (paymentData, thunkAPI) => {
@@ -48,7 +46,6 @@ const paymentSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Get all debit notes
       .addCase(getAllPayment.pending, (state) => {
         state.loading = true;
       })

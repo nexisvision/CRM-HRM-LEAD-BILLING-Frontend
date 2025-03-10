@@ -33,10 +33,8 @@ const DesignationList = () => {
   const [searchText, setSearchText] = useState('');
   const [selectedBranch, setSelectedBranch] = useState('all');
   
-  // Add branch data from Redux store
   const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
 
-  // Filter branches for current user
   const userBranches = branchData.filter(branch => branch.created_by === user);
 
   useEffect(() => {
@@ -44,7 +42,6 @@ const DesignationList = () => {
     dispatch(getBranch());
   }, [dispatch]);
 
-  //// permission
                         
   const roleId = useSelector((state) => state.user.loggedInUser.role_id);
   const roles = useSelector((state) => state.role?.role?.data);
@@ -71,7 +68,6 @@ const DesignationList = () => {
   const canDeleteClient = allpermisson?.includes('delete');
   const canViewClient = allpermisson?.includes('view');
 
-  ///endpermission
 
   useEffect(() => {
     if (tabledata && tabledata.Designation && tabledata.Designation.data) {
@@ -80,27 +76,22 @@ const DesignationList = () => {
     }
   }, [tabledata]);
 
-  // Open Add Employee Modal
   const openAddDesignationModal = () => {
     setIsAddDesignationModalVisible(true);
   };
 
-  // Close Add Employee Modal
   const closeAddDesignationModal = () => {
     setIsAddDesignationModalVisible(false);
   };
 
-  // Open Add Employee Modal
   const openEditDesignationModal = () => {
     setIsEditDesignationModalVisible(true);
   };
 
-  // Close Add Employee Modal
   const closeEditDesignationModal = () => {
     setIsEditDesignationModalVisible(false);
   };
 
-  // Open Add Employee Modal
   const handleParticularDesignationModal = () => {
     navigate('/app/hrm/designation/particulardesignation', { state: { user: selectedUser } });
   };
@@ -110,26 +101,22 @@ const DesignationList = () => {
     setSearchText(value);
   };
 
-  // Function to get branch name by ID
   const getBranchNameById = (branchId) => {
     const branch = branchData.find(branch => branch.id === branchId);
     return branch ? branch.branchName : 'N/A';
   };
 
-  // Function to filter designations based on search and branch
   const getFilteredDesignations = () => {
     if (!users) return [];
     
     let filtered = users;
 
-    // Apply search filter
     if (searchText) {
       filtered = filtered.filter(designation => 
         designation.designation_name?.toLowerCase().includes(searchText.toLowerCase())
       );
     }
 
-    // Apply branch filter
     if (selectedBranch !== 'all') {
       filtered = filtered.filter(designation => 
         designation.branch === selectedBranch
@@ -139,7 +126,6 @@ const DesignationList = () => {
     return filtered;
   };
 
-  // Handle branch change
   const handleBranchChange = (value) => {
     setSelectedBranch(value);
   };
@@ -148,12 +134,10 @@ const DesignationList = () => {
     dispatch(DeleteDes(userId))
       .then(() => {
         dispatch(getDes());
-        // message.success('designation Deleted successfully!');
         setUsers(users.filter(item => item.id !== userId));
         navigate('/app/hrm/designation');
       })
       .catch((error) => {
-        // message.error('Failed to delete designation.');
         console.error('Edit API error:', error);
       });
   };
@@ -300,7 +284,6 @@ const DesignationList = () => {
       </div>
       <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
 
-      {/* Add Designation Modal */}
       <Modal
         title="Add Designation"
         visible={isAddDesignationModalVisible}
@@ -312,7 +295,6 @@ const DesignationList = () => {
       </Modal>
 
 
- {/* Edit Designation Modal */}
  <Modal
         title="Edit Designation"
         visible={isEditDesignationModalVisible}
@@ -323,8 +305,6 @@ const DesignationList = () => {
         <EditDesignation onClose={closeEditDesignationModal} id={id}/>
       </Modal>
 
-      {/* Particular Designation Modal */}
-     
     </Card>
   );
 };

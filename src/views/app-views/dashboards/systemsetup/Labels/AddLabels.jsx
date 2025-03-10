@@ -12,7 +12,6 @@ import {
  
 } from "antd";
 
-// import { Card, Table,  Badge, Menu, Tag,Modal } from 'antd';
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import OrderListData from "assets/data/order-list.data.json";
@@ -30,9 +29,7 @@ import { GetPip } from "../Pipeline/PiplineReducer/piplineSlice";
 const { Option } = Select;
 
 const AddLabels = ({ onClose }) => {
-  // const [users, setUsers] = useState(userData);
 
-  // const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const loggeduser = useSelector((state) => state.user.loggedInUser.username);

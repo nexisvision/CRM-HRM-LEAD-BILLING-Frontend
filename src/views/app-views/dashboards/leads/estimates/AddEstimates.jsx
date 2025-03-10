@@ -21,8 +21,6 @@ const AddEstimates = ({ onClose }) => {
     const [discountType, setDiscountType] = useState("%");
     const [loading, setLoading] = useState(false);
     const [discountValue, setDiscountValue] = useState(0);
-    // const [discountRate, setDiscountRate] = useState();
-    // Add loading state for leads
     const [leadsLoading, setLeadsLoading] = useState(true);
 
     const user = useSelector((state) => state.user.loggedInUser.username);
@@ -36,25 +34,10 @@ const AddEstimates = ({ onClose }) => {
     const { taxes } = useSelector((state) => state.tax);
     const [selectedTaxDetails, setSelectedTaxDetails] = useState({});
 
-    // const [selectedLead, setSelectedLead] = useState(null);
-
-    // const subClients = useSelector((state) => state.SubClient);
-    // const sub = subClients?.SubClient?.data;
-
-    // const allproject = useSelector((state) => state.Project);
-    // const fndrewduxxdaa = allproject.Project.data
-    // const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
-
-    // const client = fnddata?.client;
-
-    // const subClientData = sub?.find((subClient) => subClient?.id === client);
-
-
     const allleads = useSelector((state) => state.Leads);
     const fndrewduxxdaa = allleads.Leads.data
     const fnddata = fndrewduxxdaa?.find((lead) => lead?.id === id);
 
-    // Add this to get the lead name
     const leadName = fnddata?.leadTitle || 'N/A';
 
 
@@ -81,12 +64,10 @@ const AddEstimates = ({ onClose }) => {
         }
     ]);
 
-    // Add this useEffect to fetch taxes when component mounts
     useEffect(() => {
         dispatch(getAllTaxes());
     }, [dispatch]);
 
-    // Fetch currencies
     useEffect(() => {
         const fetchCurrencies = async () => {
             try {
@@ -100,7 +81,6 @@ const AddEstimates = ({ onClose }) => {
         fetchCurrencies();
     }, [dispatch]);
 
-    // Modify the useEffect to handle loading and errors
     useEffect(() => {
         const fetchLeads = async () => {
             try {
@@ -117,15 +97,12 @@ const AddEstimates = ({ onClose }) => {
         fetchLeads();
     }, [dispatch]);
 
-    // Get leads data and find the selected lead
     const allLeads = useSelector((state) => state.Leads);
     const leadsData = allLeads.Leads.data || [];
     const selectedLead = leadsData?.find((lead) => lead?.id === id);
 
-    // Get the lead title
     const leadTitle = selectedLead?.leadTitle || 'N/A';
 
-    // Set initial form values including lead title
     useEffect(() => {
         form.setFieldsValue({
             leadTitle: leadTitle,
@@ -152,12 +129,10 @@ const AddEstimates = ({ onClose }) => {
         try {
             setLoading(true);
 
-            // Validate required fields
             const requiredFields = {
                 valid_till: values.valid_till,
                 currency: values.currency,
                 lead: values.lead,
-                // client: values.client,
                 calculatedTax: values.calculatedTax
             };
 
@@ -169,17 +144,14 @@ const AddEstimates = ({ onClose }) => {
                 throw new Error(`Please fill in the following required fields: ${missingFields.join(', ')}`);
             }
 
-            // Validate table data
             if (!tableData || tableData.length === 0 || !tableData[0].item) {
                 throw new Error('Please add at least one item to the estimate');
             }
 
-            // Calculate subtotal from tableData directly
             const subtotal = calculateSubTotal();
       const discountAmount = (subtotal * discountRate) / 100;
       const finalTotal = parseFloat(totals.finalTotal);
             
-            // Format items for the database
             const formattedItems = {};
             tableData.forEach((item, index) => {
                 const itemKey = `item_${index + 1}`;
@@ -199,7 +171,6 @@ const AddEstimates = ({ onClose }) => {
                 valid_till: values.valid_till.format('YYYY-MM-DD'),
                 currency: values.currency,
                 lead: values.lead,
-                // client: values.client,
                 related_id: id,
                 subtotal: subtotal.toFixed(2),
                 calculatedTax: values.calculatedTax,
@@ -229,7 +200,6 @@ const AddEstimates = ({ onClose }) => {
         }
     };
 
-    // Function to handle adding a new row
     const handleAddRow = () => {
         setTableData((prevData) => [
             ...prevData,
@@ -258,7 +228,6 @@ const AddEstimates = ({ onClose }) => {
 
     const navigate = useNavigate();
 
-    // Calculate total tax
     const calculateTotalTax = () => {
         return tableData.reduce((sum, row) => {
           const quantity = parseFloat(row.quantity) || 0;
@@ -269,7 +238,6 @@ const AddEstimates = ({ onClose }) => {
         }, 0);
       };
 
-    // Calculate subtotal (sum of all row amounts before discount)
     const calculateSubTotal = () => {
         return tableData.reduce((sum, row) => {
           const quantity = parseFloat(row.quantity) || 0;
@@ -285,15 +253,12 @@ const AddEstimates = ({ onClose }) => {
           return;
         }
     
-        // Calculate subtotal (sum of all item amounts)
         const subtotal = data.reduce((sum, row) => {
           return sum + (parseFloat(row.amount) || 0);
         }, 0);
     
-        // Calculate discount amount
         const discountAmount = (subtotal * (parseFloat(discount) || 0)) / 100;
     
-        // Calculate total tax (for display purposes)
         const totalTax = data.reduce((sum, row) => {
           const quantity = parseFloat(row.quantity) || 0;
           const price = parseFloat(row.price) || 0;
@@ -303,7 +268,6 @@ const AddEstimates = ({ onClose }) => {
           return sum + taxAmount;
         }, 0);
     
-        // Calculate final total: subtotal - discount
         const finalTotal = subtotal - discountAmount;
     
         setTotals({
@@ -338,7 +302,6 @@ const AddEstimates = ({ onClose }) => {
             }));
           }
         }
-        // Calculate amount if quantity, price, or tax changes
         if (field === 'quantity' || field === 'price' || field === 'tax') {
           const quantity = parseFloat(field === 'quantity' ? value : row.quantity) || 0;
           const price = parseFloat(field === 'price' ? value : row.price) || 0;
@@ -372,80 +335,14 @@ const AddEstimates = ({ onClose }) => {
                     // initialValues={initialValues}
 
                     >
-                        {/* <Card className="border-0 mt-2"> */}
                         <div className="">
                             <div className=" p-2">
 
                                 <Row gutter={16}>
-                                    {/* <Col span={12}>
-                                        <Form.Item
-                                            name="client"
-                                            label="Client Name"
-                                            initialValue={subClientData?.username}
-                                            rules={[{ required: true, message: "Please enter the client name" }]}
-                                        >
-                                            <Input placeholder="Enter client name" disabled />
-                                        </Form.Item>
-                                      
-                                        <Form.Item name="client" initialValue={fnddata?.client} hidden>
-                                            <Input type="hidden" />
-                                        </Form.Item>
-                                    </Col> */}
-
-                                    {/* <Col span={12}>
-                                       
-                                        <Form.Item
-                                            name="projectName"
-                                            label="Project Name"
-                                            initialValue={fnddata?.project_name}
-                                            rules={[{ required: true, message: "Please enter the project name" }]}
-                                        >
-                                            <Input placeholder="Enter project name" disabled />
-                                        </Form.Item>
-
-                                       
-                                        <Form.Item name="project" initialValue={fnddata?.id} hidden>
-                                            <Input type="hidden" />
-                                        </Form.Item>
-                                    </Col> */}
+                                   
 
                                     <Col span={12}>
-                                        {/* <Form.Item
-                                            name="lead"
-                                            label="Lead Title"
-                                            rules={[
-                                                {
-                                                    required: true,
-                                                    message: "Please select a Lead Title"
-                                                }
-                                            ]}
-                                        >
-                                            <Select
-                                                className="w-full"
-                                                placeholder="Select Lead Title"
-                                                loading={leadsLoading}
-                                                onChange={(value) => {
-                                                    if (value) {
-                                                        const selectedLead = lead?.find(
-                                                            (lead) => lead.id === value
-                                                        );
-                                                        setSelectedLead(selectedLead);
-                                                        form.setFieldsValue({
-                                                            lead: value
-                                                        });
-                                                    }
-                                                }}
-                                            >
-                                                {Array.isArray(lead) && lead.map((lead) => (
-                                                    <Option
-                                                        key={lead.id}
-                                                        value={lead.id}
-                                                    >
-                                                        {lead.leadTitle}
-                                                    </Option>
-                                                ))}
-                                            </Select>
-                                        </Form.Item> */}
+                                       
                                          <Form.Item
                                             name="leadTitle"
                                             label="Lead Title"
@@ -523,16 +420,6 @@ const AddEstimates = ({ onClose }) => {
                                             />
                                         </Form.Item>
                                     </Col>
-
-                                    {/* <Col span={12}>
-                                        <Form.Item
-                                            name="quotationNumber"
-                                            label="Quotation Number"
-                                            rules={[{ required: true, message: "Please enter quotation number" }]}
-                                        >
-                                            <Input placeholder="Auto-generated"  />
-                                        </Form.Item>
-                                    </Col> */}
 
                                     <Col span={12}>
                                         <Form.Item
@@ -652,10 +539,8 @@ const AddEstimates = ({ onClose }) => {
                                 </Button>
                             </div>
 
-                            {/* Summary Section */}
                             <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
                                 <table className='w-full lg:w-[50%] p-2'>
-                                    {/* Sub Total */}
                                     <tr className="flex justify-between px-2 py-2 border-x-2">
                                         <td className="font-medium">Sub Total</td>
                                         <td className="font-medium px-4 py-2">
@@ -663,7 +548,6 @@ const AddEstimates = ({ onClose }) => {
                                         </td>
                                     </tr>
 
-                                    {/* Discount */}
                                     <tr className="flex px-2 justify-between items-center py-2 border-x-2 border-y-2">
                                         <td className="font-medium">Discount</td>
                                         <td className="flex items-center space-x-2">
@@ -687,7 +571,6 @@ const AddEstimates = ({ onClose }) => {
                   </td>
                                     </tr>
 
-                                    {/* Tax */}
                                     <tr className="flex justify-between px-2 py-2 border-x-2 border-b-2">
                                         <td className="font-medium">Total Tax</td>
                                         <td className="font-medium px-4 py-2">
@@ -695,7 +578,6 @@ const AddEstimates = ({ onClose }) => {
                                         </td>
                                     </tr>
 
-                                    {/* Total */}
                                     <tr className="flex justify-between px-2 py-3 bg-gray-100 border-x-2 border-b-2">
                                         <td className="font-bold text-lg">Total Amount</td>
                                         <td className="font-bold text-lg px-4">

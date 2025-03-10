@@ -35,7 +35,6 @@ const AddSources = ({ onClose }) => {
   const lid = userdata.id;
 
   const onSubmit = (values, { resetForm }) => {
-    // Add static labelType to payload
     const payload = {
       ...values,
       lableType: "source",

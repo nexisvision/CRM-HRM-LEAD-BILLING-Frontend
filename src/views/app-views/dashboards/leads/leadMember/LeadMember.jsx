@@ -24,7 +24,6 @@ const LeadMember = () => {
 
   const { id } = useParams();
 
-  // Add useEffect to fetch data on component mount
   useEffect(() => {
     dispatch(GetLeads());
     dispatch(empdata());

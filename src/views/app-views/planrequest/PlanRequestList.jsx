@@ -90,12 +90,7 @@ export const PlanRequestList = () => {
                     <span className="ml-2">Edit</span>
                 </Flex>
             </Menu.Item>
-            {/* <Menu.Item>
-				<Flex alignItems="center">
-					<TiPinOutline />
-					<span className="ml-2">Pin</span>
-				</Flex>
-			</Menu.Item> */}
+        
             <Menu.Item>
                 <Flex alignItems="center">
                     <DeleteOutlined />

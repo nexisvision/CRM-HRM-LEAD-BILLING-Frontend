@@ -9,7 +9,6 @@ import * as Yup from 'yup';
 const { Option } = Select;
 
 const AddPaySlip = () => {
-  // const [form] = Form.useForm();
   const navigate = useNavigate();
 
   const onSubmit = (values) => {
@@ -43,7 +42,6 @@ const AddPaySlip = () => {
 
   return (
     <div className="add-job-form">
-      {/* <h2 className="mb-4">Create Job</h2> */}
 
       <Formik
         initialValues={initialValues}
@@ -53,7 +51,6 @@ const AddPaySlip = () => {
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <Form
             layout="vertical"
-            // form={form}
             name="add-job"
             className="formik-form" onSubmit={handleSubmit}
           >

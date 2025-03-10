@@ -3,7 +3,6 @@ import UserService from "./calanderService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
-// Async thunk for adding user
 
 export const addcalends = createAsyncThunk(
   "users/addcalends",
@@ -17,7 +16,6 @@ export const addcalends = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
 
 export const getcalends = createAsyncThunk(
   "emp/getcalends",
@@ -31,7 +29,6 @@ export const getcalends = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -44,7 +41,6 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {

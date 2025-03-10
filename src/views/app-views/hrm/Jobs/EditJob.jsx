@@ -111,11 +111,9 @@ const EditJob = ({ idd, onClose }) => {
     status: Yup.string().optional("Please enter Status."),
     expectedSalary: Yup.string().optional("Please enter Expect Salary."),
 
-    // files: Yup.string().required('Please enter Files.'),
   });
 
   const onSubmit = (values, { resetForm }) => {
-    // Transform the skills and interviewRounds into the correct format
     const transformedValues = {
       ...values,
       skills: { Skills: values.skillss }, // Changed to plain object instead of JSON string
@@ -158,7 +156,6 @@ const EditJob = ({ idd, onClose }) => {
     }
   };
 
-  // Call the function for different label types when the component mounts
   useEffect(() => {
     fetchLabels("jobcategory", setJobCategories);
     fetchLabels("jobskill", setJobSkills);

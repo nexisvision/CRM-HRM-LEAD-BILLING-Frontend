@@ -8,10 +8,8 @@ import EllipsisDropdown from 'components/shared-components/EllipsisDropdown';
 import StatisticWidget from 'components/shared-components/StatisticWidget';
 import { AnnualStatisticData } from '../../../dashboards/default/DefaultDashboardData';
 import AvatarStatus from 'components/shared-components/AvatarStatus';
-// import AddJob from './AddJob';
 import { useNavigate } from 'react-router-dom';
 import userData from 'assets/data/user-list.data.json';
-// import OrderListData from 'assets/data/order-list.data.json';
 import utils from 'utils';
 import AddVendor from './AddVendor';
 import EditVendor from './Editvendor';
@@ -235,7 +233,6 @@ const VendorList = () => {
     setIsEditAccountModalVisible(false);
   };
 
-  // Helper function to get tag color based on account type
   const getAccountTypeColor = type => {
     switch (type?.toLowerCase()) {
       case 'salary':

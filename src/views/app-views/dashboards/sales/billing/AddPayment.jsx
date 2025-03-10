@@ -13,12 +13,10 @@ const { Option } = Select;
 const AddPayment = ({ onClose, billNumber }) => {
   const dispatch = useDispatch();
   
-  // Get billing data
   const allBillingData = useSelector((state) => state?.salesbilling?.salesbilling?.data || []);
   const currentBill = allBillingData.find(bill => bill.billNumber === billNumber);
   const billAmount = currentBill?.total || 0;
 
-  // Get accounts data
   const accounts = useSelector((state) => state.account?.account?.data || []);
 
   useEffect(() => {

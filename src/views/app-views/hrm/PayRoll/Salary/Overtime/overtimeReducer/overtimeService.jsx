@@ -1,12 +1,6 @@
   import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
-// const baseUrl = import.meta.env.VITE_BASE_URL;
-// import { getToken } from "../../../configs/axiosConfig"
 
-// const addUser = async (data) => {
-//     const res = await axios.post(`${baseUrl}users/add`, data, getToken());
-//     return res
-// };
 
 const getovertime = async () => {
   const token = localStorage.getItem("auth_token");
@@ -36,7 +30,6 @@ const addovertime = async (payload) => {
         },
       }
     );
-    //    dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -86,15 +79,10 @@ const editovertime = async (meetid, values) => {
 
 
 const UserService = {
-  // addUser,
   getovertime,
   addovertime,
   deleteovertime,
   editovertime,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
 };
 
 export default UserService;

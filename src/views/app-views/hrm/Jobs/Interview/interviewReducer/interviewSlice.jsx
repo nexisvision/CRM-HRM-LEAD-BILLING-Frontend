@@ -3,8 +3,6 @@ import UserService from "./interviewService";
 import { toast } from "react-toastify";
 import { navigate } from "react-big-calendar/lib/utils/constants";
 
-// Async thunk for adding user
-
 export const AddInterviews = createAsyncThunk(
   "users/AddInterviews",
   async (userData, thunkAPI) => {
@@ -17,7 +15,6 @@ export const AddInterviews = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
 
 export const getInterview = createAsyncThunk(
   "emp/getInterview",
@@ -31,7 +28,6 @@ export const getInterview = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -44,7 +40,6 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -57,7 +52,6 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
 export const DeleteInterview = createAsyncThunk(
   "users/DeleteIntervieweet",
   async (userId, thunkAPI) => {
@@ -172,7 +166,6 @@ const RoleAndPermissionSlice = createSlice({
         toast.error(action.payload?.response?.data?.message);
       })
 
-      //getuserbyid
       .addCase(getUserById.pending, (state) => {
         state.isLoading = true;
       })
@@ -185,7 +178,6 @@ const RoleAndPermissionSlice = createSlice({
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
-      //delete
       .addCase(DeleteInterview.pending, (state) => {
         state.isLoading = true;
       })
@@ -197,14 +189,13 @@ const RoleAndPermissionSlice = createSlice({
         state.isLoading = false;
         toast.error(action.payload?.response?.data?.message);
       })
-      //update
       .addCase(EditInterview.pending, (state) => {
         state.isLoading = false;
         state.error = null;
       })
       .addCase(EditInterview.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.editItem = action.payload; // Update the state with the updated employee data
+        state.editItem = action.payload; 
       })
       .addCase(EditInterview.rejected, (state, action) => {
         state.isLoading = false;

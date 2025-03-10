@@ -55,9 +55,6 @@ const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
   const designationData = useSelector((state) => state.Designation?.Designation?.data || []);
 
 
-  // const branchData = branchDaata.filter(item => item.created_by === user);
-   //// permission
-                   
      const roleId = useSelector((state) => state.user.loggedInUser.role_id);
      const roles = useSelector((state) => state.role?.role?.data);
      const roleData = roles?.find(role => role.id === roleId);
@@ -84,8 +81,6 @@ const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
      const canDeleteClient = allpermisson?.includes('delete');
      const canViewClient = allpermisson?.includes('view');
   
-     ///endpermission
-
   useEffect(() => {
     dispatch(getBranch());
   }, [dispatch]);
@@ -102,9 +97,6 @@ const branchData = useSelector((state) => state.Branch?.Branch?.data || []);
 useEffect(() => { 
   dispatch(getIndicators());
 }, [dispatch]);
-
-
-
 
 
 useEffect(() => {
@@ -168,34 +160,16 @@ useEffect(() => {
         dispatch(deleteIndicator( userId )) 
                   .then(() => {
                     dispatch(getIndicators());
-                    // message.success('Indicator Deleted successfully!');
                     setUsers(users.filter(item => item.id !== userId));
                     navigate('/app/hrm/performance/indicator');
                   })
                   .catch((error) => {
-                    // message.error('Failed to delete Indicator.');
                     console.error('Edit API error:', error);
                   });
     };
 
   const dropdownMenu = (elm) => (
     <Menu>
-      {/* <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" className="" icon={<EyeOutlined />} onClick={openViewIndicatorModal} size="small">
-            <span className="">View Details</span>
-          </Button>
-        </Flex>
-      </Menu.Item>
-     
-      <Menu.Item>
-        <Flex alignItems="center">
-          <Button type="" className="" icon={<PushpinOutlined />} size="small">
-            <span className="ml-2">Pin</span>
-          </Button>
-        </Flex>
-      </Menu.Item> */}
-     
 
       {(whorole === "super-admin" || whorole === "client" || (canEditClient && whorole !== "super-admin" && whorole !== "client")) ? (
                                   <Menu.Item>
@@ -249,7 +223,6 @@ useEffect(() => {
       title: 'Overall Rating',
       dataIndex: 'overallRating',
       key: 'overallRating',
-      // render: (rating) => <Rate disabled defaultValue={rating} />,
       sorter: {
         compare: (a, b) => a.overallRating - b.overallRating,
       },
@@ -258,7 +231,6 @@ useEffect(() => {
       title: 'Business Process',
       dataIndex: 'businessProcess',
       key: 'businessProcess',
-      // render: (rating) => <Rate disabled defaultValue={rating} />,
       sorter: {
         compare: (a, b) => a.businessProcess - b.businessProcess,
       },
@@ -267,7 +239,6 @@ useEffect(() => {
       title: 'Oral Communication',
       dataIndex:'oralCommunication',
       key: 'oralCommunication',
-      // render: (rating) => <Rate disabled defaultValue={rating} />,
       sorter: {
         compare: (a, b) => a.oralCommunication - b.oralCommunication,
       },
@@ -277,7 +248,6 @@ useEffect(() => {
       title: 'Leadership',
       dataIndex: 'leadership',
       key: 'leadership',
-      // render: (rating) => <Rate disabled defaultValue={rating} />,
       sorter: {
         compare: (a, b) => a.leadership - b.leadership,
       },
@@ -287,7 +257,6 @@ useEffect(() => {
       title: 'Project Management',
       dataIndex: 'projectManagement',
       key: 'projectManagement',
-      // render: (rating) => <Rate disabled defaultValue={rating} />,
       sorter: {
         compare: (a, b) => a.projectManagement - b.projectManagement,
       },
@@ -296,7 +265,6 @@ useEffect(() => {
       title: 'Allocating Resources',
       dataIndex: 'allocatingResources',
       key: 'allocatingResources',
-      // render: (rating) => <Rate disabled defaultValue={rating} />,
       sorter: {
         compare: (a, b) => a.allocatingResources - b.allocatingResources,
       },
@@ -317,8 +285,6 @@ useEffect(() => {
     if (!users) return [];
     
     let filteredData = [...users];
-
-    // Filter by search text
     if (searchText) {
       const searchLower = searchText.toLowerCase();
       filteredData = filteredData.filter(indicator => {
@@ -335,8 +301,6 @@ useEffect(() => {
         );
       });
     }
-
-    // Filter by selected branch
     if (selectedBranch !== 'all') {
       filteredData = filteredData.filter(indicator => 
         indicator.branch === selectedBranch
@@ -396,7 +360,7 @@ useEffect(() => {
           <Button
                 type="primary"
                 icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
+                onClick={exportToExcel} 
                 block
               >
                 Export All
@@ -414,7 +378,6 @@ useEffect(() => {
       </div>
       <UserView data={selectedUser} visible={userProfileVisible} close={closeUserProfile} />
 
-      {/* Add Indicator Modal */}
       <Modal
         title="Add New Indicator"
         visible={isAddIndicatorModalVisible}
@@ -425,7 +388,6 @@ useEffect(() => {
         <AddIndicator onClose={closeAddIndicatorModal} />
       </Modal>
 
-      {/* Edit Indicator Modal */}
       <Modal
         title="Edit Indicator"
         visible={isEditIndicatorModalVisible}
@@ -436,7 +398,6 @@ useEffect(() => {
         <EditIndicator onClose={closeEditIndicatorModal} id={id} />
       </Modal>
 
-      {/* View Indicator Modal */}
       <Modal
         title="View Indicator"
         visible={isViewIndicatorModalVisible}

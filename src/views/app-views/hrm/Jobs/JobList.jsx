@@ -78,29 +78,24 @@ const JobList = () => {
     navigate("/app/hrm/jobs/viewjob", { state: { user: selectedUser } }); // Pass user data as state if needed
   };
 
-  // Open Add Job Modal
   const openEditJobModal = () => {
     setIsEditJobModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeEditJobModal = () => {
     setIsEditJobModalVisible(false);
   };
 
-  // Search functionality
   const onSearch = (e) => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
   };
 
-  // Update the getFilteredJobs function to include status filtering
   const getFilteredJobs = () => {
     if (!filteredData) return [];
     
     let filtered = [...filteredData];
 
-    // Text search filter
     if (searchText) {
       filtered = filtered.filter(job => {
         return (
@@ -111,12 +106,10 @@ const JobList = () => {
       });
     }
 
-    // Status filter
     if (selectedStatus && selectedStatus !== 'All') {
       filtered = filtered.filter(job => job.status === selectedStatus.toLowerCase());
     }
 
-    // Date range filter
     if (dateRange && dateRange[0] && dateRange[1]) {
       const startDate = dayjs(dateRange[0]).startOf('day');
       const endDate = dayjs(dateRange[1]).endOf('day');
@@ -137,12 +130,10 @@ const JobList = () => {
     return filtered;
   };
 
-  // Add search button handler
   const handleSearch = () => {
     message.success('Search completed');
   };
 
-  // Delete user
   const deleteUser = (userId) => {
     dispatch(Deletejobs(userId));
     dispatch(GetJobdata());
@@ -165,8 +156,6 @@ const JobList = () => {
   };
 
 
-  //// permission
-                                  
                     const roleId = useSelector((state) => state.user.loggedInUser.role_id);
                     const roles = useSelector((state) => state.role?.role?.data);
                     const roleData = roles?.find(role => role.id === roleId);
@@ -192,17 +181,11 @@ const JobList = () => {
                     const canDeleteClient = allpermisson?.includes('delete');
                     const canViewClient = allpermisson?.includes('view');
                  
-                    ///endpermission
-
-
-
-  // Show user profile
   const showUserProfile = (userInfo) => {
     setSelectedUser(userInfo);
     setUserProfileVisible(true);
   };
 
-  // Close user profile
   const closeUserProfile = () => {
     setSelectedUser(null);
     setUserProfileVisible(false);
@@ -235,13 +218,10 @@ const JobList = () => {
   useEffect(() => {
     if (filtermin) {
       setList(filteredData);
-      // Extract unique statuses from the data
       const statuses = ['All', ...new Set(filteredData.map(job => job.status).filter(Boolean))];
       setUniqueStatuses(statuses);
     }
   }, [filtermin, filteredData]);
-
-  // const jobStatusList = ["active", "blocked"];
 
   const editFunc = (idd) => {
     openEditJobModal();
@@ -321,7 +301,6 @@ const JobList = () => {
     },
   ];
 
-  // Update handler for date range changes
   const handleDateRangeChange = (dates) => {
     setDateRange(dates || [null, null]); // Ensure we set [null, null] when clearing
   };
@@ -333,18 +312,7 @@ const JobList = () => {
 
   return (
     <Card bodyStyle={{ padding: "-3px" }}>
-      {/* <Row gutter={16}>
-        {annualStatisticData.map((elm, i) => (
-          <Col xs={12} sm={12} md={12} lg={12} xl={6} key={i}>
-            <StatisticWidget
-              title={elm.title}
-              value={elm.value}
-              status={elm.status}
-              subtitle={elm.subtitle}
-            />
-          </Col>
-        ))}
-      </Row> */}
+     
       <Flex
         alignItems="center"
         justifyContent="space-between"
@@ -404,7 +372,7 @@ const JobList = () => {
           <Button
                 type="primary"
                 icon={<FileExcelOutlined />}
-                onClick={exportToExcel} // Call export function when the button is clicked
+                onClick={exportToExcel} 
                 block
               >
                 Export All
@@ -435,7 +403,6 @@ const JobList = () => {
         close={closeUserProfile}
       />
 
-      {/* Add Job Modal */}
       <Modal
         title="Create Job"
         visible={isAddJobModalVisible}
@@ -443,7 +410,6 @@ const JobList = () => {
         footer={null}
         width={1000}
         className="mt-[-70px]"
-        // height={1000}
       >
         <AddJob onClose={closeAddJobModal} />
       </Modal>
@@ -455,7 +421,6 @@ const JobList = () => {
         footer={null}
         width={1000}
         className="mt-[-70px]"
-        // height={1000}
       >
         <EditJob onClose={closeEditJobModal} idd={idd} />
       </Modal>

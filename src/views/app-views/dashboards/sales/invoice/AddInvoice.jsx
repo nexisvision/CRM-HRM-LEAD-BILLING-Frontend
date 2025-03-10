@@ -54,25 +54,19 @@ const AddInvoice = ({ onClose }) => {
     },
   ]);
 
-  // Get currencies from the store
   const currencies = useSelector((state) => state.currencies.currencies.data);
 
-  // Add this to get taxes from Redux store
   const { taxes } = useSelector((state) => state.tax);
 
 
-  // Add loading state
   const [loading, setLoading] = useState(false);
 
-  // Get products directly from Redux store
   const productsData = useSelector((state) => state.Product.Product);
 
-  // Fetch currencies when component mounts
   useEffect(() => {
     dispatch(getcurren());
   }, [dispatch]);
 
-  // Add this useEffect to fetch taxes when component mounts
   useEffect(() => {
     dispatch(getAllTaxes());
   }, [dispatch]);
@@ -116,7 +110,6 @@ const AddInvoice = ({ onClose }) => {
         if (row.id === id) {
             const updatedRow = { ...row };
             
-            // Handle empty values for numeric fields
             if (field === 'price' || field === 'discountValue') {
                 updatedRow[field] = value === '' ? '0' : value;
             } else if (field === 'quantity') {
@@ -125,13 +118,11 @@ const AddInvoice = ({ onClose }) => {
                 updatedRow[field] = value;
             }
             
-            // Calculate amount if quantity, price, or tax changes
             if (field === 'quantity' || field === 'price' || field === 'tax' || field === 'discountType' || field === 'discountValue') {
                 const quantity = parseFloat(updatedRow.quantity) || 0;
                 const price = parseFloat(updatedRow.price) || 0;
                 const baseAmount = quantity * price;
                 
-                // Calculate item discount
                 let itemDiscountAmount = 0;
                 const discountValue = parseFloat(updatedRow.discountValue) || 0;
                 if (updatedRow.discountType === 'percentage') {
@@ -140,14 +131,12 @@ const AddInvoice = ({ onClose }) => {
                     itemDiscountAmount = Math.min(discountValue, baseAmount);
                 }
 
-                // Calculate tax on amount after discount
                 const amountAfterDiscount = baseAmount - itemDiscountAmount;
                 const tax = field === 'tax' ? 
                     (value ? parseFloat(value.gstPercentage) : 0) : 
                     (row.tax ? parseFloat(row.tax.gstPercentage) : 0);
                 const taxAmount = (amountAfterDiscount * tax) / 100;
                 
-                // Calculate final amount
                 const finalAmount = amountAfterDiscount + taxAmount;
                 updatedRow.amount = finalAmount.toFixed(2);
             }
@@ -163,13 +152,11 @@ const AddInvoice = ({ onClose }) => {
 
 
   const calculateTotal = (data, globalDiscountValue, discountType) => {
-    // Calculate item-level totals
     const calculations = data.reduce((acc, row) => {
         const quantity = parseFloat(row.quantity) || 0;
         const price = row.price === '' ? 0 : (parseFloat(row.price) || 0);
         const baseAmount = quantity * price;
         
-        // Calculate item discount
         let itemDiscountAmount = 0;
         const discountValue = row.discountValue === '' ? 0 : (parseFloat(row.discountValue) || 0);
         if (row.discountType === 'percentage') {
@@ -178,7 +165,6 @@ const AddInvoice = ({ onClose }) => {
             itemDiscountAmount = Math.min(discountValue, baseAmount);
         }
 
-        // Calculate tax
         const amountAfterDiscount = baseAmount - itemDiscountAmount;
         const taxPercentage = row.tax ? parseFloat(row.tax.gstPercentage) || 0 : 0;
         const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
@@ -191,7 +177,6 @@ const AddInvoice = ({ onClose }) => {
         };
     }, { totalBaseAmount: 0, totalItemDiscount: 0, totalTax: 0, subtotal: 0 });
 
-    // Calculate global discount
     let globalDiscountAmount = 0;
     const validGlobalDiscountValue = globalDiscountValue === '' ? 0 : (parseFloat(globalDiscountValue) || 0);
     
@@ -201,10 +186,8 @@ const AddInvoice = ({ onClose }) => {
         globalDiscountAmount = validGlobalDiscountValue;
     }
 
-    // Calculate final total
     const finalTotal = Math.max(0, calculations.subtotal - globalDiscountAmount);
 
-    // Update totals state
     setTotals({
         subtotal: calculations.subtotal.toFixed(2),
         itemDiscount: calculations.totalItemDiscount.toFixed(2),
@@ -233,7 +216,6 @@ const AddInvoice = ({ onClose }) => {
             const price = parseFloat(item.price) || 0;
             const baseAmount = quantity * price;
             
-            // Calculate item discount
             let itemDiscountAmount = 0;
             const discountValue = parseFloat(item.discountValue) || 0;
             if (item.discountType === 'percentage') {
@@ -242,7 +224,6 @@ const AddInvoice = ({ onClose }) => {
                 itemDiscountAmount = Math.min(discountValue, baseAmount);
             }
 
-            // Calculate tax
             const amountAfterDiscount = baseAmount - itemDiscountAmount;
             const taxPercentage = item.tax ? parseFloat(item.tax.gstPercentage) || 0 : 0;
             const taxAmount = (amountAfterDiscount * taxPercentage) / 100;
@@ -306,7 +287,7 @@ const AddInvoice = ({ onClose }) => {
 
       if (response.payload && response.payload.data) {
         const uniqueTags = response.payload.data
-          .filter((label) => label && label.name) // Filter out invalid labels
+          .filter((label) => label && label.name) 
           .map((label) => ({
             id: label.id,
             name: label.name.trim(),
@@ -314,7 +295,7 @@ const AddInvoice = ({ onClose }) => {
           .filter(
             (label, index, self) =>
               index === self.findIndex((t) => t.name === label.name)
-          ); // Remove duplicates
+          ); 
 
         setTags(uniqueTags);
       }
@@ -324,7 +305,6 @@ const AddInvoice = ({ onClose }) => {
     }
   };
 
-  // Fetch products when component mounts
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -342,14 +322,12 @@ const AddInvoice = ({ onClose }) => {
     fetchProducts();
   }, [dispatch]);
 
-  // Update local state when Redux store changes
   useEffect(() => {
     if (productsData?.data) {
       setProducts(productsData.data);
     }
   }, [productsData]);
 
-  // Product selection handler
   const handleProductChange = (productId) => {
     
     if (productId) {
@@ -363,7 +341,6 @@ const AddInvoice = ({ onClose }) => {
                     const price = selectedProd.price || 0;
                     const baseAmount = quantity * price;
                     
-                    // Calculate tax if available
                     const taxPercentage = selectedProd.tax ? parseFloat(selectedProd.tax.gstPercentage) || 0 : 0;
                     const taxAmount = (baseAmount * taxPercentage) / 100;
                     
@@ -388,7 +365,6 @@ const AddInvoice = ({ onClose }) => {
     }
   };
 
-  // Add a reset function that can be called independently if needed
   const resetForm = () => {
     form.resetFields();
     setTableData([
@@ -417,14 +393,12 @@ const AddInvoice = ({ onClose }) => {
 
   const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] = useState(false);
 
-  // Update category related states
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
 
   const AllLoggedData = useSelector((state) => state.user);
 
-  // Add fetchLables function
   const fetchLables = async (lableType, setter) => {
     try {
       const lid = AllLoggedData.loggedInUser.id;
@@ -441,12 +415,10 @@ const AddInvoice = ({ onClose }) => {
     }
   };
 
-  // Add useEffect to fetch categories
   useEffect(() => {
     fetchLables("category", setCategories);
   }, []);
 
-  // Update handleAddNewLable function
   const handleAddNewLable = async (lableType, newValue, setter, modalSetter) => {
     if (!newValue.trim()) {
       message.error(`Please enter a ${lableType} name.`);
@@ -465,7 +437,6 @@ const AddInvoice = ({ onClose }) => {
       if (response.payload && response.payload.success) {
         message.success(`${lableType} added successfully.`);
         
-        // Refresh the labels immediately after adding
         const labelsResponse = await dispatch(GetLable(lid));
         if (labelsResponse.payload && labelsResponse.payload.data) {
           const filteredLables = labelsResponse.payload.data
@@ -473,11 +444,8 @@ const AddInvoice = ({ onClose }) => {
             .map((lable) => ({ id: lable.id, name: lable.name.trim() }));
           
           setCategories(filteredLables);
-          // Update form field value
           form.setFieldValue("category", newValue.trim());
         }
-        
-        // Reset input and close modal
         setter("");
         modalSetter(false);
       } else {
@@ -520,7 +488,6 @@ const AddInvoice = ({ onClose }) => {
                       >
                         <Button
                           type="link"
-                          // icon={<PlusOutlined />}
                           className="w-full"
                           onClick={() => setIsAddCustomerModalVisible(true)}
                         >
@@ -558,7 +525,6 @@ const AddInvoice = ({ onClose }) => {
                   format="DD-MM-YYYY" 
                   onChange={(date) => {
                     form.setFieldsValue({ issueDate: date });
-                    // Clear due date if it's before the new issue date
                     const dueDate = form.getFieldValue('dueDate');
                     if (dueDate && date && dueDate.isBefore(date)) {
                       form.setFieldsValue({ dueDate: null });
@@ -578,9 +544,7 @@ const AddInvoice = ({ onClose }) => {
                   className="w-full" 
                   format="DD-MM-YYYY"
                   disabledDate={(current) => {
-                    // Get the issue date from form
                     const issueDate = form.getFieldValue('issueDate');
-                    // Disable dates before issue date
                     return issueDate ? current && current < issueDate.startOf('day') : false;
                   }}
                 />
@@ -756,7 +720,6 @@ const AddInvoice = ({ onClose }) => {
                             value={row.price}
                             onChange={(e) => {
                               const value = e.target.value;
-                              // If user starts typing and current value is "0", clear it
                               if (row.price === "0" && value !== "") {
                                 handleTableDataChange(row.id, "price", value.replace(/^0+/, ''));
                               } else {
@@ -792,7 +755,6 @@ const AddInvoice = ({ onClose }) => {
                               value={row.discountValue}
                               onChange={(e) => {
                                 const value = e.target.value;
-                                // If user starts typing and current value is "0", clear it
                                 if (row.discountValue === "0" && value !== "") {
                                   handleTableDataChange(row.id, "discountValue", value.replace(/^0+/, ''));
                                 } else {
@@ -823,7 +785,6 @@ const AddInvoice = ({ onClose }) => {
                                 className="w-[100px]"
                                 allowClear
                             >
-                                {/* <Option value="0">0</Option> */}
                                 {taxes && taxes.data && taxes.data.map(tax => (
                                     <Option key={tax.id} value={`${tax.gstName}|${tax.gstPercentage}`}>
                                         {tax.gstName} ({tax.gstPercentage}%)
@@ -863,7 +824,6 @@ const AddInvoice = ({ onClose }) => {
             </div>
           </div>
 
-          {/* summary */}
 
           <div className="mt-3 flex flex-col justify-end items-end border-t-2 space-y-2">
             <table className="w-full lg:w-[50%] p-2">
@@ -892,7 +852,6 @@ const AddInvoice = ({ onClose }) => {
                       value={globalDiscountValue}
                       onChange={(e) => {
                         const value = e.target.value;
-                        // If user starts typing and current value is 0, clear it
                         if (globalDiscountValue === 0 && value !== "") {
                           setGlobalDiscountValue(parseFloat(value));
                           calculateTotal(tableData, parseFloat(value), globalDiscountType);

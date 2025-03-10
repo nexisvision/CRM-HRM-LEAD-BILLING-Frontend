@@ -33,7 +33,6 @@ const AddRevenue = ({ onClose }) => {
 
   const { id } = useParams();
 
-  // category start
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
@@ -90,7 +89,6 @@ const AddRevenue = ({ onClose }) => {
       if (response.payload && response.payload.success) {
         message.success(`${lableType} added successfully.`);
         
-        // Refresh the labels immediately after adding
         const labelsResponse = await dispatch(GetLable(lid));
         if (labelsResponse.payload && labelsResponse.payload.data) {
           const filteredLables = labelsResponse.payload.data
@@ -103,7 +101,6 @@ const AddRevenue = ({ onClose }) => {
           }
         }
         
-        // Reset input and close modal
         setter("");
         modalSetter(false);
       } else {
@@ -115,7 +112,6 @@ const AddRevenue = ({ onClose }) => {
     }
   };
 
-  // category end
 
   useEffect(() => {
     dispatch(Getcus());
@@ -147,15 +143,12 @@ const AddRevenue = ({ onClose }) => {
   const customerdata = useSelector((state) => state.customers);
   const fnddata = customerdata.customers.data;
 
-  // State to manage AddCustomer modal visibility
   const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] = useState(false);
 
-  // Function to open AddCustomer modal
   const openAddCustomerModal = () => {
     setIsAddCustomerModalVisible(true);
   };
 
-  // Function to close AddCustomer modal
   const closeAddCustomerModal = () => {
     setIsAddCustomerModalVisible(false);
   };
@@ -194,7 +187,6 @@ const AddRevenue = ({ onClose }) => {
   });
 
   const onSubmit = (values, { resetForm }) => {
-    // Convert amount to number before submitting
     const formattedValues = {
       ...values,
       amount: parseFloat(values.amount) || 0,
@@ -428,7 +420,7 @@ const AddRevenue = ({ onClose }) => {
                               {...field}
                               className="w-full mt-2"
                               placeholder="Select Customer"
-                              loading={!fnddata} // Loading state
+                              loading={!fnddata}
                               onChange={(value) =>
                                 setFieldValue("customer", value)
                               }
@@ -566,7 +558,6 @@ const AddRevenue = ({ onClose }) => {
                   </div>
                 </Form>
 
-                {/* Add Category Modal */}
                 <Modal
                   title="Add New Category"
                   open={isCategoryModalVisible}
@@ -581,7 +572,6 @@ const AddRevenue = ({ onClose }) => {
                   />
                 </Modal>
 
-                {/* AddCustomer Modal */}
                 <Modal
                   title="Add Customer"
                   visible={isAddCustomerModalVisible}
@@ -597,7 +587,6 @@ const AddRevenue = ({ onClose }) => {
         </div>
       </div>
 
-      {/* Add Currency Modal */}
       <Modal
         title="Add New Currency"
         visible={isAddCurrencyModalVisible}
@@ -608,12 +597,11 @@ const AddRevenue = ({ onClose }) => {
         <AddCurrencies
           onClose={() => {
             setIsAddCurrencyModalVisible(false);
-            dispatch(getcurren()); // Refresh currency list after adding
+            dispatch(getcurren()); 
           }}
         />
       </Modal>
 
-      {/* Custom render for selected value */}
       <style jsx>{`
         .currency-select .ant-select-selection-item {
           display: flex !important;

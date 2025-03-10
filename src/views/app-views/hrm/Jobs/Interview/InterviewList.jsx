@@ -188,9 +188,7 @@ const InterviewCalendarApp = () => {
       dispatch(getInterview());
       setModalVisible(false);
       form.resetFields();
-      // message.success('Interview added successfully');
     } catch (error) {
-      // message.error('Failed to add Interview');
     }
   };
 

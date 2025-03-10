@@ -1,12 +1,6 @@
 import axios from "axios";
 import { env } from "configs/EnvironmentConfig";
-// const baseUrl = import.meta.env.VITE_BASE_URL;
-// import { getToken } from "../../../configs/axiosConfig"
 
-// const addUser = async (data) => {
-//     const res = await axios.post(`${baseUrl}users/add`, data, getToken());
-//     return res
-// };
 
 const fetchEmpData = async () => {
   const token = localStorage.getItem("auth_token");
@@ -85,15 +79,11 @@ const EditEmp = async (idd, updatedFormValues) => {
 
 
 const UserService = {
-  // addUser,
   fetchEmpData,
   createEmp,
   Empdelete,
   EditEmp,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+
 };
 
 export default UserService;

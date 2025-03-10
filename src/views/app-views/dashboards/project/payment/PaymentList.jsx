@@ -50,18 +50,15 @@ const PaymentList = () => {
   const allempdata = useSelector((state) => state.Payment);
   const filtermin = allempdata.Payment.data;
 
-  // Add new states for projects and invoices
   const [projectsList, setProjectsList] = useState([]);
   const [invoicesList, setInvoicesList] = useState([]);
   
-  // Get data from redux store
   const projectsData = useSelector((state) => state.Project.Project.data || []);
   const invoicesData = useSelector((state) => state.invoice);
   const tabledata = useSelector((state) => state.Payment);
 
   const [selectedPayment, setSelectedPayment] = useState(null);
 
-  // Open Add Job Modal
   const openAddPaymentModal = () => {
     setIsAddPaymentModalVisible(true);
   };
@@ -82,7 +79,6 @@ const PaymentList = () => {
   };
 
  useEffect(() => {
-    // Fetch payments, projects and invoices data
     dispatch(Getpay(id));
     dispatch(GetProject());
     dispatch(getAllInvoices(id));
@@ -100,13 +96,11 @@ const PaymentList = () => {
     }
   }, [invoicesData]);
 
-  // Function to get project name by ID
   const getProjectName = (projectId) => {
     const project = projectsData.find(project => project.id === projectId);
     return project ? project.project_name : 'N/A';
   };
 
-  // Function to get invoice number by ID
   const getInvoiceNumber = (invoiceId) => {
     const invoice = invoicesList.find(invoice => invoice.id === invoiceId);
     return invoice ? invoice.invoiceNumber : 'N/A';
@@ -225,13 +219,11 @@ const PaymentList = () => {
     const value = e.target.value.toLowerCase();
     setSearchText(value);
     
-    // If search value is empty, show all data
     if (!value) {
       setList(filtermin);
       return;
     }
     
-    // Filter the data based on project name
     const filtered = filtermin.filter(payment => {
       const projectName = getProjectName(payment.project_name)?.toLowerCase();
       return projectName?.includes(value);
@@ -240,13 +232,11 @@ const PaymentList = () => {
     setList(filtered);
   };
 
-  // Update the filter function to include search
   const getFilteredPayments = () => {
     if (!list) return [];
     
     let filtered = list;
 
-    // Apply search filter
     if (searchText) {
       filtered = filtered.filter(payment => {
         const projectName = getProjectName(payment.project_name)?.toLowerCase();
@@ -257,7 +247,6 @@ const PaymentList = () => {
     return filtered;
   };
 
-  // Update the list when payment data changes
   useEffect(() => {
     if (tabledata && tabledata.Payment && tabledata.Payment.data) {
       setList(tabledata.Payment.data);

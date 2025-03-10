@@ -41,7 +41,6 @@ const getShippingStatus = (status) => {
 const paymentStatusList = ["Normal", "UNNormal", "Expired"];
 
 export const TicketList = () => {
-//   const [annualStatisticData] = useState(AnnualStatisticData);
   const [list, setList] = useState(OrderListData);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
@@ -100,11 +99,9 @@ useEffect(()=>{
     setIsViewTicketModalVisible(false);
   };
 
- 
-
 
   const deletfun = (userId) => {
-   
+
     setList(list.filter((item) => item.id !== userId));
     message.success({ content: `Deleted user ${userId}`, duration: 2 });
   };

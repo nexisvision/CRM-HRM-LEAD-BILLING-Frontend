@@ -1,8 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react'
 import { Card, Table, Select, Input, Row, Col, Button, Badge, Menu, Tag, Modal, message } from 'antd';
-// import { EyeOutlined, FileExcelOutlined, SearchOutlined, PlusCircleOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
-// import { Card, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import AvatarStatus from 'components/shared-components/AvatarStatus';
 import StatisticWidget from 'components/shared-components/StatisticWidget';
@@ -64,16 +62,13 @@ const EstimatesList = () => {
 		setIsAddEstimatesModalVisible(true);
 	};
 
-	// Close Add Job Modal
 	const closeAddEstimatesModal = () => {
 		setIsAddEstimatesModalVisible(false);
 	};
 
-	// Open Add Job Modal
 	const openEditEstimatesModal = () => {
         setIsEditEstimatesModalVisible(true);
     };
-    // Close Add Job Modal
     const closeEditEstimatesModal = () => {
         setIsEditEstimatesModalVisible(false);
     };
@@ -127,7 +122,6 @@ const EstimatesList = () => {
 					</Button>
 				</Flex>
 			</Menu.Item>
-			
 
 			<Menu.Item>
 				<Flex alignItems="center">
@@ -142,7 +136,9 @@ const EstimatesList = () => {
 					</Button>
 				</Flex>
 			</Menu.Item>
+			
 			<Menu.Item>
+				
 				<Flex alignItems="center">
 					<Button
 						type=""
@@ -204,7 +200,7 @@ const EstimatesList = () => {
 			key: 'currency',
 			sorter: (a, b) => utils.antdTableSorter(a, b, 'currency')
 		},
-		
+	
 		
 		{
 			title: 'Amount',
@@ -273,6 +269,7 @@ const EstimatesList = () => {
 								onChange={onSearch}
 							/>
 						</div>
+						
 					</Flex>
 
 					<Flex gap="7px" className="flex">

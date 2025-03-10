@@ -51,7 +51,6 @@ const AddTask = ({ onClose }) => {
     const [categories, setCategories] = useState([]);
     const [statuses, setStatuses] = useState([]);
 
-    // Add new state for files
     const [fileList, setFileList] = useState([]);
 
 
@@ -61,17 +60,11 @@ const AddTask = ({ onClose }) => {
 
   const { data: Leads, isLoading: isLeadsLoading, error: leadsError } = useSelector((state) => state.Leads.Leads || []);
 
-  // const lead = Leads?.filter((item) => item.created_by === user);
-
   const allproject = useSelector((state) => state.Project);
   const fndrewduxxdaa = allproject.Project.data
   const fnddata = fndrewduxxdaa?.find((project) => project?.id === id);
-
-    
   
   const AllLoggedData = useSelector((state) => state.user);
-
-
 
   const allempdata = useSelector((state) => state.Users);
   const empData = allempdata?.Users?.data || [];
@@ -87,11 +80,7 @@ const AddTask = ({ onClose }) => {
     }
   });
 
-  // const fnd = empData.filter((item) => item.created_by === user);
-  // const loggeduser = useSelector((state)=>state.user.loggedInUser.username);
   const loggeduser = useSelector((state)=>state.user.loggedInUser.username);
-
-  // const fnduserdatas = empData.filter((item)=>item.created_by === loggeduser);
 
   const [selectedLead, setSelectedLead] = useState(null);
 
@@ -207,7 +196,6 @@ const AddTask = ({ onClose }) => {
     }
   };
 
-  // File upload props configuration
   const uploadProps = {
     onRemove: (file) => {
       const index = fileList.indexOf(file);
@@ -224,26 +212,19 @@ const AddTask = ({ onClose }) => {
   };
 
   const onSubmit = async (values, { resetForm }) => {
-    // Create FormData to handle file upload
     const formData = new FormData();
     
-    // Append all regular fields
     Object.keys(values).forEach(key => {
       if (key !== 'files') {
         formData.append(key, values[key]);
       }
     });
 
-    // Append files with the key 'task_file'
     fileList.forEach((file) => {
       formData.append('task_file', file);
     });
 
-
-    // Dispatch AddTasks with updated values
     dispatch(AddTaskk({ id, values })).then(() => {
-      // message.success("Task added successfully!");
-        // Fetch updated tasks after successfully adding
         dispatch(GetTasks(id))
           .then(() => {
             resetForm();
@@ -251,7 +232,6 @@ const AddTask = ({ onClose }) => {
             onClose();
           })
           .catch((error) => {
-            // message.error("Failed to fetch the latest Task data.");
             console.error("Task API error:", error);
           });
       })
@@ -374,7 +354,6 @@ const AddTask = ({ onClose }) => {
                       format="DD-MM-YYYY"
                       onChange={(date) => {
                         setFieldValue("startDate", date);
-                        // Clear end date if it's before the new start date
                         if (values.dueDate && date && values.dueDate.isBefore(date)) {
                           setFieldValue("dueDate", null);
                         }
@@ -402,7 +381,6 @@ const AddTask = ({ onClose }) => {
                          format="DD-MM-YYYY"
                       onBlur={() => setFieldTouched("dueDate", true)}
                       disabledDate={(current) => {
-                        // Disable dates before start date
                         return values.startDate ? current && current < values.startDate.startOf('day') : false;
                       }}
                     />
@@ -581,23 +559,6 @@ const AddTask = ({ onClose }) => {
                   </div>
                 </Col>
 
-                {/* Add File Upload field */}
-                {/* <Col span={24} className="mt-4">
-                  <div className="form-item">
-                    <label className="font-semibold">Attachments</label>
-                    <Upload
-                      {...uploadProps}
-                      listType="picture-card"
-                    >
-                      <div>
-                        <PlusOutlined />
-                        <div style={{ marginTop: 8 }}>Upload</div>
-                      </div>
-                    </Upload>
-                  </div>
-                </Col> */}
-
-                {/* Alternative simple file upload design */}
                 <Col span={24} className="mt-4">
                   <div className="form-item">
                     <label className="text-sm font-semibold mb-2 block">Attachments <span className="text-red-500">*</span></label>
@@ -622,7 +583,6 @@ const AddTask = ({ onClose }) => {
               </div>
             </Form>
 
-            {/* Move Modals inside Formik render props to access setFieldValue */}
             <Modal
               title="Add New priority"
               open={isPriorityModalVisible}

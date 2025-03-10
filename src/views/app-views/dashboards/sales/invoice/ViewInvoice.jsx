@@ -25,31 +25,24 @@ const ViewInvoice = ({idd}) => {
         dispatch(Getcus())
     },[])
 
-     // Add this useEffect to fetch general settings
      useEffect(() => {
         dispatch(getgeneralsettings());
     }, [dispatch]);
     
 
-  // Get invoice data
   const allInvoices = useSelector((state) => state?.salesInvoices?.salesInvoices?.data);
   const invoiceData = allInvoices.find(inv => inv.id === idd);
-
-  // Get customer data
 
 const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
  const generalSettingsData = useSelector((state) => state.generalsetting.generalsetting.data);
 
-
-  // Get logged in user data
   const loggedInUser = useSelector((state) => state?.user?.loggedInUser);
 
   const [selectedSignature, setSelectedSignature] = useState(null);
   const [selectedSignatureName, setSelectedSignatureName] = useState(null);
   const [showSelector, setShowSelector] = useState(true);
   
-  // Get signatures from Redux store
   const signatures = useSelector((state) => state?.esignature?.esignature?.data);
 
   const [isSignatureConfirmed, setIsSignatureConfirmed] = useState(false);
@@ -63,7 +56,6 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
     dispatch(Getcus());
   }, []);
 
-   // Update useEffect to set general settings
    useEffect(() => {
     if (generalSettingsData && generalSettingsData.length > 0) {
         setGeneralSettings(generalSettingsData[0]);
@@ -81,7 +73,7 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
                     ...invoiceData,
                     items: Object.values(items),
                     discount: invoiceData.discount || 0,
-                    tax: invoiceData.tax ?? 0 // Add tax to parsed invoice, default to 0 if null
+                    tax: invoiceData.tax ?? 0 
                 });
             } catch (error) {
                 console.error("Error parsing items:", error);
@@ -91,7 +83,6 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
     useEffect(() => {
         if (parsedInvoice && allCustomers) {
-            // Find customer details matching the invoice's customer ID
             const customer = allCustomers.find(cust => cust.id === parsedInvoice.customer);
             if (customer) {
                 setCustomerData(customer);
@@ -215,15 +206,12 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
             }
         `;
     
-        // Add print styles
         const styleSheet = document.createElement('style');
         styleSheet.innerHTML = printStyles;
         document.head.appendChild(styleSheet);
     
-        // Print the specific content
         window.print();
     
-        // Remove the print styles
         document.head.removeChild(styleSheet);
     };
 
@@ -249,13 +237,11 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
         html2pdf().set(opt).from(element).save();
     };
 
-    // Update the calculateTotalDiscount function
     const calculateTotalDiscount = (subtotal, discountPercentage) => {
         if (!subtotal || !discountPercentage) return 0;
         return (subtotal * discountPercentage) / 100;
     };
     
-    // Function to calculate subtotal (before tax and discount)
     const calculateSubtotal = () => {
         if (!parsedInvoice?.items) return 0;
         return Object.values(parsedInvoice.items).reduce((sum, item) => 
@@ -263,14 +249,11 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
             );
     };
     
-    // Update the calculateTotalTax function to use tax from database
     const calculateTotalTax = (subtotal) => {
-        // Use database tax value or default to 0 if null
         const taxRate = invoiceData?.tax ?? 0;
         return (subtotal * taxRate) / 100;
     };
     
-    // Function to calculate final total (subtotal + total tax - total discount)
     const calculateFinalTotal = (subtotal, totalTax, totalDiscount) => {
         return subtotal - totalDiscount + totalTax;
     };
@@ -291,7 +274,6 @@ const allCustomers = useSelector((state) => state?.customers?.customers?.data);
 
         return (
             <div className="bg-white p-6">
-                {/* Header with gradient background */}
                 <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 mb-6 rounded-lg">
                     <div className="flex justify-between items-center">
                         <h1 className="text-3xl text-gray-700">Invoice</h1>

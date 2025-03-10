@@ -50,7 +50,6 @@ const ExpensesList = () => {
 	const [searchValue, setSearchValue] = useState("");
 	const [isSearching, setIsSearching] = useState(false);
 
-	// Create debounced search function
 	const debouncedSearch = debounce((value, data, setList) => {
 		setIsSearching(true);
 		const searchValue = value.toLowerCase();
@@ -74,22 +73,18 @@ const ExpensesList = () => {
 		setIsSearching(false);
 	}, 300); // 300ms delay
 
-	// Open Add Job Modal
 	const openAddExpensesModal = () => {
 		setIsAddExpensesModalVisible(true);
 	};
 
-	// Close Add Job Modal
 	const closeAddExpensesModal = () => {
 		setIsAddExpensesModalVisible(false);
 	};
 
-	// Open Add Job Modal
 	const openEditExpensesModal = () => {
 		setIsEditExpensesModalVisible(true);
 	};
 
-	// Close Add Job Modal
 	const closeEditExpensesModal = () => {
 		setIsEditExpensesModalVisible(false);
 	};
@@ -98,7 +93,6 @@ const ExpensesList = () => {
 		setIsViewExpensesModalVisible(true);
 	};
 
-	// Close Add Job Modal
 	const closeViewExpensesModal = () => {
 		setIsViewExpensesModalVisible(false);
 	};

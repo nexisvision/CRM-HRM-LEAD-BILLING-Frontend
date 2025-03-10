@@ -29,7 +29,6 @@ const EditRevenue = ({ idd, onClose }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // category start
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
@@ -64,7 +63,7 @@ const EditRevenue = ({ idd, onClose }) => {
           .filter(
             (label, index, self) =>
               index === self.findIndex((t) => t.name === label.name)
-          ); // Remove duplicates
+          ); 
 
         setCategories(uniqueCategories);
       }
@@ -96,7 +95,6 @@ const EditRevenue = ({ idd, onClose }) => {
       setNewCategory("");
       setIsCategoryModalVisible(false);
 
-      // Fetch updated categories
       await fetchLables();
     } catch (error) {
       console.error("Failed to add Category:", error);
@@ -104,17 +102,13 @@ const EditRevenue = ({ idd, onClose }) => {
     }
   };
 
-  // category end
 
-  // State to manage AddCustomer modal visibility
   const [isAddCustomerModalVisible, setIsAddCustomerModalVisible] = useState(false);
 
-  // Function to open AddCustomer modal
   const openAddCustomerModal = () => {
     setIsAddCustomerModalVisible(true);
   };
 
-  // Function to close AddCustomer modal
   const closeAddCustomerModal = () => {
     setIsAddCustomerModalVisible(false);
   };
@@ -151,7 +145,6 @@ const EditRevenue = ({ idd, onClose }) => {
   });
 
   useEffect(() => {
-    // Fetch revenue data
     dispatch(getRevenue());
   }, [dispatch]);
 
@@ -485,7 +478,6 @@ const EditRevenue = ({ idd, onClose }) => {
                         type="file"
                         onChange={(event) => {
                           const file = event.currentTarget.files[0];
-                          // Store the file name as a string
                           setFieldValue("paymentReceipt", file ? file.name : "");
                         }}
                         className="mt-2 w-full"

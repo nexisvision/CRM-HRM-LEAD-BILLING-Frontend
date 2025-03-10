@@ -17,7 +17,6 @@ export const Addcreditnote = createAsyncThunk(
   }
 );
 
-// Async thunk for user login
 
 export const getcreditnote = createAsyncThunk(
   "emp/getcreditnote",
@@ -31,7 +30,6 @@ export const getcreditnote = createAsyncThunk(
   }
 );
 
-// Async thunk for getting all users
 export const getAllUsers = createAsyncThunk(
   "users/getAllUsers",
   async (thunkAPI) => {
@@ -44,7 +42,6 @@ export const getAllUsers = createAsyncThunk(
   }
 );
 
-// Async thunk for getting user by id
 export const getUserById = createAsyncThunk(
   "users/getUserById",
   async (userId, thunkAPI) => {
@@ -57,7 +54,6 @@ export const getUserById = createAsyncThunk(
   }
 );
 
-// Async thunk for deleting a user
 export const deletecreditnote = createAsyncThunk(
   "users/deletecreditnoteeet",
   async (userId, thunkAPI) => {

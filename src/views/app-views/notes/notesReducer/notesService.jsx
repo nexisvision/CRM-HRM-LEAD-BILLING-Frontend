@@ -30,7 +30,6 @@ const addnote = async (id, formData) => {
         },
       }
     );
-    //    dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);

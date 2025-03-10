@@ -26,9 +26,7 @@ const EditExpenses = () => {
     });
 
     useEffect(() => {
-        // Simulate fetching existing expense data
         const fetchExpenseData = async () => {
-            // Replace with an API call to fetch expense details by ID
             const expenseData = {
                 date: '2024-01-01',
                 description: '<p>Sample description</p>',

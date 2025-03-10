@@ -8,7 +8,6 @@ import { Menu, Form, Input, Modal } from 'antd'
 import { CloseOutlined, EditOutlined, DeleteOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { updateModal, updateModalMode, updateCurrentListId, updateCardData, updateColumns, updateOrdered } from '../scrumboard/scrumboardreducer/scrumboardSlice';
 
-// ... RenameForm component stays the same ...
 
 const RenameForm = ({ title, finish }) => {
 		const [form] = Form.useForm();

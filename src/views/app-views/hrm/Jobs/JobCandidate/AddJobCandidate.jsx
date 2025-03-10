@@ -43,7 +43,6 @@ const AddJobCandidate = () => {
 
   return (
     <div className="add-job-form">
-      {/* <h2 className="mb-4">Create JobCandidate</h2> */}
 
       <Formik
         initialValues={initialValues}
@@ -53,7 +52,6 @@ const AddJobCandidate = () => {
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <Form
             layout="vertical"
-            // form={form}
             name="add-job"
             className="formik-form" onSubmit={handleSubmit}
           >

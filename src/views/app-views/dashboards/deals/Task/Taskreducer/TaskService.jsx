@@ -30,7 +30,6 @@ const AddExpence = async (id, values) => {
         },
       }
     );
-    //    dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -50,7 +49,6 @@ const DeleteEx = async (exid) => {
         },
       }
     );
-    //   dispatch(empdata());
     return res.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -79,15 +77,11 @@ const EditEx = async (id, values) => {
 
 
 const UserService = {
-  // addUser,
   Getex,
   AddExpence,
   DeleteEx,
   EditEx,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
+ 
 };
 
 export default UserService;

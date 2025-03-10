@@ -215,7 +215,6 @@ const OverViewList = () => {
     'Pending': '#F1C40F'       // Gold
   };
 
-  // Function to get color for unknown status
   const getStatusColor = (status) => {
     return statusColors[status] || generateRandomColor(status);
   };
@@ -252,7 +251,6 @@ const OverViewList = () => {
     };
   }, [taskData]);
 
-  // Group tasks by status
   const tasksByStatus = useMemo(() => {
     return taskData.reduce((acc, task) => {
       const status = task.status || 'No Status';
@@ -264,15 +262,12 @@ const OverViewList = () => {
     }, {});
   }, [taskData]);
 
-  // Navigate to task details
   const handleTaskClick = (taskId) => {
     navigate(`/app/dashboards/project/task/${taskId}`);
     setIsTaskModalVisible(false);
   };
 
-  // Update the clientInfo memo with better error handling
   const clientInfo = useMemo(() => {
-    // Wait for both project and client data to be available
     if (!fndpro || !allclient) {
       return {
         username: 'Loading...',
@@ -280,7 +275,6 @@ const OverViewList = () => {
       };
     }
 
-    // Find the client using the project's client ID
     const client = allclient.find(item => item.id === fndpro.client);
 
     if (!client) {
@@ -296,24 +290,19 @@ const OverViewList = () => {
     };
   }, [fndpro, allclient]);
 
-  // Add milestone status helper function
   const getMilestoneProgress = (milestone) => {
-    // If milestone end date has passed, consider it as completed
     const endDate = dayjs(milestone.milestone_end_date);
     const now = dayjs();
     const isOverdue = now.isAfter(endDate, 'day');
 
-    // If milestone is marked as completed or end date has passed, return 100%
     if (milestone.milestone_status?.toLowerCase() === 'completed' ||
       milestone.milestone_status?.toLowerCase() === 'done' ||
       isOverdue) {
       return 100;
     }
 
-    // Calculate progress based on tasks if available
     const tasks = taskData.filter(task => task.milestone_id === milestone.id);
     if (!tasks.length) {
-      // If no tasks, calculate progress based on timeline
       const startDate = dayjs(milestone.milestone_start_date);
       const totalDuration = endDate.diff(startDate, 'day');
       const elapsed = now.diff(startDate, 'day');
@@ -324,18 +313,15 @@ const OverViewList = () => {
     return Math.round((completed / tasks.length) * 100);
   };
 
-  // Update milestone status helper function
   const getMilestoneStatus = (status, milestone) => {
     const normalizedStatus = status?.toLowerCase();
     const endDate = dayjs(milestone?.milestone_end_date);
     const now = dayjs();
 
-    // If milestone is marked as completed or done
     if (normalizedStatus === "completed" || normalizedStatus === "done") {
       return "success";
     }
 
-    // If end date has passed, consider it completed
     if (now.isAfter(endDate, 'day')) {
       return "success";
     }
@@ -351,12 +337,10 @@ const OverViewList = () => {
     const endDate = dayjs(milestone?.milestone_end_date);
     const now = dayjs();
 
-    // If milestone is marked as completed or done
     if (normalizedStatus === "completed" || normalizedStatus === "done") {
       return "Done";
     }
 
-    // If end date has passed, show as Done
     if (now.isAfter(endDate, 'day')) {
       return "Done";
     }
@@ -367,7 +351,6 @@ const OverViewList = () => {
     return status || "Not Set";
   };
 
-  // Add milestone table columns
   const milestoneTableColumns = [
     {
       title: "Milestone Title",
@@ -403,7 +386,6 @@ const OverViewList = () => {
   ];
 
 
-  // Update the Progress Circle component to show different colors based on status
   const getProgressColor = (progress, isComplete, isOverdue) => {
     if (isComplete) return '#059669'; // Green-600
     if (isOverdue) return '#DC2626';  // Red-600
@@ -744,7 +726,6 @@ const OverViewList = () => {
     </div>
   );
 
-  // Add this new component after the CompactTimeline component
   const ProjectActivities = ({ milestoneData, taskData }) => {
     const [activeTab, setActiveTab] = useState('milestones');
     const [viewType, setViewType] = useState('card');
@@ -805,7 +786,6 @@ const OverViewList = () => {
       );
     };
 
-    // Milestone table columns
     const milestoneColumns = [
       {
         title: "Title",
@@ -874,7 +854,6 @@ const OverViewList = () => {
       },
     ];
 
-    // Task table columns
     const taskColumns = [
       {
         title: "Title",

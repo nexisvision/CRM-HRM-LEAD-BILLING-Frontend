@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// import { DealStatisticViewData } from '../../../dashboards/default/DefaultDashboardData';
 import { Card, Form, Table, Menu, Row, Col, Tag, Input, message, Button, Modal } from 'antd';
 import { EyeOutlined, DeleteOutlined, SearchOutlined, MailOutlined, PlusOutlined, PushpinOutlined, FileExcelOutlined, CopyOutlined, EditOutlined, LinkOutlined } from '@ant-design/icons';
 import Flex from 'components/shared-components/Flex';
@@ -13,15 +12,9 @@ function DebitSummaryList() {
     const [users, setUsers] = useState(userData);
     const [list, setList] = useState(OrderListData);
     const [isEditInvoiceModalVisible, setIsEditInvoiceModalVisible] = useState(false);
-
-
-
-    // Open Add Job Modal
     const openEditInvoiceModal = () => {
         setIsEditInvoiceModalVisible(true);
     };
-
-    // Delete user
     const deleteUser = (userId) => {
         setList(list.filter((item) => item.id !== userId));
         message.success({ content: `Deleted list ${userId}`, duration: 2 });

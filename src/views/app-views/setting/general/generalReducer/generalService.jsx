@@ -90,10 +90,6 @@ const UserService = {
   creategenaral,
   deletesetting,
   Editticket,
-  // getAllUsers,
-  // getUserById,
-  // deleteUser,
-  // updateUser
 };
 
 export default UserService;

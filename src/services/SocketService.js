@@ -33,7 +33,6 @@ class SocketService {
 
                 this.socket.on('error', (error) => {
                     console.error('Socket error:', error);
-                    // You might want to show this error to the user
                     if (error.details) {
                         console.error('Error details:', error.details);
                     }
@@ -95,7 +94,6 @@ class SocketService {
         }
     }
 
-    // Notification methods
     sendNotification(notification) {
         if (this.socket) {
             this.socket.emit('send_notification', notification);
@@ -108,7 +106,6 @@ class SocketService {
         }
     }
 
-    // Typing status methods
     sendTyping(data) {
         if (this.socket) {
             this.socket.emit('typing', data);
@@ -138,7 +135,6 @@ class SocketService {
         return JSON.parse(localStorage.getItem('groupChats') || '[]');
     }
 
-    // Add group-related socket methods
     createGroup(groupData) {
         if (this.socket) {
             this.socket.emit('create_group', groupData);

@@ -129,7 +129,6 @@ const ContractSlice = createSlice({
       .addCase(vendordataedata.fulfilled, (state, action) => {
         state.isLoading = false;
         state.vendors = action?.payload;
-        // message.success(action.payload?.message);
       })
 
       .addCase(vendordataedata.rejected, (state, action) => {

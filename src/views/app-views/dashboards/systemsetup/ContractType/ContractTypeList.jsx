@@ -79,32 +79,26 @@ const ContractTypeList = () => {
 
   const datas = fndddata?.filter(item => item.lableType === "contract");  
 
-  // Open Add Job Modal
   const openAddSourcesModal = () => {
     setIsAddSourcesModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeAddSourcesModal = () => {
     setIsAddSourcesModalVisible(false);
   };
 
-  // Open Add Job Modal
   const openEditSourcesModal = () => {
     setIsEditSourcesModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeEditSourcesModal = () => {
     setIsEditSourcesModalVisible(false);
   };
 
-  // Open Add Job Modal
   const openViewSourcesModal = () => {
     setIsViewSourcesModalVisible(true);
   };
 
-  // Close Add Job Modal
   const closeViewSourcesModal = () => {
     setIsViewSourcesModalVisible(false);
   };
@@ -176,9 +170,7 @@ const ContractTypeList = () => {
             <DeleteOutlined className="text-xl" />
           </button>
         </div>
-        // <div className="text-center">
-        // 	<EllipsisDropdown menu={dropdownMenu(elm)} />
-        // </div>
+      
       ),
     },
   ];
@@ -223,25 +215,14 @@ const ContractTypeList = () => {
           >
            
           </Flex>
-          {/* <Flex gap="7px" className="flex">
-						<Button type="primary" className="ml-2" onClick={openAddPaymentModal}>
-							<PlusOutlined />
-							<span className="ml-2">New</span>
-						</Button>
-					</Flex> */}
+         
         </Flex>
         <div className="table-responsive">
           <Table
             columns={tableColumns}
             dataSource={list}
             rowKey="id"
-            // scroll={{x:1000}}
-            // rowSelection={{
-            // 	selectedRowKeys: selectedRowKeys,
-            // 	type: 'checkbox',
-            // 	preserveSelectedRowKeys: false,
-            // 	...rowSelection,
-            // }}
+           
           />
         </div>
       </Card>
