@@ -39,7 +39,7 @@ const EditDebitnote = ({ onClose, debitnoteData }) => {
 
   return (
     <div className="edit-debitnote-form">
-      <hr className="border-b-2 border-gray-300"></hr>
+      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

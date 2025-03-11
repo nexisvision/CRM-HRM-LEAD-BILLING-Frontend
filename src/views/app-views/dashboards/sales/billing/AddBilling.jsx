@@ -412,7 +412,7 @@ const AddBilling = ({ onClose }) => {
         <Card className="border-0">
 
           <Row gutter={16}>
-            <Col span={12} className="mt-1">
+            <Col span={12} className="">
               <Form.Item
                 label={<span>Vendor </span>}
                 name="vendor"
@@ -735,11 +735,11 @@ const AddBilling = ({ onClose }) => {
                   ))}
                 </tbody>
               </table>
-              <div className="form-buttons text-left mb-2 mt-2">
-                <Button type="primary" onClick={handleAddRow}>
-                  <PlusOutlined /> Add Items
-                </Button>
-              </div>
+              <div className="form-buttons text-left  mt-3">
+              <Button type="primary" onClick={handleAddRow}>
+                <PlusOutlined /> Add Items
+              </Button>
+            </div>
             </div>
           </div>
 

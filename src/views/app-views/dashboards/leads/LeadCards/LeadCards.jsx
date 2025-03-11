@@ -266,7 +266,7 @@ const LeadCards = () => {
 
   return (
     <div className="lead-board" style={{ padding: "24px" }}>
-      <div className="lead-board-header" style={{ marginBottom: "24px" }}>
+      <div className="lead-board-header" >
         <Select
           placeholder="Select Pipeline"
           style={{

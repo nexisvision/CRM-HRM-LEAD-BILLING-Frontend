@@ -789,11 +789,11 @@ const AddInvoice = ({ onClose }) => {
                   ))}
                 </tbody>
               </table>
-              <div className="form-buttons text-left mt-2">
-                <Button type="primary" onClick={handleAddRow}>
-                  <PlusOutlined /> Add Items
-                </Button>
-              </div>
+              <div className="form-buttons text-left mt-3">
+              <Button type="primary" onClick={handleAddRow}>
+                <PlusOutlined /> Add Items
+              </Button>
+            </div>
             </div>
           </div>
 

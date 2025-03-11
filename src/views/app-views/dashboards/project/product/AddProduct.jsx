@@ -156,10 +156,10 @@ const AddProduct = ({ idd, onClose }) => {
 
   return (
     <div className="add-expenses-form">
-      <hr style={{ marginBottom: "20px", border: "1px solid #E8E8E8" }} />
-      <Formik initialValues={initialValues}
-        validationSchema={validationSchema}
-        onSubmit={onSubmit}>
+      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <Formik initialValues={initialValues} 
+      validationSchema={validationSchema}
+       onSubmit={onSubmit}>
         {({ values, setFieldValue, handleSubmit, setFieldTouched }) => (
           <>
             <Form className="formik-form" onSubmit={handleSubmit}>

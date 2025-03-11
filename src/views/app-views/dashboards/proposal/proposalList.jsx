@@ -54,7 +54,8 @@ const ProposalList = () => {
   const fnddatas = allproposal?.proposal?.data;
 
 
-
+  const allempdata = useSelector((state) => state.Training);
+  const fnddata = allempdata.Training.data;
 
   useEffect(() => {
     dispatch(getpropos());
@@ -87,20 +88,21 @@ const ProposalList = () => {
 
 
 
-
   useEffect(() => {
     if (fnddatas) {
-      const filteredProposals = fnddatas.filter(proposal => proposal.created_by === user);
-
+      // Filter proposals by created_by matching the logged-in user's username
+      
       // Enrich filtered proposals with lead and deal titles
-      const enrichedData = filteredProposals.map((proposal) => {
-        const lead = Leads?.find((l) => l.id === proposal.lead_title); // Match lead by ID
+      const enrichedData = fnddatas.map((proposal) => {
+
+        const lead = Leads?.find((l) => l.id === proposal.lead_title);      
+        // Match lead by ID
         const deal = Deals?.find((d) => d.id === proposal.deal_title);
 
         return {
           ...proposal,
-          lead_title: lead?.leadTitle || "N/A", // Use `title` from Leads or fallback to "N/A"
-          deal_title: deal?.dealName || "N/A", // Use `title` from Deals or fallback to "N/A"
+          lead_title: lead?.leadTitle, // Use `title` from Leads or fallback to "N/A"
+          deal_title: deal?.dealName, // Use `title` from Deals or fallback to "N/A"
         };
       });
 
@@ -180,13 +182,15 @@ const ProposalList = () => {
     });
 
     const enrichedData = filteredData.map((proposal) => {
+      
       const lead = Leads?.find((l) => l.id === proposal.lead_title);
+      
       const deal = Deals?.find((d) => d.id === proposal.deal_title);
 
       return {
         ...proposal,
-        lead_title: lead?.leadTitle || "N/A",
-        deal_title: deal?.dealName || "N/A",
+        lead_title: lead?.leadTitle,
+        deal_title: deal?.dealName,
       };
     });
 

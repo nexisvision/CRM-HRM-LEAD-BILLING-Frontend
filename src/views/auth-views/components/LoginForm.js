@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { Button, Form, Input, Modal } from 'antd';
-import { MailOutlined, LockOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Divider, Modal, Checkbox } from 'antd';
+import { MailOutlined, LockOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 import {
 	signIn,
@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { useDispatch } from 'react-redux';
 import { autol, forgototp, forgotpass, resetpass, userLogin } from '../auth-reducers/UserSlice';
+import formbg from 'assets/form/login/formbg.png';
 
 const ForgotPasswordForm = ({ visible, onCancel }) => {
 	const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
@@ -45,7 +46,7 @@ const ForgotPasswordForm = ({ visible, onCancel }) => {
 			case 1:
 				return (
 					<Form.Item
-						name="email"
+						name="login"
 						rules={[
 							{ required: true, message: 'Please enter your email' },
 							{ type: 'email', message: 'Please enter a valid email' }
@@ -166,9 +167,8 @@ const ForgotPasswordForm = ({ visible, onCancel }) => {
 
 export const LoginForm = props => {
 	const dispatch = useDispatch();
-
 	const navigate = useNavigate();
-
+	const [form] = Form.useForm();
 
 	const {
 
@@ -181,7 +181,7 @@ export const LoginForm = props => {
 	} = props
 
 	const initialCredential = {
-		email: 'user1@themenate.net',
+		login: 'user1@themenate.net',
 		password: '2005ipo'
 	}
 
@@ -252,77 +252,119 @@ export const LoginForm = props => {
 	}, [allowRedirect, hideAuthMessage, navigate, redirect, showMessage, token]);
 
 	return (
-		<div className="bg-white rounded-2xl p-8 w-full max-w-md mx-auto ">
-			<div className="mb-6">
+		<div className="flex h-full">
+			{/* Left Section with Background Image */}
+			<div className="hidden lg:flex lg:w-1/2 relative bg-[#4169E1]">
+				<div className="absolute inset-0 flex flex-col p-12">
+					<div>
+						{/* Logo and Brand */}
+						<div className="flex items-center gap-2">
+							<div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+								<svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+									<path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#4169E1"/>
+								</svg>
+							</div>
+							<span className="text-white text-xl">Woorkroom</span>
+						</div>
 
+						{/* Main Content */}
+						<div className="mt-16">
+							<h1 className="text-white text-[28px] font-normal leading-tight">
+								Your place to work<br />
+								Plan. Create. Control.
+							</h1>
+						</div>
+
+						{/* Illustration */}
+						<div className="mt-12">
+							<img 
+								src={formbg} 
+								alt="workspace illustration" 
+								className="w-full max-w-[400px]"
+							/>
+						</div>
+					</div>
+				</div>
 			</div>
 
-			<Form
-				layout="vertical"
-				name="login-form"
-				initialValues={initialCredential}
-				onFinish={onLogin}
-				className="space-y-4"
-			>
-				<Form.Item
-					name="login"
-					label={
-						<span className="flex items-center">
-							<span className="text-red-500 mr-1"></span>
-							Email / Username / Phone
-						</span>
-					}
-					rules={[
-						{ required: true, message: 'Please input your email or username' },
-						{ type: 'text', message: 'Please enter a valid username or email' }
-					]}
-				>
-					<Input
-						prefix={<MailOutlined className="text-gray-400" />}
-						className="h-12 rounded-md"
-						placeholder="Enter your email"
-					/>
-				</Form.Item>
+			{/* Right Section */}
+			<div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12">
+				<div className="w-full max-w-[360px]">
+					<div className="mb-8">
+						<h1 className="text-2xl font-bold text-gray-900 mb-2">
+							Sign In to Woorkroom
+						</h1>
+					</div>
 
-				<Form.Item
-					name="password"
-					label={
-						<span className="flex items-center">
-							<span className="text-red-500 mr-1"></span>
-							Password
-						</span>
-					}
-					rules={[
-						{ required: true, message: 'Please input your password' }
-					]}
-				>
-					<Input.Password
-						prefix={<LockOutlined className="text-gray-400" />}
-						className="h-12 rounded-md"
-						placeholder="••••••••"
-					/>
-				</Form.Item>
-
-				<div className="flex justify-end -mt-2 mb-4">
-					<span
-						onClick={() => setForgotPasswordVisible(true)}
-						className="text-blue-600 hover:text-blue-700 cursor-pointer text-sm"
+					<Form
+						form={form}
+						name="login"
+						onFinish={onLogin}
+						layout="vertical"
+						className="space-y-5"
 					>
-						Forgot Password?
-					</span>
+						<Form.Item
+							name="login"
+							label={<span className="text-gray-700 font-medium">Email/Phone/Username</span>}
+							rules={[
+								{ required: true, message: 'Please input your email!' },
+								{ type: 'text', message: 'Please enter a valid email!' }
+							]}
+						>
+							<Input 
+								placeholder="youremail@gmail.com"
+								className="h-11 rounded-lg border-gray-200 hover:border-blue-500 focus:border-blue-500 transition-colors"
+							/>
+						</Form.Item>
+
+						<Form.Item
+							name="password"
+							label={<span className="text-gray-700 font-medium">Password</span>}
+							rules={[{ required: true, message: 'Please input your password!' }]}
+						>
+							<Input.Password
+								placeholder="••••••••"
+								className="h-11 rounded-lg border-gray-200 hover:border-blue-500 focus:border-blue-500 transition-colors"
+								iconRender={visible => (
+									visible ? 
+										<EyeOutlined className="text-gray-400" /> : 
+										<EyeInvisibleOutlined className="text-gray-400" />
+								)}
+							/>
+						</Form.Item>
+
+						<div className="flex items-center justify-between">
+							<Form.Item 
+								name="remember" 
+								valuePropName="checked" 
+								className="mb-0"
+							>
+								<Checkbox className="text-gray-600">
+									Remember me
+								</Checkbox>
+							</Form.Item>
+
+							<Button 
+								type="link" 
+								onClick={() => setForgotPasswordVisible(true)}
+								className="text-blue-600 hover:text-blue-700 font-medium p-0"
+							>
+								Forgot Password?
+							</Button>
+						</div>
+
+						<Button
+							type="primary"
+							htmlType="submit"
+							loading={loading}
+							className="w-full h-11 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium text-base flex items-center justify-center group"
+						>
+							<span>Sign In</span>
+							<span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+						</Button>
+					</Form>
 				</div>
-
-				<Form.Item className="mb-0">
-					<Button
-						type="primary"
-						htmlType="submit"
-						block
-						className="h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 rounded-md"
-					>
-						Sign In
-					</Button>
-				</Form.Item>
-			</Form>
+			</div>
 
 			<ForgotPasswordForm
 				visible={forgotPasswordVisible}

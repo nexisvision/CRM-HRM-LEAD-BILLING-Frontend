@@ -494,7 +494,7 @@ const EditBilling = ({ idd, onClose }) => {
         <h2 className="mb-2 border-b font-medium"></h2>
         <Card className="border-0">
           <Row gutter={16}>
-            <Col span={12} className="mt-1">
+            <Col span={12} className="">
               <Form.Item
                 label="Vendor"
                 name="vendor"
@@ -779,11 +779,11 @@ const EditBilling = ({ idd, onClose }) => {
                   ))}
                 </tbody>
               </table>
-              <div className="form-buttons text-left mt-2 mb-2">
-                <Button type="primary" onClick={handleAddRow}>
-                  <PlusOutlined /> Add Items
-                </Button>
-              </div>
+              <div className="form-buttons text-left mt-3">
+              <Button type="primary" onClick={handleAddRow}>
+                <PlusOutlined /> Add Items
+              </Button>
+            </div>
             </div>
           </div>
 

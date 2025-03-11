@@ -240,6 +240,11 @@ export const TicketList = () => {
       sorter: (a, b) => utils.antdTableSorter(a, b, "createdAt"),
     },
     {
+      title: "End Date",
+      dataIndex: "endDate",
+      render: (date) => dayjs(date).format(DATE_FORMAT_DD_MM_YYYY),
+    },
+    {
       title: "Priority",
       dataIndex: "priority",
       sorter: {

@@ -344,6 +344,7 @@ const AddLead = ({ onClose }) => {
 
   return (
     <div className="add-job-form">
+      
       <Formik
         initialValues={initialValues}
         onSubmit={handleSubmit}
@@ -361,9 +362,10 @@ const AddLead = ({ onClose }) => {
         }) => (
           <Form className="formik-form" onSubmit={handleSubmit}>
             <div className="pb-3 pr-3">
-              <h2 className="text-xl font-semibold text-gray-700">Create Lead</h2>
+                <h2 className="text-xl font-semibold text-gray-700">Create Lead</h2>
+                <h2 className="mb-3 border-b pb-1 font-medium"></h2>
             </div>
-            <hr className="mb-4" />
+            
             <div className="bg-white border rounded mb-3">
               <div className="border-b px-4 py-2">
                 <h4 className="text-base font-medium text-gray-700">Lead Information</h4>
@@ -580,7 +582,7 @@ const AddLead = ({ onClose }) => {
                                 } else {
                                   setFieldValue('phoneCode', value);
                                 }
-                              }}
+                              }}  
                               value={values.phoneCode}
                               dropdownStyle={{ minWidth: '180px' }}
                               suffixIcon={<span className="text-gray-400 text-xs">▼</span>}
