@@ -47,7 +47,7 @@ const AddAnnouncement = ({ onClose }) => {
       date: dateObj,
       time: formattedTime,
       branch: {
-        branches: values.branch  
+        branches: values.branch
       }
     };
 
@@ -68,7 +68,7 @@ const AddAnnouncement = ({ onClose }) => {
 
   return (
     <div className="add-attendance-form">
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
 
 
       <Formik

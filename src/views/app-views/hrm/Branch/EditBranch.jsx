@@ -78,7 +78,7 @@ const EditBranch = ({ idd, onClose }) => {
 
   return (
     <div className="add-employee">
- <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
 
       <Formik
         initialValues={initialValues}

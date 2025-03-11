@@ -53,7 +53,7 @@ const AddInterviewModal = ({ open, onCancel, onAddInterview, initialDate }) => {
       onCancel={onCancel}
       footer={null}
     >
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
       <Form form={form} onFinish={handleFinish} layout="vertical">
         <Form.Item
           name="job"

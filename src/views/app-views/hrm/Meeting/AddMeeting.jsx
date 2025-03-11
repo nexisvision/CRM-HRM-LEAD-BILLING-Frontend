@@ -76,7 +76,7 @@ const AddMeeting = ({ onClose }) => {
       endTime: values.endTime ? dayjs(values.endTime).format('HH:mm:ss') : null,
     };
 
-  
+
     dispatch(AddMeet(formattedValues))
       .then(() => {
         dispatch(MeetData())
@@ -125,7 +125,7 @@ const AddMeeting = ({ onClose }) => {
 
   return (
     <div className="add-job-form">
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

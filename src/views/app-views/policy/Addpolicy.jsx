@@ -70,7 +70,7 @@ const AddpolicyList = ({ onClose }) => {
 
   return (
     <div className="">
-      <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}

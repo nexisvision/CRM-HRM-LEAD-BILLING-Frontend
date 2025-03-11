@@ -174,7 +174,7 @@ const EditCompany = ({ comnyid, onClose }) => {
 
   return (
     <div className="edit-company-modal">
-       <h2 className="mb-3 border-b pb-1 font-medium"></h2>
+      <div className="mb-3 border-b pb-1 font-medium"></div>
       <div className="modal-body">
         <form onSubmit={formik.handleSubmit}>
           {/* Personal Information Section */}
