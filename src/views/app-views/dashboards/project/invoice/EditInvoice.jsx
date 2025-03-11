@@ -241,8 +241,6 @@ const EditInvoice = ({ idd, onClose, setFieldValue, values }) => {
                 };
               });
 
-              console.log("Formatted Items:", formattedItems);
-
               setTableData(formattedItems);
 
               const totalsData = {
@@ -314,14 +312,14 @@ const EditInvoice = ({ idd, onClose, setFieldValue, values }) => {
         ...values,
         issueDate: values.issueDate.format("YYYY-MM-DD"),
         dueDate: values.dueDate.format("YYYY-MM-DD"),
-        items: formattedItems,
+        items: JSON.stringify(itemsForDb),
         subtotal: totals.subtotal,
         discount: discountRate,
         discountType: discountType,
         discountValue: discountValue,
         tax: totals.totalTax,
         total: totals.finalTotal,
-        currency: selectedCurrencyDetails?.id
+        currency: values.currency
       };
 
       await dispatch(updateInvoice({ idd, data: invoiceData })).unwrap();
@@ -329,7 +327,7 @@ const EditInvoice = ({ idd, onClose, setFieldValue, values }) => {
       onClose();
       dispatch(getAllInvoices(id));
 
-    } catch (error) {
+    } catch (error) { 
       console.error("Error updating invoice:", error);
       message.error("Failed to update invoice");
     } finally {
